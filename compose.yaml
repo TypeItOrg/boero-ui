@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - path: .env.development
+      - path: .env.dev
         required: false
     environment:
       NEXT_TELEMETRY_DISABLED: "1"

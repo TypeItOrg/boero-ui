@@ -31,7 +31,7 @@ Staging and production prioritize deployable images:
 
 - `make staging` builds and runs the staging image.
 - `make prod` builds and runs the production image.
-- Each environment uses its own env file, for example `.env.staging` and `.env.production`.
+- Each environment uses its own env file, for example `.env.dev`, `.env.staging`, and `.env.prod`.
 - Public browser variables such as `NEXT_PUBLIC_API_URL` are supplied during image build because Next.js embeds `NEXT_PUBLIC_*` values into the client bundle at build time.
 
 ## Dockerfile Design

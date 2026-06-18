@@ -28,9 +28,9 @@
 - Create `compose.staging.yaml`: staging stack with staging env file and build args.
 - Create `compose.prod.yaml`: prod stack with production env file and build args.
 - Create `.env.example`: documented variables shared by all environments.
-- Create `.env.development.example`: development defaults.
+- Create `.env.dev.example`: dev defaults.
 - Create `.env.staging.example`: staging template.
-- Create `.env.production.example`: production template.
+- Create `.env.prod.example`: prod template.
 - Create `Makefile`: team-facing commands.
 - Modify `.gitignore`: keep real env files ignored while allowing env templates to be versioned.
 - Modify `package.json`: pin pnpm through `packageManager` for Corepack reproducibility.
@@ -194,7 +194,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - path: .env.development
+      - path: .env.dev
         required: false
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
@@ -251,7 +251,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - path: .env.production
+      - path: .env.prod
         required: false
     environment:
       NODE_ENV: production
@@ -271,9 +271,9 @@ Expected: normalized Compose config prints with service `dev` and container name
 **Files:**
 - Modify: `.gitignore`
 - Create: `.env.example`
-- Create: `.env.development.example`
+- Create: `.env.dev.example`
 - Create: `.env.staging.example`
-- Create: `.env.production.example`
+- Create: `.env.prod.example`
 
 **Interfaces:**
 - Consumes: Compose env loading from Task 3.
@@ -300,7 +300,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 
 - [ ] **Step 3: Add development env example**
 
-Create `.env.development.example` with:
+Create `.env.dev.example` with:
 
 ```dotenv
 NEXT_PUBLIC_API_URL=http://localhost:3000
@@ -316,7 +316,7 @@ NEXT_PUBLIC_API_URL=https://staging-api.example.com
 
 - [ ] **Step 5: Add production env example**
 
-Create `.env.production.example` with:
+Create `.env.prod.example` with:
 
 ```dotenv
 NEXT_PUBLIC_API_URL=https://api.example.com
@@ -324,13 +324,13 @@ NEXT_PUBLIC_API_URL=https://api.example.com
 
 - [ ] **Step 6: Create local dev env if absent**
 
-If `.env.development` does not exist, create it with:
+If `.env.dev` does not exist, create it with:
 
 ```dotenv
 NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Do not create `.env.staging` or `.env.production` with real secrets.
+Do not create `.env.staging` or `.env.prod` with real secrets.
 
 ---
 
@@ -361,7 +361,7 @@ staging:
 	$(COMPOSE) --env-file .env.staging -f compose.staging.yaml up --build staging
 
 prod:
-	$(COMPOSE) --env-file .env.production -f compose.prod.yaml up --build prod
+	$(COMPOSE) --env-file .env.prod -f compose.prod.yaml up --build prod
 
 down:
 	$(COMPOSE) down --remove-orphans
@@ -375,7 +375,7 @@ build-staging:
 	$(COMPOSE) --env-file .env.staging -f compose.staging.yaml build staging
 
 build-prod:
-	$(COMPOSE) --env-file .env.production -f compose.prod.yaml build prod
+	$(COMPOSE) --env-file .env.prod -f compose.prod.yaml build prod
 
 clean:
 	$(COMPOSE) down --volumes --remove-orphans
@@ -419,10 +419,10 @@ Local Node.js and pnpm are not required for the default development workflow.
 
 ## Development
 
-Copy the development env template once:
+Copy the dev env template once:
 
 ```bash
-cp .env.development.example .env.development
+cp .env.dev.example .env.dev
 ```
 
 Start the frontend:
@@ -447,7 +447,7 @@ Create the environment files from the templates before running these commands:
 
 ```bash
 cp .env.staging.example .env.staging
-cp .env.production.example .env.production
+cp .env.prod.example .env.prod
 ```
 
 Run staging locally:
@@ -506,6 +506,6 @@ Expected: lint passes.
 
 - [ ] **Step 6: Review final diff**
 
-Run: `git diff -- Dockerfile .dockerignore compose.yaml compose.staging.yaml compose.prod.yaml Makefile next.config.ts README.md package.json .gitignore .env.example .env.development.example .env.staging.example .env.production.example docs/superpowers/specs/2026-06-18-dockerization-design.md docs/superpowers/plans/2026-06-18-dockerization.md`
+Run: `git diff -- Dockerfile .dockerignore compose.yaml compose.staging.yaml compose.prod.yaml Makefile next.config.ts README.md package.json .gitignore .env.example .env.dev.example .env.staging.example .env.prod.example docs/superpowers/specs/2026-06-18-dockerization-design.md docs/superpowers/plans/2026-06-18-dockerization.md`
 
 Expected: diff contains only the Dockerization changes described in this plan.

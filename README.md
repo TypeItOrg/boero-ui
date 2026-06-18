@@ -12,10 +12,10 @@ Local Node.js and pnpm are not required for the default development workflow.
 
 ## Development
 
-Copy the development env template once:
+Copy the dev env template once:
 
 ```bash
-cp .env.development.example .env.development
+cp .env.dev.example .env.dev
 ```
 
 Start the frontend:
@@ -41,7 +41,7 @@ Create the environment files from the templates before running these commands:
 
 ```bash
 cp .env.staging.example .env.staging
-cp .env.production.example .env.production
+cp .env.prod.example .env.prod
 ```
 
 Run staging locally:

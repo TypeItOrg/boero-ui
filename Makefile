@@ -11,7 +11,7 @@ staging:
 	$(COMPOSE) --env-file .env.staging -f compose.staging.yaml up --build staging
 
 prod:
-	$(COMPOSE) --env-file .env.production -f compose.prod.yaml up --build prod
+	$(COMPOSE) --env-file .env.prod -f compose.prod.yaml up --build prod
 
 down:
 	$(COMPOSE) down --remove-orphans
@@ -25,7 +25,7 @@ build-staging:
 	$(COMPOSE) --env-file .env.staging -f compose.staging.yaml build staging
 
 build-prod:
-	$(COMPOSE) --env-file .env.production -f compose.prod.yaml build prod
+	$(COMPOSE) --env-file .env.prod -f compose.prod.yaml build prod
 
 clean:
 	$(COMPOSE) down --volumes --remove-orphans
