@@ -1,0 +1,17 @@
+services:
+  staging:
+    container_name: boero-ui-staging
+    build:
+      context: .
+      target: prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required at build time}
+    image: boero-ui:staging
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env.staging
+        required: false
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"

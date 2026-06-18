@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Boero UI
 
-## Getting Started
+Next.js frontend for Boero UI.
 
-First, run the development server:
+## Requirements
+
+- Docker
+- Docker Compose v2
+- Make
+
+Local Node.js and pnpm are not required for the default development workflow.
+
+## Development
+
+Copy the development env template once:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.development.example .env.development
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Start the frontend:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+make
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This runs the same command as:
 
-## Learn More
+```bash
+make dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open http://localhost:3000.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Staging And Production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Public `NEXT_PUBLIC_*` variables are embedded into the browser bundle during `next build`, so staging and production are built separately.
+When adding a new public variable, add it to the Dockerfile build args and the staging/production Compose build args as well.
 
-## Deploy on Vercel
+Create the environment files from the templates before running these commands:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cp .env.staging.example .env.staging
+cp .env.production.example .env.production
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Run staging locally:
+
+```bash
+make staging
+```
+
+Run prod locally:
+
+```bash
+make prod
+```
+
+Build images without starting containers:
+
+```bash
+make build-staging
+make build-prod
+```
+
+## Useful Commands
+
+```bash
+make down
+make logs
+make clean
+```
+
+`make clean` removes Docker-managed volumes for this project, including cached dependencies.

@@ -1,0 +1,17 @@
+services:
+  prod:
+    container_name: boero-ui-prod
+    build:
+      context: .
+      target: prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required at build time}
+    image: boero-ui:prod
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env.production
+        required: false
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"

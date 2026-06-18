@@ -1,0 +1,23 @@
+services:
+  dev:
+    container_name: boero-ui-dev
+    build:
+      context: .
+      target: dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env.development
+        required: false
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - pnpm_store:/pnpm/store
+      - next_cache:/app/.next
+
+volumes:
+  node_modules:
+  pnpm_store:
+  next_cache:
