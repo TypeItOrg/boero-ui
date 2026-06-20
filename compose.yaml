@@ -11,6 +11,7 @@ services:
         required: false
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
+      CI: "true"
     volumes:
       - .:/app
       - node_modules:/app/node_modules
