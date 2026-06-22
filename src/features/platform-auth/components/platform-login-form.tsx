@@ -15,7 +15,10 @@ import type { PlatformLoginActionState } from "@features/platform-auth/types/pla
 const INITIAL_STATE: PlatformLoginActionState = {};
 
 export function PlatformLoginForm() {
-  const [state, formAction] = useActionState(loginPlatform, INITIAL_STATE);
+  const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(
+    loginPlatform,
+    INITIAL_STATE,
+  );
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {

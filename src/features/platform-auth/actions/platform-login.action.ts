@@ -2,15 +2,13 @@
 
 import { redirect } from "next/navigation";
 
-import type { ZodIssue } from "zod";
-
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
 import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 function getFieldErrors(
-  issues: ZodIssue[],
+  issues: Array<{ path: PropertyKey[]; message: string }>,
 ): NonNullable<PlatformLoginActionState["fieldErrors"]> {
   const fieldErrors: NonNullable<PlatformLoginActionState["fieldErrors"]> = {};
 
