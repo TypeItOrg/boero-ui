@@ -7,9 +7,3 @@ export const platformLoginSchema = z.object({
     .check(z.email({ message: "Ingresá un correo válido." })),
   password: z.string().min(1, "La contraseña es requerida."),
 });
-
-export type PlatformLoginActionState = {
-  error?: string;
-  errors?: string[];
-  fields?: Array<"email" | "password">;
-};

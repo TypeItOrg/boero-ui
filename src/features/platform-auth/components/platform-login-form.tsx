@@ -4,13 +4,22 @@ import type { FormEvent } from "react";
 import { useActionState, useTransition } from "react";
 
 import { AlertCircleIcon } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { loginPlatform } from "./actions";
-import type { PlatformLoginActionState } from "./schema";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@common/components/ui/alert";
+import { Button } from "@common/components/ui/button";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+} from "@common/components/ui/field";
+import { Input } from "@common/components/ui/input";
+import { PasswordInput } from "@common/components/ui/password-input";
+
+import { loginPlatform } from "../actions/platform-login-actions";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
 
 const initialState: PlatformLoginActionState = {};
 
@@ -31,8 +40,12 @@ export function PlatformLoginForm() {
       <header className="space-y-1 text-center">
         <h1 className="text-2xl font-bold">Bienvenido de nuevo</h1>
         <p className="text-muted-foreground text-sm">
-          <span className="hidden md:block">Ingresá tus credenciales para acceder a tu cuenta.</span>
-          <span className="md:hidden">Ingresá tus credenciales para continuar.</span>
+          <span className="hidden md:block">
+            Ingresá tus credenciales para acceder a tu cuenta.
+          </span>
+          <span className="md:hidden">
+            Ingresá tus credenciales para continuar.
+          </span>
         </p>
       </header>
 
@@ -60,7 +73,6 @@ export function PlatformLoginForm() {
               id="email"
               name="email"
               placeholder="correo@ejemplo.com"
-              // type="email"
             />
           </Field>
         </FieldGroup>
@@ -78,7 +90,13 @@ export function PlatformLoginForm() {
         </FieldGroup>
 
         <footer className="mt-6 flex w-full flex-col gap-4">
-          <Button variant="default" type="submit" size="lg" className="w-full" disabled={isPending}>
+          <Button
+            variant="default"
+            type="submit"
+            size="lg"
+            className="w-full"
+            disabled={isPending}
+          >
             {isPending ? "Ingresando..." : "Iniciar sesión"}
           </Button>
         </footer>

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { getPlatformAccount } from "@/lib/platform-auth";
-import { PlatformLoginForm } from "./platform-login-form";
+import { Card, CardContent } from "@common/components/ui/card";
+import { getPlatformAccount } from "@features/platform-auth/services/platform-auth-services";
+import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
