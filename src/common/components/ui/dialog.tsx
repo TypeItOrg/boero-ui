@@ -3,8 +3,8 @@
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@common/lib/utils";
+import { Button } from "@common/components/ui/button";
 import { XIcon } from "lucide-react";
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
