@@ -40,7 +40,7 @@ export function PlatformLoginForm() {
         {state.error ? (
           <Alert variant="destructive">
             <AlertCircleIcon className="size-4" />
-            <AlertTitle>Ups... algo salió mal</AlertTitle>
+            <AlertTitle>¡Ups! Algo salió mal</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pl-4">
                 {(state.errors ?? [state.error]).map((message, index) => (
@@ -55,13 +55,12 @@ export function PlatformLoginForm() {
           <Field>
             <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
             <Input
+              aria-invalid={state.fields?.includes("email")}
+              autoComplete="email"
               id="email"
               name="email"
-              type="email"
               placeholder="correo@ejemplo.com"
-              autoComplete="email"
-              required
-              aria-invalid={state.fields?.includes("email")}
+              // type="email"
             />
           </Field>
         </FieldGroup>
@@ -70,11 +69,10 @@ export function PlatformLoginForm() {
           <Field>
             <FieldLabel htmlFor="password">Contraseña</FieldLabel>
             <PasswordInput
+              aria-invalid={state.fields?.includes("password")}
+              autoComplete="current-password"
               id="password"
               name="password"
-              autoComplete="current-password"
-              required
-              aria-invalid={state.fields?.includes("password")}
             />
           </Field>
         </FieldGroup>
