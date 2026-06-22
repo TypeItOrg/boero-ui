@@ -18,12 +18,12 @@ export function PlatformLoginForm() {
   const [state, formAction] = useActionState(loginPlatform, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
+  function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
     startTransition(() => formAction(formData));
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
@@ -40,13 +40,7 @@ export function PlatformLoginForm() {
           <Alert variant="destructive">
             <AlertCircleIcon className="size-4" />
             <AlertTitle>¡Ups! Algo salió mal</AlertTitle>
-            <AlertDescription>
-              <ul className="list-disc pl-4">
-                {(state.errors ?? [state.error]).map((message, index) => (
-                  <li key={index}>{message}</li>
-                ))}
-              </ul>
-            </AlertDescription>
+            <AlertDescription>{state.error}</AlertDescription>
           </Alert>
         ) : null}
 
@@ -54,12 +48,15 @@ export function PlatformLoginForm() {
           <Field>
             <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
             <Input
-              aria-invalid={state.fields?.includes("email")}
+              aria-invalid={!!state.fieldErrors?.email}
               autoComplete="email"
               id="email"
               name="email"
               placeholder="correo@ejemplo.com"
             />
+            {state.fieldErrors?.email ? (
+              <p className="text-destructive text-sm">{state.fieldErrors.email}</p>
+            ) : null}
           </Field>
         </FieldGroup>
 
@@ -67,11 +64,14 @@ export function PlatformLoginForm() {
           <Field>
             <FieldLabel htmlFor="password">Contraseña</FieldLabel>
             <PasswordInput
-              aria-invalid={state.fields?.includes("password")}
+              aria-invalid={!!state.fieldErrors?.password}
               autoComplete="current-password"
               id="password"
               name="password"
             />
+            {state.fieldErrors?.password ? (
+              <p className="text-destructive text-sm">{state.fieldErrors.password}</p>
+            ) : null}
           </Field>
         </FieldGroup>
 
