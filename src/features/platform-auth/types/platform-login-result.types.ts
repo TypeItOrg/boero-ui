@@ -1,4 +1,4 @@
-import type { PlatformAccount } from "./platform-account-types";
+import type { PlatformAccount } from "./platform-account.types";
 
 export type PlatformLoginResult = {
   account: PlatformAccount;

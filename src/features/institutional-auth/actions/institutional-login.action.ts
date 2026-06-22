@@ -1,13 +1,13 @@
 "use server";
 
-import { institutionalRegisterSchema } from "../schemas/institutional-register-schema";
-import type { InstitutionalRegisterActionState } from "../types/institutional-register-state-types";
+import { institutionalLoginSchema } from "../schemas/institutional-login.schema";
+import type { InstitutionalLoginActionState } from "../types/institutional-login-state.types";
 
-export async function registerInstitutional(
-  _previousState: InstitutionalRegisterActionState,
+export async function loginInstitutional(
+  _previousState: InstitutionalLoginActionState,
   formData: FormData,
-): Promise<InstitutionalRegisterActionState> {
-  const parsed = institutionalRegisterSchema.safeParse({
+): Promise<InstitutionalLoginActionState> {
+  const parsed = institutionalLoginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });

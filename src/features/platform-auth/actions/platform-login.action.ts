@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 
-import { platformLoginSchema } from "../schemas/platform-login-schema";
-import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
-import { loginPlatformAccount } from "../services/platform-auth-services";
-import { setPlatformAuthCookies } from "../cookies/platform-auth-cookies";
+import { platformLoginSchema } from "../schemas/platform-login.schema";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
+import { loginPlatformAccount } from "../services/platform-auth.service";
+import { setPlatformAuthCookies } from "../utils/platform-auth-cookies.util";
 
 export async function loginPlatform(
   _previousState: PlatformLoginActionState,

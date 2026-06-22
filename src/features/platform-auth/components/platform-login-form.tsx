@@ -18,8 +18,8 @@ import {
 import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
 
-import { loginPlatform } from "../actions/platform-login-actions";
-import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
+import { loginPlatform } from "../actions/platform-login.action";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
 
 const initialState: PlatformLoginActionState = {};
 

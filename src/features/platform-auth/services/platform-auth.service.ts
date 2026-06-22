@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 
-import type { BackendError } from "../types/backend-error-types";
-import type { PlatformAccount } from "../types/platform-account-types";
-import type { PlatformLoginInput } from "../types/platform-login-input-types";
-import type { PlatformLoginResult } from "../types/platform-login-result-types";
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "../cookies/platform-auth-cookies";
+import type { BackendError } from "../types/backend-error.types";
+import type { PlatformAccount } from "../types/platform-account.types";
+import type { PlatformLoginInput } from "../types/platform-login-input.types";
+import type { PlatformLoginResult } from "../types/platform-login-result.types";
+import { PLATFORM_ACCESS_TOKEN_COOKIE } from "../utils/platform-auth-cookies.util";
 
 const apiUrl = process.env.BOERO_API_URL ?? "http://localhost:8080";
 
