@@ -557,7 +557,7 @@ import { cn } from "@/lib/utils";
 →
 
 ```ts
-import { cn } from "@common/lib/utils";
+import { cn } from "@common/utils/cn.util";
 ```
 
 - [ ] **Step 3: Commit**

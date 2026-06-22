@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
-import { loginPlatformAccount } from "@features/platform-auth/utils/login-platform-account.util";
+import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 export async function loginPlatform(

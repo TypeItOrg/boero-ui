@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import type { PlatformLoginResult } from "../types/platform-login-result.types";
+import type { PlatformLoginResult } from "@features/platform-auth/types/platform-login-result.types";
 
 export const PLATFORM_ACCESS_TOKEN_COOKIE = "platform_access_token";
 export const PLATFORM_REFRESH_TOKEN_COOKIE = "platform_refresh_token";

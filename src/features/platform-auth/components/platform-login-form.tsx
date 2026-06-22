@@ -12,18 +12,17 @@ import { PasswordInput } from "@common/components/ui/password-input";
 import { loginPlatform } from "@features/platform-auth/actions/platform-login.action";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
 
-const initialState: PlatformLoginActionState = {};
+const INITIAL_STATE: PlatformLoginActionState = {};
 
 export function PlatformLoginForm() {
-  const [state, formAction] = useActionState(loginPlatform, initialState);
+  const [state, formAction] = useActionState(loginPlatform, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    startTransition(() => {
-      formAction(formData);
-    });
+
+    startTransition(() => formAction(formData));
   };
 
   return (
