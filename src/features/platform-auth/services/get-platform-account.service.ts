@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
-const apiUrl = process.env.BOERO_API_URL ?? "http://172.17.0.1:8080";
+const API_URL = process.env.BOERO_API_URL ?? "http://172.17.0.1:8080";
 
 export async function getPlatformAccount(): Promise<PlatformAccount | null> {
   const cookieStore = await cookies();
@@ -11,7 +11,7 @@ export async function getPlatformAccount(): Promise<PlatformAccount | null> {
 
   if (!accessToken) return null;
 
-  const response = await fetch(`${apiUrl}/api/v1/auth/platform/me`, {
+  const response = await fetch(`${API_URL}/api/v1/auth/platform/me`, {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
