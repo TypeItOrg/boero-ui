@@ -1,4 +1,4 @@
-import { getBackendMessage } from "@/common/utils/get-backend-message.util";
+import { getBackendMessage } from "@common/lib/get-backend-message.util";
 
 import type { BackendError } from "../types/backend-error.types";
 import type { PlatformLoginInput } from "../types/platform-login-input.types";
