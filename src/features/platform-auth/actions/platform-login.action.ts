@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 
-import { platformLoginSchema } from "../schemas/platform-login.schema";
-import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
-import { loginPlatformAccount } from "../utils/login-platform-account.util";
-import { setPlatformAuthCookies } from "../utils/platform-auth-cookies.util";
+import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
+import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
+import { loginPlatformAccount } from "@features/platform-auth/utils/login-platform-account.util";
+import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 export async function loginPlatform(
   _previousState: PlatformLoginActionState,
@@ -20,16 +20,9 @@ export async function loginPlatform(
     const errors = parsed.error.issues.map((issue) => issue.message);
     const fields = parsed.error.issues
       .map((issue) => issue.path[0])
-      .filter(
-        (field): field is "email" | "password" =>
-          field === "email" || field === "password",
-      );
+      .filter((field): field is "email" | "password" => field === "email" || field === "password");
 
-    return {
-      error: errors[0] ?? "Revisá los datos ingresados.",
-      errors,
-      fields,
-    };
+    return { error: errors[0], errors, fields };
   }
 
   try {
@@ -37,8 +30,7 @@ export async function loginPlatform(
     await setPlatformAuthCookies(result.tokens);
   } catch (error) {
     return {
-      error:
-        error instanceof Error ? error.message : "No pudimos iniciar sesión.",
+      error: error instanceof Error ? error.message : "Hubo un error al iniciar sesión.",
     };
   }
 

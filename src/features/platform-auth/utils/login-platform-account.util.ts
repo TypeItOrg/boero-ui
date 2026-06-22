@@ -6,9 +6,7 @@ import type { PlatformLoginResult } from "../types/platform-login-result.types";
 
 const apiUrl = process.env.BOERO_API_URL ?? "http://localhost:8080";
 
-export async function loginPlatformAccount(
-  input: PlatformLoginInput,
-): Promise<PlatformLoginResult> {
+export async function loginPlatformAccount(input: PlatformLoginInput): Promise<PlatformLoginResult> {
   const response = await fetch(`${apiUrl}/api/v1/auth/platform/login`, {
     method: "POST",
     headers: {

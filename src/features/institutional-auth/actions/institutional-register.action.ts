@@ -16,10 +16,7 @@ export async function registerInstitutional(
     const errors = parsed.error.issues.map((issue) => issue.message);
     const fields = parsed.error.issues
       .map((issue) => issue.path[0])
-      .filter(
-        (field): field is "email" | "password" =>
-          field === "email" || field === "password",
-      );
+      .filter((field): field is "email" | "password" => field === "email" || field === "password");
 
     return {
       error: errors[0] ?? "Revisá los datos ingresados.",
