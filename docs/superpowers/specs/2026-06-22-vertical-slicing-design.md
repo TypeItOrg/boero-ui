@@ -78,8 +78,8 @@ src/
         button.tsx
         card.tsx
         ...
-    lib/
-      utils.ts
+    utils/
+      cn.util.ts
       get-backend-message.util.ts
 ```
 
@@ -122,7 +122,7 @@ Actualizar `tsconfig.json` para reflejar la nueva estructura:
 ### Shared/common boundaries
 
 - Componentes UI genéricos (Button, Input, Card, etc.) van a `common/components/ui/`.
-- Utilidades puras (`cn`, helpers) van a `common/lib/`.
+- Utilidades puras (`cn`, helpers) van a `common/utils/`.
 - Cualquier código que no pertenezca a una feature específica vive en `common/`.
 
 ## Decisions
@@ -134,7 +134,7 @@ Actualizar `tsconfig.json` para reflejar la nueva estructura:
 5. **Sufijo por capa con punto**: nombres explícitos que indican la responsabilidad del archivo (`*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`, `*.types.ts`).
 6. **Sin carpeta `cookies`**: el manejo de cookies vive en `utils/` como una utilidad más.
 7. **`services/` para interacciones con backend**: funciones que hacen fetch al backend se agrupan en `services/`, incluso si al principio son pocas.
-8. **Utilidades compartidas en `common/lib/`**: funciones genéricas como `getBackendMessage` viven en `common/lib/`.
+8. **Utilidades compartidas en `common/utils/`**: funciones genéricas como `getBackendMessage` viven en `common/utils/`.
 
 ## Migration scope
 
@@ -142,14 +142,14 @@ Archivos a mover/renombrar:
 
 - `app/` → `src/app/`
 - `components/ui/` → `src/common/components/ui/`
-- `lib/utils.ts` → `src/common/lib/utils.ts`
+- `lib/utils.ts` → `src/common/utils/cn.util.ts`
 - `lib/auth-cookies.ts` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
 - `lib/platform-auth.ts`:
   - types → `src/features/platform-auth/types/`
   - `loginPlatformAccount` → `src/features/platform-auth/services/login-platform-account.service.ts`
   - `getPlatformAccount` → `src/features/platform-auth/services/get-platform-account.service.ts`
   - `setPlatformAuthCookies` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
-  - `getBackendMessage` → `src/common/lib/get-backend-message.util.ts`
+  - `getBackendMessage` → `src/common/utils/get-backend-message.util.ts`
 - `app/auth/platform/login/schema.ts` → `src/features/platform-auth/schemas/platform-login.schema.ts`
 - `app/auth/platform/login/actions.ts` → `src/features/platform-auth/actions/platform-login.action.ts`
 - `app/auth/platform/login/platform-login-form.tsx` → `src/features/platform-auth/components/platform-login-form.tsx`

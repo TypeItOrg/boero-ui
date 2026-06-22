@@ -14,9 +14,9 @@
   "rtl": false,
   "aliases": {
     "components": "@common/components",
-    "utils": "@common/lib/utils",
+    "utils": "@common/utils/cn.util",
     "ui": "@common/components/ui",
-    "lib": "@common/lib",
+    "lib": "@common/utils",
     "hooks": "@common/hooks"
   },
   "menuColor": "default",

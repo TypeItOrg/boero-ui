@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
-> **Note:** This plan was executed with refinements: backend fetch functions live in `services/`, local helpers in `utils/`, shared helpers like `getBackendMessage` in `common/lib/`, and the layer suffix uses dots (e.g. `*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`). See the final state in `docs/superpowers/specs/2026-06-22-vertical-slicing-design.md`.
+> **Note:** This plan was executed with refinements: backend fetch functions live in `services/`, local helpers in `utils/`, shared helpers like `getBackendMessage` in `common/utils/`, and the layer suffix uses dots (e.g. `*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`). See the final state in `docs/superpowers/specs/2026-06-22-vertical-slicing-design.md`.
 
 **Goal:** Reorganizar `boero-ui` en una arquitectura de vertical slicing con `src/app/` para routing, `src/features/<feature>/` para dominio y `src/common/` para código compartido.
 
@@ -17,7 +17,7 @@
 - Nombres de archivos con sufijo por capa (dot-separated): `.schema.ts`, `.action.ts`, `.types.ts`, `.service.ts`, `.util.ts`, `-form.tsx`.
 - `services/` para funciones que interactúan con backend/APIs externas.
 - `utils/` para helpers locales, puras o de infraestructura (cookies, parseo, etc.).
-- Helpers compartidos (como `getBackendMessage`) van en `common/lib/`.
+- Helpers compartidos (como `getBackendMessage`) van en `common/utils/`.
 - `src/app/` solo contiene routing/pages/layouts de Next.js.
 - `src/common/` solo contiene código compartido cross-cutting.
 - No cambiar comportamiento funcional; solo mover y renombrar.
@@ -50,11 +50,11 @@ mkdir -p src/common/components
 git mv components/ui src/common/components/ui
 ```
 
-- [ ] **Step 3: Crear `src/common/lib/` y mover `lib/utils.ts`**
+- [ ] **Step 3: Crear `src/common/utils/` y mover `lib/utils.ts`**
 
 ```bash
-mkdir -p src/common/lib
-git mv lib/utils.ts src/common/lib/utils.ts
+mkdir -p src/common/utils
+git mv lib/utils.ts src/common/utils/cn.util.ts
 ```
 
 - [ ] **Step 4: Actualizar `tsconfig.json` paths**
@@ -543,7 +543,7 @@ import { Button } from "@/components/ui/button";
 import { Button } from "@common/components/ui/button";
 ```
 
-- [ ] **Step 2: Buscar imports a `@/lib/utils` y reemplazarlos por `@common/lib/utils`**
+- [ ] **Step 2: Buscar imports a `@/lib/utils` y reemplazarlos por `@common/utils/cn.util`**
 
 Archivos a revisar:
 
