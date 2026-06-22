@@ -5,7 +5,7 @@ import { AlertCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
 
@@ -54,7 +54,7 @@ export function PlatformLoginForm() {
               name="email"
               placeholder="correo@ejemplo.com"
             />
-            {state.fieldErrors?.email ? <p className="text-destructive text-sm">{state.fieldErrors.email}</p> : null}
+            <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
           </Field>
         </FieldGroup>
 
@@ -67,9 +67,7 @@ export function PlatformLoginForm() {
               id="password"
               name="password"
             />
-            {state.fieldErrors?.password ? (
-              <p className="text-destructive text-sm">{state.fieldErrors.password}</p>
-            ) : null}
+            <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
           </Field>
         </FieldGroup>
 
