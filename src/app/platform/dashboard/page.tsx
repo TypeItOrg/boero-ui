@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
-import { getPlatformAccount } from "@features/platform-auth/services/platform-auth.service";
+import { getPlatformAccount } from "@features/platform-auth/utils/get-platform-account.util";
 
 export default async function PlatformDashboardPage() {
   const account = await getPlatformAccount();

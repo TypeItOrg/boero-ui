@@ -3,7 +3,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Card, CardContent } from "@common/components/ui/card";
-import { getPlatformAccount } from "@features/platform-auth/services/platform-auth.service";
+import { getPlatformAccount } from "@features/platform-auth/utils/get-platform-account.util";
 import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
 
 export const metadata: Metadata = {
