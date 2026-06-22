@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@/lib/auth-cookies";
+import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/cookies/platform-auth-cookies";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
