@@ -1,10 +1,12 @@
 # Vertical Slicing Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Note:** This plan was executed with a late refinement: the `services/` folder was removed in favor of `utils/`, shared helpers like `getBackendMessage` moved to `common/lib/`, and the layer suffix uses dots (e.g. `*.schema.ts`, `*.action.ts`, `*.util.ts`). See the final state in `docs/superpowers/specs/2026-06-22-vertical-slicing-design.md`.
 
 **Goal:** Reorganizar `boero-ui` en una arquitectura de vertical slicing con `src/app/` para routing, `src/features/<feature>/` para dominio y `src/common/` para código compartido.
 
-**Architecture:** Mover toda la aplicación bajo `src/`, separar las features `platform-auth` e `institutional-auth` en slices verticales con sus propios componentes, schemas, actions, types, services y utils, y centralizar componentes UI/utilidades en `src/common/`.
+**Architecture:** Mover toda la aplicación bajo `src/`, separar las features `platform-auth` e `institutional-auth` en slices verticales con sus propios componentes, schemas, actions, types y utils, y centralizar componentes UI/utilidades en `src/common/`.
 
 **Tech Stack:** Next.js 16, React 19, TypeScript, Zod 4, Tailwind CSS, shadcn/ui.
 
@@ -12,7 +14,9 @@
 
 - Cada archivo debe tener una única responsabilidad clara.
 - Tipos/interfaces: una definición por archivo.
-- Nombres de archivos con sufijo por capa: `-schema.ts`, `-actions.ts`, `-types.ts`, `-services.ts`, `-cookies.ts`, `-form.tsx`.
+- Nombres de archivos con sufijo por capa (dot-separated): `.schema.ts`, `.action.ts`, `.types.ts`, `.util.ts`, `-form.tsx`.
+- Sin carpeta `services`: preferir `utils/` con archivos específicos.
+- Helpers compartidos (como `getBackendMessage`) van en `common/lib/`.
 - `src/app/` solo contiene routing/pages/layouts de Next.js.
 - `src/common/` solo contiene código compartido cross-cutting.
 - No cambiar comportamiento funcional; solo mover y renombrar.
