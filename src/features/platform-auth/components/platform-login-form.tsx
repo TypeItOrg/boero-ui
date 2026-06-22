@@ -15,10 +15,7 @@ import type { PlatformLoginActionState } from "@features/platform-auth/types/pla
 const INITIAL_STATE: PlatformLoginActionState = {};
 
 export function PlatformLoginForm() {
-  const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(
-    loginPlatform,
-    INITIAL_STATE,
-  );
+  const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(loginPlatform, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -57,9 +54,7 @@ export function PlatformLoginForm() {
               name="email"
               placeholder="correo@ejemplo.com"
             />
-            {state.fieldErrors?.email ? (
-              <p className="text-destructive text-sm">{state.fieldErrors.email}</p>
-            ) : null}
+            {state.fieldErrors?.email ? <p className="text-destructive text-sm">{state.fieldErrors.email}</p> : null}
           </Field>
         </FieldGroup>
 

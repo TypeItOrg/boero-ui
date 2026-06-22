@@ -2,34 +2,13 @@
 
 import { redirect } from "next/navigation";
 
+import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
+import { PLATFORM_LOGIN_FIELD_NAMES } from "@features/platform-auth/types/platform-login-action-state.types";
 import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
-
-function getFieldErrors(
-  issues: Array<{ path: PropertyKey[]; message: string }>,
-): NonNullable<PlatformLoginActionState["fieldErrors"]> {
-  const fieldErrors: NonNullable<PlatformLoginActionState["fieldErrors"]> = {};
-
-  for (const issue of issues) {
-    const field = issue.path[0];
-    if (field === "email" || field === "password") {
-      fieldErrors[field] = issue.message;
-    }
-  }
-
-  return fieldErrors;
-}
-
-function pickFieldErrors(
-  fieldErrors: Record<string, string> | undefined,
-): NonNullable<PlatformLoginActionState["fieldErrors"]> {
-  return {
-    email: fieldErrors?.email,
-    password: fieldErrors?.password,
-  };
-}
 
 export async function loginPlatform(
   _previousState: PlatformLoginActionState,
@@ -41,14 +20,18 @@ export async function loginPlatform(
   });
 
   if (!parsed.success) {
-    return { fieldErrors: getFieldErrors(parsed.error.issues) };
+    return {
+      fieldErrors: getFieldErrors(parsed.error.issues, PLATFORM_LOGIN_FIELD_NAMES),
+    };
   }
 
   const output = await loginPlatformAccount(parsed.data);
 
   if (!output.success) {
     if (output.error.fieldErrors) {
-      return { fieldErrors: pickFieldErrors(output.error.fieldErrors) };
+      return {
+        fieldErrors: pickFieldErrors(output.error.fieldErrors, PLATFORM_LOGIN_FIELD_NAMES),
+      };
     }
 
     return { error: output.error.message };
