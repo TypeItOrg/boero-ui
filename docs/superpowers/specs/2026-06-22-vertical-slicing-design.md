@@ -65,10 +65,11 @@ src/
         platform-login-input.types.ts
         platform-login-action-state.types.ts
         backend-error.types.ts
+      services/
+        login-platform-account.service.ts
+        get-platform-account.service.ts
       utils/
         platform-auth-cookies.util.ts
-        login-platform-account.util.ts
-        get-platform-account.util.ts
 
   common/                       # Cross-cutting/shared code
     components/
@@ -79,6 +80,7 @@ src/
         ...
     lib/
       utils.ts
+      get-backend-message.util.ts
 ```
 
 ### Naming conventions
@@ -88,9 +90,11 @@ src/
   - Schemas: `<name>.schema.ts`
   - Actions: `<name>.action.ts`
   - Types: `<name>.types.ts`
+  - Services: `<name>.service.ts`
   - Utils: `<name>.util.ts`
   - Components: `<name>-form.tsx`, `<name>-button.tsx`
-- **No `services/` folder**: preferir `utils/` con archivos pequeños y específicos.
+- **Services para interacciones con backend**: funciones que hacen fetch a APIs externas van en `services/`.
+- **Utils para helpers locales**: funciones puras o de infraestructura local (cookies, parseo, etc.) van en `utils/`.
 
 ### Path aliases
 
@@ -127,9 +131,10 @@ Actualizar `tsconfig.json` para reflejar la nueva estructura:
 2. **`src/features/` fuera de `app/`**: mantiene clara la separación entre routing y dominio.
 3. **`src/common/` para código compartido**: centraliza UI genérica y utilidades.
 4. **Una interfaz por archivo**: maximiza la claridad y el descubrimiento; acepta que algunos archivos de types tengan un único export.
-5. **Sufijo por capa con punto**: nombres explícitos que indican la responsabilidad del archivo (`*.schema.ts`, `*.action.ts`, `*.util.ts`, `*.types.ts`).
-6. **Sin carpeta `cookies` ni `services`**: el manejo de cookies vive en `utils/` como una utilidad más; los servicios se modelan como utils específicas en lugar de una carpeta `services` con un solo archivo.
-7. **Utilidades compartidas en `common/lib/`**: funciones genéricas como `getBackendMessage` viven en `common/lib/`.
+5. **Sufijo por capa con punto**: nombres explícitos que indican la responsabilidad del archivo (`*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`, `*.types.ts`).
+6. **Sin carpeta `cookies`**: el manejo de cookies vive en `utils/` como una utilidad más.
+7. **`services/` para interacciones con backend**: funciones que hacen fetch al backend se agrupan en `services/`, incluso si al principio son pocas.
+8. **Utilidades compartidas en `common/lib/`**: funciones genéricas como `getBackendMessage` viven en `common/lib/`.
 
 ## Migration scope
 
@@ -141,8 +146,8 @@ Archivos a mover/renombrar:
 - `lib/auth-cookies.ts` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
 - `lib/platform-auth.ts`:
   - types → `src/features/platform-auth/types/`
-  - `loginPlatformAccount` → `src/features/platform-auth/utils/login-platform-account.util.ts`
-  - `getPlatformAccount` → `src/features/platform-auth/utils/get-platform-account.util.ts`
+  - `loginPlatformAccount` → `src/features/platform-auth/services/login-platform-account.service.ts`
+  - `getPlatformAccount` → `src/features/platform-auth/services/get-platform-account.service.ts`
   - `setPlatformAuthCookies` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
   - `getBackendMessage` → `src/common/lib/get-backend-message.util.ts`
 - `app/auth/platform/login/schema.ts` → `src/features/platform-auth/schemas/platform-login.schema.ts`

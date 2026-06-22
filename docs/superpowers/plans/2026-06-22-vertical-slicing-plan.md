@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
-> **Note:** This plan was executed with a late refinement: the `services/` folder was removed in favor of `utils/`, shared helpers like `getBackendMessage` moved to `common/lib/`, and the layer suffix uses dots (e.g. `*.schema.ts`, `*.action.ts`, `*.util.ts`). See the final state in `docs/superpowers/specs/2026-06-22-vertical-slicing-design.md`.
+> **Note:** This plan was executed with refinements: backend fetch functions live in `services/`, local helpers in `utils/`, shared helpers like `getBackendMessage` in `common/lib/`, and the layer suffix uses dots (e.g. `*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`). See the final state in `docs/superpowers/specs/2026-06-22-vertical-slicing-design.md`.
 
 **Goal:** Reorganizar `boero-ui` en una arquitectura de vertical slicing con `src/app/` para routing, `src/features/<feature>/` para dominio y `src/common/` para código compartido.
 
@@ -14,8 +14,9 @@
 
 - Cada archivo debe tener una única responsabilidad clara.
 - Tipos/interfaces: una definición por archivo.
-- Nombres de archivos con sufijo por capa (dot-separated): `.schema.ts`, `.action.ts`, `.types.ts`, `.util.ts`, `-form.tsx`.
-- Sin carpeta `services`: preferir `utils/` con archivos específicos.
+- Nombres de archivos con sufijo por capa (dot-separated): `.schema.ts`, `.action.ts`, `.types.ts`, `.service.ts`, `.util.ts`, `-form.tsx`.
+- `services/` para funciones que interactúan con backend/APIs externas.
+- `utils/` para helpers locales, puras o de infraestructura (cookies, parseo, etc.).
 - Helpers compartidos (como `getBackendMessage`) van en `common/lib/`.
 - `src/app/` solo contiene routing/pages/layouts de Next.js.
 - `src/common/` solo contiene código compartido cross-cutting.
