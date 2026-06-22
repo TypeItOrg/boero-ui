@@ -2,7 +2,7 @@
 
 ## Goal
 
-Reorganizar el codebase de `boero-ui` para adoptar una arquitectura de **vertical slicing**, donde cada feature contenga sus propios componentes, schemas, actions, types, services y cookies. Además, separar el código compartido en `src/common/` y dejar `src/app/` exclusivamente como capa de routing/pages de Next.js.
+Reorganizar el codebase de `boero-ui` para adoptar una arquitectura de **vertical slicing**, donde cada feature contenga sus propios componentes, schemas, actions, types, services y utils. Además, separar el código compartido en `src/common/` y dejar `src/app/` exclusivamente como capa de routing/pages de Next.js.
 
 ## Context
 
@@ -41,36 +41,36 @@ src/
         institutional-login-form.tsx
         institutional-register-form.tsx
       schemas/
-        institutional-login-schema.ts
-        institutional-register-schema.ts
+        institutional-login.schema.ts
+        institutional-register.schema.ts
       actions/
-        institutional-login-actions.ts
-        institutional-register-actions.ts
+        institutional-login.action.ts
+        institutional-register.action.ts
       types/
-        institutional-login-input-types.ts
-        institutional-login-state-types.ts
-        institutional-register-input-types.ts
-        institutional-register-state-types.ts
+        institutional-login-input.types.ts
+        institutional-login-action-state.types.ts
+        institutional-register-input.types.ts
+        institutional-register-action-state.types.ts
       services/
-        institutional-auth-services.ts
+        institutional-auth.service.ts
 
     platform-auth/
       components/
         platform-login-form.tsx
       schemas/
-        platform-login-schema.ts
+        platform-login.schema.ts
       actions/
-        platform-login-actions.ts
+        platform-login.action.ts
       types/
-        platform-account-types.ts
-        platform-login-result-types.ts
-        platform-login-input-types.ts
-        platform-login-action-state-types.ts
-        backend-error-types.ts
+        platform-account.types.ts
+        platform-login-result.types.ts
+        platform-login-input.types.ts
+        platform-login-action-state.types.ts
+        backend-error.types.ts
       services/
-        platform-auth-services.ts
-      cookies/
-        platform-auth-cookies.ts
+        platform-auth.service.ts
+      utils/
+        platform-auth-cookies.util.ts
 
   common/                       # Cross-cutting/shared code
     components/
@@ -86,13 +86,13 @@ src/
 ### Naming conventions
 
 - **One interface/type per file**: cada `type`/`interface` vive en su propio archivo.
-- **Suffix by layer**:
-  - Schemas: `<name>-schema.ts`
-  - Actions: `<name>-actions.ts`
-  - Types: `<name>-types.ts`
-  - Services: `<name>-services.ts`
+- **Suffix by layer** (dot-separated):
+  - Schemas: `<name>.schema.ts`
+  - Actions: `<name>.action.ts`
+  - Types: `<name>.types.ts`
+  - Services: `<name>.service.ts`
+  - Utils: `<name>.util.ts`
   - Components: `<name>-form.tsx`, `<name>-button.tsx`
-  - Cookies: `<name>-cookies.ts`
 
 ### Path aliases
 
@@ -129,7 +129,8 @@ Actualizar `tsconfig.json` para reflejar la nueva estructura:
 2. **`src/features/` fuera de `app/`**: mantiene clara la separación entre routing y dominio.
 3. **`src/common/` para código compartido**: centraliza UI genérica y utilidades.
 4. **Una interfaz por archivo**: maximiza la claridad y el descubrimiento; acepta que algunos archivos de types tengan un único export.
-5. **Sufijo por capa**: nombres explícitos que indican la responsabilidad del archivo.
+5. **Sufijo por capa con punto**: nombres explícitos que indican la responsabilidad del archivo (`*.schema.ts`, `*.action.ts`, `*.service.ts`, `*.util.ts`, `*.types.ts`).
+6. **Sin carpeta `cookies`**: el manejo de cookies vive en `utils/` como una utilidad más.
 
 ## Migration scope
 
@@ -138,14 +139,14 @@ Archivos a mover/renombrar:
 - `app/` → `src/app/`
 - `components/ui/` → `src/common/components/ui/`
 - `lib/utils.ts` → `src/common/lib/utils.ts`
-- `lib/auth-cookies.ts` → `src/features/platform-auth/cookies/platform-auth-cookies.ts`
+- `lib/auth-cookies.ts` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
 - `lib/platform-auth.ts`:
   - types → `src/features/platform-auth/types/`
-  - `loginPlatformAccount` → `src/features/platform-auth/services/platform-auth-services.ts`
-  - `getPlatformAccount` → `src/features/platform-auth/services/platform-auth-services.ts`
-  - `setPlatformAuthCookies` → `src/features/platform-auth/cookies/platform-auth-cookies.ts`
-- `app/auth/platform/login/schema.ts` → `src/features/platform-auth/schemas/platform-login-schema.ts`
-- `app/auth/platform/login/actions.ts` → `src/features/platform-auth/actions/platform-login-actions.ts`
+  - `loginPlatformAccount` → `src/features/platform-auth/services/platform-auth.service.ts`
+  - `getPlatformAccount` → `src/features/platform-auth/services/platform-auth.service.ts`
+  - `setPlatformAuthCookies` → `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
+- `app/auth/platform/login/schema.ts` → `src/features/platform-auth/schemas/platform-login.schema.ts`
+- `app/auth/platform/login/actions.ts` → `src/features/platform-auth/actions/platform-login.action.ts`
 - `app/auth/platform/login/platform-login-form.tsx` → `src/features/platform-auth/components/platform-login-form.tsx`
 - `app/auth/platform/login/page.tsx` → `src/app/auth/platform/login/page.tsx` (actualizar imports)
 

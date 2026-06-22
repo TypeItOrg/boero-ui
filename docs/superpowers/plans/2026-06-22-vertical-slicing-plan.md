@@ -4,7 +4,7 @@
 
 **Goal:** Reorganizar `boero-ui` en una arquitectura de vertical slicing con `src/app/` para routing, `src/features/<feature>/` para dominio y `src/common/` para código compartido.
 
-**Architecture:** Mover toda la aplicación bajo `src/`, separar las features `platform-auth` e `institutional-auth` en slices verticales con sus propios componentes, schemas, actions, types, services y cookies, y centralizar componentes UI/utilidades en `src/common/`.
+**Architecture:** Mover toda la aplicación bajo `src/`, separar las features `platform-auth` e `institutional-auth` en slices verticales con sus propios componentes, schemas, actions, types, services y utils, y centralizar componentes UI/utilidades en `src/common/`.
 
 **Tech Stack:** Next.js 16, React 19, TypeScript, Zod 4, Tailwind CSS, shadcn/ui.
 
@@ -86,16 +86,16 @@ git commit -m "chore: move app, components and lib into src/"
 ### Task 2: Crear slice `platform-auth`
 
 **Files:**
-- Create: `src/features/platform-auth/schemas/platform-login-schema.ts`
-- Create: `src/features/platform-auth/actions/platform-login-actions.ts`
+- Create: `src/features/platform-auth/schemas/platform-login.schema.ts`
+- Create: `src/features/platform-auth/actions/platform-login.action.ts`
 - Create: `src/features/platform-auth/components/platform-login-form.tsx`
-- Create: `src/features/platform-auth/types/platform-account-types.ts`
-- Create: `src/features/platform-auth/types/platform-login-result-types.ts`
-- Create: `src/features/platform-auth/types/platform-login-input-types.ts`
-- Create: `src/features/platform-auth/types/platform-login-action-state-types.ts`
-- Create: `src/features/platform-auth/types/backend-error-types.ts`
-- Create: `src/features/platform-auth/services/platform-auth-services.ts`
-- Create: `src/features/platform-auth/cookies/platform-auth-cookies.ts`
+- Create: `src/features/platform-auth/types/platform-account.types.ts`
+- Create: `src/features/platform-auth/types/platform-login-result.types.ts`
+- Create: `src/features/platform-auth/types/platform-login-input.types.ts`
+- Create: `src/features/platform-auth/types/platform-login-action-state.types.ts`
+- Create: `src/features/platform-auth/types/backend-error.types.ts`
+- Create: `src/features/platform-auth/services/platform-auth.service.ts`
+- Create: `src/features/platform-auth/utils/platform-auth-cookies.util.ts`
 - Modify: `src/app/auth/platform/login/page.tsx`
 - Delete: `src/app/auth/platform/login/schema.ts`
 - Delete: `src/app/auth/platform/login/actions.ts`
@@ -109,7 +109,7 @@ git commit -m "chore: move app, components and lib into src/"
 
 - [ ] **Step 1: Crear tipos individuales**
 
-`src/features/platform-auth/types/platform-account-types.ts`:
+`src/features/platform-auth/types/platform-account.types.ts`:
 
 ```ts
 export type PlatformAccount = {
@@ -120,10 +120,10 @@ export type PlatformAccount = {
 };
 ```
 
-`src/features/platform-auth/types/platform-login-result-types.ts`:
+`src/features/platform-auth/types/platform-login-result.types.ts`:
 
 ```ts
-import type { PlatformAccount } from "./platform-account-types";
+import type { PlatformAccount } from "./platform-account.types";
 
 export type PlatformLoginResult = {
   account: PlatformAccount;
@@ -134,7 +134,7 @@ export type PlatformLoginResult = {
 };
 ```
 
-`src/features/platform-auth/types/platform-login-input-types.ts`:
+`src/features/platform-auth/types/platform-login-input.types.ts`:
 
 ```ts
 export type PlatformLoginInput = {
@@ -143,7 +143,7 @@ export type PlatformLoginInput = {
 };
 ```
 
-`src/features/platform-auth/types/platform-login-action-state-types.ts`:
+`src/features/platform-auth/types/platform-login-action-state.types.ts`:
 
 ```ts
 export type PlatformLoginActionState = {
@@ -153,7 +153,7 @@ export type PlatformLoginActionState = {
 };
 ```
 
-`src/features/platform-auth/types/backend-error-types.ts`:
+`src/features/platform-auth/types/backend-error.types.ts`:
 
 ```ts
 export type BackendError = {
@@ -164,12 +164,12 @@ export type BackendError = {
 
 - [ ] **Step 2: Crear cookies de plataforma**
 
-`src/features/platform-auth/cookies/platform-auth-cookies.ts`:
+`src/features/platform-auth/utils/platform-auth-cookies.util.ts`:
 
 ```ts
 import { cookies } from "next/headers";
 
-import type { PlatformLoginResult } from "../types/platform-login-result-types";
+import type { PlatformLoginResult } from "../types/platform-login-result.types";
 
 export const PLATFORM_ACCESS_TOKEN_COOKIE = "platform_access_token";
 export const PLATFORM_REFRESH_TOKEN_COOKIE = "platform_refresh_token";
@@ -200,14 +200,14 @@ export async function setPlatformAuthCookies(
 
 - [ ] **Step 3: Crear servicios de plataforma**
 
-`src/features/platform-auth/services/platform-auth-services.ts`:
+`src/features/platform-auth/services/platform-auth.service.ts`:
 
 ```ts
-import type { BackendError } from "../types/backend-error-types";
-import type { PlatformLoginInput } from "../types/platform-login-input-types";
-import type { PlatformLoginResult } from "../types/platform-login-result-types";
-import type { PlatformAccount } from "../types/platform-account-types";
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "../cookies/platform-auth-cookies";
+import type { BackendError } from "../types/backend-error.types";
+import type { PlatformLoginInput } from "../types/platform-login-input.types";
+import type { PlatformLoginResult } from "../types/platform-login-result.types";
+import type { PlatformAccount } from "../types/platform-account.types";
+import { PLATFORM_ACCESS_TOKEN_COOKIE } from "../utils/platform-auth-cookies.util";
 import { cookies } from "next/headers";
 
 const apiUrl = process.env.BOERO_API_URL ?? "http://localhost:8080";
@@ -273,12 +273,12 @@ export async function getPlatformAccount(): Promise<PlatformAccount | null> {
 
 - [ ] **Step 4: Mover schema de login**
 
-`src/features/platform-auth/schemas/platform-login-schema.ts`:
+`src/features/platform-auth/schemas/platform-login.schema.ts`:
 
 ```ts
 import { z } from "zod";
 
-import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
 
 export const platformLoginSchema = z.object({
   email: z
@@ -293,17 +293,17 @@ export type { PlatformLoginActionState };
 
 - [ ] **Step 5: Mover action de login**
 
-`src/features/platform-auth/actions/platform-login-actions.ts`:
+`src/features/platform-auth/actions/platform-login.action.ts`:
 
 ```ts
 "use server";
 
 import { redirect } from "next/navigation";
 
-import { platformLoginSchema } from "../schemas/platform-login-schema";
-import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
-import { loginPlatformAccount } from "../services/platform-auth-services";
-import { setPlatformAuthCookies } from "../cookies/platform-auth-cookies";
+import { platformLoginSchema } from "../schemas/platform-login.schema";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
+import { loginPlatformAccount } from "../services/platform-auth.service";
+import { setPlatformAuthCookies } from "../utils/platform-auth-cookies.util";
 
 export async function loginPlatform(
   _previousState: PlatformLoginActionState,
@@ -359,8 +359,8 @@ import { Button } from "@common/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
-import { loginPlatform } from "../actions/platform-login-actions";
-import type { PlatformLoginActionState } from "../types/platform-login-action-state-types";
+import { loginPlatform } from "../actions/platform-login.action";
+import type { PlatformLoginActionState } from "../types/platform-login-action-state.types";
 
 const initialState: PlatformLoginActionState = {};
 
@@ -447,7 +447,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Card, CardContent } from "@common/components/ui/card";
-import { getPlatformAccount } from "@features/platform-auth/services/platform-auth-services";
+import { getPlatformAccount } from "@features/platform-auth/services/platform-auth.service";
 import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
 
 export const metadata: Metadata = {
@@ -570,15 +570,15 @@ git commit -m "chore: update shared imports to @common aliases"
 **Files:**
 - Create: `src/features/institutional-auth/components/institutional-login-form.tsx`
 - Create: `src/features/institutional-auth/components/institutional-register-form.tsx`
-- Create: `src/features/institutional-auth/schemas/institutional-login-schema.ts`
-- Create: `src/features/institutional-auth/schemas/institutional-register-schema.ts`
-- Create: `src/features/institutional-auth/actions/institutional-login-actions.ts`
-- Create: `src/features/institutional-auth/actions/institutional-register-actions.ts`
-- Create: `src/features/institutional-auth/types/institutional-login-input-types.ts`
-- Create: `src/features/institutional-auth/types/institutional-login-state-types.ts`
-- Create: `src/features/institutional-auth/types/institutional-register-input-types.ts`
-- Create: `src/features/institutional-auth/types/institutional-register-state-types.ts`
-- Create: `src/features/institutional-auth/services/institutional-auth-services.ts`
+- Create: `src/features/institutional-auth/schemas/institutional-login.schema.ts`
+- Create: `src/features/institutional-auth/schemas/institutional-register.schema.ts`
+- Create: `src/features/institutional-auth/actions/institutional-login.action.ts`
+- Create: `src/features/institutional-auth/actions/institutional-register.action.ts`
+- Create: `src/features/institutional-auth/types/institutional-login-input.types.ts`
+- Create: `src/features/institutional-auth/types/institutional-login-action-state.types.ts`
+- Create: `src/features/institutional-auth/types/institutional-register-input.types.ts`
+- Create: `src/features/institutional-auth/types/institutional-register-action-state.types.ts`
+- Create: `src/features/institutional-auth/services/institutional-auth.service.ts`
 
 **Interfaces:**
 - Consumes: existing placeholder pages `src/app/auth/(institutional)/login/page.tsx` and `src/app/auth/(institutional)/register/page.tsx`.
@@ -586,7 +586,7 @@ git commit -m "chore: update shared imports to @common aliases"
 
 - [ ] **Step 1: Crear tipos base**
 
-`src/features/institutional-auth/types/institutional-login-input-types.ts`:
+`src/features/institutional-auth/types/institutional-login-input.types.ts`:
 
 ```ts
 export type InstitutionalLoginInput = {
@@ -595,7 +595,7 @@ export type InstitutionalLoginInput = {
 };
 ```
 
-`src/features/institutional-auth/types/institutional-login-state-types.ts`:
+`src/features/institutional-auth/types/institutional-login-action-state.types.ts`:
 
 ```ts
 export type InstitutionalLoginActionState = {
@@ -605,7 +605,7 @@ export type InstitutionalLoginActionState = {
 };
 ```
 
-`src/features/institutional-auth/types/institutional-register-input-types.ts`:
+`src/features/institutional-auth/types/institutional-register-input.types.ts`:
 
 ```ts
 export type InstitutionalRegisterInput = {
@@ -614,7 +614,7 @@ export type InstitutionalRegisterInput = {
 };
 ```
 
-`src/features/institutional-auth/types/institutional-register-state-types.ts`:
+`src/features/institutional-auth/types/institutional-register-action-state.types.ts`:
 
 ```ts
 export type InstitutionalRegisterActionState = {
@@ -626,7 +626,7 @@ export type InstitutionalRegisterActionState = {
 
 - [ ] **Step 2: Crear schemas base**
 
-`src/features/institutional-auth/schemas/institutional-login-schema.ts`:
+`src/features/institutional-auth/schemas/institutional-login.schema.ts`:
 
 ```ts
 import { z } from "zod";
@@ -640,7 +640,7 @@ export const institutionalLoginSchema = z.object({
 });
 ```
 
-`src/features/institutional-auth/schemas/institutional-register-schema.ts`:
+`src/features/institutional-auth/schemas/institutional-register.schema.ts`:
 
 ```ts
 import { z } from "zod";
@@ -656,13 +656,13 @@ export const institutionalRegisterSchema = z.object({
 
 - [ ] **Step 3: Crear actions base**
 
-`src/features/institutional-auth/actions/institutional-login-actions.ts`:
+`src/features/institutional-auth/actions/institutional-login.action.ts`:
 
 ```ts
 "use server";
 
-import { institutionalLoginSchema } from "../schemas/institutional-login-schema";
-import type { InstitutionalLoginActionState } from "../types/institutional-login-state-types";
+import { institutionalLoginSchema } from "../schemas/institutional-login.schema";
+import type { InstitutionalLoginActionState } from "../types/institutional-login-action-state.types";
 
 export async function loginInstitutional(
   _previousState: InstitutionalLoginActionState,
@@ -693,13 +693,13 @@ export async function loginInstitutional(
 }
 ```
 
-`src/features/institutional-auth/actions/institutional-register-actions.ts`:
+`src/features/institutional-auth/actions/institutional-register.action.ts`:
 
 ```ts
 "use server";
 
-import { institutionalRegisterSchema } from "../schemas/institutional-register-schema";
-import type { InstitutionalRegisterActionState } from "../types/institutional-register-state-types";
+import { institutionalRegisterSchema } from "../schemas/institutional-register.schema";
+import type { InstitutionalRegisterActionState } from "../types/institutional-register-action-state.types";
 
 export async function registerInstitutional(
   _previousState: InstitutionalRegisterActionState,
@@ -732,7 +732,7 @@ export async function registerInstitutional(
 
 - [ ] **Step 4: Crear servicios base**
 
-`src/features/institutional-auth/services/institutional-auth-services.ts`:
+`src/features/institutional-auth/services/institutional-auth.service.ts`:
 
 ```ts
 export async function loginInstitutionalAccount(_input: {
