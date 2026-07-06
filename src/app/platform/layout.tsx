@@ -1,16 +1,22 @@
+import { cookies } from "next/headers";
+
 import { getPlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 import { PlatformAccountProvider } from "@features/platform-auth/components/platform-account-provider";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@common/components/ui/breadcrumb";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@common/components/ui/sidebar";
+import { SIDEBAR_COOKIE_NAME } from "@common/components/ui/sidebar-constants";
 import { Separator } from "@common/components/ui/separator";
 import { PlatformSidebar } from "@features/platform-auth/components/platform-sidebar";
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }): Promise<React.ReactElement> {
   const account = await getPlatformAccount();
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value !== "false";
 
   return (
     <PlatformAccountProvider initialAccount={account}>
       <SidebarProvider
+        defaultOpen={defaultOpen}
         style={
           {
             "--sidebar-width": "20rem",
