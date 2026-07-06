@@ -3,7 +3,7 @@
 import type { ComponentProps } from "react";
 import { LayoutDashboardIcon, SchoolIcon } from "lucide-react";
 
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@common/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@common/components/ui/sidebar";
 import { PlatformSidebarHeader } from "@features/platform-auth/components/platform-sidebar-header";
 import { PlatformSidebarNav } from "@features/platform-auth/components/platform-sidebar-nav";
 import { PlatformSidebarUser } from "@features/platform-auth/components/platform-sidebar-user";
@@ -23,7 +23,7 @@ export function PlatformSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <PlatformSidebarHeader title="Boero" description="Plataforma" icon={<SchoolIcon />} />
+        <PlatformSidebarHeader title="Boero" description="Autogestión para conservatorios" icon={<SchoolIcon />} />
       </SidebarHeader>
       <SidebarContent>
         <PlatformSidebarNav items={navItems} />
@@ -33,7 +33,6 @@ export function PlatformSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
           <PlatformSidebarUser user={{ name: `${account.name} ${account.lastName}`, email: account.email }} />
         ) : null}
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }
