@@ -25,3 +25,9 @@ export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens
     maxAge: 60 * 60 * 24 * 30,
   });
 }
+
+export async function clearPlatformAuthCookies() {
+  const cookieStore = await cookies();
+  cookieStore.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
+  cookieStore.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
+}

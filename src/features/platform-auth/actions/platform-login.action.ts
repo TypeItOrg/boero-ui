@@ -1,7 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
 
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
@@ -9,6 +7,7 @@ import type { PlatformLoginActionState } from "@features/platform-auth/types/pla
 import { PLATFORM_LOGIN_FIELD_NAMES } from "@features/platform-auth/types/platform-login-action-state.types";
 import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
+import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
 
 export async function loginPlatform(
   _previousState: PlatformLoginActionState,
@@ -38,6 +37,5 @@ export async function loginPlatform(
   }
 
   await setPlatformAuthCookies(output.data.tokens);
-
-  redirect("/platform/dashboard");
+  redirectToNext(formData.get("next") as string | null);
 }

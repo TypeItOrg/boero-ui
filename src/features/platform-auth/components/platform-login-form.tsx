@@ -14,7 +14,7 @@ import type { PlatformLoginActionState } from "@features/platform-auth/types/pla
 
 const INITIAL_STATE: PlatformLoginActionState = {};
 
-export function PlatformLoginForm() {
+export function PlatformLoginForm({ next }: { next?: string }): React.ReactElement {
   const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(loginPlatform, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
 
@@ -27,6 +27,7 @@ export function PlatformLoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
+      {next ? <input type="hidden" name="next" value={next} /> : null}
       <header className="space-y-1 text-center">
         <h1 className="text-2xl font-bold">Bienvenido de nuevo</h1>
         <p className="text-muted-foreground text-sm">

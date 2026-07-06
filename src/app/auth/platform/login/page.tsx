@@ -1,27 +1,32 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { redirect } from "next/navigation";
-
 import { Card, CardContent } from "@common/components/ui/card";
 import { getPlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
+import { getSafeNextPath } from "@features/platform-auth/utils/platform-auth-paths.util";
+import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
   description: "Inicia sesión en tu cuenta",
 };
 
-export default async function LoginPage() {
+type SearchParams = Promise<{ next?: string }>;
+
+export default async function LoginPage({ searchParams }: { searchParams: SearchParams }): Promise<React.ReactElement> {
   const account = await getPlatformAccount();
+  const resolvedSearchParams = await searchParams;
+  const next = resolvedSearchParams.next;
+  const safeNext = getSafeNextPath(next);
 
   if (account) {
-    redirect("/platform/dashboard");
+    redirectToNext(next);
   }
 
   return (
     <Card className="p-0">
       <CardContent className="grid-cols-2 p-0 md:grid">
-        <PlatformLoginForm />
+        <PlatformLoginForm next={safeNext} />
 
         <section className="bg-muted relative hidden md:block">
           <Image
