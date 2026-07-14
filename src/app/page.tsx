@@ -1,9 +1,5 @@
-import { Button } from "@common/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <main className="flex h-screen items-center justify-center">
-      <Button>Click me</Button>
-    </main>
-  );
+  redirect("/platform");
 }

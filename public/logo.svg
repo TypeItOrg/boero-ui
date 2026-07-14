@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <!-- Fondo oscuro satinado -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1917" />
+      <stop offset="100%" stop-color="#0c0a09" />
+    </linearGradient>
+    <!-- Acento plateado/zinc premium -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fafaf9" />
+      <stop offset="100%" stop-color="#a8a29e" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Contenedor redondeado estilo squircle -->
+  <rect width="32" height="32" rx="9" fill="url(#bgGrad)" />
+  
+  <!-- "B" Geométrica moderna -->
+  <path d="M10 8h6a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4h-6M10 16h7a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4h-7" 
+        fill="none" 
+        stroke="url(#accentGrad)" 
+        stroke-width="3" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+  <line x1="10" y1="8" x2="10" y2="24" stroke="url(#accentGrad)" stroke-width="3" stroke-linecap="round" />
+</svg>

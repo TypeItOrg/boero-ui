@@ -120,11 +120,60 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+
+    &::-webkit-scrollbar {
+      @apply w-1.5;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--primary);
+    }
   }
+
   body {
     @apply text-foreground;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .table-scrollbar {
+    scrollbar-color: var(--primary) transparent;
+    scrollbar-width: thin;
+  }
+
+  .table-scrollbar::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 0.375rem;
+    height: 0.375rem;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-button,
+  .table-scrollbar::-webkit-scrollbar-button:horizontal:decrement,
+  .table-scrollbar::-webkit-scrollbar-button:horizontal:increment,
+  .table-scrollbar::-webkit-scrollbar-button:horizontal:start,
+  .table-scrollbar::-webkit-scrollbar-button:horizontal:end {
+    -webkit-appearance: none;
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+  }
+
+  .table-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
