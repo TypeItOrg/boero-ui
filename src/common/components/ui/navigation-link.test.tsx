@@ -28,7 +28,7 @@ describe("NavigationLink", () => {
     expect(document.querySelector("[data-navigation-pending='false']")).toBeInTheDocument();
   });
 
-  it("shows an accessible delayed indicator while navigation is pending", () => {
+  it("shows only an absolute spinner while navigation is pending", () => {
     useLinkStatusMock.mockReturnValue({ pending: true });
 
     render(
@@ -38,8 +38,8 @@ describe("NavigationLink", () => {
     );
 
     expect(screen.getByRole("status")).toHaveTextContent("Abriendo nuevo usuario");
-    expect(document.querySelector(".navigation-pending-indicator")).toBeInTheDocument();
-    expect(document.querySelector("[data-navigation-pending='true']")).toBeInTheDocument();
+    expect(document.querySelector("[data-navigation-pending='true']")).toHaveClass("absolute", "inset-0");
+    expect(screen.getByText("Nuevo usuario")).toHaveClass("invisible");
   });
 
   it("keeps pulse feedback free of spinner markup", () => {
@@ -52,7 +52,7 @@ describe("NavigationLink", () => {
     );
 
     expect(document.querySelector("[data-pending-variant='pulse']")).toBeInTheDocument();
-    expect(document.querySelector(".navigation-pending-indicator")).not.toBeInTheDocument();
+    expect(document.querySelector("[data-pending-variant='pulse'] svg")).not.toBeInTheDocument();
   });
 
   it("preserves link behavior when composed through Button asChild", () => {

@@ -143,12 +143,6 @@
 }
 
 @layer utilities {
-  @keyframes navigation-pending-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   @keyframes navigation-pending-pulse {
     50% {
       opacity: 0.45;
@@ -160,39 +154,11 @@
     cursor: wait;
   }
 
-  .navigation-pending-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  .navigation-link[data-slot="button"] > .navigation-pending-overlay[data-navigation-pending="true"] {
-    border-radius: inherit;
-    background-color: inherit;
-  }
-
-  .navigation-pending-overlay[data-pending-variant="spinner"][data-navigation-pending="true"] {
-    opacity: 1;
-  }
-
   .navigation-link:has([data-pending-variant="pulse"][data-navigation-pending="true"]) {
     animation: navigation-pending-pulse 1s ease-in-out infinite;
   }
 
-  .navigation-pending-indicator {
-    opacity: 1;
-    animation: navigation-pending-spin 1s linear infinite;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .navigation-pending-indicator {
-      animation: none;
-    }
-
     .navigation-link:has([data-pending-variant="pulse"][data-navigation-pending="true"]) {
       animation: none;
       opacity: 0.65;

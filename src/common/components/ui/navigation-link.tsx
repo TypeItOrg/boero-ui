@@ -43,33 +43,59 @@ function NavigationLink({
       tabIndex={disabled ? -1 : tabIndex}
       {...props}
     >
-      {children}
-      <NavigationPendingIndicator label={pendingLabel} variant={pendingVariant} />
+      <NavigationLinkContent label={pendingLabel} variant={pendingVariant}>
+        {children}
+      </NavigationLinkContent>
     </Link>
   );
 }
 
-function NavigationPendingIndicator({
+function NavigationLinkContent({
+  children,
   label,
   variant,
 }: {
+  children: React.ReactNode;
   label: string;
   variant: "pulse" | "spinner";
 }): React.ReactElement {
   const { pending } = useLinkStatus();
 
+  if (variant === "pulse") {
+    return (
+      <>
+        {children}
+        <NavigationPendingOverlay label={label} pending={pending} variant={variant} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className={cn("inline-flex min-w-0 items-center gap-[inherit]", pending && "invisible")}>{children}</span>
+      <NavigationPendingOverlay label={label} pending={pending} variant={variant} />
+    </>
+  );
+}
+
+function NavigationPendingOverlay({
+  label,
+  pending,
+  variant,
+}: {
+  label: string;
+  pending: boolean;
+  variant: "pulse" | "spinner";
+}): React.ReactElement {
   return (
     <span
       aria-busy={pending}
-      className="navigation-pending-overlay"
+      className={cn("pointer-events-none absolute inset-0 flex items-center justify-center", !pending && "invisible")}
       data-navigation-pending={pending ? "true" : "false"}
       data-pending-variant={variant}
     >
       {variant === "spinner" ? (
-        <Loader2Icon
-          aria-hidden="true"
-          className={cn("size-4", pending ? "navigation-pending-indicator" : "opacity-0")}
-        />
+        <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
       ) : null}
       <span className="sr-only" role="status" aria-live="polite">
         {pending ? label : ""}
