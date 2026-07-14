@@ -1,13 +1,14 @@
-const DEFAULT_REDIRECT_PATH = "/platform/dashboard";
+const DEFAULT_REDIRECT_PATH = "/platform";
 
 export function getSafeNextPath(next: string | null | undefined): string {
-  if (!next) return DEFAULT_REDIRECT_PATH;
+  if (!next || next === "/") return DEFAULT_REDIRECT_PATH;
   if (next.startsWith("/") && !next.startsWith("//")) return next;
 
   if (next.startsWith("http://") || next.startsWith("https://")) {
     try {
       const parsedUrl = new URL(next);
-      return parsedUrl.pathname + parsedUrl.search;
+      const path = parsedUrl.pathname + parsedUrl.search;
+      return path === "/" ? DEFAULT_REDIRECT_PATH : path;
     } catch {}
   }
 

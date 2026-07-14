@@ -1,20 +1,17 @@
 import "server-only";
 
 import { cache } from "react";
-import { cookies } from "next/headers";
 
+import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { getPlatformAccessToken } from "@features/platform-auth/services/get-platform-access-token.service";
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
-
-const API_URL = process.env.BOERO_API_URL ?? "http://172.17.0.1:8080";
 
 async function fetchPlatformAccount(): Promise<PlatformAccount | null> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value;
+  const accessToken = await getPlatformAccessToken();
 
   if (!accessToken) return null;
 
-  const response = await fetch(`${API_URL}/api/v1/auth/platform/me`, {
+  const response = await fetch(new URL("/api/v1/auth/platform/me", getApiUrlOrThrow()), {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });

@@ -1,29 +1,32 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import {
+  getPlatformAuthCookieOptions,
+  PLATFORM_ACCESS_TOKEN_MAX_AGE,
   PLATFORM_ACCESS_TOKEN_COOKIE,
+  PLATFORM_REFRESH_TOKEN_MAX_AGE,
   PLATFORM_REFRESH_TOKEN_COOKIE,
 } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 import { getSafeNextPath, getRedirectPath } from "@features/platform-auth/utils/platform-auth-paths.util";
-
-const API_URL = process.env.BOERO_API_URL ?? "http://172.17.0.1:8080";
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const hasAccessToken = request.cookies.has(PLATFORM_ACCESS_TOKEN_COOKIE);
   const refreshToken = request.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value;
 
-  if (pathname.startsWith("/platform/") && hasAccessToken) {
+  const requiresPlatformSession = pathname === "/" || pathname === "/platform" || pathname.startsWith("/platform/");
+
+  if (requiresPlatformSession && hasAccessToken) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/platform/")) {
-    // Try silent refresh if refresh token is present
+  if (requiresPlatformSession) {
     if (refreshToken) {
       try {
-        const response = await fetch(`${API_URL}/api/v1/auth/platform/refresh`, {
+        const response = await fetch(new URL("/api/v1/auth/platform/refresh", getApiUrlOrThrow()), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken }),
@@ -35,23 +38,8 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
           if (tokens?.accessToken && tokens?.refreshToken) {
             const nextResponse = NextResponse.next();
-            const secure = process.env.NODE_ENV === "production";
 
-            nextResponse.cookies.set(PLATFORM_ACCESS_TOKEN_COOKIE, tokens.accessToken, {
-              httpOnly: true,
-              sameSite: "lax",
-              secure,
-              path: "/",
-              maxAge: 60 * 15,
-            });
-
-            nextResponse.cookies.set(PLATFORM_REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
-              httpOnly: true,
-              sameSite: "lax",
-              secure,
-              path: "/",
-              maxAge: 60 * 60 * 24 * 30,
-            });
+            setPlatformAuthResponseCookies(nextResponse, tokens.accessToken, tokens.refreshToken);
 
             return nextResponse;
           }
@@ -69,7 +57,6 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return redirectResponse;
   }
 
-  // Redirect to dashboard if already authenticated and trying to access login
   if (pathname === "/auth/platform/login" && hasAccessToken) {
     const next = request.nextUrl.searchParams.get("next");
     return NextResponse.redirect(new URL(getSafeNextPath(next), request.url));
@@ -79,5 +66,15 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/auth/platform/login", "/platform/:path*"],
+  matcher: ["/", "/auth/platform/login", "/platform/:path*"],
 };
+
+function setPlatformAuthResponseCookies(response: NextResponse, accessToken: string, refreshToken: string): void {
+  response.cookies.set(PLATFORM_ACCESS_TOKEN_COOKIE, accessToken, {
+    ...getPlatformAuthCookieOptions(PLATFORM_ACCESS_TOKEN_MAX_AGE),
+  });
+
+  response.cookies.set(PLATFORM_REFRESH_TOKEN_COOKIE, refreshToken, {
+    ...getPlatformAuthCookieOptions(PLATFORM_REFRESH_TOKEN_MAX_AGE),
+  });
+}

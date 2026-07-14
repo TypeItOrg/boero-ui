@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+
 import { Card, CardContent } from "@common/components/ui/card";
 import { getPlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
@@ -28,17 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
       <CardContent className="grid-cols-2 p-0 md:grid">
         <PlatformLoginForm next={safeNext} />
 
-        <section className="bg-muted relative hidden md:block">
-          <Image
-            alt="Login background"
-            className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            height={1200}
-            loading="eager"
-            priority
-            src="https://ui.shadcn.com/placeholder.svg"
-            width={1200}
-          />
-        </section>
+        <section className="from-primary to-primary/80 relative hidden bg-linear-to-l md:block"></section>
       </CardContent>
     </Card>
   );

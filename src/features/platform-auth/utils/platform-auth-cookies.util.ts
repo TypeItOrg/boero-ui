@@ -2,31 +2,42 @@ import { cookies } from "next/headers";
 
 import type { PlatformLoginResult } from "@features/platform-auth/types/platform-login-result.types";
 
+type PlatformAuthCookieOptions = {
+  httpOnly: true;
+  maxAge: number;
+  path: "/";
+  sameSite: "lax";
+  secure: boolean;
+};
+
 export const PLATFORM_ACCESS_TOKEN_COOKIE = "platform_access_token";
 export const PLATFORM_REFRESH_TOKEN_COOKIE = "platform_refresh_token";
+export const PLATFORM_ACCESS_TOKEN_MAX_AGE = 60 * 15;
+export const PLATFORM_REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30;
 
-export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens"]) {
+export function getPlatformAuthCookieOptions(maxAge: number): PlatformAuthCookieOptions {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge,
+  };
+}
+
+export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens"]): Promise<void> {
   const cookieStore = await cookies();
-  const secure = process.env.NODE_ENV === "production";
 
   cookieStore.set(PLATFORM_ACCESS_TOKEN_COOKIE, tokens.accessToken, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: 60 * 15,
+    ...getPlatformAuthCookieOptions(PLATFORM_ACCESS_TOKEN_MAX_AGE),
   });
 
   cookieStore.set(PLATFORM_REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
+    ...getPlatformAuthCookieOptions(PLATFORM_REFRESH_TOKEN_MAX_AGE),
   });
 }
 
-export async function clearPlatformAuthCookies() {
+export async function clearPlatformAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
   cookieStore.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
