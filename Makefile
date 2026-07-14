@@ -2,7 +2,7 @@
 
 COMPOSE := docker compose
 
-.PHONY: dev staging prod down logs build-staging build-prod clean format format-check
+.PHONY: dev staging prod down logs build-staging build-prod clean test format format-check
 
 dev:
 	$(COMPOSE) up --build dev
@@ -31,6 +31,9 @@ clean:
 	$(COMPOSE) down --volumes --remove-orphans
 	NEXT_PUBLIC_API_URL=unused $(COMPOSE) -f compose.staging.yaml down --volumes --remove-orphans
 	NEXT_PUBLIC_API_URL=unused $(COMPOSE) -f compose.prod.yaml down --volumes --remove-orphans
+
+test:
+	pnpm test
 
 format:
 	pnpm format
