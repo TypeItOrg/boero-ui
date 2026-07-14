@@ -1,13 +1,14 @@
 "use client";
 
 import { SyntheticEvent, useActionState, useTransition } from "react";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
+import { cn } from "@common/utils/cn.util";
 
 import { loginPlatform } from "@features/platform-auth/actions/platform-login.action";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
@@ -73,8 +74,25 @@ export function PlatformLoginForm({ next }: { next?: string }): React.ReactEleme
         </FieldGroup>
 
         <footer className="mt-6 flex w-full flex-col gap-4">
-          <Button variant="default" type="submit" size="lg" className="w-full" disabled={isPending}>
-            {isPending ? "Ingresando..." : "Iniciar sesión"}
+          <Button
+            aria-busy={isPending}
+            className="relative w-full"
+            disabled={isPending}
+            size="lg"
+            type="submit"
+            variant="default"
+          >
+            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>
+              Iniciar sesión
+            </span>
+            {isPending ? (
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
+                <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+                <span className="sr-only" role="status" aria-live="polite">
+                  Ingresando...
+                </span>
+              </span>
+            ) : null}
           </Button>
         </footer>
       </div>
