@@ -11,6 +11,7 @@ import { Button } from "@common/components/ui/button";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
 import { createPersonAction } from "../actions/create-person.action";
@@ -102,10 +103,6 @@ export function PersonForm({
         router.push(listPath);
       }
     });
-  }
-
-  function handleCancel(): void {
-    router.push(listPath);
   }
 
   return (
@@ -225,14 +222,14 @@ export function PersonForm({
       {!hideActions && (
         <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
           <Button
+            asChild
             type="button"
             variant="outline"
             size="lg"
             className="flex-[1_0_min(140px,100%)] sm:flex-none"
-            onClick={handleCancel}
             disabled={isPending}
           >
-            Cancelar
+            <NavigationLink href={listPath}>Cancelar</NavigationLink>
           </Button>
           <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
             {getSubmitLabel({ isEdit, isPending })}

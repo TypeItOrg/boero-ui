@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { EllipsisVerticalIcon, FingerprintIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Button } from "@common/components/ui/button";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
@@ -106,9 +106,12 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={`/platform/accounts/${account.platformAccountId}`}>
+                      <NavigationLink
+                        className="hover:underline"
+                        href={`/platform/accounts/${account.platformAccountId}`}
+                      >
                         {account.name} {account.lastName}
-                      </Link>
+                      </NavigationLink>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{account.email}</TableCell>
                     <TableCell>
@@ -130,14 +133,20 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuContent className="w-40 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+                      <NavigationLink
+                        href={`/platform/accounts/${account.platformAccountId}`}
+                        className="px-2.5 py-1.5"
+                      >
                         Ver detalle
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+                      <NavigationLink
+                        href={`/platform/accounts/${account.platformAccountId}/edit`}
+                        className="px-2.5 py-1.5"
+                      >
                         Editar
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                   </ContextMenuGroup>
                 </ContextMenuContent>
@@ -184,14 +193,14 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
         <DropdownMenuContent align="end" className="w-40 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+              <NavigationLink href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                 Ver detalle
-              </Link>
+              </NavigationLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+              <NavigationLink href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                 Editar
-              </Link>
+              </NavigationLink>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -226,7 +235,7 @@ function PlatformAccountsEmptyState({
           La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
         </p>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/platform/accounts?size=${size}`}>Volver a la primera página</Link>
+          <NavigationLink href={`/platform/accounts?size=${size}`}>Volver a la primera página</NavigationLink>
         </Button>
       </div>
     );
@@ -256,10 +265,10 @@ function PlatformAccountsEmptyState({
         Comenzá creando un nuevo administrador para empezar a gestionar la plataforma.
       </p>
       <Button asChild size="sm">
-        <Link href="/platform/accounts/new">
+        <NavigationLink href="/platform/accounts/new">
           <PlusIcon className="mr-2 size-4" />
           Nuevo administrador
-        </Link>
+        </NavigationLink>
       </Button>
     </div>
   );

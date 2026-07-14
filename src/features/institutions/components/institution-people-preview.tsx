@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Skeleton } from "@common/components/ui/skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { DEFAULT_PEOPLE_SORT } from "@features/people/utils/people-pagination.util";
@@ -48,10 +47,10 @@ export async function InstitutionPeoplePreview({
           const additionalRoleCount = roles.length - 1;
 
           return (
-            <Link
+            <NavigationLink
               key={person.id}
               href={`/platform/institutions/${institutionId}/people/${person.id}`}
-              className="group bg-muted/40 hover:bg-muted/70 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="group bg-muted/40 hover:bg-muted/70 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               <Avatar className="size-12">
                 <AvatarFallback>{getInitials(person.firstName, person.lastName)}</AvatarFallback>
@@ -72,13 +71,13 @@ export async function InstitutionPeoplePreview({
                   </p>
                 </div>
               </div>
-            </Link>
+            </NavigationLink>
           );
         })}
       </div>
 
       <Button asChild className="mt-3 h-9 w-full justify-center">
-        <Link href={`/platform/institutions/${institutionId}/people`}>Ver todos los usuarios</Link>
+        <NavigationLink href={`/platform/institutions/${institutionId}/people`}>Ver todos los usuarios</NavigationLink>
       </Button>
     </aside>
   );
@@ -114,7 +113,7 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
         <p className="text-foreground text-sm font-medium">Todavía no hay usuarios</p>
         <p className="text-muted-foreground mt-1 text-sm">Creá el primero para esta institución.</p>
         <Button asChild size="lg" className="mt-4 w-full">
-          <Link href={`/platform/institutions/${institutionId}/people/new`}>Crear usuario</Link>
+          <NavigationLink href={`/platform/institutions/${institutionId}/people/new`}>Crear usuario</NavigationLink>
         </Button>
       </div>
     </aside>

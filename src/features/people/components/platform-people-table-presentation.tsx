@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon, SearchIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Button } from "@common/components/ui/button";
 import {
   ContextMenu,
@@ -104,18 +104,18 @@ export function PlatformPeopleTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={getPersonPath(person)}>
+                      <NavigationLink className="hover:underline" href={getPersonPath(person)}>
                         {person.lastName}, {person.firstName}
-                      </Link>
+                      </NavigationLink>
                     </TableCell>
                     <TableCell>{person.documentNumber}</TableCell>
                     <TableCell>
-                      <Link
+                      <NavigationLink
                         className="text-muted-foreground font-medium hover:underline"
                         href={getInstitutionPath(person)}
                       >
                         {person.institutionName}
-                      </Link>
+                      </NavigationLink>
                     </TableCell>
                     <TableCell>
                       {person.phoneNumber || <span className="text-muted-foreground/60">Sin teléfono</span>}
@@ -142,14 +142,14 @@ export function PlatformPeopleTablePresentation({
                 <ContextMenuContent className="w-44 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+                      <NavigationLink href={getPersonPath(person)} className="px-2.5 py-1.5">
                         Editar usuario
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
+                      <NavigationLink href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                         Ver institución
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                   </ContextMenuGroup>
                 </ContextMenuContent>
@@ -194,14 +194,14 @@ function PlatformPersonActions({ person }: { person: PlatformPersonSummary }): R
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+              <NavigationLink href={getPersonPath(person)} className="px-2.5 py-1.5">
                 Editar usuario
-              </Link>
+              </NavigationLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
+              <NavigationLink href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                 Ver institución
-              </Link>
+              </NavigationLink>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

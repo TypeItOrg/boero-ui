@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
 import { ChevronRightIcon, type LucideIcon } from "lucide-react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@common/components/ui/collapsible";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -65,10 +65,10 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
                     tooltip={item.title}
                     isActive={isActive}
                   >
-                    <Link href={item.url} aria-current={isActive ? "page" : undefined}>
+                    <NavigationLink href={item.url} aria-current={isActive ? "page" : undefined} pendingVariant="pulse">
                       <PlatformSidebarNavigationIcon icon={ItemIcon} />
                       <PlatformSidebarItemLabel>{item.title}</PlatformSidebarItemLabel>
-                    </Link>
+                    </NavigationLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
@@ -93,9 +93,9 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
                       {item.items.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={subItem.url}>
+                            <NavigationLink href={subItem.url} pendingVariant="pulse">
                               <span>{subItem.title}</span>
-                            </Link>
+                            </NavigationLink>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}

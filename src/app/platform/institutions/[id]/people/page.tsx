@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
@@ -34,10 +34,10 @@ export default async function InstitutionPeoplePage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg">
-          <Link href={`/platform/institutions/${id}/people/new`}>
+          <NavigationLink href={`/platform/institutions/${id}/people/new`} pendingLabel="Abriendo nuevo usuario">
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario
-          </Link>
+          </NavigationLink>
         </Button>
       }
     >

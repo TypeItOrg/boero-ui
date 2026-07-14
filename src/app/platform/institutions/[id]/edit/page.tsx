@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { InstitutionForm } from "@features/institutions/components/institution-form";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
@@ -22,12 +22,12 @@ export default async function EditInstitutionPage({ params }: EditInstitutionPag
         description="Reactivá la institución desde su ficha antes de editar sus datos."
         breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
         actions={
-          <Link
+          <NavigationLink
             href={`/platform/institutions/${id}`}
             className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm font-medium underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             Ver ficha
-          </Link>
+          </NavigationLink>
         }
       />
     );
@@ -39,12 +39,12 @@ export default async function EditInstitutionPage({ params }: EditInstitutionPag
       description={`Editá los datos de ${institution.name}.`}
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
-        <Link
+        <NavigationLink
           href={`/platform/institutions/${id}/people`}
           className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm font-medium underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           Administrar usuarios
-        </Link>
+        </NavigationLink>
       }
     >
       <InstitutionForm mode="edit" institution={institution} />

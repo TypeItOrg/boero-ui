@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -88,7 +88,9 @@ export function PeopleTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/platform/institutions/${institutionId}/people?size=${size}`}>Volver a la primera página</Link>
+            <NavigationLink href={`/platform/institutions/${institutionId}/people?size=${size}`}>
+              Volver a la primera página
+            </NavigationLink>
           </Button>
         </div>
       );
@@ -118,10 +120,10 @@ export function PeopleTablePresentation({
           Comenzá creando un nuevo usuario para esta institución.
         </p>
         <Button asChild size="sm">
-          <Link href={`/platform/institutions/${institutionId}/people/new`}>
+          <NavigationLink href={`/platform/institutions/${institutionId}/people/new`}>
             <PlusIcon className="mr-2 size-4" />
             Nuevo usuario
-          </Link>
+          </NavigationLink>
         </Button>
       </div>
     );
@@ -200,12 +202,12 @@ export function PeopleTablePresentation({
                   </ContextMenuTrigger>
                   <ContextMenuContent className="w-44 p-1.5">
                     <ContextMenuItem asChild>
-                      <Link
+                      <NavigationLink
                         href={`/platform/institutions/${institutionId}/people/${person.id}`}
                         className="px-2.5 py-1.5"
                       >
                         Editar
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                     <ContextMenuSeparator />
                     <ContextMenuItem
@@ -262,9 +264,12 @@ function PersonActionsMenu({ person, institutionId, isPending, onDelete }: Perso
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuItem asChild>
-            <Link href={`/platform/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
+            <NavigationLink
+              href={`/platform/institutions/${institutionId}/people/${person.id}`}
+              className="px-2.5 py-1.5"
+            >
               Editar
-            </Link>
+            </NavigationLink>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" disabled={isPending} onSelect={onDelete}>

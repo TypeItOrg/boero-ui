@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import Link from "next/link";
 import {
   Building2Icon,
   BuildingIcon,
@@ -12,6 +11,7 @@ import {
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Separator } from "@common/components/ui/separator";
@@ -184,7 +184,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
         </div>
         <div className="shrink-0 self-end">
           <Button asChild size="lg">
-            <Link href="/platform/institutions">Ver todas</Link>
+            <NavigationLink href="/platform/institutions">Ver todas</NavigationLink>
           </Button>
         </div>
       </CardHeader>
@@ -212,7 +212,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
 
 function RecentInstitutionRow({ institution }: { institution: RecentInstitution }): React.ReactElement {
   return (
-    <Link
+    <NavigationLink
       href={`/platform/institutions/${institution.id}`}
       className="hover:bg-muted/50 -mx-2 flex min-w-0 items-center gap-3 rounded-lg px-2 py-3 transition-colors"
     >
@@ -239,7 +239,7 @@ function RecentInstitutionRow({ institution }: { institution: RecentInstitution 
       >
         {formatDashboardDate(institution.createdAt)}
       </time>
-    </Link>
+    </NavigationLink>
   );
 }
 

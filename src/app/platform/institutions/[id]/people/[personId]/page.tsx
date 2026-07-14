@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
@@ -42,7 +42,7 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
 
       <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
         <Button asChild variant="outline">
-          <Link href={`/platform/institutions/${id}/people`}>Cancelar</Link>
+          <NavigationLink href={`/platform/institutions/${id}/people`}>Cancelar</NavigationLink>
         </Button>
         <Button type="submit" form="person-edit-form">
           Guardar cambios

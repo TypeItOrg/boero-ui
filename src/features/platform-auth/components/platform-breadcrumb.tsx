@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -12,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@common/components/ui/breadcrumb";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 
 type RouteConfig = {
   label: string;
@@ -89,7 +89,9 @@ export function PlatformBreadcrumb({ segmentLabels }: PlatformBreadcrumbProps): 
                   <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link href={segment.href!}>{segment.label}</Link>
+                    <NavigationLink href={segment.href!} pendingVariant="pulse">
+                      {segment.label}
+                    </NavigationLink>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { BuildingIcon, EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -99,7 +99,7 @@ export function InstitutionsTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/platform/institutions?size=${size}`}>Volver a la primera página</Link>
+            <NavigationLink href={`/platform/institutions?size=${size}`}>Volver a la primera página</NavigationLink>
           </Button>
         </div>
       );
@@ -129,10 +129,10 @@ export function InstitutionsTablePresentation({
           Comenzá creando una nueva institución para empezar a gestionar la plataforma.
         </p>
         <Button asChild size="sm">
-          <Link href="/platform/institutions/new">
+          <NavigationLink href="/platform/institutions/new">
             <PlusIcon className="mr-2 size-4" />
             Nueva Institución
-          </Link>
+          </NavigationLink>
         </Button>
       </div>
     );
@@ -172,9 +172,9 @@ export function InstitutionsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={`/platform/institutions/${institution.id}`}>
+                      <NavigationLink className="hover:underline" href={`/platform/institutions/${institution.id}`}>
                         {institution.name}
-                      </Link>
+                      </NavigationLink>
                     </TableCell>
                     <TableCell>{institution.country.name}</TableCell>
                     <TableCell>{institution.province}</TableCell>
@@ -199,9 +199,9 @@ export function InstitutionsTablePresentation({
                 <ContextMenuContent className="w-44 p-1.5">
                   {getInstitutionActions(institution).map((action) => (
                     <ContextMenuItem key={action.href} asChild>
-                      <Link href={action.href} className="px-2.5 py-1.5">
+                      <NavigationLink href={action.href} className="px-2.5 py-1.5">
                         {action.label}
-                      </Link>
+                      </NavigationLink>
                     </ContextMenuItem>
                   ))}
                   <ContextMenuSeparator />
@@ -273,7 +273,7 @@ function InstitutionUsersCell({ institution }: { institution: InstitutionSummary
   const overflow = count - visibleAvatars;
 
   return (
-    <Link href={`/platform/institutions/${institution.id}/people`} className="inline-flex items-center">
+    <NavigationLink href={`/platform/institutions/${institution.id}/people`} className="inline-flex items-center">
       <AvatarGroup>
         {Array.from({ length: visibleAvatars }).map((_, index) => (
           <Avatar key={index} size="sm">
@@ -284,7 +284,7 @@ function InstitutionUsersCell({ institution }: { institution: InstitutionSummary
         ))}
         {overflow > 0 && <AvatarGroupCount>+{overflow}</AvatarGroupCount>}
       </AvatarGroup>
-    </Link>
+    </NavigationLink>
   );
 }
 
@@ -311,9 +311,9 @@ function InstitutionActionsMenu({
           <DropdownMenuGroup>
             {getInstitutionActions(institution).map((action) => (
               <DropdownMenuItem key={action.href} asChild>
-                <Link href={action.href} className="px-2.5 py-1.5">
+                <NavigationLink href={action.href} className="px-2.5 py-1.5">
                   {action.label}
-                </Link>
+                </NavigationLink>
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>

@@ -10,6 +10,7 @@ import { cn } from "@common/utils/cn.util";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Input } from "@common/components/ui/input";
+import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Textarea } from "@common/components/ui/textarea";
 import { Switch } from "@common/components/ui/switch";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
@@ -126,14 +127,6 @@ export function InstitutionForm({
         }
       }
     });
-  }
-
-  function handleCancel(): void {
-    if (onCancel) {
-      onCancel();
-    } else {
-      router.push(INSTITUTIONS_PATH);
-    }
   }
 
   return (
@@ -317,16 +310,29 @@ export function InstitutionForm({
 
       {!hideFooter && (
         <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="flex-[1_0_min(140px,100%)] sm:flex-none"
-            onClick={handleCancel}
-            disabled={isPending}
-          >
-            Cancelar
-          </Button>
+          {onCancel ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="flex-[1_0_min(140px,100%)] sm:flex-none"
+              onClick={onCancel}
+              disabled={isPending}
+            >
+              Cancelar
+            </Button>
+          ) : (
+            <Button
+              asChild
+              type="button"
+              variant="outline"
+              size="lg"
+              className="flex-[1_0_min(140px,100%)] sm:flex-none"
+              disabled={isPending}
+            >
+              <NavigationLink href={INSTITUTIONS_PATH}>Cancelar</NavigationLink>
+            </Button>
+          )}
           <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
             {getSubmitLabel({ isEdit, isPending })}
           </Button>
