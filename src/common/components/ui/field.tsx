@@ -89,7 +89,11 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
+type FieldLabelProps = React.ComponentProps<typeof Label> & {
+  required?: boolean;
+};
+
+function FieldLabel({ className, required, children, ...props }: FieldLabelProps) {
   return (
     <Label
       data-slot="field-label"
@@ -99,7 +103,14 @@ function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>)
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+      {required && (
+        <span aria-hidden="true" className="text-destructive">
+          *
+        </span>
+      )}
+    </Label>
   );
 }
 

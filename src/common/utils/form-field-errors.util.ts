@@ -21,7 +21,10 @@ export function pickFieldErrors<T extends string>(
   const result = {} as Partial<Record<T, string>>;
 
   for (const field of fields) {
-    result[field] = fieldErrors?.[field];
+    const message = fieldErrors?.[field];
+    if (message) {
+      result[field] = message;
+    }
   }
 
   return result;
