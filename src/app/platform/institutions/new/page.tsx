@@ -4,7 +4,7 @@ import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
-  title: "Nueva Institución — Boero",
+  title: "Nueva institución",
   description: "Creá una nueva institución en la plataforma.",
 };
 

@@ -8,7 +8,7 @@ import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
-  title: "Nuevo usuario — Boero",
+  title: "Nuevo usuario",
   description: "Creá un nuevo usuario institucional en la plataforma.",
 };
 

@@ -5,7 +5,7 @@ import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
-  title: "Nuevo administrador — Boero",
+  title: "Nuevo administrador",
   description: "Creá un nuevo administrador para la plataforma.",
 };
 
