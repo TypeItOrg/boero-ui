@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { EllipsisVerticalIcon, FingerprintIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -133,20 +134,14 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuContent className="w-40 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <NavigationLink
-                        href={`/platform/accounts/${account.platformAccountId}`}
-                        className="px-2.5 py-1.5"
-                      >
+                      <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                         Ver detalle
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <NavigationLink
-                        href={`/platform/accounts/${account.platformAccountId}/edit`}
-                        className="px-2.5 py-1.5"
-                      >
+                      <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                         Editar
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                   </ContextMenuGroup>
                 </ContextMenuContent>
@@ -193,14 +188,14 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
         <DropdownMenuContent align="end" className="w-40 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <NavigationLink href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+              <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                 Ver detalle
-              </NavigationLink>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <NavigationLink href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+              <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                 Editar
-              </NavigationLink>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

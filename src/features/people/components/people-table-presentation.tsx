@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -202,12 +203,12 @@ export function PeopleTablePresentation({
                   </ContextMenuTrigger>
                   <ContextMenuContent className="w-44 p-1.5">
                     <ContextMenuItem asChild>
-                      <NavigationLink
+                      <Link
                         href={`/platform/institutions/${institutionId}/people/${person.id}`}
                         className="px-2.5 py-1.5"
                       >
                         Editar
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                     <ContextMenuSeparator />
                     <ContextMenuItem
@@ -264,12 +265,9 @@ function PersonActionsMenu({ person, institutionId, isPending, onDelete }: Perso
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuItem asChild>
-            <NavigationLink
-              href={`/platform/institutions/${institutionId}/people/${person.id}`}
-              className="px-2.5 py-1.5"
-            >
+            <Link href={`/platform/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
               Editar
-            </NavigationLink>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" disabled={isPending} onSelect={onDelete}>

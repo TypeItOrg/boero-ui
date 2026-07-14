@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon, SearchIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -142,14 +143,14 @@ export function PlatformPeopleTablePresentation({
                 <ContextMenuContent className="w-44 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <NavigationLink href={getPersonPath(person)} className="px-2.5 py-1.5">
+                      <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
                         Editar usuario
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <NavigationLink href={getInstitutionPath(person)} className="px-2.5 py-1.5">
+                      <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                         Ver institución
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                   </ContextMenuGroup>
                 </ContextMenuContent>
@@ -194,14 +195,14 @@ function PlatformPersonActions({ person }: { person: PlatformPersonSummary }): R
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <NavigationLink href={getPersonPath(person)} className="px-2.5 py-1.5">
+              <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
                 Editar usuario
-              </NavigationLink>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <NavigationLink href={getInstitutionPath(person)} className="px-2.5 py-1.5">
+              <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                 Ver institución
-              </NavigationLink>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

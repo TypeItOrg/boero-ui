@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { BuildingIcon, EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -199,9 +200,9 @@ export function InstitutionsTablePresentation({
                 <ContextMenuContent className="w-44 p-1.5">
                   {getInstitutionActions(institution).map((action) => (
                     <ContextMenuItem key={action.href} asChild>
-                      <NavigationLink href={action.href} className="px-2.5 py-1.5">
+                      <Link href={action.href} className="px-2.5 py-1.5">
                         {action.label}
-                      </NavigationLink>
+                      </Link>
                     </ContextMenuItem>
                   ))}
                   <ContextMenuSeparator />
@@ -311,9 +312,9 @@ function InstitutionActionsMenu({
           <DropdownMenuGroup>
             {getInstitutionActions(institution).map((action) => (
               <DropdownMenuItem key={action.href} asChild>
-                <NavigationLink href={action.href} className="px-2.5 py-1.5">
+                <Link href={action.href} className="px-2.5 py-1.5">
                   {action.label}
-                </NavigationLink>
+                </Link>
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
