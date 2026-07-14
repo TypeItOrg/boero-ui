@@ -88,7 +88,7 @@ make ps-prod
 curl --fail http://127.0.0.1:3000/api/health
 ```
 
-Staging sigue el mismo proceso con `.env.staging` y `make staging`. Su puerto loopback predeterminado es `3001`.
+Staging sigue el mismo proceso con `.env.staging` y `make staging`. Ambos ambientes usan el puerto loopback `3000` porque se despliegan de manera independiente.
 
 ## Nginx por HTTP
 
@@ -100,23 +100,34 @@ La configuración combinada:
 - bloquea la publicación de `/actuator`;
 - dirige el resto del tráfico a Next.js en `127.0.0.1:3000`;
 - deshabilita el buffering para conservar el streaming del App Router;
+- comprime con gzip HTML, CSS, JavaScript, JSON, SVG y respuestas RSC mayores a 1 KiB;
 - reemplaza `X-Forwarded-For` con la IP observada por Nginx.
 
-Instalarla en lugar del sitio actual del API y validar Nginx antes de recargarlo:
+Reemplazar el sitio `boero-api` por un sitio combinado llamado `boero`. Antes del cambio conviene guardar una copia de respaldo:
 
 ```bash
+sudo cp /etc/nginx/sites-available/boero-api /etc/nginx/sites-available/boero-api.bak
 sudo cp deploy/nginx/boero.conf.example /etc/nginx/sites-available/boero
 sudo ln -s /etc/nginx/sites-available/boero /etc/nginx/sites-enabled/boero
 sudo unlink /etc/nginx/sites-enabled/boero-api
 sudo nginx -t
 sudo systemctl reload nginx
+sudo rm /etc/nginx/sites-available/boero-api
 ```
 
-El comando `unlink` sólo corresponde si el enlace actual se llama `boero-api`. No se deben dejar activas simultáneamente ambas configuraciones porque las dos intentarían ocupar el sitio predeterminado del puerto 80.
+Comprobar que Nginx entrega una respuesta comprimida:
 
-El ejemplo apunta al frontend de producción en el puerto `3000`. Para publicar staging en su lugar, cambiar el upstream `boero_ui` a `127.0.0.1:3001`. Publicar ambos ambientes simultáneamente mediante una sola IP requiere asignar otro puerto público a uno de ellos o incorporar dominios.
+```bash
+curl --silent --header 'Accept-Encoding: gzip' --dump-header - --output /dev/null http://<ip-del-vps>/ | grep -i '^Content-Encoding: gzip'
+```
 
-Por el momento el acceso es HTTP y no requiere dominio ni certificados. HTTP no cifra credenciales, tokens ni respuestas: no se deben usar datos reales y conviene restringir la IP mediante firewall o VPN siempre que sea posible. Sólo el puerto 80 debe ser público; los puertos 3000, 3001 y 8080 permanecen ligados a `127.0.0.1`.
+Nginx solicita respuestas sin compresión a Next.js y Spring, y aplica gzip en un único lugar. El nivel `5` ofrece una buena relación entre uso de CPU y tamaño para una VPS. No se comprimen imágenes rasterizadas, fuentes WOFF2 ni otros formatos que ya incluyen compresión.
+
+Después de validar y recargar Nginx, el único sitio activo queda en `/etc/nginx/sites-enabled/boero` y la configuración anterior se conserva únicamente como `/etc/nginx/sites-available/boero-api.bak`.
+
+El upstream `boero_ui` apunta a `127.0.0.1:3000` tanto para staging como para producción. Si en el futuro ambos ambientes deben ejecutarse simultáneamente en la misma VPS, uno necesitará otro puerto y otro punto de entrada público o un dominio propio.
+
+Por el momento el acceso es HTTP y no requiere dominio ni certificados. HTTP no cifra credenciales, tokens ni respuestas: no se deben usar datos reales y conviene restringir la IP mediante firewall o VPN siempre que sea posible. Sólo el puerto 80 debe ser público; los puertos 3000 y 8080 permanecen ligados a `127.0.0.1`.
 
 `AUTH_COOKIE_SECURE=false` es necesario mientras el navegador acceda por HTTP. Al habilitar HTTPS debe cambiarse a `true`.
 
