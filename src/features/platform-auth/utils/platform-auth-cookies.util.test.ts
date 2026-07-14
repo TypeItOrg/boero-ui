@@ -15,6 +15,7 @@ import {
 
 describe("platform-auth-cookies.util", () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalAuthCookieSecure = process.env.AUTH_COOKIE_SECURE;
   const cookiesMock = jest.mocked(cookies);
   const rawCookieStore = {
     [Symbol.iterator]: function* iterator() {},
@@ -29,6 +30,7 @@ describe("platform-auth-cookies.util", () => {
 
   beforeEach(() => {
     (process.env as Record<string, string | undefined>).NODE_ENV = "test";
+    delete process.env.AUTH_COOKIE_SECURE;
     cookiesMock.mockResolvedValue(cookieStore);
   });
 
@@ -40,6 +42,12 @@ describe("platform-auth-cookies.util", () => {
 
   afterAll(() => {
     (process.env as Record<string, string | undefined>).NODE_ENV = originalNodeEnv;
+
+    if (originalAuthCookieSecure === undefined) {
+      delete process.env.AUTH_COOKIE_SECURE;
+    } else {
+      process.env.AUTH_COOKIE_SECURE = originalAuthCookieSecure;
+    }
   });
 
   it("returns insecure cookie options outside production", () => {
@@ -61,6 +69,19 @@ describe("platform-auth-cookies.util", () => {
       path: "/",
       sameSite: "lax",
       secure: true,
+    });
+  });
+
+  it("allows insecure cookies for an HTTP production deployment", () => {
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+    process.env.AUTH_COOKIE_SECURE = "false";
+
+    expect(getPlatformAuthCookieOptions(456)).toEqual({
+      httpOnly: true,
+      maxAge: 456,
+      path: "/",
+      sameSite: "lax",
+      secure: false,
     });
   });
 

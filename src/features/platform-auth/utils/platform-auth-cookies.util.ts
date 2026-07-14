@@ -19,10 +19,17 @@ export function getPlatformAuthCookieOptions(maxAge: number): PlatformAuthCookie
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     path: "/",
     maxAge,
   };
+}
+
+function shouldUseSecureCookies(): boolean {
+  if (process.env.AUTH_COOKIE_SECURE === "true") return true;
+  if (process.env.AUTH_COOKIE_SECURE === "false") return false;
+
+  return process.env.NODE_ENV === "production";
 }
 
 export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens"]): Promise<void> {
