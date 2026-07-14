@@ -37,11 +37,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
           const tokens = payload.tokens;
 
           if (tokens?.accessToken && tokens?.refreshToken) {
-            const nextResponse = NextResponse.next();
-
-            setPlatformAuthResponseCookies(nextResponse, tokens.accessToken, tokens.refreshToken);
-
-            return nextResponse;
+            return createRefreshedSessionResponse(request, tokens.accessToken, tokens.refreshToken);
           }
         }
       } catch {}
@@ -77,4 +73,19 @@ function setPlatformAuthResponseCookies(response: NextResponse, accessToken: str
   response.cookies.set(PLATFORM_REFRESH_TOKEN_COOKIE, refreshToken, {
     ...getPlatformAuthCookieOptions(PLATFORM_REFRESH_TOKEN_MAX_AGE),
   });
+}
+
+function createRefreshedSessionResponse(request: NextRequest, accessToken: string, refreshToken: string): NextResponse {
+  request.cookies.set(PLATFORM_ACCESS_TOKEN_COOKIE, accessToken);
+  request.cookies.set(PLATFORM_REFRESH_TOKEN_COOKIE, refreshToken);
+
+  const response = NextResponse.next({
+    request: {
+      headers: new Headers(request.headers),
+    },
+  });
+
+  setPlatformAuthResponseCookies(response, accessToken, refreshToken);
+
+  return response;
 }

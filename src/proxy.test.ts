@@ -75,6 +75,11 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
     expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
     expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
+
+    const upstreamCookies = response.headers.get("x-middleware-request-cookie");
+
+    expect(upstreamCookies).toContain(PLATFORM_ACCESS_TOKEN_COOKIE + "=new-access-token");
+    expect(upstreamCookies).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
   });
 
   it("redirects to login when refresh returns no usable tokens", async () => {
