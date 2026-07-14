@@ -1,17 +1,40 @@
 services:
   staging:
     container_name: boero-ui-staging
-    build:
-      context: .
-      target: prod
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required at build time}
-    image: boero-ui:staging
+    image: ${APP_IMAGE:-ghcr.io/typeitorg/boero-ui}:${APP_VERSION:?APP_VERSION is required for staging}
+    pull_policy: always
+    init: true
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${APP_HOST_PORT:-3001}:3000"
     env_file:
       - path: .env.staging
         required: false
     environment:
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
+      BOERO_API_URL: ${BOERO_API_URL:?BOERO_API_URL is required for staging}
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - next-cache:/app/.next/cache
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    mem_limit: ${APP_MEMORY_LIMIT:-1024m}
+    cpus: ${APP_CPU_LIMIT:-1.0}
+    logging:
+      driver: local
+      options:
+        max-size: ${LOG_MAX_SIZE:-10m}
+        max-file: ${LOG_MAX_FILES:-5}
+
+volumes:
+  next-cache:
+    name: boero-ui-next-cache-staging

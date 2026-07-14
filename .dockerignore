@@ -1,5 +1,10 @@
 .git
+.github
+.agents
+.codex
 .next
+.pnpm-store
+.swc
 node_modules
 dist
 coverage

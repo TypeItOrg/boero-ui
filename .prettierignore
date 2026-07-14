@@ -3,3 +3,4 @@ build
 coverage
 .agents/
 docs/
+deploy/nginx/boero.conf.example
