@@ -63,7 +63,6 @@ export function PersonRolesManager({
         <CardDescription>Los cambios de roles se aplican al guardar el usuario.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-
         <section className="flex flex-col gap-3">
           <h3 className="text-sm font-medium">Roles asignados</h3>
           {selectedRoles.length > 0 ? (
@@ -164,7 +163,6 @@ function getSelectedRoles(
     return role ? [{ roleCode, displayName: role.displayName }] : [];
   });
 }
-
 
 function formatAssignedAt(value: string | undefined): string {
   if (!value) return "Asignación pendiente";
