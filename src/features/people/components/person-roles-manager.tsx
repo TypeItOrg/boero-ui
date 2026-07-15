@@ -43,7 +43,6 @@ export function PersonRolesManager({
     [assignedRolesByCode, rolesByCode, selectedRoleCodeSet],
   );
   const availableRoles = roles.filter((role) => !selectedRoleCodeSet.has(role.code));
-  const hasPendingChanges = !areSetsEqual(initialRoleCodes, selectedRoleCodeSet);
 
   function selectRole(roleCode: SystemRoleCode): void {
     if (selectedRoleCodeSet.has(roleCode) || hasApplicantRoleConflict(selectedRoleCodes, roleCode)) return;
@@ -64,11 +63,6 @@ export function PersonRolesManager({
         <CardDescription>Los cambios de roles se aplican al guardar el usuario.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        {hasPendingChanges ? (
-          <p className="text-muted-foreground rounded-lg border border-dashed p-3 text-sm">
-            Hay cambios de roles pendientes de guardar.
-          </p>
-        ) : null}
 
         <section className="flex flex-col gap-3">
           <h3 className="text-sm font-medium">Roles asignados</h3>
@@ -171,15 +165,6 @@ function getSelectedRoles(
   });
 }
 
-function areSetsEqual<T>(left: ReadonlySet<T>, right: ReadonlySet<T>): boolean {
-  if (left.size !== right.size) return false;
-
-  for (const value of left) {
-    if (!right.has(value)) return false;
-  }
-
-  return true;
-}
 
 function formatAssignedAt(value: string | undefined): string {
   if (!value) return "Asignación pendiente";
