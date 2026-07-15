@@ -1,10 +1,10 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPinIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { InstitutionDetail } from "@features/institutions/components/institution-detail";
 import {
@@ -56,10 +56,10 @@ export default async function InstitutionDetailPage({
           {institution.active ? (
             <>
               <Button asChild variant="outline" size="lg">
-                <NavigationLink href={`/platform/institutions/${id}/edit`}>Editar institución</NavigationLink>
+                <Link href={`/platform/institutions/${id}/edit`}>Editar institución</Link>
               </Button>
               <Button asChild size="lg">
-                <NavigationLink href={`/platform/institutions/${id}/people`}>Administrar usuarios</NavigationLink>
+                <Link href={`/platform/institutions/${id}/people`}>Administrar usuarios</Link>
               </Button>
             </>
           ) : (

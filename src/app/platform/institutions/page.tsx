@@ -1,8 +1,8 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { InstitutionsTableFilters } from "@features/institutions/components/institutions-table-filters";
 import { InstitutionsTableContainer } from "@features/institutions/components/institutions-table-container";
@@ -33,10 +33,10 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg">
-          <NavigationLink href="/platform/institutions/new" pendingLabel="Abriendo nueva institución">
+          <Link href="/platform/institutions/new">
             <PlusIcon data-icon="inline-start" />
             Nueva Institución
-          </NavigationLink>
+          </Link>
         </Button>
       }
     >

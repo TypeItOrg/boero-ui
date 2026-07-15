@@ -6,7 +6,6 @@ import { PlatformAccountForm } from "@features/platform-accounts/components/plat
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { getPlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 
 type EditPlatformAccountPageProps = {
   params: Promise<{ id: string }>;
@@ -16,7 +15,7 @@ export default async function EditPlatformAccountPage({
   params,
 }: EditPlatformAccountPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const [account, currentAccount] = await Promise.all([getAccountOrNotFound(id), getPlatformAccount()]);
+  const account = await getAccountOrNotFound(id);
   const fullName = `${account.name} ${account.lastName}`;
 
   return (
@@ -32,11 +31,7 @@ export default async function EditPlatformAccountPage({
         </div>
       }
     >
-      <PlatformAccountForm
-        mode="edit"
-        account={account}
-        isCurrentAccount={currentAccount?.platformAccountId === account.platformAccountId}
-      />
+      <PlatformAccountForm mode="edit" account={account} />
     </PlatformPageShell>
   );
 }

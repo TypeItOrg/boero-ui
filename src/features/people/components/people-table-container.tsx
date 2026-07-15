@@ -1,14 +1,15 @@
 import type { PeoplePaginationParams } from "../utils/people-pagination.util";
-import { fetchPeople } from "../services/fetch-people.service";
+import type { fetchPeople } from "../services/fetch-people.service";
 import { PeopleTablePresentation } from "./people-table-presentation";
 
 type PeopleTableContainerProps = PeoplePaginationParams & {
+  dataPromise: ReturnType<typeof fetchPeople>;
   institutionId: string;
 };
 
 export async function PeopleTableContainer(props: PeopleTableContainerProps): Promise<React.ReactElement> {
-  const { institutionId, page, size, search, sort } = props;
-  const data = await fetchPeople(institutionId, props);
+  const { dataPromise, institutionId, page, size, search, sort } = props;
+  const data = await dataPromise;
 
   return (
     <PeopleTablePresentation

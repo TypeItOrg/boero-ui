@@ -56,9 +56,9 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
   return (
     <Sidebar
       collapsible="icon"
-      variant="floating"
+      variant="sidebar"
       className={cn(
-        "bg-background [&_[data-slot=sidebar-inner]]:bg-muted md:py-4! md:pr-0! md:pl-4! [&_[data-slot=sidebar-inner]]:rounded-xl! [&_[data-slot=sidebar-inner]]:shadow-none! [&_[data-slot=sidebar-inner]]:ring-0!",
+        "bg-background [&_[data-slot=sidebar-inner]]:bg-muted [&_[data-slot=sidebar-inner]]:shadow-none! [&_[data-slot=sidebar-inner]]:ring-0!",
         className,
       )}
       {...props}

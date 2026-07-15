@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import Link from "next/link";
 import {
   Building2Icon,
   BuildingIcon,
@@ -11,7 +12,6 @@ import {
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Separator } from "@common/components/ui/separator";
@@ -184,7 +184,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
         </div>
         <div className="shrink-0 self-end">
           <Button asChild size="lg">
-            <NavigationLink href="/platform/institutions">Ver todas</NavigationLink>
+            <Link href="/platform/institutions">Ver todas</Link>
           </Button>
         </div>
       </CardHeader>
@@ -212,7 +212,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
 
 function RecentInstitutionRow({ institution }: { institution: RecentInstitution }): React.ReactElement {
   return (
-    <NavigationLink
+    <Link
       href={`/platform/institutions/${institution.id}`}
       className="hover:bg-muted/50 -mx-2 flex min-w-0 items-center gap-3 rounded-lg px-2 py-3 transition-colors"
     >
@@ -226,8 +226,8 @@ function RecentInstitutionRow({ institution }: { institution: RecentInstitution 
             {institution.active ? "Activa" : "Inactiva"}
           </Badge>
         </div>
-        <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-xs">
-          <MapPinIcon className="size-3.5" aria-hidden="true" />
+        <p className="text-muted-foreground mt-1 flex min-w-0 items-center gap-1.5 text-xs">
+          <MapPinIcon className="size-3.5 shrink-0" aria-hidden="true" />
           <span className="truncate">
             {institution.city}, {institution.province}
           </span>
@@ -239,7 +239,7 @@ function RecentInstitutionRow({ institution }: { institution: RecentInstitution 
       >
         {formatDashboardDate(institution.createdAt)}
       </time>
-    </NavigationLink>
+    </Link>
   );
 }
 

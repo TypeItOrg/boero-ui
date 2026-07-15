@@ -1,9 +1,9 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
@@ -13,6 +13,7 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 import { PeopleSearchForm } from "@features/people/components/people-search-form";
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
+import { fetchPeople } from "@features/people/services/fetch-people.service";
 
 type PeoplePageProps = {
   params: Promise<{ id: string }>;
@@ -23,8 +24,9 @@ export default async function InstitutionPeoplePage({
   params,
   searchParams,
 }: PeoplePageProps): Promise<React.ReactElement> {
-  const { id } = await params;
-  const { page, size, search, sort } = parsePeoplePaginationParams(await searchParams);
+  const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const { page, size, search, sort } = parsePeoplePaginationParams(resolvedSearchParams);
+  const peoplePromise = fetchPeople(id, { page, size, search, sort });
   const institution = await getInstitutionOrNotFound(id);
 
   return (
@@ -34,10 +36,10 @@ export default async function InstitutionPeoplePage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg">
-          <NavigationLink href={`/platform/institutions/${id}/people/new`} pendingLabel="Abriendo nuevo usuario">
+          <Link href={`/platform/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario
-          </NavigationLink>
+          </Link>
         </Button>
       }
     >
@@ -45,7 +47,14 @@ export default async function InstitutionPeoplePage({
         <PeopleSearchForm search={search} size={size} />
 
         <Suspense fallback={<PeopleTableSkeleton />}>
-          <PeopleTableContainer institutionId={id} page={page} size={size} search={search} sort={sort} />
+          <PeopleTableContainer
+            institutionId={id}
+            page={page}
+            size={size}
+            search={search}
+            sort={sort}
+            dataPromise={peoplePromise}
+          />
         </Suspense>
       </DataTableNavigationProvider>
     </PlatformPageShell>

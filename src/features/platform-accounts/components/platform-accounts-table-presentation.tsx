@@ -4,7 +4,6 @@ import Link from "next/link";
 import { EllipsisVerticalIcon, FingerprintIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Button } from "@common/components/ui/button";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
@@ -107,12 +106,9 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <NavigationLink
-                        className="hover:underline"
-                        href={`/platform/accounts/${account.platformAccountId}`}
-                      >
+                      <Link className="hover:underline" href={`/platform/accounts/${account.platformAccountId}`}>
                         {account.name} {account.lastName}
-                      </NavigationLink>
+                      </Link>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{account.email}</TableCell>
                     <TableCell>
@@ -230,7 +226,7 @@ function PlatformAccountsEmptyState({
           La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
         </p>
         <Button asChild variant="outline" size="sm">
-          <NavigationLink href={`/platform/accounts?size=${size}`}>Volver a la primera página</NavigationLink>
+          <Link href={`/platform/accounts?size=${size}`}>Volver a la primera página</Link>
         </Button>
       </div>
     );
@@ -260,10 +256,10 @@ function PlatformAccountsEmptyState({
         Comenzá creando un nuevo administrador para empezar a gestionar la plataforma.
       </p>
       <Button asChild size="sm">
-        <NavigationLink href="/platform/accounts/new">
+        <Link href="/platform/accounts/new">
           <PlusIcon className="mr-2 size-4" />
           Nuevo administrador
-        </NavigationLink>
+        </Link>
       </Button>
     </div>
   );

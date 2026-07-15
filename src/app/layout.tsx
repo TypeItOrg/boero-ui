@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Manrope } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
 import { cn } from "@common/utils/cn.util";
@@ -41,6 +42,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
+        <NextTopLoader
+          color="var(--primary)"
+          crawlSpeed={200}
+          height={2}
+          shadow={false}
+          showForHashAnchor={false}
+          showSpinner={false}
+        />
         <Providers>
           <TooltipProvider>{children}</TooltipProvider>
         </Providers>

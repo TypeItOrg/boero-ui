@@ -4,7 +4,6 @@ import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon, SearchIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { Button } from "@common/components/ui/button";
 import {
   ContextMenu,
@@ -105,18 +104,18 @@ export function PlatformPeopleTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <NavigationLink className="hover:underline" href={getPersonPath(person)}>
+                      <Link className="hover:underline" href={getPersonPath(person)}>
                         {person.lastName}, {person.firstName}
-                      </NavigationLink>
+                      </Link>
                     </TableCell>
                     <TableCell>{person.documentNumber}</TableCell>
                     <TableCell>
-                      <NavigationLink
+                      <Link
                         className="text-muted-foreground font-medium hover:underline"
                         href={getInstitutionPath(person)}
                       >
                         {person.institutionName}
-                      </NavigationLink>
+                      </Link>
                     </TableCell>
                     <TableCell>
                       {person.phoneNumber || <span className="text-muted-foreground/60">Sin teléfono</span>}

@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
-import { toast } from "sonner";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -27,10 +26,10 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationQuery } from "@common/types/pagination.types";
-import { deletePersonAction } from "../actions/delete-person.action";
 import type { PersonSummary } from "../types/person.types";
 import type { PeopleSort, PeopleSortField } from "../utils/people-pagination.util";
 import { PeoplePagination } from "./people-pagination";
+import { PersonDeleteDialog } from "./person-delete-dialog";
 
 type PeopleTablePresentationProps = PaginationQuery & {
   data: PaginatedResponse<PersonSummary>;
@@ -47,30 +46,11 @@ export function PeopleTablePresentation({
   sort,
 }: PeopleTablePresentationProps): React.ReactElement {
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
-  const [pendingPersonId, setPendingPersonId] = useState<string>();
-  const [, startMutationTransition] = useTransition();
+  const router = useRouter();
+  const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
 
   function handleDeletePerson(person: PersonSummary): void {
-    const confirmed = window.confirm(`¿Eliminar a ${person.firstName} ${person.lastName} de la institución?`);
-    if (!confirmed) return;
-
-    setPendingPersonId(person.id);
-    startMutationTransition(async () => {
-      try {
-        const result = await deletePersonAction(institutionId, person.id);
-
-        if (result.error) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`${person.firstName} ${person.lastName} fue eliminado correctamente.`);
-      } catch {
-        toast.error("Error al eliminar el usuario.");
-      } finally {
-        setPendingPersonId(undefined);
-      }
-    });
+    setPersonToDelete(person);
   }
 
   function updateSort(nextSort: PeopleSort): void {
@@ -89,9 +69,7 @@ export function PeopleTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <NavigationLink href={`/platform/institutions/${institutionId}/people?size=${size}`}>
-              Volver a la primera página
-            </NavigationLink>
+            <Link href={`/platform/institutions/${institutionId}/people?size=${size}`}>Volver a la primera página</Link>
           </Button>
         </div>
       );
@@ -121,10 +99,10 @@ export function PeopleTablePresentation({
           Comenzá creando un nuevo usuario para esta institución.
         </p>
         <Button asChild size="sm">
-          <NavigationLink href={`/platform/institutions/${institutionId}/people/new`}>
+          <Link href={`/platform/institutions/${institutionId}/people/new`}>
             <PlusIcon className="mr-2 size-4" />
             Nuevo usuario
-          </NavigationLink>
+          </Link>
         </Button>
       </div>
     );
@@ -158,7 +136,7 @@ export function PeopleTablePresentation({
           </TableHeader>
           <TableBody>
             {data.items.map((person) => {
-              const isDeleting = pendingPersonId === person.id;
+              const isDeleting = personToDelete?.id === person.id;
 
               return (
                 <ContextMenu key={person.id}>
@@ -238,6 +216,21 @@ export function PeopleTablePresentation({
       </div>
 
       <PeoplePagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} />
+      {personToDelete ? (
+        <PersonDeleteDialog
+          institutionId={institutionId}
+          personId={personToDelete.id}
+          personName={`${personToDelete.firstName} ${personToDelete.lastName}`}
+          open
+          onOpenChange={(open) => {
+            if (!open) setPersonToDelete(undefined);
+          }}
+          onDeleted={() => {
+            setPersonToDelete(undefined);
+            router.refresh();
+          }}
+        />
+      ) : null}
     </div>
   );
 }

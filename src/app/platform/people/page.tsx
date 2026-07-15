@@ -6,6 +6,7 @@ import { fetchInstitution } from "@features/institutions/services/fetch-institut
 import { PlatformPeopleTableContainer } from "@features/people/components/platform-people-table-container";
 import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
 import { PlatformPeopleTableSkeleton } from "@features/people/components/platform-people-table-skeleton";
+import { fetchPlatformPeople } from "@features/people/services/fetch-platform-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 import { FALLBACK_SYSTEM_ROLES } from "@features/people/types/person-role.types";
 import {
@@ -28,6 +29,7 @@ export default async function PlatformPeoplePage({
   searchParams,
 }: PlatformPeoplePageProps): Promise<React.ReactElement> {
   const params = parsePlatformPeoplePaginationParams(await searchParams);
+  const peoplePromise = fetchPlatformPeople(params);
   const [roleList, selectedInstitutionName] = await Promise.all([
     fetchSystemRoles().catch(() => ({ roles: FALLBACK_SYSTEM_ROLES })),
     getSelectedInstitutionName(params.institutionId),
@@ -50,7 +52,7 @@ export default async function PlatformPeoplePage({
         />
 
         <Suspense fallback={<PlatformPeopleTableSkeleton />}>
-          <PlatformPeopleTableContainer {...params} />
+          <PlatformPeopleTableContainer {...params} dataPromise={peoplePromise} />
         </Suspense>
       </DataTableNavigationProvider>
     </PlatformPageShell>

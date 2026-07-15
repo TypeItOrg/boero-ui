@@ -10,10 +10,9 @@ const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
 
 type PlatformAccountDetailProps = {
   account: PlatformAccountAdmin;
-  currentAccountId: string | undefined;
 };
 
-export function PlatformAccountDetail({ account, currentAccountId }: PlatformAccountDetailProps): React.ReactElement {
+export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): React.ReactElement {
   return (
     <div className="grid grid-cols-12 gap-5">
       <Card className="col-span-12 h-full lg:col-span-8">
@@ -53,11 +52,7 @@ export function PlatformAccountDetail({ account, currentAccountId }: PlatformAcc
           </div>
         </CardContent>
         <CardFooter>
-          <PlatformAccountStatusControl
-            accountId={account.platformAccountId}
-            enabled={account.enabled}
-            isCurrentAccount={currentAccountId === account.platformAccountId}
-          />
+          <PlatformAccountStatusControl accountId={account.platformAccountId} enabled={account.enabled} />
         </CardFooter>
       </Card>
     </div>

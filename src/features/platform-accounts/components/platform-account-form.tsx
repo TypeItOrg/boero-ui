@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { Button } from "@common/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { cn } from "@common/utils/cn.util";
 import { createPlatformAccountAction } from "@features/platform-accounts/actions/create-platform-account.action";
 import { updatePlatformAccountAction } from "@features/platform-accounts/actions/update-platform-account.action";
@@ -26,6 +25,7 @@ import type {
 } from "@features/platform-accounts/types/platform-account-action-state.types";
 import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
 import { logoutPlatform } from "@features/platform-auth/actions/platform-logout.action";
+import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
 
 const PLATFORM_ACCOUNTS_PATH = "/platform/accounts";
 const EMPTY_FORM_VALUES: PlatformAccountFormInput = {
@@ -39,20 +39,20 @@ const EMPTY_FORM_VALUES: PlatformAccountFormInput = {
 type CreateMode = {
   mode: "create";
   account?: never;
-  isCurrentAccount?: never;
 };
 
 type EditMode = {
   mode: "edit";
   account: PlatformAccountAdmin;
-  isCurrentAccount: boolean;
 };
 
 type PlatformAccountFormProps = CreateMode | EditMode;
 
-export function PlatformAccountForm({ mode, account, isCurrentAccount }: PlatformAccountFormProps): React.ReactElement {
+export function PlatformAccountForm({ mode, account }: PlatformAccountFormProps): React.ReactElement {
   const router = useRouter();
+  const { account: currentAccount } = usePlatformAccount();
   const isEdit = mode === "edit";
+  const isCurrentAccount = isEdit && currentAccount?.platformAccountId === account.platformAccountId;
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
   const defaultValues = getDefaultValues(account);
@@ -85,6 +85,10 @@ export function PlatformAccountForm({ mode, account, isCurrentAccount }: Platfor
         router.push(isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH);
       }
     });
+  }
+
+  function handleCancel(): void {
+    router.push(isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH);
   }
 
   const errorAlert = formError ? (
@@ -192,18 +196,14 @@ export function PlatformAccountForm({ mode, account, isCurrentAccount }: Platfor
   const actions = (
     <>
       <Button
-        asChild
         type="button"
         variant="outline"
         size={isEdit ? "default" : "lg"}
         className={cn(!isEdit && "flex-[1_0_min(140px,100%)] sm:flex-none")}
+        onClick={handleCancel}
         disabled={isPending}
       >
-        <NavigationLink
-          href={isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH}
-        >
-          Cancelar
-        </NavigationLink>
+        Cancelar
       </Button>
       <Button
         type="submit"

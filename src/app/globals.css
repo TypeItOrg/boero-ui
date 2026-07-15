@@ -117,6 +117,12 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+#nprogress {
+  position: relative;
+  transition: opacity 0s linear 120ms !important;
+  z-index: 2147483647;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -143,28 +149,6 @@
 }
 
 @layer utilities {
-  @keyframes navigation-pending-pulse {
-    50% {
-      opacity: 0.45;
-    }
-  }
-
-  .navigation-link:has([data-navigation-pending="true"]) {
-    pointer-events: none;
-    cursor: wait;
-  }
-
-  .navigation-link:has([data-pending-variant="pulse"][data-navigation-pending="true"]) {
-    animation: navigation-pending-pulse 1s ease-in-out infinite;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .navigation-link:has([data-pending-variant="pulse"][data-navigation-pending="true"]) {
-      animation: none;
-      opacity: 0.65;
-    }
-  }
-
   .table-scrollbar {
     scrollbar-color: var(--primary) transparent;
     scrollbar-width: thin;
