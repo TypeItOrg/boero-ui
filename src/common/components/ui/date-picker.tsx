@@ -15,6 +15,7 @@ type DatePickerProps = {
   onChange?: (date: Date | undefined) => void;
   id?: string;
   disabled?: boolean;
+  maxDate?: Date;
   className?: string;
   "aria-invalid"?: React.AriaAttributes["aria-invalid"];
 };
@@ -24,6 +25,7 @@ export function DatePicker({
   onChange,
   id,
   disabled = false,
+  maxDate,
   className,
   "aria-invalid": ariaInvalid,
 }: DatePickerProps): React.ReactElement {
@@ -61,8 +63,9 @@ export function DatePicker({
           onSelect={handleSelect}
           captionLayout="dropdown"
           startMonth={new Date(1900, 0)}
-          endMonth={new Date()}
-          defaultMonth={value}
+          endMonth={maxDate ?? new Date()}
+          defaultMonth={value ?? maxDate}
+          disabled={maxDate ? { after: maxDate } : undefined}
           locale={es}
         />
       </PopoverContent>

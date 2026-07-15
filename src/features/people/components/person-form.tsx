@@ -11,8 +11,8 @@ import { Button } from "@common/components/ui/button";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import { NavigationLink } from "@common/components/ui/navigation-link";
 import { PasswordInput } from "@common/components/ui/password-input";
+import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
 import { createPersonAction } from "../actions/create-person.action";
 import { updatePersonAction } from "../actions/update-person.action";
@@ -20,6 +20,7 @@ import { createPersonFormSchema, updatePersonFormSchema } from "../schemas/perso
 import type { Person } from "../types/person.types";
 import type { SystemRoleCode } from "../types/person-role.types";
 import type { PersonActionState, PersonFormFieldName } from "../types/person-action-state.types";
+import { getLatestAllowedBirthDate } from "../utils/person-birth-date.util";
 
 type PersonFormInput = {
   firstName: string;
@@ -105,6 +106,10 @@ export function PersonForm({
     });
   }
 
+  function handleCancel(): void {
+    router.push(listPath);
+  }
+
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-4">
@@ -162,7 +167,8 @@ export function PersonForm({
               <FieldContent>
                 <FieldLabel htmlFor="person-phone">Teléfono</FieldLabel>
               </FieldContent>
-              <Input id="person-phone" {...register("phoneNumber")} />
+              <PhoneInput id="person-phone" aria-invalid={!!errors.phoneNumber} {...register("phoneNumber")} />
+              <FieldError errors={[errors.phoneNumber]} />
             </Field>
           </FieldGroup>
         </FormCard>
@@ -177,9 +183,8 @@ export function PersonForm({
                     Documento
                   </FieldLabel>
                 </FieldContent>
-                <Input
+                <NumericInput
                   id="person-document"
-                  inputMode="numeric"
                   aria-invalid={!!errors.documentNumber}
                   {...register("documentNumber")}
                 />
@@ -197,6 +202,7 @@ export function PersonForm({
                     <DatePicker
                       id="person-birth-date"
                       value={parseDateInputValue(field.value)}
+                      maxDate={getLatestAllowedBirthDate()}
                       onChange={(date) => field.onChange(formatDateInputValue(date))}
                       aria-invalid={fieldState.invalid}
                     />
@@ -222,14 +228,14 @@ export function PersonForm({
       {!hideActions && (
         <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
           <Button
-            asChild
             type="button"
             variant="outline"
             size="lg"
             className="flex-[1_0_min(140px,100%)] sm:flex-none"
+            onClick={handleCancel}
             disabled={isPending}
           >
-            <NavigationLink href={listPath}>Cancelar</NavigationLink>
+            Cancelar
           </Button>
           <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
             {getSubmitLabel({ isEdit, isPending })}

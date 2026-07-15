@@ -27,5 +27,7 @@ export async function deletePersonAction(institutionId: string, personId: string
   }
 
   revalidatePath(`/platform/institutions/${institutionId}/people`);
+  revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);
+  revalidatePath("/platform/people");
   return { success: true };
 }

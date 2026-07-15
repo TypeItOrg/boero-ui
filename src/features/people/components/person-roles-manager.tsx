@@ -6,6 +6,8 @@ import { PlusIcon, XIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import type { PersonRole, SystemRole, SystemRoleCode } from "../types/person-role.types";
+import { formatRoleAssignedAt } from "../utils/person-role-date.util";
+import { hasApplicantRoleConflict } from "../utils/person-role-rules.util";
 
 type PersonRolesManagerProps = {
   roles: SystemRole[];
@@ -44,12 +46,14 @@ export function PersonRolesManager({
   const hasPendingChanges = !areSetsEqual(initialRoleCodes, selectedRoleCodeSet);
 
   function selectRole(roleCode: SystemRoleCode): void {
-    if (selectedRoleCodeSet.has(roleCode)) return;
+    if (selectedRoleCodeSet.has(roleCode) || hasApplicantRoleConflict(selectedRoleCodes, roleCode)) return;
 
     onSelectedRoleCodesChange([...selectedRoleCodes, roleCode]);
   }
 
   function removeRole(roleCode: SystemRoleCode): void {
+    if (selectedRoleCodes.length <= 1) return;
+
     onSelectedRoleCodesChange(selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== roleCode));
   }
 
@@ -88,6 +92,7 @@ export function PersonRolesManager({
                       variant={isPendingAssignment ? "outline" : "destructive"}
                       size="sm"
                       onClick={() => removeRole(role.roleCode)}
+                      disabled={selectedRoleCodes.length <= 1}
                     >
                       <XIcon data-icon="inline-start" />
                       {isPendingAssignment ? "Quitar" : "Revocar"}
@@ -109,6 +114,7 @@ export function PersonRolesManager({
             <div className="flex flex-col gap-2">
               {availableRoles.map((role) => {
                 const isPendingRevocation = initialRoleCodes.has(role.code);
+                const hasRoleConflict = hasApplicantRoleConflict(selectedRoleCodes, role.code);
 
                 return (
                   <div key={role.code} className="flex items-center justify-between gap-3 rounded-lg border p-3">
@@ -116,9 +122,17 @@ export function PersonRolesManager({
                       <p className="font-medium">{role.displayName}</p>
                       {isPendingRevocation ? (
                         <p className="text-muted-foreground mt-1 text-xs">Se revocará al guardar.</p>
+                      ) : hasRoleConflict ? (
+                        <p className="text-muted-foreground mt-1 text-xs">Postulante debe ser el único rol.</p>
                       ) : null}
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={() => selectRole(role.code)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => selectRole(role.code)}
+                      disabled={hasRoleConflict}
+                    >
                       <PlusIcon data-icon="inline-start" />
                       Asignar
                     </Button>
@@ -173,8 +187,5 @@ function formatAssignedAt(value: string | undefined): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
 
-  return new Intl.DateTimeFormat("es-AR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(date);
+  return formatRoleAssignedAt(value);
 }

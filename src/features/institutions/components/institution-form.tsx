@@ -10,7 +10,7 @@ import { cn } from "@common/utils/cn.util";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Input } from "@common/components/ui/input";
-import { NavigationLink } from "@common/components/ui/navigation-link";
+import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import { Textarea } from "@common/components/ui/textarea";
 import { Switch } from "@common/components/ui/switch";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
@@ -129,6 +129,14 @@ export function InstitutionForm({
     });
   }
 
+  function handleCancel(): void {
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.push(INSTITUTIONS_PATH);
+    }
+  }
+
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pr-1.5 pb-4">
@@ -212,7 +220,7 @@ export function InstitutionForm({
                 <FieldContent>
                   <FieldLabel htmlFor="institution-number">Altura</FieldLabel>
                 </FieldContent>
-                <Input
+                <NumericInput
                   id="institution-number"
                   defaultValue={defaultValues.number}
                   maxLength={50}
@@ -257,7 +265,7 @@ export function InstitutionForm({
               <FieldContent>
                 <FieldLabel htmlFor="institution-phone">Teléfono</FieldLabel>
               </FieldContent>
-              <Input
+              <PhoneInput
                 id="institution-phone"
                 defaultValue={defaultValues.phoneNumber}
                 maxLength={30}
@@ -310,29 +318,16 @@ export function InstitutionForm({
 
       {!hideFooter && (
         <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
-          {onCancel ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="flex-[1_0_min(140px,100%)] sm:flex-none"
-              onClick={onCancel}
-              disabled={isPending}
-            >
-              Cancelar
-            </Button>
-          ) : (
-            <Button
-              asChild
-              type="button"
-              variant="outline"
-              size="lg"
-              className="flex-[1_0_min(140px,100%)] sm:flex-none"
-              disabled={isPending}
-            >
-              <NavigationLink href={INSTITUTIONS_PATH}>Cancelar</NavigationLink>
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="flex-[1_0_min(140px,100%)] sm:flex-none"
+            onClick={handleCancel}
+            disabled={isPending}
+          >
+            Cancelar
+          </Button>
           <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
             {getSubmitLabel({ isEdit, isPending })}
           </Button>

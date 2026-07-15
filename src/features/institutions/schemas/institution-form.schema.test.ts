@@ -35,4 +35,22 @@ describe("institutionFormSchema", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it.each([
+    ["number", "12A"],
+    ["phoneNumber", "+54 353 123456"],
+  ] as const)("rejects unsupported characters in %s", (field, value) => {
+    const result = institutionFormSchema.safeParse({
+      ...VALID_REQUIRED_FIELDS,
+      street: "",
+      number: "",
+      neighborhood: "",
+      additionalInfo: "",
+      phoneNumber: "",
+      email: "",
+      [field]: value,
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
