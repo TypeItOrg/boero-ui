@@ -45,12 +45,17 @@ export function PeopleTablePresentation({
   search,
   sort,
 }: PeopleTablePresentationProps): React.ReactElement {
-  const { isPending: isNavigating, navigate } = useDataTableNavigation();
   const router = useRouter();
+  const { isPending: isNavigating, navigate } = useDataTableNavigation();
   const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
 
-  function handleDeletePerson(person: PersonSummary): void {
-    setPersonToDelete(person);
+  function handleDeleteDialogOpenChange(open: boolean): void {
+    if (!open) setPersonToDelete(undefined);
+  }
+
+  function handlePersonDeleted(): void {
+    setPersonToDelete(undefined);
+    router.refresh();
   }
 
   function updateSort(nextSort: PeopleSort): void {
@@ -136,14 +141,17 @@ export function PeopleTablePresentation({
           </TableHeader>
           <TableBody>
             {data.items.map((person) => {
-              const isDeleting = personToDelete?.id === person.id;
-
               return (
                 <ContextMenu key={person.id}>
                   <ContextMenuTrigger asChild>
                     <TableRow className="hover:bg-muted/50 border-b transition-colors">
                       <TableCell className="font-medium">
-                        {person.lastName}, {person.firstName}
+                        <Link
+                          className="hover:underline"
+                          href={`/platform/institutions/${institutionId}/people/${person.id}`}
+                        >
+                          {person.lastName}, {person.firstName}
+                        </Link>
                       </TableCell>
                       <TableCell>{person.documentNumber}</TableCell>
                       <TableCell>
@@ -173,8 +181,7 @@ export function PeopleTablePresentation({
                         <PersonActionsMenu
                           person={person}
                           institutionId={institutionId}
-                          isPending={isDeleting}
-                          onDelete={() => handleDeletePerson(person)}
+                          onDelete={() => setPersonToDelete(person)}
                         />
                       </TableCell>
                     </TableRow>
@@ -192,10 +199,9 @@ export function PeopleTablePresentation({
                     <ContextMenuItem
                       variant="destructive"
                       className="px-2.5 py-1.5"
-                      disabled={isDeleting}
-                      onSelect={() => handleDeletePerson(person)}
+                      onSelect={() => setPersonToDelete(person)}
                     >
-                      {isDeleting ? "Eliminando..." : "Eliminar"}
+                      Eliminar
                     </ContextMenuItem>
                   </ContextMenuContent>
                 </ContextMenu>
@@ -216,19 +222,15 @@ export function PeopleTablePresentation({
       </div>
 
       <PeoplePagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} />
+
       {personToDelete ? (
         <PersonDeleteDialog
           institutionId={institutionId}
           personId={personToDelete.id}
           personName={`${personToDelete.firstName} ${personToDelete.lastName}`}
           open
-          onOpenChange={(open) => {
-            if (!open) setPersonToDelete(undefined);
-          }}
-          onDeleted={() => {
-            setPersonToDelete(undefined);
-            router.refresh();
-          }}
+          onOpenChange={handleDeleteDialogOpenChange}
+          onDeleted={handlePersonDeleted}
         />
       ) : null}
     </div>
@@ -238,22 +240,16 @@ export function PeopleTablePresentation({
 type PersonActionsMenuProps = {
   person: PersonSummary;
   institutionId: string;
-  isPending: boolean;
   onDelete: () => void;
 };
 
-function PersonActionsMenu({ person, institutionId, isPending, onDelete }: PersonActionsMenuProps): React.ReactElement {
+function PersonActionsMenu({ person, institutionId, onDelete }: PersonActionsMenuProps): React.ReactElement {
   return (
     <div className="flex justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Abrir acciones de ${person.firstName} ${person.lastName}`}
-            disabled={isPending}
-          >
-            {isPending ? <Loader2Icon className="animate-spin" /> : <EllipsisVerticalIcon />}
+          <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${person.firstName} ${person.lastName}`}>
+            <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
@@ -263,7 +259,7 @@ function PersonActionsMenu({ person, institutionId, isPending, onDelete }: Perso
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" disabled={isPending} onSelect={onDelete}>
+          <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onDelete}>
             Eliminar
           </DropdownMenuItem>
         </DropdownMenuContent>
