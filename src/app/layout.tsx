@@ -26,7 +26,16 @@ export const metadata: Metadata = {
   },
   description: "Plataforma de gestión para instituciones educativas",
   icons: {
-    icon: "/logo.svg",
+    icon: [
+      {
+        url: "/logo.svg",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/logo-dark.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
   },
 };
 
