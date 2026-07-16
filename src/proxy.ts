@@ -12,6 +12,18 @@ import {
 
 import { getSafeNextPath, getRedirectPath } from "@features/platform-auth/utils/platform-auth-paths.util";
 
+type PlatformRefreshTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+type PlatformRefreshAttempt = {
+  status?: number;
+  tokens?: PlatformRefreshTokens;
+};
+
+const inFlightPlatformRefreshes = new Map<string, Promise<PlatformRefreshAttempt>>();
+
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const hasAccessToken = request.cookies.has(PLATFORM_ACCESS_TOKEN_COOKIE);
@@ -24,23 +36,19 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   if (requiresPlatformSession) {
+    let refreshStatus: number | undefined;
+
     if (refreshToken) {
-      try {
-        const response = await fetch(new URL("/api/v1/auth/platform/refresh", getApiUrlOrThrow()), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        });
+      const refreshAttempt = await refreshPlatformSession(refreshToken);
+      refreshStatus = refreshAttempt.status;
 
-        if (response.ok) {
-          const payload = await response.json();
-          const tokens = payload.tokens;
-
-          if (tokens?.accessToken && tokens?.refreshToken) {
-            return createRefreshedSessionResponse(request, tokens.accessToken, tokens.refreshToken);
-          }
-        }
-      } catch {}
+      if (refreshAttempt.tokens) {
+        return createRefreshedSessionResponse(
+          request,
+          refreshAttempt.tokens.accessToken,
+          refreshAttempt.tokens.refreshToken,
+        );
+      }
     }
 
     const nextParam = request.nextUrl.pathname + request.nextUrl.search;
@@ -48,8 +56,11 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
       new URL(getRedirectPath("/auth/platform/login", nextParam), request.url),
     );
 
-    redirectResponse.cookies.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
-    redirectResponse.cookies.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
+    if (refreshStatus === 401) {
+      redirectResponse.cookies.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
+      redirectResponse.cookies.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
+    }
+
     return redirectResponse;
   }
 
@@ -88,4 +99,54 @@ function createRefreshedSessionResponse(request: NextRequest, accessToken: strin
   setPlatformAuthResponseCookies(response, accessToken, refreshToken);
 
   return response;
+}
+
+function refreshPlatformSession(refreshToken: string): Promise<PlatformRefreshAttempt> {
+  const existingRequest = inFlightPlatformRefreshes.get(refreshToken);
+  if (existingRequest) return existingRequest;
+
+  const refreshRequest = performPlatformRefresh(refreshToken);
+  inFlightPlatformRefreshes.set(refreshToken, refreshRequest);
+
+  void refreshRequest.then(
+    () => removeInFlightPlatformRefresh(refreshToken, refreshRequest),
+    () => removeInFlightPlatformRefresh(refreshToken, refreshRequest),
+  );
+
+  return refreshRequest;
+}
+
+async function performPlatformRefresh(refreshToken: string): Promise<PlatformRefreshAttempt> {
+  try {
+    const response = await fetch(new URL("/api/v1/auth/platform/refresh", getApiUrlOrThrow()), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) return { status: response.status };
+
+    const payload = (await response.json()) as { tokens?: Partial<PlatformRefreshTokens> };
+    const tokens = payload.tokens;
+
+    if (tokens?.accessToken && tokens.refreshToken) {
+      return {
+        status: response.status,
+        tokens: {
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        },
+      };
+    }
+
+    return { status: response.status };
+  } catch {
+    return {};
+  }
+}
+
+function removeInFlightPlatformRefresh(refreshToken: string, refreshRequest: Promise<PlatformRefreshAttempt>): void {
+  if (inFlightPlatformRefreshes.get(refreshToken) === refreshRequest) {
+    inFlightPlatformRefreshes.delete(refreshToken);
+  }
 }

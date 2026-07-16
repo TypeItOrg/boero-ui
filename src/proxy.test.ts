@@ -21,8 +21,8 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe(
       "https://app.example.test/auth/platform/login?next=%2Fplatform%2Forders%3Fpage%3D2",
     );
-    expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("");
-    expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("");
+    expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBeUndefined();
+    expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBeUndefined();
   }
 
   beforeEach(() => {
@@ -82,6 +82,39 @@ describe("proxy", () => {
     expect(upstreamCookies).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
   });
 
+  it("shares one refresh request between concurrent platform proxy calls", async () => {
+    let resolveRefresh: ((response: Response) => void) | undefined;
+    fetchMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveRefresh = resolve;
+        }),
+    );
+
+    const firstRequest = createRequest("/platform/institutions/1", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const secondRequest = createRequest("/platform/institutions/2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const firstResponsePromise = proxy(firstRequest);
+    const secondResponsePromise = proxy(secondRequest);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    resolveRefresh?.(
+      new Response(
+        JSON.stringify({
+          tokens: {
+            accessToken: "new-access-token",
+            refreshToken: "new-refresh-token",
+          },
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const [firstResponse, secondResponse] = await Promise.all([firstResponsePromise, secondResponsePromise]);
+
+    expect(firstResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
+    expect(secondResponse.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
+  });
+
   it("redirects to login when refresh returns no usable tokens", async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ tokens: {} }), {
@@ -97,6 +130,22 @@ describe("proxy", () => {
     expectPlatformLoginRedirect(response);
   });
 
+  it("clears auth cookies when the backend definitively rejects the refresh token", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ message: "Refresh token invalido" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const request = createRequest("/platform/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+
+    const response = await proxy(request);
+
+    expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("");
+    expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("");
+  });
+
   it("redirects to login when refresh throws", async () => {
     fetchMock.mockRejectedValue(new Error("network"));
 
@@ -105,6 +154,7 @@ describe("proxy", () => {
     const response = await proxy(request);
 
     expectPlatformLoginRedirect(response);
+    expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)).toBeUndefined();
   });
 
   it("redirects authenticated users away from the login page", async () => {
