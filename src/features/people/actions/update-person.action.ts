@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { assignPersonRoleAction } from "./assign-person-role.action";
 import { revokePersonRoleAction } from "./revoke-person-role.action";
 import { personRoleCodesSchema } from "../schemas/person-role.schema";
@@ -18,7 +19,7 @@ export async function updatePersonAction(
 ): Promise<PersonActionState> {
   const roleCodes = parseRoleCodes(formData.get("roleCodes"));
   if (roleCodes === null) {
-    return { error: "La configuración de roles no es válida." };
+    return { error: PEOPLE_ERROR_MESSAGES.INVALID_ROLE_CONFIGURATION };
   }
 
   const payload = {
@@ -33,7 +34,7 @@ export async function updatePersonAction(
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, {
+  const response = platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -41,9 +42,12 @@ export async function updatePersonAction(
     body: JSON.stringify(parsed.data),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(response, PERSON_FORM_FIELD_NAMES, "Error al actualizar el usuario.");
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    PERSON_FORM_FIELD_NAMES,
+    PEOPLE_ERROR_MESSAGES.UPDATE_PERSON,
+  );
+  if (errorState) return errorState;
 
   if (roleCodes) {
     const roleError = await syncPersonRoles(institutionId, personId, roleCodes);
@@ -78,7 +82,7 @@ async function syncPersonRoles(
   try {
     currentRoles = await fetchPersonRoles(institutionId, personId);
   } catch {
-    return "No se pudieron verificar los roles actuales del usuario.";
+    return PEOPLE_ERROR_MESSAGES.VERIFY_ROLE;
   }
 
   const currentRoleCodes = new Set(currentRoles.map((role) => role.roleCode));
@@ -89,7 +93,7 @@ async function syncPersonRoles(
 
     const result = await assignPersonRoleAction(institutionId, personId, roleCode);
     if (!result.success) {
-      return result.error ?? "No se pudo asignar uno de los roles seleccionados.";
+      return result.error ?? PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE;
     }
   }
 
@@ -98,7 +102,7 @@ async function syncPersonRoles(
 
     const result = await revokePersonRoleAction(institutionId, personId, role.roleCode);
     if (!result.success) {
-      return result.error ?? "No se pudo revocar uno de los roles seleccionados.";
+      return result.error ?? PEOPLE_ERROR_MESSAGES.REVOKE_SELECTED_ROLE;
     }
   }
 

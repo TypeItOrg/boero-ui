@@ -5,7 +5,6 @@ import { PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -27,7 +26,8 @@ export default async function InstitutionPeoplePage({
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const { page, size, search, sort } = parsePeoplePaginationParams(resolvedSearchParams);
   const peoplePromise = fetchPeople(id, { page, size, search, sort });
-  const institution = await getInstitutionOrNotFound(id);
+  const institution = await fetchInstitution(id);
+  if (!institution) notFound();
 
   return (
     <PlatformPageShell
@@ -59,16 +59,4 @@ export default async function InstitutionPeoplePage({
       </DataTableNavigationProvider>
     </PlatformPageShell>
   );
-}
-
-async function getInstitutionOrNotFound(id: string): Promise<Awaited<ReturnType<typeof fetchInstitution>>> {
-  try {
-    return await fetchInstitution(id);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

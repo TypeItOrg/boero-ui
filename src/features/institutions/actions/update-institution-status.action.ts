@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getBackendMessage } from "@common/utils/get-backend-message.util";
+import { getResponseErrorActionState } from "@common/utils/action-state.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 type UpdateInstitutionStatusActionState = {
@@ -16,26 +17,18 @@ export async function updateInstitutionStatusAction(
   id: string,
   nextActive: boolean,
 ): Promise<UpdateInstitutionStatusActionState> {
-  const fallbackMessage = `Error al ${nextActive ? "activar" : "desactivar"} la institución.`;
-  const response = await platformApiFetch(`/api/v1/platform/institutions/${id}/status`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ active: nextActive }),
-  });
-
-  if (!response.ok) {
-    let payload: unknown = null;
-
-    try {
-      payload = await response.json();
-    } catch {
-      return { error: fallbackMessage };
-    }
-
-    return { error: getBackendMessage(payload, fallbackMessage) };
-  }
+  const errorState = await getResponseErrorActionState(
+    platformApiFetch(`/api/v1/platform/institutions/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ active: nextActive }),
+    }),
+    [],
+    INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(nextActive),
+  );
+  if (errorState) return errorState;
 
   revalidatePath(INSTITUTIONS_PATH);
   revalidatePath(`${INSTITUTIONS_PATH}/${id}`);

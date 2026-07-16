@@ -4,13 +4,13 @@ import { useState } from "react";
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
+import { isHttpResponseError } from "@common/utils/http-response-error.util";
 import { getRedirectPath } from "@features/platform-auth/utils/platform-auth-paths.util";
 
 export function Providers({ children }: { children: React.ReactNode }): React.ReactElement {
   const [queryClient] = useState(() => {
     function redirectOnUnauthorized(error: unknown): void {
-      if (!isHttpStatusError(error, 401)) return;
+      if (!isHttpResponseError(error, 401)) return;
 
       client.clear();
       const currentPath = window.location.pathname + window.location.search;

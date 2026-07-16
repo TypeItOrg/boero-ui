@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { institutionFormSchema } from "../schemas/institution-form.schema";
 import { INSTITUTION_FORM_FIELD_NAMES, type InstitutionActionState } from "../types/institution-action-state.types";
@@ -26,7 +27,7 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
 
   const active = formData.get("active") === "true";
 
-  const response = await platformApiFetch(`/api/v1/institutions/${id}`, {
+  const response = platformApiFetch(`/api/v1/institutions/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -37,9 +38,12 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
     }),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, "Error al actualizar la institución.");
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    INSTITUTION_FORM_FIELD_NAMES,
+    INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION,
+  );
+  if (errorState) return errorState;
 
   revalidatePath("/platform/institutions");
   revalidatePath(`/platform/institutions/${id}`);

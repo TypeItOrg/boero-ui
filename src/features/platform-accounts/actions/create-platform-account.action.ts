@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformAccountFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
 import {
   PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
@@ -31,19 +32,18 @@ export async function createPlatformAccountAction(formData: FormData): Promise<P
     email: parsed.data.email,
     password: parsed.data.password,
   };
-  const response = await platformApiFetch("/api/v1/platform/accounts", {
+  const response = platformApiFetch("/api/v1/platform/accounts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(
-      response,
-      PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-      "No se pudo crear el administrador.",
-    );
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
+    PLATFORM_ACCOUNT_ERROR_MESSAGES.CREATE_ACCOUNT,
+  );
+  if (errorState) return errorState;
 
   revalidatePath(PLATFORM_ACCOUNTS_PATH);
   return { success: true };

@@ -1,13 +1,12 @@
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { Institution } from "../types/institution.types";
-import { createHttpError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
-export async function fetchInstitution(id: string): Promise<Institution> {
+export async function fetchInstitution(id: string): Promise<Institution | null> {
   const response = await platformApiFetch(`/api/v1/platform/institutions/${id}`);
 
-  if (!response.ok) {
-    throw createHttpError("No se pudo obtener la institución", response.status);
-  }
+  if (response.status === 404) return null;
 
-  return response.json();
+  return parseHttpResponse(response, INSTITUTION_ERROR_MESSAGES.FETCH_INSTITUTION);
 }

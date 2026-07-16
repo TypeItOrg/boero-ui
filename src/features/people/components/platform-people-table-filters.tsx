@@ -11,12 +11,14 @@ import { Button } from "@common/components/ui/button";
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { createHttpResponseError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import type { SystemRole, SystemRoleCode } from "@features/people/types/person-role.types";
+import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
 const INSTITUTION_FILTER_QUERY_KEY = ["platform", "institutions", "people-filter"] as const;
 const INSTITUTION_FILTER_PAGE_SIZE = 20;
@@ -72,7 +74,7 @@ export function PlatformPeopleTableFilters({
             className="min-w-0 flex-1"
             defaultOption={{ label: "Todas las instituciones", value: undefined }}
             emptyMessage="No se encontraron instituciones."
-            errorMessage="No se pudieron cargar las instituciones."
+            errorMessage={LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS}
             fetchPage={fetchInstitutionPage}
             getItemLabel={getInstitutionLabel}
             getItemValue={getInstitutionValue}
@@ -81,7 +83,9 @@ export function PlatformPeopleTableFilters({
             placeholder="Seleccionar institución"
             queryKey={INSTITUTION_FILTER_QUERY_KEY}
             searchPlaceholder="Buscar institución..."
-            selectedLabel={institutionName ?? (institutionId ? "Institución no disponible" : undefined)}
+            selectedLabel={
+              institutionName ?? (institutionId ? PEOPLE_ERROR_MESSAGES.INSTITUTION_UNAVAILABLE : undefined)
+            }
             value={institutionId}
           />
           <Button
@@ -110,11 +114,10 @@ async function fetchInstitutionPage({
   searchParams.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
   const response = await fetch(`/api/platform/institutions?${searchParams.toString()}`, { signal });
 
-  if (!response.ok) {
-    throw createHttpResponseError(response, `Institution request failed with status ${response.status}`);
-  }
-
-  const data = (await response.json()) as PaginatedResponse<InstitutionSummary>;
+  const data = await parseHttpResponse<PaginatedResponse<InstitutionSummary>>(
+    response,
+    LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS,
+  );
   return toAsyncDropdownPage(data);
 }
 

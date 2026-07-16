@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonFormSchema } from "@features/people/schemas/person-form.schema";
 import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "../types/person-action-state.types";
 
@@ -23,7 +24,7 @@ export async function createPersonAction(institutionId: string, formData: FormDa
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/people`, {
+  const response = platformApiFetch(`/api/v1/institutions/${institutionId}/people`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -35,9 +36,12 @@ export async function createPersonAction(institutionId: string, formData: FormDa
     }),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(response, PERSON_FORM_FIELD_NAMES, "Error al crear el usuario.");
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    PERSON_FORM_FIELD_NAMES,
+    PEOPLE_ERROR_MESSAGES.CREATE_PERSON,
+  );
+  if (errorState) return errorState;
 
   revalidatePath(`/platform/institutions/${institutionId}/people`);
   return { success: true };

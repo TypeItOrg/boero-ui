@@ -2,13 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
-import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
-import { FALLBACK_SYSTEM_ROLES } from "@features/people/types/person-role.types";
+import { fetchSystemRolesWithFallback } from "@features/people/services/fetch-system-roles.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -19,10 +17,11 @@ type EditPersonPageProps = {
 export default async function EditPersonPage({ params }: EditPersonPageProps): Promise<React.ReactElement> {
   const { id, personId } = await params;
   const [person, assignedRoles, systemRoles] = await Promise.all([
-    getPersonOrNotFound(id, personId),
+    fetchPerson(id, personId),
     fetchPersonRoles(id, personId),
-    fetchSystemRoles().catch(() => ({ roles: FALLBACK_SYSTEM_ROLES })),
+    fetchSystemRolesWithFallback(),
   ]);
+  if (!person) notFound();
   const personName = `${person.firstName} ${person.lastName}`;
 
   return (
@@ -50,19 +49,4 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
       </div>
     </PlatformPageShell>
   );
-}
-
-async function getPersonOrNotFound(
-  institutionId: string,
-  personId: string,
-): Promise<Awaited<ReturnType<typeof fetchPerson>>> {
-  try {
-    return await fetchPerson(institutionId, personId);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

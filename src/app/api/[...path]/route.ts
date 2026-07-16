@@ -1,3 +1,4 @@
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { proxyBoeroApiRequest } from "@common/services/proxy-boero-api-request.service";
 
 type ApiProxyContext = {
@@ -31,8 +32,8 @@ async function proxyRequest(request: Request, { params }: ApiProxyContext): Prom
     const { path } = await params;
     return await proxyBoeroApiRequest(path, request);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected API proxy error.";
+    console.error(error);
 
-    return Response.json({ message }, { status: 500 });
+    return Response.json({ message: COMMON_ERROR_MESSAGES.UNEXPECTED_API_PROXY }, { status: 500 });
   }
 }

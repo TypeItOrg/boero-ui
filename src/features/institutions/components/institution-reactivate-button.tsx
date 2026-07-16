@@ -5,6 +5,8 @@ import { Loader2Icon, RotateCcwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@common/components/ui/button";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { updateInstitutionStatusAction } from "@features/institutions/actions/update-institution-status.action";
 
 type InstitutionReactivateButtonProps = {
@@ -20,18 +22,17 @@ export function InstitutionReactivateButton({
 
   function reactivateInstitution(): void {
     startTransition(async () => {
-      try {
-        const result = await updateInstitutionStatusAction(institutionId, true);
+      const result = await safelyRunAction(
+        updateInstitutionStatusAction(institutionId, true),
+        INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(true),
+      );
 
-        if (result.error) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`${institutionName} fue reactivada.`);
-      } catch {
-        toast.error(`No se pudo reactivar ${institutionName}.`);
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
+
+      toast.success(`${institutionName} fue reactivada.`);
     });
   }
 

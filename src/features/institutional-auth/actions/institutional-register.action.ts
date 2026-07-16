@@ -1,5 +1,6 @@
 "use server";
 
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { institutionalRegisterSchema } from "../schemas/institutional-register.schema";
 import type { InstitutionalRegisterActionState } from "../types/institutional-register-state.types";
 
@@ -19,7 +20,7 @@ export async function registerInstitutional(
       .filter((field): field is "email" | "password" => field === "email" || field === "password");
 
     return {
-      error: errors[0] ?? "Revisá los datos ingresados.",
+      error: errors[0] ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM,
       errors,
       fields,
     };

@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getBackendMessage } from "@common/utils/get-backend-message.util";
+import { getResponseErrorActionState } from "@common/utils/action-state.util";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 type DeletePersonActionState = {
@@ -10,21 +11,12 @@ type DeletePersonActionState = {
 };
 
 export async function deletePersonAction(institutionId: string, personId: string): Promise<DeletePersonActionState> {
-  const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    let payload: unknown = null;
-
-    try {
-      payload = await response.json();
-    } catch {
-      return { error: "Error al eliminar el usuario." };
-    }
-
-    return { error: getBackendMessage(payload, "Error al eliminar el usuario.") };
-  }
+  const errorState = await getResponseErrorActionState(
+    platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, { method: "DELETE" }),
+    [],
+    PEOPLE_ERROR_MESSAGES.DELETE_PERSON,
+  );
+  if (errorState) return errorState;
 
   revalidatePath(`/platform/institutions/${institutionId}/people`);
   revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);

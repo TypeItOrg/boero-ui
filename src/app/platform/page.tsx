@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Building2Icon } from "lucide-react";
 
 import { PlatformDashboardContent } from "@features/platform-dashboard/components/platform-dashboard-content";
+import { PlatformDashboardErrorBoundary } from "@features/platform-dashboard/components/platform-dashboard-error";
 import { PlatformDashboardSkeleton } from "@features/platform-dashboard/components/platform-dashboard-skeleton";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -24,7 +25,9 @@ export default function PlatformPage(): React.ReactElement {
       }
     >
       <Suspense fallback={<PlatformDashboardSkeleton />}>
-        <PlatformDashboardContent />
+        <PlatformDashboardErrorBoundary>
+          <PlatformDashboardContent />
+        </PlatformDashboardErrorBoundary>
       </Suspense>
     </PlatformPageShell>
   );

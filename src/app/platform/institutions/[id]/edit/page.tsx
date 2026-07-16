@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { InstitutionForm } from "@features/institutions/components/institution-form";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -13,7 +12,8 @@ type EditInstitutionPageProps = {
 
 export default async function EditInstitutionPage({ params }: EditInstitutionPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const institution = await getInstitutionOrNotFound(id);
+  const institution = await fetchInstitution(id);
+  if (!institution) notFound();
 
   if (!institution.active) {
     return (
@@ -50,16 +50,4 @@ export default async function EditInstitutionPage({ params }: EditInstitutionPag
       <InstitutionForm mode="edit" institution={institution} />
     </PlatformPageShell>
   );
-}
-
-async function getInstitutionOrNotFound(id: string): Promise<Awaited<ReturnType<typeof fetchInstitution>>> {
-  try {
-    return await fetchInstitution(id);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

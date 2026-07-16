@@ -1,9 +1,10 @@
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { InstitutionSummary } from "../types/institution-summary.types";
-import { createHttpError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import type { InstitutionPaginationParams } from "../utils/institution-pagination.util";
 
 export async function fetchInstitutions({
@@ -22,9 +23,5 @@ export async function fetchInstitutions({
 
   const response = await platformApiFetch(`/api/v1/platform/institutions?${searchParams.toString()}`);
 
-  if (!response.ok) {
-    throw createHttpError("No se pudieron obtener las instituciones", response.status);
-  }
-
-  return response.json();
+  return parseHttpResponse(response, INSTITUTION_ERROR_MESSAGES.FETCH_INSTITUTIONS);
 }

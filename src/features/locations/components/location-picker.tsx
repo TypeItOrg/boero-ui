@@ -9,9 +9,10 @@ import {
 } from "@common/components/ui/async-dropdown";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { createHttpResponseError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
+import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import type { City } from "@features/locations/types/city.types";
 import type { Country } from "@features/locations/types/country.types";
 import type { Province } from "@features/locations/types/province.types";
@@ -34,8 +35,8 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
   const [country, setCountry] = React.useState<Country | undefined>(() => initialLocation?.country);
   const [province, setProvince] = React.useState<Province | undefined>(() => initialLocation?.province);
   const [city, setCity] = React.useState<City | undefined>(() => initialLocation?.city);
-  const countryError = error && !country ? "El país es requerido." : undefined;
-  const provinceError = error && country && !province ? "La provincia es requerida." : undefined;
+  const countryError = error && !country ? LOCATION_ERROR_MESSAGES.REQUIRED_COUNTRY : undefined;
+  const provinceError = error && country && !province ? LOCATION_ERROR_MESSAGES.REQUIRED_PROVINCE : undefined;
   const cityError = error && province && !city ? error : undefined;
 
   function handleSelectCountry(_value: string | undefined, item: Country | undefined): void {
@@ -65,7 +66,7 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
         <AsyncDropdown<Country>
           ariaInvalid={!!countryError}
           emptyMessage="No se encontraron países."
-          errorMessage="No se pudieron cargar los países."
+          errorMessage={LOCATION_ERROR_MESSAGES.FETCH_COUNTRIES}
           fetchPage={fetchCountries}
           getItemLabel={getCountryLabel}
           getItemValue={getLocationValue}
@@ -89,7 +90,7 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
           ariaInvalid={!!provinceError}
           disabled={!country}
           emptyMessage="No se encontraron provincias."
-          errorMessage="No se pudieron cargar las provincias."
+          errorMessage={LOCATION_ERROR_MESSAGES.FETCH_PROVINCES}
           fetchPage={(input) => fetchProvinces(input, country?.id)}
           getItemLabel={getLocationLabel}
           getItemValue={getLocationValue}
@@ -112,7 +113,7 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
           ariaInvalid={!!cityError}
           disabled={!province}
           emptyMessage="No se encontraron ciudades."
-          errorMessage="No se pudieron cargar las ciudades."
+          errorMessage={LOCATION_ERROR_MESSAGES.FETCH_CITIES}
           fetchPage={(input) => fetchCities(input, province?.id)}
           getItemLabel={getLocationLabel}
           getItemValue={getLocationValue}
@@ -139,11 +140,7 @@ async function fetchLocationPage<TItem>(
 
   const response = await fetch(url, { signal });
 
-  if (!response.ok) {
-    throw createHttpResponseError(response, `Location request failed with status ${response.status}`);
-  }
-
-  const data = (await response.json()) as PaginatedResponse<TItem>;
+  const data = await parseHttpResponse<PaginatedResponse<TItem>>(response, LOCATION_ERROR_MESSAGES.FETCH_LOCATION_PAGE);
   return toAsyncDropdownPage(data);
 }
 

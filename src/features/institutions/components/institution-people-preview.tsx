@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Skeleton } from "@common/components/ui/skeleton";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { DEFAULT_PEOPLE_SORT } from "@features/people/utils/people-pagination.util";
 
@@ -25,7 +26,7 @@ export async function InstitutionPeoplePreview({
     return (
       <aside className="bg-background rounded-2xl p-5 shadow-sm sm:p-6">
         <h2 className="text-foreground font-semibold">Usuarios</h2>
-        <p className="text-muted-foreground mt-2 text-sm">No se pudo cargar la vista previa.</p>
+        <p className="text-muted-foreground mt-2 text-sm">{INSTITUTION_ERROR_MESSAGES.PREVIEW_UNAVAILABLE}</p>
       </aside>
     );
   }

@@ -1,28 +1,29 @@
 import { z } from "zod";
 
 import { hasMinimumPersonAge } from "../utils/person-birth-date.util";
+import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
 
 const optionalEmail = z
   .string()
   .catch("")
-  .refine((value) => !value || z.string().email().safeParse(value).success, "Ingresá un email válido.");
+  .refine((value) => !value || z.string().email().safeParse(value).success, PEOPLE_ERROR_MESSAGES.INVALID_EMAIL);
 
-const optionalPhone = z.string().regex(/^[\d-]*$/, "El teléfono solo admite números y guiones.");
+const optionalPhone = z.string().regex(/^[\d-]*$/, PEOPLE_ERROR_MESSAGES.INVALID_PHONE);
 
 const basePersonSchema = z.object({
-  firstName: z.string().min(3, "El nombre debe tener al menos 3 caracteres."),
-  lastName: z.string().min(3, "El apellido debe tener al menos 3 caracteres."),
+  firstName: z.string().min(3, PEOPLE_ERROR_MESSAGES.FIRST_NAME_MIN_LENGTH),
+  lastName: z.string().min(3, PEOPLE_ERROR_MESSAGES.LAST_NAME_MIN_LENGTH),
   email: optionalEmail,
   phoneNumber: optionalPhone,
 });
 
 export const createPersonFormSchema = basePersonSchema.extend({
-  documentNumber: z.string().regex(/^\d{8}$/, "El documento debe tener exactamente 8 dígitos."),
+  documentNumber: z.string().regex(/^\d{8}$/, PEOPLE_ERROR_MESSAGES.INVALID_DOCUMENT),
   birthDate: z
     .string()
     .catch("")
-    .refine((value) => !value || hasMinimumPersonAge(value), "La persona debe tener al menos 3 años."),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres."),
+    .refine((value) => !value || hasMinimumPersonAge(value), PEOPLE_ERROR_MESSAGES.MINIMUM_AGE),
+  password: z.string().min(8, PEOPLE_ERROR_MESSAGES.PASSWORD_MIN_LENGTH),
 });
 
 export const updatePersonFormSchema = basePersonSchema;

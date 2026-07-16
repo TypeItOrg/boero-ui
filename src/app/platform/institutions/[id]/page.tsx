@@ -5,7 +5,6 @@ import { MapPinIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { InstitutionDetail } from "@features/institutions/components/institution-detail";
 import {
   InstitutionPeoplePreview,
@@ -23,7 +22,8 @@ export default async function InstitutionDetailPage({
   params,
 }: InstitutionDetailPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const institution = await getInstitutionOrNotFound(id);
+  const institution = await fetchInstitution(id);
+  if (!institution) notFound();
   const userCount = Number.isFinite(institution.userCount) ? institution.userCount : 0;
 
   return (
@@ -83,16 +83,4 @@ export default async function InstitutionDetailPage({
       </div>
     </section>
   );
-}
-
-async function getInstitutionOrNotFound(id: string): Promise<Awaited<ReturnType<typeof fetchInstitution>>> {
-  try {
-    return await fetchInstitution(id);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

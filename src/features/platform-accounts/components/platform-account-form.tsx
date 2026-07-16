@@ -11,6 +11,7 @@ import { Button } from "@common/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { cn } from "@common/utils/cn.util";
+import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { createPlatformAccountAction } from "@features/platform-accounts/actions/create-platform-account.action";
 import { updatePlatformAccountAction } from "@features/platform-accounts/actions/update-platform-account.action";
 import {
@@ -94,7 +95,9 @@ export function PlatformAccountForm({ mode, account }: PlatformAccountFormProps)
   const errorAlert = formError ? (
     <Alert variant="destructive">
       <CircleAlertIcon />
-      <AlertTitle>{isEdit ? "No se pudo actualizar el administrador" : "No se pudo crear el administrador"}</AlertTitle>
+      <AlertTitle>
+        {isEdit ? PLATFORM_ACCOUNT_ERROR_MESSAGES.UPDATE_TITLE : PLATFORM_ACCOUNT_ERROR_MESSAGES.CREATE_TITLE}
+      </AlertTitle>
       <AlertDescription>{formError}</AlertDescription>
     </Alert>
   ) : null;

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { useSearchParamNavigation } from "@common/hooks/use-search-param-navigation";
 
 type NavigateOptions = {
@@ -34,7 +35,7 @@ export function useDataTableNavigation(): DataTableNavigationContextValue {
   const context = React.useContext(DataTableNavigationContext);
 
   if (!context) {
-    throw new Error("useDataTableNavigation must be used within DataTableNavigationProvider.");
+    throw new Error(COMMON_ERROR_MESSAGES.DATA_TABLE_NAVIGATION_CONTEXT);
   }
 
   return context;

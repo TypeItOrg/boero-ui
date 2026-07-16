@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 
 const personNameSchema = z
   .string()
   .trim()
-  .min(3, "Debe tener al menos 3 caracteres.")
-  .max(255, "Admite hasta 255 caracteres.")
-  .regex(/^[\p{L} ]+$/u, "Solo puede contener letras y espacios.");
+  .min(3, PLATFORM_ACCOUNT_ERROR_MESSAGES.NAME_MIN_LENGTH)
+  .max(255, PLATFORM_ACCOUNT_ERROR_MESSAGES.NAME_MAX_LENGTH)
+  .regex(/^[\p{L} ]+$/u, PLATFORM_ACCOUNT_ERROR_MESSAGES.INVALID_NAME);
 
 const platformAccountIdentitySchema = z.object({
   name: personNameSchema,
@@ -13,13 +14,13 @@ const platformAccountIdentitySchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, "El correo electrónico es requerido.")
-    .max(150, "El correo electrónico admite hasta 150 caracteres.")
-    .email("Ingresá un correo electrónico válido."),
+    .min(1, PLATFORM_ACCOUNT_ERROR_MESSAGES.REQUIRED_EMAIL)
+    .max(150, PLATFORM_ACCOUNT_ERROR_MESSAGES.EMAIL_MAX_LENGTH)
+    .email(PLATFORM_ACCOUNT_ERROR_MESSAGES.INVALID_EMAIL),
 });
 
 const passwordConfirmationSchema = {
-  password: z.string().max(255, "La contraseña admite hasta 255 caracteres."),
+  password: z.string().max(255, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
   confirmPassword: z.string(),
 };
 
@@ -27,12 +28,12 @@ export const platformAccountFormSchema = platformAccountIdentitySchema
   .extend({
     password: z
       .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres.")
-      .max(255, "La contraseña admite hasta 255 caracteres."),
-    confirmPassword: z.string().min(1, "Confirmá la contraseña."),
+      .min(8, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
+      .max(255, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
+    confirmPassword: z.string().min(1, PLATFORM_ACCOUNT_ERROR_MESSAGES.REQUIRED_PASSWORD_CONFIRMATION),
   })
   .refine((values) => values.password === values.confirmPassword, {
-    message: "Las contraseñas no coinciden.",
+    message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MISMATCH,
     path: ["confirmPassword"],
   });
 
@@ -43,7 +44,7 @@ export const platformAccountUpdateFormSchema = platformAccountIdentitySchema
       context.addIssue({
         code: "custom",
         path: ["password"],
-        message: "La contraseña debe tener al menos 8 caracteres.",
+        message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH,
       });
     }
 
@@ -51,7 +52,7 @@ export const platformAccountUpdateFormSchema = platformAccountIdentitySchema
       context.addIssue({
         code: "custom",
         path: ["confirmPassword"],
-        message: "Las contraseñas no coinciden.",
+        message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MISMATCH,
       });
     }
   });

@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import { safelyRunAction } from "@common/utils/safe-action.util";
 import { deletePersonAction } from "../actions/delete-person.action";
 
 type PersonDeleteDialogProps = {
@@ -51,19 +53,18 @@ export function PersonDeleteDialog({
     setError(undefined);
 
     startTransition(async () => {
-      try {
-        const result = await deletePersonAction(institutionId, personId);
+      const result = await safelyRunAction(
+        deletePersonAction(institutionId, personId),
+        PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK,
+      );
 
-        if (!result.success) {
-          setError(result.error ?? "No se pudo eliminar el usuario.");
-          return;
-        }
-
-        onOpenChange(false);
-        onDeleted();
-      } catch {
-        setError("No se pudo eliminar el usuario.");
+      if (!result.success) {
+        setError(result.error ?? PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK);
+        return;
       }
+
+      onOpenChange(false);
+      onDeleted();
     });
   }
 
@@ -82,7 +83,7 @@ export function PersonDeleteDialog({
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>No se pudo eliminar el usuario</AlertTitle>
+            <AlertTitle>{PEOPLE_ERROR_MESSAGES.DELETE_TITLE}</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}

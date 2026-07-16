@@ -4,6 +4,7 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 import type { TooltipValueType } from "recharts";
 
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { cn } from "@common/utils/cn.util";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -30,7 +31,7 @@ function useChart() {
   const context = React.useContext(ChartContext);
 
   if (!context) {
-    throw new Error("useChart must be used within a <ChartContainer />");
+    throw new Error(COMMON_ERROR_MESSAGES.CHART_CONTEXT);
   }
 
   return context;

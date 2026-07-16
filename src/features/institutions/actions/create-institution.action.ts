@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { institutionFormSchema } from "@features/institutions/schemas/institution-form.schema";
 import {
@@ -28,7 +29,7 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
     return getValidationActionState(parsed.error.issues, INSTITUTION_FORM_FIELD_NAMES);
   }
 
-  const response = await platformApiFetch("/api/v1/institutions", {
+  const response = platformApiFetch("/api/v1/institutions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,9 +37,12 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
     body: JSON.stringify(parsed.data),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, "Error al crear la institución.");
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    INSTITUTION_FORM_FIELD_NAMES,
+    INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION,
+  );
+  if (errorState) return errorState;
 
   revalidatePath("/platform/institutions");
   return { success: true };

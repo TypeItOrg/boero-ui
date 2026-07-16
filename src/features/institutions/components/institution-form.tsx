@@ -15,6 +15,7 @@ import { Textarea } from "@common/components/ui/textarea";
 import { Switch } from "@common/components/ui/switch";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { LocationPicker } from "@features/locations/components/location-picker";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import {
   institutionFormSchema,
   type InstitutionFormInput,
@@ -398,7 +399,7 @@ function setActionFieldErrors(
 }
 
 function getErrorTitle(isEdit: boolean): string {
-  return isEdit ? "No se pudo actualizar la institución" : "No se pudo crear la institución";
+  return isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE;
 }
 
 function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPending: boolean }): string {

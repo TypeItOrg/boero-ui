@@ -17,16 +17,28 @@ export function getValidationActionState<TField extends string>(
 }
 
 export async function getResponseErrorActionState<TField extends string>(
-  response: Response,
+  response: Response | Promise<Response>,
   fields: readonly TField[],
   fallbackMessage: string,
-): Promise<FieldActionState<TField>> {
+): Promise<FieldActionState<TField> | undefined> {
+  let resolvedResponse: Response;
+
   try {
-    const error = (await response.json()) as BackendError;
+    resolvedResponse = await response;
+  } catch {
+    return { error: fallbackMessage };
+  }
+
+  if (resolvedResponse.ok) return undefined;
+
+  try {
+    const error = (await resolvedResponse.json()) as BackendError;
+    const fieldErrors = pickFieldErrors(error.fieldErrors, fields);
+    const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
     return {
       error: error.message || fallbackMessage,
-      fieldErrors: pickFieldErrors(error.fieldErrors, fields),
+      ...(hasFieldErrors ? { fieldErrors } : {}),
     };
   } catch {
     return {

@@ -1,14 +1,12 @@
 import { Suspense } from "react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformPeopleTableContainer } from "@features/people/components/platform-people-table-container";
 import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
 import { PlatformPeopleTableSkeleton } from "@features/people/components/platform-people-table-skeleton";
 import { fetchPlatformPeople } from "@features/people/services/fetch-platform-people.service";
-import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
-import { FALLBACK_SYSTEM_ROLES } from "@features/people/types/person-role.types";
+import { fetchSystemRolesWithFallback } from "@features/people/services/fetch-system-roles.service";
 import {
   parsePlatformPeoplePaginationParams,
   type PlatformPeopleSearchParams,
@@ -31,7 +29,7 @@ export default async function PlatformPeoplePage({
   const params = parsePlatformPeoplePaginationParams(await searchParams);
   const peoplePromise = fetchPlatformPeople(params);
   const [roleList, selectedInstitutionName] = await Promise.all([
-    fetchSystemRoles().catch(() => ({ roles: FALLBACK_SYSTEM_ROLES })),
+    fetchSystemRolesWithFallback(),
     getSelectedInstitutionName(params.institutionId),
   ]);
 
@@ -62,11 +60,6 @@ export default async function PlatformPeoplePage({
 async function getSelectedInstitutionName(institutionId: string | undefined): Promise<string | undefined> {
   if (!institutionId) return undefined;
 
-  try {
-    const institution = await fetchInstitution(institutionId);
-    return institution.name;
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) return undefined;
-    throw error;
-  }
+  const institution = await fetchInstitution(institutionId);
+  return institution?.name;
 }

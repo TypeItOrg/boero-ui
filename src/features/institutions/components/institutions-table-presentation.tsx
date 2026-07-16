@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -68,20 +70,19 @@ export function InstitutionsTablePresentation({
     const nextActive = !institution.active;
     setPendingInstitutionId(institution.id);
     startMutationTransition(async () => {
-      try {
-        const result = await updateInstitutionStatusAction(institution.id, nextActive);
+      const result = await safelyRunAction(
+        updateInstitutionStatusAction(institution.id, nextActive),
+        INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(nextActive),
+      );
 
-        if (result.error) {
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(`${institution.name} fue ${nextActive ? "activada" : "desactivada"}.`);
-      } catch {
-        toast.error(`Error al ${nextActive ? "activar" : "desactivar"} la institución.`);
-      } finally {
+      if (result.error) {
+        toast.error(result.error);
         setPendingInstitutionId(undefined);
+        return;
       }
+
+      toast.success(`${institution.name} fue ${nextActive ? "activada" : "desactivada"}.`);
+      setPendingInstitutionId(undefined);
     });
   }
 

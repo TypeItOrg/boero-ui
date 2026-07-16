@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { FingerprintIcon } from "lucide-react";
 
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { PlatformAccountForm } from "@features/platform-accounts/components/platform-account-form";
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -15,7 +14,8 @@ export default async function EditPlatformAccountPage({
   params,
 }: EditPlatformAccountPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const account = await getAccountOrNotFound(id);
+  const account = await fetchPlatformAccountAdmin(id);
+  if (!account) notFound();
   const fullName = `${account.name} ${account.lastName}`;
 
   return (
@@ -34,16 +34,4 @@ export default async function EditPlatformAccountPage({
       <PlatformAccountForm mode="edit" account={account} />
     </PlatformPageShell>
   );
-}
-
-async function getAccountOrNotFound(id: string): Promise<Awaited<ReturnType<typeof fetchPlatformAccountAdmin>>> {
-  try {
-    return await fetchPlatformAccountAdmin(id);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

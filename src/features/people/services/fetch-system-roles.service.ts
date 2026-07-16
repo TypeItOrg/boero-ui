@@ -1,13 +1,18 @@
-import { createHttpError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
-import type { SystemRoleList } from "../types/person-role.types";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import { FALLBACK_SYSTEM_ROLES, type SystemRoleList } from "../types/person-role.types";
 
 export async function fetchSystemRoles(): Promise<SystemRoleList> {
   const response = await platformApiFetch("/api/v1/roles/system");
 
-  if (!response.ok) {
-    throw createHttpError("No se pudieron obtener los roles del sistema", response.status);
-  }
+  return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_ROLES);
+}
 
-  return response.json();
+export async function fetchSystemRolesWithFallback(): Promise<SystemRoleList> {
+  try {
+    return await fetchSystemRoles();
+  } catch {
+    return { roles: FALLBACK_SYSTEM_ROLES };
+  }
 }

@@ -6,6 +6,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronsUpDownIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import {
   Command,
   CommandEmpty,
@@ -111,7 +112,7 @@ export function AsyncDropdown<TItem>({
   defaultOption,
   disabled = false,
   emptyMessage = "No se encontraron resultados.",
-  errorMessage = "No se pudieron cargar los resultados.",
+  errorMessage = COMMON_ERROR_MESSAGES.ASYNC_DROPDOWN_RESULTS,
   estimateSize = DEFAULT_ESTIMATED_ITEM_SIZE,
   fetchPage,
   getItemLabel,

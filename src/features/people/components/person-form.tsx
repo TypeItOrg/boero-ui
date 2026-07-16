@@ -14,6 +14,7 @@ import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonAction } from "../actions/create-person.action";
 import { updatePersonAction } from "../actions/update-person.action";
 import { createPersonFormSchema, updatePersonFormSchema } from "../schemas/person-form.schema";
@@ -334,7 +335,7 @@ function setActionFieldErrors(result: PersonActionState, setError: UseFormSetErr
 }
 
 function getErrorTitle(isEdit: boolean): string {
-  return isEdit ? "No se pudo actualizar el usuario" : "No se pudo crear el usuario";
+  return isEdit ? PEOPLE_ERROR_MESSAGES.UPDATE_TITLE : PEOPLE_ERROR_MESSAGES.CREATE_TITLE;
 }
 
 function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPending: boolean }): string {

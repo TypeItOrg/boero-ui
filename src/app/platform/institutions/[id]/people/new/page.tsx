@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { UserRoundIcon } from "lucide-react";
 
-import { isHttpStatusError } from "@common/utils/create-http-error.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PersonForm } from "@features/people/components/person-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -18,7 +17,8 @@ type NewPersonPageProps = {
 
 export default async function NewPersonPage({ params }: NewPersonPageProps): Promise<React.ReactElement> {
   const { id } = await params;
-  const institution = await getInstitutionOrNotFound(id);
+  const institution = await fetchInstitution(id);
+  if (!institution) notFound();
 
   return (
     <PlatformPageShell
@@ -35,16 +35,4 @@ export default async function NewPersonPage({ params }: NewPersonPageProps): Pro
       <PersonForm mode="create" institutionId={id} />
     </PlatformPageShell>
   );
-}
-
-async function getInstitutionOrNotFound(id: string): Promise<Awaited<ReturnType<typeof fetchInstitution>>> {
-  try {
-    return await fetchInstitution(id);
-  } catch (error) {
-    if (isHttpStatusError(error, 404)) {
-      notFound();
-    }
-
-    throw error;
-  }
 }

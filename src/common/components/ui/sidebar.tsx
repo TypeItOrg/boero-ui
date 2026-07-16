@@ -5,6 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 import { PanelLeftIcon } from "lucide-react";
 
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { useIsMobile } from "@common/hooks/use-mobile";
 import { cn } from "@common/utils/cn.util";
 import { Button } from "@common/components/ui/button";
@@ -39,7 +40,7 @@ const SidebarContext = React.createContext<SidebarContextProps | null>(null);
 function useSidebar() {
   const context = React.useContext(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.");
+    throw new Error(COMMON_ERROR_MESSAGES.SIDEBAR_CONTEXT);
   }
 
   return context;

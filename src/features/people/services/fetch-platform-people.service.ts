@@ -1,10 +1,11 @@
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { createHttpError } from "@common/utils/create-http-error.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import type { PlatformPersonSummary } from "@features/people/types/person.types";
 import type { PlatformPeoplePaginationParams } from "@features/people/utils/platform-people-pagination.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
 export async function fetchPlatformPeople({
   page,
@@ -21,9 +22,5 @@ export async function fetchPlatformPeople({
   if (roleCode) searchParams.set("roleCode", roleCode);
 
   const response = await platformApiFetch(`/api/v1/platform/people?${searchParams.toString()}`);
-  if (!response.ok) {
-    throw createHttpError("No se pudieron obtener los usuarios de la plataforma", response.status);
-  }
-
-  return response.json();
+  return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_PLATFORM_PEOPLE);
 }

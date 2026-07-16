@@ -12,15 +12,23 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@common/components/ui/empty";
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { cn } from "@common/utils/cn.util";
 
 type BlockingErrorProps = {
-  error: Error & { digest?: string };
+  error?: Error & { digest?: string };
   reset: () => void;
   className?: string;
+  title?: string;
+  description?: string;
 };
 
-export function BlockingError({ reset, className }: BlockingErrorProps): React.ReactElement {
+export function BlockingError({
+  reset,
+  className,
+  title = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_TITLE,
+  description = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_DESCRIPTION,
+}: BlockingErrorProps): React.ReactElement {
   return (
     <main className={cn("bg-muted flex min-h-full flex-1 items-center justify-center p-6", className)}>
       <Card className="bg-background w-full max-w-lg p-6 md:p-8">
@@ -29,11 +37,8 @@ export function BlockingError({ reset, className }: BlockingErrorProps): React.R
             <EmptyMedia variant="icon" className="bg-destructive/10 text-destructive mb-4 size-16 rounded-full">
               <ServerCrashIcon className="size-8" />
             </EmptyMedia>
-            <EmptyTitle className="text-lg">No pudimos cargar esta página</EmptyTitle>
-            <EmptyDescription>
-              El servicio puede no estar disponible temporalmente o se produjo un error inesperado. Intentá nuevamente
-              en unos momentos.
-            </EmptyDescription>
+            <EmptyTitle className="text-lg">{title}</EmptyTitle>
+            <EmptyDescription>{description}</EmptyDescription>
           </EmptyHeader>
 
           <EmptyContent className="flex-row justify-center">

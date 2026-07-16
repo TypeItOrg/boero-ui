@@ -3,6 +3,7 @@ jest.mock("@common/services/proxy-boero-api-request.service", () => ({
 }));
 
 import { proxyBoeroApiRequest } from "@common/services/proxy-boero-api-request.service";
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { DELETE, GET, PATCH, POST, PUT } from "@app/api/[...path]/route";
 
 describe("app/api/[...path]/route", () => {
@@ -43,6 +44,6 @@ describe("app/api/[...path]/route", () => {
     const response = await callHandler(GET);
 
     expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({ message: "boom" });
+    await expect(response.json()).resolves.toEqual({ message: COMMON_ERROR_MESSAGES.UNEXPECTED_API_PROXY });
   });
 });

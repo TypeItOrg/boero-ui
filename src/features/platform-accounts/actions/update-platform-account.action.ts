@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformAccountUpdateFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
 import {
   PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
@@ -25,7 +26,7 @@ export async function updatePlatformAccountAction(id: string, formData: FormData
     return getValidationActionState(parsed.error.issues, PLATFORM_ACCOUNT_FORM_FIELD_NAMES);
   }
 
-  const response = await platformApiFetch(`/api/v1/platform/accounts/${id}`, {
+  const response = platformApiFetch(`/api/v1/platform/accounts/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -36,13 +37,12 @@ export async function updatePlatformAccountAction(id: string, formData: FormData
     }),
   });
 
-  if (!response.ok) {
-    return getResponseErrorActionState(
-      response,
-      PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-      "No se pudo actualizar el administrador.",
-    );
-  }
+  const errorState = await getResponseErrorActionState(
+    response,
+    PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
+    PLATFORM_ACCOUNT_ERROR_MESSAGES.UPDATE_ACCOUNT,
+  );
+  if (errorState) return errorState;
 
   revalidatePath(PLATFORM_ACCOUNTS_PATH);
   revalidatePath(`${PLATFORM_ACCOUNTS_PATH}/${id}`);
