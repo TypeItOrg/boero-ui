@@ -74,7 +74,7 @@ export function PeopleTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/platform/institutions/${institutionId}/people?size=${size}`}>Volver a la primera página</Link>
+            <Link href={`/admin/institutions/${institutionId}/people?size=${size}`}>Volver a la primera página</Link>
           </Button>
         </div>
       );
@@ -104,7 +104,7 @@ export function PeopleTablePresentation({
           Comenzá creando un nuevo usuario para esta institución.
         </p>
         <Button asChild size="sm">
-          <Link href={`/platform/institutions/${institutionId}/people/new`}>
+          <Link href={`/admin/institutions/${institutionId}/people/new`}>
             <PlusIcon className="mr-2 size-4" />
             Nuevo usuario
           </Link>
@@ -148,7 +148,7 @@ export function PeopleTablePresentation({
                       <TableCell className="font-medium">
                         <Link
                           className="hover:underline"
-                          href={`/platform/institutions/${institutionId}/people/${person.id}`}
+                          href={`/admin/institutions/${institutionId}/people/${person.id}`}
                         >
                           {person.lastName}, {person.firstName}
                         </Link>
@@ -188,10 +188,7 @@ export function PeopleTablePresentation({
                   </ContextMenuTrigger>
                   <ContextMenuContent className="w-44 p-1.5">
                     <ContextMenuItem asChild>
-                      <Link
-                        href={`/platform/institutions/${institutionId}/people/${person.id}`}
-                        className="px-2.5 py-1.5"
-                      >
+                      <Link href={`/admin/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
                         Editar
                       </Link>
                     </ContextMenuItem>
@@ -254,7 +251,7 @@ function PersonActionsMenu({ person, institutionId, onDelete }: PersonActionsMen
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuItem asChild>
-            <Link href={`/platform/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
+            <Link href={`/admin/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
               Editar
             </Link>
           </DropdownMenuItem>

@@ -22,7 +22,7 @@ export function PersonDeleteButton({
   const [open, setOpen] = React.useState(false);
 
   function handleDeleted(): void {
-    router.push(`/platform/institutions/${institutionId}/people`);
+    router.push(`/admin/institutions/${institutionId}/people`);
   }
 
   return (

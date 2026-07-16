@@ -24,7 +24,7 @@ export async function createPersonAction(institutionId: string, formData: FormDa
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch(`/api/v1/institutions/${institutionId}/people`, {
+  const response = platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,6 +43,6 @@ export async function createPersonAction(institutionId: string, formData: FormDa
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/platform/institutions/${institutionId}/people`);
+  revalidatePath(`/admin/institutions/${institutionId}/people`);
   return { success: true };
 }

@@ -4,7 +4,7 @@ import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages
 import { FALLBACK_SYSTEM_ROLES, type SystemRoleList } from "../types/person-role.types";
 
 export async function fetchSystemRoles(): Promise<SystemRoleList> {
-  const response = await platformApiFetch("/api/v1/roles/system");
+  const response = await platformApiFetch("/api/v1/admin/roles/system");
 
   return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_ROLES);
 }

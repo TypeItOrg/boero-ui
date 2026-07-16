@@ -33,7 +33,7 @@ describe("updatePlatformAccountAction", () => {
       lastName: "González",
       email: "admin@boero.edu.ar",
     });
-    expect(revalidatePathMock).toHaveBeenCalledWith(`/platform/accounts/${ACCOUNT_ID}`);
+    expect(revalidatePathMock).toHaveBeenCalledWith(`/admin/accounts/${ACCOUNT_ID}`);
   });
 
   it("includes a new password when provided", async () => {

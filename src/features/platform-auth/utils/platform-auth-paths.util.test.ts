@@ -2,19 +2,19 @@ import { getRedirectPath, getSafeNextPath } from "@features/platform-auth/utils/
 
 describe("platform-auth-paths.util", () => {
   it("returns the default path when next is empty or '/'", () => {
-    expect(getSafeNextPath(undefined)).toBe("/platform");
-    expect(getSafeNextPath(null)).toBe("/platform");
-    expect(getSafeNextPath("")).toBe("/platform");
-    expect(getSafeNextPath("/")).toBe("/platform");
-    expect(getSafeNextPath("https://evil.com/")).toBe("/platform");
+    expect(getSafeNextPath(undefined)).toBe("/admin");
+    expect(getSafeNextPath(null)).toBe("/admin");
+    expect(getSafeNextPath("")).toBe("/admin");
+    expect(getSafeNextPath("/")).toBe("/admin");
+    expect(getSafeNextPath("https://evil.com/")).toBe("/admin");
   });
 
   it("preserves safe relative paths", () => {
-    expect(getSafeNextPath("/platform/orders?page=1")).toBe("/platform/orders?page=1");
+    expect(getSafeNextPath("/admin/orders?page=1")).toBe("/admin/orders?page=1");
   });
 
   it("rejects protocol-relative paths", () => {
-    expect(getSafeNextPath("//evil.com")).toBe("/platform");
+    expect(getSafeNextPath("//evil.com")).toBe("/admin");
   });
 
   it("extracts path and search from absolute urls", () => {
@@ -22,16 +22,14 @@ describe("platform-auth-paths.util", () => {
   });
 
   it("falls back when next is not a valid path", () => {
-    expect(getSafeNextPath("not-a-path")).toBe("/platform");
+    expect(getSafeNextPath("not-a-path")).toBe("/admin");
   });
 
   it("builds redirect paths without next", () => {
-    expect(getRedirectPath("/auth/platform/login")).toBe("/auth/platform/login");
+    expect(getRedirectPath("/admin/auth/login")).toBe("/admin/auth/login");
   });
 
   it("encodes next in redirect paths", () => {
-    expect(getRedirectPath("/auth/platform/login", "/platform?a=1")).toBe(
-      "/auth/platform/login?next=%2Fplatform%3Fa%3D1",
-    );
+    expect(getRedirectPath("/admin/auth/login", "/admin?a=1")).toBe("/admin/auth/login?next=%2Fadmin%3Fa%3D1");
   });
 });

@@ -27,7 +27,7 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
 
   const active = formData.get("active") === "true";
 
-  const response = platformApiFetch(`/api/v1/institutions/${id}`, {
+  const response = platformApiFetch(`/api/v1/admin/institutions/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -45,8 +45,8 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
   );
   if (errorState) return errorState;
 
-  revalidatePath("/platform/institutions");
-  revalidatePath(`/platform/institutions/${id}`);
-  revalidatePath(`/platform/institutions/${id}/edit`);
+  revalidatePath("/admin/institutions");
+  revalidatePath(`/admin/institutions/${id}`);
+  revalidatePath(`/admin/institutions/${id}/edit`);
   return { success: true };
 }

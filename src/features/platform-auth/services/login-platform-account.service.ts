@@ -5,7 +5,7 @@ import type { PlatformLoginInput } from "@features/platform-auth/types/platform-
 import type { PlatformLoginResult } from "@features/platform-auth/types/platform-login-result.types";
 
 export async function loginPlatformAccount(input: PlatformLoginInput): Promise<LoginPlatformAccountOutput> {
-  const response = await fetch(new URL("/api/v1/auth/platform/login", getApiUrlOrThrow()), {
+  const response = await fetch(new URL("/api/v1/admin/auth/login", getApiUrlOrThrow()), {
     body: JSON.stringify(input),
     cache: "no-store",
     headers: { "Content-Type": "application/json" },

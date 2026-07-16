@@ -56,10 +56,10 @@ export default async function InstitutionDetailPage({
           {institution.active ? (
             <>
               <Button asChild variant="outline" size="lg">
-                <Link href={`/platform/institutions/${id}/edit`}>Editar institución</Link>
+                <Link href={`/admin/institutions/${id}/edit`}>Editar institución</Link>
               </Button>
               <Button asChild size="lg">
-                <Link href={`/platform/institutions/${id}/people`}>Administrar usuarios</Link>
+                <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>
               </Button>
             </>
           ) : (

@@ -15,7 +15,9 @@ export async function fetchPeople(
   const searchParams = buildPaginationSearchParams({ page, size, search });
   searchParams.set("sort", serializeSpringSort(sort));
 
-  const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/people?${searchParams.toString()}`);
+  const response = await platformApiFetch(
+    `/api/v1/admin/institutions/${institutionId}/people?${searchParams.toString()}`,
+  );
 
   return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_PEOPLE);
 }

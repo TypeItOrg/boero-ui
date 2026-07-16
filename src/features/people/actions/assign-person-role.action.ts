@@ -38,16 +38,16 @@ export async function assignPersonRoleAction(
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);
+  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
   return { success: true };
 }
 
 function getAssignRolePath(institutionId: string, personId: string, role: SystemRoleCode): string {
   if (role === INSTITUTIONAL_AUTHORITY_ROLE) {
-    return `/api/v1/platform/institutions/${institutionId}/authority/${personId}`;
+    return `/api/v1/admin/institutions/${institutionId}/authority/${personId}`;
   }
 
-  return `/api/v1/institutions/${institutionId}/people/${personId}/roles`;
+  return `/api/v1/admin/institutions/${institutionId}/people/${personId}/roles`;
 }
 
 function getAssignRoleBody(role: SystemRoleCode): string | undefined {

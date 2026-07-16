@@ -1,4 +1,4 @@
-const DEFAULT_REDIRECT_PATH = "/platform";
+const DEFAULT_REDIRECT_PATH = "/admin";
 
 export function getSafeNextPath(next: string | null | undefined): string {
   if (!next || next === "/") return DEFAULT_REDIRECT_PATH;

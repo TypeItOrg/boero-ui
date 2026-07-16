@@ -21,6 +21,6 @@ export async function fetchPlatformAccounts({
     searchParams.set("enabled", String(enabled));
   }
 
-  const response = await platformApiFetch(`/api/v1/platform/accounts?${searchParams.toString()}`);
+  const response = await platformApiFetch(`/api/v1/admin/accounts?${searchParams.toString()}`);
   return parseHttpResponse(response, PLATFORM_ACCOUNT_ERROR_MESSAGES.FETCH_ACCOUNTS);
 }

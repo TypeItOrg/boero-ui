@@ -12,14 +12,14 @@ type DeletePersonActionState = {
 
 export async function deletePersonAction(institutionId: string, personId: string): Promise<DeletePersonActionState> {
   const errorState = await getResponseErrorActionState(
-    platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, { method: "DELETE" }),
+    platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people/${personId}`, { method: "DELETE" }),
     [],
     PEOPLE_ERROR_MESSAGES.DELETE_PERSON,
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/platform/institutions/${institutionId}/people`);
-  revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);
-  revalidatePath("/platform/people");
+  revalidatePath(`/admin/institutions/${institutionId}/people`);
+  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
+  revalidatePath("/admin/people");
   return { success: true };
 }

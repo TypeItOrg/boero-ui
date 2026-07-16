@@ -33,7 +33,7 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg">
-          <Link href="/platform/institutions/new">
+          <Link href="/admin/institutions/new">
             <PlusIcon data-icon="inline-start" />
             Nueva Institución
           </Link>

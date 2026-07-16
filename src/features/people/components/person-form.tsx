@@ -75,7 +75,7 @@ export function PersonForm({
   const isEdit = mode === "edit";
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
-  const listPath = `/platform/institutions/${institutionId}/people`;
+  const listPath = `/admin/institutions/${institutionId}/people`;
   const resolver = getPersonFormResolver(isEdit);
 
   const {

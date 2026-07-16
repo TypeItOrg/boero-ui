@@ -6,7 +6,7 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 import type { PlatformDashboard } from "@features/platform-dashboard/types/platform-dashboard.types";
 
 export async function fetchPlatformDashboard(): Promise<PlatformDashboard> {
-  const response = await platformApiFetch("/api/v1/platform/dashboard");
+  const response = await platformApiFetch("/api/v1/admin/dashboard");
 
   return parseHttpResponse(response, PLATFORM_DASHBOARD_ERROR_MESSAGES.FETCH_DASHBOARD);
 }

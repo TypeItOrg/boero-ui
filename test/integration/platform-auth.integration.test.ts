@@ -108,7 +108,7 @@ let redirectMock: jest.Mock;
 let lastAccountAuthorization: string | null = null;
 
 const server = setupServer(
-  http.post(`${API_URL}/api/v1/auth/platform/login`, async ({ request }) => {
+  http.post(`${API_URL}/api/v1/admin/auth/login`, async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
 
     if (body.email !== LOGIN_CREDENTIALS.email || body.password !== LOGIN_CREDENTIALS.password) {
@@ -120,7 +120,7 @@ const server = setupServer(
       tokens: loginTokens,
     });
   }),
-  http.post(`${API_URL}/api/v1/auth/platform/refresh`, async ({ request }) => {
+  http.post(`${API_URL}/api/v1/admin/auth/refresh`, async ({ request }) => {
     const body = (await request.json()) as { refreshToken?: string };
 
     if (body.refreshToken !== loginTokens.refreshToken) {
@@ -131,7 +131,7 @@ const server = setupServer(
       tokens: refreshedTokens,
     });
   }),
-  http.get(`${API_URL}/api/v1/auth/platform/me`, ({ request }) => {
+  http.get(`${API_URL}/api/v1/admin/auth/me`, ({ request }) => {
     lastAccountAuthorization = request.headers.get("authorization");
 
     if (
@@ -175,7 +175,7 @@ beforeEach(() => {
   }));
 });
 
-async function login(next = "/platform"): Promise<void> {
+async function login(next = "/admin"): Promise<void> {
   const { loginPlatform } = await import("@features/platform-auth/actions/platform-login.action");
 
   await expect(loginPlatform({}, createLoginFormData(next))).rejects.toMatchObject({
@@ -193,7 +193,7 @@ function createLoginFormData(next: string): FormData {
   return formData;
 }
 
-function createPlatformRequest(path = "/platform"): NextRequest {
+function createPlatformRequest(path = "/admin"): NextRequest {
   return new NextRequest(`https://app.example.test${path}`, {
     headers: {
       cookie: cookieJar.toRequestCookieHeader(),
@@ -203,15 +203,15 @@ function createPlatformRequest(path = "/platform"): NextRequest {
 
 describe("platform auth integration", () => {
   it("logs in through the real action, stores auth cookies, and redirects", async () => {
-    await login("/platform");
+    await login("/admin");
 
     expect(cookieJar.get(PLATFORM_ACCESS_TOKEN_COOKIE)).toBe(loginTokens.accessToken);
     expect(cookieJar.get(PLATFORM_REFRESH_TOKEN_COOKIE)).toBe(loginTokens.refreshToken);
-    expect(redirectMock).toHaveBeenCalledWith("/platform");
+    expect(redirectMock).toHaveBeenCalledWith("/admin");
   });
 
   it("loads the platform account using the access token stored by login", async () => {
-    await login("/platform");
+    await login("/admin");
 
     const { getPlatformAccount } = await import("@features/platform-auth/services/get-platform-account.service");
 
@@ -246,7 +246,7 @@ describe("platform auth integration", () => {
     cookieJar.applyResponseCookies(response);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe("https://app.example.test/auth/platform/login?next=%2Fplatform");
+    expect(response.headers.get("location")).toBe("https://app.example.test/admin/auth/login?next=%2Fadmin");
     expect(cookieJar.has(PLATFORM_ACCESS_TOKEN_COOKIE)).toBe(false);
     expect(cookieJar.has(PLATFORM_REFRESH_TOKEN_COOKIE)).toBe(false);
   });

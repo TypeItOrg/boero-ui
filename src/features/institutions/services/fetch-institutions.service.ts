@@ -21,7 +21,7 @@ export async function fetchInstitutions({
     searchParams.set("active", String(active));
   }
 
-  const response = await platformApiFetch(`/api/v1/platform/institutions?${searchParams.toString()}`);
+  const response = await platformApiFetch(`/api/v1/admin/institutions?${searchParams.toString()}`);
 
   return parseHttpResponse(response, INSTITUTION_ERROR_MESSAGES.FETCH_INSTITUTIONS);
 }

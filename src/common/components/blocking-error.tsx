@@ -47,7 +47,7 @@ export function BlockingError({
               Reintentar
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="/platform">
+              <a href="/admin">
                 <HouseIcon data-icon="inline-start" />
                 Ir al inicio
               </a>

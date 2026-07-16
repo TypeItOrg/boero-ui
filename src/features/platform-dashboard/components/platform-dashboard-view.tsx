@@ -184,7 +184,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
         </div>
         <div className="shrink-0 self-end">
           <Button asChild size="lg">
-            <Link href="/platform/institutions">Ver todas</Link>
+            <Link href="/admin/institutions">Ver todas</Link>
           </Button>
         </div>
       </CardHeader>
@@ -213,7 +213,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
 function RecentInstitutionRow({ institution }: { institution: RecentInstitution }): React.ReactElement {
   return (
     <Link
-      href={`/platform/institutions/${institution.id}`}
+      href={`/admin/institutions/${institution.id}`}
       className="hover:bg-muted/50 -mx-2 flex min-w-0 items-center gap-3 rounded-lg px-2 py-3 transition-colors"
     >
       <div className="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-lg">

@@ -36,7 +36,7 @@ export default async function InstitutionPeoplePage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg">
-          <Link href={`/platform/institutions/${id}/people/new`}>
+          <Link href={`/admin/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario
           </Link>

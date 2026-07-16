@@ -26,7 +26,7 @@ export default async function PlatformAccountDetailPage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       actions={
         <Button asChild size="lg">
-          <Link href={`/platform/accounts/${id}/edit`}>Editar cuenta</Link>
+          <Link href={`/admin/accounts/${id}/edit`}>Editar cuenta</Link>
         </Button>
       }
     >

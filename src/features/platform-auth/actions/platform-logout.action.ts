@@ -8,5 +8,5 @@ import { clearPlatformAuthCookies } from "@features/platform-auth/utils/platform
 export async function logoutPlatform(): Promise<never> {
   await logoutPlatformAccount();
   await clearPlatformAuthCookies();
-  redirect("/auth/platform/login");
+  redirect("/admin/auth/login");
 }

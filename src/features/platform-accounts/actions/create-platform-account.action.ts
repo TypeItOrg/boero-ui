@@ -11,7 +11,7 @@ import {
 } from "@features/platform-accounts/types/platform-account-action-state.types";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
-const PLATFORM_ACCOUNTS_PATH = "/platform/accounts";
+const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
 export async function createPlatformAccountAction(formData: FormData): Promise<PlatformAccountActionState> {
   const parsed = platformAccountFormSchema.safeParse({
@@ -32,7 +32,7 @@ export async function createPlatformAccountAction(formData: FormData): Promise<P
     email: parsed.data.email,
     password: parsed.data.password,
   };
-  const response = platformApiFetch("/api/v1/platform/accounts", {
+  const response = platformApiFetch("/api/v1/admin/accounts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

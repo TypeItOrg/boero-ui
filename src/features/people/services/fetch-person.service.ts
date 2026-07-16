@@ -4,7 +4,7 @@ import type { Person } from "../types/person.types";
 import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
 
 export async function fetchPerson(institutionId: string, personId: string): Promise<Person | null> {
-  const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`);
+  const response = await platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people/${personId}`);
 
   if (response.status === 404) return null;
 

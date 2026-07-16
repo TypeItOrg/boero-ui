@@ -34,7 +34,7 @@ export async function updatePersonAction(
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch(`/api/v1/institutions/${institutionId}/people/${personId}`, {
+  const response = platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people/${personId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -110,6 +110,6 @@ async function syncPersonRoles(
 }
 
 function revalidatePersonPaths(institutionId: string, personId: string): void {
-  revalidatePath(`/platform/institutions/${institutionId}/people`);
-  revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);
+  revalidatePath(`/admin/institutions/${institutionId}/people`);
+  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
 }

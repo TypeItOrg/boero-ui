@@ -10,7 +10,7 @@ export async function logoutPlatformAccount(): Promise<void> {
   if (!accessToken) return;
 
   try {
-    await fetch(new URL("/api/v1/auth/platform/logout", getApiUrlOrThrow()), {
+    await fetch(new URL("/api/v1/admin/auth/logout", getApiUrlOrThrow()), {
       method: "POST",
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",

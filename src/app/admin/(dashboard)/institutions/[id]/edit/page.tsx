@@ -23,7 +23,7 @@ export default async function EditInstitutionPage({ params }: EditInstitutionPag
         breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
         actions={
           <Link
-            href={`/platform/institutions/${id}`}
+            href={`/admin/institutions/${id}`}
             className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm font-medium underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             Ver ficha
@@ -40,7 +40,7 @@ export default async function EditInstitutionPage({ params }: EditInstitutionPag
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Link
-          href={`/platform/institutions/${id}/people`}
+          href={`/admin/institutions/${id}/people`}
           className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-sm text-sm font-medium underline-offset-4 transition-colors hover:underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           Administrar usuarios

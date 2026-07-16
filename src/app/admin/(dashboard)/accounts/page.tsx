@@ -35,7 +35,7 @@ export default async function PlatformAccountsPage({
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg">
-          <Link href="/platform/accounts/new">
+          <Link href="/admin/accounts/new">
             <PlusIcon data-icon="inline-start" />
             Nueva cuenta
           </Link>

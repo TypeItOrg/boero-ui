@@ -29,7 +29,7 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
     return getValidationActionState(parsed.error.issues, INSTITUTION_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch("/api/v1/institutions", {
+  const response = platformApiFetch("/api/v1/admin/institutions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,6 +44,6 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
   );
   if (errorState) return errorState;
 
-  revalidatePath("/platform/institutions");
+  revalidatePath("/admin/institutions");
   return { success: true };
 }

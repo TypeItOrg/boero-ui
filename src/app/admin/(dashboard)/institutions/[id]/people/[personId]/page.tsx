@@ -41,7 +41,7 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
 
       <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
         <Button asChild variant="outline">
-          <Link href={`/platform/institutions/${id}/people`}>Cancelar</Link>
+          <Link href={`/admin/institutions/${id}/people`}>Cancelar</Link>
         </Button>
         <Button type="submit" form="person-edit-form">
           Guardar cambios

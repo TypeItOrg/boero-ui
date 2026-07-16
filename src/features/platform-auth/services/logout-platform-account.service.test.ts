@@ -57,7 +57,7 @@ describe("logoutPlatformAccount", () => {
     const { logoutPlatformAccount } = await importService();
     await logoutPlatformAccount();
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/platform/logout", "https://api.example.test"), {
+    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/logout", "https://api.example.test"), {
       method: "POST",
       headers: { Authorization: "Bearer access-token" },
       cache: "no-store",

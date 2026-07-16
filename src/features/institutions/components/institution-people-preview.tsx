@@ -51,7 +51,7 @@ export async function InstitutionPeoplePreview({
           return (
             <Link
               key={person.id}
-              href={`/platform/institutions/${institutionId}/people/${person.id}`}
+              href={`/admin/institutions/${institutionId}/people/${person.id}`}
               className="group bg-muted/40 hover:bg-muted/70 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               <Avatar className="size-12">
@@ -79,7 +79,7 @@ export async function InstitutionPeoplePreview({
       </div>
 
       <Button asChild className="mt-3 h-9 w-full justify-center">
-        <Link href={`/platform/institutions/${institutionId}/people`}>Ver todos los usuarios</Link>
+        <Link href={`/admin/institutions/${institutionId}/people`}>Ver todos los usuarios</Link>
       </Button>
     </aside>
   );
@@ -115,7 +115,7 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
         <p className="text-foreground text-sm font-medium">Todavía no hay usuarios</p>
         <p className="text-muted-foreground mt-1 text-sm">Creá el primero para esta institución.</p>
         <Button asChild size="lg" className="mt-4 w-full">
-          <Link href={`/platform/institutions/${institutionId}/people/new`}>Crear usuario</Link>
+          <Link href={`/admin/institutions/${institutionId}/people/new`}>Crear usuario</Link>
         </Button>
       </div>
     </aside>

@@ -11,14 +11,14 @@ type UpdatePlatformAccountStatusState = {
   error?: string;
 };
 
-const PLATFORM_ACCOUNTS_PATH = "/platform/accounts";
+const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
 export async function updatePlatformAccountStatusAction(
   id: string,
   enabled: boolean,
 ): Promise<UpdatePlatformAccountStatusState> {
   const errorState = await getResponseErrorActionState(
-    platformApiFetch(`/api/v1/platform/accounts/${id}/status`, {
+    platformApiFetch(`/api/v1/admin/accounts/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enabled }),

@@ -100,7 +100,7 @@ export function InstitutionsTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/platform/institutions?size=${size}`}>Volver a la primera página</Link>
+            <Link href={`/admin/institutions?size=${size}`}>Volver a la primera página</Link>
           </Button>
         </div>
       );
@@ -130,7 +130,7 @@ export function InstitutionsTablePresentation({
           Comenzá creando una nueva institución para empezar a gestionar la plataforma.
         </p>
         <Button asChild size="sm">
-          <Link href="/platform/institutions/new">
+          <Link href="/admin/institutions/new">
             <PlusIcon className="mr-2 size-4" />
             Nueva Institución
           </Link>
@@ -173,7 +173,7 @@ export function InstitutionsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={`/platform/institutions/${institution.id}`}>
+                      <Link className="hover:underline" href={`/admin/institutions/${institution.id}`}>
                         {institution.name}
                       </Link>
                     </TableCell>
@@ -249,7 +249,7 @@ type InstitutionAction = {
 };
 
 function getInstitutionActions(institution: InstitutionSummary): InstitutionAction[] {
-  const detailHref = `/platform/institutions/${institution.id}`;
+  const detailHref = `/admin/institutions/${institution.id}`;
 
   if (!institution.active) {
     return [{ label: "Ver", href: detailHref }];
@@ -274,7 +274,7 @@ function InstitutionUsersCell({ institution }: { institution: InstitutionSummary
   const overflow = count - visibleAvatars;
 
   return (
-    <Link href={`/platform/institutions/${institution.id}/people`} className="inline-flex items-center">
+    <Link href={`/admin/institutions/${institution.id}/people`} className="inline-flex items-center">
       <AvatarGroup>
         {Array.from({ length: visibleAvatars }).map((_, index) => (
           <Avatar key={index} size="sm">

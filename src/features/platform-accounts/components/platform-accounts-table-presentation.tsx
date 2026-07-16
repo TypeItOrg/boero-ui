@@ -106,7 +106,7 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={`/platform/accounts/${account.platformAccountId}`}>
+                      <Link className="hover:underline" href={`/admin/accounts/${account.platformAccountId}`}>
                         {account.name} {account.lastName}
                       </Link>
                     </TableCell>
@@ -130,12 +130,12 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuContent className="w-40 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+                      <Link href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                         Ver detalle
                       </Link>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+                      <Link href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                         Editar
                       </Link>
                     </ContextMenuItem>
@@ -184,12 +184,12 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
         <DropdownMenuContent align="end" className="w-40 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href={`/platform/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+              <Link href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                 Ver detalle
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={`/platform/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+              <Link href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                 Editar
               </Link>
             </DropdownMenuItem>
@@ -226,7 +226,7 @@ function PlatformAccountsEmptyState({
           La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
         </p>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/platform/accounts?size=${size}`}>Volver a la primera página</Link>
+          <Link href={`/admin/accounts?size=${size}`}>Volver a la primera página</Link>
         </Button>
       </div>
     );
@@ -256,7 +256,7 @@ function PlatformAccountsEmptyState({
         Comenzá creando un nuevo administrador para empezar a gestionar la plataforma.
       </p>
       <Button asChild size="sm">
-        <Link href="/platform/accounts/new">
+        <Link href="/admin/accounts/new">
           <PlusIcon className="mr-2 size-4" />
           Nuevo administrador
         </Link>

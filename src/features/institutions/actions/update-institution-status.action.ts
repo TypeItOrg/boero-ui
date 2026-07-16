@@ -11,14 +11,14 @@ type UpdateInstitutionStatusActionState = {
   error?: string;
 };
 
-const INSTITUTIONS_PATH = "/platform/institutions";
+const INSTITUTIONS_PATH = "/admin/institutions";
 
 export async function updateInstitutionStatusAction(
   id: string,
   nextActive: boolean,
 ): Promise<UpdateInstitutionStatusActionState> {
   const errorState = await getResponseErrorActionState(
-    platformApiFetch(`/api/v1/platform/institutions/${id}/status`, {
+    platformApiFetch(`/api/v1/admin/institutions/${id}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

@@ -11,7 +11,7 @@ async function fetchPlatformAccount(): Promise<PlatformAccount | null> {
 
   if (!accessToken) return null;
 
-  const response = await fetch(new URL("/api/v1/auth/platform/me", getApiUrlOrThrow()), {
+  const response = await fetch(new URL("/api/v1/admin/auth/me", getApiUrlOrThrow()), {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });

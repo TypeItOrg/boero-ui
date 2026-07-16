@@ -39,7 +39,7 @@ describe("fetchPlatformPeople", () => {
     await expect(fetchPlatformPeople(params)).resolves.toEqual(payload);
 
     const requestUrl = new URL(platformApiFetchMock.mock.calls[0][0], "http://localhost");
-    expect(requestUrl.pathname).toBe("/api/v1/platform/people");
+    expect(requestUrl.pathname).toBe("/api/v1/admin/people");
     expect(Object.fromEntries(requestUrl.searchParams)).toEqual({
       page: "1",
       size: "20",

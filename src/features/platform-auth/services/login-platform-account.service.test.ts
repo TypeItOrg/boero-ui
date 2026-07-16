@@ -45,7 +45,7 @@ describe("loginPlatformAccount", () => {
       }),
     ).resolves.toEqual({ success: true, data: payload });
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/platform/login", "https://api.example.test"), {
+    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/login", "https://api.example.test"), {
       body: JSON.stringify({
         email: "user@example.com",
         password: "secret",

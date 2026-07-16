@@ -128,11 +128,11 @@ describe("loginPlatform", () => {
       createLoginFormData({
         email: "user@example.com",
         password: "secret",
-        next: "/platform/orders",
+        next: "/admin/orders",
       }),
     );
 
     expect(setPlatformAuthCookiesMock).toHaveBeenCalledWith(tokens);
-    expect(redirectToNextMock).toHaveBeenCalledWith("/platform/orders");
+    expect(redirectToNextMock).toHaveBeenCalledWith("/admin/orders");
   });
 });

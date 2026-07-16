@@ -4,7 +4,7 @@ import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
 export async function fetchInstitution(id: string): Promise<Institution | null> {
-  const response = await platformApiFetch(`/api/v1/platform/institutions/${id}`);
+  const response = await platformApiFetch(`/api/v1/admin/institutions/${id}`);
 
   if (response.status === 404) return null;
 

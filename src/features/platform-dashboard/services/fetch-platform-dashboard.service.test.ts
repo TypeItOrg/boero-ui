@@ -37,7 +37,7 @@ describe("fetchPlatformDashboard", () => {
     const { fetchPlatformDashboard } = await importService();
 
     await expect(fetchPlatformDashboard()).resolves.toEqual(payload);
-    expect(platformApiFetchMock).toHaveBeenCalledWith("/api/v1/platform/dashboard");
+    expect(platformApiFetchMock).toHaveBeenCalledWith("/api/v1/admin/dashboard");
   });
 
   it("throws an HTTP error when the backend call fails", async () => {

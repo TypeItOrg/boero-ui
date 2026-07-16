@@ -18,7 +18,7 @@ export async function revokePersonRoleAction(
   }
 
   const response = platformApiFetch(
-    `/api/v1/institutions/${institutionId}/people/${personId}/roles/${parsed.data.role}`,
+    `/api/v1/admin/institutions/${institutionId}/people/${personId}/roles/${parsed.data.role}`,
     {
       method: "DELETE",
     },
@@ -31,6 +31,6 @@ export async function revokePersonRoleAction(
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/platform/institutions/${institutionId}/people/${personId}`);
+  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
   return { success: true };
 }

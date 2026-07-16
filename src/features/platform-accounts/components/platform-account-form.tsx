@@ -28,7 +28,7 @@ import type { PlatformAccountAdmin } from "@features/platform-accounts/types/pla
 import { logoutPlatform } from "@features/platform-auth/actions/platform-logout.action";
 import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
 
-const PLATFORM_ACCOUNTS_PATH = "/platform/accounts";
+const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 const EMPTY_FORM_VALUES: PlatformAccountFormInput = {
   name: "",
   lastName: "",

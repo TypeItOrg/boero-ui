@@ -11,7 +11,7 @@ import {
 } from "@features/platform-accounts/types/platform-account-action-state.types";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
-const PLATFORM_ACCOUNTS_PATH = "/platform/accounts";
+const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
 export async function updatePlatformAccountAction(id: string, formData: FormData): Promise<PlatformAccountActionState> {
   const parsed = platformAccountUpdateFormSchema.safeParse({
@@ -26,7 +26,7 @@ export async function updatePlatformAccountAction(id: string, formData: FormData
     return getValidationActionState(parsed.error.issues, PLATFORM_ACCOUNT_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch(`/api/v1/platform/accounts/${id}`, {
+  const response = platformApiFetch(`/api/v1/admin/accounts/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

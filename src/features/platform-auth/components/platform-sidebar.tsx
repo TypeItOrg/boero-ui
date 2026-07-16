@@ -24,23 +24,23 @@ import { useLogoutPlatform } from "@features/platform-auth/hooks/use-logout-plat
 const navItems = [
   {
     title: "Inicio",
-    url: "/platform",
+    url: "/admin",
     icon: HouseIcon,
     exact: true,
   },
   {
     title: "Instituciones",
-    url: "/platform/institutions",
+    url: "/admin/institutions",
     icon: BuildingIcon,
   },
   {
     title: "Usuarios",
-    url: "/platform/people",
+    url: "/admin/people",
     icon: UsersIcon,
   },
   {
     title: "Administradores",
-    url: "/platform/accounts",
+    url: "/admin/accounts",
     icon: FingerprintIcon,
   },
 ];

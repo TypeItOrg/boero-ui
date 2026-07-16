@@ -22,59 +22,91 @@ type PlatformRefreshAttempt = {
   tokens?: PlatformRefreshTokens;
 };
 
+enum RouteAccess {
+  Public,
+  GuestOnly,
+  AdminSession,
+}
+
+const ROOT_PATH = "/";
+const ADMIN_ROOT_PATH = "/admin";
+const ADMIN_LOGIN_PATH = `${ADMIN_ROOT_PATH}/auth/login`;
+
 const inFlightPlatformRefreshes = new Map<string, Promise<PlatformRefreshAttempt>>();
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
-  const { pathname } = request.nextUrl;
-  const hasAccessToken = request.cookies.has(PLATFORM_ACCESS_TOKEN_COOKIE);
-  const refreshToken = request.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value;
+  const routeAccess = getRouteAccess(request.nextUrl.pathname);
 
-  const requiresPlatformSession = pathname === "/" || pathname === "/platform" || pathname.startsWith("/platform/");
-
-  if (requiresPlatformSession && hasAccessToken) {
-    return NextResponse.next();
+  switch (routeAccess) {
+    case RouteAccess.GuestOnly:
+      return handleGuestOnlyRoute(request);
+    case RouteAccess.AdminSession:
+      return handleAdminRoute(request);
+    case RouteAccess.Public:
+      return NextResponse.next();
   }
-
-  if (requiresPlatformSession) {
-    let refreshStatus: number | undefined;
-
-    if (refreshToken) {
-      const refreshAttempt = await refreshPlatformSession(refreshToken);
-      refreshStatus = refreshAttempt.status;
-
-      if (refreshAttempt.tokens) {
-        return createRefreshedSessionResponse(
-          request,
-          refreshAttempt.tokens.accessToken,
-          refreshAttempt.tokens.refreshToken,
-        );
-      }
-    }
-
-    const nextParam = request.nextUrl.pathname + request.nextUrl.search;
-    const redirectResponse = NextResponse.redirect(
-      new URL(getRedirectPath("/auth/platform/login", nextParam), request.url),
-    );
-
-    if (refreshStatus === 401) {
-      redirectResponse.cookies.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
-      redirectResponse.cookies.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
-    }
-
-    return redirectResponse;
-  }
-
-  if (pathname === "/auth/platform/login" && hasAccessToken) {
-    const next = request.nextUrl.searchParams.get("next");
-    return NextResponse.redirect(new URL(getSafeNextPath(next), request.url));
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/auth/platform/login", "/platform/:path*"],
+  matcher: ["/", "/admin/:path*"],
 };
+
+function getRouteAccess(pathname: string): RouteAccess {
+  if (pathname === ADMIN_LOGIN_PATH) {
+    return RouteAccess.GuestOnly;
+  }
+
+  if (pathname === ROOT_PATH || isAdminRoute(pathname)) {
+    return RouteAccess.AdminSession;
+  }
+
+  return RouteAccess.Public;
+}
+
+function isAdminRoute(pathname: string): boolean {
+  return pathname === ADMIN_ROOT_PATH || pathname.startsWith(`${ADMIN_ROOT_PATH}/`);
+}
+
+function handleGuestOnlyRoute(request: NextRequest): NextResponse {
+  if (!request.cookies.has(PLATFORM_ACCESS_TOKEN_COOKIE)) {
+    return NextResponse.next();
+  }
+
+  const next = request.nextUrl.searchParams.get("next");
+  return NextResponse.redirect(new URL(getSafeNextPath(next), request.url));
+}
+
+async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
+  if (request.cookies.has(PLATFORM_ACCESS_TOKEN_COOKIE)) {
+    return NextResponse.next();
+  }
+
+  const refreshToken = request.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value;
+  let refreshStatus: number | undefined;
+
+  if (refreshToken) {
+    const refreshAttempt = await refreshPlatformSession(refreshToken);
+    refreshStatus = refreshAttempt.status;
+
+    if (refreshAttempt.tokens) {
+      return createRefreshedSessionResponse(
+        request,
+        refreshAttempt.tokens.accessToken,
+        refreshAttempt.tokens.refreshToken,
+      );
+    }
+  }
+
+  const nextParam = request.nextUrl.pathname + request.nextUrl.search;
+  const redirectResponse = NextResponse.redirect(new URL(getRedirectPath(ADMIN_LOGIN_PATH, nextParam), request.url));
+
+  if (refreshStatus === 401) {
+    redirectResponse.cookies.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
+    redirectResponse.cookies.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
+  }
+
+  return redirectResponse;
+}
 
 function setPlatformAuthResponseCookies(response: NextResponse, accessToken: string, refreshToken: string): void {
   response.cookies.set(PLATFORM_ACCESS_TOKEN_COOKIE, accessToken, {
@@ -118,7 +150,7 @@ function refreshPlatformSession(refreshToken: string): Promise<PlatformRefreshAt
 
 async function performPlatformRefresh(refreshToken: string): Promise<PlatformRefreshAttempt> {
   try {
-    const response = await fetch(new URL("/api/v1/auth/platform/refresh", getApiUrlOrThrow()), {
+    const response = await fetch(new URL("/api/v1/admin/auth/refresh", getApiUrlOrThrow()), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),

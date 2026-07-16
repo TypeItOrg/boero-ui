@@ -276,9 +276,9 @@ function EmptyState({ action, description, icon, title }: EmptyStateProps): Reac
 }
 
 function getPersonPath(person: PlatformPersonSummary): string {
-  return `/platform/institutions/${person.institutionId}/people/${person.id}`;
+  return `/admin/institutions/${person.institutionId}/people/${person.id}`;
 }
 
 function getInstitutionPath(person: PlatformPersonSummary): string {
-  return `/platform/institutions/${person.institutionId}`;
+  return `/admin/institutions/${person.institutionId}`;
 }

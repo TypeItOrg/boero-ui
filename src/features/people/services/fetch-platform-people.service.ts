@@ -21,6 +21,6 @@ export async function fetchPlatformPeople({
   if (institutionId) searchParams.set("institutionId", institutionId);
   if (roleCode) searchParams.set("roleCode", roleCode);
 
-  const response = await platformApiFetch(`/api/v1/platform/people?${searchParams.toString()}`);
+  const response = await platformApiFetch(`/api/v1/admin/people?${searchParams.toString()}`);
   return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_PLATFORM_PEOPLE);
 }

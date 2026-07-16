@@ -28,7 +28,7 @@ import type { InstitutionActionState, InstitutionFormFieldName } from "../types/
 import { createInstitutionFormData } from "../utils/institution-form-data.util";
 import { createInstitutionSlug } from "../utils/institution-slug.util";
 
-const INSTITUTIONS_PATH = "/platform/institutions";
+const INSTITUTIONS_PATH = "/admin/institutions";
 
 const EMPTY_FORM_VALUES: InstitutionFormInput = {
   name: "",

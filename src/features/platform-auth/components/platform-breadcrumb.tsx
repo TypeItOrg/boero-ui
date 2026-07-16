@@ -44,16 +44,16 @@ type PlatformBreadcrumbProps = {
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
 
 function getSegments(pathname: string, segmentLabels: Readonly<Record<string, string>>): BreadcrumbSegment[] {
-  const withoutPlatform = pathname.replace(/^\/platform\/?/, "");
+  const withoutPlatform = pathname.replace(/^\/admin\/?/, "");
   const parts = withoutPlatform.split("/").filter(Boolean);
 
   if (parts.length === 0) {
     return [{ label: "Inicio" }];
   }
 
-  const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/platform" }];
+  const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/admin" }];
 
-  let accumulatedPath = "/platform";
+  let accumulatedPath = "/admin";
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     accumulatedPath = `${accumulatedPath}/${part}`;

@@ -42,7 +42,7 @@ describe("getPlatformAccount", () => {
 
     const { getPlatformAccount } = await importService();
     await expect(getPlatformAccount()).resolves.toBeNull();
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/platform/me", "https://api.example.test"), {
+    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/me", "https://api.example.test"), {
       headers: { Authorization: "Bearer access-token" },
       cache: "no-store",
     });

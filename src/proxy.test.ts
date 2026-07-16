@@ -19,7 +19,7 @@ describe("proxy", () => {
   function expectPlatformLoginRedirect(response: NextResponse): void {
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "https://app.example.test/auth/platform/login?next=%2Fplatform%2Forders%3Fpage%3D2",
+      "https://app.example.test/admin/auth/login?next=%2Fadmin%2Forders%3Fpage%3D2",
     );
     expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBeUndefined();
     expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBeUndefined();
@@ -38,8 +38,8 @@ describe("proxy", () => {
     process.env.BOERO_API_URL = originalApiUrl;
   });
 
-  it("allows platform routes when an access token cookie is present", async () => {
-    const request = createRequest("/platform", `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`);
+  it("allows admin routes when an access token cookie is present", async () => {
+    const request = createRequest("/admin", `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`);
 
     const response = await proxy(request);
 
@@ -63,11 +63,11 @@ describe("proxy", () => {
       ),
     );
 
-    const request = createRequest("/platform/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest("/admin/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
 
     const response = await proxy(request);
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/platform/refresh", "https://api.example.test"), {
+    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/refresh", "https://api.example.test"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: "refresh-token" }),
@@ -82,7 +82,7 @@ describe("proxy", () => {
     expect(upstreamCookies).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
   });
 
-  it("shares one refresh request between concurrent platform proxy calls", async () => {
+  it("shares one refresh request between concurrent admin proxy calls", async () => {
     let resolveRefresh: ((response: Response) => void) | undefined;
     fetchMock.mockImplementation(
       () =>
@@ -91,8 +91,8 @@ describe("proxy", () => {
         }),
     );
 
-    const firstRequest = createRequest("/platform/institutions/1", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
-    const secondRequest = createRequest("/platform/institutions/2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const firstRequest = createRequest("/admin/institutions/1", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const secondRequest = createRequest("/admin/institutions/2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
     const firstResponsePromise = proxy(firstRequest);
     const secondResponsePromise = proxy(secondRequest);
 
@@ -123,7 +123,7 @@ describe("proxy", () => {
       }),
     );
 
-    const request = createRequest("/platform/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest("/admin/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
 
     const response = await proxy(request);
 
@@ -138,7 +138,7 @@ describe("proxy", () => {
       }),
     );
 
-    const request = createRequest("/platform/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest("/admin/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
 
     const response = await proxy(request);
 
@@ -149,7 +149,7 @@ describe("proxy", () => {
   it("redirects to login when refresh throws", async () => {
     fetchMock.mockRejectedValue(new Error("network"));
 
-    const request = createRequest("/platform/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest("/admin/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
 
     const response = await proxy(request);
 
@@ -158,7 +158,7 @@ describe("proxy", () => {
   });
 
   it("redirects authenticated users away from the login page", async () => {
-    const request = new NextRequest("https://app.example.test/auth/platform/login?next=%2Fplatform%2Fa", {
+    const request = new NextRequest("https://app.example.test/admin/auth/login?next=%2Fadmin%2Fa", {
       headers: {
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
       },
@@ -167,11 +167,29 @@ describe("proxy", () => {
     const response = await proxy(request);
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe("https://app.example.test/platform/a");
+    expect(response.headers.get("location")).toBe("https://app.example.test/admin/a");
+  });
+
+  it("allows unauthenticated users to access the login page", async () => {
+    const request = createRequest("/admin/auth/login", "");
+
+    const response = await proxy(request);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
+
+  it("does not apply admin authentication to public routes", async () => {
+    const request = createRequest("/auth/login", "");
+
+    const response = await proxy(request);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
   it("sanitizes absolute next urls on login redirects", async () => {
-    const request = new NextRequest("https://app.example.test/auth/platform/login?next=https://evil.com/a", {
+    const request = new NextRequest("https://app.example.test/admin/auth/login?next=https://evil.com/a", {
       headers: {
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
       },
