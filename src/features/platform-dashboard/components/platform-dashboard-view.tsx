@@ -39,7 +39,7 @@ export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps)
       <DashboardSummary summary={dashboard.summary} />
 
       <div className="grid min-w-0 gap-5 lg:grid-cols-3">
-        <Card className="min-w-0 p-5 sm:p-6 lg:col-span-2">
+        <Card className="bg-background min-w-0 p-5 sm:p-6 lg:col-span-2">
           <CardHeader className="p-0">
             <CardTitle>Altas de instituciones</CardTitle>
             <CardDescription>Instituciones creadas durante los últimos 12 meses.</CardDescription>
@@ -111,7 +111,7 @@ type SummaryCardProps = {
 
 function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps): React.ReactElement {
   return (
-    <Card className="p-5 sm:p-6">
+    <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="p-0">
         <CardTitle>{label}</CardTitle>
         <CardAction className="bg-muted flex size-9 items-center justify-center rounded-lg">
@@ -128,7 +128,7 @@ function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps
 
 function InstitutionStatusCard({ summary }: { summary: PlatformDashboardSummary }): React.ReactElement {
   return (
-    <Card className="p-5 sm:p-6">
+    <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="p-0">
         <CardTitle>Estado institucional</CardTitle>
         <CardDescription>Disponibilidad actual de las instituciones.</CardDescription>
@@ -174,7 +174,7 @@ function StatusValue({ label, value, variant }: StatusValueProps): React.ReactEl
 
 function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitution[] }): React.ReactElement {
   return (
-    <Card className="p-5 sm:p-6">
+    <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="flex items-center justify-between gap-4 p-0">
         <div className="flex min-w-0 flex-col gap-1">
           <CardTitle>Instituciones recientes</CardTitle>
@@ -251,10 +251,10 @@ type DashboardEmptyStateProps = {
 
 function DashboardEmptyState({ icon: Icon, title, description }: DashboardEmptyStateProps): React.ReactElement {
   return (
-    <Empty className="min-h-56 border-0 p-4">
+    <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6 mt-4">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon aria-hidden="true" />
+        <EmptyMedia variant="icon" className="bg-background border shadow-xs size-12 rounded-xl">
+          <Icon aria-hidden="true" className="size-6" />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>
         <EmptyDescription>{description}</EmptyDescription>
