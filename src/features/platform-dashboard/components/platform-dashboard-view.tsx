@@ -251,9 +251,9 @@ type DashboardEmptyStateProps = {
 
 function DashboardEmptyState({ icon: Icon, title, description }: DashboardEmptyStateProps): React.ReactElement {
   return (
-    <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6 mt-4">
+    <Empty className="bg-muted/25 mt-4 min-h-56 rounded-xl border border-solid p-6">
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-background border shadow-xs size-12 rounded-xl">
+        <EmptyMedia variant="icon" className="bg-background size-12 rounded-xl border shadow-xs">
           <Icon aria-hidden="true" className="size-6" />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>

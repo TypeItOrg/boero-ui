@@ -1,7 +1,6 @@
 import { Badge } from "@common/components/ui/badge";
 import { PlatformAccountStatusControl } from "@features/platform-accounts/components/platform-account-status-control";
 import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
-import { Metadata } from "next";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "long",
