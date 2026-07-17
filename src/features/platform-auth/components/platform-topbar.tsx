@@ -28,8 +28,8 @@ export function PlatformTopbar(): React.ReactElement {
   };
 
   return (
-    <header className="bg-muted flex h-16 shrink-0 items-center justify-between gap-3 rounded-xl px-3 sm:px-4">
-      <div className="flex max-w-xl flex-1 items-center gap-3">
+    <header className="bg-muted flex h-16 shrink-0 items-center justify-between gap-3 rounded-xl px-3 sm:px-4 md:gap-6">
+      <div className="flex max-w-2xl flex-1 items-center gap-3 xl:max-w-xl">
         <SidebarTrigger className="bg-background hover:bg-accent size-9 shrink-0 rounded-lg shadow-xs md:hidden" />
         <div className="relative w-full">
           <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />

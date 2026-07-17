@@ -6,9 +6,14 @@ import { PlatformAccountDetail } from "@features/platform-accounts/components/pl
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { Metadata } from "next";
 
 type PlatformAccountDetailPageProps = {
   params: Promise<{ id: string }>;
+};
+
+export const metadata: Metadata = {
+  title: "Detalle de cuenta",
 };
 
 export default async function PlatformAccountDetailPage({

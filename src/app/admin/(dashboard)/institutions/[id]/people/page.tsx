@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
@@ -17,6 +18,10 @@ import { fetchPeople } from "@features/people/services/fetch-people.service";
 type PeoplePageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<PeopleSearchParams>;
+};
+
+export const metadata: Metadata = {
+  title: "Lista de usuarios",
 };
 
 export default async function InstitutionPeoplePage({

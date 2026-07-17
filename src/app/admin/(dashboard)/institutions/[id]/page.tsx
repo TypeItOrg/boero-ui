@@ -13,9 +13,14 @@ import {
 import { InstitutionReactivateButton } from "@features/institutions/components/institution-reactivate-button";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { Metadata } from "next";
 
 type InstitutionDetailPageProps = {
   params: Promise<{ id: string }>;
+};
+
+export const metadata: Metadata = {
+  title: "Detalle de institución",
 };
 
 export default async function InstitutionDetailPage({
@@ -27,7 +32,7 @@ export default async function InstitutionDetailPage({
   const userCount = Number.isFinite(institution.userCount) ? institution.userCount : 0;
 
   return (
-    <section className="flex max-w-full min-w-0 flex-col gap-4 p-4">
+    <section className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-4">
       <header className="bg-background flex flex-col gap-5 rounded-xl p-5 shadow-xs sm:p-6 xl:flex-row xl:items-end xl:justify-between">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
@@ -70,15 +75,19 @@ export default async function InstitutionDetailPage({
 
       <div
         className={
-          institution.active ? "grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]" : undefined
+          institution.active
+            ? "grid flex-1 items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]"
+            : "flex flex-1 flex-col"
         }
       >
         <InstitutionDetail institution={institution} />
 
         {institution.active && (
-          <Suspense fallback={<InstitutionPeoplePreviewSkeleton />}>
-            <InstitutionPeoplePreview institutionId={id} />
-          </Suspense>
+          <div className="self-start">
+            <Suspense fallback={<InstitutionPeoplePreviewSkeleton />}>
+              <InstitutionPeoplePreview institutionId={id} />
+            </Suspense>
+          </div>
         )}
       </div>
     </section>

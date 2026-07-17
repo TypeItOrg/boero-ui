@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 import { Button } from "@common/components/ui/button";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
@@ -12,6 +13,10 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 
 type EditPersonPageProps = {
   params: Promise<{ id: string; personId: string }>;
+};
+
+export const metadata: Metadata = {
+  title: "Editar usuario",
 };
 
 export default async function EditPersonPage({ params }: EditPersonPageProps): Promise<React.ReactElement> {
