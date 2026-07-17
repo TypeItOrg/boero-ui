@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { UsersIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Skeleton } from "@common/components/ui/skeleton";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@common/components/ui/empty";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { DEFAULT_PEOPLE_SORT } from "@features/people/utils/people-pagination.util";
@@ -52,7 +61,7 @@ export async function InstitutionPeoplePreview({
             <Link
               key={person.id}
               href={`/admin/institutions/${institutionId}/people/${person.id}`}
-              className="group bg-muted/40 hover:bg-muted/70 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="group bg-muted/40 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               <Avatar className="size-12">
                 <AvatarFallback>{getInitials(person.firstName, person.lastName)}</AvatarFallback>
@@ -109,15 +118,21 @@ export function InstitutionPeoplePreviewSkeleton(): React.ReactElement {
 
 function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React.ReactElement {
   return (
-    <aside className="bg-background rounded-2xl p-5 shadow-sm sm:p-6">
-      <h2 className="text-foreground font-semibold">Usuarios</h2>
-      <div className="mt-4">
-        <p className="text-foreground text-sm font-medium">Todavía no hay usuarios</p>
-        <p className="text-muted-foreground mt-1 text-sm">Creá el primero para esta institución.</p>
-        <Button asChild size="lg" className="mt-4 w-full">
-          <Link href={`/admin/institutions/${institutionId}/people/new`}>Crear usuario</Link>
-        </Button>
-      </div>
+    <aside className="bg-background rounded-2xl p-6 shadow-sm sm:p-8">
+      <Empty className="border-0 p-0">
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="bg-muted text-muted-foreground mb-4 size-16 rounded-full">
+            <UsersIcon className="size-8" />
+          </EmptyMedia>
+          <EmptyTitle className="text-base font-semibold">Todavía no hay usuarios</EmptyTitle>
+          <EmptyDescription className="text-sm">Creá el primero para esta institución.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent className="mt-2 w-full">
+          <Button asChild size="lg" className="w-full justify-center">
+            <Link href={`/admin/institutions/${institutionId}/people/new`}>Crear usuario</Link>
+          </Button>
+        </EmptyContent>
+      </Empty>
     </aside>
   );
 }
