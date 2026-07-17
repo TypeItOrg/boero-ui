@@ -63,8 +63,10 @@ export function PeopleTablePresentation({
   }
 
   if (data.items.length === 0) {
+    let emptyStateContent: React.ReactNode;
+
     if (data.totalItems > 0) {
-      return (
+      emptyStateContent = (
         <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
           <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
             <UserIcon className="size-5" />
@@ -78,10 +80,8 @@ export function PeopleTablePresentation({
           </Button>
         </div>
       );
-    }
-
-    if (search.trim() !== "") {
-      return (
+    } else if (search.trim() !== "") {
+      emptyStateContent = (
         <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
           <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
             <SearchIcon className="size-5" />
@@ -92,23 +92,38 @@ export function PeopleTablePresentation({
           </p>
         </div>
       );
+    } else {
+      emptyStateContent = (
+        <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+          <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+            <UserIcon className="size-5" />
+          </div>
+          <h3 className="text-foreground text-base font-semibold">No hay usuarios registrados</h3>
+          <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
+            Comenzá creando un nuevo usuario para esta institución.
+          </p>
+          <Button asChild size="sm">
+            <Link href={`/admin/institutions/${institutionId}/people/new`}>
+              <PlusIcon className="mr-2 size-4" />
+              Nuevo usuario
+            </Link>
+          </Button>
+        </div>
+      );
     }
 
     return (
-      <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
-          <UserIcon className="size-5" />
-        </div>
-        <h3 className="text-foreground text-base font-semibold">No hay usuarios registrados</h3>
-        <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
-          Comenzá creando un nuevo usuario para esta institución.
-        </p>
-        <Button asChild size="sm">
-          <Link href={`/admin/institutions/${institutionId}/people/new`}>
-            <PlusIcon className="mr-2 size-4" />
-            Nuevo usuario
-          </Link>
-        </Button>
+      <div className="relative h-full" aria-busy={isNavigating}>
+        {emptyStateContent}
+        {isNavigating ? (
+          <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px] rounded-lg">
+            <Loader2Icon
+              className="text-muted-foreground size-5 animate-spin"
+              aria-label="Cargando usuarios"
+              role="status"
+            />
+          </div>
+        ) : null}
       </div>
     );
   }

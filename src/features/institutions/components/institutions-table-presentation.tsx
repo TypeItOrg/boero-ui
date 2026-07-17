@@ -89,8 +89,10 @@ export function InstitutionsTablePresentation({
   if (data.items.length === 0) {
     const hasFilters = search.trim() !== "" || active !== undefined;
 
+    let emptyStateContent: React.ReactNode;
+
     if (data.totalItems > 0) {
-      return (
+      emptyStateContent = (
         <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
           <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
             <BuildingIcon className="size-5" />
@@ -104,10 +106,8 @@ export function InstitutionsTablePresentation({
           </Button>
         </div>
       );
-    }
-
-    if (hasFilters) {
-      return (
+    } else if (hasFilters) {
+      emptyStateContent = (
         <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
           <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
             <SearchIcon className="size-5" />
@@ -118,23 +118,38 @@ export function InstitutionsTablePresentation({
           </p>
         </div>
       );
+    } else {
+      emptyStateContent = (
+        <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+          <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+            <BuildingIcon className="size-5" />
+          </div>
+          <h3 className="text-foreground text-base font-semibold">No hay instituciones registradas</h3>
+          <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
+            Comenzá creando una nueva institución para empezar a gestionar la plataforma.
+          </p>
+          <Button asChild size="sm">
+            <Link href="/admin/institutions/new">
+              <PlusIcon className="mr-2 size-4" />
+              Nueva Institución
+            </Link>
+          </Button>
+        </div>
+      );
     }
 
     return (
-      <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
-          <BuildingIcon className="size-5" />
-        </div>
-        <h3 className="text-foreground text-base font-semibold">No hay instituciones registradas</h3>
-        <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
-          Comenzá creando una nueva institución para empezar a gestionar la plataforma.
-        </p>
-        <Button asChild size="sm">
-          <Link href="/admin/institutions/new">
-            <PlusIcon className="mr-2 size-4" />
-            Nueva Institución
-          </Link>
-        </Button>
+      <div className="relative h-full" aria-busy={isNavigating}>
+        {emptyStateContent}
+        {isNavigating ? (
+          <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px] rounded-lg">
+            <Loader2Icon
+              className="text-muted-foreground size-5 animate-spin"
+              aria-label="Cargando instituciones"
+              role="status"
+            />
+          </div>
+        ) : null}
       </div>
     );
   }

@@ -58,11 +58,22 @@ export function PlatformPeopleTablePresentation({
 
   if (data.items.length === 0) {
     return (
-      <PlatformPeopleEmptyState
-        data={data}
-        hasFilters={search.trim() !== "" || institutionId !== undefined || roleCode !== undefined}
-        onFirstPage={() => navigate({ page: "0", size: String(size) })}
-      />
+      <div className="relative h-full" aria-busy={isPending}>
+        <PlatformPeopleEmptyState
+          data={data}
+          hasFilters={search.trim() !== "" || institutionId !== undefined || roleCode !== undefined}
+          onFirstPage={() => navigate({ page: "0", size: String(size) })}
+        />
+        {isPending ? (
+          <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px] rounded-lg">
+            <Loader2Icon
+              className="text-muted-foreground size-5 animate-spin"
+              aria-label="Cargando usuarios"
+              role="status"
+            />
+          </div>
+        ) : null}
+      </div>
     );
   }
 

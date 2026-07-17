@@ -59,7 +59,20 @@ export function PlatformAccountsTablePresentation({
   }
 
   if (data.items.length === 0) {
-    return <PlatformAccountsEmptyState data={data} search={search} enabled={enabled} size={size} />;
+    return (
+      <div className="relative h-full" aria-busy={isPending}>
+        <PlatformAccountsEmptyState data={data} search={search} enabled={enabled} size={size} />
+        {isPending ? (
+          <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px] rounded-lg">
+            <Loader2Icon
+              className="text-muted-foreground size-5 animate-spin"
+              aria-label="Cargando administradores"
+              role="status"
+            />
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   return (
