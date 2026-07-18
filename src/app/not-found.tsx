@@ -35,7 +35,7 @@ export default function NotFound(): React.ReactElement {
 
           <EmptyContent className="flex-row justify-center">
             <Button asChild size="lg">
-              <Link href="/admin">
+              <Link href="/">
                 <HouseIcon data-icon="inline-start" />
                 Ir al inicio
               </Link>

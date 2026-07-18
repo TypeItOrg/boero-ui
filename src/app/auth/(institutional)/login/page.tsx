@@ -1,10 +1,33 @@
-import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
+import type { Metadata } from "next";
+import Image from "next/image";
 
-export default function LoginPage() {
+import { Card, CardContent } from "@common/components/ui/card";
+import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
+import { hasInstitutionalRegistrationSuccessCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+
+export const metadata: Metadata = {
+  title: "Iniciar sesión",
+  description: "Iniciá sesión en tu institución",
+};
+
+export default async function LoginPage(): Promise<React.ReactElement> {
+  const registered = await hasInstitutionalRegistrationSuccessCookie();
+
   return (
-    <div>
-      <h1>Login Page</h1>
-      <InstitutionalLoginForm />
-    </div>
+    <Card className="animate-fade-in-up p-0">
+      <CardContent className="grid-cols-2 p-0 md:grid">
+        <InstitutionalLoginForm registered={registered} />
+        <section className="from-primary to-primary/80 relative hidden bg-linear-to-l md:flex md:items-center md:justify-center">
+          <Image
+            priority
+            width={875}
+            height={1202}
+            src={"/boero-logo.png"}
+            alt={"Logo de la institución"}
+            className="h-auto w-56"
+          />
+        </section>
+      </CardContent>
+    </Card>
   );
 }

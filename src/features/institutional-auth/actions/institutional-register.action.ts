@@ -1,30 +1,44 @@
 "use server";
 
+import { redirect } from "next/navigation";
+
+import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { institutionalRegisterSchema } from "../schemas/institutional-register.schema";
+import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
+import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
+import { setInstitutionalRegistrationSuccessCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import type { InstitutionalRegisterActionState } from "../types/institutional-register-state.types";
+import { INSTITUTIONAL_REGISTER_FIELD_NAMES } from "../types/institutional-register-state.types";
 
 export async function registerInstitutional(
   _previousState: InstitutionalRegisterActionState,
   formData: FormData,
 ): Promise<InstitutionalRegisterActionState> {
   const parsed = institutionalRegisterSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
+    institutionId: formData.get("institutionId") ?? "",
+    name: formData.get("name") ?? "",
+    lastName: formData.get("lastName") ?? "",
+    birthDate: formData.get("birthDate") ?? "",
+    documentNumber: formData.get("documentNumber") ?? "",
+    password: formData.get("password") ?? "",
+    confirmPassword: formData.get("confirmPassword") ?? "",
   });
 
   if (!parsed.success) {
-    const errors = parsed.error.issues.map((issue) => issue.message);
-    const fields = parsed.error.issues
-      .map((issue) => issue.path[0])
-      .filter((field): field is "email" | "password" => field === "email" || field === "password");
-
-    return {
-      error: errors[0] ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM,
-      errors,
-      fields,
-    };
+    return { fieldErrors: getFieldErrors(parsed.error.issues, INSTITUTIONAL_REGISTER_FIELD_NAMES) };
   }
 
-  return {};
+  const { confirmPassword: _confirmPassword, ...input } = parsed.data;
+  const output = await registerInstitutionalAccount(input);
+
+  if (!output.success) {
+    if (output.error.fieldErrors) {
+      return { fieldErrors: pickFieldErrors(output.error.fieldErrors, INSTITUTIONAL_REGISTER_FIELD_NAMES) };
+    }
+
+    return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM };
+  }
+
+  await setInstitutionalRegistrationSuccessCookie();
+  redirect("/auth/login");
 }

@@ -1,4 +1,6 @@
 export type InstitutionalLoginInput = {
-  email: string;
+  institutionId: string;
+  documentNumber: string;
   password: string;
+  rememberMe: boolean;
 };

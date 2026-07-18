@@ -4,6 +4,10 @@ import {
   PLATFORM_ACCESS_TOKEN_COOKIE,
   PLATFORM_REFRESH_TOKEN_COOKIE,
 } from "@features/platform-auth/utils/platform-auth-cookies.util";
+import {
+  INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
+  INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
+} from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import { proxy } from "./proxy";
 
 describe("proxy", () => {
@@ -186,6 +190,54 @@ describe("proxy", () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
+
+  it("protects the institutional home with the institutional session", async () => {
+    const request = createRequest("/", "");
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe("https://app.example.test/auth/login");
+  });
+
+  it("allows the institutional home with an institutional access token", async () => {
+    const request = createRequest("/", `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=access-token`);
+
+    const response = await proxy(request);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
+
+  it("refreshes an institutional session", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ tokens: { accessToken: "new-access", refreshToken: "new-refresh" } }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const request = createRequest("/", `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const response = await proxy(request);
+
+    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/refresh", "https://api.example.test"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: "refresh-token" }),
+    });
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
+    expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+  });
+
+  it("redirects an authenticated institutional user away from login", async () => {
+    const request = createRequest("/auth/login", `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=access-token`);
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe("https://app.example.test/");
   });
 
   it("sanitizes absolute next urls on login redirects", async () => {

@@ -1,5 +1,6 @@
 export type InstitutionalLoginActionState = {
   error?: string;
-  errors?: string[];
-  fields?: Array<"email" | "password">;
+  fieldErrors?: Partial<Record<"institutionId" | "documentNumber" | "password", string>>;
 };
+
+export const INSTITUTIONAL_LOGIN_FIELD_NAMES = ["institutionId", "documentNumber", "password"] as const;
