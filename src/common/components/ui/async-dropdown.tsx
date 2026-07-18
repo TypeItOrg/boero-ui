@@ -53,6 +53,7 @@ export type AsyncDropdownProps<TItem> = {
   fetchPage: (input: AsyncDropdownFetchPageInput) => Promise<AsyncDropdownPage<TItem>>;
   getItemLabel: (item: TItem) => string;
   getItemValue: (item: TItem) => string;
+  id?: string;
   listClassName?: string;
   listHeight?: number;
   name?: string;
@@ -117,6 +118,7 @@ export function AsyncDropdown<TItem>({
   fetchPage,
   getItemLabel,
   getItemValue,
+  id,
   listClassName,
   listHeight = DEFAULT_LIST_HEIGHT,
   name,
@@ -252,6 +254,7 @@ export function AsyncDropdown<TItem>({
               className,
             )}
             disabled={disabled}
+            id={id}
             role="combobox"
             size="lg"
             type="button"
@@ -416,7 +419,6 @@ function LoadingState({ itemSize }: { itemSize: number }): React.ReactElement {
   return (
     <div className="flex w-full flex-col gap-1 p-1">
       <LoadingInitialRow itemSize={itemSize} className="mt-1" />
-      <LoadingInitialRow itemSize={itemSize} />
     </div>
   );
 }

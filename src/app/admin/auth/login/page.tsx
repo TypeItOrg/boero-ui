@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
   const safeNext = getSafeNextPath(resolvedSearchParams.next);
 
   return (
-    <Card className="p-0">
+    <Card className="animate-fade-in-up p-0">
       <CardContent className="grid-cols-2 p-0 md:grid">
         <PlatformLoginForm next={safeNext} />
 
