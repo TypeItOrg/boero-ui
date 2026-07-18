@@ -59,4 +59,18 @@ describe("person form schemas", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it("requires a birth date when creating a person", () => {
+    const result = createPersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      documentNumber: "12345678",
+      email: "",
+      phoneNumber: "",
+      birthDate: "",
+      password: "contraseña-segura",
+    });
+
+    expect(result.success).toBe(false);
+  });
 });

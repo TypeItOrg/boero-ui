@@ -194,7 +194,9 @@ export function PersonForm({
 
               <Field data-invalid={!!errors.birthDate} className="flex-[1_0_min(200px,100%)]">
                 <FieldContent>
-                  <FieldLabel htmlFor="person-birth-date">Fecha de nacimiento</FieldLabel>
+                  <FieldLabel htmlFor="person-birth-date" required>
+                    Fecha de nacimiento
+                  </FieldLabel>
                 </FieldContent>
                 <Controller
                   control={control}

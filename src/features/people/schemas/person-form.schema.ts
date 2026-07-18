@@ -21,8 +21,8 @@ export const createPersonFormSchema = basePersonSchema.extend({
   documentNumber: z.string().regex(/^\d{8}$/, PEOPLE_ERROR_MESSAGES.INVALID_DOCUMENT),
   birthDate: z
     .string()
-    .catch("")
-    .refine((value) => !value || hasMinimumPersonAge(value), PEOPLE_ERROR_MESSAGES.MINIMUM_AGE),
+    .min(1, { message: PEOPLE_ERROR_MESSAGES.REQUIRED_BIRTH_DATE, abort: true })
+    .refine(hasMinimumPersonAge, PEOPLE_ERROR_MESSAGES.MINIMUM_AGE),
   password: z.string().min(8, PEOPLE_ERROR_MESSAGES.PASSWORD_MIN_LENGTH),
 });
 

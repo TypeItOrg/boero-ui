@@ -23,6 +23,7 @@ export const PEOPLE_ERROR_MESSAGES = {
   INVALID_EMAIL: "Ingresá un email válido.",
   INVALID_PHONE: "El teléfono solo admite números y guiones.",
   INVALID_DOCUMENT: "El documento debe tener exactamente 8 dígitos.",
+  REQUIRED_BIRTH_DATE: "La fecha de nacimiento es requerida.",
   MINIMUM_AGE: "La persona debe tener al menos 3 años.",
   PASSWORD_MIN_LENGTH: "La contraseña debe tener al menos 8 caracteres.",
   INVALID_ROLE: "Seleccioná un rol válido.",
