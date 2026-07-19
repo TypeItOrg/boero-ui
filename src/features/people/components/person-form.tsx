@@ -19,9 +19,9 @@ import { createPersonAction } from "../actions/create-person.action";
 import { updatePersonAction } from "../actions/update-person.action";
 import { createPersonFormSchema, updatePersonFormSchema } from "../schemas/person-form.schema";
 import type { Person } from "../types/person.types";
-import type { SystemRoleCode } from "../types/person-role.types";
 import type { PersonActionState, PersonFormFieldName } from "../types/person-action-state.types";
-import { getLatestAllowedBirthDate } from "../utils/person-birth-date.util";
+import { formatBirthDateInput, getLatestAllowedBirthDate, parseBirthDateInput } from "../utils/person-birth-date.util";
+import type { PeopleScope } from "../utils/people-scope.util";
 
 type PersonFormInput = {
   firstName: string;
@@ -37,18 +37,20 @@ type CreateMode = {
   mode: "create";
   institutionId: string;
   person?: never;
-  roleCodes?: never;
+  roleIds?: never;
   formId?: string;
   hideActions?: boolean;
+  scope?: PeopleScope;
 };
 
 type EditMode = {
   mode: "edit";
   institutionId: string;
   person: Person;
-  roleCodes?: readonly SystemRoleCode[];
+  roleIds?: readonly string[];
   formId?: string;
   hideActions?: boolean;
+  scope?: PeopleScope;
 };
 
 type PersonFormProps = CreateMode | EditMode;
@@ -67,15 +69,16 @@ export function PersonForm({
   mode,
   institutionId,
   person,
-  roleCodes,
+  roleIds,
   formId,
   hideActions = false,
+  scope = "admin",
 }: PersonFormProps): React.ReactElement {
   const router = useRouter();
   const isEdit = mode === "edit";
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
-  const listPath = `/admin/institutions/${institutionId}/people`;
+  const listPath = scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`;
   const resolver = getPersonFormResolver(isEdit);
 
   const {
@@ -93,10 +96,10 @@ export function PersonForm({
     setFormError(undefined);
 
     startTransition(async () => {
-      const formData = getFormData(values, isEdit, roleCodes);
+      const formData = getFormData(values, isEdit, roleIds);
       const result = isEdit
-        ? await updatePersonAction(institutionId, person.personId, formData)
-        : await createPersonAction(institutionId, formData);
+        ? await updatePersonAction(institutionId, person.personId, formData, scope)
+        : await createPersonAction(institutionId, formData, scope);
 
       const hasFieldErrors = setActionFieldErrors(result, setError);
       setFormError(hasFieldErrors ? undefined : result.error);
@@ -204,9 +207,9 @@ export function PersonForm({
                   render={({ field, fieldState }) => (
                     <DatePicker
                       id="person-birth-date"
-                      value={parseDateInputValue(field.value)}
+                      value={parseBirthDateInput(field.value)}
                       maxDate={getLatestAllowedBirthDate()}
-                      onChange={(date) => field.onChange(formatDateInputValue(date))}
+                      onChange={(date) => field.onChange(formatBirthDateInput(date))}
                       aria-invalid={fieldState.invalid}
                     />
                   )}
@@ -282,29 +285,7 @@ function getDefaultValues(person: Person | undefined): PersonFormInput {
   };
 }
 
-function parseDateInputValue(value: string): Date | undefined {
-  if (!value) return undefined;
-
-  const [year, month, day] = value.split("-").map(Number);
-  if (![year, month, day].every(Number.isFinite)) return undefined;
-
-  const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return undefined;
-
-  return date;
-}
-
-function formatDateInputValue(date: Date | undefined): string {
-  if (!date) return "";
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function getFormData(values: PersonFormInput, isEdit: boolean, roleCodes?: readonly SystemRoleCode[]): FormData {
+function getFormData(values: PersonFormInput, isEdit: boolean, roleIds?: readonly string[]): FormData {
   const formData = new FormData();
   const keys: Array<keyof PersonFormInput> = isEdit
     ? ["firstName", "lastName", "email", "phoneNumber"]
@@ -314,8 +295,8 @@ function getFormData(values: PersonFormInput, isEdit: boolean, roleCodes?: reado
     formData.append(key, values[key]);
   }
 
-  if (isEdit && roleCodes) {
-    formData.append("roleCodes", JSON.stringify(roleCodes));
+  if (isEdit && roleIds) {
+    formData.append("roleIds", JSON.stringify(roleIds));
   }
 
   return formData;

@@ -28,13 +28,20 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationQuery } from "@common/types/pagination.types";
 import type { PersonSummary } from "../types/person.types";
 import type { PeopleSort, PeopleSortField } from "../utils/people-pagination.util";
+import type { PeopleScope } from "../utils/people-scope.util";
 import { PeoplePagination } from "./people-pagination";
 import { PersonDeleteDialog } from "./person-delete-dialog";
+import { PersonStatusDialog } from "./person-status-dialog";
 
 type PeopleTablePresentationProps = PaginationQuery & {
   data: PaginatedResponse<PersonSummary>;
   institutionId: string;
   sort: PeopleSort;
+  scope?: PeopleScope;
+  selfPersonId?: string | null;
+  canCreate?: boolean;
+  canDelete?: boolean;
+  canUpdateStatus?: boolean;
 };
 
 export function PeopleTablePresentation({
@@ -44,10 +51,16 @@ export function PeopleTablePresentation({
   size,
   search,
   sort,
+  scope = "admin",
+  selfPersonId,
+  canCreate = true,
+  canDelete = true,
+  canUpdateStatus = false,
 }: PeopleTablePresentationProps): React.ReactElement {
   const router = useRouter();
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
   const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
+  const [personToUpdateStatus, setPersonToUpdateStatus] = useState<PersonSummary>();
 
   function handleDeleteDialogOpenChange(open: boolean): void {
     if (!open) setPersonToDelete(undefined);
@@ -55,6 +68,15 @@ export function PeopleTablePresentation({
 
   function handlePersonDeleted(): void {
     setPersonToDelete(undefined);
+    router.refresh();
+  }
+
+  function handleStatusDialogOpenChange(open: boolean): void {
+    if (!open) setPersonToUpdateStatus(undefined);
+  }
+
+  function handleStatusUpdated(): void {
+    setPersonToUpdateStatus(undefined);
     router.refresh();
   }
 
@@ -76,7 +98,15 @@ export function PeopleTablePresentation({
             La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
           </p>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/admin/institutions/${institutionId}/people?size=${size}`}>Volver a la primera página</Link>
+            <Link
+              href={
+                scope === "institutional"
+                  ? `/people?size=${size}`
+                  : `/admin/institutions/${institutionId}/people?size=${size}`
+              }
+            >
+              Volver a la primera página
+            </Link>
           </Button>
         </div>
       );
@@ -99,15 +129,21 @@ export function PeopleTablePresentation({
             <UserIcon className="size-5" />
           </div>
           <h3 className="text-foreground text-base font-semibold">No hay usuarios registrados</h3>
-          <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
-            Comenzá creando un nuevo usuario para esta institución.
+          <p className={`text-muted-foreground mt-1.5 max-w-sm text-sm ${canCreate ? "mb-6" : ""}`}>
+            {canCreate
+              ? "Comenzá creando un nuevo usuario para esta institución."
+              : "Todavía no hay usuarios registrados en esta institución."}
           </p>
-          <Button asChild size="sm">
-            <Link href={`/admin/institutions/${institutionId}/people/new`}>
-              <PlusIcon className="mr-2 size-4" />
-              Nuevo usuario
-            </Link>
-          </Button>
+          {canCreate ? (
+            <Button asChild size="sm">
+              <Link
+                href={scope === "institutional" ? "/people/new" : `/admin/institutions/${institutionId}/people/new`}
+              >
+                <PlusIcon className="mr-2 size-4" />
+                Nuevo usuario
+              </Link>
+            </Button>
+          ) : null}
         </div>
       );
     }
@@ -148,6 +184,7 @@ export function PeopleTablePresentation({
               />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
+              {scope === "institutional" ? <TableHead>Estado</TableHead> : null}
               <TableHead>Rol</TableHead>
               <TableHead className="w-16">
                 <span className="sr-only">Acciones</span>
@@ -156,6 +193,10 @@ export function PeopleTablePresentation({
           </TableHeader>
           <TableBody>
             {data.items.map((person) => {
+              const isSelf = person.id === selfPersonId;
+              const canDeletePerson = canDelete && !isSelf;
+              const canUpdatePersonStatus = canUpdateStatus && !isSelf;
+
               return (
                 <ContextMenu key={person.id}>
                   <ContextMenuTrigger asChild>
@@ -163,7 +204,7 @@ export function PeopleTablePresentation({
                       <TableCell className="font-medium">
                         <Link
                           className="hover:underline"
-                          href={`/admin/institutions/${institutionId}/people/${person.id}`}
+                          href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
                         >
                           {person.lastName}, {person.firstName}
                         </Link>
@@ -179,6 +220,13 @@ export function PeopleTablePresentation({
                       <TableCell>
                         {person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}
                       </TableCell>
+                      {scope === "institutional" ? (
+                        <TableCell>
+                          <Badge variant={person.enabled ? "secondary" : "outline"}>
+                            {person.enabled ? "Activo" : "Inactivo"}
+                          </Badge>
+                        </TableCell>
+                      ) : null}
                       <TableCell>
                         {person.roles && person.roles.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
@@ -196,25 +244,45 @@ export function PeopleTablePresentation({
                         <PersonActionsMenu
                           person={person}
                           institutionId={institutionId}
+                          scope={scope}
+                          isSelf={isSelf}
+                          canDelete={canDeletePerson}
+                          canUpdateStatus={canUpdatePersonStatus}
                           onDelete={() => setPersonToDelete(person)}
+                          onUpdateStatus={() => setPersonToUpdateStatus(person)}
                         />
                       </TableCell>
                     </TableRow>
                   </ContextMenuTrigger>
                   <ContextMenuContent className="w-44 p-1.5">
                     <ContextMenuItem asChild>
-                      <Link href={`/admin/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
+                      <Link
+                        href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
+                        className="px-2.5 py-1.5"
+                      >
                         Editar
                       </Link>
                     </ContextMenuItem>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem
-                      variant="destructive"
-                      className="px-2.5 py-1.5"
-                      onSelect={() => setPersonToDelete(person)}
-                    >
-                      Eliminar
-                    </ContextMenuItem>
+                    {canDeletePerson ? (
+                      <>
+                        <ContextMenuSeparator />
+                        <ContextMenuItem
+                          variant="destructive"
+                          className="px-2.5 py-1.5"
+                          onSelect={() => setPersonToDelete(person)}
+                        >
+                          Eliminar
+                        </ContextMenuItem>
+                      </>
+                    ) : null}
+                    {canUpdatePersonStatus ? (
+                      <>
+                        <ContextMenuSeparator />
+                        <ContextMenuItem className="px-2.5 py-1.5" onSelect={() => setPersonToUpdateStatus(person)}>
+                          {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+                        </ContextMenuItem>
+                      </>
+                    ) : null}
                   </ContextMenuContent>
                 </ContextMenu>
               );
@@ -238,11 +306,24 @@ export function PeopleTablePresentation({
       {personToDelete ? (
         <PersonDeleteDialog
           institutionId={institutionId}
+          scope={scope}
           personId={personToDelete.id}
           personName={`${personToDelete.firstName} ${personToDelete.lastName}`}
           open
           onOpenChange={handleDeleteDialogOpenChange}
           onDeleted={handlePersonDeleted}
+        />
+      ) : null}
+
+      {personToUpdateStatus ? (
+        <PersonStatusDialog
+          institutionId={institutionId}
+          personId={personToUpdateStatus.id}
+          personName={`${personToUpdateStatus.firstName} ${personToUpdateStatus.lastName}`}
+          enabled={personToUpdateStatus.enabled}
+          open
+          onOpenChange={handleStatusDialogOpenChange}
+          onUpdated={handleStatusUpdated}
         />
       ) : null}
     </div>
@@ -253,9 +334,23 @@ type PersonActionsMenuProps = {
   person: PersonSummary;
   institutionId: string;
   onDelete: () => void;
+  scope: PeopleScope;
+  isSelf: boolean;
+  canDelete: boolean;
+  canUpdateStatus: boolean;
+  onUpdateStatus: () => void;
 };
 
-function PersonActionsMenu({ person, institutionId, onDelete }: PersonActionsMenuProps): React.ReactElement {
+function PersonActionsMenu({
+  person,
+  institutionId,
+  onDelete,
+  scope,
+  isSelf,
+  canDelete,
+  canUpdateStatus,
+  onUpdateStatus,
+}: PersonActionsMenuProps): React.ReactElement {
   return (
     <div className="flex justify-end">
       <DropdownMenu>
@@ -266,16 +361,41 @@ function PersonActionsMenu({ person, institutionId, onDelete }: PersonActionsMen
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuItem asChild>
-            <Link href={`/admin/institutions/${institutionId}/people/${person.id}`} className="px-2.5 py-1.5">
+            <Link
+              href={getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined)}
+              className="px-2.5 py-1.5"
+            >
               Editar
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onDelete}>
-            Eliminar
-          </DropdownMenuItem>
+          {canUpdateStatus ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="px-2.5 py-1.5" onSelect={onUpdateStatus}>
+                {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+              </DropdownMenuItem>
+            </>
+          ) : null}
+          {canDelete ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onDelete}>
+                Eliminar
+              </DropdownMenuItem>
+            </>
+          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
+}
+
+function getPersonHref(
+  scope: PeopleScope,
+  institutionId: string,
+  personId: string,
+  selfPersonId?: string | null,
+): string {
+  if (scope === "institutional" && personId === selfPersonId) return "/profile";
+  return scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
 }

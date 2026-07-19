@@ -1,10 +1,16 @@
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+import { peopleApiFetch } from "./people-api-fetch.service";
 import type { Person } from "../types/person.types";
 import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
+import type { PeopleScope } from "../utils/people-scope.util";
+import { getPeoplePath } from "../utils/people-scope.util";
 
-export async function fetchPerson(institutionId: string, personId: string): Promise<Person | null> {
-  const response = await platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people/${personId}`);
+export async function fetchPerson(
+  institutionId: string,
+  personId: string,
+  scope: PeopleScope = "admin",
+): Promise<Person | null> {
+  const response = await peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId));
 
   if (response.status === 404) return null;
 

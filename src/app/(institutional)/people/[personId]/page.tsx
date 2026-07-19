@@ -1,0 +1,81 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import { Button } from "@common/components/ui/button";
+import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { PersonDeleteButton } from "@features/people/components/person-delete-button";
+import { PersonEditForm } from "@features/people/components/person-edit-form";
+import { fetchPerson } from "@features/people/services/fetch-person.service";
+import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
+import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
+import type { AssignableRole, PersonRole } from "@features/people/types/person-role.types";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+
+export const metadata = { title: "Editar usuario" };
+
+export default async function PersonPage({
+  params,
+}: {
+  params: Promise<{ personId: string }>;
+}): Promise<React.ReactElement> {
+  const { personId } = await params;
+  const user = await requireInstitutionalUser();
+  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) notFound();
+  const canAssignRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN);
+  const canRevokeRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
+  const canManageRoles = canAssignRoles || canRevokeRoles;
+  const personPromise = fetchPerson(user.institutionId, personId, "institutional");
+  const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = canManageRoles
+    ? Promise.all([
+        fetchPersonRoles(user.institutionId, personId, "institutional"),
+        fetchSystemRoles(user.institutionId, "institutional"),
+      ])
+    : Promise.resolve([[], []]);
+  const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
+  if (!person) notFound();
+  const personName = `${person.firstName} ${person.lastName}`;
+  if (user.personId === personId) redirect("/profile");
+  const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
+  const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE);
+  if (!canUpdate) notFound();
+
+  return (
+    <PlatformPageShell
+      title="Editar usuario"
+      description={`Editá los datos básicos y administrá los roles de ${personName}.`}
+      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
+      actions={
+        canDelete ? (
+          <PersonDeleteButton
+            institutionId={user.institutionId}
+            personId={personId}
+            personName={personName}
+            scope="institutional"
+          />
+        ) : undefined
+      }
+    >
+      <PersonEditForm
+        formId="institutional-person-edit-form"
+        institutionId={user.institutionId}
+        person={person}
+        roles={systemRoles}
+        assignedRoles={assignedRoles}
+        scope="institutional"
+        canAssignRoles={canAssignRoles}
+        canRevokeRoles={canRevokeRoles}
+      />
+      <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
+        <Button asChild variant="outline" size="lg">
+          <Link href="/people">Cancelar</Link>
+        </Button>
+        <Button type="submit" form="institutional-person-edit-form" size="lg">
+          Guardar cambios
+        </Button>
+      </div>
+    </PlatformPageShell>
+  );
+}

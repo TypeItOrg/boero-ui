@@ -3,12 +3,18 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonFormSchema } from "@features/people/schemas/person-form.schema";
+import { peopleApiFetch } from "../services/people-api-fetch.service";
 import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "../types/person-action-state.types";
+import type { PeopleScope } from "../utils/people-scope.util";
+import { getPeoplePath } from "../utils/people-scope.util";
 
-export async function createPersonAction(institutionId: string, formData: FormData): Promise<PersonActionState> {
+export async function createPersonAction(
+  institutionId: string,
+  formData: FormData,
+  scope: PeopleScope = "admin",
+): Promise<PersonActionState> {
   const payload = {
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
@@ -24,7 +30,7 @@ export async function createPersonAction(institutionId: string, formData: FormDa
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people`, {
+  const response = peopleApiFetch(scope, getPeoplePath(scope, institutionId), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,6 +49,6 @@ export async function createPersonAction(institutionId: string, formData: FormDa
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/admin/institutions/${institutionId}/people`);
+  revalidatePath(scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`);
   return { success: true };
 }

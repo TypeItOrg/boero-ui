@@ -3,32 +3,31 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { personRoleSchema } from "@features/people/schemas/person-role.schema";
 import { ROLE_FORM_FIELD_NAMES, type RoleActionState } from "@features/people/types/role-action-state.types";
-import type { SystemRoleCode } from "@features/people/types/person-role.types";
-
-const INSTITUTIONAL_AUTHORITY_ROLE: SystemRoleCode = "INSTITUTIONAL_AUTHORITY";
+import { peopleApiFetch } from "../services/people-api-fetch.service";
+import type { PeopleScope } from "../utils/people-scope.util";
 
 export async function assignPersonRoleAction(
   institutionId: string,
   personId: string,
   role: string,
+  scope: PeopleScope = "admin",
 ): Promise<RoleActionState> {
   const parsed = personRoleSchema.safeParse({ role });
   if (!parsed.success) {
     return getValidationActionState(parsed.error.issues, ROLE_FORM_FIELD_NAMES);
   }
 
-  const path = getAssignRolePath(institutionId, personId, parsed.data.role);
+  const path = getAssignRolePath(institutionId, personId, scope);
 
-  const response = platformApiFetch(path, {
+  const response = peopleApiFetch(scope, path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: getAssignRoleBody(parsed.data.role),
+    body: JSON.stringify({ roleId: parsed.data.role }),
   });
 
   const errorState = await getResponseErrorActionState(
@@ -38,20 +37,13 @@ export async function assignPersonRoleAction(
   );
   if (errorState) return errorState;
 
-  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
+  revalidatePath(
+    scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`,
+  );
   return { success: true };
 }
 
-function getAssignRolePath(institutionId: string, personId: string, role: SystemRoleCode): string {
-  if (role === INSTITUTIONAL_AUTHORITY_ROLE) {
-    return `/api/v1/admin/institutions/${institutionId}/authority/${personId}`;
-  }
-
+function getAssignRolePath(institutionId: string, personId: string, scope: PeopleScope): string {
+  if (scope === "institutional") return `/api/v1/institutions/${institutionId}/people/${personId}/roles`;
   return `/api/v1/admin/institutions/${institutionId}/people/${personId}/roles`;
-}
-
-function getAssignRoleBody(role: SystemRoleCode): string | undefined {
-  if (role === INSTITUTIONAL_AUTHORITY_ROLE) return undefined;
-
-  return JSON.stringify({ role });
 }

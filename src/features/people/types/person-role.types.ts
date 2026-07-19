@@ -18,14 +18,21 @@ export type SystemRoleList = {
   roles: SystemRole[];
 };
 
+export type AssignableRole = {
+  id: string;
+  name: string;
+  technicalCode: SystemRoleCode | null;
+};
+
 export type PersonRole = {
-  roleCode: SystemRoleCode;
+  roleId: string;
+  technicalCode: SystemRoleCode | null;
   displayName: string;
   assignedAt: string;
 };
 
 export const FALLBACK_SYSTEM_ROLES: SystemRole[] = [
-  { code: "INSTITUTIONAL_AUTHORITY", displayName: "Autoridad Institucional" },
+  { code: "INSTITUTIONAL_AUTHORITY", displayName: "Administrador Institucional" },
   { code: "ADMINISTRATIVE", displayName: "Administrativo" },
   { code: "TEACHER", displayName: "Docente" },
   { code: "GUARDIAN", displayName: "Tutor" },

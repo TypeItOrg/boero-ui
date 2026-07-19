@@ -1,7 +1,5 @@
-import type { SystemRoleCode } from "./person-role.types";
-
 export type PersonSummaryRole = {
-  roleCode: SystemRoleCode;
+  roleCode: string;
   displayName: string;
 };
 
@@ -12,6 +10,7 @@ export type PersonSummary = {
   documentNumber: string;
   email: string | null;
   phoneNumber: string | null;
+  enabled: boolean;
   roles?: PersonSummaryRole[];
 };
 

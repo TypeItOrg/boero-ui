@@ -1,29 +1,27 @@
-import { personRoleCodesSchema } from "./person-role.schema";
-import { getRoleCodesAfterAssignment } from "../utils/person-role-rules.util";
+import { personRoleIdsSchema } from "./person-role.schema";
+import { getRoleChanges } from "../utils/person-role-rules.util";
 
-describe("personRoleCodesSchema", () => {
+const ROLE_A = "019bffff-0000-7000-8000-000000000001";
+const ROLE_B = "019bffff-0000-7000-8000-000000000002";
+const ROLE_C = "019bffff-0000-7000-8000-000000000003";
+
+describe("personRoleIdsSchema", () => {
   it("requires at least one role", () => {
-    expect(personRoleCodesSchema.safeParse([]).success).toBe(false);
+    expect(personRoleIdsSchema.safeParse([]).success).toBe(false);
   });
 
-  it.each(["INSTITUTIONAL_AUTHORITY", "ADMINISTRATIVE", "TEACHER", "GUARDIAN", "STUDENT"] as const)(
-    "rejects APPLICANT with %s",
-    (role) => {
-      expect(personRoleCodesSchema.safeParse(["APPLICANT", role]).success).toBe(false);
-    },
-  );
-
-  it("allows compatible role combinations", () => {
-    expect(personRoleCodesSchema.safeParse(["INSTITUTIONAL_AUTHORITY", "ADMINISTRATIVE", "TEACHER"]).success).toBe(
-      true,
-    );
+  it("accepts unique role identifiers", () => {
+    expect(personRoleIdsSchema.safeParse([ROLE_A, ROLE_B]).success).toBe(true);
   });
 
-  it("replaces existing roles when assigning APPLICANT", () => {
-    expect(getRoleCodesAfterAssignment(["STUDENT", "GUARDIAN"], "APPLICANT")).toEqual(["APPLICANT"]);
+  it("rejects duplicate role identifiers", () => {
+    expect(personRoleIdsSchema.safeParse([ROLE_A, ROLE_A]).success).toBe(false);
   });
 
-  it("replaces APPLICANT when assigning another role", () => {
-    expect(getRoleCodesAfterAssignment(["APPLICANT"], "ADMINISTRATIVE")).toEqual(["ADMINISTRATIVE"]);
+  it("keeps regular assignments and revocations in the role delta", () => {
+    expect(getRoleChanges([ROLE_A, ROLE_B], [ROLE_A, ROLE_C])).toEqual({
+      assignments: [ROLE_C],
+      revocations: [ROLE_B],
+    });
   });
 });

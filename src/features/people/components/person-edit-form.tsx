@@ -2,17 +2,22 @@
 
 import * as React from "react";
 
+import { cn } from "@common/utils/cn.util";
 import { PersonForm } from "./person-form";
 import { PersonRolesManager } from "./person-roles-manager";
-import type { PersonRole, SystemRole, SystemRoleCode } from "../types/person-role.types";
+import type { AssignableRole, PersonRole } from "../types/person-role.types";
 import type { Person } from "../types/person.types";
+import type { PeopleScope } from "../utils/people-scope.util";
 
 type PersonEditFormProps = {
   formId: string;
   institutionId: string;
   person: Person;
-  roles: SystemRole[];
+  roles: AssignableRole[];
   assignedRoles: PersonRole[];
+  scope?: PeopleScope;
+  canAssignRoles?: boolean;
+  canRevokeRoles?: boolean;
 };
 
 export function PersonEditForm({
@@ -21,31 +26,41 @@ export function PersonEditForm({
   person,
   roles,
   assignedRoles,
+  scope = "admin",
+  canAssignRoles = true,
+  canRevokeRoles = true,
 }: PersonEditFormProps): React.ReactElement {
-  const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<SystemRoleCode[]>(() =>
-    assignedRoles.map((role) => role.roleCode),
+  const canManageRoles = canAssignRoles || canRevokeRoles;
+  const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() =>
+    assignedRoles.map((role) => role.roleId),
   );
 
-  function handleRoleCodesChange(roleCodes: SystemRoleCode[]): void {
-    setSelectedRoleCodes(roleCodes);
-  }
-
   return (
-    <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
+    <div
+      className={cn(
+        "grid items-start gap-8",
+        canManageRoles && "xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]",
+      )}
+    >
       <PersonForm
         mode="edit"
         institutionId={institutionId}
         person={person}
         formId={formId}
         hideActions
-        roleCodes={selectedRoleCodes}
+        roleIds={canManageRoles ? selectedRoleCodes : undefined}
+        scope={scope}
       />
-      <PersonRolesManager
-        roles={roles}
-        assignedRoles={assignedRoles}
-        selectedRoleCodes={selectedRoleCodes}
-        onSelectedRoleCodesChange={handleRoleCodesChange}
-      />
+      {canManageRoles ? (
+        <PersonRolesManager
+          roles={roles}
+          assignedRoles={assignedRoles}
+          selectedRoleCodes={selectedRoleCodes}
+          onSelectedRoleCodesChange={setSelectedRoleCodes}
+          canAssignRoles={canAssignRoles}
+          canRevokeRoles={canRevokeRoles}
+        />
+      ) : null}
     </div>
   );
 }

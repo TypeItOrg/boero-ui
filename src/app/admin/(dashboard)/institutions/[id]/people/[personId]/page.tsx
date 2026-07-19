@@ -7,7 +7,7 @@ import { PersonDeleteButton } from "@features/people/components/person-delete-bu
 import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
-import { fetchSystemRolesWithFallback } from "@features/people/services/fetch-system-roles.service";
+import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -24,7 +24,7 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
   const [person, assignedRoles, systemRoles] = await Promise.all([
     fetchPerson(id, personId),
     fetchPersonRoles(id, personId),
-    fetchSystemRolesWithFallback(),
+    fetchSystemRoles(id),
   ]);
   if (!person) notFound();
   const personName = `${person.firstName} ${person.lastName}`;
@@ -40,7 +40,7 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
         formId="person-edit-form"
         institutionId={id}
         person={person}
-        roles={systemRoles.roles}
+        roles={systemRoles}
         assignedRoles={assignedRoles}
       />
 

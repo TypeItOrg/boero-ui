@@ -2,23 +2,29 @@
 
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+import { getInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { assignPersonRoleAction } from "./assign-person-role.action";
 import { revokePersonRoleAction } from "./revoke-person-role.action";
-import { personRoleCodesSchema } from "../schemas/person-role.schema";
+import { personRoleIdsSchema } from "../schemas/person-role.schema";
 import { updatePersonFormSchema } from "../schemas/person-form.schema";
 import { fetchPersonRoles } from "../services/fetch-person-roles.service";
+import { peopleApiFetch } from "../services/people-api-fetch.service";
 import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "../types/person-action-state.types";
-import type { SystemRoleCode } from "../types/person-role.types";
+import { getRoleChanges, type PersonRoleChanges } from "../utils/person-role-rules.util";
+import type { PeopleScope } from "../utils/people-scope.util";
+import { getPeoplePath } from "../utils/people-scope.util";
 
 export async function updatePersonAction(
   institutionId: string,
   personId: string,
   formData: FormData,
+  scope: PeopleScope = "admin",
 ): Promise<PersonActionState> {
-  const roleCodes = parseRoleCodes(formData.get("roleCodes"));
-  if (roleCodes === null) {
+  const roleIds = parseRoleIds(formData.get("roleIds"));
+  if (roleIds === null) {
     return { error: PEOPLE_ERROR_MESSAGES.INVALID_ROLE_CONFIGURATION };
   }
 
@@ -34,7 +40,12 @@ export async function updatePersonAction(
     return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
   }
 
-  const response = platformApiFetch(`/api/v1/admin/institutions/${institutionId}/people/${personId}`, {
+  const roleChanges = roleIds ? await prepareRoleChanges(institutionId, personId, roleIds, scope) : undefined;
+  if (typeof roleChanges === "string") {
+    return { error: roleChanges };
+  }
+
+  const response = peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId), {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -49,58 +60,82 @@ export async function updatePersonAction(
   );
   if (errorState) return errorState;
 
-  if (roleCodes) {
-    const roleError = await syncPersonRoles(institutionId, personId, roleCodes);
+  if (roleChanges) {
+    const roleError = await syncPersonRoles(institutionId, personId, roleChanges, scope);
     if (roleError) {
-      revalidatePersonPaths(institutionId, personId);
+      revalidatePersonPaths(institutionId, personId, scope);
       return { error: roleError };
     }
   }
 
-  revalidatePersonPaths(institutionId, personId);
+  revalidatePersonPaths(institutionId, personId, scope);
   return { success: true };
 }
 
-function parseRoleCodes(value: FormDataEntryValue | null): SystemRoleCode[] | null | undefined {
+function parseRoleIds(value: FormDataEntryValue | null): string[] | null | undefined {
   if (value === null || typeof value !== "string") return undefined;
 
   try {
-    const parsed = personRoleCodesSchema.safeParse(JSON.parse(value));
+    const parsed = personRoleIdsSchema.safeParse(JSON.parse(value));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }
 }
 
-async function syncPersonRoles(
+async function prepareRoleChanges(
   institutionId: string,
   personId: string,
-  desiredRoleCodes: readonly SystemRoleCode[],
-): Promise<string | undefined> {
+  desiredRoleCodes: readonly string[],
+  scope: PeopleScope,
+): Promise<PersonRoleChanges | string> {
   let currentRoles;
 
   try {
-    currentRoles = await fetchPersonRoles(institutionId, personId);
+    currentRoles = await fetchPersonRoles(institutionId, personId, scope);
   } catch {
     return PEOPLE_ERROR_MESSAGES.VERIFY_ROLE;
   }
 
-  const currentRoleCodes = new Set(currentRoles.map((role) => role.roleCode));
-  const desiredRoleCodeSet = new Set(desiredRoleCodes);
+  const roleChanges = getRoleChanges(
+    currentRoles.map((role) => role.roleId),
+    desiredRoleCodes,
+  );
 
-  for (const roleCode of desiredRoleCodes) {
-    if (currentRoleCodes.has(roleCode)) continue;
+  if (scope === "institutional" && !(await canApplyRoleChanges(institutionId, roleChanges))) {
+    return PEOPLE_ERROR_MESSAGES.UNAUTHORIZED_ROLE_CHANGE;
+  }
 
-    const result = await assignPersonRoleAction(institutionId, personId, roleCode);
+  return roleChanges;
+}
+
+async function canApplyRoleChanges(institutionId: string, roleChanges: PersonRoleChanges): Promise<boolean> {
+  const user = await getInstitutionalUser();
+  if (!user || user.institutionId !== institutionId) return false;
+
+  const canAssign =
+    roleChanges.assignments.length === 0 || hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN);
+  const canRevoke =
+    roleChanges.revocations.length === 0 || hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
+
+  return canAssign && canRevoke;
+}
+
+async function syncPersonRoles(
+  institutionId: string,
+  personId: string,
+  roleChanges: PersonRoleChanges,
+  scope: PeopleScope,
+): Promise<string | undefined> {
+  for (const roleCode of roleChanges.assignments) {
+    const result = await assignPersonRoleAction(institutionId, personId, roleCode, scope);
     if (!result.success) {
       return result.error ?? PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE;
     }
   }
 
-  for (const role of currentRoles) {
-    if (desiredRoleCodeSet.has(role.roleCode)) continue;
-
-    const result = await revokePersonRoleAction(institutionId, personId, role.roleCode);
+  for (const roleCode of roleChanges.revocations) {
+    const result = await revokePersonRoleAction(institutionId, personId, roleCode, scope);
     if (!result.success) {
       return result.error ?? PEOPLE_ERROR_MESSAGES.REVOKE_SELECTED_ROLE;
     }
@@ -109,7 +144,9 @@ async function syncPersonRoles(
   return undefined;
 }
 
-function revalidatePersonPaths(institutionId: string, personId: string): void {
-  revalidatePath(`/admin/institutions/${institutionId}/people`);
-  revalidatePath(`/admin/institutions/${institutionId}/people/${personId}`);
+function revalidatePersonPaths(institutionId: string, personId: string, scope: PeopleScope): void {
+  revalidatePath(scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`);
+  revalidatePath(
+    scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`,
+  );
 }

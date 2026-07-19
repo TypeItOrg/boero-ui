@@ -5,19 +5,22 @@ import { PlusIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import type { PersonRole, SystemRole, SystemRoleCode } from "../types/person-role.types";
+import type { AssignableRole, PersonRole, SystemRoleCode } from "../types/person-role.types";
 import { formatRoleAssignedAt } from "../utils/person-role-date.util";
-import { hasApplicantRoleConflict } from "../utils/person-role-rules.util";
+import { getRoleChanges } from "../utils/person-role-rules.util";
 
 type PersonRolesManagerProps = {
-  roles: SystemRole[];
+  roles: AssignableRole[];
   assignedRoles: PersonRole[];
-  selectedRoleCodes: readonly SystemRoleCode[];
-  onSelectedRoleCodesChange: (roleCodes: SystemRoleCode[]) => void;
+  selectedRoleCodes: readonly string[];
+  onSelectedRoleCodesChange: (roleCodes: string[]) => void;
+  canAssignRoles: boolean;
+  canRevokeRoles: boolean;
 };
 
 type SelectedRole = {
-  roleCode: SystemRoleCode;
+  roleId: string;
+  technicalCode: SystemRoleCode | null;
   displayName: string;
   assignedAt?: string;
 };
@@ -27,33 +30,71 @@ export function PersonRolesManager({
   assignedRoles,
   selectedRoleCodes,
   onSelectedRoleCodesChange,
+  canAssignRoles,
+  canRevokeRoles,
 }: PersonRolesManagerProps): React.ReactElement {
-  const initialRoleCodes = React.useMemo(
-    () => new Set<SystemRoleCode>(assignedRoles.map((role) => role.roleCode)),
-    [assignedRoles],
-  );
+  const initialRoleCodes = React.useMemo(() => assignedRoles.map((role) => role.roleId), [assignedRoles]);
+  const initialRoleCodeSet = React.useMemo(() => new Set(initialRoleCodes), [initialRoleCodes]);
   const selectedRoleCodeSet = React.useMemo(() => new Set(selectedRoleCodes), [selectedRoleCodes]);
   const assignedRolesByCode = React.useMemo(
-    () => new Map(assignedRoles.map((role) => [role.roleCode, role])),
+    () => new Map(assignedRoles.map((role) => [role.roleId, role])),
     [assignedRoles],
   );
-  const rolesByCode = React.useMemo(() => new Map(roles.map((role) => [role.code, role])), [roles]);
+  const rolesByCode = React.useMemo(() => new Map(roles.map((role) => [role.id, role])), [roles]);
   const selectedRoles = React.useMemo(
     () => getSelectedRoles(selectedRoleCodeSet, rolesByCode, assignedRolesByCode),
     [assignedRolesByCode, rolesByCode, selectedRoleCodeSet],
   );
-  const availableRoles = roles.filter((role) => !selectedRoleCodeSet.has(role.code));
+  const availableRoles = roles.filter((role) => !selectedRoleCodeSet.has(role.id));
+  const applicantRoleId = roles.find((role) => role.technicalCode === "APPLICANT")?.id;
 
-  function selectRole(roleCode: SystemRoleCode): void {
-    if (selectedRoleCodeSet.has(roleCode) || hasApplicantRoleConflict(selectedRoleCodes, roleCode)) return;
+  function selectRole(roleId: string): void {
+    if (selectedRoleCodeSet.has(roleId)) return;
 
-    onSelectedRoleCodesChange([...selectedRoleCodes, roleCode]);
+    const roleSelection = getRoleSelection(roleId);
+    if (!canApplyRoleCodes(roleSelection.roleIds, roleSelection.implicitRevocationIds)) return;
+
+    onSelectedRoleCodesChange(roleSelection.roleIds);
   }
 
-  function removeRole(roleCode: SystemRoleCode): void {
+  function removeRole(roleCode: string): void {
     if (selectedRoleCodes.length <= 1) return;
 
-    onSelectedRoleCodesChange(selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== roleCode));
+    const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== roleCode);
+    if (!canApplyRoleCodes(nextRoleCodes)) return;
+
+    onSelectedRoleCodesChange(nextRoleCodes);
+  }
+
+  function canApplyRoleCodes(nextRoleCodes: readonly string[], implicitRevocationIds: readonly string[] = []): boolean {
+    const roleChanges = getRoleChanges(initialRoleCodes, nextRoleCodes);
+    const implicitRevocationIdSet = new Set(implicitRevocationIds);
+    const requiresExplicitRevocation = roleChanges.revocations.some((roleId) => !implicitRevocationIdSet.has(roleId));
+    const canAssign = roleChanges.assignments.length === 0 || canAssignRoles;
+    const canRevoke = !requiresExplicitRevocation || canRevokeRoles;
+
+    return canAssign && canRevoke;
+  }
+
+  function getRoleSelection(roleId: string): {
+    roleIds: string[];
+    implicitRevocationIds: string[];
+  } {
+    const candidate = rolesByCode.get(roleId);
+    const replacesSelectedRoles =
+      candidate?.technicalCode === "APPLICANT" ||
+      (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
+    const roleIds = replacesSelectedRoles ? [roleId] : [...selectedRoleCodes, roleId];
+
+    if (candidate?.technicalCode === "APPLICANT") {
+      return { roleIds, implicitRevocationIds: initialRoleCodes };
+    }
+
+    const replacesInitialApplicant = applicantRoleId !== undefined && initialRoleCodeSet.has(applicantRoleId);
+    return {
+      roleIds,
+      implicitRevocationIds: replacesInitialApplicant ? [applicantRoleId] : [],
+    };
   }
 
   return (
@@ -68,10 +109,11 @@ export function PersonRolesManager({
           {selectedRoles.length > 0 ? (
             <div className="flex flex-col gap-2">
               {selectedRoles.map((role) => {
-                const isPendingAssignment = !initialRoleCodes.has(role.roleCode);
+                const isPendingAssignment = !initialRoleCodeSet.has(role.roleId);
+                const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== role.roleId);
 
                 return (
-                  <div key={role.roleCode} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                  <div key={role.roleId} className="flex items-center justify-between gap-3 rounded-lg border p-3">
                     <div className="flex min-w-0 flex-col gap-1">
                       <span className="font-medium">{role.displayName}</span>
                       <span className="text-muted-foreground text-xs">
@@ -84,8 +126,8 @@ export function PersonRolesManager({
                       type="button"
                       variant={isPendingAssignment ? "outline" : "destructive"}
                       size="sm"
-                      onClick={() => removeRole(role.roleCode)}
-                      disabled={selectedRoleCodes.length <= 1}
+                      onClick={() => removeRole(role.roleId)}
+                      disabled={selectedRoleCodes.length <= 1 || !canApplyRoleCodes(nextRoleCodes)}
                     >
                       <XIcon data-icon="inline-start" />
                       {isPendingAssignment ? "Quitar" : "Revocar"}
@@ -106,25 +148,23 @@ export function PersonRolesManager({
           {availableRoles.length > 0 ? (
             <div className="flex flex-col gap-2">
               {availableRoles.map((role) => {
-                const isPendingRevocation = initialRoleCodes.has(role.code);
-                const hasRoleConflict = hasApplicantRoleConflict(selectedRoleCodes, role.code);
+                const isPendingRevocation = initialRoleCodeSet.has(role.id);
+                const roleSelection = getRoleSelection(role.id);
 
                 return (
-                  <div key={role.code} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                  <div key={role.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
                     <div className="min-w-0">
-                      <p className="font-medium">{role.displayName}</p>
+                      <p className="font-medium">{role.name}</p>
                       {isPendingRevocation ? (
                         <p className="text-muted-foreground mt-1 text-xs">Se revocará al guardar.</p>
-                      ) : hasRoleConflict ? (
-                        <p className="text-muted-foreground mt-1 text-xs">Postulante debe ser el único rol.</p>
                       ) : null}
                     </div>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => selectRole(role.code)}
-                      disabled={hasRoleConflict}
+                      onClick={() => selectRole(role.id)}
+                      disabled={!canApplyRoleCodes(roleSelection.roleIds, roleSelection.implicitRevocationIds)}
                     >
                       <PlusIcon data-icon="inline-start" />
                       Asignar
@@ -143,24 +183,25 @@ export function PersonRolesManager({
 }
 
 function getSelectedRoles(
-  selectedRoleCodes: ReadonlySet<SystemRoleCode>,
-  rolesByCode: ReadonlyMap<SystemRoleCode, SystemRole>,
-  assignedRolesByCode: ReadonlyMap<SystemRoleCode, PersonRole>,
+  selectedRoleCodes: ReadonlySet<string>,
+  rolesByCode: ReadonlyMap<string, AssignableRole>,
+  assignedRolesByCode: ReadonlyMap<string, PersonRole>,
 ): SelectedRole[] {
-  return Array.from(selectedRoleCodes).flatMap((roleCode) => {
-    const assignedRole = assignedRolesByCode.get(roleCode);
+  return Array.from(selectedRoleCodes).flatMap((roleId) => {
+    const assignedRole = assignedRolesByCode.get(roleId);
     if (assignedRole) {
       return [
         {
-          roleCode,
+          roleId,
+          technicalCode: assignedRole.technicalCode,
           displayName: assignedRole.displayName,
           assignedAt: assignedRole.assignedAt,
         },
       ];
     }
 
-    const role = rolesByCode.get(roleCode);
-    return role ? [{ roleCode, displayName: role.displayName }] : [];
+    const role = rolesByCode.get(roleId);
+    return role ? [{ roleId, technicalCode: role.technicalCode, displayName: role.name }] : [];
   });
 }
 

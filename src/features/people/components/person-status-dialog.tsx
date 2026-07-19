@@ -13,91 +13,91 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
-import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { safelyRunAction } from "@common/utils/safe-action.util";
-import { deletePersonAction } from "../actions/delete-person.action";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { updatePersonStatusAction } from "../actions/update-person-status.action";
+import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
 
-type PersonDeleteDialogProps = {
+type PersonStatusDialogProps = {
   institutionId: string;
   personId: string;
   personName: string;
+  enabled: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDeleted: () => void;
-  trigger?: React.ReactElement;
-  scope?: PeopleScope;
+  onUpdated: () => void;
 };
 
-export function PersonDeleteDialog({
+export function PersonStatusDialog({
   institutionId,
   personId,
   personName,
+  enabled,
   open,
   onOpenChange,
-  onDeleted,
-  trigger,
-  scope = "admin",
-}: PersonDeleteDialogProps): React.ReactElement {
+  onUpdated,
+}: PersonStatusDialogProps): React.ReactElement {
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string>();
-  const buttonSize = scope === "institutional" ? "lg" : "default";
+  const nextEnabled = !enabled;
+  const actionLabel = nextEnabled ? "Activar usuario" : "Desactivar usuario";
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) return;
     if (!nextOpen) setError(undefined);
-
     onOpenChange(nextOpen);
   }
 
-  function handleDelete(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleConfirm(event: React.MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
     setError(undefined);
 
     startTransition(async () => {
       const result = await safelyRunAction(
-        deletePersonAction(institutionId, personId, scope),
-        PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK,
+        updatePersonStatusAction(institutionId, personId, nextEnabled),
+        PEOPLE_ERROR_MESSAGES.UPDATE_STATUS,
       );
-
       if (!result.success) {
-        setError(result.error ?? PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK);
+        setError(result.error ?? PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
         return;
       }
 
       onOpenChange(false);
-      onDeleted();
+      onUpdated();
     });
   }
 
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      {trigger ? <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger> : null}
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Eliminar usuario</AlertDialogTitle>
+          <AlertDialogTitle>{actionLabel}</AlertDialogTitle>
           <AlertDialogDescription>
-            {personName} dejará de tener acceso y ya no aparecerá en los listados de la institución. Esta acción no
-            elimina físicamente sus datos.
+            {nextEnabled
+              ? `${personName} recuperará el acceso al portal institucional.`
+              : `${personName} perderá el acceso y se cerrarán todas sus sesiones activas.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>{PEOPLE_ERROR_MESSAGES.DELETE_TITLE}</AlertTitle>
+            <AlertTitle>No se pudo actualizar el acceso</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
 
         <AlertDialogFooter>
-          <AlertDialogCancel size={buttonSize} disabled={isPending}>
+          <AlertDialogCancel size="lg" disabled={isPending}>
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction size={buttonSize} variant="destructive" disabled={isPending} onClick={handleDelete}>
-            {isPending ? "Eliminando..." : "Eliminar usuario"}
+          <AlertDialogAction
+            size="lg"
+            variant={nextEnabled ? "default" : "destructive"}
+            disabled={isPending}
+            onClick={handleConfirm}
+          >
+            {isPending ? "Actualizando…" : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
