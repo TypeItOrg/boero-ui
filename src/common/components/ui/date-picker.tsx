@@ -6,12 +6,7 @@ import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
 import { Calendar } from "@common/components/ui/calendar";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@common/components/ui/input-group";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
 import { cn } from "@common/utils/cn.util";
 
@@ -88,11 +83,7 @@ export function DatePicker({
         />
         <InputGroupAddon align="inline-end">
           <PopoverTrigger asChild>
-            <InputGroupButton
-              aria-label="Abrir calendario"
-              disabled={disabled}
-              size="icon-xs"
-            >
+            <InputGroupButton aria-label="Abrir calendario" disabled={disabled} size="icon-xs">
               <CalendarIcon />
             </InputGroupButton>
           </PopoverTrigger>
