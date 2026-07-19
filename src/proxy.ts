@@ -19,14 +19,14 @@ import {
   INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
-type PlatformRefreshTokens = {
+type RefreshTokens = {
   accessToken: string;
   refreshToken: string;
 };
 
-type PlatformRefreshAttempt = {
+type RefreshAttempt = {
   status?: number;
-  tokens?: PlatformRefreshTokens;
+  tokens?: RefreshTokens;
 };
 
 enum RouteAccess {
@@ -41,19 +41,36 @@ const ROOT_PATH = "/";
 const ADMIN_ROOT_PATH = "/admin";
 const ADMIN_LOGIN_PATH = `${ADMIN_ROOT_PATH}/auth/login`;
 const INSTITUTIONAL_LOGIN_PATH = "/auth/login";
+const INSTITUTIONAL_REGISTER_PATH = "/auth/register";
+const PLATFORM_REFRESH_PATH = "/api/v1/admin/auth/refresh";
+const INSTITUTIONAL_REFRESH_PATH = "/api/v1/auth/refresh";
+const PLATFORM_CURRENT_USER_PATH = "/api/v1/admin/auth/me";
+const INSTITUTIONAL_CURRENT_USER_PATH = "/api/v1/auth/me";
 
-const inFlightPlatformRefreshes = new Map<string, Promise<PlatformRefreshAttempt>>();
+const inFlightRefreshes = new Map<string, Promise<RefreshAttempt>>();
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const routeAccess = getRouteAccess(request.nextUrl.pathname);
 
   switch (routeAccess) {
     case RouteAccess.AdminGuestOnly:
-      return handleGuestOnlyRoute(request, PLATFORM_ACCESS_TOKEN_COOKIE, ADMIN_LOGIN_PATH);
+      return handleGuestOnlyRoute(
+        request,
+        PLATFORM_ACCESS_TOKEN_COOKIE,
+        PLATFORM_REFRESH_TOKEN_COOKIE,
+        ADMIN_LOGIN_PATH,
+        PLATFORM_CURRENT_USER_PATH,
+      );
     case RouteAccess.AdminSession:
       return handleAdminRoute(request);
     case RouteAccess.InstitutionalGuestOnly:
-      return handleGuestOnlyRoute(request, INSTITUTIONAL_ACCESS_TOKEN_COOKIE, INSTITUTIONAL_LOGIN_PATH);
+      return handleGuestOnlyRoute(
+        request,
+        INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
+        INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
+        INSTITUTIONAL_LOGIN_PATH,
+        INSTITUTIONAL_CURRENT_USER_PATH,
+      );
     case RouteAccess.InstitutionalSession:
       return handleInstitutionalRoute(request);
     case RouteAccess.Public:
@@ -62,7 +79,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/", "/admin/:path*", "/auth/login"],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };
 
 function getRouteAccess(pathname: string): RouteAccess {
@@ -74,29 +91,66 @@ function getRouteAccess(pathname: string): RouteAccess {
     return RouteAccess.InstitutionalGuestOnly;
   }
 
-  if (pathname === ROOT_PATH) {
-    return RouteAccess.InstitutionalSession;
+  if (pathname === INSTITUTIONAL_REGISTER_PATH) {
+    return RouteAccess.Public;
   }
 
   if (isAdminRoute(pathname)) {
     return RouteAccess.AdminSession;
   }
 
-  return RouteAccess.Public;
+  return RouteAccess.InstitutionalSession;
 }
 
 function isAdminRoute(pathname: string): boolean {
-  return pathname === ADMIN_ROOT_PATH || pathname.startsWith(`${ADMIN_ROOT_PATH}/`);
+  return isRouteOrDescendant(pathname, ADMIN_ROOT_PATH);
 }
 
-function handleGuestOnlyRoute(request: NextRequest, accessCookie: string, loginPath: string): NextResponse {
-  if (!request.cookies.has(accessCookie)) {
-    return NextResponse.next();
+function isRouteOrDescendant(pathname: string, routePath: string): boolean {
+  return pathname === routePath || pathname.startsWith(`${routePath}/`);
+}
+
+async function handleGuestOnlyRoute(
+  request: NextRequest,
+  accessCookie: string,
+  refreshCookie: string,
+  loginPath: string,
+  currentUserPath: string,
+): Promise<NextResponse> {
+  const accessToken = request.cookies.get(accessCookie)?.value;
+  if (!accessToken) return NextResponse.next();
+
+  const sessionStatus = await getSessionStatus(currentUserPath, accessToken);
+  if (sessionStatus !== "valid") {
+    const response = NextResponse.next();
+    if (sessionStatus === "invalid") {
+      response.cookies.delete(accessCookie);
+      response.cookies.delete(refreshCookie);
+    }
+    return response;
   }
 
   const next = request.nextUrl.searchParams.get("next");
   const fallback = loginPath === ADMIN_LOGIN_PATH ? getSafeNextPath(next) : next || ROOT_PATH;
   return NextResponse.redirect(new URL(fallback, request.url));
+}
+
+async function getSessionStatus(
+  currentUserPath: string,
+  accessToken: string,
+): Promise<"valid" | "invalid" | "unavailable"> {
+  try {
+    const response = await fetch(new URL(currentUserPath, getApiUrlOrThrow()), {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+
+    if (response.ok) return "valid";
+    if (response.status === 401) return "invalid";
+    return "unavailable";
+  } catch {
+    return "unavailable";
+  }
 }
 
 async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
@@ -108,7 +162,7 @@ async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
   let refreshStatus: number | undefined;
 
   if (refreshToken) {
-    const refreshAttempt = await refreshPlatformSession(refreshToken);
+    const refreshAttempt = await refreshSession(PLATFORM_REFRESH_PATH, refreshToken);
     refreshStatus = refreshAttempt.status;
 
     if (refreshAttempt.tokens) {
@@ -140,7 +194,7 @@ async function handleInstitutionalRoute(request: NextRequest): Promise<NextRespo
   let refreshStatus: number | undefined;
 
   if (refreshToken) {
-    const refreshAttempt = await refreshInstitutionalSession(refreshToken);
+    const refreshAttempt = await refreshSession(INSTITUTIONAL_REFRESH_PATH, refreshToken);
     refreshStatus = refreshAttempt.status;
 
     if (refreshAttempt.tokens) {
@@ -209,24 +263,25 @@ function createRefreshedInstitutionalSessionResponse(
   return response;
 }
 
-function refreshPlatformSession(refreshToken: string): Promise<PlatformRefreshAttempt> {
-  const existingRequest = inFlightPlatformRefreshes.get(refreshToken);
+function refreshSession(refreshPath: string, refreshToken: string): Promise<RefreshAttempt> {
+  const requestKey = `${refreshPath}:${refreshToken}`;
+  const existingRequest = inFlightRefreshes.get(requestKey);
   if (existingRequest) return existingRequest;
 
-  const refreshRequest = performPlatformRefresh(refreshToken);
-  inFlightPlatformRefreshes.set(refreshToken, refreshRequest);
+  const refreshRequest = performRefresh(refreshPath, refreshToken);
+  inFlightRefreshes.set(requestKey, refreshRequest);
 
   void refreshRequest.then(
-    () => removeInFlightPlatformRefresh(refreshToken, refreshRequest),
-    () => removeInFlightPlatformRefresh(refreshToken, refreshRequest),
+    () => removeInFlightRefresh(requestKey, refreshRequest),
+    () => removeInFlightRefresh(requestKey, refreshRequest),
   );
 
   return refreshRequest;
 }
 
-async function performPlatformRefresh(refreshToken: string): Promise<PlatformRefreshAttempt> {
+async function performRefresh(refreshPath: string, refreshToken: string): Promise<RefreshAttempt> {
   try {
-    const response = await fetch(new URL("/api/v1/admin/auth/refresh", getApiUrlOrThrow()), {
+    const response = await fetch(new URL(refreshPath, getApiUrlOrThrow()), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
@@ -234,7 +289,7 @@ async function performPlatformRefresh(refreshToken: string): Promise<PlatformRef
 
     if (!response.ok) return { status: response.status };
 
-    const payload = (await response.json()) as { tokens?: Partial<PlatformRefreshTokens> };
+    const payload = (await response.json()) as { tokens?: Partial<RefreshTokens> };
     const tokens = payload.tokens;
 
     if (tokens?.accessToken && tokens.refreshToken) {
@@ -253,33 +308,8 @@ async function performPlatformRefresh(refreshToken: string): Promise<PlatformRef
   }
 }
 
-function refreshInstitutionalSession(refreshToken: string): Promise<PlatformRefreshAttempt> {
-  const refreshRequest = fetch(new URL("/api/v1/auth/refresh", getApiUrlOrThrow()), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  })
-    .then(async (response) => {
-      if (!response.ok) return { status: response.status };
-
-      const payload = (await response.json()) as { tokens?: Partial<PlatformRefreshTokens> };
-      const tokens = payload.tokens;
-      if (tokens?.accessToken && tokens.refreshToken) {
-        return {
-          status: response.status,
-          tokens: { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken },
-        };
-      }
-
-      return { status: response.status };
-    })
-    .catch(() => ({}));
-
-  return refreshRequest;
-}
-
-function removeInFlightPlatformRefresh(refreshToken: string, refreshRequest: Promise<PlatformRefreshAttempt>): void {
-  if (inFlightPlatformRefreshes.get(refreshToken) === refreshRequest) {
-    inFlightPlatformRefreshes.delete(refreshToken);
+function removeInFlightRefresh(requestKey: string, refreshRequest: Promise<RefreshAttempt>): void {
+  if (inFlightRefreshes.get(requestKey) === refreshRequest) {
+    inFlightRefreshes.delete(requestKey);
   }
 }

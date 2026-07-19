@@ -162,6 +162,7 @@ describe("proxy", () => {
   });
 
   it("redirects authenticated users away from the login page", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login?next=%2Fadmin%2Fa", {
       headers: {
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
@@ -201,6 +202,18 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe("https://app.example.test/auth/login");
   });
 
+  it.each(["/profile", "/people", "/people/person-1", "/roles", "/future-portal-route"])(
+    "protects the institutional route %s with the institutional session",
+    async (pathname) => {
+      const request = createRequest(pathname, "");
+
+      const response = await proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe("https://app.example.test/auth/login");
+    },
+  );
+
   it("allows the institutional home with an institutional access token", async () => {
     const request = createRequest("/", `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=access-token`);
 
@@ -231,7 +244,43 @@ describe("proxy", () => {
     expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
   });
 
+  it("shares one refresh request between concurrent institutional proxy calls", async () => {
+    let resolveRefresh: ((response: Response) => void) | undefined;
+    fetchMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveRefresh = resolve;
+        }),
+    );
+
+    const firstRequest = createRequest("/people", `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const secondRequest = createRequest("/roles", `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const firstResponsePromise = proxy(firstRequest);
+    const secondResponsePromise = proxy(secondRequest);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    resolveRefresh?.(
+      new Response(JSON.stringify({ tokens: { accessToken: "new-access", refreshToken: "new-refresh" } }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const [firstResponse, secondResponse] = await Promise.all([firstResponsePromise, secondResponsePromise]);
+
+    expect(firstResponse.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
+    expect(secondResponse.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+  });
+
+  it("keeps institutional registration public", async () => {
+    const response = await proxy(createRequest("/auth/register", ""));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
+
   it("redirects an authenticated institutional user away from login", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = createRequest("/auth/login", `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=access-token`);
 
     const response = await proxy(request);
@@ -240,7 +289,22 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe("https://app.example.test/");
   });
 
+  it("allows institutional login and clears cookies when the existing session was revoked", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 401 }));
+    const request = createRequest(
+      "/auth/login",
+      `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=revoked-access; ${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=revoked-refresh`,
+    );
+
+    const response = await proxy(request);
+
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("");
+    expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("");
+  });
+
   it("sanitizes absolute next urls on login redirects", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login?next=https://evil.com/a", {
       headers: {
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
