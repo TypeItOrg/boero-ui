@@ -1,0 +1,185 @@
+"use client";
+
+import type { ComponentProps } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ChevronsUpDownIcon,
+  HouseIcon,
+  LogOutIcon,
+  MoonIcon,
+  SunIcon,
+  UserLockIcon,
+  UserRoundIcon,
+  UsersIcon,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+
+import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@common/components/ui/dropdown-menu";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@common/components/ui/sidebar";
+import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
+import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import { cn } from "@common/utils/cn.util";
+
+type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
+  user: InstitutionalUser;
+  institutionName?: string;
+};
+
+export function InstitutionalSidebar({
+  user,
+  institutionName,
+  className,
+  ...props
+}: InstitutionalSidebarProps): React.ReactElement {
+  const { resolvedTheme, setTheme } = useTheme();
+  const canReadOwnProfile = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_OWN);
+  const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
+  const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
+  const navSections = [
+    {
+      label: "Plataforma",
+      items: [
+        { title: "Inicio", url: "/", icon: HouseIcon, exact: true },
+        ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
+        ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
+      ],
+    },
+    ...(canReadOwnProfile
+      ? [
+          {
+            label: "General",
+            items: [{ title: "Perfil", url: "/profile", icon: UserRoundIcon }],
+          },
+        ]
+      : []),
+  ];
+
+  return (
+    <Sidebar
+      collapsible="icon"
+      variant="sidebar"
+      className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)}
+      {...props}
+    >
+      <SidebarHeader className="border-sidebar-border border-b p-4">
+        <Link
+          href="/"
+          aria-label="Ir al inicio del portal institucional"
+          className="flex h-14 items-center gap-3 px-0 group-data-[collapsible=icon]:justify-center"
+        >
+          <Image src="/boero-logo.png" alt="Boero" width={32} height={32} className="size-8! shrink-0" />
+          <span className="min-w-0 group-data-[collapsible=icon]:hidden">
+            <span className="block truncate text-sm font-semibold">{institutionName ?? "Boero"}</span>
+            <span className="text-muted-foreground block truncate text-xs">Portal Institucional</span>
+          </span>
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent className="p-4">
+        <InstitutionalSidebarNav sections={navSections} />
+      </SidebarContent>
+
+      <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={`${user.name} ${user.lastName}`}
+                  className="hover:text-sidebar-foreground data-[state=open]:bg-background data-[state=open]:text-foreground px-0 group-data-[collapsible=icon]:p-0! hover:bg-transparent"
+                >
+                  <InstitutionalUserAvatar user={user} />
+                  <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
+                    <span className="block truncate text-sm font-semibold">
+                      {user.name} {user.lastName}
+                    </span>
+                    <span className="text-muted-foreground block truncate text-xs">{user.documentNumber}</span>
+                  </span>
+                  <ChevronsUpDownIcon className="ml-auto group-data-[collapsible=icon]:hidden" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="right"
+                align="end"
+                sideOffset={8}
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
+              >
+                <DropdownMenuLabel className="flex items-center gap-2">
+                  <InstitutionalUserAvatar user={user} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">
+                      {user.name} {user.lastName}
+                    </span>
+                    <span className="text-muted-foreground block truncate text-xs font-normal">
+                      {user.documentNumber}
+                    </span>
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  {canReadOwnProfile ? (
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">
+                        <UserRoundIcon />
+                        Perfil
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : null}
+                  <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+                    {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
+                    Cambiar tema
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <form action={logoutInstitutional}>
+                  <DropdownMenuItem asChild>
+                    <button type="submit" className="w-full">
+                      <LogOutIcon />
+                      Cerrar sesión
+                    </button>
+                  </DropdownMenuItem>
+                </form>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+function InstitutionalUserAvatar({ user }: { user: InstitutionalUser }): React.ReactElement {
+  return (
+    <Avatar className="size-8 rounded-md">
+      <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">
+        {getInitials(user.name, user.lastName)}
+      </AvatarFallback>
+    </Avatar>
+  );
+}
+
+function getInitials(name: string, lastName: string): string {
+  return `${name.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+}

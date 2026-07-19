@@ -25,6 +25,7 @@ describe("loginInstitutionalAccount", () => {
         lastName: "Lovelace",
         documentNumber: "12345678",
         institutionId: "institution-id",
+        permissions: [],
       },
       tokens: { accessToken: "access-token", refreshToken: "refresh-token" },
     };

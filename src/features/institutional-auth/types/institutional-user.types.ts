@@ -1,3 +1,5 @@
+import type { InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
+
 export type InstitutionalUser = {
   userId: string;
   personId?: string | null;
@@ -5,4 +7,5 @@ export type InstitutionalUser = {
   lastName: string;
   documentNumber: string;
   institutionId: string;
+  permissions: readonly InstitutionalPermission[];
 };

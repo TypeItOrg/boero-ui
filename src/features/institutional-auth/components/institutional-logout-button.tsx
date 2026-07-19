@@ -16,7 +16,7 @@ export function InstitutionalLogoutButton(): React.ReactElement {
 
   return (
     <form action={logoutInstitutional} className="mt-6">
-      <Button type="submit" variant="outline" className="w-full" onClick={clearInstitutionalUser}>
+      <Button type="submit" variant="outline" size="lg" className="w-full" onClick={clearInstitutionalUser}>
         <LogOutIcon data-icon="inline-start" />
         Cerrar sesión
       </Button>

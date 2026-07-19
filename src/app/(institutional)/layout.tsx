@@ -1,12 +1,9 @@
-import { InstitutionalUserProvider } from "@features/institutional-auth/components/institutional-user-provider";
-import { getInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { InstitutionalRouteLayout } from "@features/institutional-auth/components/institutional-route-layout";
 
 export default async function InstitutionalLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>): Promise<React.ReactElement> {
-  const user = await getInstitutionalUser();
-
-  return <InstitutionalUserProvider initialUser={user}>{children}</InstitutionalUserProvider>;
+  return <InstitutionalRouteLayout>{children}</InstitutionalRouteLayout>;
 }

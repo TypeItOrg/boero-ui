@@ -19,7 +19,7 @@ import {
   type InstitutionalInstitution,
 } from "@features/institutional-auth/components/institution-picker";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
-import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
+import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
@@ -127,7 +127,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
             <FieldLabel htmlFor="register-birth-date" required>
               Fecha de nacimiento
             </FieldLabel>
-            <input name="birthDate" type="hidden" value={formatBirthDate(birthDate)} />
+            <input name="birthDate" type="hidden" value={formatBirthDateInput(birthDate)} />
             <DatePicker
               aria-invalid={!!state.fieldErrors?.birthDate}
               id="register-birth-date"
@@ -195,14 +195,4 @@ export function InstitutionalRegisterForm(): React.ReactElement {
       </div>
     </form>
   );
-}
-
-function formatBirthDate(date: Date | undefined): string {
-  if (!date) return "";
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
 }

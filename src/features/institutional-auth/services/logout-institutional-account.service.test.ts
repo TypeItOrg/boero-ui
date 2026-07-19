@@ -1,5 +1,6 @@
 describe("logoutInstitutionalAccount", () => {
-  type LogoutInstitutionalAccountModule = typeof import("@features/institutional-auth/services/logout-institutional-account.service");
+  type LogoutInstitutionalAccountModule =
+    typeof import("@features/institutional-auth/services/logout-institutional-account.service");
 
   const originalApiUrl = process.env.BOERO_API_URL;
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();

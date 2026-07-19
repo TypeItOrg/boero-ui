@@ -28,7 +28,14 @@ export async function registerInstitutional(
     return { fieldErrors: getFieldErrors(parsed.error.issues, INSTITUTIONAL_REGISTER_FIELD_NAMES) };
   }
 
-  const { confirmPassword: _confirmPassword, ...input } = parsed.data;
+  const input = {
+    institutionId: parsed.data.institutionId,
+    name: parsed.data.name,
+    lastName: parsed.data.lastName,
+    birthDate: parsed.data.birthDate,
+    documentNumber: parsed.data.documentNumber,
+    password: parsed.data.password,
+  };
   const output = await registerInstitutionalAccount(input);
 
   if (!output.success) {
