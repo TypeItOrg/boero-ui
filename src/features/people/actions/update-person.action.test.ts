@@ -78,7 +78,9 @@ describe("updatePersonAction", () => {
 });
 
 function createFormData(
-  overrides: Partial<Record<"firstName" | "lastName" | "email" | "phoneNumber" | "password" | "confirmPassword", string>> = {},
+  overrides: Partial<
+    Record<"firstName" | "lastName" | "email" | "phoneNumber" | "password" | "confirmPassword", string>
+  > = {},
 ): FormData {
   const values = {
     firstName: "María",

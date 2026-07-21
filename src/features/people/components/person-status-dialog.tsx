@@ -74,7 +74,7 @@ export function PersonStatusDialog({
         <AlertDialogHeader>
           <div
             className={cn(
-              "flex size-12 items-center justify-center rounded-2xl mb-1",
+              "mb-1 flex size-12 items-center justify-center rounded-2xl",
               nextEnabled ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive",
             )}
           >
@@ -84,13 +84,13 @@ export function PersonStatusDialog({
           <AlertDialogDescription>
             {nextEnabled ? (
               <>
-                <span className="font-semibold text-foreground">{personName}</span> recuperará el acceso al portal
+                <span className="text-foreground font-semibold">{personName}</span> recuperará el acceso al portal
                 institucional.
               </>
             ) : (
               <>
-                <span className="font-semibold text-foreground">{personName}</span> perderá el acceso y se cerrarán todas
-                sus sesiones activas.
+                <span className="text-foreground font-semibold">{personName}</span> perderá el acceso y se cerrarán
+                todas sus sesiones activas.
               </>
             )}
           </AlertDialogDescription>

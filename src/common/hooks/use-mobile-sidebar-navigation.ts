@@ -24,7 +24,8 @@ export function useMobileSidebarNavigation(): MobileSidebarNavigation {
 
   if (pendingUrl) {
     const hasPathnameChanged = navigatedFromPathname !== undefined && pathname !== navigatedFromPathname;
-    const shouldResetOnRender = (!isMobile && pathname === pendingUrl) || (hasPathnameChanged && pathname !== pendingUrl);
+    const shouldResetOnRender =
+      (!isMobile && pathname === pendingUrl) || (hasPathnameChanged && pathname !== pendingUrl);
 
     if (shouldResetOnRender) {
       clearPendingState();

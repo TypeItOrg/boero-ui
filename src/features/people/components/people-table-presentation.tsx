@@ -416,7 +416,7 @@ type PersonNavigationLinkProps = React.ComponentProps<typeof Link> & {
 
 const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigationLinkProps>(
   function PersonNavigationLink({ href, children, returnTo, ...props }, ref): React.ReactElement {
-    const hrefString = typeof href === "string" ? href : href.pathname ?? "";
+    const hrefString = typeof href === "string" ? href : (href.pathname ?? "");
     if (hrefString === "/profile") {
       return (
         <Link ref={ref} href={href} {...props}>

@@ -82,8 +82,8 @@ export function PersonDeleteDialog({
           </div>
           <AlertDialogTitle>Eliminar usuario</AlertDialogTitle>
           <AlertDialogDescription>
-            <span className="font-semibold text-foreground">{personName}</span> dejará de tener acceso y ya no
-            aparecerá en los listados de la institución. Esta acción no elimina físicamente sus datos.
+            <span className="text-foreground font-semibold">{personName}</span> dejará de tener acceso y ya no aparecerá
+            en los listados de la institución. Esta acción no elimina físicamente sus datos.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

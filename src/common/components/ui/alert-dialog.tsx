@@ -57,7 +57,7 @@ function AlertDialogHeader({ className, ...props }: React.ComponentProps<"div">)
   return (
     <div
       data-slot="alert-dialog-header"
-      className={cn("flex flex-col items-center text-center gap-1.5", className)}
+      className={cn("flex flex-col items-center gap-1.5 text-center", className)}
       {...props}
     />
   );
@@ -83,7 +83,7 @@ function AlertDialogTitle({
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn("font-heading text-base leading-none font-semibold text-center", className)}
+      className={cn("font-heading text-center text-base leading-none font-semibold", className)}
       {...props}
     />
   );
@@ -96,7 +96,7 @@ function AlertDialogDescription({
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn("text-muted-foreground text-sm text-center text-balance", className)}
+      className={cn("text-muted-foreground text-center text-sm text-balance", className)}
       {...props}
     />
   );

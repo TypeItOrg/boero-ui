@@ -12,15 +12,16 @@ export type ReturnToLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   returnTo?: string;
 };
 
-export const ReturnToLink = React.forwardRef<HTMLAnchorElement, ReturnToLinkProps>(
-  function ReturnToLink({ href, returnTo, ...props }, ref): ReactElement {
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-    const currentPath = returnTo ?? getCurrentPath(pathname, searchParams.toString());
+export const ReturnToLink = React.forwardRef<HTMLAnchorElement, ReturnToLinkProps>(function ReturnToLink(
+  { href, returnTo, ...props },
+  ref,
+): ReactElement {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPath = returnTo ?? getCurrentPath(pathname, searchParams.toString());
 
-    return <Link ref={ref} href={appendReturnTo(href, currentPath)} {...props} />;
-  }
-);
+  return <Link ref={ref} href={appendReturnTo(href, currentPath)} {...props} />;
+});
 
 ReturnToLink.displayName = "ReturnToLink";
 

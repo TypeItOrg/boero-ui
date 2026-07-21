@@ -83,13 +83,13 @@ export function InstitutionStatusDialog({
           <AlertDialogDescription>
             {nextActive ? (
               <>
-                <span className="font-semibold text-foreground">{institutionName}</span> volverá a estar activa en la
+                <span className="text-foreground font-semibold">{institutionName}</span> volverá a estar activa en la
                 plataforma.
               </>
             ) : (
               <>
-                <span className="font-semibold text-foreground">{institutionName}</span> perderá el acceso y se suspenderán
-                sus operaciones.
+                <span className="text-foreground font-semibold">{institutionName}</span> perderá el acceso y se
+                suspenderán sus operaciones.
               </>
             )}
           </AlertDialogDescription>

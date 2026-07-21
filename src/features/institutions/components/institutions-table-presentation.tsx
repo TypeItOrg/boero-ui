@@ -312,10 +312,7 @@ type InstitutionActionsMenuProps = {
   onStatusChange: () => void;
 };
 
-function InstitutionActionsMenu({
-  institution,
-  onStatusChange,
-}: InstitutionActionsMenuProps): React.ReactElement {
+function InstitutionActionsMenu({ institution, onStatusChange }: InstitutionActionsMenuProps): React.ReactElement {
   return (
     <div className="flex justify-end">
       <DropdownMenu>

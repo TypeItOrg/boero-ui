@@ -45,7 +45,7 @@ export function InstitutionRoleDeleteButton({
             <Trash2Icon className="size-6" />
           </div>
           <AlertDialogTitle>
-            Eliminar “<span className="font-semibold text-foreground">{roleName}</span>”
+            Eliminar “<span className="text-foreground font-semibold">{roleName}</span>”
           </AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción es permanente y solo puede realizarse si el rol no tiene usuarios asignados.
