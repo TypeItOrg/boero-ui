@@ -39,6 +39,7 @@ describe("app/api/[...path]/route", () => {
   });
 
   it("returns a 500 response when the proxy throws", async () => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
     proxyBoeroApiRequestMock.mockRejectedValue(new Error("boom"));
 
     const response = await callHandler(GET);

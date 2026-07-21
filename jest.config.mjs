@@ -10,6 +10,7 @@ const customJestConfig = {
   setupFiles: ["<rootDir>/jest.polyfills.mjs"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   clearMocks: true,
+  maxWorkers: "50%",
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
   moduleNameMapper: {
     "^msw$": "<rootDir>/node_modules/msw/lib/core/index.js",
