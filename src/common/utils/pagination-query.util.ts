@@ -4,7 +4,8 @@ import { getQueryParamValue } from "@common/utils/query-param.util";
 
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 10;
-const DEFAULT_ALLOWED_PAGE_SIZES = new Set([10, 20, 50]);
+export const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const;
+const DEFAULT_ALLOWED_PAGE_SIZES = new Set<number>(PAGE_SIZE_OPTIONS);
 
 type ParsePaginationQueryOptions = {
   allowedPageSizes?: Set<number>;

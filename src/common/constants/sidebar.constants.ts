@@ -1,0 +1,1 @@
+export const MOBILE_SIDEBAR_CLOSE_DELAY_MS = 200;
