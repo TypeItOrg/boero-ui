@@ -1,4 +1,4 @@
-import { createInstitutionSlug } from "./institution-slug.util";
+import { createInstitutionSlug } from "@features/institutions/utils/institution-slug.util";
 
 describe("createInstitutionSlug", () => {
   it.each([

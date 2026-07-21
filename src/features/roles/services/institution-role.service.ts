@@ -2,7 +2,7 @@ import "server-only";
 
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import type { InstitutionPermissionGroup, InstitutionRole } from "../types/institution-role.types";
+import type { InstitutionPermissionGroup, InstitutionRole } from "@features/roles/types/institution-role.types";
 
 const FETCH_ROLES_ERROR = "No se pudieron obtener los roles institucionales.";
 

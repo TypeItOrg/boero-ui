@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { NumericInput, PhoneInput } from "./restricted-input";
+import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 
 describe("restricted inputs", () => {
   it("keeps only digits in numeric inputs", async () => {

@@ -5,13 +5,21 @@ export function getFieldErrors<T extends string>(
   const result = {} as Partial<Record<T, string>>;
 
   for (const issue of issues) {
-    const field = issue.path[0];
-    if (typeof field === "string" && fields.includes(field as T)) {
-      result[field as T] = issue.message;
-    }
+    const field = getIssueField(issue.path, fields);
+    if (field) result[field] = issue.message;
   }
 
   return result;
+}
+
+function getIssueField<T extends string>(path: PropertyKey[], fields: readonly T[]): T | undefined {
+  const nestedField = path.filter((part) => typeof part === "string" || typeof part === "number").join(".");
+  if (fields.includes(nestedField as T)) return nestedField as T;
+
+  const rootField = path[0];
+  if (typeof rootField === "string" && fields.includes(rootField as T)) return rootField as T;
+
+  return undefined;
 }
 
 export function pickFieldErrors<T extends string>(

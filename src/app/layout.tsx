@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
-import "./globals.css";
+import "@app/globals.css";
 
 import { cn } from "@common/utils/cn.util";
 import { TooltipProvider } from "@common/components/ui/tooltip";

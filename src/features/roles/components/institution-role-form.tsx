@@ -7,11 +7,15 @@ import { CircleAlertIcon, InfoIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import { saveInstitutionRoleAction } from "../actions/save-institution-role.action";
-import type { InstitutionPermissionGroup, InstitutionRole, RoleFormState } from "../types/institution-role.types";
+import { saveInstitutionRoleAction } from "@features/roles/actions/save-institution-role.action";
+import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
+import type {
+  InstitutionPermissionGroup,
+  InstitutionRole,
+  RoleFormState,
+} from "@features/roles/types/institution-role.types";
 
 type InstitutionRoleFormProps = {
   role?: InstitutionRole;
@@ -77,29 +81,14 @@ export function InstitutionRoleForm({
         <div>
           <h2 className="text-lg font-semibold">Permisos</h2>
           <p className="text-muted-foreground text-sm">
-            Solo podés delegar permisos que ya poseés. Los demás se muestran bloqueados.
+            Solo podés delegar permisos que ya poseés. Los permisos de consulta requeridos se agregan automáticamente.
           </p>
         </div>
-        <div className="flex flex-wrap items-stretch gap-4">
-          {permissionGroups.map((group) => (
-            <Card key={group.code} className="bg-muted/25 flex-[1_0_min(450px,100%)]">
-              <CardHeader>
-                <CardTitle>{group.displayName}</CardTitle>
-                <CardDescription>{group.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                {group.permissions.map((permission) => (
-                  <RolePermissionField
-                    key={permission.code}
-                    permission={permission}
-                    checked={role?.permissions.includes(permission.code)}
-                    protectedPermission={role?.protectedPermissions.includes(permission.code)}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PermissionGroupsFields
+          groups={permissionGroups}
+          selectedPermissions={role?.permissions}
+          protectedPermissions={role?.protectedPermissions}
+        />
       </div>
 
       <div className="flex justify-end gap-3">
@@ -111,37 +100,5 @@ export function InstitutionRoleForm({
         </Button>
       </div>
     </form>
-  );
-}
-
-type RolePermissionFieldProps = {
-  permission: InstitutionPermissionGroup["permissions"][number];
-  checked?: boolean;
-  protectedPermission?: boolean;
-};
-
-function RolePermissionField({
-  permission,
-  checked,
-  protectedPermission,
-}: RolePermissionFieldProps): React.ReactElement {
-  const disabled = !permission.grantable || protectedPermission;
-
-  return (
-    <>
-      {protectedPermission ? <input type="hidden" name="permissions" value={permission.code} /> : null}
-      <Field orientation="horizontal" data-disabled={disabled}>
-        <Checkbox
-          id={permission.code}
-          name="permissions"
-          value={permission.code}
-          defaultChecked={checked}
-          disabled={disabled}
-        />
-        <FieldLabel htmlFor={permission.code} className="font-normal">
-          {permission.description}
-        </FieldLabel>
-      </Field>
-    </>
   );
 }

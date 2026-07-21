@@ -1,4 +1,4 @@
-import { institutionFormSchema } from "./institution-form.schema";
+import { institutionFormSchema } from "@features/institutions/schemas/institution-form.schema";
 
 const VALID_REQUIRED_FIELDS = {
   name: "Conservatorio Felipe Boero",

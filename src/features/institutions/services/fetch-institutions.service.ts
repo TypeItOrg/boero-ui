@@ -1,11 +1,11 @@
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import type { InstitutionSummary } from "../types/institution-summary.types";
+import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
-import type { InstitutionPaginationParams } from "../utils/institution-pagination.util";
+import type { InstitutionPaginationParams } from "@features/institutions/utils/institution-pagination.util";
 
 export async function fetchInstitutions({
   page,

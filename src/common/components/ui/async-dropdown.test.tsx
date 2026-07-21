@@ -3,7 +3,7 @@ import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { AsyncDropdown, type AsyncDropdownFetchPageInput } from "@common/components/ui/async-dropdown";
-import { renderWithQueryClient } from "../../../../test/utils/render-with-query-client";
+import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@tanstack/react-virtual", () => ({
   useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({

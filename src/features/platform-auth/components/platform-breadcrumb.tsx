@@ -30,6 +30,12 @@ const ROUTE_CONFIGS: Record<string, RouteConfig> = {
   people: {
     label: "Usuarios",
   },
+  roles: {
+    label: "Roles",
+  },
+  edit: {
+    label: "Editar",
+  },
 };
 
 type BreadcrumbSegment = {

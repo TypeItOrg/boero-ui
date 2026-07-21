@@ -1,7 +1,7 @@
 "use client";
 
 import { BlockingError } from "@common/components/blocking-error";
-import "./globals.css";
+import "@app/globals.css";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };

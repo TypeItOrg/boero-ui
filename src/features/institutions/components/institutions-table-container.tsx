@@ -1,7 +1,7 @@
-import type { InstitutionPaginationParams } from "../utils/institution-pagination.util";
+import type { InstitutionPaginationParams } from "@features/institutions/utils/institution-pagination.util";
 
-import { fetchInstitutions } from "../services/fetch-institutions.service";
-import { InstitutionsTablePresentation } from "./institutions-table-presentation";
+import { fetchInstitutions } from "@features/institutions/services/fetch-institutions.service";
+import { InstitutionsTablePresentation } from "@features/institutions/components/institutions-table-presentation";
 
 type ContainerProps = InstitutionPaginationParams;
 

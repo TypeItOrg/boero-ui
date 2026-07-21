@@ -1,4 +1,7 @@
-import { platformAccountFormSchema, platformAccountUpdateFormSchema } from "./platform-account-form.schema";
+import {
+  platformAccountFormSchema,
+  platformAccountUpdateFormSchema,
+} from "@features/platform-accounts/schemas/platform-account-form.schema";
 
 const validAccount = {
   name: "María",

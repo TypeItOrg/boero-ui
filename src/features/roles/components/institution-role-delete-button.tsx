@@ -16,7 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
-import { deleteInstitutionRoleAction } from "../actions/delete-institution-role.action";
+import { deleteInstitutionRoleAction } from "@features/roles/actions/delete-institution-role.action";
 
 export function InstitutionRoleDeleteButton({
   roleId,
@@ -59,7 +59,7 @@ export function InstitutionRoleDeleteButton({
                   setError(result.error);
                   return;
                 }
-                router.refresh();
+                router.replace("/roles");
               });
             }}
           >

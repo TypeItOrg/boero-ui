@@ -1,4 +1,4 @@
-import { getQueryParamValue, parseOptionalBooleanQueryParam } from "./query-param.util";
+import { getQueryParamValue, parseOptionalBooleanQueryParam } from "@common/utils/query-param.util";
 
 describe("getQueryParamValue", () => {
   it("returns the first value from query params", () => {

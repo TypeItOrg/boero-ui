@@ -1,7 +1,16 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { BuildingIcon, FingerprintIcon, HouseIcon, LogOutIcon, MoonIcon, SunIcon, UsersIcon } from "lucide-react";
+import {
+  BuildingIcon,
+  FingerprintIcon,
+  HouseIcon,
+  LogOutIcon,
+  MoonIcon,
+  SunIcon,
+  UserLockIcon,
+  UsersIcon,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 
 import {
@@ -37,6 +46,11 @@ const navItems = [
     title: "Usuarios",
     url: "/admin/people",
     icon: UsersIcon,
+  },
+  {
+    title: "Roles",
+    url: "/admin/roles",
+    icon: UserLockIcon,
   },
   {
     title: "Administradores",

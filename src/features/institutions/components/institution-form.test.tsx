@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { InstitutionForm } from "./institution-form";
+import { InstitutionForm } from "@features/institutions/components/institution-form";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),

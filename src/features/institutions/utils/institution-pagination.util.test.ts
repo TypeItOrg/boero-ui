@@ -1,4 +1,4 @@
-import { parseInstitutionPaginationParams } from "./institution-pagination.util";
+import { parseInstitutionPaginationParams } from "@features/institutions/utils/institution-pagination.util";
 
 describe("parseInstitutionPaginationParams", () => {
   it("uses defaults when query params are missing", () => {

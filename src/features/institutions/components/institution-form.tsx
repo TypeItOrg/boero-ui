@@ -20,13 +20,16 @@ import {
   institutionFormSchema,
   type InstitutionFormInput,
   type InstitutionFormValues,
-} from "../schemas/institution-form.schema";
-import { createInstitutionAction } from "../actions/create-institution.action";
-import { updateInstitutionAction } from "../actions/update-institution.action";
-import type { Institution } from "../types/institution.types";
-import type { InstitutionActionState, InstitutionFormFieldName } from "../types/institution-action-state.types";
-import { createInstitutionFormData } from "../utils/institution-form-data.util";
-import { createInstitutionSlug } from "../utils/institution-slug.util";
+} from "@features/institutions/schemas/institution-form.schema";
+import { createInstitutionAction } from "@features/institutions/actions/create-institution.action";
+import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
+import type { Institution } from "@features/institutions/types/institution.types";
+import type {
+  InstitutionActionState,
+  InstitutionFormFieldName,
+} from "@features/institutions/types/institution-action-state.types";
+import { createInstitutionFormData } from "@features/institutions/utils/institution-form-data.util";
+import { createInstitutionSlug } from "@features/institutions/utils/institution-slug.util";
 
 const INSTITUTIONS_PATH = "/admin/institutions";
 

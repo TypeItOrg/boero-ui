@@ -1,4 +1,4 @@
-import { getNextSort, getSortDirection, parseSortQuery, serializeSpringSort } from "./sort-query.util";
+import { getNextSort, getSortDirection, parseSortQuery, serializeSpringSort } from "@common/utils/sort-query.util";
 
 const SORT_FIELDS = new Set(["name", "createdAt"] as const);
 const DEFAULT_SORT = { field: "name", direction: "asc" } as const;

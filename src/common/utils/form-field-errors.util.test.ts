@@ -30,4 +30,19 @@ describe("form field errors", () => {
       ),
     ).toEqual({ name: "El nombre es requerido." });
   });
+
+  it("maps nested issue paths to dot-separated field names", () => {
+    expect(
+      getFieldErrors(
+        [
+          { path: ["address", "cityId"], message: "La ciudad es requerida." },
+          { path: ["address", "street"], message: "La calle es requerida." },
+        ],
+        ["address.cityId", "address.street"],
+      ),
+    ).toEqual({
+      "address.cityId": "La ciudad es requerida.",
+      "address.street": "La calle es requerida.",
+    });
+  });
 });

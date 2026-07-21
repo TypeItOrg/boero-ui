@@ -9,7 +9,7 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
-import type { RoleFormState } from "../types/institution-role.types";
+import type { RoleFormState } from "@features/roles/types/institution-role.types";
 
 const fields = ["name"] as const;
 const schema = z.object({

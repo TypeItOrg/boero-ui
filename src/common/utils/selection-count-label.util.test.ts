@@ -1,4 +1,4 @@
-import { formatSelectionCountLabel } from "./selection-count-label.util";
+import { formatSelectionCountLabel } from "@common/utils/selection-count-label.util";
 
 describe("formatSelectionCountLabel", () => {
   it("uses singular labels when total items is one", () => {

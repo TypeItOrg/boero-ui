@@ -19,22 +19,27 @@ const LOCATION_PAGE_SIZE = 20;
 const CITY_OPTION_HEIGHT = 56;
 
 type LocationDropdownProps<TItem> = {
+  ariaInvalid?: boolean;
   id: string;
   name: string;
   initialItem?: TItem;
+  onValueChange?: (value: string | undefined, item: TItem | undefined) => void;
   optional?: boolean;
 };
 
 export function CountryDropdown({
+  ariaInvalid,
   id,
   name,
   initialItem,
+  onValueChange,
   optional = false,
 }: LocationDropdownProps<Country>): React.ReactElement {
   const [country, setCountry] = React.useState<Country | undefined>(initialItem);
 
   return (
     <AsyncDropdown<Country>
+      ariaInvalid={ariaInvalid}
       id={id}
       name={name}
       defaultOption={optional ? { label: "Sin especificar", value: undefined } : undefined}
@@ -43,7 +48,10 @@ export function CountryDropdown({
       fetchPage={(input) => fetchLocationPage<Country>("/api/countries", input)}
       getItemLabel={(item) => item.name}
       getItemValue={(item) => item.id}
-      onValueChange={(_value, item) => setCountry(item)}
+      onValueChange={(value, item) => {
+        setCountry(item);
+        onValueChange?.(value, item);
+      }}
       pageSize={LOCATION_PAGE_SIZE}
       placeholder="Seleccionar país"
       queryKey={["locations", "countries"]}
@@ -55,15 +63,18 @@ export function CountryDropdown({
 }
 
 export function CityDropdown({
+  ariaInvalid,
   id,
   name,
   initialItem,
+  onValueChange,
   optional = false,
 }: LocationDropdownProps<City>): React.ReactElement {
   const [city, setCity] = React.useState<City | undefined>(initialItem);
 
   return (
     <AsyncDropdown<City>
+      ariaInvalid={ariaInvalid}
       id={id}
       name={name}
       defaultOption={optional ? { label: "Sin especificar", value: undefined } : undefined}
@@ -73,7 +84,10 @@ export function CityDropdown({
       getItemLabel={getCityLabel}
       getItemValue={(item) => item.id}
       estimateSize={CITY_OPTION_HEIGHT}
-      onValueChange={(_value, item) => setCity(item)}
+      onValueChange={(value, item) => {
+        setCity(item);
+        onValueChange?.(value, item);
+      }}
       pageSize={LOCATION_PAGE_SIZE}
       placeholder="Seleccionar ciudad"
       queryKey={["locations", "cities"]}

@@ -8,7 +8,7 @@ import {
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
-import { proxy } from "./proxy";
+import { proxy } from "@/proxy";
 
 describe("proxy", () => {
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();
