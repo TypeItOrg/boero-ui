@@ -86,7 +86,7 @@ describe("proxy", () => {
     expect(upstreamCookies).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
   });
 
-  it("shares one refresh request between concurrent admin proxy calls", async () => {
+  it("deduplicates concurrent admin refreshes for the same token", async () => {
     let resolveRefresh: ((response: Response) => void) | undefined;
     fetchMock.mockImplementation(
       () =>
@@ -116,7 +116,39 @@ describe("proxy", () => {
     const [firstResponse, secondResponse] = await Promise.all([firstResponsePromise, secondResponsePromise]);
 
     expect(firstResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
+    expect(firstResponse.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
+    expect(secondResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
     expect(secondResponse.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
+    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(
+      PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token",
+    );
+    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(
+      PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token",
+    );
+  });
+
+  it("refreshes different admin tokens independently", async () => {
+    fetchMock.mockImplementation(
+      async () =>
+        new Response(
+          JSON.stringify({
+            tokens: {
+              accessToken: "new-access-token",
+              refreshToken: "new-refresh-token",
+            },
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+    );
+
+    const firstRequest = createRequest("/admin/institutions/1", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token-1`);
+    const secondRequest = createRequest("/admin/institutions/2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token-2`);
+
+    const [firstResponse, secondResponse] = await Promise.all([proxy(firstRequest), proxy(secondRequest)]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(firstResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
+    expect(secondResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
   });
 
   it("redirects to login when refresh returns no usable tokens", async () => {
@@ -244,7 +276,7 @@ describe("proxy", () => {
     expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
   });
 
-  it("shares one refresh request between concurrent institutional proxy calls", async () => {
+  it("deduplicates concurrent institutional refreshes for the same token", async () => {
     let resolveRefresh: ((response: Response) => void) | undefined;
     fetchMock.mockImplementation(
       () =>
@@ -269,7 +301,15 @@ describe("proxy", () => {
     const [firstResponse, secondResponse] = await Promise.all([firstResponsePromise, secondResponsePromise]);
 
     expect(firstResponse.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
+    expect(firstResponse.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+    expect(secondResponse.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
     expect(secondResponse.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(
+      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
+    );
+    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(
+      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
+    );
   });
 
   it("keeps institutional registration public", async () => {

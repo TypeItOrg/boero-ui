@@ -17,7 +17,7 @@ describe("parseInstitutionalUser", () => {
     });
 
     expect(user?.roles).toEqual(["Preceptor", "Docente"]);
-    expect(user?.permissions).toEqual([INSTITUTIONAL_PERMISSION.PERSON_READ_ANY]);
+    expect(user?.permissions).toEqual([INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, "institution:future:permission"]);
   });
 
   it("fails closed when the user payload is malformed", () => {

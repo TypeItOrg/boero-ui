@@ -23,11 +23,18 @@ type InstitutionalProfileProps = {
   person: InstitutionalPerson;
 };
 
+type InstitutionalProfileFormProps = InstitutionalProfileProps & {
+  returnTo?: string;
+};
+
 export function InstitutionalProfile({ person }: InstitutionalProfileProps): React.ReactElement {
   return <ProfileSummary person={person} />;
 }
 
-export function InstitutionalProfileForm({ person }: Pick<InstitutionalProfileProps, "person">): React.ReactElement {
+export function InstitutionalProfileForm({
+  person,
+  returnTo = "/profile",
+}: InstitutionalProfileFormProps): React.ReactElement {
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string>();
@@ -45,7 +52,7 @@ export function InstitutionalProfileForm({ person }: Pick<InstitutionalProfilePr
     startTransition(async () => {
       const result = await updateInstitutionalProfileAction(formData);
       if (result.success) {
-        router.replace("/profile");
+        router.replace(returnTo);
         return;
       }
       const nextFieldErrors = "fieldErrors" in result ? result.fieldErrors : undefined;
@@ -213,7 +220,7 @@ export function InstitutionalProfileForm({ person }: Pick<InstitutionalProfilePr
 
       <div className="flex flex-wrap justify-end gap-3">
         <Button asChild variant="outline" size="lg">
-          <Link href="/profile">Cancelar</Link>
+          <Link href={returnTo}>Cancelar</Link>
         </Button>
         <Button type="submit" size="lg" disabled={isPending}>
           {isPending ? "Guardando..." : "Guardar cambios"}

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 
 import { Separator } from "@common/components/ui/separator";
@@ -13,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@common/components/ui/sidebar";
+import type { MobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 
 export type InstitutionalNavItem = {
   title: string;
@@ -28,11 +28,10 @@ type InstitutionalNavSection = {
 
 type InstitutionalSidebarNavProps = {
   sections: readonly InstitutionalNavSection[];
+  navigation: MobileSidebarNavigation;
 };
 
-export function InstitutionalSidebarNav({ sections }: InstitutionalSidebarNavProps): React.ReactElement {
-  const pathname = usePathname();
-
+export function InstitutionalSidebarNav({ sections, navigation }: InstitutionalSidebarNavProps): React.ReactElement {
   return (
     <div className="flex flex-col gap-3 group-data-[collapsible=icon]:gap-2">
       {sections.map((section, index) => (
@@ -44,18 +43,23 @@ export function InstitutionalSidebarNav({ sections }: InstitutionalSidebarNavPro
           <SidebarGroupContent>
             <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
               {section.items.map((item) => {
-                const isActive = isRouteActive(pathname, item);
+                const itemIsActive = navigation.isActive(item.url, item.exact);
                 const Icon = item.icon;
 
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton
                       asChild
-                      isActive={isActive}
+                      isActive={itemIsActive}
                       tooltip={item.title}
                       className="text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground data-active:bg-primary data-active:text-primary-foreground data-active:hover:bg-primary data-active:hover:text-primary-foreground h-9 gap-3 rounded-md px-2 text-sm font-medium transition-colors group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!"
                     >
-                      <Link href={item.url} prefetch aria-current={isActive ? "page" : undefined}>
+                      <Link
+                        href={item.url}
+                        prefetch
+                        aria-current={itemIsActive ? "page" : undefined}
+                        onClick={() => navigation.handleNavigation(item.url)}
+                      >
                         <Icon />
                         <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                       </Link>
@@ -69,8 +73,4 @@ export function InstitutionalSidebarNav({ sections }: InstitutionalSidebarNavPro
       ))}
     </div>
   );
-}
-
-function isRouteActive(pathname: string, item: InstitutionalNavItem): boolean {
-  return item.exact ? pathname === item.url : pathname === item.url || pathname.startsWith(`${item.url}/`);
 }

@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 
 import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
-import { InstitutionalUserProvider } from "@features/institutional-auth/components/institutional-user-provider";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
@@ -17,10 +16,8 @@ export async function InstitutionalRouteLayout({
   const sidebarOpen = cookieStore.get("institutional-sidebar-open")?.value !== "false";
 
   return (
-    <InstitutionalUserProvider initialUser={user}>
-      <InstitutionalShell user={user} institutionName={person?.institutionName} defaultSidebarOpen={sidebarOpen}>
-        {children}
-      </InstitutionalShell>
-    </InstitutionalUserProvider>
+    <InstitutionalShell user={user} institutionName={person?.institutionName} defaultSidebarOpen={sidebarOpen}>
+      {children}
+    </InstitutionalShell>
   );
 }

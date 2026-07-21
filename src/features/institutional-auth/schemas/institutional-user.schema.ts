@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { isInstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 
 const institutionalUserResponseSchema = z.object({
@@ -20,8 +19,5 @@ export function parseInstitutionalUser(payload: unknown): InstitutionalUser | nu
   const result = institutionalUserResponseSchema.safeParse(payload);
   if (!result.success) return null;
 
-  return {
-    ...result.data.user,
-    permissions: result.data.user.permissions.filter(isInstitutionalPermission),
-  };
+  return result.data.user;
 }

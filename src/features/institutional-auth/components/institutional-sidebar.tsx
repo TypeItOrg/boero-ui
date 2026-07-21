@@ -34,6 +34,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@common/components/ui/sidebar";
+import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
@@ -53,6 +54,7 @@ export function InstitutionalSidebar({
   ...props
 }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
+  const navigation = useMobileSidebarNavigation();
   const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
   const navSections = [
@@ -82,6 +84,7 @@ export function InstitutionalSidebar({
           href="/"
           aria-label="Ir al inicio del portal institucional"
           className="flex h-14 items-center gap-3 px-0 group-data-[collapsible=icon]:justify-center"
+          onClick={() => navigation.handleNavigation("/")}
         >
           <Image src="/boero-logo.png" alt="Boero" width={32} height={32} className="size-8! shrink-0" />
           <span className="min-w-0 group-data-[collapsible=icon]:hidden">
@@ -92,7 +95,7 @@ export function InstitutionalSidebar({
       </SidebarHeader>
 
       <SidebarContent className="p-4">
-        <InstitutionalSidebarNav sections={navSections} />
+        <InstitutionalSidebarNav sections={navSections} navigation={navigation} />
       </SidebarContent>
 
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
@@ -103,7 +106,7 @@ export function InstitutionalSidebar({
                 <SidebarMenuButton
                   size="lg"
                   tooltip={`${user.name} ${user.lastName}`}
-                  className="hover:text-sidebar-foreground data-[state=open]:bg-background data-[state=open]:text-foreground px-0 group-data-[collapsible=icon]:p-0! hover:bg-transparent"
+                  className="hover:text-sidebar-foreground px-0 group-data-[collapsible=icon]:p-0! hover:bg-transparent focus-visible:ring-0 focus-visible:outline-none"
                 >
                   <InstitutionalUserAvatar user={user} />
                   <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
@@ -135,7 +138,7 @@ export function InstitutionalSidebar({
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile">
+                    <Link href="/profile" onClick={() => navigation.handleNavigation("/profile")}>
                       <UserRoundIcon />
                       Perfil
                     </Link>
