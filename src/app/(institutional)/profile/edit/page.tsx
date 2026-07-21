@@ -5,15 +5,12 @@ import { InstitutionalBreadcrumb } from "@features/institutional-auth/components
 import { InstitutionalProfileForm } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = { title: "Editar perfil" };
 
 export default async function EditProfilePage(): Promise<React.ReactElement> {
-  const user = await requireInstitutionalUser();
-  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_OWN)) notFound();
+  await requireInstitutionalUser();
 
   const person = await fetchInstitutionalPerson();
   if (!person) notFound();

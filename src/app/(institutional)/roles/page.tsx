@@ -19,6 +19,7 @@ export default async function RolesPage(): Promise<React.ReactElement> {
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) notFound();
   const roles = await fetchInstitutionRoles(user.institutionId);
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_CREATE);
+  const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
 
   return (
     <PlatformPageShell
@@ -68,8 +69,13 @@ export default async function RolesPage(): Promise<React.ReactElement> {
                 </span>
               </div>
             </CardContent>
-            <CardFooter className="bg-background/50 border-t">
-              <Button asChild variant="ghost" size="lg" className="ml-auto">
+            <CardFooter className="bg-background/50 flex items-center justify-end gap-2 border-t">
+              {canUpdate && role.editable ? (
+                <Button asChild variant="ghost" size="lg">
+                  <Link href={`/roles/${role.id}/edit`}>Editar</Link>
+                </Button>
+              ) : null}
+              <Button asChild size="lg">
                 <Link href={`/roles/${role.id}`}>Ver detalle</Link>
               </Button>
             </CardFooter>

@@ -1,5 +1,5 @@
 import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
-import { institutionalRegisterSchema } from "./institutional-register.schema";
+import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
 
 function createValidInput(overrides: Record<string, string> = {}) {
   return {

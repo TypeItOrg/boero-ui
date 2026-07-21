@@ -46,7 +46,13 @@ const PROFILE_FIELDS = [
   "phoneNumber",
   "birthCityId",
   "nationalityCountryId",
-  "address",
+  "address.cityId",
+  "address.street",
+  "address.number",
+  "address.floor",
+  "address.apartment",
+  "address.neighborhood",
+  "address.additionalInfo",
 ] as const;
 
 function parseAddress(formData: FormData) {

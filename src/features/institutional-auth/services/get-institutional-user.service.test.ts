@@ -59,6 +59,7 @@ describe("getInstitutionalUser", () => {
       lastName: "García",
       documentNumber: "12345678",
       institutionId: "institution-id",
+      roles: [],
       permissions: [],
     };
 

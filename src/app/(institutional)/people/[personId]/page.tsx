@@ -31,21 +31,26 @@ export default async function PersonPage({
   const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = canManageRoles
     ? Promise.all([
         fetchPersonRoles(user.institutionId, personId, "institutional"),
-        fetchSystemRoles(user.institutionId, "institutional"),
+        canAssignRoles ? fetchSystemRoles(user.institutionId, "institutional") : Promise.resolve([]),
       ])
     : Promise.resolve([[], []]);
   const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
   if (!person) notFound();
+  const assignableRoles = systemRoles.filter((role) => role.technicalCode !== "INSTITUTIONAL_AUTHORITY");
   const personName = `${person.firstName} ${person.lastName}`;
   if (user.personId === personId) redirect("/profile");
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
   const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE);
-  if (!canUpdate) notFound();
+  if (!canUpdate && !canManageRoles) notFound();
 
   return (
     <PlatformPageShell
-      title="Editar usuario"
-      description={`Editá los datos básicos y administrá los roles de ${personName}.`}
+      title={canUpdate ? "Editar usuario" : "Administrar roles"}
+      description={
+        canUpdate
+          ? `Editá los datos básicos y administrá los roles de ${personName}.`
+          : `Administrá los roles institucionales de ${personName}.`
+      }
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
       actions={
         canDelete ? (
@@ -62,9 +67,10 @@ export default async function PersonPage({
         formId="institutional-person-edit-form"
         institutionId={user.institutionId}
         person={person}
-        roles={systemRoles}
+        roles={assignableRoles}
         assignedRoles={assignedRoles}
         scope="institutional"
+        canEdit={canUpdate}
         canAssignRoles={canAssignRoles}
         canRevokeRoles={canRevokeRoles}
       />
@@ -73,7 +79,7 @@ export default async function PersonPage({
           <Link href="/people">Cancelar</Link>
         </Button>
         <Button type="submit" form="institutional-person-edit-form" size="lg">
-          Guardar cambios
+          {canUpdate ? "Guardar cambios" : "Guardar roles"}
         </Button>
       </div>
     </PlatformPageShell>

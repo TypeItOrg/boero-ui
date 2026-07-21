@@ -11,10 +11,12 @@ describe("parseInstitutionalUser", () => {
         lastName: "García",
         documentNumber: "12345678",
         institutionId: "institution-id",
+        roles: ["Preceptor", "Docente"],
         permissions: [INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, "institution:future:permission"],
       },
     });
 
+    expect(user?.roles).toEqual(["Preceptor", "Docente"]);
     expect(user?.permissions).toEqual([INSTITUTIONAL_PERMISSION.PERSON_READ_ANY]);
   });
 

@@ -11,6 +11,7 @@ const institutionalUserResponseSchema = z.object({
     lastName: z.string(),
     documentNumber: z.string(),
     institutionId: z.string().min(1),
+    roles: z.array(z.string()).default([]),
     permissions: z.array(z.string()).default([]),
   }),
 });

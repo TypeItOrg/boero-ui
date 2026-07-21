@@ -1,91 +1,85 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightIcon, UsersIcon, UserRoundIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import {
+  getInstitutionalHomeLinks,
+  type InstitutionalHomeLink,
+} from "@features/institutional-auth/utils/institutional-home-access.util";
 
 export default async function Home(): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
   const person = await fetchInstitutionalPerson();
-  const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
+  const links = getInstitutionalHomeLinks(user);
+  const managementLinks = links.filter((link) => link.href !== "/profile");
   const greeting = getGreeting();
 
   return (
-    <main className="flex h-full flex-col gap-5 p-4">
-      <header className="bg-background rounded-xl p-5 shadow-xs sm:p-6">
-        <p className="text-muted-foreground text-sm">{person?.institutionName ?? "Institución"}</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-          {greeting}, {user.name}
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-          Gestioná tus datos personales y accedé a los recursos de tu institución desde un mismo lugar.
-        </p>
+    <main className="flex min-h-full flex-col gap-4 p-4">
+      <header className="bg-background flex flex-row items-center justify-between gap-4 rounded-xl p-6 shadow-xs">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p className="text-muted-foreground text-sm font-medium">{person?.institutionName ?? "Institución"}</p>
+          <div>
+            <h1 className="text-foreground text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+              {greeting}, {user.name}
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Podés administrar tus accesos y herramientas de gestión desde acá.
+            </p>
+          </div>
+        </div>
+        <Image
+          src="/boero-logo.png"
+          alt="Logo Boero"
+          width={875}
+          height={1202}
+          priority
+          className="hidden h-12 w-auto shrink-0 object-contain sm:block sm:h-[88px]"
+        />
       </header>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
-        <Card className="p-5 sm:p-6">
-          <CardHeader className="p-0">
-            <CardTitle>Tu perfil</CardTitle>
-            <CardDescription>Revisá y mantené actualizada tu información personal.</CardDescription>
-          </CardHeader>
-          <CardContent className="mt-5 flex flex-col gap-4 p-0 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
-                <UserRoundIcon />
-              </div>
-              <div>
-                <p className="font-medium">
-                  {person ? `${person.firstName} ${person.lastName}` : "Perfil no disponible"}
-                </p>
-                <p className="text-muted-foreground text-sm">{person?.email || "Completá tus datos"}</p>
-              </div>
-            </div>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/profile">
-                Ver mi perfil <ArrowRightIcon data-icon="inline-end" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+      {managementLinks.length > 0 ? (
+        <section
+          aria-labelledby="management-title"
+          className="bg-background flex flex-col gap-6 rounded-xl p-6 shadow-xs"
+        >
+          <div>
+            <h2 id="management-title" className="text-xl font-semibold tracking-tight sm:text-2xl">
+              Gestión institucional
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Administrá las personas y los accesos de la institución.
+            </p>
+          </div>
 
-        <Card className="p-5 sm:p-6">
-          <CardHeader className="p-0">
-            <CardTitle>Institución</CardTitle>
-            <CardDescription>{person?.institutionName ?? "Tu espacio institucional"}</CardDescription>
-          </CardHeader>
-          <CardContent className="mt-5 p-0">
-            <div className="bg-muted flex items-center gap-3 rounded-lg p-4">
-              <UsersIcon className="text-primary" />
-              <span className="text-sm">
-                {canManagePeople
-                  ? "Tenés acceso a la gestión de usuarios."
-                  : "Consultá tus datos y mantené tu perfil actualizado."}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {canManagePeople ? (
-        <Card className="p-5 sm:p-6">
-          <CardHeader className="p-0">
-            <CardTitle>Gestión institucional</CardTitle>
-            <CardDescription>Accedé rápidamente a las tareas de tu organización.</CardDescription>
-          </CardHeader>
-          <CardContent className="mt-5 p-0">
-            <Button asChild size="lg">
-              <Link href="/people">
-                Ver usuarios <ArrowRightIcon data-icon="inline-end" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+          <nav aria-label="Herramientas de gestión" className="grid gap-4 sm:grid-cols-2">
+            {managementLinks.map((link) => (
+              <HomeAccessRow key={link.href} link={link} />
+            ))}
+          </nav>
+        </section>
       ) : null}
     </main>
+  );
+}
+
+function HomeAccessRow({ link }: { link: InstitutionalHomeLink }): React.ReactElement {
+  const Icon = link.icon;
+
+  return (
+    <Link
+      href={link.href}
+      className="bg-muted/25 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring flex min-w-0 flex-row items-center justify-between gap-4 rounded-xl border p-6 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+    >
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="text-base font-semibold tracking-tight sm:text-lg">{link.title}</span>
+        <span className="text-muted-foreground text-sm leading-relaxed">{link.description}</span>
+      </div>
+      <div className="bg-background text-primary flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs">
+        <Icon aria-hidden="true" className="size-6" />
+      </div>
+    </Link>
   );
 }
 

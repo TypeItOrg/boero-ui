@@ -11,6 +11,7 @@ import { PeopleSearchForm } from "@features/people/components/people-search-form
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
+import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -40,9 +41,16 @@ export default async function PeoplePage({
   }
 
   const resolvedSearchParams = await searchParams;
-  const { page, size, search, sort } = parsePeoplePaginationParams(resolvedSearchParams);
-  const peoplePromise = fetchPeople(user.institutionId, { page, size, search, sort }, "institutional");
-  const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE);
+  const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
+  const rolesPromise = fetchSystemRoles(user.institutionId, "institutional");
+  const peoplePromise = fetchPeople(user.institutionId, { page, size, search, sort, roleId }, "institutional");
+  const [roles, canCreate, canUpdate, canManageRoles] = await Promise.all([
+    rolesPromise,
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE),
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY),
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN) ||
+      hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE),
+  ]);
 
   return (
     <PlatformPageShell
@@ -61,7 +69,7 @@ export default async function PeoplePage({
       }
     >
       <DataTableNavigationProvider>
-        <PeopleSearchForm search={search} size={size} />
+        <PeopleSearchForm search={search} size={size} roleId={roleId} roles={roles} />
         <Suspense fallback={<PeopleTableSkeleton />}>
           <PeopleTableContainer
             institutionId={user.institutionId}
@@ -69,10 +77,13 @@ export default async function PeoplePage({
             size={size}
             search={search}
             sort={sort}
+            roleId={roleId}
             scope="institutional"
             dataPromise={peoplePromise}
             selfPersonId={user.personId}
             canCreate={canCreate}
+            canUpdate={canUpdate}
+            canManageRoles={canManageRoles}
             canDelete={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE)}
             canUpdateStatus={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.USER_STATUS_UPDATE)}
           />

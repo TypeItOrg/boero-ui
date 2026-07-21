@@ -1,6 +1,4 @@
 export const INSTITUTIONAL_PERMISSION = {
-  PERSON_READ_OWN: "institution:person:read-own",
-  PERSON_UPDATE_OWN: "institution:person:update-own",
   PERSON_READ_ANY: "institution:person:read-any",
   PERSON_CREATE: "institution:person:create",
   PERSON_UPDATE_ANY: "institution:person:update-any",

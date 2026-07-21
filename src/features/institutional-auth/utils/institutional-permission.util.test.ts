@@ -13,6 +13,7 @@ const user: InstitutionalUser = {
   lastName: "García",
   documentNumber: "12345678",
   institutionId: "institution-id",
+  roles: [],
   permissions: [INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN],
 };
 

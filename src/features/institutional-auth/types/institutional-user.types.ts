@@ -7,5 +7,6 @@ export type InstitutionalUser = {
   lastName: string;
   documentNumber: string;
   institutionId: string;
+  roles: readonly string[];
   permissions: readonly InstitutionalPermission[];
 };

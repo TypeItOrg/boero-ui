@@ -10,8 +10,8 @@ import {
   setInstitutionalAuthCookies,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import { institutionalLoginSchema } from "@features/institutional-auth/schemas/institutional-login.schema";
-import type { InstitutionalLoginActionState } from "../types/institutional-login-state.types";
-import { INSTITUTIONAL_LOGIN_FIELD_NAMES } from "../types/institutional-login-state.types";
+import type { InstitutionalLoginActionState } from "@features/institutional-auth/types/institutional-login-state.types";
+import { INSTITUTIONAL_LOGIN_FIELD_NAMES } from "@features/institutional-auth/types/institutional-login-state.types";
 
 export async function loginInstitutional(
   _previousState: InstitutionalLoginActionState,

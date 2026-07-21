@@ -53,7 +53,6 @@ export function InstitutionalSidebar({
   ...props
 }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
-  const canReadOwnProfile = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_OWN);
   const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
   const navSections = [
@@ -65,14 +64,10 @@ export function InstitutionalSidebar({
         ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
       ],
     },
-    ...(canReadOwnProfile
-      ? [
-          {
-            label: "General",
-            items: [{ title: "Perfil", url: "/profile", icon: UserRoundIcon }],
-          },
-        ]
-      : []),
+    {
+      label: "General",
+      items: [{ title: "Perfil", url: "/profile", icon: UserRoundIcon }],
+    },
   ];
 
   return (
@@ -139,14 +134,12 @@ export function InstitutionalSidebar({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  {canReadOwnProfile ? (
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <UserRoundIcon />
-                        Perfil
-                      </Link>
-                    </DropdownMenuItem>
-                  ) : null}
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <UserRoundIcon />
+                      Perfil
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
                     {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
                     Cambiar tema
