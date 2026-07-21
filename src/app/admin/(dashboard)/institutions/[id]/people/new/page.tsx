@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { UserRoundIcon } from "lucide-react";
 
+import type { QueryParamValue } from "@common/types/query-param.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PersonForm } from "@features/people/components/person-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -13,10 +15,13 @@ export const metadata = {
 
 type NewPersonPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
 
-export default async function NewPersonPage({ params }: NewPersonPageProps): Promise<React.ReactElement> {
+export default async function NewPersonPage({ params, searchParams }: NewPersonPageProps): Promise<React.ReactElement> {
   const { id } = await params;
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
   const institution = await fetchInstitution(id);
   if (!institution) notFound();
 
@@ -32,7 +37,7 @@ export default async function NewPersonPage({ params }: NewPersonPageProps): Pro
         </div>
       }
     >
-      <PersonForm mode="create" institutionId={id} />
+      <PersonForm mode="create" institutionId={id} returnTo={destination} />
     </PlatformPageShell>
   );
 }

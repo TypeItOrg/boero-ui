@@ -18,19 +18,22 @@ import type {
 } from "@features/roles/types/institution-role.types";
 
 type InstitutionRoleFormProps = {
+  institutionId: string;
   role?: InstitutionRole;
   permissionGroups: readonly InstitutionPermissionGroup[];
-  cancelHref?: string;
+  returnTo?: string;
 };
 
 const initialState: RoleFormState = {};
 
 export function InstitutionRoleForm({
+  institutionId,
   role,
   permissionGroups,
-  cancelHref = "/roles",
+  returnTo,
 }: InstitutionRoleFormProps): React.ReactElement {
-  const action = saveInstitutionRoleAction.bind(null, role?.id);
+  const destination = returnTo ?? (role ? `/roles/${role.id}` : "/roles");
+  const action = saveInstitutionRoleAction.bind(null, institutionId, role?.id, destination);
   const [state, formAction, pending] = useActionState(action, initialState);
 
   return (
@@ -93,7 +96,7 @@ export function InstitutionRoleForm({
 
       <div className="flex justify-end gap-3">
         <Button asChild variant="outline" size="lg">
-          <Link href={cancelHref}>Cancelar</Link>
+          <Link href={destination}>Cancelar</Link>
         </Button>
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Guardando…" : "Guardar cambios"}

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
@@ -38,10 +38,10 @@ export default async function PlatformRolesPage({
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg">
-          <Link href="/admin/roles/new">
+          <ReturnToLink href="/admin/roles/new">
             <PlusIcon data-icon="inline-start" />
             Nuevo rol
-          </Link>
+          </ReturnToLink>
         </Button>
       }
     >

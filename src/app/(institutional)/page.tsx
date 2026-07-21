@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,6 +8,11 @@ import {
   getInstitutionalHomeLinks,
   type InstitutionalHomeLink,
 } from "@features/institutional-auth/utils/institutional-home-access.util";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Inicio");
+}
 
 export default async function Home(): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();

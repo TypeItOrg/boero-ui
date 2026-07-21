@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { UsersIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
@@ -58,7 +59,7 @@ export async function InstitutionPeoplePreview({
           const additionalRoleCount = roles.length - 1;
 
           return (
-            <Link
+            <ReturnToLink
               key={person.id}
               href={`/admin/institutions/${institutionId}/people/${person.id}`}
               className="group bg-muted/40 focus-visible:ring-ring grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-3 transition-colors focus-visible:ring-2 focus-visible:outline-none"
@@ -82,7 +83,7 @@ export async function InstitutionPeoplePreview({
                   </p>
                 </div>
               </div>
-            </Link>
+            </ReturnToLink>
           );
         })}
       </div>
@@ -129,7 +130,7 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
         </EmptyHeader>
         <EmptyContent className="mt-2 w-full">
           <Button asChild size="lg" className="w-full justify-center">
-            <Link href={`/admin/institutions/${institutionId}/people/new`}>Crear usuario</Link>
+            <ReturnToLink href={`/admin/institutions/${institutionId}/people/new`}>Crear usuario</ReturnToLink>
           </Button>
         </EmptyContent>
       </Empty>

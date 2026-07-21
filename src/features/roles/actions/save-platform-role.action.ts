@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { PlatformRoleFormState } from "@features/roles/types/platform-role.types";
 
@@ -18,6 +19,7 @@ const SCHEMA = z.object({
 export async function savePlatformRoleAction(
   roleId: string | undefined,
   fixedInstitutionId: string | undefined,
+  returnTo: string | undefined,
   _state: PlatformRoleFormState,
   formData: FormData,
 ): Promise<PlatformRoleFormState> {
@@ -41,6 +43,7 @@ export async function savePlatformRoleAction(
   );
   if (error) return error;
 
+  const destination = getSafeReturnTo(returnTo, roleId ? `/admin/roles/${roleId}` : "/admin/roles");
   revalidatePath("/admin/roles");
-  redirect("/admin/roles");
+  redirect(destination);
 }

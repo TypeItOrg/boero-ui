@@ -1,10 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KeyRoundIcon, PencilIcon, UserLockIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
@@ -17,7 +18,12 @@ import {
   fetchInstitutionRole,
 } from "@features/roles/services/institution-role.service";
 
-export const metadata = { title: "Detalle del rol" };
+import type { Metadata } from "next";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Detalle del rol");
+}
 
 export default async function RoleDetailPage({
   params,
@@ -26,7 +32,9 @@ export default async function RoleDetailPage({
 }): Promise<React.ReactElement> {
   const { roleId } = await params;
   const user = await requireInstitutionalUser();
-  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) notFound();
+  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) {
+    return <InstitutionalAccessDenied />;
+  }
 
   const [role, permissionGroups] = await Promise.all([
     fetchInstitutionRole(user.institutionId, roleId),
@@ -45,13 +53,15 @@ export default async function RoleDetailPage({
       actions={
         canUpdate || canDelete ? (
           <div className="flex flex-wrap gap-3">
-            {canDelete ? <InstitutionRoleDeleteButton roleId={role.id} roleName={role.name} /> : null}
+            {canDelete ? (
+              <InstitutionRoleDeleteButton institutionId={user.institutionId} roleId={role.id} roleName={role.name} />
+            ) : null}
             {canUpdate ? (
               <Button asChild size="lg">
-                <Link href={`/roles/${role.id}/edit`}>
+                <ReturnToLink href={`/roles/${role.id}/edit`}>
                   <PencilIcon data-icon="inline-start" />
                   Editar rol
-                </Link>
+                </ReturnToLink>
               </Button>
             ) : null}
           </div>

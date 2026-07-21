@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { PlatformAccountDetail } from "@features/platform-accounts/components/platform-account-detail";
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -31,7 +31,7 @@ export default async function PlatformAccountDetailPage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       actions={
         <Button asChild size="lg">
-          <Link href={`/admin/accounts/${id}/edit`}>Editar cuenta</Link>
+          <ReturnToLink href={`/admin/accounts/${id}/edit`}>Editar cuenta</ReturnToLink>
         </Button>
       }
     >

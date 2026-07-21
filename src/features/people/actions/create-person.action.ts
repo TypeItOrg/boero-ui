@@ -23,6 +23,7 @@ export async function createPersonAction(
     phoneNumber: formData.get("phoneNumber") || "",
     birthDate: formData.get("birthDate") || "",
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   };
 
   const parsed = createPersonFormSchema.safeParse(payload);
@@ -36,8 +37,13 @@ export async function createPersonAction(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ...parsed.data,
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      documentNumber: parsed.data.documentNumber,
+      email: parsed.data.email,
+      phoneNumber: parsed.data.phoneNumber,
       birthDate: parsed.data.birthDate || null,
+      password: parsed.data.password,
       initialRole: "APPLICANT",
     }),
   });

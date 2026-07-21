@@ -31,6 +31,8 @@ export async function updatePersonAction(
       lastName: formData.get("lastName"),
       email: formData.get("email") || "",
       phoneNumber: formData.get("phoneNumber") || "",
+      password: formData.get("password") || "",
+      confirmPassword: formData.get("confirmPassword") || "",
     };
 
     const parsed = updatePersonFormSchema.safeParse(payload);
@@ -38,11 +40,22 @@ export async function updatePersonAction(
       return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
     }
 
+    const updateBody: Record<string, unknown> = {
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      email: parsed.data.email,
+      phoneNumber: parsed.data.phoneNumber,
+    };
+
+    if (parsed.data.password) {
+      updateBody.password = parsed.data.password;
+    }
+
     const errorState = await getResponseErrorActionState(
       peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify(updateBody),
       }),
       PERSON_FORM_FIELD_NAMES,
       PEOPLE_ERROR_MESSAGES.UPDATE_PERSON,

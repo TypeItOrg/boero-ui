@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
 import { ChevronRightIcon, type LucideIcon } from "lucide-react";
 
@@ -18,6 +17,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@common/components/ui/sidebar";
+import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 
 type PlatformSidebarNavItem = {
   title: string;
@@ -38,8 +38,8 @@ export const platformSidebarItemButtonClassName =
   "text-muted-foreground/80 h-11 gap-3 rounded-lg px-2 text-base font-normal hover:bg-transparent hover:text-foreground active:bg-transparent data-active:bg-primary data-active:font-medium data-active:text-primary-foreground data-active:hover:bg-primary data-active:hover:text-primary-foreground data-open:hover:bg-transparent group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!";
 
 export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactElement {
-  const pathname = usePathname();
   const { state } = useSidebar();
+  const { handleNavigation, isActive } = useMobileSidebarNavigation();
 
   return (
     <SidebarGroup className="gap-1 px-4 py-0">
@@ -51,9 +51,7 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
       <SidebarGroupContent>
         <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">
           {items.map((item) => {
-            const isActive = item.exact
-              ? pathname === item.url
-              : pathname === item.url || pathname.startsWith(`${item.url}/`);
+            const itemIsActive = isActive(item.url, item.exact);
             const ItemIcon = item.icon;
 
             if (!item.items?.length) {
@@ -63,9 +61,14 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
                     asChild
                     className={platformSidebarItemButtonClassName}
                     tooltip={item.title}
-                    isActive={isActive}
+                    isActive={itemIsActive}
                   >
-                    <Link href={item.url} prefetch aria-current={isActive ? "page" : undefined}>
+                    <Link
+                      href={item.url}
+                      prefetch
+                      aria-current={itemIsActive ? "page" : undefined}
+                      onClick={() => handleNavigation(item.url)}
+                    >
                       <PlatformSidebarNavigationIcon icon={ItemIcon} />
                       <PlatformSidebarItemLabel>{item.title}</PlatformSidebarItemLabel>
                     </Link>
@@ -75,13 +78,13 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
             }
 
             return (
-              <Collapsible key={item.title} asChild defaultOpen={isActive} className="group/collapsible">
+              <Collapsible key={item.title} asChild defaultOpen={itemIsActive} className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
                       className={platformSidebarItemButtonClassName}
                       tooltip={item.title}
-                      isActive={isActive}
+                      isActive={itemIsActive}
                     >
                       <PlatformSidebarNavigationIcon icon={ItemIcon} />
                       <PlatformSidebarItemLabel>{item.title}</PlatformSidebarItemLabel>
@@ -90,15 +93,24 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <Link href={subItem.url} prefetch>
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                      {item.items.map((subItem) => {
+                        const isSubItemActive = isActive(subItem.url);
+
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild isActive={isSubItemActive}>
+                              <Link
+                                href={subItem.url}
+                                prefetch
+                                aria-current={isSubItemActive ? "page" : undefined}
+                                onClick={() => handleNavigation(subItem.url)}
+                              >
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>

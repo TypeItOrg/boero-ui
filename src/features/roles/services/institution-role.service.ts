@@ -13,7 +13,7 @@ export async function fetchInstitutionRoles(institutionId: string): Promise<Inst
 
 export async function fetchInstitutionRole(institutionId: string, roleId: string): Promise<InstitutionRole | null> {
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/roles/${roleId}`);
-  if (response.status === 404) return null;
+  if (!response.ok) return null;
   return parseHttpResponse(response, FETCH_ROLES_ERROR);
 }
 

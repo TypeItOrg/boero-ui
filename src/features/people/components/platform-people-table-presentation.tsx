@@ -5,6 +5,7 @@ import { EllipsisVerticalIcon, Loader2Icon, SearchIcon, UsersIcon } from "lucide
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -118,9 +119,9 @@ export function PlatformPeopleTablePresentation({
                   <TableRow className="h-11">
                     <TableCell className="font-medium">
                       {canUpdate ? (
-                        <Link className="hover:underline" href={getPersonPath(person)}>
+                        <ReturnToLink className="hover:underline" href={getPersonPath(person)}>
                           {person.lastName}, {person.firstName}
-                        </Link>
+                        </ReturnToLink>
                       ) : (
                         <span>
                           {person.lastName}, {person.firstName}
@@ -162,9 +163,9 @@ export function PlatformPeopleTablePresentation({
                   <ContextMenuGroup>
                     {canUpdate ? (
                       <ContextMenuItem asChild>
-                        <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+                        <ReturnToLink href={getPersonPath(person)} className="px-2.5 py-1.5">
                           Editar usuario
-                        </Link>
+                        </ReturnToLink>
                       </ContextMenuItem>
                     ) : null}
                     <ContextMenuItem asChild>
@@ -222,9 +223,9 @@ function PlatformPersonActions({
           <DropdownMenuGroup>
             {canUpdate ? (
               <DropdownMenuItem asChild>
-                <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+                <ReturnToLink href={getPersonPath(person)} className="px-2.5 py-1.5">
                   Editar usuario
-                </Link>
+                </ReturnToLink>
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuItem asChild>

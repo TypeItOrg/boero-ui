@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EllipsisVerticalIcon, Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -63,8 +64,8 @@ export function PeopleTablePresentation({
 }: PeopleTablePresentationProps): React.ReactElement {
   const router = useRouter();
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
-  const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
-  const [personToUpdateStatus, setPersonToUpdateStatus] = useState<PersonSummary>();
+  const [personToDelete, setPersonToDelete] = React.useState<PersonSummary>();
+  const [personToUpdateStatus, setPersonToUpdateStatus] = React.useState<PersonSummary>();
 
   function handleDeleteDialogOpenChange(open: boolean): void {
     if (!open) setPersonToDelete(undefined);
@@ -140,12 +141,12 @@ export function PeopleTablePresentation({
           </p>
           {canCreate ? (
             <Button asChild size="sm">
-              <Link
+              <ReturnToLink
                 href={scope === "institutional" ? "/people/new" : `/admin/institutions/${institutionId}/people/new`}
               >
                 <PlusIcon className="mr-2 size-4" />
                 Nuevo usuario
-              </Link>
+              </ReturnToLink>
             </Button>
           ) : null}
         </div>
@@ -198,6 +199,7 @@ export function PeopleTablePresentation({
           <TableBody>
             {data.items.map((person) => {
               const isSelf = person.id === selfPersonId;
+              const personHref = getPersonHref(scope, institutionId, person.id, selfPersonId);
               const canEditPerson = canUpdate;
               const canOpenPerson = canEditPerson || (scope === "institutional" && canManageRoles && !isSelf);
               const canDeletePerson = canDelete && !isSelf;
@@ -208,12 +210,9 @@ export function PeopleTablePresentation({
                 <TableRow key={person.id} className="hover:bg-muted/50 h-11 border-b transition-colors">
                   <TableCell className="font-medium">
                     {canOpenPerson ? (
-                      <Link
-                        className="hover:underline"
-                        href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
-                      >
+                      <PersonNavigationLink className="hover:underline" href={personHref}>
                         {person.lastName}, {person.firstName}
-                      </Link>
+                      </PersonNavigationLink>
                     ) : (
                       <span>
                         {person.lastName}, {person.firstName}
@@ -280,12 +279,9 @@ export function PeopleTablePresentation({
                   <ContextMenuContent className="w-44 p-1.5">
                     {canOpenPerson ? (
                       <ContextMenuItem asChild>
-                        <Link
-                          href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
-                          className="px-2.5 py-1.5"
-                        >
+                        <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
                           {canEditPerson ? "Editar" : "Administrar"}
-                        </Link>
+                        </PersonNavigationLink>
                       </ContextMenuItem>
                     ) : null}
                     {canUpdatePersonStatus ? (
@@ -377,6 +373,8 @@ function PersonActionsMenu({
   canUpdateStatus,
   onUpdateStatus,
 }: PersonActionsMenuProps): React.ReactElement {
+  const personHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined);
+
   return (
     <div className="flex justify-end">
       <DropdownMenu>
@@ -388,12 +386,9 @@ function PersonActionsMenu({
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           {canEdit ? (
             <DropdownMenuItem asChild>
-              <Link
-                href={getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined)}
-                className="px-2.5 py-1.5"
-              >
+              <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
                 {editLabel}
-              </Link>
+              </PersonNavigationLink>
             </DropdownMenuItem>
           ) : null}
           {canUpdateStatus ? (
@@ -414,6 +409,30 @@ function PersonActionsMenu({
     </div>
   );
 }
+
+type PersonNavigationLinkProps = React.ComponentProps<typeof Link> & {
+  returnTo?: string;
+};
+
+const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigationLinkProps>(
+  function PersonNavigationLink({ href, children, returnTo, ...props }, ref): React.ReactElement {
+    const hrefString = typeof href === "string" ? href : href.pathname ?? "";
+    if (hrefString === "/profile") {
+      return (
+        <Link ref={ref} href={href} {...props}>
+          {children}
+        </Link>
+      );
+    }
+
+    return (
+      <ReturnToLink ref={ref} href={hrefString} returnTo={returnTo} {...props}>
+        {children}
+      </ReturnToLink>
+    );
+  },
+);
+PersonNavigationLink.displayName = "PersonNavigationLink";
 
 function getPersonHref(
   scope: PeopleScope,

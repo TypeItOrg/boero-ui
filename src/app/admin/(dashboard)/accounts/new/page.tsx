@@ -1,5 +1,7 @@
 import { UserPlusIcon } from "lucide-react";
 
+import type { QueryParamValue } from "@common/types/query-param.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { PlatformAccountForm } from "@features/platform-accounts/components/platform-account-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -9,7 +11,13 @@ export const metadata = {
   description: "Creá un nuevo administrador para la plataforma.",
 };
 
-export default function NewPlatformAccountPage(): React.ReactElement {
+export default async function NewPlatformAccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+}): Promise<React.ReactElement> {
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, "/admin/accounts");
   return (
     <PlatformPageShell
       title="Nuevo administrador"
@@ -23,7 +31,7 @@ export default function NewPlatformAccountPage(): React.ReactElement {
         </div>
       }
     >
-      <PlatformAccountForm mode="create" />
+      <PlatformAccountForm mode="create" returnTo={destination} />
     </PlatformPageShell>
   );
 }

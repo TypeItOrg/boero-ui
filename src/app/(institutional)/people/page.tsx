@@ -1,23 +1,27 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import Link from "next/link";
-import { PlusIcon, UsersIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PeopleSearchForm } from "@features/people/components/people-search-form";
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
-export const metadata = { title: "Usuarios" };
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Usuarios");
+}
 
 export default async function PeoplePage({
   searchParams,
@@ -27,17 +31,7 @@ export default async function PeoplePage({
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) {
-    return (
-      <Empty className="bg-background m-4 min-h-96 sm:m-6">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <UsersIcon />
-          </EmptyMedia>
-          <EmptyTitle>Sin acceso</EmptyTitle>
-          <EmptyDescription>No tenés permisos para gestionar usuarios de esta institución.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
+    return <InstitutionalAccessDenied description="No tenés permisos para gestionar usuarios de esta institución." />;
   }
 
   const resolvedSearchParams = await searchParams;
@@ -60,10 +54,10 @@ export default async function PeoplePage({
       actions={
         canCreate ? (
           <Button asChild size="lg">
-            <Link href="/people/new">
+            <ReturnToLink href="/people/new">
               <PlusIcon data-icon="inline-start" />
               Nuevo usuario
-            </Link>
+            </ReturnToLink>
           </Button>
         ) : undefined
       }

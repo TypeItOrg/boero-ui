@@ -35,28 +35,29 @@ type PersonFormInput = {
   phoneNumber: string;
   birthDate: string;
   password: string;
+  confirmPassword: string;
 };
 
-type CreateMode = {
-  mode: "create";
+type PersonFormCommonProps = {
   institutionId: string;
+  formId?: string;
+  hideActions?: boolean;
+  scope?: PeopleScope;
+  returnTo?: string;
+};
+
+type CreateMode = PersonFormCommonProps & {
+  mode: "create";
   person?: never;
   roleIds?: never;
-  formId?: string;
-  hideActions?: boolean;
   canEdit?: never;
-  scope?: PeopleScope;
 };
 
-type EditMode = {
+type EditMode = PersonFormCommonProps & {
   mode: "edit";
-  institutionId: string;
   person: Person;
   roleIds?: readonly string[];
-  formId?: string;
-  hideActions?: boolean;
   canEdit?: boolean;
-  scope?: PeopleScope;
 };
 
 type PersonFormProps = CreateMode | EditMode;
@@ -69,6 +70,7 @@ const EMPTY_FORM_VALUES: PersonFormInput = {
   phoneNumber: "",
   birthDate: "",
   password: "",
+  confirmPassword: "",
 };
 
 export function PersonForm({
@@ -80,12 +82,14 @@ export function PersonForm({
   hideActions = false,
   canEdit = true,
   scope = "admin",
+  returnTo,
 }: PersonFormProps): React.ReactElement {
   const router = useRouter();
   const isEdit = mode === "edit";
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
   const listPath = scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`;
+  const destination = returnTo ?? listPath;
   const resolver = getPersonFormResolver(isEdit);
 
   const {
@@ -112,13 +116,13 @@ export function PersonForm({
       setFormError(hasFieldErrors ? undefined : result.error);
 
       if (result.success) {
-        router.push(listPath);
+        router.push(destination);
       }
     });
   }
 
   function handleCancel(): void {
-    router.push(listPath);
+    router.push(destination);
   }
 
   return (
@@ -186,7 +190,37 @@ export function PersonForm({
           </FormCard>
         </fieldset>
 
-        {!isEdit && (
+        {isEdit ? (
+          <fieldset disabled={!canEdit} className="contents">
+            <FormCard>
+              <SectionHeading
+                title="Cambiar contraseña"
+                description="Dejá los campos en blanco para conservar la contraseña actual."
+              />
+              <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+                <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
+                  <FieldContent>
+                    <FieldLabel htmlFor="person-password">Nueva contraseña</FieldLabel>
+                  </FieldContent>
+                  <PasswordInput id="person-password" aria-invalid={!!errors.password} {...register("password")} />
+                  <FieldError errors={[errors.password]} />
+                </Field>
+
+                <Field data-invalid={!!errors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
+                  <FieldContent>
+                    <FieldLabel htmlFor="person-confirm-password">Confirmar nueva contraseña</FieldLabel>
+                  </FieldContent>
+                  <PasswordInput
+                    id="person-confirm-password"
+                    aria-invalid={!!errors.confirmPassword}
+                    {...register("confirmPassword")}
+                  />
+                  <FieldError errors={[errors.confirmPassword]} />
+                </Field>
+              </FieldGroup>
+            </FormCard>
+          </fieldset>
+        ) : (
           <FormCard>
             <SectionHeading title="Cuenta de acceso" description="Credenciales iniciales para iniciar sesión." />
             <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
@@ -226,7 +260,7 @@ export function PersonForm({
                 <FieldError errors={[errors.birthDate]} />
               </Field>
 
-              <Field data-invalid={!!errors.password} className="basis-full">
+              <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
                 <FieldContent>
                   <FieldLabel htmlFor="person-password" required>
                     Contraseña inicial
@@ -234,6 +268,20 @@ export function PersonForm({
                 </FieldContent>
                 <PasswordInput id="person-password" aria-invalid={!!errors.password} {...register("password")} />
                 <FieldError errors={[errors.password]} />
+              </Field>
+
+              <Field data-invalid={!!errors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
+                <FieldContent>
+                  <FieldLabel htmlFor="person-confirm-password" required>
+                    Confirmar contraseña
+                  </FieldLabel>
+                </FieldContent>
+                <PasswordInput
+                  id="person-confirm-password"
+                  aria-invalid={!!errors.confirmPassword}
+                  {...register("confirmPassword")}
+                />
+                <FieldError errors={[errors.confirmPassword]} />
               </Field>
             </FieldGroup>
           </FormCard>
@@ -291,6 +339,7 @@ function getDefaultValues(person: Person | undefined): PersonFormInput {
     phoneNumber: person.phoneNumber ?? "",
     birthDate: person.birthDate ?? "",
     password: "",
+    confirmPassword: "",
   };
 }
 
@@ -304,8 +353,8 @@ function getFormData(
 
   if (!isEdit || canEdit) {
     const keys: Array<keyof PersonFormInput> = isEdit
-      ? ["firstName", "lastName", "email", "phoneNumber"]
-      : ["firstName", "lastName", "documentNumber", "email", "phoneNumber", "birthDate", "password"];
+      ? ["firstName", "lastName", "email", "phoneNumber", "password", "confirmPassword"]
+      : ["firstName", "lastName", "documentNumber", "email", "phoneNumber", "birthDate", "password", "confirmPassword"];
 
     for (const key of keys) {
       formData.append(key, values[key]);

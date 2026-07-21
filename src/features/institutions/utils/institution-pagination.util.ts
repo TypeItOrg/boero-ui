@@ -1,12 +1,12 @@
 import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { parseOptionalBooleanQueryParam } from "@common/utils/query-param.util";
-import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 
 export const DEFAULT_INSTITUTION_PAGE_SIZE = 10;
-export const INSTITUTION_PAGE_SIZE_OPTIONS = [DEFAULT_INSTITUTION_PAGE_SIZE, 20, 30, 40, 50] as const;
+export const INSTITUTION_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 export const INSTITUTION_SORT_FIELDS = ["name", "active"] as const satisfies readonly (keyof InstitutionSummary)[];
 
 export type InstitutionSortField = (typeof INSTITUTION_SORT_FIELDS)[number];

@@ -25,7 +25,7 @@ export async function fetchPlatformRoles(
 
 export async function fetchPlatformRole(roleId: string): Promise<PlatformRole | null> {
   const response = await platformApiFetch(`/api/v1/admin/roles/${roleId}`);
-  if (response.status === 404) return null;
+  if (!response.ok) return null;
   return parseHttpResponse(response, ROLES_ERROR);
 }
 

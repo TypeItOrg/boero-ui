@@ -6,7 +6,7 @@ import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/err
 export async function fetchInstitution(id: string): Promise<Institution | null> {
   const response = await platformApiFetch(`/api/v1/admin/institutions/${id}`);
 
-  if (response.status === 404) return null;
+  if (!response.ok) return null;
 
   return parseHttpResponse(response, INSTITUTION_ERROR_MESSAGES.FETCH_INSTITUTION);
 }

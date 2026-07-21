@@ -1,6 +1,8 @@
-import { notFound } from "next/navigation";
 import { UserPlusIcon } from "lucide-react";
 
+import type { QueryParamValue } from "@common/types/query-param.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { PersonForm } from "@features/people/components/person-form";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -8,11 +10,24 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 
-export const metadata = { title: "Nuevo usuario" };
+import type { Metadata } from "next";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
-export default async function NewPersonPage(): Promise<React.ReactElement> {
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Nuevo usuario");
+}
+
+export default async function NewPersonPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+}): Promise<React.ReactElement> {
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, "/people");
   const user = await requireInstitutionalUser();
-  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE)) notFound();
+  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE)) {
+    return <InstitutionalAccessDenied />;
+  }
 
   return (
     <PlatformPageShell
@@ -27,7 +42,7 @@ export default async function NewPersonPage(): Promise<React.ReactElement> {
         </div>
       }
     >
-      <PersonForm mode="create" institutionId={user.institutionId} scope="institutional" />
+      <PersonForm mode="create" institutionId={user.institutionId} scope="institutional" returnTo={destination} />
     </PlatformPageShell>
   );
 }

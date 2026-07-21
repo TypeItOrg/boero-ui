@@ -33,6 +33,7 @@ describe("person form schemas", () => {
       phoneNumber: "",
       birthDate: "",
       password: "contraseña-segura",
+      confirmPassword: "contraseña-segura",
     });
 
     expect(result.success).toBe(false);
@@ -55,6 +56,7 @@ describe("person form schemas", () => {
       phoneNumber: "",
       birthDate,
       password: "contraseña-segura",
+      confirmPassword: "contraseña-segura",
     });
 
     expect(result.success).toBe(false);
@@ -69,8 +71,72 @@ describe("person form schemas", () => {
       phoneNumber: "",
       birthDate: "",
       password: "contraseña-segura",
+      confirmPassword: "contraseña-segura",
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("requires password confirmation when creating a person", () => {
+    const result = createPersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      documentNumber: "12345678",
+      email: "",
+      phoneNumber: "",
+      birthDate: "2000-01-01",
+      password: "contraseña-segura",
+      confirmPassword: "diferente-contraseña",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe("Las contraseñas no coinciden.");
+    }
+  });
+
+  it("allows empty password fields when updating a person", () => {
+    const result = updatePersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      email: "ana@boero.edu.ar",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("validates new password when updating a person", () => {
+    const shortPasswordResult = updatePersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      email: "",
+      phoneNumber: "",
+      password: "123",
+      confirmPassword: "123",
+    });
+    expect(shortPasswordResult.success).toBe(false);
+
+    const mismatchResult = updatePersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      email: "",
+      phoneNumber: "",
+      password: "contraseña-nueva",
+      confirmPassword: "otra-contraseña",
+    });
+    expect(mismatchResult.success).toBe(false);
+
+    const validResult = updatePersonFormSchema.safeParse({
+      firstName: "Ana",
+      lastName: "Pérez",
+      email: "",
+      phoneNumber: "",
+      password: "contraseña-nueva",
+      confirmPassword: "contraseña-nueva",
+    });
+    expect(validResult.success).toBe(true);
   });
 });

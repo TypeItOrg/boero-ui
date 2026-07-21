@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { PlusIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { PlatformAccountsTableContainer } from "@features/platform-accounts/components/platform-accounts-table-container";
@@ -35,10 +35,10 @@ export default async function PlatformAccountsPage({
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg">
-          <Link href="/admin/accounts/new">
+          <ReturnToLink href="/admin/accounts/new">
             <PlusIcon data-icon="inline-start" />
             Nueva cuenta
-          </Link>
+          </ReturnToLink>
         </Button>
       }
     >

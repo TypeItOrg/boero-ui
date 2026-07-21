@@ -5,10 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import type { RoleFormState } from "@features/roles/types/institution-role.types";
 
 const fields = ["name"] as const;
@@ -18,23 +16,19 @@ const schema = z.object({
 });
 
 export async function saveInstitutionRoleAction(
+  institutionId: string,
   roleId: string | undefined,
+  returnTo: string | undefined,
   _state: RoleFormState,
   formData: FormData,
 ): Promise<RoleFormState> {
-  const user = await requireInstitutionalUser();
-  const requiredPermission = roleId ? INSTITUTIONAL_PERMISSION.ROLE_UPDATE : INSTITUTIONAL_PERMISSION.ROLE_CREATE;
-  if (!hasInstitutionalPermission(user, requiredPermission)) {
-    return { error: "No tenés permisos para realizar esta acción." };
-  }
-
   const parsed = schema.safeParse({
     name: formData.get("name"),
     permissions: formData.getAll("permissions").filter((value): value is string => typeof value === "string"),
   });
   if (!parsed.success) return getValidationActionState(parsed.error.issues, fields);
 
-  const path = `/api/v1/institutions/${user.institutionId}/roles${roleId ? `/${roleId}` : ""}`;
+  const path = `/api/v1/institutions/${institutionId}/roles${roleId ? `/${roleId}` : ""}`;
   const error = await getResponseErrorActionState(
     institutionalApiFetch(path, {
       method: roleId ? "PUT" : "POST",
@@ -46,6 +40,7 @@ export async function saveInstitutionRoleAction(
   );
   if (error) return error;
 
+  const destination = getSafeReturnTo(returnTo, roleId ? `/roles/${roleId}` : "/roles");
   revalidatePath("/roles");
-  redirect("/roles");
+  redirect(destination);
 }

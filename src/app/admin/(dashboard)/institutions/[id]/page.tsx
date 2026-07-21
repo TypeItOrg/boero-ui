@@ -1,10 +1,11 @@
-import { Suspense } from "react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { MapPinIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { InstitutionDetail } from "@features/institutions/components/institution-detail";
 import {
   InstitutionPeoplePreview,
@@ -61,7 +62,7 @@ export default async function InstitutionDetailPage({
           {institution.active ? (
             <>
               <Button asChild variant="outline" size="lg">
-                <Link href={`/admin/institutions/${id}/edit`}>Editar institución</Link>
+                <ReturnToLink href={`/admin/institutions/${id}/edit`}>Editar institución</ReturnToLink>
               </Button>
               <Button asChild size="lg">
                 <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>

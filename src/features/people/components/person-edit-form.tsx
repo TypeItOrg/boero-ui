@@ -19,6 +19,7 @@ type PersonEditFormProps = {
   canEdit?: boolean;
   canAssignRoles?: boolean;
   canRevokeRoles?: boolean;
+  returnTo?: string;
 };
 
 export function PersonEditForm({
@@ -31,6 +32,7 @@ export function PersonEditForm({
   canEdit = true,
   canAssignRoles = true,
   canRevokeRoles = true,
+  returnTo,
 }: PersonEditFormProps): React.ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() =>
@@ -53,6 +55,7 @@ export function PersonEditForm({
         canEdit={canEdit}
         roleIds={canManageRoles ? selectedRoleCodes : undefined}
         scope={scope}
+        returnTo={returnTo}
       />
       {canManageRoles ? (
         <PersonRolesManager

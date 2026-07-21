@@ -31,7 +31,7 @@ describe("parsePlatformPeoplePaginationParams", () => {
         institutionId: "invalid",
         page: "-1",
         roleCode: "UNKNOWN",
-        size: "30",
+        size: "60",
         sortDirection: "sideways",
         sortField: "email",
       }),

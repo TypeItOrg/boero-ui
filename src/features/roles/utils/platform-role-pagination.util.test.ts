@@ -31,7 +31,7 @@ describe("parsePlatformRolesPaginationParams", () => {
         institutionId: "invalid",
         page: "-1",
         roleType: "UNKNOWN",
-        size: "30",
+        size: "60",
         sortDirection: "sideways",
         sortField: "permissionCount",
       }),

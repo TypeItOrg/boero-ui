@@ -5,6 +5,7 @@ import { EllipsisVerticalIcon, FingerprintIcon, Loader2Icon, PlusIcon, SearchIco
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import {
@@ -148,9 +149,12 @@ export function PlatformAccountsTablePresentation({
                       </Link>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
-                      <Link href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+                      <ReturnToLink
+                        href={`/admin/accounts/${account.platformAccountId}/edit`}
+                        className="px-2.5 py-1.5"
+                      >
                         Editar
-                      </Link>
+                      </ReturnToLink>
                     </ContextMenuItem>
                   </ContextMenuGroup>
                 </ContextMenuContent>
@@ -202,9 +206,9 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
+              <ReturnToLink href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
                 Editar
-              </Link>
+              </ReturnToLink>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -269,10 +273,10 @@ function PlatformAccountsEmptyState({
         Comenzá creando un nuevo administrador para empezar a gestionar la plataforma.
       </p>
       <Button asChild size="sm">
-        <Link href="/admin/accounts/new">
+        <ReturnToLink href="/admin/accounts/new">
           <PlusIcon className="mr-2 size-4" />
           Nuevo administrador
-        </Link>
+        </ReturnToLink>
       </Button>
     </div>
   );

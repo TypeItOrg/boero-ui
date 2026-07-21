@@ -30,10 +30,12 @@ const INSTITUTION_QUERY_KEY = ["platform", "roles", "form-institutions"] as cons
 type PlatformRoleFormProps = {
   role?: PlatformRole;
   permissionGroups: readonly InstitutionPermissionGroup[];
+  returnTo?: string;
 };
 
-export function PlatformRoleForm({ role, permissionGroups }: PlatformRoleFormProps): React.ReactElement {
-  const action = savePlatformRoleAction.bind(null, role?.id, role?.institution.id);
+export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformRoleFormProps): React.ReactElement {
+  const destination = returnTo ?? (role ? `/admin/roles/${role.id}` : "/admin/roles");
+  const action = savePlatformRoleAction.bind(null, role?.id, role?.institution.id, destination);
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
   const isEdit = Boolean(role);
 
@@ -109,7 +111,7 @@ export function PlatformRoleForm({ role, permissionGroups }: PlatformRoleFormPro
       </section>
       <div className="flex justify-end gap-3">
         <Button asChild variant="outline" size="lg">
-          <Link href={role ? `/admin/roles/${role.id}` : "/admin/roles"}>Cancelar</Link>
+          <Link href={destination}>Cancelar</Link>
         </Button>
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Guardando…" : "Guardar cambios"}

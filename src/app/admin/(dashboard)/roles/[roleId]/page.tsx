@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KeyRoundIcon, PencilIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
@@ -35,10 +35,10 @@ export default async function PlatformRoleDetailPage({
             ) : null}
             {role.editable ? (
               <Button asChild size="lg">
-                <Link href={`/admin/roles/${role.id}/edit`}>
+                <ReturnToLink href={`/admin/roles/${role.id}/edit`}>
                   <PencilIcon data-icon="inline-start" />
                   Editar rol
-                </Link>
+                </ReturnToLink>
               </Button>
             ) : null}
           </div>

@@ -12,7 +12,7 @@ export async function fetchPerson(
 ): Promise<Person | null> {
   const response = await peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId));
 
-  if (response.status === 404) return null;
+  if (!response.ok) return null;
 
   return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_PERSON);
 }

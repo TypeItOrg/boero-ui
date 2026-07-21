@@ -58,6 +58,7 @@ type EditMode = {
 type InstitutionFormProps = (CreateMode | EditMode) & {
   onSuccess?: () => void;
   onCancel?: () => void;
+  returnTo?: string;
   id?: string;
   hideFooter?: boolean;
 };
@@ -68,6 +69,7 @@ export function InstitutionForm({
   institution,
   onSuccess,
   onCancel,
+  returnTo = INSTITUTIONS_PATH,
   id,
   hideFooter = false,
 }: InstitutionFormProps): React.ReactElement {
@@ -127,7 +129,7 @@ export function InstitutionForm({
         if (onSuccess) {
           onSuccess();
         } else {
-          router.push(INSTITUTIONS_PATH);
+          router.push(returnTo);
         }
       }
     });
@@ -137,7 +139,7 @@ export function InstitutionForm({
     if (onCancel) {
       onCancel();
     } else {
-      router.push(INSTITUTIONS_PATH);
+      router.push(returnTo);
     }
   }
 

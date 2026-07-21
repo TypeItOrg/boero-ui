@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
@@ -43,10 +43,10 @@ export default async function InstitutionPeoplePage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg">
-          <Link href={`/admin/institutions/${id}/people/new`}>
+          <ReturnToLink href={`/admin/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario
-          </Link>
+          </ReturnToLink>
         </Button>
       }
     >

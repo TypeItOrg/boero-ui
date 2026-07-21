@@ -1,22 +1,29 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowRightIcon, KeyRoundIcon, PlusIcon, UserLockIcon, UsersIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { fetchInstitutionRoles } from "@features/roles/services/institution-role.service";
 
-export const metadata = { title: "Roles" };
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Roles");
+}
 
 export default async function RolesPage(): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
-  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) notFound();
+  if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) {
+    return <InstitutionalAccessDenied />;
+  }
   const roles = await fetchInstitutionRoles(user.institutionId);
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_CREATE);
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
@@ -29,10 +36,10 @@ export default async function RolesPage(): Promise<React.ReactElement> {
       actions={
         canCreate ? (
           <Button asChild size="lg">
-            <Link href="/roles/new">
+            <ReturnToLink href="/roles/new">
               <PlusIcon data-icon="inline-start" />
               Nuevo rol
-            </Link>
+            </ReturnToLink>
           </Button>
         ) : undefined
       }
@@ -72,9 +79,13 @@ export default async function RolesPage(): Promise<React.ReactElement> {
             <CardFooter className="bg-background/50 flex items-center justify-end gap-2 border-t">
               {canUpdate && role.editable ? (
                 <Button asChild variant="ghost" size="lg">
-                  <Link href={`/roles/${role.id}/edit`}>Editar</Link>
+                  <ReturnToLink href={`/roles/${role.id}/edit`}>Editar</ReturnToLink>
                 </Button>
-              ) : null}
+              ) : (
+                <Button disabled variant="ghost" size="lg">
+                  Editar
+                </Button>
+              )}
               <Button asChild size="lg">
                 <Link href={`/roles/${role.id}`}>Ver detalle</Link>
               </Button>

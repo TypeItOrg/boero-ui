@@ -47,12 +47,16 @@ type EditMode = {
   account: PlatformAccountAdmin;
 };
 
-type PlatformAccountFormProps = CreateMode | EditMode;
+type PlatformAccountFormProps = (CreateMode | EditMode) & {
+  returnTo?: string;
+};
 
-export function PlatformAccountForm({ mode, account }: PlatformAccountFormProps): React.ReactElement {
+export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccountFormProps): React.ReactElement {
   const router = useRouter();
   const { account: currentAccount } = usePlatformAccount();
   const isEdit = mode === "edit";
+  const defaultDestination = isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH;
+  const destination = returnTo ?? defaultDestination;
   const isCurrentAccount = isEdit && currentAccount?.platformAccountId === account.platformAccountId;
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
@@ -83,13 +87,13 @@ export function PlatformAccountForm({ mode, account }: PlatformAccountFormProps)
           return;
         }
 
-        router.push(isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH);
+        router.push(destination);
       }
     });
   }
 
   function handleCancel(): void {
-    router.push(isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH);
+    router.push(destination);
   }
 
   const errorAlert = formError ? (

@@ -1,10 +1,10 @@
 import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
-import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
 import type { PersonSummary } from "@features/people/types/person.types";
 
 export const DEFAULT_PEOPLE_PAGE_SIZE = 10;
-export const PEOPLE_PAGE_SIZE_OPTIONS = [DEFAULT_PEOPLE_PAGE_SIZE, 20, 50] as const;
+export const PEOPLE_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 export const PEOPLE_SORT_FIELDS = [
   "lastName",
   "firstName",

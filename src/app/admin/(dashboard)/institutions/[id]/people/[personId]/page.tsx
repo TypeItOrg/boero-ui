@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 import { Button } from "@common/components/ui/button";
+import type { QueryParamValue } from "@common/types/query-param.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
@@ -13,14 +15,20 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 
 type EditPersonPageProps = {
   params: Promise<{ id: string; personId: string }>;
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
 
 export const metadata: Metadata = {
   title: "Editar usuario",
 };
 
-export default async function EditPersonPage({ params }: EditPersonPageProps): Promise<React.ReactElement> {
+export default async function EditPersonPage({
+  params,
+  searchParams,
+}: EditPersonPageProps): Promise<React.ReactElement> {
   const { id, personId } = await params;
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
   const [person, assignedRoles, systemRoles] = await Promise.all([
     fetchPerson(id, personId),
     fetchPersonRoles(id, personId),
@@ -42,11 +50,12 @@ export default async function EditPersonPage({ params }: EditPersonPageProps): P
         person={person}
         roles={systemRoles}
         assignedRoles={assignedRoles}
+        returnTo={destination}
       />
 
       <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
         <Button asChild variant="outline">
-          <Link href={`/admin/institutions/${id}/people`}>Cancelar</Link>
+          <Link href={destination}>Cancelar</Link>
         </Button>
         <Button type="submit" form="person-edit-form">
           Guardar cambios

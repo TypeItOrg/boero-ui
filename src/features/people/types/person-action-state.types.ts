@@ -8,6 +8,7 @@ export const PERSON_FORM_FIELD_NAMES = [
   "phoneNumber",
   "birthDate",
   "password",
+  "confirmPassword",
 ] as const;
 
 export type PersonFormFieldName = (typeof PERSON_FORM_FIELD_NAMES)[number];

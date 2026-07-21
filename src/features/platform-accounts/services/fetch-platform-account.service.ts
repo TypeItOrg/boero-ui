@@ -5,7 +5,7 @@ import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/con
 
 export async function fetchPlatformAccountAdmin(id: string): Promise<PlatformAccountAdmin | null> {
   const response = await platformApiFetch(`/api/v1/admin/accounts/${id}`);
-  if (response.status === 404) return null;
+  if (!response.ok) return null;
 
   return parseHttpResponse(response, PLATFORM_ACCOUNT_ERROR_MESSAGES.FETCH_ACCOUNT);
 }

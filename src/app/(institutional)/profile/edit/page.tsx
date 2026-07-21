@@ -1,15 +1,28 @@
 import { notFound } from "next/navigation";
 import { UserRoundPenIcon } from "lucide-react";
 
+import type { QueryParamValue } from "@common/types/query-param.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { InstitutionalProfileForm } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
-export const metadata = { title: "Editar perfil" };
+import type { Metadata } from "next";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
-export default async function EditProfilePage(): Promise<React.ReactElement> {
+export async function generateMetadata(): Promise<Metadata> {
+  return getInstitutionalMetadata("Editar perfil");
+}
+
+export default async function EditProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+}): Promise<React.ReactElement> {
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, "/profile");
   await requireInstitutionalUser();
 
   const person = await fetchInstitutionalPerson();
@@ -27,7 +40,7 @@ export default async function EditProfilePage(): Promise<React.ReactElement> {
         </div>
       }
     >
-      <InstitutionalProfileForm person={person} />
+      <InstitutionalProfileForm person={person} returnTo={destination} />
     </PlatformPageShell>
   );
 }

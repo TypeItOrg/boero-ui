@@ -1,12 +1,12 @@
 import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { getQueryParamValue } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
 import type { PlatformRoleType } from "@features/roles/types/platform-role.types";
 
 export const DEFAULT_PLATFORM_ROLES_PAGE_SIZE = 10;
-export const PLATFORM_ROLES_PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
+export const PLATFORM_ROLES_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 export const PLATFORM_ROLES_SORT_FIELDS = ["name", "institutionName"] as const satisfies readonly (
   | "name"
   | "institutionName"

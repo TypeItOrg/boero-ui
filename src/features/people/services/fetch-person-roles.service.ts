@@ -12,5 +12,7 @@ export async function fetchPersonRoles(
 ): Promise<PersonRole[]> {
   const response = await peopleApiFetch(scope, getRolesPath(scope, institutionId, personId));
 
+  if (!response.ok) return [];
+
   return parseHttpResponse(response, PEOPLE_ERROR_MESSAGES.FETCH_PERSON_ROLES);
 }

@@ -63,10 +63,7 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-primary! data-[state=open]:text-sidebar-accent-foreground"
-            >
+            <SidebarMenuButton size="lg" className="focus-visible:ring-0 focus-visible:outline-none">
               <div className="grid flex-1 text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <div>
                   <span className="font-semibold">{user.name}</span>
