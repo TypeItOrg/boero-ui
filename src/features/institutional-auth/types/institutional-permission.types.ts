@@ -12,6 +12,8 @@ export const INSTITUTIONAL_PERMISSION = {
   ROLE_DELETE: "institution:roles:delete",
   GRADES_ENTER: "institution:grades:enter",
   GRADES_ENTER_FINAL: "institution:grades:enter-final",
+  INSTITUTION_READ: "institution:read",
+  INSTITUTION_UPDATE: "institution:update",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];

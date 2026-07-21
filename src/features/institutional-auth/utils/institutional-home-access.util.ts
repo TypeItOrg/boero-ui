@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { KeyRoundIcon, UserRoundIcon, UserRoundPlusIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, KeyRoundIcon, UserRoundIcon, UserRoundPlusIcon, UsersIcon } from "lucide-react";
 
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import {
@@ -24,6 +24,13 @@ const PERSONAL_LINK: InstitutionalHomeLink = {
 };
 
 const MANAGEMENT_LINKS: readonly InstitutionalHomeLink[] = [
+  {
+    href: "/institution",
+    title: "Institución",
+    description: "Consultá y actualizá la información de tu institución.",
+    icon: Building2Icon,
+    permission: INSTITUTIONAL_PERMISSION.INSTITUTION_READ,
+  },
   {
     href: "/people",
     title: "Usuarios",

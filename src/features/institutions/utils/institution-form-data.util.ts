@@ -1,10 +1,8 @@
-import type { InstitutionFormValues } from "@features/institutions/schemas/institution-form.schema";
-
-export function createInstitutionFormData(values: InstitutionFormValues, active?: boolean): FormData {
+export function createInstitutionFormData(values: Record<string, unknown>, active?: boolean): FormData {
   const formData = new FormData();
 
   for (const [key, value] of Object.entries(values)) {
-    formData.append(key, value);
+    formData.append(key, (value ?? "") as string);
   }
 
   if (active !== undefined) {

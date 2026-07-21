@@ -59,7 +59,7 @@ export default async function Home(): Promise<React.ReactElement> {
             </p>
           </div>
 
-          <nav aria-label="Herramientas de gestión" className="grid gap-4 sm:grid-cols-2">
+          <nav aria-label="Herramientas de gestión" className="flex flex-wrap gap-4">
             {managementLinks.map((link) => (
               <HomeAccessRow key={link.href} link={link} />
             ))}
@@ -76,7 +76,7 @@ function HomeAccessRow({ link }: { link: InstitutionalHomeLink }): React.ReactEl
   return (
     <Link
       href={link.href}
-      className="bg-muted/25 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring flex min-w-0 flex-row items-center justify-between gap-4 rounded-xl border p-6 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+      className="bg-muted/25 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring flex min-w-0 flex-[1_0_min(500px,100%)] flex-row items-center justify-between gap-4 rounded-xl border p-6 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
     >
       <div className="flex min-w-0 flex-col gap-1">
         <span className="text-base font-semibold tracking-tight sm:text-lg">{link.title}</span>

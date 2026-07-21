@@ -19,6 +19,7 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   profile: "Perfil",
   edit: "Editar",
   roles: "Roles",
+  institution: "Institución",
 };
 
 type BreadcrumbSegment = {
