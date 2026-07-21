@@ -1,4 +1,4 @@
-import { getLatestAllowedBirthDate, hasMinimumPersonAge } from "./person-birth-date.util";
+import { getLatestAllowedBirthDate, hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
 
 describe("person birth date rules", () => {
   const today = new Date(2026, 6, 14);

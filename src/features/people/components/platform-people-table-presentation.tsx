@@ -39,6 +39,7 @@ type PlatformPeopleTablePresentationProps = PaginationParams & {
   roleCode: SystemRoleCode | undefined;
   search: string;
   sort: PlatformPeopleSort;
+  canUpdate?: boolean;
 };
 
 export function PlatformPeopleTablePresentation({
@@ -49,6 +50,7 @@ export function PlatformPeopleTablePresentation({
   roleCode,
   search,
   sort,
+  canUpdate = true,
 }: PlatformPeopleTablePresentationProps): React.ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
@@ -82,7 +84,7 @@ export function PlatformPeopleTablePresentation({
       <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isPending}>
         <Table containerClassName="table-scrollbar" className="min-w-260">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-            <TableRow>
+            <TableRow className="h-11">
               <DataTableSortableHead<PlatformPeopleSortField>
                 field="lastName"
                 label="Nombre"
@@ -113,11 +115,17 @@ export function PlatformPeopleTablePresentation({
             {data.items.map((person) => (
               <ContextMenu key={person.id}>
                 <ContextMenuTrigger asChild>
-                  <TableRow>
+                  <TableRow className="h-11">
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={getPersonPath(person)}>
-                        {person.lastName}, {person.firstName}
-                      </Link>
+                      {canUpdate ? (
+                        <Link className="hover:underline" href={getPersonPath(person)}>
+                          {person.lastName}, {person.firstName}
+                        </Link>
+                      ) : (
+                        <span>
+                          {person.lastName}, {person.firstName}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>{person.documentNumber}</TableCell>
                     <TableCell>
@@ -146,17 +154,19 @@ export function PlatformPeopleTablePresentation({
                       )}
                     </TableCell>
                     <TableCell className="pr-4">
-                      <PlatformPersonActions person={person} />
+                      <PlatformPersonActions person={person} canUpdate={canUpdate} />
                     </TableCell>
                   </TableRow>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-44 p-1.5">
                   <ContextMenuGroup>
-                    <ContextMenuItem asChild>
-                      <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
-                        Editar usuario
-                      </Link>
-                    </ContextMenuItem>
+                    {canUpdate ? (
+                      <ContextMenuItem asChild>
+                        <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+                          Editar usuario
+                        </Link>
+                      </ContextMenuItem>
+                    ) : null}
                     <ContextMenuItem asChild>
                       <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                         Ver institución
@@ -193,7 +203,13 @@ export function PlatformPeopleTablePresentation({
   );
 }
 
-function PlatformPersonActions({ person }: { person: PlatformPersonSummary }): React.ReactElement {
+function PlatformPersonActions({
+  person,
+  canUpdate = true,
+}: {
+  person: PlatformPersonSummary;
+  canUpdate?: boolean;
+}): React.ReactElement {
   return (
     <div className="flex justify-end">
       <DropdownMenu>
@@ -204,11 +220,13 @@ function PlatformPersonActions({ person }: { person: PlatformPersonSummary }): R
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
           <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
-                Editar usuario
-              </Link>
-            </DropdownMenuItem>
+            {canUpdate ? (
+              <DropdownMenuItem asChild>
+                <Link href={getPersonPath(person)} className="px-2.5 py-1.5">
+                  Editar usuario
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem asChild>
               <Link href={getInstitutionPath(person)} className="px-2.5 py-1.5">
                 Ver institución

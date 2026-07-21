@@ -5,9 +5,10 @@ import { PlusIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import type { AssignableRole, PersonRole, SystemRoleCode } from "../types/person-role.types";
-import { formatRoleAssignedAt } from "../utils/person-role-date.util";
-import { getRoleChanges } from "../utils/person-role-rules.util";
+import type { AssignableRole, PersonRole, SystemRoleCode } from "@features/people/types/person-role.types";
+import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
+import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PersonRolesManagerProps = {
   roles: AssignableRole[];
@@ -16,6 +17,7 @@ type PersonRolesManagerProps = {
   onSelectedRoleCodesChange: (roleCodes: string[]) => void;
   canAssignRoles: boolean;
   canRevokeRoles: boolean;
+  scope?: PeopleScope;
 };
 
 type SelectedRole = {
@@ -32,6 +34,7 @@ export function PersonRolesManager({
   onSelectedRoleCodesChange,
   canAssignRoles,
   canRevokeRoles,
+  scope = "admin",
 }: PersonRolesManagerProps): React.ReactElement {
   const initialRoleCodes = React.useMemo(() => assignedRoles.map((role) => role.roleId), [assignedRoles]);
   const initialRoleCodeSet = React.useMemo(() => new Set(initialRoleCodes), [initialRoleCodes]);
@@ -111,6 +114,8 @@ export function PersonRolesManager({
               {selectedRoles.map((role) => {
                 const isPendingAssignment = !initialRoleCodeSet.has(role.roleId);
                 const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== role.roleId);
+                const isInstitutionalAuthority = role.technicalCode === "INSTITUTIONAL_AUTHORITY";
+                const isRevokable = !isInstitutionalAuthority || scope === "admin";
 
                 return (
                   <div key={role.roleId} className="flex items-center justify-between gap-3 rounded-lg border p-3">
@@ -127,7 +132,7 @@ export function PersonRolesManager({
                       variant={isPendingAssignment ? "outline" : "destructive"}
                       size="sm"
                       onClick={() => removeRole(role.roleId)}
-                      disabled={selectedRoleCodes.length <= 1 || !canApplyRoleCodes(nextRoleCodes)}
+                      disabled={selectedRoleCodes.length <= 1 || !canApplyRoleCodes(nextRoleCodes) || !isRevokable}
                     >
                       <XIcon data-icon="inline-start" />
                       {isPendingAssignment ? "Quitar" : "Revocar"}

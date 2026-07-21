@@ -1,4 +1,4 @@
-import { formatRoleAssignedAt } from "./person-role-date.util";
+import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 
 describe("formatRoleAssignedAt", () => {
   it("formats UTC timestamps in the Buenos Aires timezone", () => {

@@ -2,20 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { getInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { assignPersonRoleAction } from "./assign-person-role.action";
-import { revokePersonRoleAction } from "./revoke-person-role.action";
-import { personRoleIdsSchema } from "../schemas/person-role.schema";
-import { updatePersonFormSchema } from "../schemas/person-form.schema";
-import { fetchPersonRoles } from "../services/fetch-person-roles.service";
-import { peopleApiFetch } from "../services/people-api-fetch.service";
-import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "../types/person-action-state.types";
-import { getRoleChanges, type PersonRoleChanges } from "../utils/person-role-rules.util";
-import type { PeopleScope } from "../utils/people-scope.util";
-import { getPeoplePath } from "../utils/people-scope.util";
+import { assignPersonRoleAction } from "@features/people/actions/assign-person-role.action";
+import { revokePersonRoleAction } from "@features/people/actions/revoke-person-role.action";
+import { personRoleIdsSchema } from "@features/people/schemas/person-role.schema";
+import { updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
+import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "@features/people/types/person-action-state.types";
+import { getRoleChanges, type PersonRoleChanges } from "@features/people/utils/person-role-rules.util";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { getPeoplePath } from "@features/people/utils/people-scope.util";
 
 export async function updatePersonAction(
   institutionId: string,
@@ -28,39 +25,38 @@ export async function updatePersonAction(
     return { error: PEOPLE_ERROR_MESSAGES.INVALID_ROLE_CONFIGURATION };
   }
 
-  const payload = {
-    firstName: formData.get("firstName"),
-    lastName: formData.get("lastName"),
-    email: formData.get("email") || "",
-    phoneNumber: formData.get("phoneNumber") || "",
-  };
+  if (formData.has("firstName")) {
+    const payload = {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email") || "",
+      phoneNumber: formData.get("phoneNumber") || "",
+    };
 
-  const parsed = updatePersonFormSchema.safeParse(payload);
-  if (!parsed.success) {
-    return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
+    const parsed = updatePersonFormSchema.safeParse(payload);
+    if (!parsed.success) {
+      return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
+    }
+
+    const errorState = await getResponseErrorActionState(
+      peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      }),
+      PERSON_FORM_FIELD_NAMES,
+      PEOPLE_ERROR_MESSAGES.UPDATE_PERSON,
+    );
+    if (errorState) return errorState;
   }
 
-  const roleChanges = roleIds ? await prepareRoleChanges(institutionId, personId, roleIds, scope) : undefined;
-  if (typeof roleChanges === "string") {
-    return { error: roleChanges };
-  }
+  if (roleIds) {
+    const roleChanges = await prepareRoleChanges(institutionId, personId, roleIds, scope);
+    if (typeof roleChanges === "string") {
+      revalidatePersonPaths(institutionId, personId, scope);
+      return { error: roleChanges };
+    }
 
-  const response = peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId), {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(parsed.data),
-  });
-
-  const errorState = await getResponseErrorActionState(
-    response,
-    PERSON_FORM_FIELD_NAMES,
-    PEOPLE_ERROR_MESSAGES.UPDATE_PERSON,
-  );
-  if (errorState) return errorState;
-
-  if (roleChanges) {
     const roleError = await syncPersonRoles(institutionId, personId, roleChanges, scope);
     if (roleError) {
       revalidatePersonPaths(institutionId, personId, scope);
@@ -89,36 +85,16 @@ async function prepareRoleChanges(
   desiredRoleCodes: readonly string[],
   scope: PeopleScope,
 ): Promise<PersonRoleChanges | string> {
-  let currentRoles;
-
   try {
-    currentRoles = await fetchPersonRoles(institutionId, personId, scope);
+    const currentRoles = await fetchPersonRoles(institutionId, personId, scope);
+
+    return getRoleChanges(
+      currentRoles.map((role) => role.roleId),
+      desiredRoleCodes,
+    );
   } catch {
     return PEOPLE_ERROR_MESSAGES.VERIFY_ROLE;
   }
-
-  const roleChanges = getRoleChanges(
-    currentRoles.map((role) => role.roleId),
-    desiredRoleCodes,
-  );
-
-  if (scope === "institutional" && !(await canApplyRoleChanges(institutionId, roleChanges))) {
-    return PEOPLE_ERROR_MESSAGES.UNAUTHORIZED_ROLE_CHANGE;
-  }
-
-  return roleChanges;
-}
-
-async function canApplyRoleChanges(institutionId: string, roleChanges: PersonRoleChanges): Promise<boolean> {
-  const user = await getInstitutionalUser();
-  if (!user || user.institutionId !== institutionId) return false;
-
-  const canAssign =
-    roleChanges.assignments.length === 0 || hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN);
-  const canRevoke =
-    roleChanges.revocations.length === 0 || hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
-
-  return canAssign && canRevoke;
 }
 
 async function syncPersonRoles(

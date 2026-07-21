@@ -6,8 +6,8 @@ import { getResponseErrorActionState, getValidationActionState } from "@common/u
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { personRoleSchema } from "@features/people/schemas/person-role.schema";
 import { ROLE_FORM_FIELD_NAMES, type RoleActionState } from "@features/people/types/role-action-state.types";
-import { peopleApiFetch } from "../services/people-api-fetch.service";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 export async function assignPersonRoleAction(
   institutionId: string,

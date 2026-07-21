@@ -1,5 +1,5 @@
-import { personRoleIdsSchema } from "./person-role.schema";
-import { getRoleChanges } from "../utils/person-role-rules.util";
+import { personRoleIdsSchema } from "@features/people/schemas/person-role.schema";
+import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 
 const ROLE_A = "019bffff-0000-7000-8000-000000000001";
 const ROLE_B = "019bffff-0000-7000-8000-000000000002";

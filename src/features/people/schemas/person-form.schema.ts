@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { hasMinimumPersonAge } from "../utils/person-birth-date.util";
-import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
+import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
 const optionalEmail = z
   .string()

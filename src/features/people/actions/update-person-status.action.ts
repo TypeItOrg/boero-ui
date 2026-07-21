@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { peopleApiFetch } from "../services/people-api-fetch.service";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 
 type UpdatePersonStatusActionState = {
   success?: boolean;

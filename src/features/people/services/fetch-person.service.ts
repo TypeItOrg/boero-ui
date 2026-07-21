@@ -1,9 +1,9 @@
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { peopleApiFetch } from "./people-api-fetch.service";
-import type { Person } from "../types/person.types";
-import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
-import type { PeopleScope } from "../utils/people-scope.util";
-import { getPeoplePath } from "../utils/people-scope.util";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import type { Person } from "@features/people/types/person.types";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { getPeoplePath } from "@features/people/utils/people-scope.util";
 
 export async function fetchPerson(
   institutionId: string,

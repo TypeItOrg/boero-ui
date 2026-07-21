@@ -1,8 +1,12 @@
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { peopleApiFetch } from "./people-api-fetch.service";
-import { FALLBACK_SYSTEM_ROLES, type AssignableRole, type SystemRoleList } from "../types/person-role.types";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import {
+  FALLBACK_SYSTEM_ROLES,
+  type AssignableRole,
+  type SystemRoleList,
+} from "@features/people/types/person-role.types";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 export async function fetchSystemRoles(institutionId: string, scope: PeopleScope = "admin"): Promise<AssignableRole[]> {
   const response = await peopleApiFetch(

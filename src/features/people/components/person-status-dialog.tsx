@@ -15,8 +15,8 @@ import {
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
 import { safelyRunAction } from "@common/utils/safe-action.util";
-import { updatePersonStatusAction } from "../actions/update-person-status.action";
-import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
+import { updatePersonStatusAction } from "@features/people/actions/update-person-status.action";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
 type PersonStatusDialogProps = {
   institutionId: string;

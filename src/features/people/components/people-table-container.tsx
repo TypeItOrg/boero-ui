@@ -1,7 +1,7 @@
-import type { PeoplePaginationParams } from "../utils/people-pagination.util";
-import type { fetchPeople } from "../services/fetch-people.service";
-import { PeopleTablePresentation } from "./people-table-presentation";
-import type { PeopleScope } from "../utils/people-scope.util";
+import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
+import type { fetchPeople } from "@features/people/services/fetch-people.service";
+import { PeopleTablePresentation } from "@features/people/components/people-table-presentation";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PeopleTableContainerProps = PeoplePaginationParams & {
   dataPromise: ReturnType<typeof fetchPeople>;
@@ -9,6 +9,8 @@ type PeopleTableContainerProps = PeoplePaginationParams & {
   scope?: PeopleScope;
   selfPersonId?: string | null;
   canCreate?: boolean;
+  canUpdate?: boolean;
+  canManageRoles?: boolean;
   canDelete?: boolean;
   canUpdateStatus?: boolean;
 };
@@ -24,6 +26,8 @@ export async function PeopleTableContainer(props: PeopleTableContainerProps): Pr
     scope = "admin",
     selfPersonId,
     canCreate = true,
+    canUpdate = true,
+    canManageRoles = false,
     canDelete = true,
     canUpdateStatus = false,
   } = props;
@@ -41,6 +45,8 @@ export async function PeopleTableContainer(props: PeopleTableContainerProps): Pr
       scope={scope}
       selfPersonId={selfPersonId}
       canCreate={canCreate}
+      canUpdate={canUpdate}
+      canManageRoles={canManageRoles}
       canDelete={canDelete}
       canUpdateStatus={canUpdateStatus}
     />

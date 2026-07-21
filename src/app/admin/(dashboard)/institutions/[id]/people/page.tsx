@@ -14,6 +14,7 @@ import { PeopleSearchForm } from "@features/people/components/people-search-form
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
+import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 
 type PeoplePageProps = {
   params: Promise<{ id: string }>;
@@ -29,9 +30,10 @@ export default async function InstitutionPeoplePage({
   searchParams,
 }: PeoplePageProps): Promise<React.ReactElement> {
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const { page, size, search, sort } = parsePeoplePaginationParams(resolvedSearchParams);
-  const peoplePromise = fetchPeople(id, { page, size, search, sort });
-  const institution = await fetchInstitution(id);
+  const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
+  const rolesPromise = fetchSystemRoles(id, "admin");
+  const peoplePromise = fetchPeople(id, { page, size, search, sort, roleId });
+  const [institution, roles] = await Promise.all([fetchInstitution(id), rolesPromise]);
   if (!institution) notFound();
 
   return (
@@ -49,7 +51,7 @@ export default async function InstitutionPeoplePage({
       }
     >
       <DataTableNavigationProvider>
-        <PeopleSearchForm search={search} size={size} />
+        <PeopleSearchForm search={search} size={size} roleId={roleId} roles={roles} />
 
         <Suspense fallback={<PeopleTableSkeleton />}>
           <PeopleTableContainer
@@ -58,6 +60,7 @@ export default async function InstitutionPeoplePage({
             size={size}
             search={search}
             sort={sort}
+            roleId={roleId}
             dataPromise={peoplePromise}
           />
         </Suspense>

@@ -18,11 +18,15 @@ export const DEFAULT_PEOPLE_SORT = { field: "lastName", direction: "asc" } as co
 
 const peopleSortFields = new Set<PeopleSortField>(PEOPLE_SORT_FIELDS);
 
-export type PeopleSearchParams = PaginationSearchParams & SortSearchParams;
+export type PeopleSearchParams = PaginationSearchParams &
+  SortSearchParams & {
+    roleId?: string;
+  };
 
 export type PeoplePaginationParams = PaginationParams & {
   search: string;
   sort: PeopleSort;
+  roleId?: string;
 };
 
 export function parsePeoplePaginationParams(searchParams: PeopleSearchParams): PeoplePaginationParams {
@@ -35,6 +39,7 @@ export function parsePeoplePaginationParams(searchParams: PeopleSearchParams): P
     page,
     size,
     search,
+    roleId: searchParams.roleId || undefined,
     sort: parseSortQuery(searchParams, peopleSortFields, DEFAULT_PEOPLE_SORT),
   };
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PEOPLE_ERROR_MESSAGES } from "../constants/error-messages.constants";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
 export const personRoleSchema = z.object({
   role: z.string().uuid(PEOPLE_ERROR_MESSAGES.INVALID_ROLE),

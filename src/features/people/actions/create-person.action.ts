@@ -5,10 +5,10 @@ import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonFormSchema } from "@features/people/schemas/person-form.schema";
-import { peopleApiFetch } from "../services/people-api-fetch.service";
-import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "../types/person-action-state.types";
-import type { PeopleScope } from "../utils/people-scope.util";
-import { getPeoplePath } from "../utils/people-scope.util";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "@features/people/types/person-action-state.types";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { getPeoplePath } from "@features/people/utils/people-scope.util";
 
 export async function createPersonAction(
   institutionId: string,

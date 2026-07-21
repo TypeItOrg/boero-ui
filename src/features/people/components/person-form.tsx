@@ -15,13 +15,17 @@ import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { createPersonAction } from "../actions/create-person.action";
-import { updatePersonAction } from "../actions/update-person.action";
-import { createPersonFormSchema, updatePersonFormSchema } from "../schemas/person-form.schema";
-import type { Person } from "../types/person.types";
-import type { PersonActionState, PersonFormFieldName } from "../types/person-action-state.types";
-import { formatBirthDateInput, getLatestAllowedBirthDate, parseBirthDateInput } from "../utils/person-birth-date.util";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { createPersonAction } from "@features/people/actions/create-person.action";
+import { updatePersonAction } from "@features/people/actions/update-person.action";
+import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
+import type { Person } from "@features/people/types/person.types";
+import type { PersonActionState, PersonFormFieldName } from "@features/people/types/person-action-state.types";
+import {
+  formatBirthDateInput,
+  getLatestAllowedBirthDate,
+  parseBirthDateInput,
+} from "@features/people/utils/person-birth-date.util";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PersonFormInput = {
   firstName: string;
@@ -40,6 +44,7 @@ type CreateMode = {
   roleIds?: never;
   formId?: string;
   hideActions?: boolean;
+  canEdit?: never;
   scope?: PeopleScope;
 };
 
@@ -50,6 +55,7 @@ type EditMode = {
   roleIds?: readonly string[];
   formId?: string;
   hideActions?: boolean;
+  canEdit?: boolean;
   scope?: PeopleScope;
 };
 
@@ -72,6 +78,7 @@ export function PersonForm({
   roleIds,
   formId,
   hideActions = false,
+  canEdit = true,
   scope = "admin",
 }: PersonFormProps): React.ReactElement {
   const router = useRouter();
@@ -96,7 +103,7 @@ export function PersonForm({
     setFormError(undefined);
 
     startTransition(async () => {
-      const formData = getFormData(values, isEdit, roleIds);
+      const formData = getFormData(values, isEdit, canEdit, roleIds);
       const result = isEdit
         ? await updatePersonAction(institutionId, person.personId, formData, scope)
         : await createPersonAction(institutionId, formData, scope);
@@ -125,57 +132,59 @@ export function PersonForm({
           </Alert>
         )}
 
-        <FormCard>
-          <SectionHeading title="Datos personales" description="Información principal del usuario institucional." />
-          <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-            <Field data-invalid={!!errors.firstName} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="person-first-name" required>
-                  Nombre
-                </FieldLabel>
-              </FieldContent>
-              <Input id="person-first-name" aria-invalid={!!errors.firstName} {...register("firstName")} />
-              <FieldError errors={[errors.firstName]} />
-            </Field>
-
-            <Field data-invalid={!!errors.lastName} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="person-last-name" required>
-                  Apellido
-                </FieldLabel>
-              </FieldContent>
-              <Input id="person-last-name" aria-invalid={!!errors.lastName} {...register("lastName")} />
-              <FieldError errors={[errors.lastName]} />
-            </Field>
-          </FieldGroup>
-
-          <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-            {isEdit && (
-              <Field data-disabled className="flex-[1_0_min(200px,100%)]">
+        <fieldset disabled={isEdit && !canEdit} className="contents">
+          <FormCard>
+            <SectionHeading title="Datos personales" description="Información principal del usuario institucional." />
+            <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+              <Field data-invalid={!!errors.firstName} className="flex-[1_0_min(200px,100%)]">
                 <FieldContent>
-                  <FieldLabel htmlFor="person-document">Documento</FieldLabel>
+                  <FieldLabel htmlFor="person-first-name" required>
+                    Nombre
+                  </FieldLabel>
                 </FieldContent>
-                <Input id="person-document" value={person.documentNumber} disabled />
+                <Input id="person-first-name" aria-invalid={!!errors.firstName} {...register("firstName")} />
+                <FieldError errors={[errors.firstName]} />
               </Field>
-            )}
 
-            <Field data-invalid={!!errors.email} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="person-email">Email</FieldLabel>
-              </FieldContent>
-              <Input id="person-email" type="email" aria-invalid={!!errors.email} {...register("email")} />
-              <FieldError errors={[errors.email]} />
-            </Field>
+              <Field data-invalid={!!errors.lastName} className="flex-[1_0_min(200px,100%)]">
+                <FieldContent>
+                  <FieldLabel htmlFor="person-last-name" required>
+                    Apellido
+                  </FieldLabel>
+                </FieldContent>
+                <Input id="person-last-name" aria-invalid={!!errors.lastName} {...register("lastName")} />
+                <FieldError errors={[errors.lastName]} />
+              </Field>
+            </FieldGroup>
 
-            <Field className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="person-phone">Teléfono</FieldLabel>
-              </FieldContent>
-              <PhoneInput id="person-phone" aria-invalid={!!errors.phoneNumber} {...register("phoneNumber")} />
-              <FieldError errors={[errors.phoneNumber]} />
-            </Field>
-          </FieldGroup>
-        </FormCard>
+            <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+              {isEdit && (
+                <Field data-disabled className="flex-[1_0_min(200px,100%)]">
+                  <FieldContent>
+                    <FieldLabel htmlFor="person-document">Documento</FieldLabel>
+                  </FieldContent>
+                  <Input id="person-document" value={person.documentNumber} disabled />
+                </Field>
+              )}
+
+              <Field data-invalid={!!errors.email} className="flex-[1_0_min(200px,100%)]">
+                <FieldContent>
+                  <FieldLabel htmlFor="person-email">Email</FieldLabel>
+                </FieldContent>
+                <Input id="person-email" type="email" aria-invalid={!!errors.email} {...register("email")} />
+                <FieldError errors={[errors.email]} />
+              </Field>
+
+              <Field className="flex-[1_0_min(200px,100%)]">
+                <FieldContent>
+                  <FieldLabel htmlFor="person-phone">Teléfono</FieldLabel>
+                </FieldContent>
+                <PhoneInput id="person-phone" aria-invalid={!!errors.phoneNumber} {...register("phoneNumber")} />
+                <FieldError errors={[errors.phoneNumber]} />
+              </Field>
+            </FieldGroup>
+          </FormCard>
+        </fieldset>
 
         {!isEdit && (
           <FormCard>
@@ -285,14 +294,22 @@ function getDefaultValues(person: Person | undefined): PersonFormInput {
   };
 }
 
-function getFormData(values: PersonFormInput, isEdit: boolean, roleIds?: readonly string[]): FormData {
+function getFormData(
+  values: PersonFormInput,
+  isEdit: boolean,
+  canEdit: boolean,
+  roleIds?: readonly string[],
+): FormData {
   const formData = new FormData();
-  const keys: Array<keyof PersonFormInput> = isEdit
-    ? ["firstName", "lastName", "email", "phoneNumber"]
-    : ["firstName", "lastName", "documentNumber", "email", "phoneNumber", "birthDate", "password"];
 
-  for (const key of keys) {
-    formData.append(key, values[key]);
+  if (!isEdit || canEdit) {
+    const keys: Array<keyof PersonFormInput> = isEdit
+      ? ["firstName", "lastName", "email", "phoneNumber"]
+      : ["firstName", "lastName", "documentNumber", "email", "phoneNumber", "birthDate", "password"];
+
+    for (const key of keys) {
+      formData.append(key, values[key]);
+    }
   }
 
   if (isEdit && roleIds) {

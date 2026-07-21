@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { peopleApiFetch } from "../services/people-api-fetch.service";
-import type { PeopleScope } from "../utils/people-scope.util";
-import { getPeoplePath } from "../utils/people-scope.util";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { getPeoplePath } from "@features/people/utils/people-scope.util";
 
 type DeletePersonActionState = {
   success?: boolean;

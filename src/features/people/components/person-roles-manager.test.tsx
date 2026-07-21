@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { PersonRolesManager } from "./person-roles-manager";
-import type { AssignableRole, PersonRole, SystemRoleCode } from "../types/person-role.types";
+import { PersonRolesManager } from "@features/people/components/person-roles-manager";
+import type { AssignableRole, PersonRole, SystemRoleCode } from "@features/people/types/person-role.types";
 
 const applicantRole: AssignableRole = {
   id: "019bffff-0000-7000-8000-000000000001",
@@ -78,5 +78,42 @@ describe("PersonRolesManager", () => {
     });
 
     expect(screen.getByRole("button", { name: "Asignar" })).toBeDisabled();
+  });
+
+  it("disables revoking institutional authority role in institutional scope", () => {
+    const authorityRole: AssignableRole = {
+      id: "019bffff-0000-7000-8000-000000000003",
+      name: "Administrador Institucional",
+      technicalCode: "INSTITUTIONAL_AUTHORITY",
+    };
+
+    render(
+      <PersonRolesManager
+        roles={[authorityRole, administrativeRole]}
+        assignedRoles={[
+          {
+            roleId: authorityRole.id,
+            technicalCode: "INSTITUTIONAL_AUTHORITY",
+            displayName: authorityRole.name,
+            assignedAt: "2026-07-17T21:03:00Z",
+          },
+          {
+            roleId: administrativeRole.id,
+            technicalCode: null,
+            displayName: administrativeRole.name,
+            assignedAt: "2026-07-17T21:03:00Z",
+          },
+        ]}
+        selectedRoleCodes={[authorityRole.id, administrativeRole.id]}
+        onSelectedRoleCodesChange={jest.fn()}
+        canAssignRoles={true}
+        canRevokeRoles={true}
+        scope="institutional"
+      />,
+    );
+
+    const revokeButtons = screen.getAllByRole("button", { name: "Revocar" });
+    expect(revokeButtons[0]).toBeDisabled();
+    expect(revokeButtons[1]).not.toBeDisabled();
   });
 });

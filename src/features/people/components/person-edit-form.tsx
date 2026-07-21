@@ -3,11 +3,11 @@
 import * as React from "react";
 
 import { cn } from "@common/utils/cn.util";
-import { PersonForm } from "./person-form";
-import { PersonRolesManager } from "./person-roles-manager";
-import type { AssignableRole, PersonRole } from "../types/person-role.types";
-import type { Person } from "../types/person.types";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { PersonForm } from "@features/people/components/person-form";
+import { PersonRolesManager } from "@features/people/components/person-roles-manager";
+import type { AssignableRole, PersonRole } from "@features/people/types/person-role.types";
+import type { Person } from "@features/people/types/person.types";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PersonEditFormProps = {
   formId: string;
@@ -16,6 +16,7 @@ type PersonEditFormProps = {
   roles: AssignableRole[];
   assignedRoles: PersonRole[];
   scope?: PeopleScope;
+  canEdit?: boolean;
   canAssignRoles?: boolean;
   canRevokeRoles?: boolean;
 };
@@ -27,6 +28,7 @@ export function PersonEditForm({
   roles,
   assignedRoles,
   scope = "admin",
+  canEdit = true,
   canAssignRoles = true,
   canRevokeRoles = true,
 }: PersonEditFormProps): React.ReactElement {
@@ -48,6 +50,7 @@ export function PersonEditForm({
         person={person}
         formId={formId}
         hideActions
+        canEdit={canEdit}
         roleIds={canManageRoles ? selectedRoleCodes : undefined}
         scope={scope}
       />
@@ -59,6 +62,7 @@ export function PersonEditForm({
           onSelectedRoleCodesChange={setSelectedRoleCodes}
           canAssignRoles={canAssignRoles}
           canRevokeRoles={canRevokeRoles}
+          scope={scope}
         />
       ) : null}
     </div>

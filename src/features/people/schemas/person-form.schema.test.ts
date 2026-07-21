@@ -1,5 +1,5 @@
-import { createPersonFormSchema, updatePersonFormSchema } from "./person-form.schema";
-import { getLatestAllowedBirthDate } from "../utils/person-birth-date.util";
+import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
+import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 describe("person form schemas", () => {
   it("accepts phone numbers with digits and hyphens", () => {

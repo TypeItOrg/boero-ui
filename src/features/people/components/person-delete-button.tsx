@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { TrashIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { PersonDeleteDialog } from "./person-delete-dialog";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PersonDeleteButtonProps = {
   institutionId: string;

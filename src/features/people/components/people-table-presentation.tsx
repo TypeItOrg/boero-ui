@@ -26,12 +26,12 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationQuery } from "@common/types/pagination.types";
-import type { PersonSummary } from "../types/person.types";
-import type { PeopleSort, PeopleSortField } from "../utils/people-pagination.util";
-import type { PeopleScope } from "../utils/people-scope.util";
-import { PeoplePagination } from "./people-pagination";
-import { PersonDeleteDialog } from "./person-delete-dialog";
-import { PersonStatusDialog } from "./person-status-dialog";
+import type { PersonSummary } from "@features/people/types/person.types";
+import type { PeopleSort, PeopleSortField } from "@features/people/utils/people-pagination.util";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeoplePagination } from "@features/people/components/people-pagination";
+import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
+import { PersonStatusDialog } from "@features/people/components/person-status-dialog";
 
 type PeopleTablePresentationProps = PaginationQuery & {
   data: PaginatedResponse<PersonSummary>;
@@ -40,6 +40,8 @@ type PeopleTablePresentationProps = PaginationQuery & {
   scope?: PeopleScope;
   selfPersonId?: string | null;
   canCreate?: boolean;
+  canUpdate?: boolean;
+  canManageRoles?: boolean;
   canDelete?: boolean;
   canUpdateStatus?: boolean;
 };
@@ -54,6 +56,8 @@ export function PeopleTablePresentation({
   scope = "admin",
   selfPersonId,
   canCreate = true,
+  canUpdate = true,
+  canManageRoles = false,
   canDelete = true,
   canUpdateStatus = false,
 }: PeopleTablePresentationProps): React.ReactElement {
@@ -169,7 +173,7 @@ export function PeopleTablePresentation({
       <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isNavigating}>
         <Table containerClassName="table-scrollbar" className="min-w-190">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-            <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors">
+            <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
               <DataTableSortableHead<PeopleSortField>
                 field="lastName"
                 label="Nombre"
@@ -194,92 +198,110 @@ export function PeopleTablePresentation({
           <TableBody>
             {data.items.map((person) => {
               const isSelf = person.id === selfPersonId;
+              const canEditPerson = canUpdate;
+              const canOpenPerson = canEditPerson || (scope === "institutional" && canManageRoles && !isSelf);
               const canDeletePerson = canDelete && !isSelf;
               const canUpdatePersonStatus = canUpdateStatus && !isSelf;
+              const hasActions = canOpenPerson || canDeletePerson || canUpdatePersonStatus;
+
+              const tableRow = (
+                <TableRow key={person.id} className="hover:bg-muted/50 h-11 border-b transition-colors">
+                  <TableCell className="font-medium">
+                    {canOpenPerson ? (
+                      <Link
+                        className="hover:underline"
+                        href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
+                      >
+                        {person.lastName}, {person.firstName}
+                      </Link>
+                    ) : (
+                      <span>
+                        {person.lastName}, {person.firstName}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>{person.documentNumber}</TableCell>
+                  <TableCell>
+                    {person.phoneNumber ? (
+                      person.phoneNumber
+                    ) : (
+                      <span className="text-muted-foreground/60">Sin teléfono</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}
+                  </TableCell>
+                  {scope === "institutional" ? (
+                    <TableCell>
+                      <Badge variant={person.enabled ? "secondary" : "outline"}>
+                        {person.enabled ? "Activo" : "Inactivo"}
+                      </Badge>
+                    </TableCell>
+                  ) : null}
+                  <TableCell>
+                    {person.roles && person.roles.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {person.roles.map((role) => (
+                          <Badge key={role.roleCode} variant="secondary">
+                            {role.displayName}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground/60">Sin rol</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {hasActions ? (
+                      <PersonActionsMenu
+                        person={person}
+                        institutionId={institutionId}
+                        scope={scope}
+                        isSelf={isSelf}
+                        canEdit={canOpenPerson}
+                        editLabel={canEditPerson ? "Editar" : "Administrar"}
+                        canDelete={canDeletePerson}
+                        canUpdateStatus={canUpdatePersonStatus}
+                        onDelete={() => setPersonToDelete(person)}
+                        onUpdateStatus={() => setPersonToUpdateStatus(person)}
+                      />
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              );
+
+              if (!hasActions) {
+                return tableRow;
+              }
 
               return (
                 <ContextMenu key={person.id}>
-                  <ContextMenuTrigger asChild>
-                    <TableRow className="hover:bg-muted/50 border-b transition-colors">
-                      <TableCell className="font-medium">
-                        <Link
-                          className="hover:underline"
-                          href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
-                        >
-                          {person.lastName}, {person.firstName}
-                        </Link>
-                      </TableCell>
-                      <TableCell>{person.documentNumber}</TableCell>
-                      <TableCell>
-                        {person.phoneNumber ? (
-                          person.phoneNumber
-                        ) : (
-                          <span className="text-muted-foreground/60">Sin teléfono</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}
-                      </TableCell>
-                      {scope === "institutional" ? (
-                        <TableCell>
-                          <Badge variant={person.enabled ? "secondary" : "outline"}>
-                            {person.enabled ? "Activo" : "Inactivo"}
-                          </Badge>
-                        </TableCell>
-                      ) : null}
-                      <TableCell>
-                        {person.roles && person.roles.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {person.roles.map((role) => (
-                              <Badge key={role.roleCode} variant="secondary">
-                                {role.displayName}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground/60">Sin rol</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <PersonActionsMenu
-                          person={person}
-                          institutionId={institutionId}
-                          scope={scope}
-                          isSelf={isSelf}
-                          canDelete={canDeletePerson}
-                          canUpdateStatus={canUpdatePersonStatus}
-                          onDelete={() => setPersonToDelete(person)}
-                          onUpdateStatus={() => setPersonToUpdateStatus(person)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  </ContextMenuTrigger>
+                  <ContextMenuTrigger asChild>{tableRow}</ContextMenuTrigger>
                   <ContextMenuContent className="w-44 p-1.5">
-                    <ContextMenuItem asChild>
-                      <Link
-                        href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
-                        className="px-2.5 py-1.5"
-                      >
-                        Editar
-                      </Link>
-                    </ContextMenuItem>
+                    {canOpenPerson ? (
+                      <ContextMenuItem asChild>
+                        <Link
+                          href={getPersonHref(scope, institutionId, person.id, selfPersonId)}
+                          className="px-2.5 py-1.5"
+                        >
+                          {canEditPerson ? "Editar" : "Administrar"}
+                        </Link>
+                      </ContextMenuItem>
+                    ) : null}
+                    {canUpdatePersonStatus ? (
+                      <ContextMenuItem className="px-2.5 py-1.5" onSelect={() => setPersonToUpdateStatus(person)}>
+                        {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+                      </ContextMenuItem>
+                    ) : null}
                     {canDeletePerson ? (
                       <>
-                        <ContextMenuSeparator />
+                        {canOpenPerson || canUpdatePersonStatus ? <ContextMenuSeparator /> : null}
                         <ContextMenuItem
                           variant="destructive"
                           className="px-2.5 py-1.5"
                           onSelect={() => setPersonToDelete(person)}
                         >
                           Eliminar
-                        </ContextMenuItem>
-                      </>
-                    ) : null}
-                    {canUpdatePersonStatus ? (
-                      <>
-                        <ContextMenuSeparator />
-                        <ContextMenuItem className="px-2.5 py-1.5" onSelect={() => setPersonToUpdateStatus(person)}>
-                          {person.enabled ? "Desactivar acceso" : "Activar acceso"}
                         </ContextMenuItem>
                       </>
                     ) : null}
@@ -336,6 +358,8 @@ type PersonActionsMenuProps = {
   onDelete: () => void;
   scope: PeopleScope;
   isSelf: boolean;
+  canEdit: boolean;
+  editLabel: string;
   canDelete: boolean;
   canUpdateStatus: boolean;
   onUpdateStatus: () => void;
@@ -347,6 +371,8 @@ function PersonActionsMenu({
   onDelete,
   scope,
   isSelf,
+  canEdit,
+  editLabel,
   canDelete,
   canUpdateStatus,
   onUpdateStatus,
@@ -360,25 +386,24 @@ function PersonActionsMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
-          <DropdownMenuItem asChild>
-            <Link
-              href={getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined)}
-              className="px-2.5 py-1.5"
-            >
-              Editar
-            </Link>
-          </DropdownMenuItem>
+          {canEdit ? (
+            <DropdownMenuItem asChild>
+              <Link
+                href={getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined)}
+                className="px-2.5 py-1.5"
+              >
+                {editLabel}
+              </Link>
+            </DropdownMenuItem>
+          ) : null}
           {canUpdateStatus ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="px-2.5 py-1.5" onSelect={onUpdateStatus}>
-                {person.enabled ? "Desactivar acceso" : "Activar acceso"}
-              </DropdownMenuItem>
-            </>
+            <DropdownMenuItem className="px-2.5 py-1.5" onSelect={onUpdateStatus}>
+              {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+            </DropdownMenuItem>
           ) : null}
           {canDelete ? (
             <>
-              <DropdownMenuSeparator />
+              {canEdit || canUpdateStatus ? <DropdownMenuSeparator /> : null}
               <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onDelete}>
                 Eliminar
               </DropdownMenuItem>

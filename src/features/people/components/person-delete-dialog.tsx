@@ -17,8 +17,8 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { safelyRunAction } from "@common/utils/safe-action.util";
-import { deletePersonAction } from "../actions/delete-person.action";
-import type { PeopleScope } from "../utils/people-scope.util";
+import { deletePersonAction } from "@features/people/actions/delete-person.action";
+import type { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PersonDeleteDialogProps = {
   institutionId: string;
