@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import {
@@ -77,10 +77,13 @@ export function PersonDeleteDialog({
       {trigger ? <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger> : null}
       <AlertDialogContent>
         <AlertDialogHeader>
+          <div className="bg-destructive/10 text-destructive mb-1 flex size-12 items-center justify-center rounded-2xl">
+            <Trash2Icon className="size-6" />
+          </div>
           <AlertDialogTitle>Eliminar usuario</AlertDialogTitle>
           <AlertDialogDescription>
-            {personName} dejará de tener acceso y ya no aparecerá en los listados de la institución. Esta acción no
-            elimina físicamente sus datos.
+            <span className="font-semibold text-foreground">{personName}</span> dejará de tener acceso y ya no
+            aparecerá en los listados de la institución. Esta acción no elimina físicamente sus datos.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

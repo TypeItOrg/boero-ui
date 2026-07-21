@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CircleAlertIcon, UserCheckIcon, UserXIcon } from "lucide-react";
+import { Building2Icon, CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import {
@@ -16,32 +16,30 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { cn } from "@common/utils/cn.util";
 import { safelyRunAction } from "@common/utils/safe-action.util";
-import { updatePersonStatusAction } from "@features/people/actions/update-person-status.action";
-import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import { updateInstitutionStatusAction } from "@features/institutions/actions/update-institution-status.action";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
-type PersonStatusDialogProps = {
+type InstitutionStatusDialogProps = {
   institutionId: string;
-  personId: string;
-  personName: string;
-  enabled: boolean;
+  institutionName: string;
+  active: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdated: () => void;
 };
 
-export function PersonStatusDialog({
+export function InstitutionStatusDialog({
   institutionId,
-  personId,
-  personName,
-  enabled,
+  institutionName,
+  active,
   open,
   onOpenChange,
   onUpdated,
-}: PersonStatusDialogProps): React.ReactElement {
+}: InstitutionStatusDialogProps): React.ReactElement {
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string>();
-  const nextEnabled = !enabled;
-  const actionLabel = nextEnabled ? "Activar usuario" : "Desactivar usuario";
+  const nextActive = !active;
+  const actionLabel = nextActive ? "Activar institución" : "Desactivar institución";
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) return;
@@ -55,11 +53,12 @@ export function PersonStatusDialog({
 
     startTransition(async () => {
       const result = await safelyRunAction(
-        updatePersonStatusAction(institutionId, personId, nextEnabled),
-        PEOPLE_ERROR_MESSAGES.UPDATE_STATUS,
+        updateInstitutionStatusAction(institutionId, nextActive),
+        INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(nextActive),
       );
-      if (!result.success) {
-        setError(result.error ?? PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
+
+      if (result.error) {
+        setError(result.error);
         return;
       }
 
@@ -74,23 +73,23 @@ export function PersonStatusDialog({
         <AlertDialogHeader>
           <div
             className={cn(
-              "flex size-12 items-center justify-center rounded-2xl mb-1",
-              nextEnabled ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive",
+              "mb-1 flex size-12 items-center justify-center rounded-2xl",
+              nextActive ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive",
             )}
           >
-            {nextEnabled ? <UserCheckIcon className="size-6" /> : <UserXIcon className="size-6" />}
+            <Building2Icon className="size-6" />
           </div>
           <AlertDialogTitle>{actionLabel}</AlertDialogTitle>
           <AlertDialogDescription>
-            {nextEnabled ? (
+            {nextActive ? (
               <>
-                <span className="font-semibold text-foreground">{personName}</span> recuperará el acceso al portal
-                institucional.
+                <span className="font-semibold text-foreground">{institutionName}</span> volverá a estar activa en la
+                plataforma.
               </>
             ) : (
               <>
-                <span className="font-semibold text-foreground">{personName}</span> perderá el acceso y se cerrarán todas
-                sus sesiones activas.
+                <span className="font-semibold text-foreground">{institutionName}</span> perderá el acceso y se suspenderán
+                sus operaciones.
               </>
             )}
           </AlertDialogDescription>
@@ -99,7 +98,7 @@ export function PersonStatusDialog({
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>No se pudo actualizar el acceso</AlertTitle>
+            <AlertTitle>No se pudo actualizar el estado</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
@@ -110,11 +109,11 @@ export function PersonStatusDialog({
           </AlertDialogCancel>
           <AlertDialogAction
             size="lg"
-            variant={nextEnabled ? "default" : "destructive"}
+            variant={nextActive ? "default" : "destructive"}
             disabled={isPending}
             onClick={handleConfirm}
           >
-            {isPending ? "Actualizando…" : actionLabel}
+            {isPending ? (nextActive ? "Activando…" : "Desactivando…") : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

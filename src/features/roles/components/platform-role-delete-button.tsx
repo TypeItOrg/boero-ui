@@ -53,7 +53,12 @@ export function PlatformRoleDeleteButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Eliminar “{roleName}”?</AlertDialogTitle>
+          <div className="bg-destructive/10 text-destructive mb-1 flex size-12 items-center justify-center rounded-2xl">
+            <Trash2Icon className="size-6" />
+          </div>
+          <AlertDialogTitle>
+            ¿Eliminar “<span className="font-semibold text-foreground">{roleName}</span>”?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción no se puede deshacer. El rol solo puede eliminarse si no tiene usuarios asignados.
           </AlertDialogDescription>
