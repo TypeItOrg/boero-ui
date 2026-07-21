@@ -1,0 +1,215 @@
+"use client";
+
+import Link from "next/link";
+import { EllipsisVerticalIcon, KeyRoundIcon, Loader2Icon, SearchIcon, ShieldCheckIcon } from "lucide-react";
+
+import { Badge } from "@common/components/ui/badge";
+import { Button } from "@common/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@common/components/ui/dropdown-menu";
+import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import type { PaginationParams } from "@common/types/pagination.types";
+import { PlatformRolesPagination } from "@features/roles/components/platform-roles-pagination";
+import type { PlatformRoleListItem } from "@features/roles/types/platform-role.types";
+import type { PlatformRoleSort, PlatformRoleSortField } from "@features/roles/utils/platform-role-pagination.util";
+
+type PlatformRolesTablePresentationProps = PaginationParams & {
+  data: PaginatedResponse<PlatformRoleListItem>;
+  institutionId: string | undefined;
+  roleType: "SYSTEM" | "CUSTOM" | undefined;
+  search: string;
+  sort: PlatformRoleSort;
+};
+
+export function PlatformRolesTablePresentation({
+  data,
+  page,
+  size,
+  institutionId,
+  roleType,
+  search,
+  sort,
+}: PlatformRolesTablePresentationProps): React.ReactElement {
+  const { isPending, navigate } = useDataTableNavigation();
+
+  function updateSort(nextSort: PlatformRoleSort): void {
+    navigate({ page: "0", sortField: nextSort.field, sortDirection: nextSort.direction });
+  }
+
+  const hasFilters = search.trim() !== "" || institutionId !== undefined || roleType !== undefined;
+  if (data.items.length === 0) {
+    return (
+      <div className="relative h-full" aria-busy={isPending}>
+        <EmptyState
+          data={data}
+          hasFilters={hasFilters}
+          onFirstPage={() => navigate({ page: "0", size: String(size) })}
+        />
+        {isPending ? <LoadingOverlay /> : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col gap-4">
+      <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isPending}>
+        <Table containerClassName="table-scrollbar" className="min-w-220">
+          <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
+            <TableRow>
+              <DataTableSortableHead<PlatformRoleSortField>
+                field="name"
+                label="Rol"
+                sort={sort}
+                onSortChange={updateSort}
+              />
+              <DataTableSortableHead<PlatformRoleSortField>
+                field="institutionName"
+                label="Institución"
+                sort={sort}
+                onSortChange={updateSort}
+              />
+              <TableHead>Tipo</TableHead>
+              <TableHead>Usuarios</TableHead>
+              <TableHead>Permisos</TableHead>
+              <TableHead className="w-16 pr-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.items.map((role) => (
+              <TableRow key={role.id}>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/roles/${role.id}`} className="hover:underline">
+                    {role.name}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Link
+                    href={`/admin/institutions/${role.institution.id}`}
+                    className="text-muted-foreground font-medium hover:underline"
+                  >
+                    {role.institution.name}
+                  </Link>
+                  {!role.institution.active ? (
+                    <Badge variant="outline" className="ml-2">
+                      Inactiva
+                    </Badge>
+                  ) : null}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={role.technicalCode ? "secondary" : "outline"}>
+                    {role.technicalCode ? "Sistema" : "Personalizado"}
+                  </Badge>
+                </TableCell>
+                <TableCell>{role.assignmentCount}</TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center gap-1.5">
+                    <KeyRoundIcon className="text-muted-foreground size-4" />
+                    {role.permissionCount}
+                  </span>
+                </TableCell>
+                <TableCell className="pr-4">
+                  <PlatformRoleActions role={role} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {isPending ? <LoadingOverlay /> : null}
+      </div>
+      <PlatformRolesPagination
+        page={page}
+        size={size}
+        totalItems={data.totalItems}
+        totalPages={data.totalPages}
+        isPending={isPending}
+        onPageChange={(nextPage) => navigate({ page: String(nextPage), size: String(size) })}
+        onPageSizeChange={(nextSize) => navigate({ page: "0", size: nextSize })}
+      />
+    </div>
+  );
+}
+
+function PlatformRoleActions({ role }: { role: PlatformRoleListItem }): React.ReactElement {
+  return (
+    <div className="flex justify-end">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${role.name}`}>
+            <EllipsisVerticalIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48 p-1.5">
+          <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <Link href={`/admin/roles/${role.id}`} className="px-2.5 py-1.5">
+                Ver detalle
+              </Link>
+            </DropdownMenuItem>
+            {role.editable ? (
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/roles/${role.id}/edit`} className="px-2.5 py-1.5">
+                  Editar rol
+                </Link>
+              </DropdownMenuItem>
+            ) : null}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
+function LoadingOverlay(): React.ReactElement {
+  return (
+    <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
+      <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando roles" role="status" />
+    </div>
+  );
+}
+
+function EmptyState({
+  data,
+  hasFilters,
+  onFirstPage,
+}: {
+  data: PaginatedResponse<PlatformRoleListItem>;
+  hasFilters: boolean;
+  onFirstPage: () => void;
+}): React.ReactElement {
+  if (data.totalItems > 0) {
+    return (
+      <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+        <ShieldCheckIcon className="mb-4 size-8" />
+        <h3 className="text-foreground text-base font-semibold">No hay roles en esta página</h3>
+        <p className="mt-1.5 max-w-sm text-sm">Podés volver a la primera página para ver los resultados.</p>
+        <Button type="button" variant="outline" size="sm" className="mt-6" onClick={onFirstPage}>
+          Volver a la primera página
+        </Button>
+      </div>
+    );
+  }
+  const Icon = hasFilters ? SearchIcon : ShieldCheckIcon;
+  return (
+    <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+      <Icon className="mb-4 size-8" />
+      <h3 className="text-foreground text-base font-semibold">
+        {hasFilters ? "No se encontraron resultados" : "No hay roles registrados"}
+      </h3>
+      <p className="mt-1.5 max-w-sm text-sm">
+        {hasFilters
+          ? "No encontramos roles que coincidan con los filtros."
+          : "Todavía no hay roles cargados en las instituciones."}
+      </p>
+    </div>
+  );
+}
