@@ -5,7 +5,7 @@ COMPOSE := docker compose
 .PHONY: dev build down logs clean ps test typecheck lint format format-check
 
 dev:
-	$(COMPOSE) watch
+	@$(COMPOSE) up --watch --remove-orphans
 
 build:
 	$(COMPOSE) build

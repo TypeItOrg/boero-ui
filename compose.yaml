@@ -22,24 +22,31 @@ services:
         - action: sync
           path: ./src
           target: /app/src
+          initial_sync: true
         - action: sync
           path: ./public
           target: /app/public
+          initial_sync: true
         - action: sync
           path: ./components.json
           target: /app/components.json
+          initial_sync: true
         - action: sync
           path: ./next.config.ts
           target: /app/next.config.ts
+          initial_sync: true
         - action: sync
           path: ./tsconfig.json
           target: /app/tsconfig.json
+          initial_sync: true
         - action: sync
           path: ./postcss.config.mjs
           target: /app/postcss.config.mjs
+          initial_sync: true
         - action: sync
           path: ./eslint.config.mjs
           target: /app/eslint.config.mjs
+          initial_sync: true
         - action: rebuild
           path: ./package.json
         - action: rebuild
