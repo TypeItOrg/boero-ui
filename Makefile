@@ -2,10 +2,13 @@
 
 COMPOSE := docker compose
 
-.PHONY: dev down logs clean ps test typecheck lint format format-check
+.PHONY: dev build down logs clean ps test typecheck lint format format-check
 
 dev:
-	$(COMPOSE) up --build dev
+	$(COMPOSE) watch
+
+build:
+	$(COMPOSE) build
 
 down:
 	$(COMPOSE) down --remove-orphans
@@ -14,7 +17,7 @@ logs:
 	$(COMPOSE) logs -f dev
 
 clean:
-	$(COMPOSE) down --volumes --remove-orphans
+	$(COMPOSE) down --remove-orphans
 
 ps:
 	$(COMPOSE) ps

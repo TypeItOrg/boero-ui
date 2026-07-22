@@ -8,18 +8,19 @@ RUN corepack enable
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 FROM deps AS dev
 ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
+COPY . .
 EXPOSE 3000
-CMD ["sh", "-c", "pnpm install --frozen-lockfile && pnpm dev --hostname 0.0.0.0"]
+CMD ["pnpm", "dev", "--hostname", "0.0.0.0"]
 
 FROM deps AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
-RUN --mount=type=cache,id=next-cache,target=/app/.next/cache pnpm build
+RUN pnpm build
 
 FROM node:24-alpine AS prod
 WORKDIR /app
