@@ -2,10 +2,15 @@
 
 import * as React from "react";
 
+import { MobileBottomNavigation } from "@common/components/navigation/mobile-bottom-navigation";
 import { SidebarInset, SidebarProvider } from "@common/components/ui/sidebar";
 import { InstitutionalSidebar } from "@features/institutional-auth/components/institutional-sidebar";
 import { InstitutionalTopbar } from "@features/institutional-auth/components/institutional-topbar";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import {
+  INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM,
+  getInstitutionalNavigationSections,
+} from "@features/institutional-auth/utils/institutional-navigation.util";
 
 type InstitutionalShellProps = {
   children: React.ReactNode;
@@ -21,6 +26,11 @@ export function InstitutionalShell({
   defaultSidebarOpen,
 }: InstitutionalShellProps): React.ReactElement {
   const [sidebarOpen, setSidebarOpen] = React.useState(defaultSidebarOpen);
+  const navigationSections = getInstitutionalNavigationSections(user);
+  const navigationItems = navigationSections
+    .flatMap((section) => section.items)
+    .filter((item) => item.url !== INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM.url)
+    .slice(0, 4);
 
   function handleSidebarOpenChange(open: boolean): void {
     setSidebarOpen(open);
@@ -39,11 +49,12 @@ export function InstitutionalShell({
         } as React.CSSProperties
       }
     >
-      <InstitutionalSidebar user={user} institutionName={institutionName} />
-      <SidebarInset className="bg-background gap-4 p-3 md:m-0 md:ml-0 md:rounded-none md:p-4 md:shadow-none md:peer-data-[state=collapsed]:ml-0">
+      <InstitutionalSidebar user={user} institutionName={institutionName} navigationSections={navigationSections} />
+      <SidebarInset className="bg-background gap-4 p-2 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:m-0 md:ml-0 md:rounded-none md:p-4 md:shadow-none md:peer-data-[state=collapsed]:ml-0">
         <InstitutionalTopbar />
         <div className="bg-muted flex min-w-0 flex-1 flex-col overflow-x-hidden rounded-2xl">{children}</div>
       </SidebarInset>
+      <MobileBottomNavigation items={navigationItems} primaryItem={INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM} />
     </SidebarProvider>
   );
 }

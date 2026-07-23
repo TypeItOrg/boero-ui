@@ -3,17 +3,7 @@
 import type { ComponentProps } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Building2Icon,
-  ChevronsUpDownIcon,
-  HouseIcon,
-  LogOutIcon,
-  MoonIcon,
-  SunIcon,
-  UserLockIcon,
-  UserRoundIcon,
-  UsersIcon,
-} from "lucide-react";
+import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
@@ -38,42 +28,25 @@ import {
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import type { InstitutionalNavigationSection } from "@features/institutional-auth/utils/institutional-navigation.util";
 import { cn } from "@common/utils/cn.util";
 
 type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
   user: InstitutionalUser;
   institutionName?: string;
+  navigationSections: readonly InstitutionalNavigationSection[];
 };
 
 export function InstitutionalSidebar({
   user,
   institutionName,
+  navigationSections,
   className,
   ...props
 }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
   const navigation = useMobileSidebarNavigation();
-  const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
-  const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
-  const canReadInstitution = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ);
-  const navSections = [
-    {
-      label: "Plataforma",
-      items: [
-        { title: "Inicio", url: "/", icon: HouseIcon, exact: true },
-        ...(canReadInstitution ? [{ title: "Institución", url: "/institution", icon: Building2Icon }] : []),
-        ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
-        ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
-      ],
-    },
-    {
-      label: "General",
-      items: [{ title: "Perfil", url: "/profile", icon: UserRoundIcon }],
-    },
-  ];
 
   return (
     <Sidebar
@@ -98,7 +71,7 @@ export function InstitutionalSidebar({
       </SidebarHeader>
 
       <SidebarContent className="p-4">
-        <InstitutionalSidebarNav sections={navSections} navigation={navigation} />
+        <InstitutionalSidebarNav sections={navigationSections} navigation={navigation} />
       </SidebarContent>
 
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">

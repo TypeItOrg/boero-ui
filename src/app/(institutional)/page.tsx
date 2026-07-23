@@ -22,8 +22,8 @@ export default async function Home(): Promise<React.ReactElement> {
   const greeting = getGreeting();
 
   return (
-    <main className="flex min-h-full flex-col gap-4 p-4">
-      <header className="bg-background flex flex-row items-center justify-between gap-4 rounded-xl p-6 shadow-xs">
+    <main className="flex min-h-full flex-col gap-4 p-3 md:p-4">
+      <header className="bg-background flex flex-row items-center justify-between gap-4 rounded-xl p-4 shadow-xs sm:p-6">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <p className="text-muted-foreground text-sm font-medium">{person?.institutionName ?? "Institución"}</p>
           <div>
@@ -48,7 +48,7 @@ export default async function Home(): Promise<React.ReactElement> {
       {managementLinks.length > 0 ? (
         <section
           aria-labelledby="management-title"
-          className="bg-background flex flex-col gap-6 rounded-xl p-6 shadow-xs"
+          className="bg-background flex flex-col gap-6 rounded-xl p-4 shadow-xs sm:p-6"
         >
           <div>
             <h2 id="management-title" className="text-xl font-semibold tracking-tight sm:text-2xl">
@@ -76,7 +76,7 @@ function HomeAccessRow({ link }: { link: InstitutionalHomeLink }): React.ReactEl
   return (
     <Link
       href={link.href}
-      className="bg-muted/25 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring flex min-w-0 flex-[1_0_min(500px,100%)] flex-row items-center justify-between gap-4 rounded-xl border p-6 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+      className="bg-muted/25 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring flex min-w-0 flex-[1_0_min(500px,100%)] flex-row items-center justify-between gap-4 rounded-xl border p-4 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset sm:p-6"
     >
       <div className="flex min-w-0 flex-col gap-1">
         <span className="text-base font-semibold tracking-tight sm:text-lg">{link.title}</span>

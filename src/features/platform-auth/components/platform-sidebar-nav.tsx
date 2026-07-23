@@ -31,7 +31,7 @@ type PlatformSidebarNavItem = {
 };
 
 type PlatformSidebarNavProps = {
-  items: PlatformSidebarNavItem[];
+  items: readonly PlatformSidebarNavItem[];
 };
 
 export const platformSidebarItemButtonClassName =

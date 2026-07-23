@@ -25,11 +25,14 @@ export function PlatformPageShell({
 }: PlatformPageShellProps): React.ReactElement {
   return (
     <section
-      className={cn("flex h-full max-w-full min-w-0 flex-col gap-4 p-4", minViewportHeight && "min-h-full flex-1")}
+      className={cn(
+        "flex h-full max-w-full min-w-0 flex-col gap-4 p-3 md:p-4",
+        minViewportHeight && "min-h-full flex-1",
+      )}
     >
       <header
         className={cn(
-          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-5 shadow-xs sm:p-6 md:flex-row md:items-end md:justify-between",
+          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 md:flex-row md:items-end md:justify-between",
           headerClassName,
         )}
       >
@@ -47,7 +50,7 @@ export function PlatformPageShell({
         <div
           className={cn(
             "flex h-full min-w-0 flex-col gap-5",
-            contentVariant === "surface" && "bg-background rounded-xl p-5 shadow-xs sm:p-6",
+            contentVariant === "surface" && "bg-background rounded-xl p-4 shadow-xs sm:p-6",
             minViewportHeight && "flex-1",
           )}
         >

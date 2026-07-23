@@ -1,16 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import {
-  BuildingIcon,
-  FingerprintIcon,
-  HouseIcon,
-  LogOutIcon,
-  MoonIcon,
-  SunIcon,
-  UserLockIcon,
-  UsersIcon,
-} from "lucide-react";
+import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import {
@@ -29,35 +20,7 @@ import {
   platformSidebarItemButtonClassName,
 } from "@features/platform-auth/components/platform-sidebar-nav";
 import { useLogoutPlatform } from "@features/platform-auth/hooks/use-logout-platform.hook";
-
-const navItems = [
-  {
-    title: "Inicio",
-    url: "/admin",
-    icon: HouseIcon,
-    exact: true,
-  },
-  {
-    title: "Instituciones",
-    url: "/admin/institutions",
-    icon: BuildingIcon,
-  },
-  {
-    title: "Usuarios",
-    url: "/admin/people",
-    icon: UsersIcon,
-  },
-  {
-    title: "Roles",
-    url: "/admin/roles",
-    icon: UserLockIcon,
-  },
-  {
-    title: "Administradores",
-    url: "/admin/accounts",
-    icon: FingerprintIcon,
-  },
-];
+import { PLATFORM_NAVIGATION_ITEMS } from "@features/platform-auth/constants/platform-navigation.constants";
 
 export function PlatformSidebar({ className, ...props }: ComponentProps<typeof Sidebar>) {
   const { resolvedTheme, setTheme } = useTheme();
@@ -83,7 +46,7 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <PlatformSidebarNav items={navItems} />
+        <PlatformSidebarNav items={PLATFORM_NAVIGATION_ITEMS} />
       </SidebarContent>
       <SidebarFooter className="px-4 pb-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
         <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">

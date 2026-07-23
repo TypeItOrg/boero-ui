@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useSidebar } from "@common/components/ui/sidebar";
 import { MOBILE_SIDEBAR_CLOSE_DELAY_MS } from "@common/constants/sidebar.constants";
+import { isNavigationItemActive } from "@common/utils/navigation.util";
 
 export type MobileSidebarNavigation = {
   handleNavigation: (url: string) => void;
@@ -40,7 +41,7 @@ export function useMobileSidebarNavigation(): MobileSidebarNavigation {
   function isActive(url: string, exact = false): boolean {
     if (pendingUrl) return pendingUrl === url;
 
-    return exact ? pathname === url : pathname === url || pathname.startsWith(`${url}/`);
+    return isNavigationItemActive(pathname, url, exact);
   }
 
   useEffect(() => {

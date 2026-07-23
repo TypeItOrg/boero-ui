@@ -33,8 +33,8 @@ export default async function InstitutionDetailPage({
   const userCount = Number.isFinite(institution.userCount) ? institution.userCount : 0;
 
   return (
-    <section className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-4">
-      <header className="bg-background flex flex-col gap-5 rounded-xl p-5 shadow-xs sm:p-6 xl:flex-row xl:items-end xl:justify-between">
+    <section className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-3 md:p-4">
+      <header className="bg-background flex flex-col gap-5 rounded-xl p-4 shadow-xs sm:p-6 xl:flex-row xl:items-end xl:justify-between">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
           <div className="mt-4 mb-3 flex flex-wrap items-center gap-3">

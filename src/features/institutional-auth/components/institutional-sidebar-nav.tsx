@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
-
 import { Separator } from "@common/components/ui/separator";
 import {
   SidebarGroup,
@@ -13,21 +11,10 @@ import {
   SidebarMenuItem,
 } from "@common/components/ui/sidebar";
 import type { MobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
-
-export type InstitutionalNavItem = {
-  title: string;
-  url: string;
-  icon: LucideIcon;
-  exact?: boolean;
-};
-
-type InstitutionalNavSection = {
-  label: string;
-  items: readonly InstitutionalNavItem[];
-};
+import type { InstitutionalNavigationSection } from "@features/institutional-auth/utils/institutional-navigation.util";
 
 type InstitutionalSidebarNavProps = {
-  sections: readonly InstitutionalNavSection[];
+  sections: readonly InstitutionalNavigationSection[];
   navigation: MobileSidebarNavigation;
 };
 
