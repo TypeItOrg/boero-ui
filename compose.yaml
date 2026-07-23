@@ -53,4 +53,3 @@ services:
           path: ./pnpm-lock.yaml
         - action: rebuild
           path: ./pnpm-workspace.yaml
-
