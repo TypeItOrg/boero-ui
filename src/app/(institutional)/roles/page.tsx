@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRightIcon, KeyRoundIcon, PlusIcon, UserLockIcon, UsersIcon } from "lucide-react";
+import { KeyRoundIcon, PlusIcon, UserLockIcon, UsersIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
