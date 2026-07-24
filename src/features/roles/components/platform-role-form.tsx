@@ -110,10 +110,10 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
         />
       </section>
       <div className="flex justify-end gap-3">
-        <Button asChild variant="outline" size="lg">
+        <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none">
           <Link href={destination}>Cancelar</Link>
         </Button>
-        <Button type="submit" size="lg" disabled={pending}>
+        <Button type="submit" size="lg" disabled={pending} className="flex-1 sm:flex-none">
           {pending ? "Guardando…" : "Guardar cambios"}
         </Button>
       </div>

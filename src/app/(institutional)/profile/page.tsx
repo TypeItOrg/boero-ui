@@ -26,7 +26,7 @@ export default async function ProfilePage(): Promise<React.ReactElement> {
       description="Consultá tus datos personales."
       breadcrumb={<InstitutionalBreadcrumb />}
       actions={
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/profile/edit">
             <PencilIcon data-icon="inline-start" />
             Editar datos

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { UserRoundPlusIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
@@ -23,6 +24,13 @@ export default async function NewPlatformRolePage({
       title="Nuevo rol"
       description="Creá un rol para una institución."
       breadcrumb={<PlatformBreadcrumb />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
+      actions={
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <UserRoundPlusIcon className="size-6 sm:size-7" />
+        </div>
+      }
     >
       <PlatformRoleForm permissionGroups={permissionGroups} returnTo={destination} />
     </PlatformPageShell>

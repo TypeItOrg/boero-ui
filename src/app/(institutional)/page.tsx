@@ -9,6 +9,7 @@ import {
   type InstitutionalHomeLink,
 } from "@features/institutional-auth/utils/institutional-home-access.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
+import { Building2Icon } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Inicio");
@@ -19,29 +20,45 @@ export default async function Home(): Promise<React.ReactElement> {
   const person = await fetchInstitutionalPerson();
   const links = getInstitutionalHomeLinks(user);
   const managementLinks = links.filter((link) => link.href !== "/profile");
-  const greeting = getGreeting();
 
   return (
     <main className="flex min-h-full flex-col gap-4 p-3 md:p-4">
       <header className="bg-background flex flex-row items-center justify-between gap-4 rounded-xl p-4 shadow-xs sm:p-6">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <p className="text-muted-foreground text-sm font-medium">{person?.institutionName ?? "Institución"}</p>
-          <div>
-            <h1 className="text-foreground text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
-              {greeting}, {user.name}
+        <div className="flex h-full min-w-0 flex-1 gap-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-muted-foreground truncate text-sm font-medium">
+              {person?.institutionName ?? "Institución"}
+            </p>
+            <h1 className="text-foreground mt-2 truncate text-2xl font-bold tracking-tight sm:mt-1 sm:text-3xl">
+              Hola, {user.name}
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm">
+
+            <p className="text-muted-foreground mt-1 text-sm sm:hidden">
+              Gestioná tus accesos y herramientas desde un solo lugar.
+            </p>
+
+            <p className="text-muted-foreground mt-1 hidden text-sm sm:block">
               Podés administrar tus accesos y herramientas de gestión desde acá.
             </p>
           </div>
+
+          <Image
+            src="/boero-logo.png"
+            alt="Logo Boero"
+            width={875}
+            height={1202}
+            priority
+            className="h-26 w-auto shrink-0 object-contain sm:hidden"
+          />
         </div>
+
         <Image
           src="/boero-logo.png"
           alt="Logo Boero"
           width={875}
           height={1202}
           priority
-          className="hidden h-12 w-auto shrink-0 object-contain sm:block sm:h-[88px]"
+          className="hidden h-21 w-auto shrink-0 object-contain sm:block"
         />
       </header>
 
@@ -50,13 +67,21 @@ export default async function Home(): Promise<React.ReactElement> {
           aria-labelledby="management-title"
           className="bg-background flex flex-col gap-6 rounded-xl p-4 shadow-xs sm:p-6"
         >
-          <div>
-            <h2 id="management-title" className="text-xl font-semibold tracking-tight sm:text-2xl">
-              Gestión institucional
-            </h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Administrá las personas y los accesos de la institución.
-            </p>
+          <div className="flex justify-between gap-4">
+            <div className="flex flex-col">
+              <h2 id="management-title" className="text-xl leading-none font-semibold tracking-tight sm:text-2xl">
+                Gestión institucional
+              </h2>
+
+              <p className="text-muted-foreground mt-1 text-sm">
+                <span className="hidden sm:block">Administrá las personas y los accesos de la institución.</span>
+                <span className="sm:hidden">Administrá las personas y los accesos.</span>
+              </p>
+            </div>
+
+            <div className="text-muted-foreground bg-accent flex items-center justify-center rounded-xl p-2">
+              <Building2Icon />
+            </div>
           </div>
 
           <nav aria-label="Herramientas de gestión" className="flex flex-wrap gap-4">
@@ -82,24 +107,9 @@ function HomeAccessRow({ link }: { link: InstitutionalHomeLink }): React.ReactEl
         <span className="text-base font-semibold tracking-tight sm:text-lg">{link.title}</span>
         <span className="text-muted-foreground text-sm leading-relaxed">{link.description}</span>
       </div>
-      <div className="bg-background text-primary flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs">
+      <div className="bg-background text-primary flex size-12 h-full shrink-0 items-center justify-center rounded-xl border shadow-xs">
         <Icon aria-hidden="true" className="size-6" />
       </div>
     </Link>
   );
-}
-
-function getGreeting(): string {
-  const currentHour = Number(
-    new Intl.DateTimeFormat("es-AR", {
-      hour: "2-digit",
-      hourCycle: "h23",
-      timeZone: "America/Argentina/Cordoba",
-    }).format(new Date()),
-  );
-
-  if (currentHour < 5 || currentHour >= 20) return "Buenas noches";
-  if (currentHour < 12) return "Buenos días";
-
-  return "Buenas tardes";
 }

@@ -240,7 +240,7 @@ function ProfileSummary({ person }: { person: InstitutionalPerson }): React.Reac
           </CardTitle>
           <CardDescription>Información personal de tu cuenta institucional.</CardDescription>
         </CardHeader>
-        <CardContent className="mt-6 p-0">
+        <CardContent className="p-0">
           <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <ProfileValue label="Documento" value={person.documentNumber} />
             <ProfileValue label="Fecha de nacimiento" value={formatDate(person.birthDate)} />

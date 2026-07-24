@@ -34,7 +34,7 @@ export default async function PlatformAccountsPage({
       description="Administrá quiénes pueden ingresar y operar en la plataforma."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/accounts/new">
             <PlusIcon data-icon="inline-start" />
             Nueva cuenta

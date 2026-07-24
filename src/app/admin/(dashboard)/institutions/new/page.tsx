@@ -23,10 +23,12 @@ export default async function NewInstitutionPage({
       title="Nueva institución"
       description="Completá los datos esenciales para sumarla a la plataforma."
       minViewportHeight
-      breadcrumb={<PlatformBreadcrumb />}
+      breadcrumb={<PlatformBreadcrumb segmentLabels={{ new: "Nueva" }} />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="bg-primary text-primary-foreground flex size-14 items-center justify-center rounded-xl">
-          <Building2 className="size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <Building2 className="size-6 sm:size-7" />
         </div>
       }
     >

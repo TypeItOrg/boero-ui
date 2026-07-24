@@ -52,12 +52,12 @@ export default async function RoleDetailPage({
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [roleId]: role.name }} />}
       actions={
         canUpdate || canDelete ? (
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full flex-wrap gap-3">
             {canDelete ? (
               <InstitutionRoleDeleteButton institutionId={user.institutionId} roleId={role.id} roleName={role.name} />
             ) : null}
             {canUpdate ? (
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="w-full">
                 <ReturnToLink href={`/roles/${role.id}/edit`}>
                   <PencilIcon data-icon="inline-start" />
                   Editar rol

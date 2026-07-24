@@ -32,7 +32,7 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
       description="Visualizá, buscá y administrá todas las instituciones registradas en la plataforma."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/institutions/new">
             <PlusIcon data-icon="inline-start" />
             Nueva Institución

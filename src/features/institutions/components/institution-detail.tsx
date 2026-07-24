@@ -13,7 +13,7 @@ export function InstitutionDetail({ institution }: InstitutionDetailProps): Reac
         <h2 className="text-foreground font-semibold">Ubicación</h2>
 
         <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <LocationDetail label="Dirección" value={address} />
+          <LocationDetail className="col-span-full" label="Dirección" value={address} />
           <LocationDetail label="País" value={institution.country.name} />
           <LocationDetail label="Provincia" value={institution.province.name} />
           <LocationDetail label="Ciudad" value={institution.city.name} />
@@ -39,9 +39,14 @@ export function InstitutionDetail({ institution }: InstitutionDetailProps): Reac
   );
 }
 
-function LocationDetail({ label, value }: { label: string; value: string }): React.ReactElement {
+interface LocationDetailProps extends React.HTMLAttributes<HTMLDivElement> {
+  label: string;
+  value: string;
+}
+
+function LocationDetail({ label, value, ...props }: LocationDetailProps): React.ReactElement {
   return (
-    <div>
+    <div {...props}>
       <p className="text-muted-foreground text-sm">{label}</p>
       <p className="text-foreground mt-1.5 text-base font-medium">{value}</p>
     </div>

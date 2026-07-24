@@ -53,7 +53,7 @@ export default async function PeoplePage({
       breadcrumb={<InstitutionalBreadcrumb />}
       actions={
         canCreate ? (
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-full">
             <ReturnToLink href="/people/new">
               <PlusIcon data-icon="inline-start" />
               Nuevo usuario

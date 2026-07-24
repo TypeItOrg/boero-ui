@@ -38,11 +38,11 @@ export default async function InstitutionPeoplePage({
 
   return (
     <PlatformPageShell
-      title={`Lista de Usuarios`}
+      title="Lista de usuarios"
       description="Creá usuarios, editá sus datos básicos y administrá sus roles."
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="w-full">
           <ReturnToLink href={`/admin/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario

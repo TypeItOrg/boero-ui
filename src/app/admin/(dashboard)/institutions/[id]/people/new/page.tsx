@@ -28,12 +28,14 @@ export default async function NewPersonPage({ params, searchParams }: NewPersonP
   return (
     <PlatformPageShell
       title="Nuevo usuario"
-      description={`Creá una cuenta institucional para ${institution.name}. El rol inicial será Postulante.`}
+      description={`Creá una cuenta institucional para el ${institution.name}.`}
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="bg-primary text-primary-foreground flex size-14 items-center justify-center rounded-xl">
-          <UserRoundIcon className="size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <UserRoundIcon className="size-6 sm:size-7" />
         </div>
       }
     >

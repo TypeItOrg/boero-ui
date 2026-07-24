@@ -11,6 +11,7 @@ type PlatformPageShellProps = {
   breadcrumb?: React.ReactNode;
   contentVariant?: "surface" | "plain";
   headerClassName?: string;
+  actionsClassName?: string;
 };
 
 export function PlatformPageShell({
@@ -22,6 +23,7 @@ export function PlatformPageShell({
   breadcrumb,
   contentVariant = "surface",
   headerClassName,
+  actionsClassName,
 }: PlatformPageShellProps): React.ReactElement {
   return (
     <section
@@ -32,7 +34,7 @@ export function PlatformPageShell({
     >
       <header
         className={cn(
-          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 md:flex-row md:items-end md:justify-between",
+          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 lg:flex-row lg:items-end lg:justify-between",
           headerClassName,
         )}
       >
@@ -40,10 +42,10 @@ export function PlatformPageShell({
           {breadcrumb ? <div>{breadcrumb}</div> : null}
           <div>
             <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-            {description ? <p className="text-muted-foreground mt-1 line-clamp-1 text-sm">{description}</p> : null}
+            {description ? <p className="text-muted-foreground mt-1 text-sm">{description}</p> : null}
           </div>
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-3">{actions}</div> : null}
+        {actions ? <div className={cn("flex shrink-0 items-center gap-3", actionsClassName)}>{actions}</div> : null}
       </header>
 
       {children ? (

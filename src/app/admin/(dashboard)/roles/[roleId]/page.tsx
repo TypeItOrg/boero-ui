@@ -29,12 +29,12 @@ export default async function PlatformRoleDetailPage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ roles: "Roles", [roleId]: role.name }} />}
       actions={
         role.editable || role.deletable ? (
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full flex-wrap gap-3">
             {role.deletable ? (
               <PlatformRoleDeleteButton roleId={role.id} institutionId={role.institution.id} roleName={role.name} />
             ) : null}
             {role.editable ? (
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="w-full">
                 <ReturnToLink href={`/admin/roles/${role.id}/edit`}>
                   <PencilIcon data-icon="inline-start" />
                   Editar rol

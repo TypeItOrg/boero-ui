@@ -49,10 +49,11 @@ export default async function EditRolePage({
       title={`Editar rol ${role.name}`}
       description="Actualizá el nombre y los permisos concedidos por este rol."
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [roleId]: role.name }} />}
-      headerClassName="flex-row items-end justify-between"
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex size-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-xs">
-          <UserRoundCogIcon className="size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <UserRoundCogIcon className="size-6 sm:size-7" />
         </div>
       }
     >

@@ -40,7 +40,7 @@ export default async function InstitutionalInstitutionPage(): Promise<React.Reac
       minViewportHeight
       actions={
         canUpdate ? (
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-full">
             <Link href="/institution/edit">
               <PencilIcon className="size-4" />
               <span>Editar información</span>

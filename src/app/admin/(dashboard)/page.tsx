@@ -17,10 +17,11 @@ export default function PlatformPage(): React.ReactElement {
       title="Inicio"
       description="Una vista general del alcance y la actividad de la plataforma."
       contentVariant="plain"
-      headerClassName="flex-row items-center justify-between md:items-center"
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex size-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-xs sm:size-[60px]">
-          <Building2Icon className="size-7 sm:size-8" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <Building2Icon className="size-6 sm:size-7" />
         </div>
       }
     >

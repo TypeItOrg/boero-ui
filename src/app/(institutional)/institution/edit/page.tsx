@@ -34,10 +34,11 @@ export default async function EditInstitutionalInstitutionPage(): Promise<React.
       description="Actualizá la ubicación y los datos de contacto institucionales."
       breadcrumb={<InstitutionalBreadcrumb />}
       minViewportHeight
-      headerClassName="flex-row items-end justify-between"
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex size-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-xs">
-          <Building2Icon className="size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <Building2Icon className="size-6 sm:size-7" />
         </div>
       }
     >

@@ -35,7 +35,7 @@ export default async function RolesPage(): Promise<React.ReactElement> {
       breadcrumb={<InstitutionalBreadcrumb />}
       actions={
         canCreate ? (
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-full">
             <ReturnToLink href="/roles/new">
               <PlusIcon data-icon="inline-start" />
               Nuevo rol

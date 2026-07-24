@@ -66,7 +66,7 @@ function getSegments(pathname: string, segmentLabels: Readonly<Record<string, st
     const isLast = i === parts.length - 1;
 
     const config = ROUTE_CONFIGS[part];
-    const label = config?.label ?? segmentLabels[part] ?? "Editar";
+    const label = segmentLabels[part] ?? config?.label ?? "Editar";
 
     if (isLast) {
       segments.push({ label });

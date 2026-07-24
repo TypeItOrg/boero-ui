@@ -21,7 +21,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         }
       >
         <PlatformSidebar />
-        <SidebarInset className="bg-background gap-4 p-2 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:m-0 md:ml-0 md:rounded-none md:p-4 md:shadow-none md:peer-data-[state=collapsed]:ml-0">
+        <SidebarInset className="bg-background gap-3 pb-[calc((var(--spacing)*21)+env(safe-area-inset-bottom))] md:m-0 md:ml-0 md:gap-4 md:rounded-none md:p-4 md:shadow-none md:peer-data-[state=collapsed]:ml-0">
           <PlatformTopbar />
           <div className="bg-muted flex min-w-0 flex-1 flex-col overflow-x-hidden rounded-2xl">{children}</div>
         </SidebarInset>
@@ -30,3 +30,5 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     </PlatformAccountProvider>
   );
 }
+
+// pb-[calc(var(--spacing)*12+env(safe-area-inset-bottom))]

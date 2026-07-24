@@ -33,10 +33,11 @@ export default async function EditProfilePage({
       title="Editar perfil"
       description="Actualizá tus datos personales."
       breadcrumb={<InstitutionalBreadcrumb />}
-      headerClassName="flex-row items-end justify-between"
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex size-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-xs">
-          <UserRoundPenIcon className="size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <UserRoundPenIcon className="size-6 sm:size-7" />
         </div>
       }
     >

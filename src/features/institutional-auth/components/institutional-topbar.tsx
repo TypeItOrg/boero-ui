@@ -5,7 +5,7 @@ import { SidebarTrigger } from "@common/components/ui/sidebar";
 
 export function InstitutionalTopbar(): React.ReactElement {
   return (
-    <header className="bg-muted flex h-16 shrink-0 items-center justify-between gap-3 rounded-xl px-3 sm:px-4 md:gap-6">
+    <header className="bg-muted sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 rounded-xl px-3 sm:px-4 md:gap-6">
       <SidebarTrigger
         aria-label="Cambiar estado de la barra lateral"
         className="bg-background hover:bg-accent size-9 shrink-0 rounded-lg shadow-xs"

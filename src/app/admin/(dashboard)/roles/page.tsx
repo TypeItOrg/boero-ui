@@ -37,7 +37,7 @@ export default async function PlatformRolesPage({
       description="Consultá y administrá las responsabilidades y permisos de todas las instituciones."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/roles/new">
             <PlusIcon data-icon="inline-start" />
             Nuevo rol
