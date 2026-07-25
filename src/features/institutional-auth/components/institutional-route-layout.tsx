@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 
 import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
@@ -17,7 +18,7 @@ export async function InstitutionalRouteLayout({
 
   return (
     <InstitutionalShell user={user} institutionName={person?.institutionName} defaultSidebarOpen={sidebarOpen}>
-      {children}
+      <Suspense fallback={null}>{children}</Suspense>
     </InstitutionalShell>
   );
 }
