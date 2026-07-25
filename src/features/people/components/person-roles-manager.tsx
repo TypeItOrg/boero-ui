@@ -5,7 +5,12 @@ import { PlusIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import type { AssignableRole, PersonRole, SystemRoleCode } from "@features/people/types/person-role.types";
+import {
+  SystemRoleCode,
+  type AssignableRole,
+  type PersonRole,
+  type SystemRoleCode as SystemRoleCodeType,
+} from "@features/people/types/person-role.types";
 import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
@@ -22,7 +27,7 @@ type PersonRolesManagerProps = {
 
 type SelectedRole = {
   roleId: string;
-  technicalCode: SystemRoleCode | null;
+  technicalCode: SystemRoleCodeType | null;
   displayName: string;
   assignedAt?: string;
 };
@@ -49,7 +54,18 @@ export function PersonRolesManager({
     [assignedRolesByCode, rolesByCode, selectedRoleCodeSet],
   );
   const availableRoles = roles.filter((role) => !selectedRoleCodeSet.has(role.id));
-  const applicantRoleId = roles.find((role) => role.technicalCode === "APPLICANT")?.id;
+  const protectedRoleIds = React.useMemo(
+    () =>
+      PeopleScope.isInstitutional(scope)
+        ? new Set(
+            assignedRoles
+              .filter((role) => role.technicalCode === SystemRoleCode.INSTITUTIONAL_AUTHORITY)
+              .map((role) => role.roleId),
+          )
+        : new Set<string>(),
+    [assignedRoles, scope],
+  );
+  const applicantRoleId = roles.find((role) => role.technicalCode === SystemRoleCode.APPLICANT)?.id;
 
   function selectRole(roleId: string): void {
     if (selectedRoleCodeSet.has(roleId)) return;
@@ -70,6 +86,9 @@ export function PersonRolesManager({
   }
 
   function canApplyRoleCodes(nextRoleCodes: readonly string[], implicitRevocationIds: readonly string[] = []): boolean {
+    const preservesProtectedRoles = Array.from(protectedRoleIds).every((roleId) => nextRoleCodes.includes(roleId));
+    if (!preservesProtectedRoles) return false;
+
     const roleChanges = getRoleChanges(initialRoleCodes, nextRoleCodes);
     const implicitRevocationIdSet = new Set(implicitRevocationIds);
     const requiresExplicitRevocation = roleChanges.revocations.some((roleId) => !implicitRevocationIdSet.has(roleId));
@@ -85,11 +104,11 @@ export function PersonRolesManager({
   } {
     const candidate = rolesByCode.get(roleId);
     const replacesSelectedRoles =
-      candidate?.technicalCode === "APPLICANT" ||
+      candidate?.technicalCode === SystemRoleCode.APPLICANT ||
       (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
     const roleIds = replacesSelectedRoles ? [roleId] : [...selectedRoleCodes, roleId];
 
-    if (candidate?.technicalCode === "APPLICANT") {
+    if (candidate?.technicalCode === SystemRoleCode.APPLICANT) {
       return { roleIds, implicitRevocationIds: initialRoleCodes };
     }
 
@@ -114,7 +133,7 @@ export function PersonRolesManager({
               {selectedRoles.map((role) => {
                 const isPendingAssignment = !initialRoleCodeSet.has(role.roleId);
                 const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== role.roleId);
-                const isInstitutionalAuthority = role.technicalCode === "INSTITUTIONAL_AUTHORITY";
+                const isInstitutionalAuthority = role.technicalCode === SystemRoleCode.INSTITUTIONAL_AUTHORITY;
                 const isRevokable = !isInstitutionalAuthority || PeopleScope.isAdmin(scope);
 
                 return (

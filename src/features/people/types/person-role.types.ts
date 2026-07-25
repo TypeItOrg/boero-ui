@@ -1,13 +1,15 @@
-export const SYSTEM_ROLE_CODES = [
-  "INSTITUTIONAL_AUTHORITY",
-  "ADMINISTRATIVE",
-  "TEACHER",
-  "GUARDIAN",
-  "APPLICANT",
-  "STUDENT",
-] as const;
+export const SystemRoleCode = {
+  INSTITUTIONAL_AUTHORITY: "INSTITUTIONAL_AUTHORITY",
+  ADMINISTRATIVE: "ADMINISTRATIVE",
+  TEACHER: "TEACHER",
+  GUARDIAN: "GUARDIAN",
+  APPLICANT: "APPLICANT",
+  STUDENT: "STUDENT",
+} as const;
 
-export type SystemRoleCode = (typeof SYSTEM_ROLE_CODES)[number];
+export type SystemRoleCode = (typeof SystemRoleCode)[keyof typeof SystemRoleCode];
+
+export const SYSTEM_ROLE_CODES = Object.values(SystemRoleCode);
 
 export type SystemRole = {
   code: SystemRoleCode;
