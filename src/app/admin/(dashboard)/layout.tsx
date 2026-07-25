@@ -1,4 +1,4 @@
-import { getPlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
+import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 import { PlatformAccountProvider } from "@features/platform-auth/components/platform-account-provider";
 import { PlatformMobileBottomNavigation } from "@features/platform-auth/components/platform-mobile-bottom-navigation";
 import { SidebarInset, SidebarProvider } from "@common/components/ui/sidebar";
@@ -6,7 +6,7 @@ import { PlatformSidebar } from "@features/platform-auth/components/platform-sid
 import { PlatformTopbar } from "@features/platform-auth/components/platform-topbar";
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }): Promise<React.ReactElement> {
-  const account = await getPlatformAccount();
+  const account = await requirePlatformAccount();
 
   return (
     <PlatformAccountProvider initialAccount={account}>

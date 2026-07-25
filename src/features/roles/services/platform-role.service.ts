@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
@@ -25,8 +25,7 @@ export async function fetchPlatformRoles(
 
 export async function fetchPlatformRole(roleId: string): Promise<PlatformRole | null> {
   const response = await platformApiFetch(`/api/v1/admin/roles/${roleId}`);
-  if (!response.ok) return null;
-  return parseHttpResponse(response, ROLES_ERROR);
+  return parseNullableHttpResponse(response, ROLES_ERROR);
 }
 
 export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermissionGroup[]> {

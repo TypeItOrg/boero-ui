@@ -75,11 +75,11 @@ describe("getInstitutionalUser", () => {
     await expect(getInstitutionalUser()).resolves.toEqual(user);
   });
 
-  it("returns null when the backend is unavailable", async () => {
+  it("propagates network failures instead of treating them as logout", async () => {
     mockAccessToken("access-token");
     fetchMock.mockRejectedValue(new Error("network"));
 
     const { getInstitutionalUser } = await importService();
-    await expect(getInstitutionalUser()).resolves.toBeNull();
+    await expect(getInstitutionalUser()).rejects.toThrow("network");
   });
 });
