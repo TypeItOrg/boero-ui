@@ -24,6 +24,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@common/components/ui/sidebar";
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
@@ -47,6 +48,7 @@ export function InstitutionalSidebar({
 }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
   const navigation = useMobileSidebarNavigation();
+  const { isMobile } = useSidebar();
 
   return (
     <Sidebar
@@ -77,7 +79,7 @@ export function InstitutionalSidebar({
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
@@ -95,9 +97,16 @@ export function InstitutionalSidebar({
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                side="right"
-                align="end"
+                side={isMobile ? "top" : "right"}
+                align={isMobile ? "start" : "end"}
                 sideOffset={8}
+                onCloseAutoFocus={(event) => event.preventDefault()}
+                onPointerDownOutside={(event) => {
+                  const target = event.target as HTMLElement;
+                  if (target.closest('[data-sidebar="sidebar"]')) {
+                    event.preventDefault();
+                  }
+                }}
                 className="w-(--radix-dropdown-menu-trigger-width) min-w-56"
               >
                 <DropdownMenuLabel className="flex items-center gap-2">
