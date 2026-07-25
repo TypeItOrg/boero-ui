@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { cookies } from "next/headers";
 
 import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
+import { InstitutionalRouteSkeleton } from "@features/institutional-auth/components/institutional-route-skeleton";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
@@ -18,7 +19,7 @@ export async function InstitutionalRouteLayout({
 
   return (
     <InstitutionalShell user={user} institutionName={person?.institutionName} defaultSidebarOpen={sidebarOpen}>
-      <Suspense fallback={null}>{children}</Suspense>
+      <Suspense fallback={<InstitutionalRouteSkeleton />}>{children}</Suspense>
     </InstitutionalShell>
   );
 }
