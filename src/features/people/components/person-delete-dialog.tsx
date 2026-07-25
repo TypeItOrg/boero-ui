@@ -42,11 +42,13 @@ export function PersonDeleteDialog({
   scope = PeopleScope.ADMIN,
 }: PersonDeleteDialogProps): React.ReactElement {
   const [isPending, startTransition] = React.useTransition();
+  const [isNavigating, startNavigation] = React.useTransition();
   const [error, setError] = React.useState<string>();
   const buttonSize = PeopleScope.isInstitutional(scope) ? "lg" : "default";
+  const isBusy = isPending || isNavigating;
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isBusy && !nextOpen) return;
     if (!nextOpen) setError(undefined);
 
     onOpenChange(nextOpen);
@@ -67,8 +69,7 @@ export function PersonDeleteDialog({
         return;
       }
 
-      onOpenChange(false);
-      onDeleted();
+      startNavigation(onDeleted);
     });
   }
 
@@ -96,11 +97,11 @@ export function PersonDeleteDialog({
         ) : null}
 
         <AlertDialogFooter>
-          <AlertDialogCancel size={buttonSize} disabled={isPending}>
+          <AlertDialogCancel size={buttonSize} disabled={isBusy}>
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction size={buttonSize} variant="destructive" disabled={isPending} onClick={handleDelete}>
-            {isPending ? "Eliminando..." : "Eliminar usuario"}
+          <AlertDialogAction size={buttonSize} variant="destructive" disabled={isBusy} onClick={handleDelete}>
+            {isBusy ? "Eliminando..." : "Eliminar usuario"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
