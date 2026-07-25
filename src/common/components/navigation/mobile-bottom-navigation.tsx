@@ -29,7 +29,7 @@ export function MobileBottomNavigation({ items, primaryItem }: MobileBottomNavig
   return (
     <nav
       aria-label="Navegación principal"
-      className="border-border bg-background fixed inset-x-0 bottom-0 z-40 border-t md:hidden"
+      className="bg-background fixed inset-x-0 bottom-0 z-40 border-t-0 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] md:hidden dark:shadow-[0_-4px_16px_rgba(0,0,0,0.35)]"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="flex min-w-0 items-stretch px-2">

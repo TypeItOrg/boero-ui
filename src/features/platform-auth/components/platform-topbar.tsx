@@ -28,7 +28,7 @@ export function PlatformTopbar(): React.ReactElement {
   };
 
   return (
-    <header className="bg-muted sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 rounded-xl px-3 sm:px-4 md:gap-6">
+    <header className="bg-muted sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 rounded-none px-3 sm:px-4 md:gap-6 md:rounded-xl">
       <div className="flex max-w-2xl flex-1 items-center gap-3 xl:max-w-xl">
         <SidebarTrigger className="bg-background hover:bg-accent size-9 shrink-0 rounded-lg shadow-xs md:hidden" />
         <div className="relative w-full">
