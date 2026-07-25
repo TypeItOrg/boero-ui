@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type UpdatePersonStatusActionState = {
   success?: boolean;
@@ -17,7 +18,7 @@ export async function updatePersonStatusAction(
   enabled: boolean,
 ): Promise<UpdatePersonStatusActionState> {
   const errorState = await getResponseErrorActionState(
-    peopleApiFetch("institutional", `/api/v1/institutions/${institutionId}/people/${personId}/status`, {
+    peopleApiFetch(PeopleScope.INSTITUTIONAL, `/api/v1/institutions/${institutionId}/people/${personId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enabled }),

@@ -5,6 +5,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { PersonForm } from "@features/people/components/person-form";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
@@ -43,7 +44,12 @@ export default async function NewPersonPage({
         </div>
       }
     >
-      <PersonForm mode="create" institutionId={user.institutionId} scope="institutional" returnTo={destination} />
+      <PersonForm
+        mode="create"
+        institutionId={user.institutionId}
+        scope={PeopleScope.INSTITUTIONAL}
+        returnTo={destination}
+      />
     </PlatformPageShell>
   );
 }

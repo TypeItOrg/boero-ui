@@ -7,7 +7,7 @@ import { PersonForm } from "@features/people/components/person-form";
 import { PersonRolesManager } from "@features/people/components/person-roles-manager";
 import type { AssignableRole, PersonRole } from "@features/people/types/person-role.types";
 import type { Person } from "@features/people/types/person.types";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonEditFormProps = {
   formId: string;
@@ -15,7 +15,7 @@ type PersonEditFormProps = {
   person: Person;
   roles: AssignableRole[];
   assignedRoles: PersonRole[];
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
   canEdit?: boolean;
   canAssignRoles?: boolean;
   canRevokeRoles?: boolean;
@@ -28,7 +28,7 @@ export function PersonEditForm({
   person,
   roles,
   assignedRoles,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
   canEdit = true,
   canAssignRoles = true,
   canRevokeRoles = true,

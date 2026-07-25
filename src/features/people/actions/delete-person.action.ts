@@ -4,8 +4,11 @@ import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
-import { getPeoplePath } from "@features/people/utils/people-scope.util";
+import {
+  getPeoplePath,
+  PeopleScope,
+  type PeopleScope as PeopleScopeType,
+} from "@features/people/utils/people-scope.util";
 
 type DeletePersonActionState = {
   success?: boolean;
@@ -15,7 +18,7 @@ type DeletePersonActionState = {
 export async function deletePersonAction(
   institutionId: string,
   personId: string,
-  scope: PeopleScope = "admin",
+  scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<DeletePersonActionState> {
   const errorState = await getResponseErrorActionState(
     peopleApiFetch(scope, getPeoplePath(scope, institutionId, personId), { method: "DELETE" }),
@@ -24,9 +27,11 @@ export async function deletePersonAction(
   );
   if (errorState) return errorState;
 
-  revalidatePath(scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`);
+  revalidatePath(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
   revalidatePath(
-    scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`,
+    PeopleScope.isInstitutional(scope)
+      ? `/people/${personId}`
+      : `/admin/institutions/${institutionId}/people/${personId}`,
   );
   revalidatePath("/admin/people");
   return { success: true };

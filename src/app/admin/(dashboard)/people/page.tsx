@@ -6,7 +6,7 @@ import { PlatformPeopleTableContainer } from "@features/people/components/platfo
 import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
 import { PlatformPeopleTableSkeleton } from "@features/people/components/platform-people-table-skeleton";
 import { fetchPlatformPeople } from "@features/people/services/fetch-platform-people.service";
-import { fetchSystemRolesWithFallback } from "@features/people/services/fetch-system-roles.service";
+import { fetchSystemRolesCatalog } from "@features/people/services/fetch-system-roles.service";
 import {
   parsePlatformPeoplePaginationParams,
   type PlatformPeopleSearchParams,
@@ -29,7 +29,7 @@ export default async function PlatformPeoplePage({
   const params = parsePlatformPeoplePaginationParams(await searchParams);
   const peoplePromise = fetchPlatformPeople(params);
   const [roleList, selectedInstitutionName] = await Promise.all([
-    fetchSystemRolesWithFallback(),
+    fetchSystemRolesCatalog(),
     getSelectedInstitutionName(params.institutionId),
   ]);
 

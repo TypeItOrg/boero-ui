@@ -1,3 +1,5 @@
+import { PeopleScope } from "@features/people/utils/people-scope.util";
+
 describe("peopleApiFetch", () => {
   const institutionalApiFetchMock = jest.fn();
   const platformApiFetchMock = jest.fn();
@@ -21,7 +23,7 @@ describe("peopleApiFetch", () => {
     const { peopleApiFetch } = await import("./people-api-fetch.service");
     const init = { method: "PUT" };
 
-    await expect(peopleApiFetch("institutional", "/api/v1/people/1", init)).resolves.toBe(response);
+    await expect(peopleApiFetch(PeopleScope.INSTITUTIONAL, "/api/v1/people/1", init)).resolves.toBe(response);
 
     expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/people/1", init);
     expect(platformApiFetchMock).not.toHaveBeenCalled();
@@ -32,7 +34,7 @@ describe("peopleApiFetch", () => {
     platformApiFetchMock.mockResolvedValue(response);
     const { peopleApiFetch } = await import("./people-api-fetch.service");
 
-    await expect(peopleApiFetch("admin", "/api/v1/admin/people")).resolves.toBe(response);
+    await expect(peopleApiFetch(PeopleScope.ADMIN, "/api/v1/admin/people")).resolves.toBe(response);
 
     expect(platformApiFetchMock).toHaveBeenCalledWith("/api/v1/admin/people", {});
     expect(institutionalApiFetchMock).not.toHaveBeenCalled();

@@ -18,7 +18,7 @@ import {
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { safelyRunAction } from "@common/utils/safe-action.util";
 import { deletePersonAction } from "@features/people/actions/delete-person.action";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonDeleteDialogProps = {
   institutionId: string;
@@ -28,7 +28,7 @@ type PersonDeleteDialogProps = {
   onOpenChange: (open: boolean) => void;
   onDeleted: () => void;
   trigger?: React.ReactElement;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
 };
 
 export function PersonDeleteDialog({
@@ -39,11 +39,11 @@ export function PersonDeleteDialog({
   onOpenChange,
   onDeleted,
   trigger,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
 }: PersonDeleteDialogProps): React.ReactElement {
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string>();
-  const buttonSize = scope === "institutional" ? "lg" : "default";
+  const buttonSize = PeopleScope.isInstitutional(scope) ? "lg" : "default";
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) return;

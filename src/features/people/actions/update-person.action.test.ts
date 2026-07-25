@@ -10,9 +10,13 @@ jest.mock("@features/people/services/fetch-person-roles.service", () => ({
   fetchPersonRoles: jest.fn(),
 }));
 
+jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({
+  requirePlatformAccount: jest.fn().mockResolvedValue({ platformAccountId: "account-1" }),
+}));
+
 import { revalidatePath } from "next/cache";
 
-import { updatePersonAction } from "@features/people/actions/update-person.action";
+import { updatePlatformPersonAction } from "@features/people/actions/update-person.action";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 
 const INSTITUTION_ID = "inst-1";
@@ -30,7 +34,7 @@ describe("updatePersonAction", () => {
   it("omits the password when fields are empty", async () => {
     peopleApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    const result = await updatePersonAction(INSTITUTION_ID, PERSON_ID, createFormData());
+    const result = await updatePlatformPersonAction(INSTITUTION_ID, PERSON_ID, createFormData());
 
     expect(result).toEqual({ success: true });
     const [, , request] = peopleApiFetchMock.mock.calls[0];
@@ -46,7 +50,7 @@ describe("updatePersonAction", () => {
   it("includes the new password when provided with matching confirmation", async () => {
     peopleApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    const result = await updatePersonAction(
+    const result = await updatePlatformPersonAction(
       INSTITUTION_ID,
       PERSON_ID,
       createFormData({ password: "nueva-contraseña", confirmPassword: "nueva-contraseña" }),
@@ -64,7 +68,7 @@ describe("updatePersonAction", () => {
   });
 
   it("returns validation error when passwords do not match", async () => {
-    const result = await updatePersonAction(
+    const result = await updatePlatformPersonAction(
       INSTITUTION_ID,
       PERSON_ID,
       createFormData({ password: "nueva-contraseña", confirmPassword: "diferente-contraseña" }),

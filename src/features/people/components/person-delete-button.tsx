@@ -6,26 +6,26 @@ import { TrashIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonDeleteButtonProps = {
   institutionId: string;
   personId: string;
   personName: string;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
 };
 
 export function PersonDeleteButton({
   institutionId,
   personId,
   personName,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
 }: PersonDeleteButtonProps): React.ReactElement {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
   function handleDeleted(): void {
-    router.push(scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`);
+    router.push(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
   }
 
   return (
@@ -38,7 +38,7 @@ export function PersonDeleteButton({
       onDeleted={handleDeleted}
       scope={scope}
       trigger={
-        <Button type="button" variant="destructive" size={scope === "institutional" ? "lg" : "default"}>
+        <Button type="button" variant="destructive" size={PeopleScope.isInstitutional(scope) ? "lg" : "default"}>
           <TrashIcon data-icon="inline-start" />
           Eliminar usuario
         </Button>

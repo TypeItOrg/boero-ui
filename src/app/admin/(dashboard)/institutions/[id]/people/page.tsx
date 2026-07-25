@@ -15,6 +15,7 @@ import { PeopleTableContainer } from "@features/people/components/people-table-c
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 
 type PeoplePageProps = {
   params: Promise<{ id: string }>;
@@ -31,7 +32,7 @@ export default async function InstitutionPeoplePage({
 }: PeoplePageProps): Promise<React.ReactElement> {
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
-  const rolesPromise = fetchSystemRoles(id, "admin");
+  const rolesPromise = fetchSystemRoles(id, PeopleScope.ADMIN);
   const peoplePromise = fetchPeople(id, { page, size, search, sort, roleId });
   const [institution, roles] = await Promise.all([fetchInstitution(id), rolesPromise]);
   if (!institution) notFound();

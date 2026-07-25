@@ -16,6 +16,7 @@ import { PeopleTableContainer } from "@features/people/components/people-table-c
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -36,8 +37,12 @@ export default async function PeoplePage({
 
   const resolvedSearchParams = await searchParams;
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
-  const rolesPromise = fetchSystemRoles(user.institutionId, "institutional");
-  const peoplePromise = fetchPeople(user.institutionId, { page, size, search, sort, roleId }, "institutional");
+  const rolesPromise = fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL);
+  const peoplePromise = fetchPeople(
+    user.institutionId,
+    { page, size, search, sort, roleId },
+    PeopleScope.INSTITUTIONAL,
+  );
   const [roles, canCreate, canUpdate, canManageRoles] = await Promise.all([
     rolesPromise,
     hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE),
@@ -72,7 +77,7 @@ export default async function PeoplePage({
             search={search}
             sort={sort}
             roleId={roleId}
-            scope="institutional"
+            scope={PeopleScope.INSTITUTIONAL}
             dataPromise={peoplePromise}
             selfPersonId={user.personId}
             canCreate={canCreate}

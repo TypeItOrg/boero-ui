@@ -6,13 +6,16 @@ import { peopleApiFetch } from "@features/people/services/people-api-fetch.servi
 import type { PersonSummary } from "@features/people/types/person.types";
 import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
-import { getPeoplePath } from "@features/people/utils/people-scope.util";
+import {
+  getPeoplePath,
+  PeopleScope,
+  type PeopleScope as PeopleScopeType,
+} from "@features/people/utils/people-scope.util";
 
 export async function fetchPeople(
   institutionId: string,
   params: PeoplePaginationParams,
-  scope: PeopleScope = "admin",
+  scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<PaginatedResponse<PersonSummary>> {
   const { page, size, search, sort, roleId } = params;
   const searchParams = buildPaginationSearchParams({ page, size, search });

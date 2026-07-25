@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comm
 import type { AssignableRole, PersonRole, SystemRoleCode } from "@features/people/types/person-role.types";
 import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonRolesManagerProps = {
   roles: AssignableRole[];
@@ -17,7 +17,7 @@ type PersonRolesManagerProps = {
   onSelectedRoleCodesChange: (roleCodes: string[]) => void;
   canAssignRoles: boolean;
   canRevokeRoles: boolean;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
 };
 
 type SelectedRole = {
@@ -34,7 +34,7 @@ export function PersonRolesManager({
   onSelectedRoleCodesChange,
   canAssignRoles,
   canRevokeRoles,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
 }: PersonRolesManagerProps): React.ReactElement {
   const initialRoleCodes = React.useMemo(() => assignedRoles.map((role) => role.roleId), [assignedRoles]);
   const initialRoleCodeSet = React.useMemo(() => new Set(initialRoleCodes), [initialRoleCodes]);
@@ -115,7 +115,7 @@ export function PersonRolesManager({
                 const isPendingAssignment = !initialRoleCodeSet.has(role.roleId);
                 const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== role.roleId);
                 const isInstitutionalAuthority = role.technicalCode === "INSTITUTIONAL_AUTHORITY";
-                const isRevokable = !isInstitutionalAuthority || scope === "admin";
+                const isRevokable = !isInstitutionalAuthority || PeopleScope.isAdmin(scope);
 
                 return (
                   <div key={role.roleId} className="flex items-center justify-between gap-3 rounded-lg border p-3">

@@ -1,12 +1,12 @@
 import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
 import type { fetchPeople } from "@features/people/services/fetch-people.service";
 import { PeopleTablePresentation } from "@features/people/components/people-table-presentation";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PeopleTableContainerProps = PeoplePaginationParams & {
   dataPromise: ReturnType<typeof fetchPeople>;
   institutionId: string;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
   selfPersonId?: string | null;
   canCreate?: boolean;
   canUpdate?: boolean;
@@ -23,7 +23,7 @@ export async function PeopleTableContainer(props: PeopleTableContainerProps): Pr
     size,
     search,
     sort,
-    scope = "admin",
+    scope = PeopleScope.ADMIN,
     selfPersonId,
     canCreate = true,
     canUpdate = true,

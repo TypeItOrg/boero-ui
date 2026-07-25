@@ -15,8 +15,14 @@ import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { createPersonAction } from "@features/people/actions/create-person.action";
-import { updatePersonAction } from "@features/people/actions/update-person.action";
+import {
+  createInstitutionalPersonAction,
+  createPlatformPersonAction,
+} from "@features/people/actions/create-person.action";
+import {
+  updateInstitutionalPersonAction,
+  updatePlatformPersonAction,
+} from "@features/people/actions/update-person.action";
 import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
 import type { Person } from "@features/people/types/person.types";
 import type { PersonActionState, PersonFormFieldName } from "@features/people/types/person-action-state.types";
@@ -25,7 +31,7 @@ import {
   getLatestAllowedBirthDate,
   parseBirthDateInput,
 } from "@features/people/utils/person-birth-date.util";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonFormInput = {
   firstName: string;
@@ -42,7 +48,7 @@ type PersonFormCommonProps = {
   institutionId: string;
   formId?: string;
   hideActions?: boolean;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
   returnTo?: string;
 };
 
@@ -81,14 +87,14 @@ export function PersonForm({
   formId,
   hideActions = false,
   canEdit = true,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
   returnTo,
 }: PersonFormProps): React.ReactElement {
   const router = useRouter();
   const isEdit = mode === "edit";
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
-  const listPath = scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`;
+  const listPath = PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`;
   const destination = returnTo ?? listPath;
   const resolver = getPersonFormResolver(isEdit);
 
@@ -108,9 +114,7 @@ export function PersonForm({
 
     startTransition(async () => {
       const formData = getFormData(values, isEdit, canEdit, roleIds);
-      const result = isEdit
-        ? await updatePersonAction(institutionId, person.personId, formData, scope)
-        : await createPersonAction(institutionId, formData, scope);
+      const result = await submitPerson(formData);
 
       const hasFieldErrors = setActionFieldErrors(result, setError);
       setFormError(hasFieldErrors ? undefined : result.error);
@@ -119,6 +123,22 @@ export function PersonForm({
         router.push(destination);
       }
     });
+  }
+
+  async function submitPerson(formData: FormData): Promise<PersonActionState> {
+    if (isEdit && person) {
+      if (PeopleScope.isInstitutional(scope)) {
+        return updateInstitutionalPersonAction(institutionId, person.personId, formData);
+      }
+
+      return updatePlatformPersonAction(institutionId, person.personId, formData);
+    }
+
+    if (PeopleScope.isInstitutional(scope)) {
+      return createInstitutionalPersonAction(institutionId, formData);
+    }
+
+    return createPlatformPersonAction(institutionId, formData);
   }
 
   function handleCancel(): void {

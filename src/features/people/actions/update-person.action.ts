@@ -2,23 +2,42 @@
 
 import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { assignPersonRoleAction } from "@features/people/actions/assign-person-role.action";
-import { revokePersonRoleAction } from "@features/people/actions/revoke-person-role.action";
 import { personRoleIdsSchema } from "@features/people/schemas/person-role.schema";
 import { updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
-import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "@features/people/types/person-action-state.types";
-import { getRoleChanges, type PersonRoleChanges } from "@features/people/utils/person-role-rules.util";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
-import { getPeoplePath } from "@features/people/utils/people-scope.util";
+import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
+import {
+  getPeoplePath,
+  PeopleScope,
+  type PeopleScope as PeopleScopeType,
+} from "@features/people/utils/people-scope.util";
 
-export async function updatePersonAction(
+export async function updateInstitutionalPersonAction(
   institutionId: string,
   personId: string,
   formData: FormData,
-  scope: PeopleScope = "admin",
+): Promise<PersonActionState> {
+  await requireInstitutionalUser();
+  return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.INSTITUTIONAL);
+}
+
+export async function updatePlatformPersonAction(
+  institutionId: string,
+  personId: string,
+  formData: FormData,
+): Promise<PersonActionState> {
+  await requirePlatformAccount();
+  return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.ADMIN);
+}
+
+async function updatePersonActionInternal(
+  institutionId: string,
+  personId: string,
+  formData: FormData,
+  scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<PersonActionState> {
   const roleIds = parseRoleIds(formData.get("roleIds"));
   if (roleIds === null) {
@@ -64,16 +83,17 @@ export async function updatePersonAction(
   }
 
   if (roleIds) {
-    const roleChanges = await prepareRoleChanges(institutionId, personId, roleIds, scope);
-    if (typeof roleChanges === "string") {
-      revalidatePersonPaths(institutionId, personId, scope);
-      return { error: roleChanges };
-    }
-
-    const roleError = await syncPersonRoles(institutionId, personId, roleChanges, scope);
+    const roleError = await getResponseErrorActionState(
+      peopleApiFetch(scope, `${getPeoplePath(scope, institutionId, personId)}/roles`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roleIds }),
+      }),
+      PERSON_FORM_FIELD_NAMES,
+      PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE,
+    );
     if (roleError) {
-      revalidatePersonPaths(institutionId, personId, scope);
-      return { error: roleError };
+      return roleError;
     }
   }
 
@@ -92,50 +112,11 @@ function parseRoleIds(value: FormDataEntryValue | null): string[] | null | undef
   }
 }
 
-async function prepareRoleChanges(
-  institutionId: string,
-  personId: string,
-  desiredRoleCodes: readonly string[],
-  scope: PeopleScope,
-): Promise<PersonRoleChanges | string> {
-  try {
-    const currentRoles = await fetchPersonRoles(institutionId, personId, scope);
-
-    return getRoleChanges(
-      currentRoles.map((role) => role.roleId),
-      desiredRoleCodes,
-    );
-  } catch {
-    return PEOPLE_ERROR_MESSAGES.VERIFY_ROLE;
-  }
-}
-
-async function syncPersonRoles(
-  institutionId: string,
-  personId: string,
-  roleChanges: PersonRoleChanges,
-  scope: PeopleScope,
-): Promise<string | undefined> {
-  for (const roleCode of roleChanges.assignments) {
-    const result = await assignPersonRoleAction(institutionId, personId, roleCode, scope);
-    if (!result.success) {
-      return result.error ?? PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE;
-    }
-  }
-
-  for (const roleCode of roleChanges.revocations) {
-    const result = await revokePersonRoleAction(institutionId, personId, roleCode, scope);
-    if (!result.success) {
-      return result.error ?? PEOPLE_ERROR_MESSAGES.REVOKE_SELECTED_ROLE;
-    }
-  }
-
-  return undefined;
-}
-
 function revalidatePersonPaths(institutionId: string, personId: string, scope: PeopleScope): void {
-  revalidatePath(scope === "institutional" ? "/people" : `/admin/institutions/${institutionId}/people`);
+  revalidatePath(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
   revalidatePath(
-    scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`,
+    PeopleScope.isInstitutional(scope)
+      ? `/people/${personId}`
+      : `/admin/institutions/${institutionId}/people/${personId}`,
   );
 }

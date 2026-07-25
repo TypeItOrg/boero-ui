@@ -30,12 +30,3 @@ export type PersonRole = {
   displayName: string;
   assignedAt: string;
 };
-
-export const FALLBACK_SYSTEM_ROLES: SystemRole[] = [
-  { code: "INSTITUTIONAL_AUTHORITY", displayName: "Administrador Institucional" },
-  { code: "ADMINISTRATIVE", displayName: "Administrativo" },
-  { code: "TEACHER", displayName: "Docente" },
-  { code: "GUARDIAN", displayName: "Tutor" },
-  { code: "APPLICANT", displayName: "Postulante" },
-  { code: "STUDENT", displayName: "Estudiante" },
-];

@@ -29,7 +29,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationQuery } from "@common/types/pagination.types";
 import type { PersonSummary } from "@features/people/types/person.types";
 import type { PeopleSort, PeopleSortField } from "@features/people/utils/people-pagination.util";
-import type { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 import { PeoplePagination } from "@features/people/components/people-pagination";
 import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
 import { PersonStatusDialog } from "@features/people/components/person-status-dialog";
@@ -38,7 +38,7 @@ type PeopleTablePresentationProps = PaginationQuery & {
   data: PaginatedResponse<PersonSummary>;
   institutionId: string;
   sort: PeopleSort;
-  scope?: PeopleScope;
+  scope?: PeopleScopeType;
   selfPersonId?: string | null;
   canCreate?: boolean;
   canUpdate?: boolean;
@@ -54,7 +54,7 @@ export function PeopleTablePresentation({
   size,
   search,
   sort,
-  scope = "admin",
+  scope = PeopleScope.ADMIN,
   selfPersonId,
   canCreate = true,
   canUpdate = true,
@@ -105,7 +105,7 @@ export function PeopleTablePresentation({
           <Button asChild variant="outline" size="sm">
             <Link
               href={
-                scope === "institutional"
+                PeopleScope.isInstitutional(scope)
                   ? `/people?size=${size}`
                   : `/admin/institutions/${institutionId}/people?size=${size}`
               }
@@ -142,7 +142,9 @@ export function PeopleTablePresentation({
           {canCreate ? (
             <Button asChild size="sm">
               <ReturnToLink
-                href={scope === "institutional" ? "/people/new" : `/admin/institutions/${institutionId}/people/new`}
+                href={
+                  PeopleScope.isInstitutional(scope) ? "/people/new" : `/admin/institutions/${institutionId}/people/new`
+                }
               >
                 <PlusIcon className="mr-2 size-4" />
                 Nuevo usuario
@@ -189,7 +191,7 @@ export function PeopleTablePresentation({
               />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
-              {scope === "institutional" ? <TableHead>Estado</TableHead> : null}
+              {PeopleScope.isInstitutional(scope) ? <TableHead>Estado</TableHead> : null}
               <TableHead>Rol</TableHead>
               <TableHead className="w-16">
                 <span className="sr-only">Acciones</span>
@@ -201,7 +203,7 @@ export function PeopleTablePresentation({
               const isSelf = person.id === selfPersonId;
               const personHref = getPersonHref(scope, institutionId, person.id, selfPersonId);
               const canEditPerson = canUpdate;
-              const canOpenPerson = canEditPerson || (scope === "institutional" && canManageRoles && !isSelf);
+              const canOpenPerson = canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf);
               const canDeletePerson = canDelete && !isSelf;
               const canUpdatePersonStatus = canUpdateStatus && !isSelf;
               const hasActions = canOpenPerson || canDeletePerson || canUpdatePersonStatus;
@@ -230,7 +232,7 @@ export function PeopleTablePresentation({
                   <TableCell>
                     {person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}
                   </TableCell>
-                  {scope === "institutional" ? (
+                  {PeopleScope.isInstitutional(scope) ? (
                     <TableCell>
                       <Badge variant={person.enabled ? "secondary" : "outline"}>
                         {person.enabled ? "Activo" : "Inactivo"}
@@ -440,6 +442,8 @@ function getPersonHref(
   personId: string,
   selfPersonId?: string | null,
 ): string {
-  if (scope === "institutional" && personId === selfPersonId) return "/profile";
-  return scope === "institutional" ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
+  if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/profile";
+  return PeopleScope.isInstitutional(scope)
+    ? `/people/${personId}`
+    : `/admin/institutions/${institutionId}/people/${personId}`;
 }

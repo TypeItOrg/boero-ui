@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { PersonRolesManager } from "@features/people/components/person-roles-manager";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 import type { AssignableRole, PersonRole, SystemRoleCode } from "@features/people/types/person-role.types";
 
 const applicantRole: AssignableRole = {
@@ -108,7 +109,7 @@ describe("PersonRolesManager", () => {
         onSelectedRoleCodesChange={jest.fn()}
         canAssignRoles={true}
         canRevokeRoles={true}
-        scope="institutional"
+        scope={PeopleScope.INSTITUTIONAL}
       />,
     );
 

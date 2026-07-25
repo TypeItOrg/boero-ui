@@ -11,6 +11,7 @@ import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 import type { AssignableRole, PersonRole } from "@features/people/types/person-role.types";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
@@ -41,11 +42,11 @@ export default async function PersonPage({
   const canAssignRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN);
   const canRevokeRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
   const canManageRoles = canAssignRoles || canRevokeRoles;
-  const personPromise = fetchPerson(user.institutionId, personId, "institutional");
+  const personPromise = fetchPerson(user.institutionId, personId, PeopleScope.INSTITUTIONAL);
   const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = canManageRoles
     ? Promise.all([
-        fetchPersonRoles(user.institutionId, personId, "institutional"),
-        canAssignRoles ? fetchSystemRoles(user.institutionId, "institutional") : Promise.resolve([]),
+        fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL),
+        canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
       ])
     : Promise.resolve([[], []]);
   const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
@@ -74,7 +75,7 @@ export default async function PersonPage({
             institutionId={user.institutionId}
             personId={personId}
             personName={personName}
-            scope="institutional"
+            scope={PeopleScope.INSTITUTIONAL}
           />
         ) : undefined
       }
@@ -85,7 +86,7 @@ export default async function PersonPage({
         person={person}
         roles={assignableRoles}
         assignedRoles={assignedRoles}
-        scope="institutional"
+        scope={PeopleScope.INSTITUTIONAL}
         canEdit={canUpdate}
         canAssignRoles={canAssignRoles}
         canRevokeRoles={canRevokeRoles}
