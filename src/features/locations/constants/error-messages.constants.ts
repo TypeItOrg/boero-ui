@@ -7,4 +7,6 @@ export const LOCATION_ERROR_MESSAGES = {
   FETCH_CITIES: "No se pudieron cargar las ciudades.",
   FETCH_INSTITUTIONS: "No se pudieron cargar las instituciones.",
   FETCH_LOCATION_PAGE: "No se pudieron cargar las ubicaciones.",
+  INVALID_LOCATION_ID: "El identificador de ubicación no es válido.",
+  LOCATION_SERVICE_UNAVAILABLE: "El servicio de ubicaciones no está disponible.",
 } as const;
