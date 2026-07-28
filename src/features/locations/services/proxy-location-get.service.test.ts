@@ -1,3 +1,7 @@
+jest.mock("@common/utils/get-api-url-or-throw.util", () => ({
+  getApiUrlOrThrow: jest.fn(() => "http://localhost:8080"),
+}));
+
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import { proxyLocationGet } from "@features/locations/services/proxy-location-get.service";
 
