@@ -123,7 +123,7 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
         title={copy.label}
         description={`${copy.label}. Escribí al menos 2 caracteres para buscar.`}
         showCloseButton={false}
-        className="max-sm:data-open:slide-in-from-bottom max-sm:data-closed:slide-out-to-bottom max-sm:data-closed:zoom-out-100 top-auto right-0 bottom-0 left-0 h-[min(78dvh,42rem)] max-h-[calc(100dvh-1rem)] max-w-none translate-x-0 translate-y-0 gap-0 rounded-none! p-0 duration-200 ease-out max-sm:duration-300 sm:top-[15vh] sm:right-auto sm:bottom-auto sm:left-1/2 sm:h-auto sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:max-w-2xl sm:-translate-x-1/2 sm:translate-y-0 sm:rounded-xl!"
+        className="max-sm:data-open:slide-in-from-bottom max-sm:data-closed:slide-out-to-bottom max-sm:data-closed:zoom-out-100 top-auto right-0 bottom-0 left-0 h-[min(78dvh,42rem)] max-h-[calc(100dvh-1rem)] max-w-none translate-x-0 translate-y-0 gap-0 rounded-none! p-0 duration-200 ease-out max-sm:duration-300 sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:h-auto sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:max-w-2xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl!"
       >
         <Command label={copy.label} shouldFilter={false} className="max-h-full rounded-none! p-0 sm:rounded-xl!">
           <CommandInput

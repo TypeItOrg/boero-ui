@@ -117,9 +117,9 @@ describe("ContextualSearch", () => {
       "rounded-none!",
       "max-sm:data-open:slide-in-from-bottom",
       "sm:max-w-2xl",
-      "sm:top-[15vh]",
+      "sm:top-1/2",
       "sm:rounded-xl!",
-      "sm:translate-y-0",
+      "sm:-translate-y-1/2",
     );
     expect(screen.getByRole("combobox", { name: "Buscar en la institución" })).toHaveFocus();
     expect(screen.getByText("Esc")).toHaveAttribute("data-slot", "kbd");
