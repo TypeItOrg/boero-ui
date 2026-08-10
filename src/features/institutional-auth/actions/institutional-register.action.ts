@@ -8,7 +8,7 @@ import { registerInstitutionalAccount } from "@features/institutional-auth/servi
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
 import { setInstitutionalRegistrationSuccessCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
-import { INSTITUTIONAL_REGISTER_FIELD_NAMES } from "@features/institutional-auth/types/institutional-register-state.types";
+import { INSTITUTIONAL_REGISTER_FIELD_NAMES } from "@features/institutional-auth/types/institutional-register-field-name.types";
 
 export async function registerInstitutional(
   _previousState: InstitutionalRegisterActionState,

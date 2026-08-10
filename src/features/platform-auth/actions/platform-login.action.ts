@@ -4,7 +4,7 @@ import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors
 
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
-import { PLATFORM_LOGIN_FIELD_NAMES } from "@features/platform-auth/types/platform-login-action-state.types";
+import { PLATFORM_LOGIN_FIELD_NAMES } from "@features/platform-auth/types/platform-login-field-name.types";
 import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";

@@ -1,5 +1,5 @@
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
-import type { BackendError } from "@features/platform-auth/types/backend-error.types";
+import type { BackendError } from "@common/types/backend-error.types";
 import type { LoginPlatformAccountOutput } from "@features/platform-auth/types/login-platform-account-output.types";
 import type { PlatformLoginInput } from "@features/platform-auth/types/platform-login-input.types";
 import type { PlatformLoginResult } from "@features/platform-auth/types/platform-login-result.types";
