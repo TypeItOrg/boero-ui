@@ -35,18 +35,16 @@ type PlatformSidebarNavProps = {
 };
 
 export const platformSidebarItemButtonClassName =
-  "text-primary-foreground/72 h-11 gap-3 rounded-lg px-2 text-base font-normal hover:bg-primary-foreground/10 hover:text-primary-foreground active:bg-primary-foreground/10 data-active:bg-primary-foreground data-active:font-semibold data-active:text-primary data-active:shadow-sm data-active:hover:bg-primary-foreground data-active:hover:text-primary data-open:bg-primary-foreground/10 data-open:text-primary-foreground data-open:hover:bg-primary-foreground/10 group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!";
+  "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground data-active:bg-primary data-active:text-primary-foreground data-active:hover:bg-primary data-active:hover:text-primary-foreground data-open:bg-muted-foreground/10 data-open:text-foreground data-open:hover:bg-muted-foreground/10 h-10 gap-3 rounded-md px-2 text-sm font-medium transition-colors group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!";
 
 export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactElement {
   const { state } = useSidebar();
   const { handleNavigation, isActive } = useMobileSidebarNavigation();
 
   return (
-    <SidebarGroup className="gap-1 px-4 py-0">
+    <SidebarGroup className="gap-1 p-0 group-data-[collapsible=icon]:gap-0">
       {state === "expanded" && (
-        <SidebarGroupLabel className="text-primary-foreground/55 h-6 px-2 text-[13px] font-medium tracking-[0.02em] uppercase">
-          Menú
-        </SidebarGroupLabel>
+        <SidebarGroupLabel className="text-muted-foreground h-7 px-0 text-xs font-bold">Menú</SidebarGroupLabel>
       )}
       <SidebarGroupContent>
         <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">

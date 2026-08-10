@@ -23,17 +23,18 @@ export function InstitutionalTopbar({
           aria-label="Cambiar estado de la barra lateral"
           className="bg-background hover:bg-accent size-9 shrink-0 rounded-lg shadow-xs"
         />
-        <div className="hidden min-w-0 flex-1 sm:block">
+        <div className="hidden min-w-0 flex-1 md:block">
           <span className="block truncate text-sm font-semibold" title={institutionName ?? "Institución"}>
             {institutionName ?? "Institución"}
           </span>
           <span className="text-muted-foreground block text-xs">Portal Institucional</span>
         </div>
-        <div className="max-w-lg md:flex-1">
+        <div className="max-w-lg min-w-0 flex-1">
           <ContextualSearch
             accessSections={accessSections}
             scope="institutional"
             institutionId={institutionId}
+            mobileVariant="input"
             shortcutPlatform={shortcutPlatform}
             className="rounded-lg bg-transparent p-0"
           />

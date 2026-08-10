@@ -46,6 +46,7 @@ export function PlatformTopbar({ shortcutPlatform }: PlatformTopbarProps): React
           <ContextualSearch
             accessSections={PLATFORM_CONTEXTUAL_SEARCH_SECTIONS}
             scope="platform"
+            mobileVariant="input"
             shortcutPlatform={shortcutPlatform}
             className="rounded-lg bg-transparent p-0"
           />

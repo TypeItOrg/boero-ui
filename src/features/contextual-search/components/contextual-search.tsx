@@ -22,6 +22,7 @@ type ContextualSearchScopeProps =
 
 type ContextualSearchProps = ContextualSearchScopeProps & {
   accessSections: readonly ContextualSearchAccessSection[];
+  mobileVariant?: "icon" | "input";
   shortcutPlatform?: ContextualSearchShortcutPlatform;
 };
 
@@ -42,7 +43,7 @@ const CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS: Record<ContextualSearchScope, read
 };
 
 export function ContextualSearch(props: ContextualSearchProps): React.ReactElement {
-  const { accessSections, scope, className, shortcutPlatform = "windows" } = props;
+  const { accessSections, scope, className, mobileVariant = "icon", shortcutPlatform = "windows" } = props;
   const router = useRouter();
   const [value, setValue] = React.useState("");
   const [open, setOpen] = React.useState(false);
@@ -100,17 +101,25 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
   }
 
   return (
-    <div className={cn("w-auto md:w-full", className)}>
+    <div className={cn("w-auto md:w-full", mobileVariant === "input" && "w-full", className)}>
       <button
         type="button"
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={copy.label}
-        className="topbar-search-input bg-background text-muted-foreground hover:bg-accent focus-visible:ring-ring relative flex size-9 shrink-0 items-center justify-center rounded-lg p-0 text-left text-sm shadow-xs transition-[background-color,border-color,box-shadow] duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none md:h-9 md:w-full md:justify-start md:px-3 md:pr-16 md:pl-9"
+        className={cn(
+          "topbar-search-input bg-background text-muted-foreground hover:bg-accent focus-visible:ring-ring relative flex size-9 shrink-0 items-center justify-center rounded-lg p-0 text-left text-sm shadow-xs transition-[background-color,border-color,box-shadow] duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none md:h-9 md:w-full md:justify-start md:px-3 md:pr-16 md:pl-9",
+          mobileVariant === "input" && "h-9 w-full justify-start px-3 pr-3 pl-9",
+        )}
         onClick={() => setOpen(true)}
       >
-        <SearchIcon className="pointer-events-none size-4 md:absolute md:left-3" />
-        <span className="hidden truncate md:block">{copy.placeholder}</span>
+        <SearchIcon
+          className={cn(
+            "pointer-events-none size-4 md:absolute md:left-3",
+            mobileVariant === "input" && "absolute left-3",
+          )}
+        />
+        <span className={cn("hidden truncate md:block", mobileVariant === "input" && "block")}>{copy.placeholder}</span>
         <span className="hidden md:contents">
           <ContextualSearchShortcut platform={shortcutPlatform} />
         </span>

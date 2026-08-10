@@ -93,6 +93,16 @@ describe("ContextualSearch", () => {
     expect(await screen.findByText("Ctrl K")).toBeInTheDocument();
   });
 
+  it("can render an expanded search trigger on mobile", () => {
+    renderWithQueryClient(
+      <ContextualSearch accessSections={platformAccessSections} scope="platform" mobileVariant="input" />,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Buscar en la plataforma" });
+    expect(trigger).toHaveClass("w-full", "justify-start", "pl-9");
+    expect(screen.getByText("Buscar en la plataforma...")).toHaveClass("block");
+  });
+
   it("opens the modal and focuses the contextual input", async () => {
     const user = userEvent.setup();
 
