@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@common/components/ui/select";
-import type { PaginationParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
 
 type DataTablePaginationProps = PaginationParams & {
   isPending?: boolean;

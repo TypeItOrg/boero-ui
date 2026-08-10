@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { XIcon } from "lucide-react";
+import { SearchIcon, XIcon } from "lucide-react";
 
+import { DatePicker } from "@common/components/ui/date-picker";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import {
@@ -13,8 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@common/components/ui/select";
+import { YearSelect } from "@common/components/ui/year-select";
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
 import { cn } from "@common/utils/cn.util";
+import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
 
 export type DataTableFilterOption<TValue extends string = string> = {
   label: string;
@@ -29,13 +32,30 @@ export type DataTableSelectFilter<TValue extends string = string> = {
   value: TValue;
 };
 
+export type DataTableDateFilter = {
+  label: string;
+  name: string;
+  value: string | undefined;
+};
+
+export type DataTableYearFilter = {
+  defaultValue: "all";
+  label: string;
+  maxYear: number;
+  minYear: number;
+  name: string;
+  value: string;
+};
+
 type DataTableFiltersProps = {
   children?: React.ReactNode;
   className?: string;
-  search: string;
-  searchPlaceholder: string;
+  dateFilters?: readonly DataTableDateFilter[];
+  search?: string;
+  searchPlaceholder?: string;
   selectFilters?: readonly DataTableSelectFilter[];
   size?: number;
+  yearFilters?: readonly DataTableYearFilter[];
 };
 
 type DataTableFilterSelectProps<TValue extends string> = {
@@ -49,15 +69,22 @@ type DataTableSearchFilterProps = {
   placeholder: string;
 };
 
+type PendingDateFilterValue = {
+  value: string | undefined;
+};
+
 const SEARCH_DEBOUNCE_MS = 350;
+const DATE_FILTER_DEBOUNCE_MS = 350;
 
 export function DataTableFilters({
   children,
   className,
+  dateFilters = [],
   search,
   searchPlaceholder,
   selectFilters = [],
   size,
+  yearFilters = [],
 }: DataTableFiltersProps): React.ReactElement {
   const { navigate } = useDataTableNavigation();
 
@@ -80,9 +107,23 @@ export function DataTableFilters({
 
   return (
     <form className={cn("bg-muted/25 grid gap-3 rounded-lg border p-4 md:items-end", className)}>
-      <DataTableSearchFilter initialValue={search} onValueChange={updateSearch} placeholder={searchPlaceholder} />
+      {search !== undefined && searchPlaceholder !== undefined ? (
+        <DataTableSearchFilter initialValue={search} onValueChange={updateSearch} placeholder={searchPlaceholder} />
+      ) : null}
 
       {children}
+
+      {yearFilters.map((filter) => (
+        <DataTableFilterYear
+          key={filter.name}
+          filter={filter}
+          onValueChange={(value) => updateQueryParam(filter.name, value === filter.defaultValue ? undefined : value)}
+        />
+      ))}
+
+      {dateFilters.map((filter) => (
+        <DataTableFilterDate key={filter.name} filter={filter} updateQueryParam={updateQueryParam} />
+      ))}
 
       {selectFilters.map((filter) => (
         <DataTableFilterSelect
@@ -92,6 +133,82 @@ export function DataTableFilters({
         />
       ))}
     </form>
+  );
+}
+
+function DataTableFilterYear({
+  filter,
+  onValueChange,
+}: {
+  filter: DataTableYearFilter;
+  onValueChange: (value: string) => void;
+}): React.ReactElement {
+  const labelId = React.useId();
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span id={labelId} className="text-foreground text-sm font-medium">
+        {filter.label}
+      </span>
+      <YearSelect
+        allOptionLabel="Todos"
+        ariaLabelledBy={labelId}
+        className="h-9! min-w-36"
+        maxYear={filter.maxYear}
+        minYear={filter.minYear}
+        value={filter.value}
+        onValueChange={onValueChange}
+      />
+    </div>
+  );
+}
+
+function DataTableFilterDate({
+  filter,
+  updateQueryParam,
+}: {
+  filter: DataTableDateFilter;
+  updateQueryParam: (name: string, value: string | undefined) => void;
+}): React.ReactElement {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(() => parseDateInput(filter.value));
+  const [pendingInputValue, setPendingInputValue] = React.useState<PendingDateFilterValue | null>(null);
+  const debouncedInputValue = useDebouncedValue(pendingInputValue, DATE_FILTER_DEBOUNCE_MS);
+  const date = pendingInputValue?.value === filter.value ? selectedDate : parseDateInput(filter.value);
+
+  React.useEffect(() => {
+    if (debouncedInputValue && debouncedInputValue.value !== filter.value) {
+      updateQueryParam(filter.name, debouncedInputValue.value);
+    }
+  }, [debouncedInputValue, filter.name, filter.value, updateQueryParam]);
+
+  function handleChange(value: Date | undefined, source: "calendar" | "clear" | "input"): void {
+    setSelectedDate(value);
+    const formattedValue = value ? formatDateInput(value) : undefined;
+
+    if (source === "input") {
+      setPendingInputValue({ value: formattedValue });
+      return;
+    }
+
+    setPendingInputValue(null);
+    updateQueryParam(filter.name, formattedValue);
+  }
+
+  function handleDraftChange(): void {
+    setPendingInputValue(null);
+  }
+
+  return (
+    <label className="flex min-w-0 flex-col gap-1.5">
+      <span className="text-foreground text-sm font-medium">{filter.label}</span>
+      <DatePicker
+        autoComplete="off"
+        className="min-w-40"
+        value={date}
+        onCommit={handleChange}
+        onDraftChange={handleDraftChange}
+      />
+    </label>
   );
 }
 
@@ -116,6 +233,9 @@ function DataTableSearchFilter({
     <label className="flex min-w-0 flex-col gap-1.5">
       <span className="text-foreground text-sm font-medium">Buscar</span>
       <InputGroup className="h-9">
+        <InputGroupAddon align="inline-start">
+          <SearchIcon className="text-muted-foreground size-4 shrink-0" />
+        </InputGroupAddon>
         <InputGroupInput
           ref={inputRef}
           name="search"

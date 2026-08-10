@@ -2,7 +2,8 @@ import * as React from "react";
 import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { AsyncDropdown, type AsyncDropdownFetchPageInput } from "@common/components/ui/async-dropdown";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@tanstack/react-virtual", () => ({
@@ -163,6 +164,20 @@ describe("AsyncDropdown", () => {
     expect(getTrigger()).toHaveTextContent("ar");
   });
 
+  it("clears the selected value from the trigger", async () => {
+    const user = userEvent.setup();
+    const { onValueChange } = renderDropdown({
+      clearable: true,
+      value: "ar",
+      selectedLabel: "Argentina",
+    });
+
+    await user.click(screen.getByRole("button", { name: "Limpiar selección" }));
+
+    expect(onValueChange).toHaveBeenCalledWith(undefined, undefined);
+    expect(screen.queryByPlaceholderText("Buscar...")).not.toBeInTheDocument();
+  });
+
   it("renders the empty state", async () => {
     const user = userEvent.setup();
     const { fetchPage } = renderDropdown({
@@ -190,6 +205,7 @@ describe("AsyncDropdown", () => {
     await user.click(getTrigger());
 
     expect(await screen.findByText("No carga")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("No carga");
 
     fetchPage.mockResolvedValueOnce({
       items: baseItems,
@@ -218,7 +234,7 @@ describe("AsyncDropdown", () => {
 
     expect(fetchPage).toHaveBeenCalledTimes(1);
 
-    await act(async () => {
+    act(() => {
       jest.advanceTimersByTime(200);
     });
 
