@@ -5,15 +5,20 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  postcss: ">=8.5.18"
-  minimatch@3>brace-expansion: 1.1.16
-  minimatch@7>brace-expansion: 1.1.16
-  minimatch@9>brace-expansion: 2.1.2
-  minimatch@10>brace-expansion: 5.0.8
-  brace-expansion@^1.0.0: 1.1.16
-  brace-expansion@^2.0.0: 2.1.2
-  brace-expansion@^5.0.0: 5.0.8
-  js-yaml@4: ">=4.3.0"
+  postcss: 8.5.23
+  minimatch@3>brace-expansion: 1.1.18
+  minimatch@7>brace-expansion: 1.1.18
+  minimatch@9>brace-expansion: 2.1.4
+  minimatch@10>brace-expansion: 5.0.9
+  brace-expansion@^1.0.0: 1.1.18
+  brace-expansion@^2.0.0: 2.1.4
+  brace-expansion@^5.0.0: 5.0.9
+  js-yaml@3: 3.15.1
+  js-yaml@4: 4.3.1
+  hono: 4.12.34
+  undici: 7.29.0
+  ip-address: 10.3.1
+  fast-uri: 3.1.5
   "@hono/node-server": ">=2.0.5"
   sharp: ">=0.35.0"
 
@@ -146,6 +151,9 @@ importers:
       typescript:
         specifier: 6.0.2
         version: 6.0.2
+      undici:
+        specifier: 7.29.0
+        version: 7.29.0
 
 packages:
   "@adobe/css-tools@4.5.0":
@@ -554,7 +562,7 @@ packages:
       { integrity: sha512-bjD221KPLoJTWUwso1J6fGKiTXEUFedG/s0visavY4zakFPkeGURMRNly+FhBHs7T8Dz4qHaZIMX9ZoJHSJtKA== }
     engines: { node: ">=20" }
     peerDependencies:
-      hono: ^4
+      hono: 4.12.34
 
   "@hookform/resolvers@5.4.0":
     resolution:
@@ -2652,17 +2660,17 @@ packages:
       { integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw== }
     engines: { node: ">=18" }
 
-  brace-expansion@1.1.16:
+  brace-expansion@1.1.18:
     resolution:
-      { integrity: sha512-IDw48K2/2kRkg9LdJxurvq3lV3aBgq0REY89duEqFRthjlPdXHKMj7EnQOXVckxzgisinf3nHfrcE2FufFLXMw== }
+      { integrity: sha512-Edep/X9fGqVNmzKBVsDYIOtD+z1tuezV70LBjdCst9Tqu76lsnvRiZ6oTic1n+/BIwX6QDGAO94PN4N2SADvtw== }
 
-  brace-expansion@2.1.2:
+  brace-expansion@2.1.4:
     resolution:
-      { integrity: sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA== }
+      { integrity: sha512-hGfVzPxthbf3+2yjg/RBs60cB0FhqBS/zvdV/4wn4/BmN0bNMMHPc4V/BbFieqf1TKAGGAHnY4eSjajCl0f2Xg== }
 
-  brace-expansion@5.0.8:
+  brace-expansion@5.0.9:
     resolution:
-      { integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg== }
+      { integrity: sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg== }
     engines: { node: 20 || >=22 }
 
   braces@3.0.3:
@@ -3477,9 +3485,9 @@ packages:
     resolution:
       { integrity: sha512-gX8LrtNEI5hq8DVUfRQMbr5lpaS4nMIWV+7XEbXk2b8kiQIizgnlr12B4dA3ZEx3308ze0O4Q1R+cHts8kyUJg== }
 
-  fast-uri@3.1.4:
+  fast-uri@3.1.5:
     resolution:
-      { integrity: sha512-8JnbkQ4juDyvYs4mgFGQqg4yCYtFDtUtmp2QIQq11ZZe5CFQ5wcqm1rqDgAh/QdMySuBnPzMUiJUNZG5N/AiQw== }
+      { integrity: sha512-gHwA1O9LDIcKunMKhObS/HimwtehO1nPUECKAu5TpKgaO19fcWEl4bliWe1jWxVFvIXztJjjQ4L8XQ1EU9f7Jw== }
 
   fast-wrap-ansi@0.2.2:
     resolution:
@@ -3759,9 +3767,9 @@ packages:
     resolution:
       { integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA== }
 
-  hono@4.12.31:
+  hono@4.12.34:
     resolution:
-      { integrity: sha512-zJIHFrl6bq3RDd2YusFNCDlM8qUprxKswyi/OPzPyzKDdyBXDqWx8bZlZ7R+saTdSTatUmb3O7K4SspGPaEOQg== }
+      { integrity: sha512-GqXJqY/xJkJmuloTrnV1ZEXG3fqte+VjkUqoRNZXcrUidiUOP4fMSIHHY4tsqZBK++kVyWmt/AAfSUuy57/eSA== }
     engines: { node: ">=16.9.0" }
 
   html-encoding-sniffer@4.0.0:
@@ -3866,9 +3874,9 @@ packages:
       { integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg== }
     engines: { node: ">=12" }
 
-  ip-address@10.2.0:
+  ip-address@10.3.1:
     resolution:
-      { integrity: sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA== }
+      { integrity: sha512-1e9d3kb97NHJTIJDZW9rKqW2h6+dFa50Dy0fpPSMQp2ADje5gvKsXmdiK6dwY5t76TaTt5+P5N1Y/LoToIxP6g== }
     engines: { node: ">= 12" }
 
   ipaddr.js@1.9.1:
@@ -4337,14 +4345,14 @@ packages:
     resolution:
       { integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ== }
 
-  js-yaml@3.15.0:
+  js-yaml@3.15.1:
     resolution:
-      { integrity: sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog== }
+      { integrity: sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag== }
     hasBin: true
 
-  js-yaml@4.3.0:
+  js-yaml@4.3.1:
     resolution:
-      { integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q== }
+      { integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ== }
     hasBin: true
 
   jsdom@26.1.0:
@@ -4697,9 +4705,9 @@ packages:
       { integrity: sha512-dkEJPVvun4FryqBmZ5KhDo0K9iDXAwn08tMLDinNdRBNPcYEDiWYysLcc6k3mjTMlbP9KyylvRpd4wFtwrT9rw== }
     engines: { node: ^20.17.0 || >=22.9.0 }
 
-  nanoid@3.3.16:
+  nanoid@3.3.18:
     resolution:
-      { integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q== }
+      { integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w== }
     engines: { node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1 }
     hasBin: true
 
@@ -5038,9 +5046,9 @@ packages:
       { integrity: sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg== }
     engines: { node: ">=4" }
 
-  postcss@8.5.22:
+  postcss@8.5.23:
     resolution:
-      { integrity: sha512-KBDEIpLrvpv16pp3K0Fw+UCoZfopFjjgeB+0tA/aaThfEE74kKDLrgg603YvOWJyg3+WYtyq3xYsQWsIyZlPqQ== }
+      { integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg== }
     engines: { node: ^10 || ^12 || >=14 }
 
   powershell-utils@0.1.0:
@@ -5894,9 +5902,9 @@ packages:
     resolution:
       { integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ== }
 
-  undici@7.28.0:
+  undici@7.29.0:
     resolution:
-      { integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA== }
+      { integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw== }
     engines: { node: ">=20.18.1" }
 
   unicorn-magic@0.3.0:
@@ -6474,7 +6482,7 @@ snapshots:
       open: 8.4.2
       picomatch: 4.0.5
       systeminformation: 5.33.0
-      undici: 7.28.0
+      undici: 7.29.0
       which: 4.0.0
       yocto-spinner: 1.2.2
 
@@ -6532,7 +6540,7 @@ snapshots:
       globals: 14.0.0
       ignore: 5.3.2
       import-fresh: 3.3.1
-      js-yaml: 4.3.0
+      js-yaml: 4.3.1
       minimatch: 3.1.5
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -6564,9 +6572,9 @@ snapshots:
 
   "@floating-ui/utils@0.2.11": {}
 
-  "@hono/node-server@2.0.11(hono@4.12.31)":
+  "@hono/node-server@2.0.11(hono@4.12.34)":
     dependencies:
-      hono: 4.12.31
+      hono: 4.12.34
 
   "@hookform/resolvers@5.4.0(react-hook-form@7.79.0(react@19.2.4))(zod@4.4.3)":
     dependencies:
@@ -6738,7 +6746,7 @@ snapshots:
       camelcase: 5.3.1
       find-up: 4.1.0
       get-package-type: 0.1.0
-      js-yaml: 3.15.0
+      js-yaml: 3.15.1
       resolve-from: 5.0.0
 
   "@istanbuljs/schema@0.1.6": {}
@@ -6953,7 +6961,7 @@ snapshots:
 
   "@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76)":
     dependencies:
-      "@hono/node-server": 2.0.11(hono@4.12.31)
+      "@hono/node-server": 2.0.11(hono@4.12.34)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -6963,7 +6971,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
-      hono: 4.12.31
+      hono: 4.12.34
       jose: 6.2.4
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -7898,7 +7906,7 @@ snapshots:
       "@alloc/quick-lru": 5.2.0
       "@tailwindcss/node": 4.3.1
       "@tailwindcss/oxide": 4.3.1
-      postcss: 8.5.22
+      postcss: 8.5.23
       tailwindcss: 4.3.1
 
   "@tanstack/query-core@5.101.0": {}
@@ -8261,7 +8269,7 @@ snapshots:
   ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.4
+      fast-uri: 3.1.5
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
@@ -8461,16 +8469,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  brace-expansion@1.1.16:
+  brace-expansion@1.1.18:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@2.1.2:
+  brace-expansion@2.1.4:
     dependencies:
       balanced-match: 1.0.2
 
-  brace-expansion@5.0.8:
+  brace-expansion@5.0.9:
     dependencies:
       balanced-match: 4.0.4
 
@@ -8624,7 +8632,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
-      js-yaml: 4.3.0
+      js-yaml: 4.3.1
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 6.0.2
@@ -9206,7 +9214,7 @@ snapshots:
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       express: 5.2.1(supports-color@8.1.1)
-      ip-address: 10.2.0
+      ip-address: 10.3.1
     transitivePeerDependencies:
       - supports-color
 
@@ -9271,7 +9279,7 @@ snapshots:
     dependencies:
       fast-string-truncated-width: 3.0.3
 
-  fast-uri@3.1.4: {}
+  fast-uri@3.1.5: {}
 
   fast-wrap-ansi@0.2.2:
     dependencies:
@@ -9498,7 +9506,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.12.31: {}
+  hono@4.12.34: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
@@ -9577,7 +9585,7 @@ snapshots:
 
   internmap@2.0.3: {}
 
-  ip-address@10.2.0: {}
+  ip-address@10.3.1: {}
 
   ipaddr.js@1.9.1: {}
 
@@ -10124,12 +10132,12 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@3.15.0:
+  js-yaml@3.15.1:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
 
-  js-yaml@4.3.0:
+  js-yaml@4.3.1:
     dependencies:
       argparse: 2.0.1
 
@@ -10346,15 +10354,15 @@ snapshots:
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.9
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 1.1.16
+      brace-expansion: 1.1.18
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.1.2
+      brace-expansion: 2.1.4
 
   minimist@1.2.8: {}
 
@@ -10389,7 +10397,7 @@ snapshots:
 
   mute-stream@3.0.0: {}
 
-  nanoid@3.3.16: {}
+  nanoid@3.3.18: {}
 
   napi-postinstall@0.3.4: {}
 
@@ -10408,7 +10416,7 @@ snapshots:
       "@swc/helpers": 0.5.15
       baseline-browser-mapping: 2.11.1
       caniuse-lite: 1.0.30001806
-      postcss: 8.5.22
+      postcss: 8.5.23
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       styled-jsx: 5.1.6(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.4)
@@ -10659,9 +10667,9 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss@8.5.22:
+  postcss@8.5.23:
     dependencies:
-      nanoid: 3.3.16
+      nanoid: 3.3.18
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -11071,7 +11079,7 @@ snapshots:
       kleur: 4.1.5
       open: 11.0.0
       ora: 8.2.0
-      postcss: 8.5.22
+      postcss: 8.5.23
       postcss-selector-parser: 7.1.4
       prompts: 2.4.2
       recast: 0.23.12
@@ -11079,7 +11087,7 @@ snapshots:
       tailwind-merge: 3.6.0
       ts-morph: 26.0.0
       tsconfig-paths: 4.2.0
-      undici: 7.28.0
+      undici: 7.29.0
       validate-npm-package-name: 7.0.2
       zod: 3.25.76
       zod-to-json-schema: 3.25.2(zod@3.25.76)
@@ -11477,7 +11485,7 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici@7.28.0: {}
+  undici@7.29.0: {}
 
   unicorn-magic@0.3.0: {}
 
