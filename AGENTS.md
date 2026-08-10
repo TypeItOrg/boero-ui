@@ -20,3 +20,16 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 - Form navigation uses `returnTo` for both cancellation and successful saves when a navigable origin exists, preserving list filters, pagination, search, and ordering.
 - `returnTo` is restricted to internal paths (`/…`, never `//…` or absolute URLs); pages validate it before passing it to client forms, and Server Actions validate it again before redirecting.
 - Sensitive account changes still force logout, and deletion flows keep their fixed list destinations instead of using `returnTo`.
+
+## Type organization
+
+- Define frontend API types manually from the payloads consumed by each feature; do not generate or synchronize TypeScript from OpenAPI.
+- Each dedicated `*.types.ts` file contains exactly one top-level `type`, `interface`, or `enum` declaration.
+- Import types from their specific files instead of introducing umbrella type files or barrels.
+
+## New feature boundaries
+
+- Validate Server Action bound arguments and form data at runtime; values bound by a client component are untrusted input.
+- Use the shared authenticated API transport for server-side backend calls so authorization, no-store behavior, timeouts, and request headers remain consistent.
+- Use Route Handlers for client-side reads that proxy backend data. Keep mutations and redirects in Server Actions.
+- Paginate or search option catalogs through the API instead of loading every page into a form.
