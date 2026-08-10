@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  AsyncDropdown,
-  type AsyncDropdownFetchPageInput,
-  type AsyncDropdownPage,
-} from "@common/components/ui/async-dropdown";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";

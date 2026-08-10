@@ -2,12 +2,10 @@
 
 import * as React from "react";
 
-import {
-  AsyncDropdown,
-  type AsyncDropdownFetchPageInput,
-  type AsyncDropdownPage,
-} from "@common/components/ui/async-dropdown";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
