@@ -1,54 +1,63 @@
-import type { InstitutionPermission, InstitutionPermissionGroup } from "@features/roles/types/institution-role.types";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 
-export type PermissionWithDepth = {
+export type PermissionTreeNode = {
   permission: InstitutionPermission;
-  depth: number;
+  children: readonly PermissionTreeNode[];
 };
 
 export function getPermissionMap(groups: readonly InstitutionPermissionGroup[]): Map<string, InstitutionPermission> {
   return new Map(groups.flatMap((group) => group.permissions.map((permission) => [permission.code, permission])));
 }
 
-export function getPermissionRows(
+export function getPermissionTree(
   groupPermissions: readonly InstitutionPermission[],
   allPermissions: ReadonlyMap<string, InstitutionPermission>,
-): PermissionWithDepth[] {
+): PermissionTreeNode[] {
   const groupPermissionCodes = new Set(groupPermissions.map((permission) => permission.code));
   const originalOrder = new Map(groupPermissions.map((permission, index) => [permission.code, index]));
+  const childrenByParentCode = new Map<string, InstitutionPermission[]>();
+  const rootPermissions: InstitutionPermission[] = [];
 
-  return groupPermissions
-    .map((permission) => ({
-      permission,
-      depth: getPermissionDepth(permission.code, groupPermissionCodes, allPermissions),
-    }))
-    .sort(
-      (left, right) =>
-        left.depth - right.depth ||
-        (originalOrder.get(left.permission.code) ?? 0) - (originalOrder.get(right.permission.code) ?? 0),
-    );
+  for (const permission of groupPermissions) {
+    const parentCode = getVisibleParentCode(permission, groupPermissionCodes, allPermissions);
+    if (!parentCode) {
+      rootPermissions.push(permission);
+      continue;
+    }
+
+    const children = childrenByParentCode.get(parentCode) ?? [];
+    children.push(permission);
+    childrenByParentCode.set(parentCode, children);
+  }
+
+  const sortByOriginalOrder = (left: InstitutionPermission, right: InstitutionPermission): number =>
+    (originalOrder.get(left.code) ?? 0) - (originalOrder.get(right.code) ?? 0);
+
+  function buildTree(
+    permission: InstitutionPermission,
+    ancestorCodes: ReadonlySet<string> = new Set(),
+  ): PermissionTreeNode {
+    const nextAncestorCodes = new Set(ancestorCodes).add(permission.code);
+    const children = (childrenByParentCode.get(permission.code) ?? [])
+      .filter((child) => !nextAncestorCodes.has(child.code))
+      .sort(sortByOriginalOrder)
+      .map((child) => buildTree(child, nextAncestorCodes));
+
+    return { permission, children };
+  }
+
+  return rootPermissions.sort(sortByOriginalOrder).map((permission) => buildTree(permission));
 }
 
-export function getPermissionIndentClass(depth: number): string {
-  if (depth === 1) return "ml-6";
-  if (depth === 2) return "ml-12";
-  return depth > 2 ? "ml-18" : "ml-0";
-}
-
-function getPermissionDepth(
-  code: string,
+function getVisibleParentCode(
+  permission: InstitutionPermission,
   groupPermissionCodes: ReadonlySet<string>,
   allPermissions: ReadonlyMap<string, InstitutionPermission>,
-  visitedCodes: ReadonlySet<string> = new Set(),
-): number {
-  const permission = allPermissions.get(code);
-  if (!permission || visitedCodes.has(code)) return 0;
+): string | null {
+  const parentCodes = permission.requiredPermissions.filter(
+    (requiredCode) => groupPermissionCodes.has(requiredCode) && allPermissions.has(requiredCode),
+  );
 
-  const nextVisitedCodes = new Set(visitedCodes).add(code);
-  const parentDepths = permission.requiredPermissions
-    .filter((requiredCode) => groupPermissionCodes.has(requiredCode))
-    .map(
-      (requiredCode) => 1 + getPermissionDepth(requiredCode, groupPermissionCodes, allPermissions, nextVisitedCodes),
-    );
-
-  return Math.max(0, ...parentDepths);
+  return parentCodes.length === 1 ? parentCodes[0] : null;
 }

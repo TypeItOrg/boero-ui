@@ -5,8 +5,10 @@ import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
-import type { InstitutionPermission, InstitutionPermissionGroup } from "@features/roles/types/institution-role.types";
-import type { PlatformRole, PlatformRoleListItem } from "@features/roles/types/platform-role.types";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
+import type { PlatformRoleListItem } from "@features/roles/types/platform-role-list-item.types";
+import type { PlatformRole } from "@features/roles/types/platform-role.types";
 import type { PlatformRolesPaginationParams } from "@features/roles/utils/platform-role-pagination.util";
 
 const ROLES_ERROR = "No se pudieron obtener los roles.";

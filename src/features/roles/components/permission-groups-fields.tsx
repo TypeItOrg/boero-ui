@@ -5,13 +5,10 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldLabel } from "@common/components/ui/field";
-import { cn } from "@common/utils/cn.util";
-import type { InstitutionPermission, InstitutionPermissionGroup } from "@features/roles/types/institution-role.types";
-import {
-  getPermissionIndentClass,
-  getPermissionMap,
-  getPermissionRows,
-} from "@features/roles/utils/permission-hierarchy.util";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
+import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
+import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
 
 type PermissionGroupsFieldsProps = {
   groups: readonly InstitutionPermissionGroup[];
@@ -53,9 +50,7 @@ export function PermissionGroupsFields({
   return (
     <div className="flex flex-wrap items-stretch gap-4">
       {groups.map((group) => {
-        const permissionRows = getPermissionRows(group.permissions, permissions);
-        const rootRows = permissionRows.filter(({ depth }) => depth === 0);
-        const nestedRows = permissionRows.filter(({ depth }) => depth > 0);
+        const permissionTree = getPermissionTree(group.permissions, permissions);
 
         return (
           <Card key={group.code} className="bg-muted/25 flex-[1_0_min(450px,100%)]">
@@ -64,16 +59,7 @@ export function PermissionGroupsFields({
               <CardDescription>{group.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-              {rootRows.map(({ permission }) => renderPermissionField(permission))}
-              {nestedRows.length > 0 ? (
-                <div className="border-border/50 ml-6 flex flex-col gap-3 border-l pl-3">
-                  {nestedRows.map(({ permission, depth }) => (
-                    <div key={permission.code} className={cn(getPermissionIndentClass(depth - 1))}>
-                      {renderPermissionField(permission)}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
+              <PermissionHierarchy nodes={permissionTree} renderPermission={renderPermissionField} />
             </CardContent>
           </Card>
         );

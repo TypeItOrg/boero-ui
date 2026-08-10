@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
-import type { PaginationParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
 import { PLATFORM_ROLES_PAGE_SIZE_OPTIONS } from "@features/roles/utils/platform-role-pagination.util";
 
 type PlatformRolesPaginationProps = PaginationParams & {

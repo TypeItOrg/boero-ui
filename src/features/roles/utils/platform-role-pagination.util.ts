@@ -1,9 +1,10 @@
-import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
-import { getQueryParamValue } from "@common/utils/query-param.util";
+import { getQueryParamValue, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
-import type { PlatformRoleType } from "@features/roles/types/platform-role.types";
+import type { PlatformRoleType } from "@features/roles/types/platform-role-type.types";
 
 export const DEFAULT_PLATFORM_ROLES_PAGE_SIZE = 10;
 export const PLATFORM_ROLES_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
@@ -30,7 +31,6 @@ export const DEFAULT_PLATFORM_ROLES_SORT = {
   direction: "asc",
 } as const satisfies PlatformRoleSort;
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ROLE_TYPES = new Set<PlatformRoleType>(["SYSTEM", "CUSTOM"]);
 const SORT_FIELDS = new Set<PlatformRoleSortField>(PLATFORM_ROLES_SORT_FIELDS);
 
@@ -47,13 +47,8 @@ export function parsePlatformRolesPaginationParams(
     page,
     size,
     search,
-    institutionId: parseUuid(searchParams.institutionId),
+    institutionId: parseUuidQueryParam(searchParams.institutionId),
     roleType: roleType && ROLE_TYPES.has(roleType as PlatformRoleType) ? (roleType as PlatformRoleType) : undefined,
     sort: parseSortQuery(searchParams, SORT_FIELDS, DEFAULT_PLATFORM_ROLES_SORT),
   };
-}
-
-function parseUuid(value: QueryParamValue): string | undefined {
-  const parsed = getQueryParamValue(value);
-  return parsed && UUID_PATTERN.test(parsed) ? parsed : undefined;
 }

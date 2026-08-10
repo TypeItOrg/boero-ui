@@ -11,11 +11,9 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui
 import { Input } from "@common/components/ui/input";
 import { saveInstitutionRoleAction } from "@features/roles/actions/save-institution-role.action";
 import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
-import type {
-  InstitutionPermissionGroup,
-  InstitutionRole,
-  RoleFormState,
-} from "@features/roles/types/institution-role.types";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { InstitutionRole } from "@features/roles/types/institution-role.types";
+import type { RoleFormState } from "@features/roles/types/role-form-state.types";
 
 type InstitutionRoleFormProps = {
   institutionId: string;
@@ -37,7 +35,7 @@ export function InstitutionRoleForm({
   const [state, formAction, pending] = useActionState(action, initialState);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />

@@ -24,9 +24,9 @@ import { useDataTableNavigation } from "@common/components/ui/data-table-navigat
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import type { PaginationParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
 import { PlatformRolesPagination } from "@features/roles/components/platform-roles-pagination";
-import type { PlatformRoleListItem } from "@features/roles/types/platform-role.types";
+import type { PlatformRoleListItem } from "@features/roles/types/platform-role-list-item.types";
 import type { PlatformRoleSort, PlatformRoleSortField } from "@features/roles/utils/platform-role-pagination.util";
 
 type PlatformRolesTablePresentationProps = PaginationParams & {

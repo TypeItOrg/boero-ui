@@ -1,13 +1,10 @@
 import { CheckIcon } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { cn } from "@common/utils/cn.util";
-import type { InstitutionPermission, InstitutionPermissionGroup } from "@features/roles/types/institution-role.types";
-import {
-  getPermissionIndentClass,
-  getPermissionMap,
-  getPermissionRows,
-} from "@features/roles/utils/permission-hierarchy.util";
+import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
+import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
 
 type InstitutionRolePermissionsProps = {
   permissionCodes: readonly string[];
@@ -47,35 +44,14 @@ export function InstitutionRolePermissions({
             <CardDescription>{group.description}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            {renderPermissionRows(group.permissions, permissionMap)}
+            <PermissionHierarchy
+              nodes={getPermissionTree(group.permissions, permissionMap)}
+              renderPermission={renderPermissionRow}
+            />
           </CardContent>
         </Card>
       ))}
     </div>
-  );
-}
-
-function renderPermissionRows(
-  permissions: readonly InstitutionPermission[],
-  permissionMap: ReadonlyMap<string, InstitutionPermission>,
-): React.ReactNode {
-  const rows = getPermissionRows(permissions, permissionMap);
-  const rootRows = rows.filter(({ depth }) => depth === 0);
-  const nestedRows = rows.filter(({ depth }) => depth > 0);
-
-  return (
-    <>
-      {rootRows.map(({ permission }) => renderPermissionRow(permission))}
-      {nestedRows.length > 0 ? (
-        <div className="border-border/50 ml-6 flex flex-col gap-3 border-l pl-3">
-          {nestedRows.map(({ permission, depth }) => (
-            <div key={permission.code} className={cn(getPermissionIndentClass(depth - 1))}>
-              {renderPermissionRow(permission)}
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </>
   );
 }
 

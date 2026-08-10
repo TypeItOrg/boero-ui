@@ -6,22 +6,21 @@ import { useActionState } from "react";
 import { CircleAlertIcon, InfoIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import {
-  AsyncDropdown,
-  type AsyncDropdownFetchPageInput,
-  type AsyncDropdownPage,
-} from "@common/components/ui/async-dropdown";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { savePlatformRoleAction } from "@features/roles/actions/save-platform-role.action";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
-import type { InstitutionPermissionGroup } from "@features/roles/types/institution-role.types";
-import type { PlatformRole, PlatformRoleFormState } from "@features/roles/types/platform-role.types";
+import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
+import type { PlatformRoleFormState } from "@features/roles/types/platform-role-form-state.types";
+import type { PlatformRole } from "@features/roles/types/platform-role.types";
 import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
 
 const INITIAL_STATE: PlatformRoleFormState = {};
@@ -40,7 +39,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
   const isEdit = Boolean(role);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />

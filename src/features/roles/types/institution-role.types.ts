@@ -1,4 +1,4 @@
-import type { SystemRoleCode } from "@features/people/types/person-role.types";
+import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
 
 export type InstitutionRole = {
   id: string;
@@ -9,23 +9,4 @@ export type InstitutionRole = {
   assignmentCount: number;
   permissions: readonly string[];
   protectedPermissions: readonly string[];
-};
-
-export type InstitutionPermission = {
-  code: string;
-  description: string;
-  grantable: boolean;
-  requiredPermissions: readonly string[];
-};
-
-export type InstitutionPermissionGroup = {
-  code: string;
-  displayName: string;
-  description: string;
-  permissions: readonly InstitutionPermission[];
-};
-
-export type RoleFormState = {
-  error?: string;
-  fieldErrors?: { name?: string };
 };
