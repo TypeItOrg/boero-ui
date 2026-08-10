@@ -35,20 +35,20 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
       collapsible="icon"
       variant="sidebar"
       className={cn(
-        "bg-background [&_[data-slot=sidebar-inner]]:bg-muted [&_[data-slot=sidebar-inner]]:shadow-none! [&_[data-slot=sidebar-inner]]:ring-0!",
+        "bg-background [&_[data-slot=sidebar-inner]]:shadow-none! [&_[data-slot=sidebar-inner]]:ring-0!",
         className,
       )}
       {...props}
     >
-      <SidebarHeader className="px-4 pt-4 pb-0 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:pb-0 md:pb-9">
+      <SidebarHeader className="bg-primary text-primary-foreground px-4 pt-4 pb-0 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:pb-0 md:pb-9">
         <div className="flex hidden items-center gap-3 group-data-[collapsible=icon]:hidden md:flex">
-          <span className="text-foreground text-lg font-bold tracking-tight">Boero</span>
+          <span className="text-lg font-bold tracking-tight">Boero</span>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-primary text-primary-foreground">
         <PlatformSidebarNav items={PLATFORM_NAVIGATION_ITEMS} />
       </SidebarContent>
-      <SidebarFooter className="px-4 pb-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
+      <SidebarFooter className="bg-primary text-primary-foreground px-4 pb-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
         <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">
           <SidebarMenuItem>
             <SidebarMenuButton

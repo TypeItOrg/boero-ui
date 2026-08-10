@@ -1,7 +1,6 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -20,7 +19,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -35,13 +33,11 @@ import { cn } from "@common/utils/cn.util";
 
 type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
   user: InstitutionalUser;
-  institutionName?: string;
   navigationSections: readonly InstitutionalNavigationSection[];
 };
 
 export function InstitutionalSidebar({
   user,
-  institutionName,
   navigationSections,
   className,
   ...props
@@ -57,21 +53,6 @@ export function InstitutionalSidebar({
       className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)}
       {...props}
     >
-      <SidebarHeader className="border-sidebar-border border-b p-4">
-        <Link
-          href="/"
-          aria-label="Ir al inicio del portal institucional"
-          className="flex h-14 items-center gap-3 px-0 group-data-[collapsible=icon]:justify-center"
-          onClick={() => navigation.handleNavigation("/")}
-        >
-          <Image src="/boero-logo.png" alt="Boero" width={32} height={32} className="size-8! shrink-0" />
-          <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <span className="block truncate text-sm font-semibold">{institutionName ?? "Boero"}</span>
-            <span className="text-muted-foreground block truncate text-xs">Portal Institucional</span>
-          </span>
-        </Link>
-      </SidebarHeader>
-
       <SidebarContent className="p-4">
         <InstitutionalSidebarNav sections={navigationSections} navigation={navigation} />
       </SidebarContent>
@@ -153,7 +134,7 @@ export function InstitutionalSidebar({
 
 function InstitutionalUserAvatar({ user }: { user: InstitutionalUser }): React.ReactElement {
   return (
-    <Avatar className="size-8 rounded-md">
+    <Avatar className="size-[34px] rounded-md group-data-[collapsible=icon]:size-8!">
       <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">
         {getInitials(user.name, user.lastName)}
       </AvatarFallback>
