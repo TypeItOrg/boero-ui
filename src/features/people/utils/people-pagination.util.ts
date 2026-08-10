@@ -1,7 +1,8 @@
-import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
-import type { PersonSummary } from "@features/people/types/person.types";
+import type { PersonSummary } from "@features/people/types/person-summary.types";
 
 export const DEFAULT_PEOPLE_PAGE_SIZE = 10;
 export const PEOPLE_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;

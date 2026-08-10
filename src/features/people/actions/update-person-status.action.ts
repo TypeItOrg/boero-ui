@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
@@ -17,6 +18,10 @@ export async function updatePersonStatusAction(
   personId: string,
   enabled: boolean,
 ): Promise<UpdatePersonStatusActionState> {
+  if (!isValidUuid(institutionId) || !isValidUuid(personId)) {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
+
   const errorState = await getResponseErrorActionState(
     peopleApiFetch(PeopleScope.INSTITUTIONAL, `/api/v1/institutions/${institutionId}/people/${personId}/status`, {
       method: "PATCH",

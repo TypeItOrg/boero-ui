@@ -5,12 +5,12 @@ import { PlusIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import type { AssignableRole } from "@features/people/types/assignable-role.types";
+import type { PersonRole } from "@features/people/types/person-role.types";
 import {
   SystemRoleCode,
-  type AssignableRole,
-  type PersonRole,
   type SystemRoleCode as SystemRoleCodeType,
-} from "@features/people/types/person-role.types";
+} from "@features/people/types/system-role-code.types";
 import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
@@ -120,12 +120,12 @@ export function PersonRolesManager({
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-muted/25 p-5 md:p-6">
+      <CardHeader className="p-0">
         <CardTitle>Roles institucionales</CardTitle>
         <CardDescription>Los cambios de roles se aplican al guardar el usuario.</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="flex flex-col gap-6 p-0">
         <section className="flex flex-col gap-3">
           <h3 className="text-sm font-medium">Roles asignados</h3>
           {selectedRoles.length > 0 ? (

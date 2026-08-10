@@ -2,7 +2,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
-import type { PlatformPersonSummary } from "@features/people/types/person.types";
+import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 import type { PlatformPeoplePaginationParams } from "@features/people/utils/platform-people-pagination.util";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";

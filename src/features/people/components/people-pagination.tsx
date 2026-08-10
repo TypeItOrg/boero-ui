@@ -2,7 +2,7 @@
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
-import type { PaginationParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
 import { PEOPLE_PAGE_SIZE_OPTIONS } from "@features/people/utils/people-pagination.util";
 
 type PeoplePaginationProps = PaginationParams & {

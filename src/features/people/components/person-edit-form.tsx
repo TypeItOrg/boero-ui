@@ -5,7 +5,8 @@ import * as React from "react";
 import { cn } from "@common/utils/cn.util";
 import { PersonForm } from "@features/people/components/person-form";
 import { PersonRolesManager } from "@features/people/components/person-roles-manager";
-import type { AssignableRole, PersonRole } from "@features/people/types/person-role.types";
+import type { AssignableRole } from "@features/people/types/assignable-role.types";
+import type { PersonRole } from "@features/people/types/person-role.types";
 import type { Person } from "@features/people/types/person.types";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
@@ -42,7 +43,7 @@ export function PersonEditForm({
   return (
     <div
       className={cn(
-        "grid items-start gap-8",
+        "grid items-start gap-4",
         canManageRoles && "xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]",
       )}
     >

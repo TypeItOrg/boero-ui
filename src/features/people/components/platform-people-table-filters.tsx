@@ -2,21 +2,20 @@
 
 import { XIcon } from "lucide-react";
 
-import {
-  AsyncDropdown,
-  type AsyncDropdownFetchPageInput,
-  type AsyncDropdownPage,
-} from "@common/components/ui/async-dropdown";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
-import type { SystemRole, SystemRoleCode } from "@features/people/types/person-role.types";
+import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
+import type { SystemRole } from "@features/people/types/system-role.types";
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 

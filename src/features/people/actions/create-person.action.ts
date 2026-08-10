@@ -2,13 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonFormSchema } from "@features/people/schemas/person-form.schema";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
-import { PERSON_FORM_FIELD_NAMES, type PersonActionState } from "@features/people/types/person-action-state.types";
+import type { PersonActionState } from "@features/people/types/person-action-state.types";
+import { PERSON_FORM_FIELD_NAMES } from "@features/people/types/person-form-field-name.types";
 import {
   getPeoplePath,
   PeopleScope,
@@ -36,6 +38,8 @@ async function createPersonActionInternal(
   formData: FormData,
   scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<PersonActionState> {
+  if (!isValidUuid(institutionId)) return { error: INVALID_ACTION_ARGUMENTS };
+
   const payload = {
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),

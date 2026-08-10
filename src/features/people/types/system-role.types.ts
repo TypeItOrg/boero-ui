@@ -1,8 +1,6 @@
 import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
 
-export type PersonRole = {
-  roleId: string;
-  technicalCode: SystemRoleCode | null;
+export type SystemRole = {
+  code: SystemRoleCode;
   displayName: string;
-  assignedAt: string;
 };

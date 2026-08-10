@@ -2,18 +2,12 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Controller, useForm, type Resolver, type UseFormSetError } from "react-hook-form";
+import { useForm, type Resolver, type UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { DatePicker } from "@common/components/ui/date-picker";
-import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { Input } from "@common/components/ui/input";
-import { PasswordInput } from "@common/components/ui/password-input";
-import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
-import { cn } from "@common/utils/cn.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import {
   createInstitutionalPersonAction,
@@ -23,26 +17,17 @@ import {
   updateInstitutionalPersonAction,
   updatePlatformPersonAction,
 } from "@features/people/actions/update-person.action";
+import {
+  PersonCreateFields,
+  PersonDetailsFields,
+  PersonPasswordFields,
+} from "@features/people/components/person-form-fields";
 import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
 import type { Person } from "@features/people/types/person.types";
-import type { PersonActionState, PersonFormFieldName } from "@features/people/types/person-action-state.types";
-import {
-  formatBirthDateInput,
-  getLatestAllowedBirthDate,
-  parseBirthDateInput,
-} from "@features/people/utils/person-birth-date.util";
+import type { PersonActionState } from "@features/people/types/person-action-state.types";
+import type { PersonFormFieldName } from "@features/people/types/person-form-field-name.types";
+import type { PersonFormInput } from "@features/people/types/person-form-input.types";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
-
-type PersonFormInput = {
-  firstName: string;
-  lastName: string;
-  documentNumber: string;
-  email: string;
-  phoneNumber: string;
-  birthDate: string;
-  password: string;
-  confirmPassword: string;
-};
 
 type PersonFormCommonProps = {
   institutionId: string;
@@ -147,7 +132,7 @@ export function PersonForm({
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {formError && (
           <Alert variant="destructive">
             <CircleAlertIcon />
@@ -157,154 +142,15 @@ export function PersonForm({
         )}
 
         <fieldset disabled={isEdit && !canEdit} className="contents">
-          <FormCard>
-            <SectionHeading title="Datos personales" description="Información principal del usuario institucional." />
-            <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-              <Field data-invalid={!!errors.firstName} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-first-name" required>
-                    Nombre
-                  </FieldLabel>
-                </FieldContent>
-                <Input id="person-first-name" aria-invalid={!!errors.firstName} {...register("firstName")} />
-                <FieldError errors={[errors.firstName]} />
-              </Field>
-
-              <Field data-invalid={!!errors.lastName} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-last-name" required>
-                    Apellido
-                  </FieldLabel>
-                </FieldContent>
-                <Input id="person-last-name" aria-invalid={!!errors.lastName} {...register("lastName")} />
-                <FieldError errors={[errors.lastName]} />
-              </Field>
-            </FieldGroup>
-
-            <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-              {isEdit && (
-                <Field data-disabled className="flex-[1_0_min(200px,100%)]">
-                  <FieldContent>
-                    <FieldLabel htmlFor="person-document">Documento</FieldLabel>
-                  </FieldContent>
-                  <Input id="person-document" value={person.documentNumber} disabled />
-                </Field>
-              )}
-
-              <Field data-invalid={!!errors.email} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-email">Email</FieldLabel>
-                </FieldContent>
-                <Input id="person-email" type="email" aria-invalid={!!errors.email} {...register("email")} />
-                <FieldError errors={[errors.email]} />
-              </Field>
-
-              <Field className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-phone">Teléfono</FieldLabel>
-                </FieldContent>
-                <PhoneInput id="person-phone" aria-invalid={!!errors.phoneNumber} {...register("phoneNumber")} />
-                <FieldError errors={[errors.phoneNumber]} />
-              </Field>
-            </FieldGroup>
-          </FormCard>
+          <PersonDetailsFields errors={errors} isEdit={isEdit} person={person} register={register} />
         </fieldset>
 
         {isEdit ? (
           <fieldset disabled={!canEdit} className="contents">
-            <FormCard>
-              <SectionHeading
-                title="Cambiar contraseña"
-                description="Dejá los campos en blanco para conservar la contraseña actual."
-              />
-              <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-                <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
-                  <FieldContent>
-                    <FieldLabel htmlFor="person-password">Nueva contraseña</FieldLabel>
-                  </FieldContent>
-                  <PasswordInput id="person-password" aria-invalid={!!errors.password} {...register("password")} />
-                  <FieldError errors={[errors.password]} />
-                </Field>
-
-                <Field data-invalid={!!errors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
-                  <FieldContent>
-                    <FieldLabel htmlFor="person-confirm-password">Confirmar nueva contraseña</FieldLabel>
-                  </FieldContent>
-                  <PasswordInput
-                    id="person-confirm-password"
-                    aria-invalid={!!errors.confirmPassword}
-                    {...register("confirmPassword")}
-                  />
-                  <FieldError errors={[errors.confirmPassword]} />
-                </Field>
-              </FieldGroup>
-            </FormCard>
+            <PersonPasswordFields errors={errors} register={register} />
           </fieldset>
         ) : (
-          <FormCard>
-            <SectionHeading title="Cuenta de acceso" description="Credenciales iniciales para iniciar sesión." />
-            <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
-              <Field data-invalid={!!errors.documentNumber} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-document" required>
-                    Documento
-                  </FieldLabel>
-                </FieldContent>
-                <NumericInput
-                  id="person-document"
-                  aria-invalid={!!errors.documentNumber}
-                  {...register("documentNumber")}
-                />
-                <FieldError errors={[errors.documentNumber]} />
-              </Field>
-
-              <Field data-invalid={!!errors.birthDate} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-birth-date" required>
-                    Fecha de nacimiento
-                  </FieldLabel>
-                </FieldContent>
-                <Controller
-                  control={control}
-                  name="birthDate"
-                  render={({ field, fieldState }) => (
-                    <DatePicker
-                      id="person-birth-date"
-                      value={parseBirthDateInput(field.value)}
-                      maxDate={getLatestAllowedBirthDate()}
-                      onChange={(date) => field.onChange(formatBirthDateInput(date))}
-                      aria-invalid={fieldState.invalid}
-                    />
-                  )}
-                />
-                <FieldError errors={[errors.birthDate]} />
-              </Field>
-
-              <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-password" required>
-                    Contraseña inicial
-                  </FieldLabel>
-                </FieldContent>
-                <PasswordInput id="person-password" aria-invalid={!!errors.password} {...register("password")} />
-                <FieldError errors={[errors.password]} />
-              </Field>
-
-              <Field data-invalid={!!errors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="person-confirm-password" required>
-                    Confirmar contraseña
-                  </FieldLabel>
-                </FieldContent>
-                <PasswordInput
-                  id="person-confirm-password"
-                  aria-invalid={!!errors.confirmPassword}
-                  {...register("confirmPassword")}
-                />
-                <FieldError errors={[errors.confirmPassword]} />
-              </Field>
-            </FieldGroup>
-          </FormCard>
+          <PersonCreateFields control={control} errors={errors} register={register} />
         )}
       </div>
 
@@ -327,19 +173,6 @@ export function PersonForm({
       )}
     </form>
   );
-}
-
-function SectionHeading({ title, description }: { title: string; description: string }): React.ReactElement {
-  return (
-    <div>
-      <h2 className="text-base font-semibold">{title}</h2>
-      <p className="text-muted-foreground mt-1 text-sm">{description}</p>
-    </div>
-  );
-}
-
-function FormCard({ children, className }: { children: React.ReactNode; className?: string }): React.ReactElement {
-  return <div className={cn("bg-muted/25 rounded-xl border p-5 md:p-6", className)}>{children}</div>;
 }
 
 function getPersonFormResolver(isEdit: boolean): Resolver<PersonFormInput> {

@@ -2,12 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { PersonRolesManager } from "@features/people/components/person-roles-manager";
+import type { AssignableRole } from "@features/people/types/assignable-role.types";
+import type { PersonRole } from "@features/people/types/person-role.types";
 import {
   SystemRoleCode,
-  type AssignableRole,
-  type PersonRole,
   type SystemRoleCode as SystemRoleCodeType,
-} from "@features/people/types/person-role.types";
+} from "@features/people/types/system-role-code.types";
 import { PeopleScope } from "@features/people/utils/people-scope.util";
 
 const applicantRole: AssignableRole = {

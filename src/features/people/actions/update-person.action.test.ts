@@ -19,8 +19,8 @@ import { revalidatePath } from "next/cache";
 import { updatePlatformPersonAction } from "@features/people/actions/update-person.action";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 
-const INSTITUTION_ID = "inst-1";
-const PERSON_ID = "person-1";
+const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
+const PERSON_ID = "00000000-0000-4000-8000-000000000002";
 
 describe("updatePersonAction", () => {
   const peopleApiFetchMock = jest.mocked(peopleApiFetch);

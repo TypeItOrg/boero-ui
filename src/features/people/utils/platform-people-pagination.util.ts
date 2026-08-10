@@ -1,10 +1,11 @@
-import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
-import { getQueryParamValue } from "@common/utils/query-param.util";
+import { getQueryParamValue, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
-import { SYSTEM_ROLE_CODES, type SystemRoleCode } from "@features/people/types/person-role.types";
-import type { PlatformPersonSummary } from "@features/people/types/person.types";
+import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
+import { SYSTEM_ROLE_CODES, type SystemRoleCode } from "@features/people/types/system-role-code.types";
 
 export const DEFAULT_PLATFORM_PEOPLE_PAGE_SIZE = 10;
 export const PLATFORM_PEOPLE_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
@@ -24,7 +25,6 @@ export const DEFAULT_PLATFORM_PEOPLE_SORT = {
 
 const platformPeopleSortFields = new Set<PlatformPeopleSortField>(PLATFORM_PEOPLE_SORT_FIELDS);
 const systemRoleCodes = new Set<string>(SYSTEM_ROLE_CODES);
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export type PlatformPeopleSearchParams = PaginationSearchParams &
   SortSearchParams & {
@@ -51,15 +51,10 @@ export function parsePlatformPeoplePaginationParams(
     page,
     size,
     search,
-    institutionId: parseInstitutionId(searchParams.institutionId),
+    institutionId: parseUuidQueryParam(searchParams.institutionId),
     roleCode: parseRoleCode(searchParams.roleCode),
     sort: parseSortQuery(searchParams, platformPeopleSortFields, DEFAULT_PLATFORM_PEOPLE_SORT),
   };
-}
-
-function parseInstitutionId(value: QueryParamValue): string | undefined {
-  const institutionId = getQueryParamValue(value);
-  return institutionId && UUID_PATTERN.test(institutionId) ? institutionId : undefined;
 }
 
 function parseRoleCode(value: QueryParamValue): SystemRoleCode | undefined {

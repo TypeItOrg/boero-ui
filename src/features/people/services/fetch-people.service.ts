@@ -3,7 +3,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
-import type { PersonSummary } from "@features/people/types/person.types";
+import type { PersonSummary } from "@features/people/types/person-summary.types";
 import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import {

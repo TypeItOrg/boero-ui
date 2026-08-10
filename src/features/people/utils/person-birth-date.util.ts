@@ -1,3 +1,5 @@
+import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
+
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
 const MINIMUM_PERSON_AGE = 3;
 
@@ -22,25 +24,11 @@ export function hasMinimumPersonAge(value: string, today = getArgentinaToday()):
 }
 
 export function parseBirthDateInput(value: string | null): Date | undefined {
-  if (!value) return undefined;
-
-  const [year, month, day] = value.split("-").map(Number);
-  if (![year, month, day].every(Number.isInteger)) return undefined;
-
-  const date = new Date(year, month - 1, day);
-  const isValidDate = date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-
-  return isValidDate ? date : undefined;
+  return parseDateInput(value);
 }
 
 export function formatBirthDateInput(date: Date | undefined): string {
-  if (!date) return "";
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+  return formatDateInput(date);
 }
 
 function getArgentinaToday(): Date {

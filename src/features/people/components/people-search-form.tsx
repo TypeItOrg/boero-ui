@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
-import type { AssignableRole } from "@features/people/types/person-role.types";
+import type { AssignableRole } from "@features/people/types/assignable-role.types";
 
 const ALL_ROLES = "all";
 
