@@ -7,6 +7,7 @@ import { SidebarInset, SidebarProvider } from "@common/components/ui/sidebar";
 import { InstitutionalSidebar } from "@features/institutional-auth/components/institutional-sidebar";
 import { InstitutionalTopbar } from "@features/institutional-auth/components/institutional-topbar";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
 import {
   INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM,
   getInstitutionalNavigationSections,
@@ -17,6 +18,7 @@ type InstitutionalShellProps = {
   user: InstitutionalUser;
   institutionName?: string;
   defaultSidebarOpen: boolean;
+  shortcutPlatform: ContextualSearchShortcutPlatform;
 };
 
 export function InstitutionalShell({
@@ -24,6 +26,7 @@ export function InstitutionalShell({
   user,
   institutionName,
   defaultSidebarOpen,
+  shortcutPlatform,
 }: InstitutionalShellProps): React.ReactElement {
   const [sidebarOpen, setSidebarOpen] = React.useState(defaultSidebarOpen);
   const navigationSections = getInstitutionalNavigationSections(user);
@@ -49,9 +52,14 @@ export function InstitutionalShell({
         } as React.CSSProperties
       }
     >
-      <InstitutionalSidebar user={user} institutionName={institutionName} navigationSections={navigationSections} />
+      <InstitutionalSidebar user={user} navigationSections={navigationSections} />
       <SidebarInset className="bg-background gap-3 pb-[calc((var(--spacing)*21)+env(safe-area-inset-bottom))] md:m-0 md:ml-0 md:gap-4 md:rounded-none md:p-4 md:shadow-none md:peer-data-[state=collapsed]:ml-0">
-        <InstitutionalTopbar />
+        <InstitutionalTopbar
+          accessSections={navigationSections}
+          institutionId={user.institutionId}
+          institutionName={institutionName}
+          shortcutPlatform={shortcutPlatform}
+        />
         <div className="bg-muted flex min-w-0 flex-1 flex-col overflow-x-hidden rounded-none md:rounded-2xl">
           {children}
         </div>
