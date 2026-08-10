@@ -2,18 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformAccountUpdateFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
-import {
-  PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-  type PlatformAccountActionState,
-} from "@features/platform-accounts/types/platform-account-action-state.types";
+import { type PlatformAccountActionState } from "@features/platform-accounts/types/platform-account-action-state.types";
+import { PLATFORM_ACCOUNT_FORM_FIELD_NAMES } from "@features/platform-accounts/types/platform-account-form-field-name.types";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
 export async function updatePlatformAccountAction(id: string, formData: FormData): Promise<PlatformAccountActionState> {
+  if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
+
   const parsed = platformAccountUpdateFormSchema.safeParse({
     name: formData.get("name"),
     lastName: formData.get("lastName"),

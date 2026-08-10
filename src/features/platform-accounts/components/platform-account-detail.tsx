@@ -1,6 +1,6 @@
 import { Badge } from "@common/components/ui/badge";
 import { PlatformAccountStatusControl } from "@features/platform-accounts/components/platform-account-status-control";
-import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
+import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account-admin.types";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "long",
@@ -13,7 +13,7 @@ type PlatformAccountDetailProps = {
 
 export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): React.ReactElement {
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid grid-cols-12 gap-4">
       <div className="bg-muted/25 col-span-12 flex flex-col gap-4 rounded-xl border p-5 md:p-6 lg:col-span-8">
         <div>
           <h2 className="text-foreground text-lg leading-none font-semibold">Información del administrador</h2>

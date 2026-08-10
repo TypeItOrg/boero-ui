@@ -20,11 +20,9 @@ import {
   type PlatformAccountFormInput,
   type PlatformAccountFormValues,
 } from "@features/platform-accounts/schemas/platform-account-form.schema";
-import type {
-  PlatformAccountActionState,
-  PlatformAccountFormFieldName,
-} from "@features/platform-accounts/types/platform-account-action-state.types";
-import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
+import type { PlatformAccountActionState } from "@features/platform-accounts/types/platform-account-action-state.types";
+import type { PlatformAccountFormFieldName } from "@features/platform-accounts/types/platform-account-form-field-name.types";
+import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account-admin.types";
 import { logoutPlatform } from "@features/platform-auth/actions/platform-logout.action";
 import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
 
@@ -226,12 +224,12 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {errorAlert}
 
         <FormSection>
           <SectionHeading title="Identidad y acceso" description={getSectionDescription(isEdit)} />
-          <FieldGroup className="mt-5 gap-5">{fields}</FieldGroup>
+          <FieldGroup className="mt-4 gap-4">{fields}</FieldGroup>
         </FormSection>
       </div>
 

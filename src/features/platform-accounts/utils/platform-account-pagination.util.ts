@@ -1,9 +1,10 @@
-import type { PaginationParams, PaginationSearchParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { parseOptionalBooleanQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
-import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
+import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account-admin.types";
 
 export const DEFAULT_PLATFORM_ACCOUNT_PAGE_SIZE = 10;
 export const PLATFORM_ACCOUNT_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;

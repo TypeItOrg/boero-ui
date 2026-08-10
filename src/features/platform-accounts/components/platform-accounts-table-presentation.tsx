@@ -24,9 +24,9 @@ import {
 } from "@common/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import type { PaginationParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
 import { PlatformAccountsPagination } from "@features/platform-accounts/components/platform-accounts-pagination";
-import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account.types";
+import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account-admin.types";
 import type {
   PlatformAccountSort,
   PlatformAccountSortField,

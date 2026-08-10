@@ -11,7 +11,7 @@ import { revalidatePath } from "next/cache";
 import { updatePlatformAccountAction } from "@features/platform-accounts/actions/update-platform-account.action";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
-const ACCOUNT_ID = "11111111-1111-1111-1111-111111111111";
+const ACCOUNT_ID = "00000000-0000-4000-8000-000000000003";
 
 describe("updatePlatformAccountAction", () => {
   const platformApiFetchMock = jest.mocked(platformApiFetch);

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
@@ -17,6 +18,8 @@ export async function updatePlatformAccountStatusAction(
   id: string,
   enabled: boolean,
 ): Promise<UpdatePlatformAccountStatusState> {
+  if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
+
   const errorState = await getResponseErrorActionState(
     platformApiFetch(`/api/v1/admin/accounts/${id}/status`, {
       method: "PATCH",

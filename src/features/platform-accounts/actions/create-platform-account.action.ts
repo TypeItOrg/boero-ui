@@ -5,10 +5,8 @@ import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformAccountFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
-import {
-  PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-  type PlatformAccountActionState,
-} from "@features/platform-accounts/types/platform-account-action-state.types";
+import { type PlatformAccountActionState } from "@features/platform-accounts/types/platform-account-action-state.types";
+import { PLATFORM_ACCOUNT_FORM_FIELD_NAMES } from "@features/platform-accounts/types/platform-account-form-field-name.types";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
