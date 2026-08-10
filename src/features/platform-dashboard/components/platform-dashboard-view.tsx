@@ -18,11 +18,9 @@ import { Separator } from "@common/components/ui/separator";
 import { cn } from "@common/utils/cn.util";
 import { InstitutionRegistrationChart } from "@features/platform-dashboard/components/institution-registration-chart";
 import { InstitutionStatusChart } from "@features/platform-dashboard/components/institution-status-chart";
-import type {
-  PlatformDashboard,
-  PlatformDashboardSummary,
-  RecentInstitution,
-} from "@features/platform-dashboard/types/platform-dashboard.types";
+import type { PlatformDashboardSummary } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
+import type { PlatformDashboard } from "@features/platform-dashboard/types/platform-dashboard.types";
+import type { RecentInstitution } from "@features/platform-dashboard/types/recent-institution.types";
 import { formatDashboardDate } from "@features/platform-dashboard/utils/dashboard-date.util";
 
 const numberFormatter = new Intl.NumberFormat("es-AR");
@@ -35,10 +33,10 @@ export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps)
   const hasRegistrations = dashboard.institutionRegistrations.some((registration) => registration.count > 0);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <DashboardSummary summary={dashboard.summary} />
 
-      <div className="grid min-w-0 gap-5 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-3">
         <Card className="bg-background min-w-0 p-5 sm:p-6 lg:col-span-2">
           <CardHeader className="p-0">
             <CardTitle>Altas de instituciones</CardTitle>

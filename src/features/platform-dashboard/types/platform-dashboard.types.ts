@@ -1,25 +1,6 @@
-export type PlatformDashboardSummary = {
-  institutions: number;
-  activeInstitutions: number;
-  inactiveInstitutions: number;
-  people: number;
-  usersWithAccess: number;
-};
-
-export type MonthlyInstitutionRegistration = {
-  year: number;
-  month: number;
-  count: number;
-};
-
-export type RecentInstitution = {
-  id: string;
-  name: string;
-  city: string;
-  province: string;
-  active: boolean;
-  createdAt: string;
-};
+import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/monthly-institution-registration.types";
+import type { PlatformDashboardSummary } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
+import type { RecentInstitution } from "@features/platform-dashboard/types/recent-institution.types";
 
 export type PlatformDashboard = {
   summary: PlatformDashboardSummary;

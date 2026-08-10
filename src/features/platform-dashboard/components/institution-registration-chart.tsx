@@ -3,7 +3,7 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@common/components/ui/chart";
-import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/platform-dashboard.types";
+import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/monthly-institution-registration.types";
 import { formatDashboardMonth } from "@features/platform-dashboard/utils/dashboard-month.util";
 
 const chartConfig = {

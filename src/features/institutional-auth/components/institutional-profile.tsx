@@ -7,17 +7,17 @@ import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { DatePicker } from "@common/components/ui/date-picker";
-import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { Input } from "@common/components/ui/input";
+import { FieldGroup } from "@common/components/ui/field";
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
+import {
+  DateField,
+  DropdownField,
+  TextField,
+} from "@features/institutional-auth/components/institutional-profile-fields";
+import { InstitutionalProfileSummary } from "@features/institutional-auth/components/institutional-profile-summary";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { CityDropdown, CountryDropdown } from "@features/locations/components/location-dropdowns";
-import {
-  formatBirthDateInput,
-  getLatestAllowedBirthDate,
-  parseBirthDateInput,
-} from "@features/people/utils/person-birth-date.util";
+import { parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
 
 type InstitutionalProfileProps = {
   person: InstitutionalPerson;
@@ -28,7 +28,7 @@ type InstitutionalProfileFormProps = InstitutionalProfileProps & {
 };
 
 export function InstitutionalProfile({ person }: InstitutionalProfileProps): React.ReactElement {
-  return <ProfileSummary person={person} />;
+  return <InstitutionalProfileSummary person={person} />;
 }
 
 export function InstitutionalProfileForm({
@@ -62,7 +62,7 @@ export function InstitutionalProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error ? (
         <Alert variant="destructive">
           <AlertTitle>No se pudieron guardar los cambios</AlertTitle>
@@ -228,163 +228,6 @@ export function InstitutionalProfileForm({
       </div>
     </form>
   );
-}
-
-function ProfileSummary({ person }: { person: InstitutionalPerson }): React.ReactElement {
-  return (
-    <div className="flex flex-col gap-5">
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="p-0">
-          <CardTitle>
-            {person.firstName} {person.lastName}
-          </CardTitle>
-          <CardDescription>Información personal de tu cuenta institucional.</CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <ProfileValue label="Documento" value={person.documentNumber} />
-            <ProfileValue label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
-            <ProfileValue label="Email" value={person.email} />
-            <ProfileValue label="Teléfono" value={person.phoneNumber} />
-            <ProfileValue label="Nacionalidad" value={person.nationalityCountry?.name} />
-            <ProfileValue label="Ciudad natal" value={person.birthCity?.name} />
-          </dl>
-        </CardContent>
-      </Card>
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="p-0">
-          <CardTitle>Domicilio</CardTitle>
-          <CardDescription>Dirección registrada en tu institución.</CardDescription>
-        </CardHeader>
-        <CardContent className="mt-5 p-0">
-          <dl className="grid gap-5 sm:grid-cols-2">
-            <ProfileValue label="Dirección" value={formatAddress(person)} />
-            <ProfileValue label="Barrio" value={person.address?.neighborhood} />
-            <ProfileValue label="Información adicional" value={person.address?.additionalInfo} />
-          </dl>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function TextField({
-  id,
-  name,
-  label,
-  description,
-  error,
-  className,
-  ...props
-}: React.ComponentProps<typeof Input> & { label: string; description?: string; error?: string }): React.ReactElement {
-  return (
-    <Field
-      className={className ?? "flex-[1_0_min(240px,100%)]"}
-      data-disabled={props.disabled}
-      data-invalid={Boolean(error)}
-    >
-      <FieldContent>
-        <FieldLabel htmlFor={id} required={props.required}>
-          {label}
-        </FieldLabel>
-        {description ? <p className="text-muted-foreground text-xs">{description}</p> : null}
-      </FieldContent>
-      <Input id={id} name={name} aria-invalid={Boolean(error)} {...props} />
-      <FieldError>{error}</FieldError>
-    </Field>
-  );
-}
-
-function DropdownField({
-  id,
-  label,
-  error,
-  required,
-  children,
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}): React.ReactElement {
-  return (
-    <Field className="flex-[1_0_min(240px,100%)]" data-invalid={Boolean(error)}>
-      <FieldContent>
-        <FieldLabel htmlFor={id} required={required}>
-          {label}
-        </FieldLabel>
-      </FieldContent>
-      {children}
-      <FieldError>{error}</FieldError>
-    </Field>
-  );
-}
-
-function DateField({
-  id,
-  label,
-  name,
-  onChange,
-  error,
-  required,
-  value,
-}: {
-  id: string;
-  label: string;
-  name: string;
-  onChange: (date: Date | undefined) => void;
-  error?: string;
-  required?: boolean;
-  value?: Date;
-}): React.ReactElement {
-  return (
-    <Field className="flex-[1_0_min(240px,100%)]" data-invalid={Boolean(error)}>
-      <FieldContent>
-        <FieldLabel htmlFor={id} required={required}>
-          {label}
-        </FieldLabel>
-      </FieldContent>
-      <input type="hidden" name={name} value={formatBirthDateInput(value)} />
-      <DatePicker
-        id={id}
-        value={value}
-        onChange={onChange}
-        maxDate={getLatestAllowedBirthDate()}
-        aria-invalid={Boolean(error)}
-      />
-      <FieldError>{error}</FieldError>
-    </Field>
-  );
-}
-
-function ProfileValue({ label, value }: { label: string; value?: string | null }): React.ReactElement {
-  return (
-    <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">{label}</dt>
-      <dd className="mt-1 text-sm font-medium">{value || "—"}</dd>
-    </div>
-  );
-}
-
-function formatDate(value: string | null): string {
-  if (!value) return "—";
-  const [year, month, day] = value.split("-");
-  return year && month && day ? `${day}/${month}/${year}` : value;
-}
-
-function formatAddress(person: InstitutionalPerson): string {
-  const address = person.address;
-  if (!address) return "—";
-  return [
-    address.street,
-    address.number,
-    address.floor && `Piso ${address.floor}`,
-    address.apartment && `Depto. ${address.apartment}`,
-    address.city?.name,
-  ]
-    .filter(Boolean)
-    .join(", ");
 }
 
 function getFormError(error: string | undefined, fieldErrors: Record<string, string> | undefined): string | undefined {

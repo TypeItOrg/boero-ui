@@ -51,7 +51,7 @@ export function PlatformPageShell({
       {children ? (
         <div
           className={cn(
-            "flex h-full min-w-0 flex-col gap-5",
+            "flex h-full min-w-0 flex-col gap-4",
             contentVariant === "surface" && "bg-background rounded-xl p-4 shadow-xs sm:p-6",
             minViewportHeight && "flex-1",
           )}

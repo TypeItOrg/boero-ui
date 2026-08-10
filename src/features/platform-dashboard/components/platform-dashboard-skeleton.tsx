@@ -3,7 +3,7 @@ import { Skeleton } from "@common/components/ui/skeleton";
 
 export function PlatformDashboardSkeleton(): React.ReactElement {
   return (
-    <div className="flex flex-col gap-5" aria-label="Cargando resumen de la plataforma" role="status">
+    <div className="flex flex-col gap-4" aria-label="Cargando resumen de la plataforma" role="status">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <Card key={index} className="p-5 sm:p-6">
@@ -17,7 +17,7 @@ export function PlatformDashboardSkeleton(): React.ReactElement {
           </Card>
         ))}
       </div>
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5 sm:p-6 lg:col-span-2">
           <CardHeader className="flex flex-col gap-2 p-0">
             <Skeleton className="h-4 w-40" />

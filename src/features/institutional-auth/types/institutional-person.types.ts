@@ -1,26 +1,6 @@
-export type InstitutionalCity = {
-  id: string;
-  name: string;
-  provinceId?: string;
-  province?: string;
-};
-
-export type InstitutionalCountry = {
-  id: string;
-  name: string;
-  isoCode?: string;
-};
-
-export type InstitutionalAddress = {
-  id?: string;
-  street: string;
-  number?: string | null;
-  floor?: string | null;
-  apartment?: string | null;
-  neighborhood?: string | null;
-  additionalInfo?: string | null;
-  city?: InstitutionalCity | null;
-};
+import type { InstitutionalAddress } from "@features/institutional-auth/types/institutional-address.types";
+import type { InstitutionalCity } from "@features/institutional-auth/types/institutional-city.types";
+import type { InstitutionalCountry } from "@features/institutional-auth/types/institutional-country.types";
 
 export type InstitutionalPerson = {
   personId: string;

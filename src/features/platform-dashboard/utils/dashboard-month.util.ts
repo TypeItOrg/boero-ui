@@ -1,4 +1,4 @@
-import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/platform-dashboard.types";
+import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/monthly-institution-registration.types";
 
 const MONTH_NAMES = [
   "enero",
