@@ -1,4 +1,4 @@
-import type { AsyncDropdownPage } from "@common/components/ui/async-dropdown";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 
 export function toAsyncDropdownPage<TItem>(data: PaginatedResponse<TItem>): AsyncDropdownPage<TItem> {

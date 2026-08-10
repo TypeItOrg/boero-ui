@@ -5,11 +5,3 @@ export type PaginationSearchParams = {
   size?: QueryParamValue;
   search?: QueryParamValue;
 };
-
-export type PaginationQuery = {
-  page: number;
-  size: number;
-  search: string;
-};
-
-export type PaginationParams = Pick<PaginationQuery, "page" | "size">;

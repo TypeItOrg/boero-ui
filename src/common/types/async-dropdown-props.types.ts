@@ -1,0 +1,36 @@
+import type { AsyncDropdownDefaultOption } from "@common/types/async-dropdown-default-option.types";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
+import type { AsyncDropdownRenderItemState } from "@common/types/async-dropdown-render-item-state.types";
+
+export type AsyncDropdownProps<TItem> = {
+  ariaInvalid?: boolean;
+  className?: string;
+  contentClassName?: string;
+  clearLabel?: string;
+  clearable?: boolean;
+  debounceMs?: number;
+  defaultOption?: AsyncDropdownDefaultOption;
+  disabled?: boolean;
+  emptyMessage?: string;
+  errorMessage?: string;
+  estimateSize?: number;
+  fetchPage: (input: AsyncDropdownFetchPageInput) => Promise<AsyncDropdownPage<TItem>>;
+  getItemLabel: (item: TItem) => string;
+  getItemValue: (item: TItem) => string;
+  id?: string;
+  listClassName?: string;
+  listHeight?: number;
+  name?: string;
+  onOpenChange?: (open: boolean) => void;
+  onValueChange: (value: string | undefined, item: TItem | undefined) => void;
+  open?: boolean;
+  pageSize?: number;
+  placeholder?: string;
+  queryKey: readonly unknown[];
+  renderItem?: (item: TItem, state: AsyncDropdownRenderItemState) => React.ReactNode;
+  resetSearchOnClose?: boolean;
+  searchPlaceholder?: string;
+  selectedLabel?: string;
+  value?: string;
+};

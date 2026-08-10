@@ -1,4 +1,6 @@
-import type { PaginationParams, PaginationQuery, PaginationSearchParams } from "@common/types/pagination.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import type { PaginationQuery } from "@common/types/pagination-query.types";
+import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getQueryParamValue } from "@common/utils/query-param.util";
 
