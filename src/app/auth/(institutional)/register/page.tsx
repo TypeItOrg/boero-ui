@@ -19,7 +19,7 @@ export default function RegisterPage(): React.ReactElement {
             priority
             width={875}
             height={1202}
-            src="/boero-logo.png"
+            src="/boero-logo.webp"
             alt="Logo de la institución"
             className="h-auto w-56"
           />
