@@ -5,14 +5,14 @@ import "@app/globals.css";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 };
 
-export default function GlobalError({ error, reset }: GlobalErrorProps): React.ReactElement {
+export default function GlobalError({ error, retry }: GlobalErrorProps): React.ReactElement {
   return (
     <html lang="es">
       <body>
-        <BlockingError error={error} reset={reset} className="bg-muted min-h-dvh" />
+        <BlockingError error={error} retry={retry} className="bg-muted min-h-dvh" />
       </body>
     </html>
   );

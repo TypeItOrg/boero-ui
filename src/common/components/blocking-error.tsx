@@ -17,17 +17,19 @@ import { cn } from "@common/utils/cn.util";
 
 type BlockingErrorProps = {
   error?: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
   className?: string;
   title?: string;
   description?: string;
+  homeHref?: string;
 };
 
 export function BlockingError({
-  reset,
+  retry,
   className,
   title = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_TITLE,
   description = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_DESCRIPTION,
+  homeHref = "/",
 }: BlockingErrorProps): React.ReactElement {
   return (
     <main className={cn("bg-muted flex min-h-full flex-1 items-center justify-center p-6", className)}>
@@ -42,12 +44,12 @@ export function BlockingError({
           </EmptyHeader>
 
           <EmptyContent className="flex-row justify-center">
-            <Button type="button" size="lg" onClick={reset}>
+            <Button type="button" size="lg" onClick={retry}>
               <RefreshCwIcon data-icon="inline-start" />
               Reintentar
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="/admin">
+              <a href={homeHref}>
                 <HouseIcon data-icon="inline-start" />
                 Ir al inicio
               </a>

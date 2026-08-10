@@ -4,9 +4,9 @@ import { BlockingError } from "@common/components/blocking-error";
 
 type PlatformErrorProps = {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 };
 
-export default function PlatformError({ error, reset }: PlatformErrorProps): React.ReactElement {
-  return <BlockingError error={error} reset={reset} />;
+export default function PlatformError({ error, retry }: PlatformErrorProps): React.ReactElement {
+  return <BlockingError error={error} retry={retry} homeHref="/admin" />;
 }
