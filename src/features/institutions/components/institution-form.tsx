@@ -2,18 +2,18 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller, type UseFormSetError } from "react-hook-form";
+import { useForm, type UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
 
-import { cn } from "@common/utils/cn.util";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Input } from "@common/components/ui/input";
-import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
-import { Textarea } from "@common/components/ui/textarea";
-import { Switch } from "@common/components/ui/switch";
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import {
+  InstitutionContactFields,
+  InstitutionGeneralFields,
+  InstitutionLocationFields,
+  InstitutionStatusField,
+} from "@features/institutions/components/institution-form-fields";
 import { LocationPicker } from "@features/locations/components/location-picker";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import {
@@ -24,10 +24,8 @@ import {
 import { createInstitutionAction } from "@features/institutions/actions/create-institution.action";
 import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
 import type { Institution } from "@features/institutions/types/institution.types";
-import type {
-  InstitutionActionState,
-  InstitutionFormFieldName,
-} from "@features/institutions/types/institution-action-state.types";
+import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import type { InstitutionFormFieldName } from "@features/institutions/types/institution-form-field-name.types";
 import { createInstitutionFormData } from "@features/institutions/utils/institution-form-data.util";
 import { createInstitutionSlug } from "@features/institutions/utils/institution-slug.util";
 
@@ -145,7 +143,7 @@ export function InstitutionForm({
 
   return (
     <form id={id} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pr-1.5 pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1.5 pb-4">
         {formError && (
           <Alert variant="destructive">
             <CircleAlertIcon />
@@ -154,172 +152,23 @@ export function InstitutionForm({
           </Alert>
         )}
 
-        <FormCard>
-          <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
-            <Field data-invalid={!!errors.name} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="institution-name" required>
-                  Nombre
-                </FieldLabel>
-              </FieldContent>
-              <Input
-                id="institution-name"
-                defaultValue={defaultValues.name}
-                maxLength={255}
-                placeholder="Conservatorio Superior de Música"
-                aria-invalid={!!errors.name}
-                {...nameField}
-                onChange={handleNameChange}
-              />
-              <FieldError errors={[errors.name]} />
-            </Field>
-
-            <Field data-invalid={!!errors.slug} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="institution-slug" required>
-                  Slug
-                </FieldLabel>
-              </FieldContent>
-              <Input
-                id="institution-slug"
-                defaultValue={defaultValues.slug}
-                maxLength={100}
-                aria-invalid={!!errors.slug}
-                {...slugField}
-                onChange={handleSlugChange}
-              />
-              <FieldError errors={[errors.slug]} />
-            </Field>
-          </FieldGroup>
-        </FormCard>
-
-        <FormCard className="flex grow flex-col">
-          <div className="flex grow flex-col gap-5">
-            <Controller
-              control={control}
-              name="cityId"
-              render={({ field, fieldState }) => (
-                <LocationPicker
-                  error={fieldState.error?.message}
-                  initialLocation={initialLocation}
-                  onValueChange={field.onChange}
-                />
-              )}
-            />
-
-            <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
-              <Field data-invalid={!!errors.street} className="flex-[1_0_min(250px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-street">Calle</FieldLabel>
-                </FieldContent>
-                <Input
-                  id="institution-street"
-                  defaultValue={defaultValues.street}
-                  placeholder="Bv. España"
-                  aria-invalid={!!errors.street}
-                  {...register("street")}
-                />
-                <FieldError errors={[errors.street]} />
-              </Field>
-
-              <Field data-invalid={!!errors.number} className="flex-[1_0_min(120px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-number">Altura</FieldLabel>
-                </FieldContent>
-                <NumericInput
-                  id="institution-number"
-                  defaultValue={defaultValues.number}
-                  maxLength={50}
-                  placeholder="1174"
-                  aria-invalid={!!errors.number}
-                  {...register("number")}
-                />
-                <FieldError errors={[errors.number]} />
-              </Field>
-
-              <Field className="flex-[1_0_min(180px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-neighborhood">Barrio</FieldLabel>
-                </FieldContent>
-                <Input
-                  id="institution-neighborhood"
-                  defaultValue={defaultValues.neighborhood}
-                  placeholder="Centro"
-                  {...register("neighborhood")}
-                />
-              </Field>
-            </FieldGroup>
-
-            <Field className="flex w-full grow flex-col">
-              <FieldContent className="grow-0">
-                <FieldLabel htmlFor="institution-additional-info">Información adicional</FieldLabel>
-              </FieldContent>
-              <Textarea
-                id="institution-additional-info"
-                className="bg-background grow resize-none"
-                defaultValue={defaultValues.additionalInfo}
-                placeholder="Piso, oficina o indicaciones para llegar..."
-                {...register("additionalInfo")}
-              />
-            </Field>
-          </div>
-        </FormCard>
-
-        <FormCard>
-          <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
-            <Field data-invalid={!!errors.phoneNumber} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="institution-phone">Teléfono</FieldLabel>
-              </FieldContent>
-              <PhoneInput
-                id="institution-phone"
-                defaultValue={defaultValues.phoneNumber}
-                maxLength={30}
-                placeholder="0353-4619146"
-                aria-invalid={!!errors.phoneNumber}
-                {...register("phoneNumber")}
-              />
-              <FieldError errors={[errors.phoneNumber]} />
-            </Field>
-
-            <Field data-invalid={!!errors.email} className="flex-[1_0_min(200px,100%)]">
-              <FieldContent>
-                <FieldLabel htmlFor="institution-email">Email</FieldLabel>
-              </FieldContent>
-              <Input
-                id="institution-email"
-                defaultValue={defaultValues.email}
-                type="email"
-                maxLength={150}
-                placeholder="info@conservatorio.edu.ar"
-                aria-invalid={!!errors.email}
-                {...register("email")}
-              />
-              <FieldError errors={[errors.email]} />
-            </Field>
-          </FieldGroup>
-        </FormCard>
-
-        {isEdit && (
-          <FormCard>
-            <FieldGroup>
-              <Field orientation="horizontal" className="bg-background rounded-lg border p-4">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-active">Institución activa</FieldLabel>
-                  <FieldDescription>
-                    Las instituciones inactivas no están disponibles para el acceso de usuarios.
-                  </FieldDescription>
-                </FieldContent>
-                <Switch
-                  id="institution-active"
-                  checked={active}
-                  onCheckedChange={setActive}
-                  aria-label="Estado de la institución"
-                />
-              </Field>
-            </FieldGroup>
-          </FormCard>
-        )}
+        <InstitutionGeneralFields
+          defaultValues={defaultValues}
+          errors={errors}
+          nameField={nameField}
+          onNameChange={handleNameChange}
+          onSlugChange={handleSlugChange}
+          slugField={slugField}
+        />
+        <InstitutionLocationFields
+          control={control}
+          defaultValues={defaultValues}
+          errors={errors}
+          initialLocation={initialLocation}
+          register={register}
+        />
+        <InstitutionContactFields defaultValues={defaultValues} errors={errors} register={register} />
+        {isEdit ? <InstitutionStatusField active={active} onActiveChange={setActive} /> : null}
       </div>
 
       {!hideFooter && (
@@ -341,10 +190,6 @@ export function InstitutionForm({
       )}
     </form>
   );
-}
-
-function FormCard({ children, className }: { children: React.ReactNode; className?: string }): React.ReactElement {
-  return <div className={cn("bg-muted/25 rounded-xl border p-5 md:p-6", className)}>{children}</div>;
 }
 
 function getInitialLocation(institution: Institution | undefined): InitialLocation {

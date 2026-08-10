@@ -1,20 +1,7 @@
+import type { InstitutionCity } from "@features/institutions/types/institution-city.types";
+import type { InstitutionCountry } from "@features/institutions/types/institution-country.types";
+import type { InstitutionProvince } from "@features/institutions/types/institution-province.types";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
-
-type InstitutionCity = {
-  cityId: string;
-  name: string;
-};
-
-type InstitutionProvince = {
-  provinceId: string;
-  name: string;
-};
-
-type InstitutionCountry = {
-  countryId: string;
-  isoCode: string;
-  name: string;
-};
 
 export type Institution = Omit<InstitutionSummary, "city" | "province"> & {
   city: InstitutionCity;

@@ -6,10 +6,8 @@ import { getResponseErrorActionState, getValidationActionState } from "@common/u
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { institutionFormSchema } from "@features/institutions/schemas/institution-form.schema";
-import {
-  INSTITUTION_FORM_FIELD_NAMES,
-  type InstitutionActionState,
-} from "@features/institutions/types/institution-action-state.types";
+import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
 
 export async function createInstitutionAction(formData: FormData): Promise<InstitutionActionState> {
   const payload = {

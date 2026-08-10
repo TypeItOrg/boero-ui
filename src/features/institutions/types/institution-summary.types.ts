@@ -1,8 +1,4 @@
-type InstitutionSummaryCountry = {
-  countryId: string;
-  isoCode: string;
-  name: string;
-};
+import type { InstitutionSummaryCountry } from "@features/institutions/types/institution-summary-country.types";
 
 export type InstitutionSummary = {
   id: string;

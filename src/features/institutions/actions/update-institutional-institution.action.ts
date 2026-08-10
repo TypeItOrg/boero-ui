@@ -1,19 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { institutionalInstitutionFormSchema } from "@features/institutions/schemas/institutional-institution-form.schema";
-import {
-  INSTITUTION_FORM_FIELD_NAMES,
-  type InstitutionActionState,
-} from "@features/institutions/types/institution-action-state.types";
+import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
 
 export async function updateInstitutionalInstitutionAction(
   institutionId: string,
   formData: FormData,
 ): Promise<InstitutionActionState> {
+  if (!isValidUuid(institutionId)) return { error: INVALID_ACTION_ARGUMENTS };
+
   const payload = {
     name: formData.get("name"),
     cityId: formData.get("cityId"),
