@@ -13,29 +13,22 @@ import {
   BreadcrumbSeparator,
 } from "@common/components/ui/breadcrumb";
 
-type RouteConfig = {
-  label: string;
-};
-
-const ROUTE_CONFIGS: Record<string, RouteConfig> = {
-  institutions: {
-    label: "Instituciones",
-  },
-  accounts: {
-    label: "Administradores",
-  },
-  new: {
-    label: "Nuevo",
-  },
-  people: {
-    label: "Usuarios",
-  },
-  roles: {
-    label: "Roles",
-  },
-  edit: {
-    label: "Editar",
-  },
+const ROUTE_LABELS: Readonly<Record<string, string>> = {
+  institutions: "Instituciones",
+  accounts: "Administradores",
+  new: "Nuevo",
+  people: "Usuarios",
+  roles: "Roles",
+  edit: "Editar",
+  academic: "Académico",
+  "academic-years": "Ciclos lectivos",
+  "training-paths": "Trayectos formativos",
+  "study-plans": "Planes de estudio",
+  "academic-levels": "Niveles",
+  spaces: "Espacios",
+  prerequisites: "Correlatividades",
+  "academic-spaces": "Espacios académicos",
+  instruments: "Instrumentos",
 };
 
 type BreadcrumbSegment = {
@@ -44,12 +37,20 @@ type BreadcrumbSegment = {
 };
 
 type PlatformBreadcrumbProps = {
+  hiddenSegments?: readonly string[];
+  segmentHrefs?: Readonly<Record<string, string>>;
   segmentLabels?: Readonly<Record<string, string>>;
 };
 
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
+const EMPTY_SEGMENTS: readonly string[] = [];
 
-function getSegments(pathname: string, segmentLabels: Readonly<Record<string, string>>): BreadcrumbSegment[] {
+function getSegments(
+  pathname: string,
+  segmentLabels: Readonly<Record<string, string>>,
+  segmentHrefs: Readonly<Record<string, string>>,
+  hiddenSegments: readonly string[],
+): BreadcrumbSegment[] {
   const withoutPlatform = pathname.replace(/^\/admin\/?/, "");
   const parts = withoutPlatform.split("/").filter(Boolean);
 
@@ -58,29 +59,37 @@ function getSegments(pathname: string, segmentLabels: Readonly<Record<string, st
   }
 
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/admin" }];
+  const hiddenSegmentSet = new Set(hiddenSegments);
+  const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
 
   let accumulatedPath = "/admin";
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
+  let visiblePartIndex = 0;
+  for (const part of parts) {
     accumulatedPath = `${accumulatedPath}/${part}`;
-    const isLast = i === parts.length - 1;
+    if (hiddenSegmentSet.has(part)) continue;
 
-    const config = ROUTE_CONFIGS[part];
-    const label = segmentLabels[part] ?? config?.label ?? "Editar";
+    const isLast = visiblePartIndex === visiblePartCount - 1;
+    const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
 
-    if (isLast) {
-      segments.push({ label });
-    } else {
-      segments.push({ label, href: accumulatedPath });
-    }
+    segments.push({ label, href: isLast ? undefined : (segmentHrefs[part] ?? accumulatedPath) });
+    visiblePartIndex += 1;
   }
 
   return segments;
 }
 
-export function PlatformBreadcrumb({ segmentLabels }: PlatformBreadcrumbProps): React.ReactElement {
+export function PlatformBreadcrumb({
+  hiddenSegments = EMPTY_SEGMENTS,
+  segmentHrefs,
+  segmentLabels,
+}: PlatformBreadcrumbProps): React.ReactElement {
   const pathname = usePathname();
-  const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS);
+  const segments = getSegments(
+    pathname,
+    segmentLabels ?? EMPTY_SEGMENT_LABELS,
+    segmentHrefs ?? EMPTY_SEGMENT_LABELS,
+    hiddenSegments,
+  );
 
   return (
     <Breadcrumb className="text-muted-foreground max-w-full min-w-0">
@@ -99,7 +108,7 @@ export function PlatformBreadcrumb({ segmentLabels }: PlatformBreadcrumbProps): 
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
-              {!isLast && <BreadcrumbSeparator className="shrink-0" />}
+              {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
             </React.Fragment>
           );
         })}

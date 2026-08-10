@@ -1,0 +1,76 @@
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/training-paths/2d9ec931-453c-4778-86a9-dc40a06d0247",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+import { render, screen, within } from "@testing-library/react";
+
+import { AcademicDetail } from "@features/academic/components/academic-detail";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import type { StudyPlan } from "@features/academic/types/study-plan.types";
+import type { TrainingPath } from "@features/academic/types/training-path.types";
+
+const STUDY_PLAN: StudyPlan = {
+  id: "019f9c3d-9663-77da-a21b-5c811c040616",
+  institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+  trainingPathId: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+  trainingPathName: "CAVI",
+  name: "Plan 2026",
+  effectiveFrom: "2026-01-01",
+  effectiveTo: "2026-12-31",
+  status: "DRAFT",
+};
+
+const TRAINING_PATH: TrainingPath = {
+  id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+  institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+  name: "CAVI",
+  description: "Formación docente.",
+  active: true,
+};
+
+describe("AcademicDetail", () => {
+  it("shows training-path description and preserves the detail as edit origin", () => {
+    render(<AcademicDetail item={TRAINING_PATH} resource={AcademicResource.TRAINING_PATH} basePath="" canEdit />);
+
+    expect(screen.getByText("Formación docente.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Editar" })).toHaveAttribute(
+      "href",
+      "/training-paths/2d9ec931-453c-4778-86a9-dc40a06d0247/edit?returnTo=%2Ftraining-paths%2F2d9ec931-453c-4778-86a9-dc40a06d0247",
+    );
+  });
+
+  it("integrates study-plan status and validity into the information section", () => {
+    render(<AcademicDetail item={STUDY_PLAN} resource={AcademicResource.STUDY_PLAN} basePath="" canEdit />);
+
+    const summary = screen.getByRole("region", { name: "Resumen" });
+
+    expect(within(summary).getByText("CAVI")).toBeInTheDocument();
+    expect(within(summary).getByText("Borrador")).toBeInTheDocument();
+    expect(within(summary).getByText("Vigencia")).toBeInTheDocument();
+    expect(within(summary).getByText("01/01/2026 — 31/12/2026")).toBeInTheDocument();
+    expect(within(summary).queryByText("Hoy")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    { effectiveFrom: null, effectiveTo: null, expected: "Sin período definido" },
+    { effectiveFrom: "2026-01-01", effectiveTo: null, expected: "Desde 01/01/2026" },
+    { effectiveFrom: null, effectiveTo: "2026-12-31", expected: "Hasta 31/12/2026" },
+    { effectiveFrom: "2026-01-01", effectiveTo: "2026-12-31", expected: "01/01/2026 — 31/12/2026" },
+  ])("shows study-plan validity as $expected", ({ effectiveFrom, effectiveTo, expected }) => {
+    render(
+      <AcademicDetail
+        item={{ ...STUDY_PLAN, effectiveFrom, effectiveTo }}
+        resource={AcademicResource.STUDY_PLAN}
+        basePath=""
+        canEdit
+      />,
+    );
+
+    const summary = screen.getByRole("region", { name: "Resumen" });
+    const validity = within(summary).getByText("Vigencia").nextElementSibling;
+
+    expect(validity).toHaveTextContent(expected);
+  });
+});

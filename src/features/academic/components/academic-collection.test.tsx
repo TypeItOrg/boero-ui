@@ -1,0 +1,94 @@
+jest.mock("@common/components/ui/data-table-navigation", () => ({
+  DataTableNavigationProvider: ({ children }: React.PropsWithChildren): React.ReactElement => <>{children}</>,
+}));
+jest.mock("@features/academic/components/academic-table-filters", () => ({
+  AcademicTableFilters: jest.fn(() => <div data-testid="academic-table-filters" />),
+}));
+jest.mock("@features/academic/components/academic-table-presentation", () => ({
+  AcademicTablePresentation: jest.fn(() => <div data-testid="academic-table-presentation" />),
+}));
+jest.mock("@features/academic/services/academic.service", () => ({
+  fetchAcademicSpace: jest.fn(),
+  fetchAcademicSpaces: jest.fn(),
+  fetchAcademicYear: jest.fn(),
+  fetchAcademicYears: jest.fn(),
+  fetchInstrument: jest.fn(),
+  fetchInstruments: jest.fn(),
+  fetchStudyPlan: jest.fn(),
+  fetchStudyPlans: jest.fn(),
+  fetchTrainingPath: jest.fn(),
+  fetchTrainingPaths: jest.fn(),
+}));
+
+import { render } from "@testing-library/react";
+
+import { AcademicCollectionView } from "@features/academic/components/academic-collection";
+import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
+import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
+import { fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
+const FIXED_TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
+const OTHER_TRAINING_PATH_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
+
+describe("AcademicCollectionView", () => {
+  beforeEach(() => {
+    jest.mocked(fetchStudyPlans).mockResolvedValue({
+      items: [],
+      page: 0,
+      size: 20,
+      totalItems: 0,
+      totalPages: 0,
+    });
+  });
+
+  it("keeps contextual study-plan queries fixed and hides the redundant path filter", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "",
+      canChangeStatus: true,
+      canUpdate: true,
+      columns: {
+        primaryLabel: "Nombre",
+        detailLabels: ["Vigente desde", "Vigente hasta"],
+        sortableFields: ["name", "effectiveFrom", "effectiveTo"],
+      },
+      fixedTrainingPathId: FIXED_TRAINING_PATH_ID,
+      institutionId: INSTITUTION_ID,
+      resource: AcademicResource.STUDY_PLAN,
+      scope: AcademicScope.INSTITUTIONAL,
+      searchParams: {
+        size: "20",
+        trainingPathId: OTHER_TRAINING_PATH_ID,
+      },
+    });
+
+    render(result);
+
+    expect(fetchStudyPlans).toHaveBeenCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      INSTITUTION_ID,
+      expect.objectContaining({
+        size: 20,
+        trainingPathId: FIXED_TRAINING_PATH_ID,
+      }),
+    );
+    expect(fetchTrainingPath).not.toHaveBeenCalled();
+    expect(jest.mocked(AcademicTableFilters)).toHaveBeenCalledWith(
+      expect.objectContaining({ trainingPathFilter: undefined }),
+      undefined,
+    );
+    expect(jest.mocked(AcademicTablePresentation)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hasFilters: false,
+        columns: {
+          primaryLabel: "Nombre",
+          detailLabels: ["Vigente desde", "Vigente hasta"],
+          sortableFields: ["name", "effectiveFrom", "effectiveTo"],
+        },
+      }),
+      undefined,
+    );
+  });
+});

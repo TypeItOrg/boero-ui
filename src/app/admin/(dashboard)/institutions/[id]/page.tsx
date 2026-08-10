@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { MapPinIcon, UsersIcon } from "lucide-react";
+import { GraduationCapIcon, MapPinIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
@@ -34,7 +34,7 @@ export default async function InstitutionDetailPage({
 
   return (
     <section className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-3 md:p-4">
-      <header className="bg-background flex flex-col gap-5 rounded-xl p-4 shadow-xs sm:p-6 xl:flex-row xl:items-end xl:justify-between">
+      <header className="bg-background flex flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 xl:flex-row xl:items-end xl:justify-between">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
           <div className="mt-4 mb-3 flex flex-wrap items-center gap-3">
@@ -63,6 +63,12 @@ export default async function InstitutionDetailPage({
             <>
               <Button asChild variant="outline" size="lg">
                 <ReturnToLink href={`/admin/institutions/${id}/edit`}>Editar institución</ReturnToLink>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href={`/admin/institutions/${id}/academic`}>
+                  <GraduationCapIcon data-icon="inline-start" />
+                  Gestión académica
+                </Link>
               </Button>
               <Button asChild size="lg">
                 <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>

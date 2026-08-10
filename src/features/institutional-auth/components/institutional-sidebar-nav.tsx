@@ -22,11 +22,16 @@ export function InstitutionalSidebarNav({ sections, navigation }: InstitutionalS
   return (
     <div className="flex flex-col gap-3 group-data-[collapsible=icon]:gap-2">
       {sections.map((section, index) => (
-        <SidebarGroup key={section.label} className="gap-1 p-0 group-data-[collapsible=icon]:gap-0">
+        <SidebarGroup
+          key={section.label ?? section.items[0]?.url}
+          className="gap-1 p-0 group-data-[collapsible=icon]:gap-0"
+        >
           {index > 0 ? <Separator className="my-2 hidden group-data-[collapsible=icon]:block" /> : null}
-          <SidebarGroupLabel className="text-muted-foreground h-7 pr-2 pl-0 text-xs font-bold group-data-[collapsible=icon]:hidden">
-            {section.label}
-          </SidebarGroupLabel>
+          {section.label ? (
+            <SidebarGroupLabel className="text-muted-foreground h-7 pr-2 pl-0 text-xs font-bold group-data-[collapsible=icon]:hidden">
+              {section.label}
+            </SidebarGroupLabel>
+          ) : null}
           <SidebarGroupContent>
             <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
               {section.items.map((item) => {
