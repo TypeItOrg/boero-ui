@@ -1,14 +1,6 @@
 import type { NextRequest, NextResponse } from "next/server";
 
-export type RefreshedTokens = {
-  accessToken: string;
-  refreshToken: string;
-};
-
-export type RefreshAttempt = {
-  status?: number;
-  tokens?: RefreshedTokens;
-};
+import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
 
 export type AuthProxyPolicy = {
   accessTokenCookie: string;

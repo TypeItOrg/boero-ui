@@ -1,4 +1,5 @@
 import { NextRequest, type NextResponse } from "next/server";
+import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
 
 import {
   PLATFORM_ACCESS_TOKEN_COOKIE,
@@ -8,7 +9,7 @@ import {
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
-import { proxy } from "@/proxy";
+import { config, proxy } from "@/proxy";
 
 describe("proxy", () => {
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();
@@ -42,6 +43,19 @@ describe("proxy", () => {
     process.env.BOERO_API_URL = originalApiUrl;
   });
 
+  it.each([
+    "/api/admin/search",
+    "/api/admin/academic/options/training-paths",
+    "/api/institutional/search",
+    "/api/institutional/academic/options/training-paths",
+  ])("runs for the authenticated BFF route %s", (pathname) => {
+    expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url: pathname })).toBe(true);
+  });
+
+  it.each(["/api/health", "/api/countries"])("does not run for the public API route %s", (pathname) => {
+    expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url: pathname })).toBe(false);
+  });
+
   it("allows admin routes when an access token cookie is present", async () => {
     const request = createRequest("/admin", `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`);
 
@@ -51,7 +65,7 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("refreshes tokens and continues when the refresh token is valid", async () => {
+  it("refreshes an admin BFF request when the refresh token is valid", async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -67,15 +81,19 @@ describe("proxy", () => {
       ),
     );
 
-    const request = createRequest("/admin/orders?page=2", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest("/api/admin/search?search=pa", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
 
     const response = await proxy(request);
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/refresh", "https://api.example.test"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: "refresh-token" }),
-    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("/api/v1/admin/auth/refresh", "https://api.example.test"),
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken: "refresh-token" }),
+        signal: expect.any(AbortSignal),
+      }),
+    );
     expect(response.headers.get("x-middleware-next")).toBe("1");
     expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
     expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
@@ -207,6 +225,20 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe("https://app.example.test/admin/a");
   });
 
+  it("bounds guest session checks with an abort signal", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 503 }));
+    const request = new NextRequest("https://app.example.test/admin/auth/login", {
+      headers: { cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token` },
+    });
+
+    await proxy(request);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("/api/v1/admin/auth/me", "https://api.example.test"),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+  });
+
   it("allows unauthenticated users to access the login page", async () => {
     const request = createRequest("/admin/auth/login", "");
 
@@ -255,7 +287,7 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("refreshes an institutional session", async () => {
+  it("refreshes an institutional BFF request", async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ tokens: { accessToken: "new-access", refreshToken: "new-refresh" } }), {
         status: 200,
@@ -263,17 +295,30 @@ describe("proxy", () => {
       }),
     );
 
-    const request = createRequest("/", `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`);
+    const request = createRequest(
+      "/api/institutional/search?search=pa&institutionId=019e18e4-d919-76d8-9848-7f1b14e64452",
+      `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`,
+    );
     const response = await proxy(request);
 
-    expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/refresh", "https://api.example.test"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: "refresh-token" }),
-    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("/api/v1/auth/refresh", "https://api.example.test"),
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken: "refresh-token" }),
+        signal: expect.any(AbortSignal),
+      }),
+    );
     expect(response.headers.get("x-middleware-next")).toBe("1");
     expect(response.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
     expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+    expect(response.headers.get("x-middleware-request-cookie")).toContain(
+      INSTITUTIONAL_ACCESS_TOKEN_COOKIE + "=new-access",
+    );
+    expect(response.headers.get("x-middleware-request-cookie")).toContain(
+      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
+    );
   });
 
   it("deduplicates concurrent institutional refreshes for the same token", async () => {

@@ -32,7 +32,7 @@ export const getPlatformAccount = cache(fetchPlatformAccount);
 
 export async function requirePlatformAccount(): Promise<PlatformAccount> {
   const account = await getPlatformAccount();
-  if (!account) redirect("/auth/login");
+  if (!account) redirect("/admin/auth/login");
 
   return account;
 }

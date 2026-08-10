@@ -1,10 +1,12 @@
 export class HttpResponseError extends Error {
   readonly status: number;
+  readonly requestId?: string;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, requestId?: string) {
     super(message);
     this.name = "HttpResponseError";
     this.status = status;
+    this.requestId = requestId;
   }
 }
 
@@ -15,11 +17,28 @@ export function isHttpResponseError(error: unknown, status?: number): error is H
 }
 
 export async function parseHttpResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
+  const payload = await parseJson(response);
   if (!response.ok) {
-    throw new HttpResponseError(fallbackMessage, response.status);
+    const message = getErrorMessage(payload) ?? fallbackMessage;
+    throw new HttpResponseError(message, response.status, response.headers.get("x-request-id") ?? undefined);
   }
 
-  return response.json() as Promise<T>;
+  return payload as T;
+}
+
+async function parseJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return undefined;
+  }
+}
+
+function getErrorMessage(payload: unknown): string | undefined {
+  if (!payload || typeof payload !== "object" || !("message" in payload)) return undefined;
+  const message = payload.message;
+  if (typeof message !== "string" || message.length === 0) return undefined;
+  return message;
 }
 
 /**

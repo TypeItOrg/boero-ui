@@ -22,5 +22,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/api/admin/:path*", "/api/institutional/:path*", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };

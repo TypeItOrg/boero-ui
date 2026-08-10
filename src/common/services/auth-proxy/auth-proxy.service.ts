@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
-import type { AuthProxyPolicy, RefreshAttempt, RefreshedTokens } from "@common/services/auth-proxy/auth-proxy.types";
+import type { AuthProxyPolicy } from "@common/services/auth-proxy/auth-proxy-policy.types";
+import type { RefreshAttempt } from "@common/services/auth-proxy/refresh-attempt.types";
+import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
 
 const inFlightRefreshes = new Map<string, Promise<RefreshAttempt>>();
+const AUTH_PROXY_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthProxyPolicy): Promise<NextResponse> {
   const accessToken = request.cookies.get(policy.accessTokenCookie)?.value;
@@ -40,6 +43,7 @@ async function getSessionStatus(
     const response = await fetch(new URL(currentUserPath, getApiUrlOrThrow()), {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(AUTH_PROXY_REQUEST_TIMEOUT_MS),
     });
 
     if (response.ok) return "valid";
@@ -72,6 +76,7 @@ async function performRefresh(refreshPath: string, refreshToken: string): Promis
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
+      signal: AbortSignal.timeout(AUTH_PROXY_REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) return { status: response.status };

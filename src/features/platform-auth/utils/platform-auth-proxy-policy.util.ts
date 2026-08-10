@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import type { AuthProxyPolicy, RefreshedTokens } from "@common/services/auth-proxy/auth-proxy.types";
+import type { AuthProxyPolicy } from "@common/services/auth-proxy/auth-proxy-policy.types";
+import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
 import {
   getPlatformAuthCookieOptions,
   PLATFORM_ACCESS_TOKEN_COOKIE,
