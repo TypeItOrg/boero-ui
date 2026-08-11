@@ -16,7 +16,7 @@ overrides:
   js-yaml@3: 3.15.1
   js-yaml@4: 4.3.1
   hono: 4.12.34
-  undici: 7.29.0
+  undici: 8.10.0
   ip-address: 10.3.1
   fast-uri: 3.1.5
   '@hono/node-server': '>=2.0.5'
@@ -153,8 +153,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       undici:
-        specifier: 7.29.0
-        version: 7.29.0
+        specifier: 8.10.0
+        version: 8.10.0
 
 packages:
 
@@ -5185,9 +5185,9 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  undici@7.29.0:
-    resolution: {integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw==}
-    engines: {node: '>=20.18.1'}
+  undici@8.10.0:
+    resolution: {integrity: sha512-HvltHd7avK13QIw/oLe4qoOLyoVSoafqJ2jYOrtMRBkbYT31eiBQ8O0ehRKZiEZCMEyLFQNIADpgCWC5fALvYQ==}
+    engines: {node: '>=22.19.0'}
 
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
@@ -5734,7 +5734,7 @@ snapshots:
       open: 8.4.2
       picomatch: 4.0.5
       systeminformation: 5.33.1
-      undici: 7.29.0
+      undici: 8.10.0
       which: 4.0.0
       yocto-spinner: 1.2.2
 
@@ -10492,7 +10492,7 @@ snapshots:
       tailwind-merge: 3.6.0
       ts-morph: 26.0.0
       tsconfig-paths: 4.2.0
-      undici: 7.29.0
+      undici: 8.10.0
       validate-npm-package-name: 7.0.2
       zod: 3.25.76
       zod-to-json-schema: 3.25.2(zod@3.25.76)
@@ -10890,7 +10890,7 @@ snapshots:
 
   undici-types@8.3.0: {}
 
-  undici@7.29.0: {}
+  undici@8.10.0: {}
 
   unicorn-magic@0.3.0: {}
 
