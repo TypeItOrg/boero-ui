@@ -2,8 +2,7 @@ import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import type { ContextualSearchSummary } from "@features/contextual-search/types/contextual-search-summary.types";
 
 type FetchContextualSearchOptions =
-  | { scope: "platform"; search: string }
-  | { scope: "institutional"; search: string; institutionId: string };
+  { scope: "platform"; search: string } | { scope: "institutional"; search: string; institutionId: string };
 
 export async function fetchContextualSearch(
   options: FetchContextualSearchOptions,

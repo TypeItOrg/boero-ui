@@ -9,8 +9,7 @@ import type { PlatformRoleType } from "@features/roles/types/platform-role-type.
 export const DEFAULT_PLATFORM_ROLES_PAGE_SIZE = 10;
 export const PLATFORM_ROLES_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 export const PLATFORM_ROLES_SORT_FIELDS = ["name", "institutionName"] as const satisfies readonly (
-  | "name"
-  | "institutionName"
+  "name" | "institutionName"
 )[];
 export type PlatformRoleSortField = (typeof PLATFORM_ROLES_SORT_FIELDS)[number];
 export type PlatformRoleSort = Sort<PlatformRoleSortField>;
