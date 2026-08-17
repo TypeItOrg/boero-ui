@@ -32,7 +32,6 @@ export function PlatformAccountsTableFilters({
 
   return (
     <DataTableFilters
-      className="md:grid-cols-[minmax(16rem,1fr)_auto]"
       search={search}
       searchPlaceholder="Buscar por nombre o correo electrónico..."
       selectFilters={selectFilters}

@@ -28,7 +28,6 @@ export function InstitutionsTableFilters({ active, search, size }: InstitutionsT
 
   return (
     <DataTableFilters
-      className="md:grid-cols-[minmax(16rem,1fr)_auto_auto]"
       search={search}
       searchPlaceholder="Buscar por nombre, ciudad, provincia o país..."
       selectFilters={selectFilters}

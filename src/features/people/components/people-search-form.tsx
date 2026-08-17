@@ -26,7 +26,6 @@ export function PeopleSearchForm({ search, size, roleId, roles = [] }: PeopleSea
 
   return (
     <DataTableFilters
-      className="md:grid-cols-[minmax(16rem,1fr)_minmax(12rem,16rem)_auto]"
       search={search}
       searchPlaceholder="Buscar por nombre, apellido o documento..."
       selectFilters={[roleFilter]}

@@ -89,9 +89,11 @@ export function AsyncDropdown<TItem>({
     enabled: isOpen && !disabled,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 
-  const { data, fetchNextPage, hasNextPage, isError, isFetchingNextPage, isPending, refetch } = query;
+  const { data, fetchNextPage, hasNextPage, isError, isFetching, isFetchingNextPage, isPending, refetch } = query;
   const items = React.useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
   const selectedItem = React.useMemo(
     () => items.find((item) => getItemValue(item) === value),
@@ -137,8 +139,9 @@ export function AsyncDropdown<TItem>({
   let commandListContent: React.ReactNode;
   const showDefaultOption =
     !!defaultOption && (!search || defaultOption.label.toLowerCase().includes(search.toLowerCase()));
+  const isLoading = isPending || (isFetching && !isFetchingNextPage);
 
-  if (isPending) {
+  if (isLoading) {
     commandListContent = <LoadingState itemSize={estimateSize} />;
   } else if (isError) {
     commandListContent = <ErrorState message={errorMessage} retry={() => void refetch()} />;
@@ -148,19 +151,14 @@ export function AsyncDropdown<TItem>({
     commandListContent = (
       <CommandGroup className="px-1 pt-2 pb-1">
         {items.length === 0 ? (
-          <>
-            {showDefaultOption && (
-              <CommandItem
-                className="h-9"
-                data-checked={value === defaultOption.value}
-                onSelect={() => selectItem(undefined)}
-                value="__async-dropdown-default"
-              >
-                <span className="truncate">{defaultOption.label}</span>
-              </CommandItem>
-            )}
-            <div className="text-muted-foreground py-6 text-center text-sm">{emptyMessage}</div>
-          </>
+          <CommandItem
+            className="h-9"
+            data-checked={value === defaultOption?.value}
+            onSelect={() => selectItem(undefined)}
+            value="__async-dropdown-default"
+          >
+            <span className="truncate">{defaultOption?.label}</span>
+          </CommandItem>
         ) : (
           <VirtualizedDropdownItems
             key={virtualListKey}

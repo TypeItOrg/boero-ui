@@ -1,5 +1,6 @@
 import * as React from "react";
-import { act, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import userEvent from "@testing-library/user-event";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -260,6 +261,63 @@ describe("AsyncDropdown", () => {
     expect(fetchPage).toHaveBeenCalled();
   });
 
+  it("refreshes options when the selector is reopened", async () => {
+    const user = userEvent.setup();
+    const { fetchPage } = renderDropdown();
+    const refreshedItems = [{ id: "br", name: "Brasil" }];
+
+    await user.click(getTrigger());
+    await screen.findByText("Argentina");
+    await user.click(getTrigger());
+
+    fetchPage.mockResolvedValueOnce({ items: refreshedItems, nextPage: null });
+
+    await user.click(getTrigger());
+
+    await waitFor(() => expect(fetchPage).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText("Brasil")).toBeInTheDocument();
+    expect(screen.queryByText("Argentina")).not.toBeInTheDocument();
+  });
+
+  it("refreshes options even when the app query client considers them fresh", async () => {
+    const user = userEvent.setup();
+    const fetchPage = jest.fn<Promise<FetchPageResult>, [AsyncDropdownFetchPageInput]>();
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          gcTime: Infinity,
+          refetchOnWindowFocus: false,
+          retry: false,
+          staleTime: 5 * 60 * 1000,
+        },
+      },
+    });
+    fetchPage.mockResolvedValueOnce({ items: baseItems, nextPage: null });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AsyncDropdown<Item>
+          fetchPage={fetchPage}
+          getItemLabel={(item) => item.name}
+          getItemValue={(item) => item.id}
+          onValueChange={jest.fn()}
+          placeholder="Seleccionar"
+          queryKey={["fresh-options"]}
+        />
+      </QueryClientProvider>,
+    );
+
+    await user.click(getTrigger());
+    await screen.findByText("Argentina");
+    await user.click(getTrigger());
+
+    fetchPage.mockResolvedValueOnce({ items: [{ id: "br", name: "Brasil" }], nextPage: null });
+    await user.click(getTrigger());
+
+    await waitFor(() => expect(fetchPage).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText("Brasil")).toBeInTheDocument();
+  });
+
   it("preserves the search input when resetSearchOnClose is false", async () => {
     const user = userEvent.setup();
 
@@ -313,5 +371,19 @@ describe("AsyncDropdown", () => {
     await user.click(defaultOptionItem);
 
     expect(onValueChange).toHaveBeenCalledWith(undefined, undefined);
+  });
+
+  it("does not show an empty result message when only the default option is available", async () => {
+    const user = userEvent.setup();
+    const { fetchPage } = renderDropdown({
+      defaultOption: { label: "Todos los países", value: undefined },
+      emptyMessage: "No se encontraron países.",
+    });
+    fetchPage.mockResolvedValueOnce({ items: [], nextPage: null });
+
+    await user.click(getTrigger());
+
+    expect(await screen.findByRole("option", { name: "Todos los países" })).toBeInTheDocument();
+    expect(screen.queryByText("No se encontraron países.")).not.toBeInTheDocument();
   });
 });

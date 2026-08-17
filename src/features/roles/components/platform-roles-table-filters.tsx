@@ -54,7 +54,6 @@ export function PlatformRolesTableFilters({
 
   return (
     <DataTableFilters
-      className="md:grid-cols-[minmax(16rem,1fr)_minmax(14rem,18rem)_minmax(10rem,14rem)]"
       search={search}
       searchPlaceholder="Buscar por rol o institución..."
       selectFilters={[roleTypeFilter]}

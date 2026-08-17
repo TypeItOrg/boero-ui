@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -45,22 +45,27 @@ const CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS: Record<ContextualSearchScope, read
 export function ContextualSearch(props: ContextualSearchProps): React.ReactElement {
   const { accessSections, scope, className, mobileVariant = "icon", shortcutPlatform = "windows" } = props;
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [value, setValue] = React.useState("");
   const [open, setOpen] = React.useState(false);
   const copy = CONTEXTUAL_SEARCH_COPY[scope];
+  const institutionId = props.scope === "institutional" ? props.institutionId : null;
   const debouncedSearch = useDebouncedValue(value.trim(), 300);
   const canSearch = debouncedSearch.length >= 2;
+  const contextualSearchQueryKey = React.useMemo(
+    () => ["contextual-search", scope, institutionId] as const,
+    [institutionId, scope],
+  );
   const visibleAccessSections = omitContextualSearchAccessItems(
     accessSections,
     CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope],
   );
+  const openSearch = React.useCallback(() => {
+    queryClient.removeQueries({ queryKey: contextualSearchQueryKey });
+    setOpen(true);
+  }, [contextualSearchQueryKey, queryClient]);
   const query = useQuery({
-    queryKey: [
-      "contextual-search",
-      scope,
-      props.scope === "institutional" ? props.institutionId : null,
-      debouncedSearch,
-    ],
+    queryKey: [...contextualSearchQueryKey, debouncedSearch],
     queryFn: ({ signal }) =>
       fetchContextualSearch(
         props.scope === "institutional"
@@ -77,14 +82,18 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
     function handleShortcut(event: KeyboardEvent): void {
       if (!event.defaultPrevented && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setOpen(true);
+        if (!open) openSearch();
       }
     }
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, []);
+  }, [open, openSearch]);
 
   function handleOpenChange(nextOpen: boolean): void {
+    if (nextOpen && !open) {
+      openSearch();
+      return;
+    }
     setOpen(nextOpen);
   }
 
@@ -111,7 +120,7 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
           "topbar-search-input bg-background text-muted-foreground hover:bg-accent focus-visible:ring-ring relative flex size-9 shrink-0 items-center justify-center rounded-lg p-0 text-left text-sm shadow-xs transition-[background-color,border-color,box-shadow] duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-2 motion-reduce:transition-none md:h-9 md:w-full md:justify-start md:px-3 md:pr-16 md:pl-9",
           mobileVariant === "input" && "h-9 w-full justify-start px-3 pr-3 pl-9",
         )}
-        onClick={() => setOpen(true)}
+        onClick={openSearch}
       >
         <SearchIcon
           className={cn(

@@ -106,7 +106,12 @@ export function DataTableFilters({
   );
 
   return (
-    <form className={cn("bg-muted/25 grid gap-3 rounded-lg border p-4 md:items-end", className)}>
+    <form
+      className={cn(
+        "bg-muted/25 flex flex-row flex-wrap gap-3 rounded-lg border p-4 md:items-end [&>*]:flex-[1_0_min(250px,100%)]",
+        className,
+      )}
+    >
       {search !== undefined && searchPlaceholder !== undefined ? (
         <DataTableSearchFilter initialValue={search} onValueChange={updateSearch} placeholder={searchPlaceholder} />
       ) : null}
@@ -146,7 +151,7 @@ function DataTableFilterYear({
   const labelId = React.useId();
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 !flex-[1_0_min(160px,100%)] flex-col gap-1.5">
       <span id={labelId} className="text-foreground text-sm font-medium">
         {filter.label}
       </span>
@@ -199,7 +204,7 @@ function DataTableFilterDate({
   }
 
   return (
-    <label className="flex min-w-0 flex-col gap-1.5">
+    <label className="flex min-w-0 !flex-[1_0_min(200px,100%)] flex-col gap-1.5">
       <span className="text-foreground text-sm font-medium">{filter.label}</span>
       <DatePicker
         autoComplete="off"
@@ -230,7 +235,7 @@ function DataTableSearchFilter({
   }, [debouncedValue, initialValue, onValueChange]);
 
   return (
-    <label className="flex min-w-0 flex-col gap-1.5">
+    <label className="flex min-w-0 !flex-[2_1_min(300px,100%)] flex-col gap-1.5">
       <span className="text-foreground text-sm font-medium">Buscar</span>
       <InputGroup className="h-9">
         <InputGroupAddon align="inline-start">
@@ -272,7 +277,7 @@ function DataTableFilterSelect<TValue extends string = string>({
   const selectedLabel = filter.options.find((option) => option.value === filter.value)?.label;
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5">
       <span id={labelId} className="text-foreground text-sm font-medium">
         {filter.label}
       </span>

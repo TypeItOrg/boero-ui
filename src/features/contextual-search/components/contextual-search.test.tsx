@@ -71,6 +71,8 @@ const userSearchSummary: ContextualSearchSummary = {
   ],
 };
 
+const emptySearchSummary: ContextualSearchSummary = { groups: [] };
+
 describe("ContextualSearch", () => {
   beforeEach(() => {
     mockRouter.push.mockReset();
@@ -203,6 +205,67 @@ describe("ContextualSearch", () => {
       { scope: "institutional", institutionId, search: "ma" },
       expect.any(AbortSignal),
     );
+  });
+
+  it("refreshes results after each reopening for deletion and restoration changes", async () => {
+    const user = userEvent.setup();
+    mockedFetchContextualSearch
+      .mockResolvedValueOnce(userSearchSummary)
+      .mockResolvedValueOnce(emptySearchSummary)
+      .mockResolvedValueOnce(userSearchSummary);
+
+    renderWithQueryClient(
+      <ContextualSearch
+        accessSections={institutionalAccessSections}
+        scope="institutional"
+        institutionId={institutionId}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Buscar en la institución" });
+    await user.click(trigger);
+    await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
+    expect(await screen.findByText("Matías Delgado")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+
+    await user.click(trigger);
+    await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
+    expect(await screen.findByText("No encontramos coincidencias")).toBeInTheDocument();
+    expect(screen.queryByText("Matías Delgado")).not.toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+
+    await user.click(trigger);
+    await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
+    expect(await screen.findByText("Matías Delgado")).toBeInTheDocument();
+    expect(mockedFetchContextualSearch).toHaveBeenCalledTimes(3);
+  });
+
+  it("clears only the active scope and institution search cache when opening", async () => {
+    const user = userEvent.setup();
+    const { queryClient } = renderWithQueryClient(
+      <ContextualSearch
+        accessSections={institutionalAccessSections}
+        scope="institutional"
+        institutionId={institutionId}
+      />,
+    );
+    const platformKey = ["contextual-search", "platform", null, "ma"] as const;
+    const institutionalKey = ["contextual-search", "institutional", institutionId, "ma"] as const;
+    const otherInstitutionKey = ["contextual-search", "institutional", "other-institution", "ma"] as const;
+
+    queryClient.setQueryData(platformKey, userSearchSummary);
+    queryClient.setQueryData(institutionalKey, userSearchSummary);
+    queryClient.setQueryData(otherInstitutionKey, userSearchSummary);
+
+    await user.click(screen.getByRole("button", { name: "Buscar en la institución" }));
+
+    expect(queryClient.getQueryData(institutionalKey)).toBeUndefined();
+    expect(queryClient.getQueryData(platformKey)).toEqual(userSearchSummary);
+    expect(queryClient.getQueryData(otherInstitutionKey)).toEqual(userSearchSummary);
   });
 
   it("shows a result-shaped loading skeleton", async () => {

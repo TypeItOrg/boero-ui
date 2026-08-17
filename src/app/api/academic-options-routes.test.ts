@@ -50,6 +50,7 @@ describe("academic options routes", () => {
       expect(receivedUrl.pathname).toBe(`${backendBasePath}/training-paths`);
       expect(Object.fromEntries(receivedUrl.searchParams)).toEqual({
         active: "true",
+        deleted: "false",
         page: "1",
         search: "Tecnicatura",
         size: "20",

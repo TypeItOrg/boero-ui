@@ -18,6 +18,33 @@ describe("DataTableFilters", () => {
     jest.useRealTimers();
   });
 
+  it("uses a wrapped flex layout with compact year and date filters", () => {
+    const { container } = render(
+      <DataTableFilters
+        dateFilters={[{ label: "Vigente en", name: "validOn", value: undefined }]}
+        search=""
+        searchPlaceholder="Buscar..."
+        yearFilters={[
+          {
+            defaultValue: "all",
+            label: "Año",
+            maxYear: 2030,
+            minYear: 2020,
+            name: "year",
+            value: "all",
+          },
+        ]}
+      >
+        <div data-testid="custom-filter" />
+      </DataTableFilters>,
+    );
+
+    expect(container.querySelector("form")).toHaveClass("flex", "flex-wrap", "[&>*]:flex-[1_0_min(250px,100%)]");
+    expect(screen.getByText("Buscar").closest("label")).toHaveClass("!flex-[2_1_min(300px,100%)]");
+    expect(screen.getByText("Año").parentElement).toHaveClass("!flex-[1_0_min(160px,100%)]");
+    expect(screen.getByText("Vigente en").closest("label")).toHaveClass("!flex-[1_0_min(200px,100%)]");
+  });
+
   it("debounces a manually entered date before updating the query", async () => {
     jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
