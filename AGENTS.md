@@ -1,8 +1,10 @@
 <!-- BEGIN:nextjs-agent-rules -->
 
-# Next.js: ALWAYS read docs before coding
+# This is NOT the Next.js you know
 
-Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
@@ -30,6 +32,10 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 ## New feature boundaries
 
 - Validate Server Action bound arguments and form data at runtime; values bound by a client component are untrusted input.
+- Validate raw form values before coercion. A missing or unknown boolean value is invalid input, never an implicit `false`.
 - Use the shared authenticated API transport for server-side backend calls so authorization, no-store behavior, timeouts, and request headers remain consistent.
 - Use Route Handlers for client-side reads that proxy backend data. Keep mutations and redirects in Server Actions.
+- Use `useActionState` for Server Action forms and confirmation dialogs; it owns pending and returned validation/business errors. Use `useMutation` only when the client owns the mutated data through TanStack Query cache and the mutation rejects errors.
+- Pass network promises to the shared action-error helper so transport failures and non-success HTTP responses use the same UI contract.
+- Mount controlled confirmation dialogs only while open; keep them open while pending or after an error, and unmount them on close to reset action state.
 - Paginate or search option catalogs through the API instead of loading every page into a form.

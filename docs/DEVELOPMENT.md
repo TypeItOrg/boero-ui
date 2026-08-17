@@ -29,3 +29,7 @@ La aplicación queda disponible en **http://localhost:3000**.
 | `make format-check` | Verificar formato              |
 | `make down`         | Detener contenedores           |
 | `make clean`        | Eliminar volúmenes y cachés    |
+
+## Guías de implementación
+
+- [Mutaciones y estado asíncrono](MUTACIONES-Y-ESTADO-ASINCRONO.md): decisiones entre Server Components, Route Handlers, Server Actions y React Query; validación, errores y diálogos de confirmación.

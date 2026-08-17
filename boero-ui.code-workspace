@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"path": "."
+	},
+	{
+		"path": "../boero-api"
+	}
+],
+  "settings": {
+    "java.compile.nullAnalysis.mode": "automatic"
+  }
+}
