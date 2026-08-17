@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { AcademicRouteView } from "@features/academic/components/academic-route-view";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
 import {
+  fetchInstrument,
   fetchStudyPlan,
   fetchStudyPlanCurriculum,
   fetchTrainingPath,
@@ -14,6 +15,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 jest.mock("@features/academic/services/academic.service", () => ({
+  fetchInstrument: jest.fn(),
   fetchStudyPlan: jest.fn(),
   fetchStudyPlanCurriculum: jest.fn(),
   fetchTrainingPath: jest.fn(),
@@ -26,6 +28,7 @@ jest.mock("@features/academic/components/training-path-study-plans", () => ({
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const STUDY_PLAN_ID = "019f9c3d-9663-77da-a21b-5c811c040616";
 const TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
+const INSTRUMENT_ID = "3b9ec931-453c-4778-86a9-dc40a06d0247";
 const LEVEL_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
 
 const STUDY_PLAN = {
@@ -44,6 +47,14 @@ const TRAINING_PATH = {
   institutionId: INSTITUTION_ID,
   name: "Profesorado de Música",
   description: "Formación docente musical.",
+  active: true,
+};
+
+const INSTRUMENT = {
+  id: INSTRUMENT_ID,
+  institutionId: INSTITUTION_ID,
+  name: "Piano",
+  description: "Instrumento de teclas.",
   active: true,
 };
 
@@ -72,6 +83,7 @@ describe("AcademicRouteView", () => {
       totalPages: 1,
     });
     jest.mocked(fetchTrainingPath).mockResolvedValue(TRAINING_PATH);
+    jest.mocked(fetchInstrument).mockResolvedValue(INSTRUMENT);
   });
 
   it("renders a training-path detail with its related study plans", async () => {
@@ -163,6 +175,22 @@ describe("AcademicRouteView", () => {
     expect(screen.getByText("Borrador")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Resumen" })).toBeInTheDocument();
     expect(screen.getByText("Vigencia")).toBeInTheDocument();
+  });
+
+  it("shows the instrument status action without the edit permission", async () => {
+    const result = await AcademicRouteView({
+      access: { ...FULL_ACADEMIC_ACCESS, instrumentUpdate: false, instrumentStatusUpdate: true },
+      institutionId: INSTITUTION_ID,
+      renderBreadcrumb: () => null,
+      scope: AcademicScope.INSTITUTIONAL,
+      segments: [AcademicResource.INSTRUMENT, INSTRUMENT_ID],
+      searchParams: {},
+    });
+
+    render(result);
+
+    expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
   });
 
   it.each([[ACADEMIC_ROUTE_SEGMENT.EDIT, "Editar plan de estudio"]])(

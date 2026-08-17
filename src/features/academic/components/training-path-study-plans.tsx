@@ -58,8 +58,11 @@ export async function TrainingPathStudyPlans({
 
       <AcademicCollectionView
         basePath={basePath}
+        canCreate={access.studyPlanCreate}
+        canDelete={access.studyPlanDelete}
         canChangeStatus={access.studyPlanStatusUpdate}
         canUpdate={access.studyPlanUpdate}
+        canRestore={access.studyPlanRestore}
         columns={STUDY_PLAN_CONTEXT_COLUMNS}
         fixedTrainingPathId={trainingPath.id}
         institutionId={institutionId}

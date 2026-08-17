@@ -24,7 +24,7 @@ describe("fetchAcademicOptionPage", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       `/api/${scope}/academic/options/training-paths?institutionId=${institutionId}&page=0&search=Tecnicatura&size=20`,
-      { signal },
+      { cache: "no-store", signal },
     );
   });
 });

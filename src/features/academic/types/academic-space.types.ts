@@ -7,4 +7,5 @@ export type AcademicSpace = {
   description: string | null;
   type: AcademicSpaceType;
   active: boolean;
+  deletedAt?: string | null;
 };

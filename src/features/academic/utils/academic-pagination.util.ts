@@ -57,6 +57,7 @@ const studyPlanSortFields = new Set<StudyPlanSortField>(STUDY_PLAN_SORT_FIELDS);
 export type AcademicSearchParams = PaginationSearchParams &
   SortSearchParams & {
     active?: QueryParamValue;
+    deleted?: QueryParamValue;
     endDate?: QueryParamValue;
     trainingPathId?: QueryParamValue;
     validOn?: QueryParamValue;
@@ -68,6 +69,7 @@ export type AcademicSearchParams = PaginationSearchParams &
 
 export type AcademicPaginationParams = PaginationParams & {
   active: boolean | undefined;
+  deleted: boolean;
   endDate: string | undefined;
   search: string;
   sort: AcademicSort;
@@ -91,6 +93,7 @@ export function parseAcademicPaginationParams(
   return {
     ...pagination,
     active: parseOptionalBooleanQueryParam(searchParams.active),
+    deleted: parseOptionalBooleanQueryParam(searchParams.deleted) ?? false,
     endDate: parseAcademicDateFilter(searchParams.endDate),
     startDate: parseAcademicDateFilter(searchParams.startDate),
     sort: parseAcademicSort(searchParams, resource),

@@ -9,6 +9,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { academicStatusSchema, parseAcademicForm } from "@features/academic/schemas/academic-form.schema";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
+import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import {
   getAcademicApiBase,
@@ -124,10 +125,37 @@ const STATUS_PERMISSIONS: Record<StatusResource, InstitutionalPermission> = {
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE,
 };
 const deletableResourceSchema = z.enum([
+  AcademicResource.ACADEMIC_YEAR,
+  AcademicResource.TRAINING_PATH,
+  AcademicResource.STUDY_PLAN,
+  AcademicResource.ACADEMIC_SPACE,
+  AcademicResource.INSTRUMENT,
   AcademicResource.ACADEMIC_LEVEL,
   AcademicResource.STUDY_PLAN_SPACE,
   AcademicResource.PREREQUISITE,
 ]);
+const restorableResourceSchema = z.enum([
+  AcademicResource.ACADEMIC_YEAR,
+  AcademicResource.TRAINING_PATH,
+  AcademicResource.STUDY_PLAN,
+  AcademicResource.ACADEMIC_SPACE,
+  AcademicResource.INSTRUMENT,
+]);
+type LifecycleResource = z.infer<typeof restorableResourceSchema>;
+const DELETE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
+  [AcademicResource.ACADEMIC_YEAR]: INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_DELETE,
+  [AcademicResource.TRAINING_PATH]: INSTITUTIONAL_PERMISSION.TRAINING_PATH_DELETE,
+  [AcademicResource.STUDY_PLAN]: INSTITUTIONAL_PERMISSION.STUDY_PLAN_DELETE,
+  [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_DELETE,
+  [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_DELETE,
+};
+const RESTORE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
+  [AcademicResource.ACADEMIC_YEAR]: INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_RESTORE,
+  [AcademicResource.TRAINING_PATH]: INSTITUTIONAL_PERMISSION.TRAINING_PATH_RESTORE,
+  [AcademicResource.STUDY_PLAN]: INSTITUTIONAL_PERMISSION.STUDY_PLAN_RESTORE,
+  [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_RESTORE,
+  [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_RESTORE,
+};
 const actionContextSchema = z.object({
   scope: academicScopeSchema,
   institutionId: z.uuid(),
@@ -246,28 +274,80 @@ export async function updateAcademicStatusAction(
 export async function deleteAcademicResourceAction(
   scope: AcademicScopeType,
   institutionId: string,
-  resource: AcademicResource.ACADEMIC_LEVEL | AcademicResource.STUDY_PLAN_SPACE | AcademicResource.PREREQUISITE,
+  resource:
+    | AcademicResource.ACADEMIC_YEAR
+    | AcademicResource.TRAINING_PATH
+    | AcademicResource.STUDY_PLAN
+    | AcademicResource.ACADEMIC_SPACE
+    | AcademicResource.INSTRUMENT
+    | AcademicResource.ACADEMIC_LEVEL
+    | AcademicResource.STUDY_PLAN_SPACE
+    | AcademicResource.PREREQUISITE,
   id: string,
   destination: string,
+  _state: AcademicActionState,
+  _formData: FormData,
 ): Promise<AcademicActionState> {
+  void _state;
+  void _formData;
   const context = actionContextSchema
     .extend({ resource: deletableResourceSchema, id: z.uuid(), destination: z.string() })
+    .safeParse({ scope, institutionId, resource, id, destination });
+  if (!context.success) return invalidActionState();
+
+  const permission = restorableResourceSchema.safeParse(context.data.resource).success
+    ? DELETE_PERMISSIONS[context.data.resource as LifecycleResource]
+    : INSTITUTIONAL_PERMISSION.STUDY_PLAN_CURRICULUM_UPDATE;
+  const authorizationError = await authorize(context.data.scope, context.data.institutionId, permission);
+  if (authorizationError) return authorizationError;
+
+  const error = await getResponseErrorActionState(
+    academicApiFetch(
+      context.data.scope,
+      `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}`,
+      { method: "DELETE" },
+    ),
+    FIELDS,
+    "No se pudo eliminar el elemento.",
+  );
+  if (error) return error;
+
+  const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
+  revalidatePath(fallback);
+  redirect(getSafeReturnTo(context.data.destination, fallback));
+}
+
+export async function restoreAcademicResourceAction(
+  scope: AcademicScopeType,
+  institutionId: string,
+  resource: LifecycleResource,
+  id: string,
+  destination: string,
+  _state: AcademicActionState,
+  _formData: FormData,
+): Promise<AcademicActionState> {
+  void _state;
+  void _formData;
+  const context = actionContextSchema
+    .extend({ resource: restorableResourceSchema, id: z.uuid(), destination: z.string() })
     .safeParse({ scope, institutionId, resource, id, destination });
   if (!context.success) return invalidActionState();
 
   const authorizationError = await authorize(
     context.data.scope,
     context.data.institutionId,
-    INSTITUTIONAL_PERMISSION.STUDY_PLAN_CURRICULUM_UPDATE,
+    RESTORE_PERMISSIONS[context.data.resource],
   );
   if (authorizationError) return authorizationError;
 
-  const response = await academicApiFetch(
-    context.data.scope,
-    `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}`,
-    { method: "DELETE" },
+  const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
+  const error = await getResponseErrorActionState(
+    academicApiFetch(context.data.scope, `${apiBase}/${context.data.resource}/${context.data.id}/restore`, {
+      method: "POST",
+    }),
+    FIELDS,
+    "No se pudo restaurar el elemento.",
   );
-  const error = await getResponseErrorActionState(response, FIELDS, "No se pudo eliminar el elemento.");
   if (error) return error;
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
@@ -292,8 +372,8 @@ async function authorize(
   return { error: "No tenés permisos para modificar esta configuración académica." };
 }
 
-function activeStatusInput(resource: StatusResource): (formData: FormData) => Record<string, unknown> {
-  return (formData) => ({ resource, active: formData.get("active") === "true" });
+function activeStatusInput(resource: ActiveAcademicStatusResource): (formData: FormData) => Record<string, unknown> {
+  return (formData) => ({ resource, active: formData.get("active") });
 }
 
 function getStatusRequestBody(data: z.infer<typeof academicStatusSchema>): Record<string, unknown> {

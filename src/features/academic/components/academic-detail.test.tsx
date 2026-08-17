@@ -40,6 +40,55 @@ describe("AcademicDetail", () => {
     );
   });
 
+  it("shows the academic-space status action without the edit permission", () => {
+    render(
+      <AcademicDetail
+        basePath=""
+        canEdit={false}
+        item={{
+          id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+          institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+          name: "Armonía",
+          description: null,
+          type: "SUBJECT",
+          active: true,
+        }}
+        resource={AcademicResource.ACADEMIC_SPACE}
+        statusAction={<button type="button">Desactivar</button>}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
+  });
+
+  it("shows the academic-space description with its fallback", () => {
+    const academicSpace = {
+      id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+      institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+      name: "Armonía",
+      description: "Estudio de relaciones entre sonidos.",
+      type: "SUBJECT" as const,
+      active: true,
+    };
+    const { rerender } = render(
+      <AcademicDetail item={academicSpace} resource={AcademicResource.ACADEMIC_SPACE} basePath="" canEdit={false} />,
+    );
+
+    expect(screen.getByText("Estudio de relaciones entre sonidos.")).toBeInTheDocument();
+
+    rerender(
+      <AcademicDetail
+        item={{ ...academicSpace, description: null }}
+        resource={AcademicResource.ACADEMIC_SPACE}
+        basePath=""
+        canEdit={false}
+      />,
+    );
+
+    expect(screen.getByText("Sin descripción")).toBeInTheDocument();
+  });
+
   it("integrates study-plan status and validity into the information section", () => {
     render(<AcademicDetail item={STUDY_PLAN} resource={AcademicResource.STUDY_PLAN} basePath="" canEdit />);
 

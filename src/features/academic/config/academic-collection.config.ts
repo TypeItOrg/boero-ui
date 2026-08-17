@@ -51,6 +51,7 @@ export type AcademicTableRow = {
   active: boolean;
   effectiveFrom?: string | null;
   statusValue?: string;
+  deletedAt?: string | null;
 };
 
 export type AcademicTableColumns = {
@@ -64,7 +65,9 @@ type FetchInput = AcademicPaginationParams & { institutionId: string; scope: Aca
 export type AcademicCollectionConfig = {
   canChangeStatus: (access: AcademicAccess) => boolean;
   canCreate: (access: AcademicAccess) => boolean;
+  canDelete: (access: AcademicAccess) => boolean;
   canRead: (access: AcademicAccess) => boolean;
+  canRestore: (access: AcademicAccess) => boolean;
   canUpdate: (access: AcademicAccess) => boolean;
   columns: AcademicTableColumns;
   createLabel: string;
@@ -109,10 +112,26 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     searchPlaceholder: "Buscar por año, fecha o estado...",
     canRead: (access) => access.yearRead,
     canCreate: (access) => access.yearCreate,
+    canDelete: (access) => access.yearDelete,
     canUpdate: (access) => access.yearUpdate,
     canChangeStatus: (access) => access.yearStatusUpdate,
-    fetchPage: ({ scope, institutionId, page, search, size, sort, status, year, startDate, endDate, validOn }) =>
+    canRestore: (access) => access.yearRestore,
+    fetchPage: ({
+      scope,
+      institutionId,
+      page,
+      search,
+      size,
+      sort,
+      status,
+      year,
+      startDate,
+      endDate,
+      validOn,
+      deleted,
+    }) =>
       fetchAcademicYears(scope, institutionId, {
+        deleted,
         endDate,
         page,
         search,
@@ -125,7 +144,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
       }),
     fetchDetail: fetchAcademicYear,
     getTitle: (item) => String((item as Extract<AcademicCollection, { year: number }>).year),
-    filters: ({ status }) => [
+    filters: ({ status, deleted }) => [
       {
         defaultValue: "all",
         label: "Estado",
@@ -133,6 +152,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
         options: [{ value: "all", label: "Todos" }, ...toOptions(academicYearStatusLabels)],
         value: status ?? "all",
       },
+      deletionFilter(deleted),
     ],
     yearFilters: ({ year }) => [
       {
@@ -157,6 +177,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
         status: academicYearStatusLabels[year.status],
         active: year.status === "ACTIVE",
         statusValue: year.status,
+        deletedAt: year.deletedAt ?? null,
       };
     },
   },
@@ -175,11 +196,14 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     description: "Carreras, orientaciones y recorridos formativos.",
     canRead: (access) => access.trainingPathRead,
     canCreate: (access) => access.trainingPathCreate,
+    canDelete: (access) => access.trainingPathDelete,
     canUpdate: (access) => access.trainingPathUpdate,
     canChangeStatus: (access) => access.trainingPathStatusUpdate,
-    fetchPage: ({ scope, institutionId, page, size, search, sort, active }) =>
+    canRestore: (access) => access.trainingPathRestore,
+    fetchPage: ({ scope, institutionId, page, size, search, sort, active, deleted }) =>
       fetchTrainingPaths(scope, institutionId, {
         active,
+        deleted,
         page,
         search,
         size,
@@ -203,10 +227,13 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     hasCurriculum: true,
     canRead: (access) => access.studyPlanRead,
     canCreate: (access) => access.studyPlanCreate,
+    canDelete: (access) => access.studyPlanDelete,
     canUpdate: (access) => access.studyPlanUpdate,
     canChangeStatus: (access) => access.studyPlanStatusUpdate,
-    fetchPage: ({ scope, institutionId, page, size, search, sort, status, trainingPathId, validOn }) =>
+    canRestore: (access) => access.studyPlanRestore,
+    fetchPage: ({ scope, institutionId, page, size, search, sort, status, trainingPathId, validOn, deleted }) =>
       fetchStudyPlans(scope, institutionId, {
+        deleted,
         page,
         size,
         search,
@@ -217,7 +244,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
       }),
     fetchDetail: fetchStudyPlan,
     getTitle: (item) => (item as Extract<AcademicCollection, { trainingPathId: string }>).name,
-    filters: ({ status }) => [
+    filters: ({ status, deleted }) => [
       {
         defaultValue: "all",
         label: "Estado",
@@ -225,6 +252,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
         options: [{ value: "all", label: "Todos" }, ...toOptions(studyPlanStatusLabels)],
         value: status ?? "all",
       },
+      deletionFilter(deleted),
     ],
     dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
     toRow: (item) => {
@@ -241,6 +269,7 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
         active: plan.status === "ACTIVE",
         effectiveFrom: plan.effectiveFrom,
         statusValue: plan.status,
+        deletedAt: plan.deletedAt ?? null,
       };
     },
   },
@@ -251,17 +280,19 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     createIcon: LibraryBigIcon,
     singular: "espacio académico",
     plural: "espacios académicos",
-    columns: { primaryLabel: "Nombre", detailLabels: ["Tipo"] },
+    columns: { primaryLabel: "Nombre", detailLabels: ["Tipo", "Descripción"] },
     description: "Catálogo de asignaturas, talleres y seminarios.",
     canRead: (access) => access.academicSpaceRead,
     canCreate: (access) => access.academicSpaceCreate,
+    canDelete: (access) => access.academicSpaceDelete,
     canUpdate: (access) => access.academicSpaceUpdate,
     canChangeStatus: (access) => access.academicSpaceStatusUpdate,
-    fetchPage: ({ scope, institutionId, page, size, search, active, type }) =>
-      fetchAcademicSpaces(scope, institutionId, { page, size, search, active, type }),
+    canRestore: (access) => access.academicSpaceRestore,
+    fetchPage: ({ scope, institutionId, page, size, search, active, type, deleted }) =>
+      fetchAcademicSpaces(scope, institutionId, { page, size, search, active, type, deleted }),
     fetchDetail: fetchAcademicSpace,
     getTitle: (item) => (item as Extract<AcademicCollection, { type: string }>).name,
-    filters: ({ active, type }) => [
+    filters: ({ active, type, deleted }) => [
       activeFilter(active),
       {
         defaultValue: "all",
@@ -270,15 +301,17 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
         options: [{ value: "all", label: "Todos" }, ...toOptions(academicSpaceTypeLabels)],
         value: type ?? "all",
       },
+      deletionFilter(deleted),
     ],
     toRow: (item) => {
       const space = item as Extract<AcademicCollection, { type: string }>;
       return {
         id: space.id,
         primaryValue: space.name,
-        detailValues: [academicSpaceTypeLabels[space.type]],
+        detailValues: [academicSpaceTypeLabels[space.type], space.description || "Sin descripción"],
         status: space.active ? "Activo" : "Inactivo",
         active: space.active,
+        deletedAt: space.deletedAt ?? null,
       };
     },
   },
@@ -293,10 +326,12 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     description: "Catálogo institucional de instrumentos.",
     canRead: (access) => access.instrumentRead,
     canCreate: (access) => access.instrumentCreate,
+    canDelete: (access) => access.instrumentDelete,
     canUpdate: (access) => access.instrumentUpdate,
     canChangeStatus: (access) => access.instrumentStatusUpdate,
-    fetchPage: ({ scope, institutionId, page, size, search, active }) =>
-      fetchInstruments(scope, institutionId, { page, size, search, active }),
+    canRestore: (access) => access.instrumentRestore,
+    fetchPage: ({ scope, institutionId, page, size, search, active, deleted }) =>
+      fetchInstruments(scope, institutionId, { page, size, search, active, deleted }),
     fetchDetail: fetchInstrument,
   }),
 };
@@ -307,7 +342,7 @@ function activeResource(
   return {
     ...config,
     getTitle: (item) => (item as Extract<AcademicCollection, { active: boolean }>).name,
-    filters: ({ active }) => [activeFilter(active)],
+    filters: ({ active, deleted }) => [activeFilter(active), deletionFilter(deleted)],
     toRow: (item) => {
       const activeItem = item as Extract<AcademicCollection, { active: boolean }>;
       return {
@@ -316,6 +351,7 @@ function activeResource(
         detailValues: [activeItem.description || "Sin descripción"],
         status: activeItem.active ? "Activo" : "Inactivo",
         active: activeItem.active,
+        deletedAt: activeItem.deletedAt ?? null,
       };
     },
   };
@@ -328,6 +364,19 @@ function activeFilter(active: boolean | undefined): DataTableSelectFilter {
     name: "active",
     options: ACTIVE_OPTIONS,
     value: active === undefined ? "all" : String(active),
+  };
+}
+
+function deletionFilter(deleted: boolean): DataTableSelectFilter {
+  return {
+    defaultValue: "false",
+    label: "Registros",
+    name: "deleted",
+    options: [
+      { value: "false", label: "Vigentes" },
+      { value: "true", label: "Eliminados" },
+    ],
+    value: String(deleted),
   };
 }
 

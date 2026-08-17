@@ -23,7 +23,10 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     size: String(size),
   });
   if (options.active !== undefined) searchParams.set("active", String(options.active));
-  const response = await fetch(`/api/${scope}/academic/options/${resource}?${searchParams}`, { signal });
+  const response = await fetch(`/api/${scope}/academic/options/${resource}?${searchParams}`, {
+    cache: "no-store",
+    signal,
+  });
   const data = await parseHttpResponse<{ items: TItem[]; page: number; totalPages: number }>(
     response,
     "No se pudieron cargar las opciones académicas.",

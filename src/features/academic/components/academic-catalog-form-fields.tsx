@@ -14,7 +14,7 @@ const ACTIVE_STATUS_OPTIONS = [
   { value: "false", label: "Inactivo" },
 ];
 
-export function NamedDescriptionFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState =
     initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
@@ -27,6 +27,15 @@ export function NamedDescriptionFields({ initialValues = {}, fieldErrors }: Acad
           <FormSelect name="active" defaultValue={initialActive} options={ACTIVE_STATUS_OPTIONS} />
         </FormField>
       ) : null}
+      <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
+    </>
+  );
+}
+
+export function InstrumentFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+  return (
+    <>
+      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth />
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>
   );

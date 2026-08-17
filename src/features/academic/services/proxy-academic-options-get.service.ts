@@ -28,6 +28,7 @@ export async function proxyAcademicOptionsGet(
   }
 
   const backendParams = new URLSearchParams({
+    deleted: "false",
     page: String(parsed.data.page),
     size: String(parsed.data.size),
     sort: "name,asc",

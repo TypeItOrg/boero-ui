@@ -19,6 +19,7 @@ import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils
 const FETCH_ERROR = "No se pudo obtener la información académica.";
 
 type PageParams = {
+  deleted?: boolean;
   page?: number;
   size?: number;
   search?: string;

@@ -16,8 +16,11 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 
 type AcademicCollectionProps = {
   basePath: string;
+  canCreate: boolean;
+  canDelete: boolean;
   canChangeStatus: boolean;
   canUpdate: boolean;
+  canRestore: boolean;
   columns?: AcademicTableColumns;
   fixedTrainingPathId?: string;
   institutionId: string;
@@ -28,8 +31,11 @@ type AcademicCollectionProps = {
 
 export async function AcademicCollectionView({
   basePath,
+  canCreate,
+  canDelete,
   canChangeStatus,
   canUpdate,
+  canRestore,
   columns,
   fixedTrainingPathId,
   institutionId,
@@ -85,9 +91,13 @@ export async function AcademicCollectionView({
         <AcademicTablePresentation
           basePath={basePath}
           canChangeStatus={canChangeStatus}
+          canDelete={canDelete}
+          canRestore={canRestore}
           canUpdate={canUpdate}
           data={{ ...data, items: rows }}
           institutionId={institutionId}
+          canCreate={canCreate && !isTrainingPathFixed}
+          deleted={params.deleted}
           page={params.page}
           resource={resource}
           hasFilters={hasFilters}

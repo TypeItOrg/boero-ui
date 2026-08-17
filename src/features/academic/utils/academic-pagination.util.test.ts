@@ -11,6 +11,7 @@ describe("parseAcademicPaginationParams", () => {
     expect(
       parseAcademicPaginationParams({
         active: "false",
+        deleted: "true",
         page: "2",
         search: " piano ",
         size: "20",
@@ -21,6 +22,7 @@ describe("parseAcademicPaginationParams", () => {
       }),
     ).toMatchObject({
       active: false,
+      deleted: true,
       page: 2,
       search: "piano",
       size: 20,

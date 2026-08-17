@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
@@ -9,11 +10,14 @@ import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
+import type { AcademicSpace } from "@features/academic/types/academic-space.types";
+import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
 import type { StudyPlanCurriculum } from "@features/academic/types/study-plan-curriculum.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
+import { hasActiveAcademicStatus } from "@features/academic/utils/has-active-academic-status.util";
 import {
   academicSpaceTypeLabels,
   academicYearStatusLabels,
@@ -30,12 +34,19 @@ type AcademicDetailProps = {
   resource: AcademicCollectionResource;
   basePath: string;
   canEdit: boolean;
+  statusAction?: ReactNode;
 };
 
-export function AcademicDetail({ item, resource, basePath, canEdit }: AcademicDetailProps): React.ReactElement {
-  if ("trainingPathId" in item) return <StudyPlanSummary plan={item} />;
+export function AcademicDetail({
+  item,
+  resource,
+  basePath,
+  canEdit,
+  statusAction,
+}: AcademicDetailProps): React.ReactElement {
+  if (resource === AcademicResource.STUDY_PLAN) return <StudyPlanSummary plan={item as StudyPlan} />;
 
-  const detail = getDetail(item);
+  const detail = getDetail(resource, item);
   const detailPath = `${basePath}/${resource}/${item.id}`;
   return (
     <div className="flex flex-col gap-4">
@@ -43,11 +54,14 @@ export function AcademicDetail({ item, resource, basePath, canEdit }: AcademicDe
         <div>
           <Badge variant={detail.active ? "success" : "secondary"}>{detail.status}</Badge>
         </div>
-        {canEdit ? (
+        {canEdit || statusAction ? (
           <div className="flex gap-2">
-            <Button asChild size="lg" variant="outline">
-              <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
-            </Button>
+            {canEdit ? (
+              <Button asChild size="lg" variant="outline">
+                <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
+              </Button>
+            ) : null}
+            {statusAction}
           </div>
         ) : null}
       </div>
@@ -202,36 +216,58 @@ export function StudyPlanSpaceDetail({
   );
 }
 
-function getDetail(item: Exclude<AcademicCollection, StudyPlan>): {
+function getDetail(
+  resource: Exclude<AcademicCollectionResource, AcademicResource.STUDY_PLAN>,
+  item: AcademicCollection,
+): {
   status: string;
   active: boolean;
   fields: [string, string][];
 } {
-  if ("year" in item)
-    return {
-      status: academicYearStatusLabels[item.status],
-      active: item.status === "ACTIVE",
-      fields: [
-        ["Inicio", formatDisplayDate(item.startDate, "Sin definir")],
-        ["Finalización", formatDisplayDate(item.endDate, "Sin definir")],
-      ],
-    };
-  if ("type" in item)
-    return {
-      status: item.active ? "Activo" : "Inactivo",
-      active: item.active,
-      fields: [
-        ["Tipo", academicSpaceTypeLabels[item.type]],
-        ["Estado", item.active ? "Disponible" : "No disponible"],
-      ],
-    };
-  if ("description" in item) {
-    return {
-      status: item.active ? "Activo" : "Inactivo",
-      active: item.active,
-      fields: [["Descripción", item.description || "Sin descripción"]],
-    };
+  switch (resource) {
+    case AcademicResource.ACADEMIC_YEAR: {
+      if (!isAcademicYear(item)) return unsupportedDetailResource(resource);
+      return {
+        status: academicYearStatusLabels[item.status],
+        active: item.status === "ACTIVE",
+        fields: [
+          ["Inicio", formatDisplayDate(item.startDate, "Sin definir")],
+          ["Finalización", formatDisplayDate(item.endDate, "Sin definir")],
+        ],
+      };
+    }
+    case AcademicResource.ACADEMIC_SPACE: {
+      if (!isAcademicSpace(item)) return unsupportedDetailResource(resource);
+      return {
+        status: item.active ? "Activo" : "Inactivo",
+        active: item.active,
+        fields: [
+          ["Tipo", academicSpaceTypeLabels[item.type]],
+          ["Descripción", item.description || "Sin descripción"],
+          ["Estado", item.active ? "Disponible" : "No disponible"],
+        ],
+      };
+    }
+    case AcademicResource.TRAINING_PATH:
+    case AcademicResource.INSTRUMENT: {
+      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      return {
+        status: item.active ? "Activo" : "Inactivo",
+        active: item.active,
+        fields: [["Descripción", item.description || "Sin descripción"]],
+      };
+    }
   }
+}
 
-  throw new Error("Unsupported academic detail resource.");
+function isAcademicYear(item: AcademicCollection): item is AcademicYear {
+  return "year" in item;
+}
+
+function isAcademicSpace(item: AcademicCollection): item is AcademicSpace {
+  return "type" in item;
+}
+
+function unsupportedDetailResource(resource: AcademicCollectionResource): never {
+  throw new Error(`Unsupported academic detail resource: ${resource}.`);
 }

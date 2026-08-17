@@ -25,6 +25,7 @@ import { render } from "@testing-library/react";
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
+import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
 import { fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -47,8 +48,11 @@ describe("AcademicCollectionView", () => {
   it("keeps contextual study-plan queries fixed and hides the redundant path filter", async () => {
     const result = await AcademicCollectionView({
       basePath: "",
+      canCreate: true,
+      canDelete: true,
       canChangeStatus: true,
       canUpdate: true,
+      canRestore: true,
       columns: {
         primaryLabel: "Nombre",
         detailLabels: ["Vigente desde", "Vigente hasta"],
@@ -88,6 +92,49 @@ describe("AcademicCollectionView", () => {
           sortableFields: ["name", "effectiveFrom", "effectiveTo"],
         },
       }),
+      undefined,
+    );
+  });
+
+  it("maps academic-space descriptions into their table column", () => {
+    const config = ACADEMIC_COLLECTION_CONFIG[AcademicResource.ACADEMIC_SPACE];
+
+    expect(config.columns.detailLabels).toEqual(["Tipo", "Descripción"]);
+    expect(
+      config.toRow({
+        id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+        institutionId: INSTITUTION_ID,
+        name: "Armonía",
+        description: null,
+        type: "SUBJECT",
+        active: true,
+      }).detailValues,
+    ).toEqual(["Asignatura", "Sin descripción"]);
+  });
+
+  it("shows deleted records without offering a create action", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "",
+      canCreate: true,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      institutionId: INSTITUTION_ID,
+      resource: AcademicResource.STUDY_PLAN,
+      scope: AcademicScope.INSTITUTIONAL,
+      searchParams: { deleted: "true" },
+    });
+
+    render(result);
+
+    expect(fetchStudyPlans).toHaveBeenLastCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      INSTITUTION_ID,
+      expect.objectContaining({ deleted: true }),
+    );
+    expect(jest.mocked(AcademicTablePresentation)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ canCreate: true, deleted: true }),
       undefined,
     );
   });

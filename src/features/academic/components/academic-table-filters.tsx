@@ -47,17 +47,8 @@ export function AcademicTableFilters({
   trainingPathFilter,
   yearFilters,
 }: AcademicTableFiltersProps): React.ReactElement {
-  const columns = getFilterColumns(
-    filters.length +
-      yearFilters.length +
-      dateFilters.length +
-      Number(searchable) +
-      Number(trainingPathFilter !== undefined),
-  );
-
   return (
     <DataTableFilters
-      className={columns}
       dateFilters={dateFilters}
       search={searchable ? search : undefined}
       searchPlaceholder={searchable ? (searchPlaceholder ?? "Buscar por nombre...") : undefined}
@@ -75,6 +66,10 @@ const TRAINING_PATH_FILTER_PAGE_SIZE = 20;
 
 function TrainingPathFilterControl({ filter, size }: TrainingPathFilterControlProps): React.ReactElement {
   const { navigate } = useDataTableNavigation();
+  const queryKey = React.useMemo(
+    () => [...TRAINING_PATH_FILTER_QUERY_KEY, filter.scope, filter.institutionId],
+    [filter.institutionId, filter.scope],
+  );
 
   function updateTrainingPath(value: string | undefined): void {
     navigate({ page: "0", size: String(size), trainingPathId: value }, { replace: true });
@@ -104,24 +99,11 @@ function TrainingPathFilterControl({ filter, size }: TrainingPathFilterControlPr
         pageSize={TRAINING_PATH_FILTER_PAGE_SIZE}
         onValueChange={updateTrainingPath}
         placeholder="Seleccionar trayecto"
-        queryKey={TRAINING_PATH_FILTER_QUERY_KEY}
+        queryKey={queryKey}
         searchPlaceholder="Buscar trayecto..."
         selectedLabel={filter.selectedLabel ?? (filter.value ? "Trayecto no disponible" : undefined)}
         value={filter.value}
       />
     </div>
   );
-}
-
-function getFilterColumns(fieldCount: number): string {
-  if (fieldCount >= 4) {
-    return "md:grid-cols-2 xl:grid-cols-4";
-  }
-  if (fieldCount > 2) {
-    return "md:grid-cols-[minmax(16rem,1fr)_minmax(10rem,14rem)_minmax(10rem,14rem)]";
-  }
-  if (fieldCount === 2) {
-    return "md:grid-cols-[minmax(16rem,1fr)_minmax(10rem,14rem)]";
-  }
-  return "md:grid-cols-[minmax(10rem,14rem)]";
 }

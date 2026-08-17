@@ -4,4 +4,5 @@ export type Instrument = {
   name: string;
   description: string | null;
   active: boolean;
+  deletedAt?: string | null;
 };

@@ -9,6 +9,7 @@ import { AcademicCollectionView } from "@features/academic/components/academic-c
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
+import { ActiveAcademicStatusButton } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicDetail } from "@features/academic/components/academic-detail";
 import { AcademicOverview } from "@features/academic/components/academic-overview";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
@@ -21,6 +22,7 @@ import { canReadAcademic, type AcademicAccess } from "@features/academic/types/a
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
+import { hasActiveAcademicStatus } from "@features/academic/utils/has-active-academic-status.util";
 import { canEditAcademicResource } from "@features/academic/utils/academic-state.util";
 import { parseAcademicCollectionResource } from "@features/academic/utils/parse-academic-collection-resource.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -87,7 +89,10 @@ export async function AcademicRouteView({
         >
           <AcademicCollectionView
             basePath={basePath}
+            canCreate={config.canCreate(access)}
             canChangeStatus={config.canChangeStatus(access)}
+            canDelete={config.canDelete(access)}
+            canRestore={config.canRestore(access)}
             canUpdate={config.canUpdate(access)}
             institutionId={institutionId}
             resource={collectionResource}
@@ -242,6 +247,20 @@ async function renderPrimaryDetail(
     );
   }
   if (input.action) notFound();
+  let statusAction: React.ReactNode;
+  if (config.canChangeStatus(input.access) && isDetailStatusResource(input.resource) && hasActiveAcademicStatus(item)) {
+    statusAction = (
+      <ActiveAcademicStatusButton
+        active={item.active}
+        id={item.id}
+        institutionId={input.institutionId}
+        resource={input.resource}
+        resourceLabel={config.getTitle(item)}
+        returnTo={detailPath}
+        scope={input.scope}
+      />
+    );
+  }
   return (
     <AcademicShell
       title={config.getTitle(item)}
@@ -251,7 +270,13 @@ async function renderPrimaryDetail(
       actionsClassName="self-stretch"
       actions={<AcademicPageIcon icon={ACADEMIC_RESOURCE_ICONS[input.resource]} />}
     >
-      <AcademicDetail item={item} resource={input.resource} basePath={input.basePath} canEdit={canEdit} />
+      <AcademicDetail
+        basePath={input.basePath}
+        canEdit={canEdit}
+        item={item}
+        resource={input.resource}
+        statusAction={statusAction}
+      />
       {curriculum ? (
         <StudyPlanCurriculumView
           curriculum={curriculum}
@@ -264,6 +289,12 @@ async function renderPrimaryDetail(
       {relatedPlans}
     </AcademicShell>
   );
+}
+
+function isDetailStatusResource(
+  resource: AcademicCollectionResource,
+): resource is AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT {
+  return resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT;
 }
 
 async function getContextualTrainingPath(

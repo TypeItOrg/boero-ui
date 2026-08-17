@@ -87,6 +87,31 @@ describe("AcademicFormFields", () => {
     expect(statusSelect).toHaveTextContent("Planificado");
   });
 
+  it("keeps instrument status outside the edit form", () => {
+    const { container } = render(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.INSTRUMENT}
+          initialValues={{
+            id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+            name: "Piano",
+            description: "Instrumento de teclas.",
+            active: true,
+          }}
+        />
+      </form>,
+    );
+
+    expect(screen.getByLabelText(/^Nombre/)).toHaveValue("Piano");
+    expect(screen.getByLabelText("Descripción")).toHaveValue("Instrumento de teclas.");
+    expect(screen.queryByRole("combobox", { name: "Estado" })).not.toBeInTheDocument();
+
+    const formData = new FormData(container.querySelector("form")!);
+    expect(formData.get("name")).toBe("Piano");
+    expect(formData.get("description")).toBe("Instrumento de teclas.");
+    expect(formData.has("active")).toBe(false);
+  });
+
   it("restricts academic dates to the selected year and the following year", async () => {
     const user = userEvent.setup();
     const year = getCurrentAcademicYear();

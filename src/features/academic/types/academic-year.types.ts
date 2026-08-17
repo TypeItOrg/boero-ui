@@ -7,4 +7,5 @@ export type AcademicYear = {
   startDate: string | null;
   endDate: string | null;
   status: AcademicYearStatus;
+  deletedAt?: string | null;
 };

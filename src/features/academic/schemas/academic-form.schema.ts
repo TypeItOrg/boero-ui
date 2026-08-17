@@ -141,7 +141,7 @@ export const academicStatusSchema = z.discriminatedUnion("resource", [
     }),
   z.object({
     resource: z.enum([AcademicResource.TRAINING_PATH, AcademicResource.ACADEMIC_SPACE, AcademicResource.INSTRUMENT]),
-    active: z.boolean(),
+    active: z.enum(["true", "false"]).transform((value) => value === "true"),
   }),
 ]);
 
