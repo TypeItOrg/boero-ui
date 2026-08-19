@@ -1,9 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 
+jest.mock("next/navigation", () => ({
+  ...jest.requireActual("next/navigation"),
+  usePathname: () => "/academic-spaces/4c9ec931-453c-4778-86a9-dc40a06d0247",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 import { AcademicRouteView } from "@features/academic/components/academic-route-view";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
 import {
+  fetchAcademicSpace,
+  fetchAcademicSpaceUsage,
   fetchInstrument,
   fetchStudyPlan,
   fetchStudyPlanCurriculum,
@@ -11,10 +19,13 @@ import {
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
+import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 jest.mock("@features/academic/services/academic.service", () => ({
+  fetchAcademicSpace: jest.fn(),
+  fetchAcademicSpaceUsage: jest.fn(),
   fetchInstrument: jest.fn(),
   fetchStudyPlan: jest.fn(),
   fetchStudyPlanCurriculum: jest.fn(),
@@ -29,6 +40,7 @@ const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const STUDY_PLAN_ID = "019f9c3d-9663-77da-a21b-5c811c040616";
 const TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 const INSTRUMENT_ID = "3b9ec931-453c-4778-86a9-dc40a06d0247";
+const ACADEMIC_SPACE_ID = "4c9ec931-453c-4778-86a9-dc40a06d0247";
 const LEVEL_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
 
 const STUDY_PLAN = {
@@ -58,9 +70,40 @@ const INSTRUMENT = {
   active: true,
 };
 
+const ACADEMIC_SPACE = {
+  id: ACADEMIC_SPACE_ID,
+  institutionId: INSTITUTION_ID,
+  name: "Armonía",
+  description: "Lenguaje musical aplicado.",
+  type: "SUBJECT" as const,
+  active: true,
+};
+
+const ACADEMIC_SPACE_USAGE: AcademicSpaceUsage = {
+  summary: {
+    totalPlans: 1,
+    activePlans: 1,
+    draftPlans: 0,
+    inactivePlans: 0,
+    totalPlacements: 1,
+    unassignedPlacements: 0,
+    deactivationBlocked: true,
+  },
+  plans: {
+    items: [],
+    page: 0,
+    size: 10,
+    totalItems: 0,
+    totalPages: 0,
+  },
+  warnings: [{ code: "USED_IN_ACTIVE_OR_DRAFT_PLAN", blockingPlanCount: 1 }],
+};
+
 describe("AcademicRouteView", () => {
   beforeEach(() => {
     jest.mocked(fetchStudyPlan).mockResolvedValue(STUDY_PLAN);
+    jest.mocked(fetchAcademicSpace).mockResolvedValue(ACADEMIC_SPACE);
+    jest.mocked(fetchAcademicSpaceUsage).mockResolvedValue(ACADEMIC_SPACE_USAGE);
     jest.mocked(fetchStudyPlanCurriculum).mockResolvedValue({
       studyPlan: STUDY_PLAN,
       levels: [],
@@ -177,6 +220,29 @@ describe("AcademicRouteView", () => {
     expect(screen.getByText("Vigencia")).toBeInTheDocument();
   });
 
+  it("renders academic space usage when study plans are readable", async () => {
+    const result = await AcademicRouteView({
+      access: FULL_ACADEMIC_ACCESS,
+      institutionId: INSTITUTION_ID,
+      renderBreadcrumb: () => null,
+      scope: AcademicScope.INSTITUTIONAL,
+      segments: [AcademicResource.ACADEMIC_SPACE, ACADEMIC_SPACE_ID],
+      searchParams: {},
+    });
+
+    render(result);
+
+    expect(screen.getByRole("heading", { name: "Uso en planes de estudio" })).toBeInTheDocument();
+    expect(screen.getByText("No se puede desactivar este espacio")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Desactivar" })).toBeDisabled();
+    expect(fetchAcademicSpaceUsage).toHaveBeenCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      INSTITUTION_ID,
+      ACADEMIC_SPACE_ID,
+      { page: 0, size: 10 },
+    );
+  });
+
   it("shows the instrument status action without the edit permission", async () => {
     const result = await AcademicRouteView({
       access: { ...FULL_ACADEMIC_ACCESS, instrumentUpdate: false, instrumentStatusUpdate: true },
@@ -184,6 +250,22 @@ describe("AcademicRouteView", () => {
       renderBreadcrumb: () => null,
       scope: AcademicScope.INSTITUTIONAL,
       segments: [AcademicResource.INSTRUMENT, INSTRUMENT_ID],
+      searchParams: {},
+    });
+
+    render(result);
+
+    expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
+  });
+
+  it("shows the training-path status action without the edit permission", async () => {
+    const result = await AcademicRouteView({
+      access: { ...FULL_ACADEMIC_ACCESS, trainingPathUpdate: false, trainingPathStatusUpdate: true },
+      institutionId: INSTITUTION_ID,
+      renderBreadcrumb: () => null,
+      scope: AcademicScope.INSTITUTIONAL,
+      segments: [AcademicResource.TRAINING_PATH, TRAINING_PATH_ID],
       searchParams: {},
     });
 
@@ -206,7 +288,8 @@ describe("AcademicRouteView", () => {
       });
 
       expect(result).toHaveProperty("props.title", expectedTitle);
-      expect(result).toHaveProperty("props.backHref", `/study-plans/${STUDY_PLAN_ID}`);
+      expect(result).not.toHaveProperty("props.backHref");
+      expect(result).toHaveProperty("props.actions");
     },
   );
 

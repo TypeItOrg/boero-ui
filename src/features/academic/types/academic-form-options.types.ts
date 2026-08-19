@@ -7,6 +7,7 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 
 export type AcademicFormOptions = {
   academicSpaces?: AcademicSpace[];
+  canChangeStatus?: boolean;
   excludedPlanSpaceId?: string;
   initialValues?: Record<string, FormValue>;
   levels?: AcademicLevel[];

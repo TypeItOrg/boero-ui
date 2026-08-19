@@ -5,6 +5,7 @@ import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
+import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
@@ -108,6 +109,15 @@ export async function fetchAcademicSpace(
   return fetchDetail(scope, institutionId, `academic-spaces/${id}`);
 }
 
+export async function fetchAcademicSpaceUsage(
+  scope: AcademicScope,
+  institutionId: string,
+  id: string,
+  params: Pick<PageParams, "page" | "size"> = {},
+): Promise<AcademicSpaceUsage | null> {
+  return fetchDetailWithParams(scope, institutionId, `academic-spaces/${id}/usage`, params);
+}
+
 export async function fetchInstruments(
   scope: AcademicScope,
   institutionId: string,
@@ -157,5 +167,20 @@ async function fetchPage<T>(
 
 async function fetchDetail<T>(scope: AcademicScope, institutionId: string, resource: string): Promise<T | null> {
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}`);
+  return parseNullableHttpResponse(response, FETCH_ERROR);
+}
+
+async function fetchDetailWithParams<T>(
+  scope: AcademicScope,
+  institutionId: string,
+  resource: string,
+  params: Record<string, string | number | undefined>,
+): Promise<T | null> {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") searchParams.set(key, String(value));
+  });
+  const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
+  const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
   return parseNullableHttpResponse(response, FETCH_ERROR);
 }

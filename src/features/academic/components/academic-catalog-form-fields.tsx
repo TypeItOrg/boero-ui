@@ -14,6 +14,11 @@ const ACTIVE_STATUS_OPTIONS = [
   { value: "false", label: "Inactivo" },
 ];
 
+type ActiveStatusFieldProps = {
+  error?: string;
+  initialActive: string;
+};
+
 export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState =
     initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
@@ -22,29 +27,40 @@ export function TrainingPathFields({ initialValues = {}, fieldErrors }: Academic
   return (
     <>
       <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={!hasActiveState} />
-      {hasActiveState ? (
-        <FormField label="Estado" name="active" error={fieldErrors?.active}>
-          <FormSelect name="active" defaultValue={initialActive} options={ACTIVE_STATUS_OPTIONS} />
-        </FormField>
-      ) : null}
+      {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>
   );
 }
 
-export function InstrumentFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function InstrumentFields({
+  canChangeStatus = true,
+  initialValues = {},
+  fieldErrors,
+}: AcademicFieldsProps): React.ReactElement {
+  const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+  const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
+
   return (
     <>
-      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth />
+      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={!hasActiveState} />
+      {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>
   );
 }
 
-export function AcademicSpaceFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function AcademicSpaceFields({
+  canChangeStatus = true,
+  initialValues = {},
+  fieldErrors,
+}: AcademicFieldsProps): React.ReactElement {
+  const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+  const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
+
   return (
     <>
-      <NameField initialValues={initialValues} error={fieldErrors?.name} />
+      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={!hasActiveState} />
       <FormField label="Tipo" name="type" error={fieldErrors?.type} required>
         <FormSelect
           name="type"
@@ -52,7 +68,19 @@ export function AcademicSpaceFields({ initialValues = {}, fieldErrors }: Academi
           options={ACADEMIC_SPACE_TYPE.map((type) => ({ value: type, label: academicSpaceTypeLabels[type] }))}
         />
       </FormField>
+      {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
+    </>
+  );
+}
+
+function ActiveStatusField({ error, initialActive }: ActiveStatusFieldProps): React.ReactElement {
+  return (
+    <>
+      <input type="hidden" name="initialActive" value={initialActive} />
+      <FormField label="Estado" name="active" error={error}>
+        <FormSelect name="active" defaultValue={initialActive} options={ACTIVE_STATUS_OPTIONS} />
+      </FormField>
     </>
   );
 }

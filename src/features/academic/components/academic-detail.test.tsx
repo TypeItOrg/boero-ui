@@ -33,7 +33,11 @@ describe("AcademicDetail", () => {
   it("shows training-path description and preserves the detail as edit origin", () => {
     render(<AcademicDetail item={TRAINING_PATH} resource={AcademicResource.TRAINING_PATH} basePath="" canEdit />);
 
-    expect(screen.getByText("Formación docente.")).toBeInTheDocument();
+    const info = screen.getByRole("region", { name: "Información" });
+    expect(
+      within(info).getByText("Consultá los datos generales y el estado del trayecto formativo."),
+    ).toBeInTheDocument();
+    expect(within(info).getByText("Formación docente.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Editar" })).toHaveAttribute(
       "href",
       "/training-paths/2d9ec931-453c-4778-86a9-dc40a06d0247/edit?returnTo=%2Ftraining-paths%2F2d9ec931-453c-4778-86a9-dc40a06d0247",
@@ -58,6 +62,11 @@ describe("AcademicDetail", () => {
       />,
     );
 
+    const info = screen.getByRole("region", { name: "Información" });
+    expect(
+      within(info).getByText("Consultá los datos generales y el estado del espacio académico."),
+    ).toBeInTheDocument();
+    expect(within(info).getByText("Activo")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
   });

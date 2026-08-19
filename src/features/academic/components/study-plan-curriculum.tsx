@@ -34,13 +34,20 @@ export function StudyPlanCurriculumView({
   const isEmpty = !hasSpaces && curriculum.levels.length === 0;
 
   return (
-    <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
-      <div className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-base font-semibold">Estructura curricular</h2>
-          <p className="text-muted-foreground text-sm">
-            Organizá los niveles y espacios académicos que forman parte de este plan.
-          </p>
+    <section aria-labelledby="study-plan-curriculum-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
+      <div className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+            <BookOpenCheckIcon className="size-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 id="study-plan-curriculum-title" className="text-base font-semibold">
+              Estructura curricular
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Organizá los niveles y espacios académicos que forman parte de este plan.
+            </p>
+          </div>
         </div>
         {canEditCurriculum ? (
           <div className="flex flex-wrap gap-2">
@@ -61,13 +68,20 @@ export function StudyPlanCurriculumView({
       </div>
 
       {isEmpty ? (
-        <Empty className="bg-background mt-5 min-h-72 border">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
+        <Empty className="bg-background mt-5 min-h-72 border-0">
+          <EmptyHeader className="max-w-md">
+            <EmptyMedia
+              className="bg-background text-primary mb-5 size-14 rounded-full border shadow-xs"
+              variant="default"
+            >
               <BookOpenCheckIcon />
             </EmptyMedia>
-            <EmptyTitle>La currícula todavía está vacía</EmptyTitle>
-            <EmptyDescription>Creá los niveles y luego incorporá espacios académicos al plan.</EmptyDescription>
+            <EmptyTitle className="text-foreground font-heading text-lg font-medium tracking-tight">
+              La currícula todavía está vacía
+            </EmptyTitle>
+            <EmptyDescription className="text-sm/relaxed">
+              Creá los niveles y luego incorporá espacios académicos al plan.
+            </EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
@@ -121,7 +135,7 @@ export function StudyPlanCurriculumView({
           ))}
 
           {curriculum.unassignedSpaces.length > 0 ? (
-            <section className="bg-background rounded-xl border border-dashed p-4">
+            <section className="bg-background rounded-xl border p-4">
               <div className="mb-3">
                 <h3 className="text-base font-semibold">Sin nivel asignado</h3>
                 <p className="text-muted-foreground text-sm">Espacios transversales o pendientes de ubicación.</p>

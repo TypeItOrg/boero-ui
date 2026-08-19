@@ -53,7 +53,10 @@ export async function AcademicCollectionView({
       ? fetchTrainingPath(scope, institutionId, params.trainingPathId)
       : Promise.resolve(null);
   const [data, selectedTrainingPath] = await Promise.all([dataPromise, selectedTrainingPathPromise]);
-  const rows = data.items.map(config.toRow);
+  const rows = data.items.map(config.toRow).map((row) => {
+    if (!isTrainingPathFixed || resource !== AcademicResource.STUDY_PLAN) return row;
+    return { ...row, detailValues: row.detailValues.slice(1) };
+  });
   const filters = config.filters(params);
   const yearFilters = config.yearFilters?.(params) ?? [];
   const dateFilters = config.dateFilters?.(params) ?? [];

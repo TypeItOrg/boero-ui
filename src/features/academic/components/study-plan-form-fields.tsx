@@ -83,9 +83,10 @@ export function AcademicLevelFields({ initialValues = {}, fieldErrors }: Academi
         required
       >
         <NumericInput
+          aria-invalid={Boolean(fieldErrors?.displayOrder)}
+          defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
           id="displayOrder"
           name="displayOrder"
-          defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
           required
         />
       </FormField>
@@ -145,9 +146,10 @@ export function StudyPlanSpaceFields({
       </FormField>
       <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} required>
         <NumericInput
+          aria-invalid={Boolean(fieldErrors?.displayOrder)}
+          defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
           id="displayOrder"
           name="displayOrder"
-          defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
           required
         />
       </FormField>
@@ -181,6 +183,7 @@ export function PrerequisiteFields({
       value: space.id,
       label: [space.academicLevelName, space.academicSpaceName].filter(Boolean).join(" · "),
     }));
+  const hasAvailableSpaces = options.length > 0;
   return (
     <>
       <FormField
@@ -193,7 +196,8 @@ export function PrerequisiteFields({
         <FormSelect
           name="requiredStudyPlanSpaceId"
           defaultValue={toFormControlValue(initialValues.requiredStudyPlanSpaceId)}
-          placeholder="Seleccionar espacio"
+          disabled={!hasAvailableSpaces}
+          placeholder={hasAvailableSpaces ? "Seleccionar espacio" : "No hay otros espacios disponibles"}
           options={options}
         />
       </FormField>

@@ -1,4 +1,4 @@
-import { PlusIcon } from "lucide-react";
+import { BookMarkedIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
@@ -36,21 +36,26 @@ export async function TrainingPathStudyPlans({
   const createHref = `${basePath}/${AcademicResource.STUDY_PLAN}/new?trainingPathId=${encodeURIComponent(trainingPath.id)}`;
 
   return (
-    <section aria-labelledby="training-path-study-plans-title" className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 id="training-path-study-plans-title" className="text-xl font-semibold tracking-tight">
-            Planes de estudio
-          </h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Versiones curriculares asociadas a este trayecto formativo.
-          </p>
+    <section
+      aria-labelledby="training-path-study-plans-title"
+      className="bg-muted/25 flex flex-col gap-5 rounded-xl border p-5 md:p-6"
+    >
+      <header className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
+            <BookMarkedIcon className="size-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 id="training-path-study-plans-title" className="text-base font-semibold">
+              Planes de estudio
+            </h2>
+            <p className="text-muted-foreground text-sm">Versiones curriculares asociadas a este trayecto formativo.</p>
+          </div>
         </div>
         {access.studyPlanCreate ? (
-          <Button asChild size="lg">
-            <ReturnToLink href={createHref}>
-              <PlusIcon data-icon="inline-start" />
-              Nuevo plan de estudio
+          <Button asChild size="icon" className="size-11 rounded-xl" title="Nuevo plan de estudio">
+            <ReturnToLink aria-label="Nuevo plan de estudio" href={createHref}>
+              <PlusIcon className="size-5" />
             </ReturnToLink>
           </Button>
         ) : null}

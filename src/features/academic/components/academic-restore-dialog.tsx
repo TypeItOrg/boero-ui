@@ -1,6 +1,6 @@
 "use client";
 
-import { ArchiveRestoreIcon } from "lucide-react";
+import { ArchiveRestoreIcon, CircleAlertIcon } from "lucide-react";
 import { useActionState } from "react";
 
 import {
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
@@ -67,7 +68,12 @@ export function AcademicRestoreDialog(props: AcademicRestoreDialogProps): React.
               El registro volverá a estar disponible con el estado operativo que tenía antes de eliminarse.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {state.error ? <p className="text-destructive mt-4 text-sm">{state.error}</p> : null}
+          {state.error ? (
+            <Alert className="mt-4" variant="destructive">
+              <CircleAlertIcon />
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          ) : null}
           <AlertDialogFooter className="mt-5">
             <AlertDialogCancel type="button" disabled={isPending}>
               Cancelar

@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2Icon } from "lucide-react";
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 import { useActionState } from "react";
 
 import {
@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
@@ -77,7 +78,12 @@ export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.Re
             <AlertDialogTitle>Eliminar {props.label}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
           </AlertDialogHeader>
-          {state.error ? <p className="text-destructive mt-4 text-sm">{state.error}</p> : null}
+          {state.error ? (
+            <Alert className="mt-4" variant="destructive">
+              <CircleAlertIcon />
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          ) : null}
           <AlertDialogFooter className="mt-5">
             <AlertDialogCancel type="button" disabled={isPending}>
               Cancelar

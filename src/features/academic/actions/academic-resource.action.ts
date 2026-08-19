@@ -67,6 +67,7 @@ const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConfig> = {
     createPath: directPath(AcademicResource.TRAINING_PATH),
     createPermission: INSTITUTIONAL_PERMISSION.TRAINING_PATH_CREATE,
     updatePermission: INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE,
+    prepareBody: withoutActiveStatus,
   },
   [AcademicResource.STUDY_PLAN]: {
     createPath: (base, parentId, data) => `${base}/training-paths/${parentId ?? data.trainingPathId}/study-plans`,
@@ -93,11 +94,13 @@ const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConfig> = {
     createPath: directPath(AcademicResource.ACADEMIC_SPACE),
     createPermission: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_CREATE,
     updatePermission: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_UPDATE,
+    prepareBody: withoutActiveStatus,
   },
   [AcademicResource.INSTRUMENT]: {
     createPath: directPath(AcademicResource.INSTRUMENT),
     createPermission: INSTITUTIONAL_PERMISSION.INSTRUMENT_CREATE,
     updatePermission: INSTITUTIONAL_PERMISSION.INSTRUMENT_UPDATE,
+    prepareBody: withoutActiveStatus,
   },
 };
 
@@ -199,6 +202,28 @@ export async function saveAcademicResourceAction(
   const authorizationError = await authorize(context.data.scope, context.data.institutionId, requiredPermission);
   if (authorizationError) return authorizationError;
 
+  const activeStatusValue = formData.get("active");
+  const initialActiveStatusValue = formData.get("initialActive");
+  const nextActiveStatus = isValidActiveStatusValue(activeStatusValue) ? activeStatusValue : null;
+  const formStatusResource = isFormStatusResource(context.data.resource) ? context.data.resource : null;
+  const hasCatalogStatus = Boolean(context.data.id && formStatusResource && formData.has("active"));
+  if (hasCatalogStatus && !isValidActiveStatusValue(activeStatusValue)) {
+    return getValidationActionState([{ path: ["active"], message: "Seleccioná un estado válido." }], FIELDS);
+  }
+  const shouldUpdateCatalogStatus =
+    hasCatalogStatus &&
+    nextActiveStatus !== null &&
+    isValidActiveStatusValue(initialActiveStatusValue) &&
+    nextActiveStatus !== initialActiveStatusValue;
+  if (shouldUpdateCatalogStatus && formStatusResource && nextActiveStatus !== null) {
+    const statusAuthorizationError = await authorize(
+      context.data.scope,
+      context.data.institutionId,
+      STATUS_PERMISSIONS[formStatusResource],
+    );
+    if (statusAuthorizationError) return statusAuthorizationError;
+  }
+
   const parsed = parseAcademicForm(context.data.resource, formData);
   if (!parsed.success) return getValidationActionState(parsed.error.issues, FIELDS);
 
@@ -218,6 +243,21 @@ export async function saveAcademicResourceAction(
     "No se pudo guardar la configuración académica.",
   );
   if (error) return error;
+
+  if (shouldUpdateCatalogStatus && formStatusResource && nextActiveStatus !== null && context.data.id) {
+    const statusFormData = new FormData();
+    statusFormData.set("active", nextActiveStatus);
+    const statusState = await updateAcademicStatusAction(
+      context.data.scope,
+      context.data.institutionId,
+      formStatusResource,
+      context.data.id,
+      context.data.returnTo,
+      {},
+      statusFormData,
+    );
+    if (statusState) return statusState;
+  }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
   revalidatePath(fallback);
@@ -374,6 +414,24 @@ async function authorize(
 
 function activeStatusInput(resource: ActiveAcademicStatusResource): (formData: FormData) => Record<string, unknown> {
   return (formData) => ({ resource, active: formData.get("active") });
+}
+
+function withoutActiveStatus(data: ParsedFormData): ParsedFormData {
+  return Object.fromEntries(Object.entries(data).filter(([field]) => field !== "active"));
+}
+
+function isValidActiveStatusValue(value: FormDataEntryValue | null): value is "true" | "false" {
+  return value === "true" || value === "false";
+}
+
+function isFormStatusResource(
+  resource: AcademicResource,
+): resource is AcademicResource.TRAINING_PATH | AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT {
+  return (
+    resource === AcademicResource.TRAINING_PATH ||
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT
+  );
 }
 
 function getStatusRequestBody(data: z.infer<typeof academicStatusSchema>): Record<string, unknown> {

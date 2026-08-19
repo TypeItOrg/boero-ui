@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { LibraryBigIcon, RouteIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
@@ -33,7 +34,10 @@ export function TrainingPathDropdown(props: AcademicOptionDropdownProps): React.
     <AsyncDropdown<TrainingPath>
       ariaInvalid={props.ariaInvalid}
       disabled={props.disabled}
+      emptyDescription="Todavía no se registraron trayectos formativos en esta institución."
+      emptyIcon={RouteIcon}
       emptyMessage="No se encontraron trayectos formativos."
+      emptyTitle="No hay trayectos formativos"
       errorMessage="No se pudieron cargar los trayectos formativos."
       fetchPage={fetchPage}
       getItemLabel={(item) => item.name}
@@ -66,7 +70,10 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
     <AsyncDropdown<AcademicSpace>
       ariaInvalid={props.ariaInvalid}
       disabled={props.disabled}
+      emptyDescription="Todavía no se registraron espacios académicos en esta institución."
+      emptyIcon={LibraryBigIcon}
       emptyMessage="No se encontraron espacios académicos."
+      emptyTitle="No hay espacios académicos"
       errorMessage="No se pudieron cargar los espacios académicos."
       fetchPage={fetchPage}
       getItemLabel={(item) => `${item.name} · ${academicSpaceTypeLabels[item.type]}`}

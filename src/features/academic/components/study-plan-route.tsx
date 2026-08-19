@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BookPlusIcon, GitBranchPlusIcon, Layers3Icon } from "lucide-react";
+import { BookPlusIcon, GitBranchPlusIcon, Layers3Icon, LibraryBigIcon } from "lucide-react";
 
+import { Button } from "@common/components/ui/button";
 import { StudyPlanSpaceDetail } from "@features/academic/components/academic-detail";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
@@ -67,20 +69,40 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   if (props.action === ACADEMIC_ROUTE_SEGMENT.SPACES) {
     if (props.nestedId === ACADEMIC_ROUTE_SEGMENT.NEW) {
       if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
-      return <NewPlanSpace {...props} levels={levels} planPath={planPath} />;
+      const breadcrumb = props.renderBreadcrumb({
+        hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
+        segmentLabels: { [props.id]: curriculum.studyPlan.name },
+      });
+      return <NewPlanSpace {...props} breadcrumb={breadcrumb} levels={levels} planPath={planPath} />;
     }
     if (!props.nestedId) notFound();
     const space = await fetchStudyPlanSpace(props.scope, props.institutionId, props.nestedId);
     if (!space || space.studyPlanId !== props.id) notFound();
     const spacePath = `${planPath}/spaces/${space.id}`;
+    const spaceBreadcrumbLabels = {
+      [props.id]: curriculum.studyPlan.name,
+      [space.id]: space.academicSpaceName,
+    };
+    const spaceBreadcrumb = props.renderBreadcrumb({
+      hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
+      segmentLabels: spaceBreadcrumbLabels,
+    });
+    const editSpaceBreadcrumb = props.renderBreadcrumb({
+      hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
+      segmentLabels: {
+        ...spaceBreadcrumbLabels,
+        [ACADEMIC_ROUTE_SEGMENT.EDIT]: "Editar espacio",
+      },
+    });
 
     if (!props.nestedAction) {
       return (
         <AcademicShell
           title={space.academicSpaceName}
-          description="Detalle del espacio dentro del plan."
-          breadcrumb={props.breadcrumb}
-          backHref={planPath}
+          breadcrumb={spaceBreadcrumb}
+          headerClassName="flex-row items-center justify-between"
+          actionsClassName="self-stretch"
+          actions={<AcademicPageIcon icon={LibraryBigIcon} />}
         >
           <StudyPlanSpaceDetail
             space={space}
@@ -95,21 +117,54 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
     }
     if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
     if (props.nestedAction === ACADEMIC_ROUTE_SEGMENT.EDIT)
-      return <EditPlanSpace {...props} levels={levels} space={space} spacePath={spacePath} />;
+      return (
+        <EditPlanSpace
+          {...props}
+          breadcrumb={editSpaceBreadcrumb}
+          levels={levels}
+          space={space}
+          spacePath={spacePath}
+        />
+      );
     if (props.nestedAction === AcademicResource.PREREQUISITE) {
       const planSpaces = [...curriculum.levels.flatMap((level) => level.spaces), ...curriculum.unassignedSpaces];
-      if (props.leaf === ACADEMIC_ROUTE_SEGMENT.NEW)
-        return <NewPrerequisite {...props} planSpaces={planSpaces} spaceId={space.id} spacePath={spacePath} />;
-      if (props.leaf && props.leafId === ACADEMIC_ROUTE_SEGMENT.EDIT)
+      if (props.leaf === ACADEMIC_ROUTE_SEGMENT.NEW) {
+        const breadcrumb = props.renderBreadcrumb({
+          hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES, AcademicResource.PREREQUISITE],
+          segmentLabels: {
+            ...spaceBreadcrumbLabels,
+            [ACADEMIC_ROUTE_SEGMENT.NEW]: "Nueva correlatividad",
+          },
+        });
+        return (
+          <NewPrerequisite
+            {...props}
+            breadcrumb={breadcrumb}
+            planSpaces={planSpaces}
+            spaceId={space.id}
+            spacePath={spacePath}
+          />
+        );
+      }
+      if (props.leaf && props.leafId === ACADEMIC_ROUTE_SEGMENT.EDIT) {
+        const breadcrumb = props.renderBreadcrumb({
+          hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES, AcademicResource.PREREQUISITE, props.leaf],
+          segmentLabels: {
+            ...spaceBreadcrumbLabels,
+            [ACADEMIC_ROUTE_SEGMENT.EDIT]: "Editar correlatividad",
+          },
+        });
         return (
           <EditPrerequisite
             {...props}
+            breadcrumb={breadcrumb}
             prerequisiteId={props.leaf}
             planSpaces={planSpaces}
             spaceId={space.id}
             spacePath={spacePath}
           />
         );
+      }
     }
   }
   notFound();
@@ -119,7 +174,6 @@ function NewLevel(props: StudyPlanRouteProps & { planPath: string }): React.Reac
   return (
     <AcademicShell
       title="Nuevo nivel"
-      description="Agregá un nivel ordenado a la currícula."
       breadcrumb={props.breadcrumb}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
@@ -141,7 +195,6 @@ function EditLevel(props: StudyPlanRouteProps & { level: AcademicLevel; planPath
   return (
     <AcademicShell
       title="Editar nivel"
-      description="Actualizá el orden y la descripción del nivel."
       breadcrumb={props.breadcrumb}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
@@ -164,7 +217,6 @@ function NewPlanSpace(props: StudyPlanRouteProps & { levels: AcademicLevel[]; pl
   return (
     <AcademicShell
       title="Incorporar espacio"
-      description="Ubicá un espacio del catálogo dentro de la currícula."
       breadcrumb={props.breadcrumb}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
@@ -189,9 +241,10 @@ function EditPlanSpace(
   return (
     <AcademicShell
       title="Editar espacio"
-      description="Actualizá su ubicación y reglas curriculares."
       breadcrumb={props.breadcrumb}
-      backHref={props.spacePath}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
+      actions={<AcademicPageIcon icon={BookPlusIcon} />}
     >
       <AcademicResourceForm
         scope={props.scope}
@@ -217,7 +270,6 @@ function NewPrerequisite(
   return (
     <AcademicShell
       title="Nueva correlatividad"
-      description="Definí qué espacio debe regularizarse o aprobarse."
       breadcrumb={props.breadcrumb}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
@@ -250,10 +302,25 @@ async function EditPrerequisite(
   return (
     <AcademicShell
       title="Editar correlatividad"
-      description="Actualizá la condición académica requerida."
       breadcrumb={props.breadcrumb}
-      backHref={props.spacePath}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
+      actions={<AcademicPageIcon icon={GitBranchPlusIcon} />}
     >
+      <div className="flex items-center justify-between gap-3">
+        <Button asChild size="lg" variant="outline">
+          <Link href={props.spacePath}>Volver</Link>
+        </Button>
+        <AcademicDeleteButton
+          scope={props.scope}
+          institutionId={props.institutionId}
+          resource={AcademicResource.PREREQUISITE}
+          id={prerequisite.id}
+          destination={props.spacePath}
+          label="la correlatividad"
+          size="lg"
+        />
+      </div>
       <AcademicResourceForm
         scope={props.scope}
         institutionId={props.institutionId}
@@ -265,22 +332,6 @@ async function EditPrerequisite(
         planSpaces={props.planSpaces}
         excludedPlanSpaceId={props.spaceId}
       />
-      <DeleteFooter
-        scope={props.scope}
-        institutionId={props.institutionId}
-        resource={AcademicResource.PREREQUISITE}
-        id={prerequisite.id}
-        destination={props.spacePath}
-        label="la correlatividad"
-      />
     </AcademicShell>
-  );
-}
-
-function DeleteFooter(props: React.ComponentProps<typeof AcademicDeleteButton>): React.ReactElement {
-  return (
-    <div className="mx-auto mt-5 flex w-full max-w-3xl justify-end">
-      <AcademicDeleteButton {...props} />
-    </div>
   );
 }

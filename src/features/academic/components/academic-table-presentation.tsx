@@ -97,7 +97,7 @@ export function AcademicTablePresentation({
           showingDeleted={deleted}
           onFirstPage={() => navigate({ page: "0", size: String(size) })}
           supportingDescription={
-            allowCreate && isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined
+            isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined
           }
           createAction={
             allowCreate ? (

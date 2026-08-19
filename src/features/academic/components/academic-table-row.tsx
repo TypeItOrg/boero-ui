@@ -196,7 +196,12 @@ function AcademicContextMenuActions({
 
     if (action.kind === "status") {
       return (
-        <ContextMenuItem key={action.label} className="px-2.5 py-1.5" onSelect={() => onStatusAction(action)}>
+        <ContextMenuItem
+          key={action.label}
+          variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
+          className="px-2.5 py-1.5"
+          onSelect={() => onStatusAction(action)}
+        >
           {action.label}
         </ContextMenuItem>
       );
@@ -267,7 +272,12 @@ function AcademicDropdownActions({
 
     if (action.kind === "status") {
       return (
-        <DropdownMenuItem key={action.label} className="px-2.5 py-1.5" onSelect={() => onStatusAction(action)}>
+        <DropdownMenuItem
+          key={action.label}
+          variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
+          className="px-2.5 py-1.5"
+          onSelect={() => onStatusAction(action)}
+        >
           {action.label}
         </DropdownMenuItem>
       );
@@ -373,6 +383,10 @@ function isActiveStatusResource(resource: AcademicCollectionResource): resource 
     resource === AcademicResource.ACADEMIC_SPACE ||
     resource === AcademicResource.INSTRUMENT
   );
+}
+
+function isDestructiveStatusAction(action: AcademicStatusAction): boolean {
+  return action.targetStatus === "INACTIVE" || action.targetStatus === "CLOSED";
 }
 
 type AcademicActionLinkProps = Omit<React.ComponentProps<typeof Link>, "href"> & {

@@ -87,7 +87,21 @@ describe("AcademicFormFields", () => {
     expect(statusSelect).toHaveTextContent("Planificado");
   });
 
-  it("keeps instrument status outside the edit form", () => {
+  it("includes the original training-path status while editing", () => {
+    const { container } = render(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.TRAINING_PATH}
+          initialValues={{ id: "2d9ec931-453c-4778-86a9-dc40a06d0247", name: "CAVI", active: true }}
+        />
+      </form>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Activo");
+    expect(new FormData(container.querySelector("form")!).get("initialActive")).toBe("true");
+  });
+
+  it("renders instrument status while editing", () => {
     const { container } = render(
       <form>
         <AcademicFormFields
@@ -104,12 +118,37 @@ describe("AcademicFormFields", () => {
 
     expect(screen.getByLabelText(/^Nombre/)).toHaveValue("Piano");
     expect(screen.getByLabelText("Descripción")).toHaveValue("Instrumento de teclas.");
-    expect(screen.queryByRole("combobox", { name: "Estado" })).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Activo");
 
     const formData = new FormData(container.querySelector("form")!);
     expect(formData.get("name")).toBe("Piano");
     expect(formData.get("description")).toBe("Instrumento de teclas.");
-    expect(formData.has("active")).toBe(false);
+    expect(formData.get("active")).toBe("true");
+    expect(formData.get("initialActive")).toBe("true");
+  });
+
+  it("renders the academic-space status selector while editing", () => {
+    const { container } = render(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.ACADEMIC_SPACE}
+          canChangeStatus
+          initialValues={{
+            id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+            name: "Armonía",
+            description: "Relaciones entre sonidos.",
+            type: "SUBJECT",
+            active: true,
+          }}
+        />
+      </form>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Activo");
+
+    const formData = new FormData(container.querySelector("form")!);
+    expect(formData.get("active")).toBe("true");
+    expect(formData.get("initialActive")).toBe("true");
   });
 
   it("restricts academic dates to the selected year and the following year", async () => {

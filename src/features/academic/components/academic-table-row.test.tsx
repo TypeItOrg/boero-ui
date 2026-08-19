@@ -68,8 +68,10 @@ describe("AcademicTableRow", () => {
       });
 
       await openActions(user, primaryValue);
-      await user.click(screen.getByRole("menuitem", { name: action }));
+      const statusAction = screen.getByRole("menuitem", { name: action });
 
+      expect(statusAction).toHaveAttribute("data-variant", targetStatus === "INACTIVE" ? "destructive" : "default");
+      await user.click(statusAction);
       expect(onStatusAction).toHaveBeenCalledWith({
         id: ROW_ID,
         resource,

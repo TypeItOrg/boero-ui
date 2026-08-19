@@ -4,7 +4,7 @@ import * as React from "react";
 import { useActionState } from "react";
 import { CircleAlertIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -41,12 +41,12 @@ type ActiveAcademicStatusButtonProps = Omit<
   "onOpenChange" | "open" | "targetStatus"
 > & {
   active: boolean;
+  disabled?: boolean;
 };
 
 type ActiveStatusDialogConfig = {
   actionLabel: string;
   description: (resourceLabel: string) => React.ReactNode;
-  errorTitle: string;
   icon: React.ComponentType<{ className?: string }>;
   iconClassName: string;
   pendingLabel: string;
@@ -69,7 +69,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           disponible para nuevas configuraciones.
         </>
       ),
-      errorTitle: "No se pudo actualizar el trayecto formativo",
       icon: RouteIcon,
       iconClassName: "bg-primary/10 text-primary",
       pendingLabel: "Activando…",
@@ -84,7 +83,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           disponible para nuevas configuraciones.
         </>
       ),
-      errorTitle: "No se pudo actualizar el trayecto formativo",
       icon: RouteIcon,
       iconClassName: "bg-destructive/10 text-destructive",
       pendingLabel: "Desactivando…",
@@ -101,7 +99,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           disponible para nuevas configuraciones curriculares.
         </>
       ),
-      errorTitle: "No se pudo actualizar el espacio académico",
       icon: LibraryBigIcon,
       iconClassName: "bg-primary/10 text-primary",
       pendingLabel: "Activando…",
@@ -117,7 +114,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           estudio borrador o activo.
         </>
       ),
-      errorTitle: "No se pudo actualizar el espacio académico",
       icon: LibraryBigIcon,
       iconClassName: "bg-destructive/10 text-destructive",
       pendingLabel: "Desactivando…",
@@ -134,7 +130,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           disponible para nuevas configuraciones.
         </>
       ),
-      errorTitle: "No se pudo actualizar el instrumento",
       icon: Music2Icon,
       iconClassName: "bg-primary/10 text-primary",
       pendingLabel: "Activando…",
@@ -149,7 +144,6 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
           disponible para nuevas configuraciones.
         </>
       ),
-      errorTitle: "No se pudo actualizar el instrumento",
       icon: Music2Icon,
       iconClassName: "bg-destructive/10 text-destructive",
       pendingLabel: "Desactivando…",
@@ -197,7 +191,6 @@ export function ActiveAcademicStatusDialog({
           {state.error ? (
             <Alert className="mt-4" variant="destructive">
               <CircleAlertIcon />
-              <AlertTitle>{config.errorTitle}</AlertTitle>
               <AlertDescription>{state.error}</AlertDescription>
             </Alert>
           ) : null}
@@ -218,7 +211,11 @@ export function ActiveAcademicStatusDialog({
   );
 }
 
-export function ActiveAcademicStatusButton({ active, ...props }: ActiveAcademicStatusButtonProps): React.ReactElement {
+export function ActiveAcademicStatusButton({
+  active,
+  disabled = false,
+  ...props
+}: ActiveAcademicStatusButtonProps): React.ReactElement {
   const [open, setOpen] = React.useState(false);
   const targetStatus = active ? "INACTIVE" : "ACTIVE";
 
@@ -229,6 +226,7 @@ export function ActiveAcademicStatusButton({ active, ...props }: ActiveAcademicS
         size="lg"
         variant={targetStatus === "INACTIVE" ? "destructive" : "default"}
         onClick={() => setOpen(true)}
+        disabled={disabled}
       >
         {targetStatus === "ACTIVE" ? "Activar" : "Desactivar"}
       </Button>

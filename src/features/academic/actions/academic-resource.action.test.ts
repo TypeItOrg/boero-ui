@@ -87,6 +87,52 @@ describe("academic resource actions", () => {
     );
   });
 
+  it("updates a training-path status separately from its editable data", async () => {
+    jest.mocked(requireInstitutionalUser).mockResolvedValue({
+      userId: "user-id",
+      personId: "person-id",
+      name: "Ana",
+      lastName: "García",
+      documentNumber: "12345678",
+      institutionId: INSTITUTION_ID,
+      roles: [],
+      permissions: [
+        INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE,
+        INSTITUTIONAL_PERMISSION.TRAINING_PATH_STATUS_UPDATE,
+      ],
+    });
+    jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 200 }));
+
+    const formData = new FormData();
+    formData.set("name", "CAVI");
+    formData.set("description", "Formación docente.");
+    formData.set("active", "false");
+    formData.set("initialActive", "true");
+
+    await saveAcademicResourceAction(
+      AcademicScope.INSTITUTIONAL,
+      INSTITUTION_ID,
+      AcademicResource.TRAINING_PATH,
+      RESOURCE_ID,
+      undefined,
+      "/training-paths",
+      {},
+      formData,
+    );
+
+    expect(academicApiFetch).toHaveBeenNthCalledWith(
+      1,
+      AcademicScope.INSTITUTIONAL,
+      `/api/v1/institutions/${INSTITUTION_ID}/training-paths/${RESOURCE_ID}`,
+      expect.objectContaining({ body: JSON.stringify({ name: "CAVI", description: "Formación docente." }) }),
+    );
+    expect(academicApiFetch).toHaveBeenLastCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      `/api/v1/institutions/${INSTITUTION_ID}/training-paths/${RESOURCE_ID}/status`,
+      expect.objectContaining({ body: JSON.stringify({ active: false }), method: "PATCH" }),
+    );
+  });
+
   it("deletes study plans with the dedicated delete permission", async () => {
     const institutionId = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
     const studyPlanId = "2d9ec931-453c-4778-86a9-dc40a06d0247";

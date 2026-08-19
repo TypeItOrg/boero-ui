@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { Button } from "@common/components/ui/button";
 import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import { AcademicFormFields } from "@features/academic/components/academic-form-fields";
+import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import type { AcademicFormOptions } from "@features/academic/types/academic-form-options.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -81,12 +82,14 @@ export function AcademicResourceForm({
   const action = saveAcademicResourceAction.bind(null, scope, institutionId, resource, id, parentId, returnTo);
   const [state, formAction, pending] = useActionState(action, initialState);
   const section = FORM_SECTION_COPY[resource];
+  const Icon = ACADEMIC_RESOURCE_ICONS[resource];
   const submitLabel = id ? "Guardar cambios" : CREATE_ACTION_LABELS[resource];
+  const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (
     <form action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
-        {state.error ? (
+        {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">
             <AlertTitle>No se pudo guardar</AlertTitle>
             <AlertDescription>{state.error}</AlertDescription>
@@ -94,11 +97,18 @@ export function AcademicResourceForm({
         ) : null}
 
         <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
-          <div>
-            <h2 className="text-base font-semibold">{section.title}</h2>
-            <p className="text-muted-foreground mt-1 text-sm">{section.description}</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-4">
+          <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+            <div className="flex items-center gap-3.5">
+              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+                <Icon className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">{section.title}</h2>
+                <p className="text-muted-foreground text-sm">{section.description}</p>
+              </div>
+            </div>
+          </header>
+          <div className="mt-5 flex flex-wrap gap-4">
             <AcademicFormFields
               resource={resource}
               fieldErrors={state.fieldErrors}

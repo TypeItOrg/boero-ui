@@ -10,6 +10,7 @@ import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-c
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
 import { ActiveAcademicStatusButton } from "@features/academic/components/active-academic-status-dialog";
+import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import { AcademicDetail } from "@features/academic/components/academic-detail";
 import { AcademicOverview } from "@features/academic/components/academic-overview";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
@@ -17,7 +18,11 @@ import { AcademicAccessDenied, AcademicPageIcon, AcademicShell } from "@features
 import { StudyPlanRoute } from "@features/academic/components/study-plan-route";
 import { StudyPlanCurriculumView } from "@features/academic/components/study-plan-curriculum";
 import { TrainingPathStudyPlans } from "@features/academic/components/training-path-study-plans";
-import { fetchStudyPlanCurriculum, fetchTrainingPath } from "@features/academic/services/academic.service";
+import {
+  fetchAcademicSpaceUsage,
+  fetchStudyPlanCurriculum,
+  fetchTrainingPath,
+} from "@features/academic/services/academic.service";
 import { canReadAcademic, type AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -27,6 +32,7 @@ import { canEditAcademicResource } from "@features/academic/utils/academic-state
 import { parseAcademicCollectionResource } from "@features/academic/utils/parse-academic-collection-resource.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { getAcademicRouteBase } from "@features/academic/utils/academic-scope.util";
+import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 
 type AcademicRouteViewProps = {
   access: AcademicAccess;
@@ -160,7 +166,6 @@ async function renderPrimaryForm(
   return (
     <AcademicShell
       title={`Nuevo ${config.singular}`}
-      description={`Creá un nuevo ${config.singular} para la institución.`}
       breadcrumb={input.breadcrumb}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
@@ -193,11 +198,33 @@ async function renderPrimaryDetail(
   },
 ): Promise<React.ReactElement> {
   const config = ACADEMIC_COLLECTION_CONFIG[input.resource];
-  const curriculum =
+  const curriculumPromise =
     input.resource === AcademicResource.STUDY_PLAN && !input.action
-      ? await fetchStudyPlanCurriculum(input.scope, input.institutionId, input.id)
+      ? fetchStudyPlanCurriculum(input.scope, input.institutionId, input.id)
+      : Promise.resolve(null);
+  const itemPromise =
+    input.resource === AcademicResource.STUDY_PLAN && !input.action
+      ? Promise.resolve(null)
+      : config.fetchDetail(input.scope, input.institutionId, input.id);
+  const usagePagination =
+    input.resource === AcademicResource.ACADEMIC_SPACE && !input.action && input.access.studyPlanRead
+      ? parsePaginationQuery({
+          page: input.searchParams.usagePage,
+          size: input.searchParams.usageSize,
+        })
       : null;
-  const item = curriculum?.studyPlan ?? (await config.fetchDetail(input.scope, input.institutionId, input.id));
+  const academicSpaceUsagePromise = usagePagination
+    ? fetchAcademicSpaceUsage(input.scope, input.institutionId, input.id, {
+        page: usagePagination.page,
+        size: usagePagination.size,
+      })
+    : Promise.resolve(null);
+  const [curriculum, fetchedItem, academicSpaceUsage] = await Promise.all([
+    curriculumPromise,
+    itemPromise,
+    academicSpaceUsagePromise,
+  ]);
+  const item = curriculum?.studyPlan ?? fetchedItem;
   if (!item) notFound();
   const detailPath = `${input.basePath}/${input.resource}/${input.id}`;
   const collectionPath = `${input.basePath}/${input.resource}`;
@@ -206,6 +233,31 @@ async function renderPrimaryDetail(
   const canEdit = config.canUpdate(input.access) && canEditAcademicResource(input.resource, item);
   const canEditCurriculum =
     input.access.studyPlanCurriculumUpdate && curriculum !== null && curriculum.studyPlan.status === "DRAFT";
+  const currentResource = input.resource;
+  const academicSpaceStatusBlocked =
+    currentResource === AcademicResource.ACADEMIC_SPACE &&
+    hasActiveAcademicStatus(item) &&
+    item.active &&
+    academicSpaceUsage?.summary.deactivationBlocked === true;
+  let statusAction: React.ReactNode;
+  if (
+    config.canChangeStatus(input.access) &&
+    isDetailStatusResource(currentResource) &&
+    hasActiveAcademicStatus(item)
+  ) {
+    statusAction = (
+      <ActiveAcademicStatusButton
+        active={item.active}
+        disabled={academicSpaceStatusBlocked}
+        id={item.id}
+        institutionId={input.institutionId}
+        resource={currentResource}
+        resourceLabel={config.getTitle(item)}
+        returnTo={detailPath}
+        scope={input.scope}
+      />
+    );
+  }
   const relatedPlans =
     input.resource === AcademicResource.TRAINING_PATH && input.access.studyPlanRead
       ? await TrainingPathStudyPlans({
@@ -221,21 +273,19 @@ async function renderPrimaryDetail(
     segmentHrefs: isNoDetailResource ? { [input.id]: collectionPath } : undefined,
     segmentLabels: { [input.id]: config.getTitle(item) },
   });
-  const description = `Detalle de ${config.singular}.`;
   if (input.action === ACADEMIC_ROUTE_SEGMENT.EDIT) {
     if (!config.canUpdate(input.access)) return <AcademicAccessDenied breadcrumb={breadcrumb} />;
     if (!canEdit) notFound();
     return (
       <AcademicShell
         title={`Editar ${config.singular}`}
-        description="Actualizá la información del registro."
         breadcrumb={breadcrumb}
-        backHref={isNoDetailResource ? undefined : detailPath}
-        headerClassName={isNoDetailResource ? "flex-row items-center justify-between" : undefined}
-        actionsClassName={isNoDetailResource ? "self-stretch" : undefined}
-        actions={isNoDetailResource ? <AcademicPageIcon icon={config.createIcon} /> : undefined}
+        headerClassName="flex-row items-center justify-between"
+        actionsClassName="self-stretch"
+        actions={<AcademicPageIcon icon={config.createIcon} />}
       >
         <AcademicResourceForm
+          canChangeStatus={config.canChangeStatus(input.access)}
           scope={input.scope}
           institutionId={input.institutionId}
           resource={input.resource}
@@ -247,24 +297,9 @@ async function renderPrimaryDetail(
     );
   }
   if (input.action) notFound();
-  let statusAction: React.ReactNode;
-  if (config.canChangeStatus(input.access) && isDetailStatusResource(input.resource) && hasActiveAcademicStatus(item)) {
-    statusAction = (
-      <ActiveAcademicStatusButton
-        active={item.active}
-        id={item.id}
-        institutionId={input.institutionId}
-        resource={input.resource}
-        resourceLabel={config.getTitle(item)}
-        returnTo={detailPath}
-        scope={input.scope}
-      />
-    );
-  }
   return (
     <AcademicShell
       title={config.getTitle(item)}
-      description={input.resource === AcademicResource.STUDY_PLAN ? undefined : description}
       breadcrumb={breadcrumb}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
@@ -273,6 +308,7 @@ async function renderPrimaryDetail(
       <AcademicDetail
         basePath={input.basePath}
         canEdit={canEdit}
+        academicSpaceUsage={academicSpaceUsage}
         item={item}
         resource={input.resource}
         statusAction={statusAction}
@@ -291,10 +327,12 @@ async function renderPrimaryDetail(
   );
 }
 
-function isDetailStatusResource(
-  resource: AcademicCollectionResource,
-): resource is AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT {
-  return resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT;
+function isDetailStatusResource(resource: AcademicCollectionResource): resource is ActiveAcademicStatusResource {
+  return (
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.TRAINING_PATH
+  );
 }
 
 async function getContextualTrainingPath(

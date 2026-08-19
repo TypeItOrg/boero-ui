@@ -96,6 +96,60 @@ describe("AcademicCollectionView", () => {
     );
   });
 
+  it("removes the redundant training-path value from contextual study-plan rows", async () => {
+    jest.mocked(AcademicTablePresentation).mockClear();
+    jest.mocked(fetchStudyPlans).mockResolvedValue({
+      items: [
+        {
+          id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+          institutionId: INSTITUTION_ID,
+          trainingPathId: FIXED_TRAINING_PATH_ID,
+          trainingPathName: "CAV Básico",
+          name: "Plan 2026",
+          effectiveFrom: "2026-03-03",
+          effectiveTo: null,
+          status: "DRAFT",
+        },
+      ],
+      page: 0,
+      size: 20,
+      totalItems: 1,
+      totalPages: 1,
+    });
+
+    const result = await AcademicCollectionView({
+      basePath: "",
+      canCreate: true,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      columns: {
+        primaryLabel: "Nombre",
+        detailLabels: ["Vigente desde", "Vigente hasta"],
+        sortableFields: ["name", "effectiveFrom", "effectiveTo"],
+      },
+      fixedTrainingPathId: FIXED_TRAINING_PATH_ID,
+      institutionId: INSTITUTION_ID,
+      resource: AcademicResource.STUDY_PLAN,
+      scope: AcademicScope.INSTITUTIONAL,
+      searchParams: { size: "20" },
+    });
+    render(result);
+
+    expect(jest.mocked(AcademicTablePresentation).mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          items: [
+            expect.objectContaining({
+              detailValues: ["03/03/2026", "Sin definir"],
+            }),
+          ],
+        }),
+      }),
+    );
+  });
+
   it("maps academic-space descriptions into their table column", () => {
     const config = ACADEMIC_COLLECTION_CONFIG[AcademicResource.ACADEMIC_SPACE];
 

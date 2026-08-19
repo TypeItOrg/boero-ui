@@ -94,6 +94,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     name,
     description: optionalText(1000),
     type: z.enum(ACADEMIC_SPACE_TYPE),
+    active: activeSchema,
   }),
   [AcademicResource.STUDY_PLAN_SPACE]: z.object({
     academicSpaceId: z.string().uuid("Seleccioná un espacio académico."),

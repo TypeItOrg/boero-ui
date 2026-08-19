@@ -34,6 +34,7 @@ type FormFieldProps = React.PropsWithChildren<{
 
 type FormSelectProps = {
   defaultValue?: string | number;
+  disabled?: boolean;
   name: string;
   onValueChange?: (value: string) => void;
   options: { value: string; label: string }[];
@@ -50,7 +51,14 @@ export function NameField({ initialValues, error, fullWidth = true }: NameFieldP
       className={fullWidth ? "w-full flex-[1_0_100%]" : undefined}
       required
     >
-      <Input id="name" name="name" defaultValue={toFormControlValue(initialValues.name)} maxLength={150} required />
+      <Input
+        aria-invalid={Boolean(error)}
+        defaultValue={toFormControlValue(initialValues.name)}
+        id="name"
+        maxLength={150}
+        name="name"
+        required
+      />
     </FormField>
   );
 }
@@ -59,10 +67,11 @@ export function DescriptionField({ initialValues, error }: SharedFieldProps): Re
   return (
     <FormField label="Descripción" name="description" error={error} className="w-full flex-[1_0_100%]">
       <Textarea
-        id="description"
-        name="description"
+        aria-invalid={Boolean(error)}
         defaultValue={toFormControlValue(initialValues.description)}
+        id="description"
         maxLength={1000}
+        name="description"
         rows={5}
       />
     </FormField>
@@ -93,6 +102,7 @@ export function FormField({
 export function FormSelect({
   name,
   defaultValue,
+  disabled = false,
   options,
   placeholder,
   value: controlledValue,
@@ -106,7 +116,7 @@ export function FormSelect({
   return (
     <>
       <input type="hidden" name={name} value={value} />
-      <Select value={value} onValueChange={handleValueChange}>
+      <Select disabled={disabled} value={value} onValueChange={handleValueChange}>
         <SelectTrigger id={name} className="h-9! w-full">
           <SelectValue placeholder={placeholder}>{selectedOption?.label}</SelectValue>
         </SelectTrigger>

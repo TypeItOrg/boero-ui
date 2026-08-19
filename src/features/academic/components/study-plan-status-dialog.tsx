@@ -4,7 +4,7 @@ import * as React from "react";
 import { useActionState, useState } from "react";
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -132,7 +132,6 @@ export function StudyPlanStatusDialog({
           {state.error ? (
             <Alert className="mt-4" variant="destructive">
               <CircleAlertIcon />
-              <AlertTitle>No se pudo actualizar el plan de estudio</AlertTitle>
               <AlertDescription>{state.error}</AlertDescription>
             </Alert>
           ) : null}

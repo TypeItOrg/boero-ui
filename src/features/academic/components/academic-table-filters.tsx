@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { RouteIcon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import {
   DataTableFilters,
@@ -91,7 +92,10 @@ function TrainingPathFilterControl({ filter, size }: TrainingPathFilterControlPr
         clearLabel="Limpiar trayecto formativo"
         clearable
         defaultOption={{ label: "Todos los trayectos", value: undefined }}
+        emptyDescription="Todavía no se registraron trayectos formativos en esta institución."
+        emptyIcon={RouteIcon}
         emptyMessage="No se encontraron trayectos formativos."
+        emptyTitle="No hay trayectos formativos"
         errorMessage="No se pudieron cargar los trayectos formativos."
         fetchPage={fetchPage}
         getItemLabel={(item) => (item.active ? item.name : `${item.name} · Inactivo`)}

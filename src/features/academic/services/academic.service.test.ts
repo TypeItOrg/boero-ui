@@ -86,4 +86,40 @@ describe("academic service pagination", () => {
       sort: "name,desc",
     });
   });
+
+  it("serializes academic space usage pagination for the admin endpoint", async () => {
+    const payload = {
+      summary: {
+        totalPlans: 1,
+        activePlans: 1,
+        draftPlans: 0,
+        inactivePlans: 0,
+        totalPlacements: 1,
+        unassignedPlacements: 0,
+        deactivationBlocked: true,
+      },
+      plans: { items: [], page: 1, size: 20, totalItems: 1, totalPages: 1 },
+      warnings: [{ code: "USED_IN_ACTIVE_OR_DRAFT_PLAN", blockingPlanCount: 1 }],
+    };
+    academicApiFetchMock.mockResolvedValue(
+      new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const { fetchAcademicSpaceUsage } = await importService();
+    await expect(
+      fetchAcademicSpaceUsage(AcademicScope.ADMIN, institutionId, "2d9ec931-453c-4778-86a9-dc40a06d0247", {
+        page: 1,
+        size: 20,
+      }),
+    ).resolves.toEqual(payload);
+
+    const requestUrl = new URL(academicApiFetchMock.mock.calls[0][1], "http://localhost");
+    expect(requestUrl.pathname).toBe(
+      `/api/v1/admin/institutions/${institutionId}/academic-spaces/2d9ec931-453c-4778-86a9-dc40a06d0247/usage`,
+    );
+    expect(Object.fromEntries(requestUrl.searchParams)).toEqual({ page: "1", size: "20" });
+  });
 });
