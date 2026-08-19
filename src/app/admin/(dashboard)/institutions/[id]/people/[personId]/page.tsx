@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { UserRoundPenIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
@@ -40,10 +41,23 @@ export default async function EditPersonPage({
   return (
     <PlatformPageShell
       title="Editar usuario"
-      description={`Editá los datos básicos y administrá los roles de ${personName}.`}
+      minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: person.institutionName, [personId]: personName }} />}
-      actions={<PersonDeleteButton institutionId={id} personId={personId} personName={personName} />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
+      actions={
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
+          <UserRoundPenIcon className="size-6 sm:size-7" />
+        </div>
+      }
     >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline">
+          <Link href={destination}>Volver</Link>
+        </Button>
+        <PersonDeleteButton institutionId={id} personId={personId} personName={personName} />
+      </div>
+
       <PersonEditForm
         formId="person-edit-form"
         institutionId={id}
@@ -52,15 +66,6 @@ export default async function EditPersonPage({
         assignedRoles={assignedRoles}
         returnTo={destination}
       />
-
-      <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button asChild variant="outline">
-          <Link href={destination}>Cancelar</Link>
-        </Button>
-        <Button type="submit" form="person-edit-form">
-          Guardar cambios
-        </Button>
-      </div>
     </PlatformPageShell>
   );
 }

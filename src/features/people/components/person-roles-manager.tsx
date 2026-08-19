@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon, ShieldCheckIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import type { AssignableRole } from "@features/people/types/assignable-role.types";
 import type { PersonRole } from "@features/people/types/person-role.types";
 import {
@@ -120,12 +119,19 @@ export function PersonRolesManager({
   }
 
   return (
-    <Card className="bg-muted/25 p-5 md:p-6">
-      <CardHeader className="p-0">
-        <CardTitle>Roles institucionales</CardTitle>
-        <CardDescription>Los cambios de roles se aplican al guardar el usuario.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6 p-0">
+    <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+      <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+            <ShieldCheckIcon className="size-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-foreground text-base font-semibold">Roles institucionales</h2>
+            <p className="text-muted-foreground text-sm">Los cambios de roles se aplican al guardar el usuario.</p>
+          </div>
+        </div>
+      </header>
+      <div className="mt-4 flex flex-col gap-5 sm:mt-5">
         <section className="flex flex-col gap-3">
           <h3 className="text-sm font-medium">Roles asignados</h3>
           {selectedRoles.length > 0 ? (
@@ -201,8 +207,8 @@ export function PersonRolesManager({
             <p className="text-muted-foreground rounded-lg border p-4 text-sm">Todos los roles están seleccionados.</p>
           )}
         </section>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

@@ -3,11 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { KeyRoundIcon, MapPinIcon, UserRoundIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { FieldGroup } from "@common/components/ui/field";
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { PasswordInput } from "@common/components/ui/password-input";
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
 import {
   DateField,
@@ -62,19 +63,28 @@ export function InstitutionalProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col gap-4">
       {error ? (
         <Alert variant="destructive">
           <AlertTitle>No se pudieron guardar los cambios</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="p-0">
-          <CardTitle>Datos personales</CardTitle>
-          <CardDescription>Actualizá la información con la que te identifica tu institución.</CardDescription>
-        </CardHeader>
-        <CardContent className="mt-5 p-0">
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <UserRoundIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">Datos personales</h2>
+              <p className="text-muted-foreground text-sm">
+                Actualizá la información con la que te identifica tu institución.
+              </p>
+            </div>
+          </div>
+        </header>
+        <div className="mt-4 sm:mt-5">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
             <TextField
               id="profile-first-name"
@@ -120,15 +130,24 @@ export function InstitutionalProfileForm({
               error={fieldErrors.phoneNumber}
             />
           </FieldGroup>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="p-0">
-          <CardTitle>Ubicación</CardTitle>
-          <CardDescription>Completá tu nacionalidad, ciudad de nacimiento y domicilio.</CardDescription>
-        </CardHeader>
-        <CardContent className="mt-5 p-0">
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <MapPinIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">Ubicación</h2>
+              <p className="text-muted-foreground text-sm">
+                Completá tu nacionalidad, ciudad de nacimiento y domicilio.
+              </p>
+            </div>
+          </div>
+        </header>
+        <div className="mt-4 sm:mt-5">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
             <DropdownField id="profile-nationality" label="Nacionalidad" error={fieldErrors.nationalityCountryId}>
               <CountryDropdown
@@ -215,14 +234,59 @@ export function InstitutionalProfileForm({
               error={fieldErrors["address.additionalInfo"]}
             />
           </FieldGroup>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="flex flex-wrap justify-end gap-3">
-        <Button asChild variant="outline" size="lg">
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <KeyRoundIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">Cambiar contraseña</h2>
+              <p className="text-muted-foreground text-sm">
+                Dejá los campos en blanco para conservar la contraseña actual.
+              </p>
+            </div>
+          </div>
+        </header>
+        <div className="mt-4 sm:mt-5">
+          <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
+            <Field data-invalid={!!fieldErrors.password} className="flex-[1_0_min(200px,100%)]">
+              <FieldContent>
+                <FieldLabel htmlFor="profile-password">Nueva contraseña</FieldLabel>
+              </FieldContent>
+              <PasswordInput
+                id="profile-password"
+                name="password"
+                aria-invalid={!!fieldErrors.password}
+                autoComplete="new-password"
+              />
+              <FieldError>{fieldErrors.password}</FieldError>
+            </Field>
+
+            <Field data-invalid={!!fieldErrors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
+              <FieldContent>
+                <FieldLabel htmlFor="profile-confirm-password">Confirmar nueva contraseña</FieldLabel>
+              </FieldContent>
+              <PasswordInput
+                id="profile-confirm-password"
+                name="confirmPassword"
+                aria-invalid={!!fieldErrors.confirmPassword}
+                autoComplete="new-password"
+              />
+              <FieldError>{fieldErrors.confirmPassword}</FieldError>
+            </Field>
+          </FieldGroup>
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-row flex-wrap justify-end gap-3">
+        <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none">
           <Link href={returnTo}>Cancelar</Link>
         </Button>
-        <Button type="submit" size="lg" disabled={isPending}>
+        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
           {isPending ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>

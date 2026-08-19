@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { UserRoundPenIcon } from "lucide-react";
 
+import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -31,16 +33,22 @@ export default async function EditProfilePage({
   return (
     <PlatformPageShell
       title="Editar perfil"
-      description="Actualizá tus datos personales."
+      minViewportHeight
       breadcrumb={<InstitutionalBreadcrumb />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
           <UserRoundPenIcon className="size-6 sm:size-7" />
         </div>
       }
     >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href={destination}>Volver</Link>
+        </Button>
+      </div>
+
       <InstitutionalProfileForm person={person} returnTo={destination} />
     </PlatformPageShell>
   );

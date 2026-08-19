@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -7,23 +8,30 @@ import type { Institution } from "@features/institutions/types/institution.types
 type InstitutionalInstitutionDetailProps = {
   canUpdate: boolean;
   institution: Institution;
+  returnTo: string;
 };
 
 export function InstitutionalInstitutionDetail({
   canUpdate,
   institution,
+  returnTo,
 }: InstitutionalInstitutionDetailProps): React.ReactElement {
   const address = formatAddress(institution);
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      {canUpdate ? (
-        <div className="flex justify-end">
-          <Button asChild variant="outline" size="lg">
-            <ReturnToLink href="/institution/edit">Editar</ReturnToLink>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href={returnTo}>Volver</Link>
+        </Button>
+        {canUpdate ? (
+          <Button asChild size="lg">
+            <ReturnToLink href="/institution/edit" returnTo={returnTo}>
+              Editar
+            </ReturnToLink>
           </Button>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <InstitutionSectionHeader
           description="Datos de localización de la institución."

@@ -177,13 +177,13 @@ export function InstitutionForm({
             type="button"
             variant="outline"
             size="lg"
-            className="flex-[1_0_min(140px,100%)] sm:flex-none"
+            className="flex-1 sm:flex-none"
             onClick={handleCancel}
             disabled={isPending}
           >
             Cancelar
           </Button>
-          <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
+          <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
             {getSubmitLabel({ isEdit, isPending })}
           </Button>
         </div>

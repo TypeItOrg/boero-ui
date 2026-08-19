@@ -38,7 +38,7 @@ export function PlatformPageShell({
           headerClassName,
         )}
       >
-        <div className="flex min-w-0 flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-1 sm:gap-2">
           {breadcrumb ? <div>{breadcrumb}</div> : null}
           <div>
             <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>

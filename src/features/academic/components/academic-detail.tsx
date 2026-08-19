@@ -66,7 +66,7 @@ export function AcademicDetail({
       {canEdit || statusAction ? (
         <div className="flex justify-end gap-2">
           {canEdit ? (
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg">
               <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
             </Button>
           ) : null}
@@ -193,7 +193,7 @@ export function StudyPlanSpaceDetail({
         </Button>
         {canEditCurriculum ? (
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline">
+            <Button asChild>
               <Link href={`${planPath}/spaces/${space.id}/edit`}>Editar</Link>
             </Button>
             <AcademicDeleteButton

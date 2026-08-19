@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { UserRoundPenIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
@@ -54,9 +55,9 @@ export default async function PersonPage({
   if (!person) notFound();
   const assignableRoles = systemRoles.filter((role) => role.technicalCode !== "INSTITUTIONAL_AUTHORITY");
   const personName = `${person.firstName} ${person.lastName}`;
-  if (user.personId === personId) redirect("/profile");
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
-  const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE);
+  const canDelete =
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
   if (!canUpdate && !canManageRoles) {
     return <InstitutionalAccessDenied />;
   }
@@ -64,23 +65,29 @@ export default async function PersonPage({
   return (
     <PlatformPageShell
       title={canUpdate ? "Editar usuario" : "Administrar roles"}
-      description={
-        canUpdate
-          ? `Editá los datos básicos y administrá los roles de ${personName}.`
-          : `Administrá los roles institucionales de ${personName}.`
-      }
+      minViewportHeight
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        canDelete ? (
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
+          <UserRoundPenIcon className="size-6 sm:size-7" />
+        </div>
+      }
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href={destination}>Volver</Link>
+        </Button>
+        {canDelete ? (
           <PersonDeleteButton
             institutionId={user.institutionId}
             personId={personId}
             personName={personName}
             scope={PeopleScope.INSTITUTIONAL}
           />
-        ) : undefined
-      }
-    >
+        ) : null}
+      </div>
       <PersonEditForm
         formId="institutional-person-edit-form"
         institutionId={user.institutionId}
@@ -93,14 +100,6 @@ export default async function PersonPage({
         canRevokeRoles={canRevokeRoles}
         returnTo={destination}
       />
-      <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button asChild variant="outline" size="lg">
-          <Link href={destination}>Cancelar</Link>
-        </Button>
-        <Button type="submit" form="institutional-person-edit-form" size="lg">
-          {canUpdate ? "Guardar cambios" : "Guardar roles"}
-        </Button>
-      </div>
     </PlatformPageShell>
   );
 }

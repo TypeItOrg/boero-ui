@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { TrashIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
@@ -13,6 +12,8 @@ type PersonDeleteButtonProps = {
   personId: string;
   personName: string;
   scope?: PeopleScopeType;
+  label?: string;
+  size?: React.ComponentProps<typeof Button>["size"];
 };
 
 export function PersonDeleteButton({
@@ -20,6 +21,8 @@ export function PersonDeleteButton({
   personId,
   personName,
   scope = PeopleScope.ADMIN,
+  label = "Eliminar",
+  size,
 }: PersonDeleteButtonProps): React.ReactElement {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -27,6 +30,8 @@ export function PersonDeleteButton({
   function handleDeleted(): void {
     router.push(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
   }
+
+  const resolvedSize = size ?? (PeopleScope.isInstitutional(scope) ? "lg" : "default");
 
   return (
     <PersonDeleteDialog
@@ -38,9 +43,8 @@ export function PersonDeleteButton({
       onDeleted={handleDeleted}
       scope={scope}
       trigger={
-        <Button type="button" variant="destructive" size={PeopleScope.isInstitutional(scope) ? "lg" : "default"}>
-          <TrashIcon data-icon="inline-start" />
-          Eliminar usuario
+        <Button type="button" variant="destructive" size={resolvedSize}>
+          {label}
         </Button>
       }
     />

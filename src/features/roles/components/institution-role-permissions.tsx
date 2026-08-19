@@ -1,4 +1,4 @@
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, KeyRoundIcon } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
@@ -6,6 +6,8 @@ import { PermissionHierarchy } from "@features/roles/components/permission-hiera
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
+
+const HIDDEN_PERMISSION_GROUP_CODES = new Set(["GRADES"]);
 
 type InstitutionRolePermissionsProps = {
   permissionCodes: readonly string[];
@@ -17,8 +19,9 @@ export function InstitutionRolePermissions({
   groups,
 }: InstitutionRolePermissionsProps): React.ReactElement {
   const assignedPermissionCodes = new Set(permissionCodes);
-  const permissionMap = getPermissionMap(groups);
-  const assignedGroups = groups
+  const visibleGroups = groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code));
+  const permissionMap = getPermissionMap(visibleGroups);
+  const assignedGroups = visibleGroups
     .map((group) => ({
       ...group,
       permissions: group.permissions.filter((permission) => assignedPermissionCodes.has(permission.code)),
@@ -27,12 +30,15 @@ export function InstitutionRolePermissions({
 
   if (assignedGroups.length === 0) {
     return (
-      <Card className="bg-muted/25">
-        <CardHeader>
-          <CardTitle>Sin permisos asignados</CardTitle>
-          <CardDescription>Este rol todavía no concede acceso a ninguna operación.</CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="bg-muted/25 text-muted-foreground flex min-h-80 flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+        <div className="bg-background text-primary mb-5 flex size-14 items-center justify-center rounded-full border shadow-xs">
+          <KeyRoundIcon className="size-7" aria-hidden="true" />
+        </div>
+        <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">Sin permisos asignados</h3>
+        <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">
+          Este rol todavía no concede acceso a ninguna operación.
+        </p>
+      </div>
     );
   }
 
@@ -44,11 +50,11 @@ export function InstitutionRolePermissions({
         return (
           <Card key={group.code} className="bg-muted/25 flex-[1_0_min(450px,100%)]">
             <CardHeader className="border-b">
-              <div className="flex items-center gap-3.5">
-                <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+              <div className="flex items-stretch gap-3.5">
+                <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
                   <Icon className="size-5" aria-hidden="true" />
                 </div>
-                <div className="min-w-0">
+                <div className="flex min-w-0 flex-col justify-center">
                   <CardTitle>{group.displayName}</CardTitle>
                   <CardDescription className="line-clamp-1">{group.description}</CardDescription>
                 </div>

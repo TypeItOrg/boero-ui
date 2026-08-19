@@ -201,12 +201,19 @@ export function InstitutionalInstitutionForm({
         </FormCard>
       </div>
 
-      <div className="border-border/40 flex items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button type="button" variant="outline" size="lg" disabled={isPending} onClick={() => router.push(returnTo)}>
+      <div className="border-border/40 flex flex-row flex-wrap items-center justify-end gap-3 border-t pt-5 pb-6">
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="flex-1 sm:flex-none"
+          disabled={isPending}
+          onClick={() => router.push(returnTo)}
+        >
           Cancelar
         </Button>
 
-        <Button type="submit" size="lg" disabled={isPending}>
+        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
           {isPending ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>

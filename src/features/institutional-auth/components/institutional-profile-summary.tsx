@@ -1,9 +1,6 @@
 import * as React from "react";
 import { HomeIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 
 type InstitutionalProfileSummaryProps = {
@@ -13,20 +10,15 @@ type InstitutionalProfileSummaryProps = {
 export function InstitutionalProfileSummary({ person }: InstitutionalProfileSummaryProps): React.ReactElement {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <Button asChild variant="outline" size="lg">
-          <ReturnToLink href="/profile/edit">Editar</ReturnToLink>
-        </Button>
-      </div>
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="-mx-5 border-b px-5 pb-5 sm:-mx-6 sm:px-6">
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
           <ProfileSectionHeader
             description="Información principal de tu cuenta institucional."
             icon={UserRoundIcon}
             title="Datos personales"
           />
-        </CardHeader>
-        <CardContent className="mt-5 p-0">
+        </header>
+        <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <ProfileValue label="Nombre completo" value={`${person.firstName} ${person.lastName}`} />
             <ProfileValue label="Documento" value={person.documentNumber} />
@@ -36,24 +28,24 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
             <ProfileValue label="Nacionalidad" value={person.nationalityCountry?.name} />
             <ProfileValue label="Ciudad natal" value={person.birthCity?.name} />
           </dl>
-        </CardContent>
-      </Card>
-      <Card className="bg-muted/25 p-5 sm:p-6">
-        <CardHeader className="-mx-5 border-b px-5 pb-5 sm:-mx-6 sm:px-6">
+        </div>
+      </div>
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
           <ProfileSectionHeader
             description="Dirección registrada en tu institución."
             icon={HomeIcon}
             title="Domicilio"
           />
-        </CardHeader>
-        <CardContent className="mt-4 p-0">
+        </header>
+        <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2">
             <ProfileValue label="Dirección" value={formatAddress(person)} />
             <ProfileValue label="Barrio" value={person.address?.neighborhood} />
             <ProfileValue label="Información adicional" value={person.address?.additionalInfo} />
           </dl>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -73,8 +65,8 @@ function ProfileSectionHeader({
         <Icon className="size-5" aria-hidden="true" />
       </div>
       <div className="min-w-0">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <h2 className="text-foreground font-semibold">{title}</h2>
+        <p className="text-muted-foreground text-sm">{description}</p>
       </div>
     </div>
   );

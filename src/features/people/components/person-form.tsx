@@ -131,43 +131,41 @@ export function PersonForm({
   }
 
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
-        {formError && (
-          <Alert variant="destructive">
-            <CircleAlertIcon />
-            <AlertTitle>{getErrorTitle(isEdit)}</AlertTitle>
-            <AlertDescription>{formError}</AlertDescription>
-          </Alert>
-        )}
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col gap-4">
+      {formError && (
+        <Alert variant="destructive">
+          <CircleAlertIcon />
+          <AlertTitle>{getErrorTitle(isEdit)}</AlertTitle>
+          <AlertDescription>{formError}</AlertDescription>
+        </Alert>
+      )}
 
-        <fieldset disabled={isEdit && !canEdit} className="contents">
-          <PersonDetailsFields errors={errors} isEdit={isEdit} person={person} register={register} />
+      <fieldset disabled={isEdit && !canEdit} className="contents">
+        <PersonDetailsFields errors={errors} isEdit={isEdit} person={person} register={register} />
+      </fieldset>
+
+      {isEdit ? (
+        <fieldset disabled={!canEdit} className="contents">
+          <PersonPasswordFields errors={errors} register={register} />
         </fieldset>
-
-        {isEdit ? (
-          <fieldset disabled={!canEdit} className="contents">
-            <PersonPasswordFields errors={errors} register={register} />
-          </fieldset>
-        ) : (
-          <PersonCreateFields control={control} errors={errors} register={register} />
-        )}
-      </div>
+      ) : (
+        <PersonCreateFields control={control} errors={errors} register={register} />
+      )}
 
       {!hideActions && (
-        <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
+        <div className="flex flex-row flex-wrap items-center justify-end gap-3">
           <Button
             type="button"
             variant="outline"
             size="lg"
-            className="flex-[1_0_min(140px,100%)] sm:flex-none"
+            className="flex-1 sm:flex-none"
             onClick={handleCancel}
             disabled={isPending}
           >
             Cancelar
           </Button>
-          <Button type="submit" size="lg" className="flex-[1_0_min(140px,100%)] sm:flex-none" disabled={isPending}>
-            {getSubmitLabel({ isEdit, isPending })}
+          <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
+            {getSubmitLabel({ isEdit, isPending, canEdit })}
           </Button>
         </div>
       )}
@@ -240,9 +238,17 @@ function getErrorTitle(isEdit: boolean): string {
   return isEdit ? PEOPLE_ERROR_MESSAGES.UPDATE_TITLE : PEOPLE_ERROR_MESSAGES.CREATE_TITLE;
 }
 
-function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPending: boolean }): string {
+function getSubmitLabel({
+  isEdit,
+  isPending,
+  canEdit = true,
+}: {
+  isEdit: boolean;
+  isPending: boolean;
+  canEdit?: boolean;
+}): string {
   if (isPending) return "Guardando...";
-  if (isEdit) return "Guardar cambios";
+  if (isEdit) return canEdit ? "Guardar cambios" : "Guardar roles";
 
   return "Crear usuario";
 }

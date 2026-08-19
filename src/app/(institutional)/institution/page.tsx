@@ -4,6 +4,7 @@ import { Building2Icon } from "lucide-react";
 
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import type { QueryParamValue } from "@common/types/query-param.types";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -11,12 +12,19 @@ import { getInstitutionalMetadata } from "@features/institutional-auth/utils/ins
 import { fetchInstitutionalInstitution } from "@features/institutions/services/fetch-institutional-institution.service";
 import { InstitutionalInstitutionDetail } from "@features/institutions/components/institutional-institution-detail";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Mi institución");
 }
 
-export default async function InstitutionalInstitutionPage(): Promise<React.ReactElement> {
+export default async function InstitutionalInstitutionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+}): Promise<React.ReactElement> {
+  const { returnTo } = await searchParams;
+  const destination = getSafeReturnTo(returnTo, "/");
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ)) {
@@ -38,12 +46,12 @@ export default async function InstitutionalInstitutionPage(): Promise<React.Reac
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
           <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
         </div>
       }
     >
-      <InstitutionalInstitutionDetail canUpdate={canUpdate} institution={institution} />
+      <InstitutionalInstitutionDetail canUpdate={canUpdate} institution={institution} returnTo={destination} />
     </PlatformPageShell>
   );
 }

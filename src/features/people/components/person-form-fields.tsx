@@ -42,7 +42,7 @@ export function PersonDetailsFields({
         title="Datos personales"
         description="Información principal del usuario institucional."
       />
-      <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+      <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
         <Field data-invalid={!!errors.firstName} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
             <FieldLabel htmlFor="person-first-name" required>
@@ -74,7 +74,7 @@ export function PersonDetailsFields({
         </Field>
       </FieldGroup>
 
-      <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+      <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4">
         {isEdit ? (
           <Field data-disabled className="flex-[1_0_min(200px,100%)]">
             <FieldContent>
@@ -123,7 +123,7 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
         title="Cambiar contraseña"
         description="Dejá los campos en blanco para conservar la contraseña actual."
       />
-      <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+      <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
         <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
             <FieldLabel htmlFor="person-password">Nueva contraseña</FieldLabel>
@@ -156,7 +156,7 @@ export function PersonCreateFields({ control, errors, register }: PersonCreateFi
         title="Cuenta de acceso"
         description="Credenciales iniciales para iniciar sesión."
       />
-      <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
+      <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
         <Field data-invalid={!!errors.documentNumber} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
             <FieldLabel htmlFor="person-document" required>
@@ -227,7 +227,7 @@ function PersonFormSectionHeading({
   title: string;
 }): React.ReactElement {
   return (
-    <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+    <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
       <div className="flex items-center gap-3.5">
         <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
           <Icon className="size-5" aria-hidden="true" />
@@ -242,5 +242,5 @@ function PersonFormSectionHeading({
 }
 
 function PersonFormCard({ children }: React.PropsWithChildren): React.ReactElement {
-  return <div className="bg-muted/25 rounded-xl border p-5 md:p-6">{children}</div>;
+  return <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">{children}</div>;
 }

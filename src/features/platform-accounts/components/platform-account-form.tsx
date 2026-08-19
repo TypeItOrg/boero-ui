@@ -203,19 +203,14 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
       <Button
         type="button"
         variant="outline"
-        size={isEdit ? "default" : "lg"}
-        className={cn(!isEdit && "flex-[1_0_min(140px,100%)] sm:flex-none")}
+        size="lg"
+        className="flex-1 sm:flex-none"
         onClick={handleCancel}
         disabled={isPending}
       >
         Cancelar
       </Button>
-      <Button
-        type="submit"
-        size={isEdit ? "default" : "lg"}
-        className={cn(!isEdit && "flex-[1_0_min(140px,100%)] sm:flex-none")}
-        disabled={isPending}
-      >
+      <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
         {isPending ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : null}
         {getSubmitLabel({ isEdit, isPending })}
       </Button>

@@ -16,15 +16,32 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
     birthCityId: formData.get("birthCityId") || undefined,
     nationalityCountryId: formData.get("nationalityCountryId") || undefined,
     address: parseAddress(formData),
+    password: formData.get("password") || "",
+    confirmPassword: formData.get("confirmPassword") || "",
   };
 
   const parsed = institutionalProfileSchema.safeParse(payload);
   if (!parsed.success) return getValidationActionState(parsed.error.issues, PROFILE_FIELDS);
 
+  const requestBody: Record<string, unknown> = {
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    birthDate: parsed.data.birthDate,
+    email: parsed.data.email,
+    phoneNumber: parsed.data.phoneNumber,
+    birthCityId: parsed.data.birthCityId,
+    nationalityCountryId: parsed.data.nationalityCountryId,
+    address: parsed.data.address,
+  };
+
+  if (parsed.data.password) {
+    requestBody.password = parsed.data.password;
+  }
+
   const response = institutionalApiFetch("/api/v1/person/me", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(parsed.data),
+    body: JSON.stringify(requestBody),
   });
   const errorState = await getResponseErrorActionState(
     response,
@@ -53,6 +70,8 @@ const PROFILE_FIELDS = [
   "address.apartment",
   "address.neighborhood",
   "address.additionalInfo",
+  "password",
+  "confirmPassword",
 ] as const;
 
 function parseAddress(formData: FormData) {

@@ -20,7 +20,7 @@ export default function PlatformPage(): React.ReactElement {
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
           <Building2Icon className="size-6 sm:size-7" />
         </div>
       }
