@@ -7,6 +7,40 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { getCurrentAcademicYear, getMaxAcademicYear } from "@features/academic/utils/academic-year.util";
 
+jest.mock("@common/components/ui/year-select", () => ({
+  YearSelect: ({
+    id,
+    maxYear,
+    minYear,
+    name,
+    onValueChange,
+    required,
+    value,
+  }: {
+    id?: string;
+    maxYear: number;
+    minYear: number;
+    name?: string;
+    onValueChange?: (value: string) => void;
+    required?: boolean;
+    value?: string;
+  }) => (
+    <select
+      id={id}
+      name={name}
+      required={required}
+      value={value ?? ""}
+      onChange={(event) => onValueChange?.(event.currentTarget.value)}
+    >
+      {Array.from({ length: maxYear - minYear + 1 }, (_, index) => maxYear - index).map((year) => (
+        <option key={year} value={String(year)}>
+          {year}
+        </option>
+      ))}
+    </select>
+  ),
+}));
+
 describe("AcademicFormFields", () => {
   it("keeps a contextual study-plan trayecto fixed while preserving its hidden value", () => {
     const trainingPathId = "2d9ec931-453c-4778-86a9-dc40a06d0247";
@@ -66,8 +100,7 @@ describe("AcademicFormFields", () => {
     expect(screen.getByLabelText("Fecha de inicio")).toBeDisabled();
     expect(screen.getByLabelText("Fecha de finalización")).toBeDisabled();
 
-    await user.click(screen.getByLabelText(/Año/));
-    await user.click(screen.getByRole("option", { name: String(getCurrentAcademicYear()) }));
+    await user.selectOptions(screen.getByLabelText(/Año/), String(getCurrentAcademicYear()));
 
     expect(screen.getByLabelText("Fecha de inicio")).toBeEnabled();
     expect(screen.getByLabelText("Fecha de finalización")).toBeEnabled();
@@ -180,8 +213,7 @@ describe("AcademicFormFields", () => {
     expect(startDate).toHaveValue(`01/01/${initialYear}`);
     expect(endDate).toHaveValue(`31/12/${initialYear}`);
 
-    await user.click(screen.getByLabelText(/Año/));
-    await user.click(screen.getByRole("option", { name: String(nextYear) }));
+    await user.selectOptions(screen.getByLabelText(/Año/), String(nextYear));
 
     expect(screen.getByLabelText("Fecha de inicio")).toHaveValue("");
     expect(screen.getByLabelText("Fecha de finalización")).toHaveValue("");
