@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Controller, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
+import { KeyRoundIcon, ShieldCheckIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
@@ -37,6 +38,7 @@ export function PersonDetailsFields({
   return (
     <PersonFormCard>
       <PersonFormSectionHeading
+        icon={UserRoundIcon}
         title="Datos personales"
         description="Información principal del usuario institucional."
       />
@@ -117,6 +119,7 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
   return (
     <PersonFormCard>
       <PersonFormSectionHeading
+        icon={KeyRoundIcon}
         title="Cambiar contraseña"
         description="Dejá los campos en blanco para conservar la contraseña actual."
       />
@@ -148,7 +151,11 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
 export function PersonCreateFields({ control, errors, register }: PersonCreateFieldsProps): React.ReactElement {
   return (
     <PersonFormCard>
-      <PersonFormSectionHeading title="Cuenta de acceso" description="Credenciales iniciales para iniciar sesión." />
+      <PersonFormSectionHeading
+        icon={ShieldCheckIcon}
+        title="Cuenta de acceso"
+        description="Credenciales iniciales para iniciar sesión."
+      />
       <FieldGroup className="mt-5 flex flex-row flex-wrap items-start gap-4">
         <Field data-invalid={!!errors.documentNumber} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
@@ -210,12 +217,27 @@ export function PersonCreateFields({ control, errors, register }: PersonCreateFi
   );
 }
 
-function PersonFormSectionHeading({ title, description }: { title: string; description: string }): React.ReactElement {
+function PersonFormSectionHeading({
+  description,
+  icon: Icon,
+  title,
+}: {
+  description: string;
+  icon: LucideIcon;
+  title: string;
+}): React.ReactElement {
   return (
-    <div>
-      <h2 className="text-base font-semibold">{title}</h2>
-      <p className="text-muted-foreground mt-1 text-sm">{description}</p>
-    </div>
+    <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+      <div className="flex items-center gap-3.5">
+        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+          <Icon className="size-5" aria-hidden="true" />
+        </div>
+        <div>
+          <h2 className="text-base font-semibold">{title}</h2>
+          <p className="text-muted-foreground text-sm">{description}</p>
+        </div>
+      </div>
+    </header>
   );
 }
 

@@ -33,7 +33,6 @@ export default async function NewPersonPage({
   return (
     <PlatformPageShell
       title="Nuevo usuario"
-      description="Creá una cuenta institucional para una persona de tu organización."
       breadcrumb={<InstitutionalBreadcrumb />}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"

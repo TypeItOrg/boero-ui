@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PencilIcon } from "lucide-react";
+import { Building2Icon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -35,21 +33,17 @@ export default async function InstitutionalInstitutionPage(): Promise<React.Reac
   return (
     <PlatformPageShell
       title={institution.name}
-      description="Detalles e información general de tu institución."
       breadcrumb={<InstitutionalBreadcrumb />}
       minViewportHeight
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        canUpdate ? (
-          <Button asChild size="lg" className="w-full">
-            <Link href="/institution/edit">
-              <PencilIcon className="size-4" />
-              <span>Editar información</span>
-            </Link>
-          </Button>
-        ) : undefined
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
+        </div>
       }
     >
-      <InstitutionalInstitutionDetail institution={institution} />
+      <InstitutionalInstitutionDetail canUpdate={canUpdate} institution={institution} />
     </PlatformPageShell>
   );
 }

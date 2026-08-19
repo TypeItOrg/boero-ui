@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { XIcon } from "lucide-react";
+import { BuildingIcon, XIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
@@ -65,7 +65,10 @@ export function PlatformRolesTableFilters({
           <AsyncDropdown<InstitutionSummary>
             className="min-w-0 flex-1"
             defaultOption={{ label: "Todas las instituciones", value: undefined }}
+            emptyDescription="No hay instituciones disponibles para filtrar."
+            emptyIcon={BuildingIcon}
             emptyMessage="No se encontraron instituciones."
+            emptyTitle="No hay instituciones"
             errorMessage={LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS}
             fetchPage={fetchInstitutionPage}
             getItemLabel={(institution) => institution.name}

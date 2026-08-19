@@ -13,7 +13,7 @@ export function InstitutionDetail({ institution }: InstitutionDetailProps): Reac
         <h2 className="text-foreground font-semibold">Ubicación</h2>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <LocationDetail className="col-span-full" label="Dirección" value={address} />
+          <LocationDetail label="Dirección" value={address} />
           <LocationDetail label="País" value={institution.country.name} />
           <LocationDetail label="Provincia" value={institution.province.name} />
           <LocationDetail label="Ciudad" value={institution.city.name} />

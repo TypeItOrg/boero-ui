@@ -3,7 +3,7 @@
 import * as React from "react";
 import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -91,7 +91,6 @@ export function PersonDeleteDialog({
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>{PEOPLE_ERROR_MESSAGES.DELETE_TITLE}</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}

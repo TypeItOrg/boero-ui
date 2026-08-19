@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2Icon } from "lucide-react";
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
 import {
   AlertDialog,
@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { deleteInstitutionRoleAction } from "@features/roles/actions/delete-institution-role.action";
 
@@ -50,7 +51,12 @@ export function InstitutionRoleDeleteButton({
           <AlertDialogDescription>
             Esta acción es permanente y solo puede realizarse si el rol no tiene usuarios asignados.
           </AlertDialogDescription>
-          {error ? <p className="text-destructive text-sm">{error}</p> : null}
+          {error ? (
+            <Alert variant="destructive">
+              <CircleAlertIcon />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel size="lg">Cancelar</AlertDialogCancel>

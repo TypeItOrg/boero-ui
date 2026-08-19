@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { GlobeIcon, MapPinIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
@@ -63,7 +64,10 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
         </FieldContent>
         <AsyncDropdown<Country>
           ariaInvalid={!!countryError}
+          emptyDescription="No encontramos países registrados."
+          emptyIcon={GlobeIcon}
           emptyMessage="No se encontraron países."
+          emptyTitle="No hay países"
           errorMessage={LOCATION_ERROR_MESSAGES.FETCH_COUNTRIES}
           fetchPage={fetchCountries}
           getItemLabel={getCountryLabel}
@@ -87,7 +91,10 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
         <AsyncDropdown<Province>
           ariaInvalid={!!provinceError}
           disabled={!country}
+          emptyDescription="No encontramos provincias para el país seleccionado."
+          emptyIcon={MapPinIcon}
           emptyMessage="No se encontraron provincias."
+          emptyTitle="No hay provincias"
           errorMessage={LOCATION_ERROR_MESSAGES.FETCH_PROVINCES}
           fetchPage={(input) => fetchProvinces(input, country?.id)}
           getItemLabel={getLocationLabel}
@@ -110,7 +117,10 @@ export function LocationPicker({ onValueChange, error, initialLocation }: Locati
         <AsyncDropdown<City>
           ariaInvalid={!!cityError}
           disabled={!province}
+          emptyDescription="No encontramos ciudades para la provincia seleccionada."
+          emptyIcon={MapPinIcon}
           emptyMessage="No se encontraron ciudades."
+          emptyTitle="No hay ciudades"
           errorMessage={LOCATION_ERROR_MESSAGES.FETCH_CITIES}
           fetchPage={(input) => fetchCities(input, province?.id)}
           getItemLabel={getLocationLabel}

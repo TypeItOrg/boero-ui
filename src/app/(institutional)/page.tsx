@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Building2Icon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from "lucide-react";
@@ -10,6 +11,7 @@ import {
   getReadableAcademicResources,
 } from "@features/academic/components/academic-resource-links";
 import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
+import { InstitutionalHomeSkeleton } from "@features/institutional-auth/components/institutional-home-skeleton";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import {
@@ -42,7 +44,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Inicio");
 }
 
-export default async function Home(): Promise<React.ReactElement> {
+export default function Home(): React.ReactElement {
+  return (
+    <Suspense fallback={<InstitutionalHomeSkeleton />}>
+      <InstitutionalHomeContent />
+    </Suspense>
+  );
+}
+
+async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
   const links = getInstitutionalHomeLinks(user);
   const managementLinks = links.filter((link) => link.href !== "/profile");

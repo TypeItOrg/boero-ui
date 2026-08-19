@@ -9,7 +9,7 @@ const FALLBACK_MESSAGE = "No se pudieron obtener tus datos personales.";
 
 async function getInstitutionalPerson(): Promise<InstitutionalPerson | null> {
   const response = await institutionalApiFetch("/api/v1/person/me");
-  if (response.status === 403 || response.status === 404) return null;
+  if (response.status === 401 || response.status === 403 || response.status === 404) return null;
 
   return parseHttpResponse(response, FALLBACK_MESSAGE);
 }

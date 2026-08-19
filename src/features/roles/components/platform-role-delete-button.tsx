@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { deletePlatformRoleAction } from "@features/roles/actions/delete-platform-role.action";
 
@@ -64,10 +65,10 @@ export function PlatformRoleDeleteButton({
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error ? (
-          <div className="text-destructive flex items-start gap-2 text-sm">
-            <CircleAlertIcon className="mt-0.5 size-4 shrink-0" />
-            <span>{error}</span>
-          </div>
+          <Alert variant="destructive">
+            <CircleAlertIcon />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>

@@ -8,7 +8,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,19 +33,17 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)}
+      className={cn(
+        "bg-muted [&_[data-slot=sidebar-inner]]:bg-muted [&_[data-slot=sidebar-inner]]:shadow-none! [&_[data-slot=sidebar-inner]]:ring-0!",
+        className,
+      )}
       {...props}
     >
-      <SidebarHeader className="p-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:p-2">
-        <div className="flex hidden items-center gap-3 group-data-[collapsible=icon]:hidden md:flex">
-          <span className="text-lg font-bold tracking-tight">Boero</span>
-        </div>
-      </SidebarHeader>
-      <SidebarContent className="p-4 pt-0">
+      <SidebarContent className="p-4">
         <PlatformSidebarNav items={PLATFORM_NAVIGATION_ITEMS} />
       </SidebarContent>
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
-        <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">
+        <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
           <SidebarMenuItem>
             <SidebarMenuButton
               aria-label="Cambiar tema"

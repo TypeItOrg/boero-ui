@@ -10,7 +10,6 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 
 export const metadata = {
   title: "Nuevo usuario",
-  description: "Creá un nuevo usuario institucional en la plataforma.",
 };
 
 type NewPersonPageProps = {
@@ -28,7 +27,6 @@ export default async function NewPersonPage({ params, searchParams }: NewPersonP
   return (
     <PlatformPageShell
       title="Nuevo usuario"
-      description={`Creá una cuenta institucional para el ${institution.name}.`}
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       headerClassName="flex-row items-center justify-between"

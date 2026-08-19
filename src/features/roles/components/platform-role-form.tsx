@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useActionState } from "react";
-import { CircleAlertIcon, InfoIcon } from "lucide-react";
+import { BuildingIcon, CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -57,9 +57,16 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
         </Alert>
       ) : null}
       <Card className="bg-muted/25">
-        <CardHeader>
-          <CardTitle>Datos del rol</CardTitle>
-          <CardDescription>Usá un nombre reconocible para las personas de la institución.</CardDescription>
+        <CardHeader className="border-b">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <UserRoundCogIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <CardTitle>Datos del rol</CardTitle>
+              <CardDescription>Usá un nombre reconocible para las personas de la institución.</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <FieldGroup>
@@ -96,17 +103,26 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
           </FieldGroup>
         </CardContent>
       </Card>
-      <section className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-lg font-semibold">Permisos</h2>
-          <p className="text-muted-foreground text-sm">Seleccioná los permisos que este rol podrá conceder.</p>
+      <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <KeyRoundIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold">Permisos</h2>
+              <p className="text-muted-foreground text-sm">Seleccioná los permisos que podrá conceder este rol.</p>
+            </div>
+          </div>
+        </header>
+        <div className="mt-5">
+          <PermissionGroupsFields
+            groups={permissionGroups}
+            selectedPermissions={role?.permissions}
+            protectedPermissions={role?.protectedPermissions}
+            inputIdPrefix="platform"
+          />
         </div>
-        <PermissionGroupsFields
-          groups={permissionGroups}
-          selectedPermissions={role?.permissions}
-          protectedPermissions={role?.protectedPermissions}
-          inputIdPrefix="platform"
-        />
       </section>
       <div className="flex justify-end gap-3">
         <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none">
@@ -128,7 +144,10 @@ function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }):
       id="platform-role-institution"
       name="institutionId"
       defaultOption={{ label: "Seleccionar institución", value: undefined }}
+      emptyDescription="Todavía no se registraron instituciones en la plataforma."
+      emptyIcon={BuildingIcon}
       emptyMessage="No se encontraron instituciones."
+      emptyTitle="No hay instituciones"
       errorMessage="No se pudieron cargar las instituciones."
       fetchPage={fetchInstitutionPage}
       getItemLabel={(item) => item.name}

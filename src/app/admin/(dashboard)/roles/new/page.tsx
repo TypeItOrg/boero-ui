@@ -22,7 +22,6 @@ export default async function NewPlatformRolePage({
   return (
     <PlatformPageShell
       title="Nuevo rol"
-      description="Creá un rol para una institución."
       breadcrumb={<PlatformBreadcrumb />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"

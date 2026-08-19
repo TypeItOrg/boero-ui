@@ -35,7 +35,7 @@ type PlatformSidebarNavProps = {
 };
 
 export const platformSidebarItemButtonClassName =
-  "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground data-active:bg-primary data-active:text-primary-foreground data-active:hover:bg-primary data-active:hover:text-primary-foreground data-open:bg-muted-foreground/10 data-open:text-foreground data-open:hover:bg-muted-foreground/10 h-10 gap-3 rounded-md px-2 text-sm font-medium transition-colors group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!";
+  "text-muted-foreground hover:bg-muted-foreground/10 hover:text-foreground data-active:bg-primary data-active:text-primary-foreground data-active:hover:bg-primary data-active:hover:text-primary-foreground data-open:bg-muted-foreground/10 data-open:text-foreground data-open:hover:bg-muted-foreground/10 h-9 gap-3 rounded-md px-2 text-sm font-medium transition-colors group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0!";
 
 export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactElement {
   const { state } = useSidebar();
@@ -44,10 +44,12 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
   return (
     <SidebarGroup className="gap-1 p-0 group-data-[collapsible=icon]:gap-0">
       {state === "expanded" && (
-        <SidebarGroupLabel className="text-muted-foreground h-7 px-0 text-xs font-bold">Menú</SidebarGroupLabel>
+        <SidebarGroupLabel className="text-muted-foreground h-7 pr-2 pl-0 text-xs font-bold group-data-[collapsible=icon]:hidden">
+          Plataforma
+        </SidebarGroupLabel>
       )}
       <SidebarGroupContent>
-        <SidebarMenu className="gap-1 group-data-[collapsible=icon]:gap-2">
+        <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
           {items.map((item) => {
             const itemIsActive = isActive(item.url, item.exact);
             const ItemIcon = item.icon;
@@ -122,7 +124,7 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
 }
 
 export function PlatformSidebarItemIcon({ children }: { children: ReactNode }): ReactElement {
-  return <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:size-5!">{children}</span>;
+  return <span className="flex size-4 shrink-0 items-center justify-center [&>svg]:size-4!">{children}</span>;
 }
 
 function PlatformSidebarNavigationIcon({ icon: Icon }: { icon: LucideIcon | undefined }): ReactElement {

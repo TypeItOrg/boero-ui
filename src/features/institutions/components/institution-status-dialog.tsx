@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Building2Icon, CircleAlertIcon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -98,7 +98,6 @@ export function InstitutionStatusDialog({
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>No se pudo actualizar el estado</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}

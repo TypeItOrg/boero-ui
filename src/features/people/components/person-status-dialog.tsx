@@ -3,7 +3,7 @@
 import * as React from "react";
 import { CircleAlertIcon, UserCheckIcon, UserXIcon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -99,7 +99,6 @@ export function PersonStatusDialog({
         {error ? (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>No se pudo actualizar el acceso</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}

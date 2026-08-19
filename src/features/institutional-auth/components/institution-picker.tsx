@@ -1,5 +1,6 @@
 "use client";
 
+import { BuildingIcon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
@@ -37,7 +38,10 @@ export function InstitutionPicker({
   return (
     <AsyncDropdown<InstitutionalInstitution>
       ariaInvalid={ariaInvalid}
+      emptyDescription="No encontramos instituciones activas disponibles para iniciar sesión."
+      emptyIcon={BuildingIcon}
       emptyMessage="No se encontraron instituciones activas."
+      emptyTitle="No hay instituciones activas"
       errorMessage={INSTITUTIONAL_AUTH_ERROR_MESSAGES.FETCH_INSTITUTIONS}
       estimateSize={INSTITUTION_OPTION_HEIGHT}
       fetchPage={fetchInstitutionPage}

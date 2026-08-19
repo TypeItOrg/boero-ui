@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { GlobeIcon, MapPinIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
@@ -41,7 +42,10 @@ export function CountryDropdown({
       id={id}
       name={name}
       defaultOption={optional ? { label: "Sin especificar", value: undefined } : undefined}
+      emptyDescription="No encontramos países registrados."
+      emptyIcon={GlobeIcon}
       emptyMessage="No se encontraron países."
+      emptyTitle="No hay países"
       errorMessage={LOCATION_ERROR_MESSAGES.FETCH_COUNTRIES}
       fetchPage={(input) => fetchLocationPage<Country>("/api/countries", input)}
       getItemLabel={(item) => item.name}
@@ -76,7 +80,10 @@ export function CityDropdown({
       id={id}
       name={name}
       defaultOption={optional ? { label: "Sin especificar", value: undefined } : undefined}
+      emptyDescription="No encontramos ciudades registradas."
+      emptyIcon={MapPinIcon}
       emptyMessage="No se encontraron ciudades."
+      emptyTitle="No hay ciudades"
       errorMessage={LOCATION_ERROR_MESSAGES.FETCH_CITIES}
       fetchPage={(input) => fetchLocationPage<City>("/api/cities", input)}
       getItemLabel={getCityLabel}

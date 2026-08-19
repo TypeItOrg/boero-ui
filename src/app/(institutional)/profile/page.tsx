@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PencilIcon } from "lucide-react";
+import { UserRoundIcon } from "lucide-react";
 
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { Button } from "@common/components/ui/button";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { InstitutionalProfile } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
@@ -23,15 +21,13 @@ export default async function ProfilePage(): Promise<React.ReactElement> {
   return (
     <PlatformPageShell
       title="Perfil"
-      description="Consultá tus datos personales."
       breadcrumb={<InstitutionalBreadcrumb />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
-        <Button asChild size="lg" className="w-full">
-          <ReturnToLink href="/profile/edit">
-            <PencilIcon data-icon="inline-start" />
-            Editar datos
-          </ReturnToLink>
-        </Button>
+        <div className="from-primary to-primary/80 text-primary-foreground flex h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs">
+          <UserRoundIcon className="size-6 sm:size-7" aria-hidden="true" />
+        </div>
       }
     >
       <InstitutionalProfile person={person} />
