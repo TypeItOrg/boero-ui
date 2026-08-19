@@ -5,22 +5,39 @@ import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import type { AuthProxyPolicy } from "@common/services/auth-proxy/auth-proxy-policy.types";
 import type { RefreshAttempt } from "@common/services/auth-proxy/refresh-attempt.types";
 import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
+import { SessionStatus } from "@common/services/auth-proxy/session-status.types";
 
 const inFlightRefreshes = new Map<string, Promise<RefreshAttempt>>();
 const AUTH_PROXY_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthProxyPolicy): Promise<NextResponse> {
   const accessToken = request.cookies.get(policy.accessTokenCookie)?.value;
-  if (!accessToken) return NextResponse.next();
+  if (accessToken) {
+    const sessionStatus = await getSessionStatus(policy.currentUserPath, accessToken);
+    if (sessionStatus === SessionStatus.VALID) {
+      return NextResponse.redirect(policy.getAuthenticatedRedirect(request));
+    }
+  }
 
-  const sessionStatus = await getSessionStatus(policy.currentUserPath, accessToken);
-  if (sessionStatus !== "valid") {
+  const refreshToken = request.cookies.get(policy.refreshTokenCookie)?.value;
+  if (!refreshToken) {
     const response = NextResponse.next();
-    if (sessionStatus === "invalid") policy.clearCookies(response);
+    if (accessToken) policy.clearCookies(response);
     return response;
   }
 
-  return NextResponse.redirect(policy.getAuthenticatedRedirect(request));
+  const refreshAttempt = await refreshSession(policy.refreshPath, refreshToken);
+  if (refreshAttempt.tokens) {
+    const response = NextResponse.redirect(policy.getAuthenticatedRedirect(request));
+    policy.setRefreshedCookies(response, refreshAttempt.tokens);
+    return response;
+  }
+
+  const response = NextResponse.next();
+  if (refreshAttempt.status === 401) {
+    policy.clearCookies(response);
+  }
+  return response;
 }
 
 export async function handleProtectedRoute(request: NextRequest, policy: AuthProxyPolicy): Promise<NextResponse> {
@@ -35,10 +52,7 @@ export async function handleProtectedRoute(request: NextRequest, policy: AuthPro
   return createLoginRedirectResponse(request, policy, refreshAttempt.status);
 }
 
-async function getSessionStatus(
-  currentUserPath: string,
-  accessToken: string,
-): Promise<"valid" | "invalid" | "unavailable"> {
+async function getSessionStatus(currentUserPath: string, accessToken: string): Promise<SessionStatus> {
   try {
     const response = await fetch(new URL(currentUserPath, getApiUrlOrThrow()), {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -46,11 +60,11 @@ async function getSessionStatus(
       signal: AbortSignal.timeout(AUTH_PROXY_REQUEST_TIMEOUT_MS),
     });
 
-    if (response.ok) return "valid";
-    if (response.status === 401) return "invalid";
-    return "unavailable";
+    if (response.ok) return SessionStatus.VALID;
+    if (response.status === 401) return SessionStatus.INVALID;
+    return SessionStatus.UNAVAILABLE;
   } catch {
-    return "unavailable";
+    return SessionStatus.UNAVAILABLE;
   }
 }
 

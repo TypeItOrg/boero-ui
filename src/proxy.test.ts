@@ -388,6 +388,27 @@ describe("proxy", () => {
     expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("");
   });
 
+  it("refreshes and redirects to home when guest route has expired access token and valid refresh token", async () => {
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 401 })).mockResolvedValueOnce(
+      new Response(JSON.stringify({ tokens: { accessToken: "new-access", refreshToken: "new-refresh" } }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const request = createRequest(
+      "/auth/login",
+      `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=expired-access; ${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=valid-refresh`,
+    );
+
+    const response = await proxy(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe("https://app.example.test/");
+    expect(response.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
+    expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
+  });
+
   it("sanitizes absolute next urls on login redirects", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login?next=https://evil.com/a", {
