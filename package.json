@@ -13,7 +13,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",
@@ -52,8 +53,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "lint-staged": "^17.3.0",
     "msw": "^2.15.0",
     "prettier": "3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
@@ -78,5 +81,14 @@
     "fast-uri": "3.1.5",
     "@hono/node-server": ">=2.0.5",
     "sharp": ">=0.35.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
