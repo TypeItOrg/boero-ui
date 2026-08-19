@@ -1,13 +1,25 @@
 {
   "folders": [
     {
-      "path": ".",
+      "path": "."
     },
     {
-      "path": "../boero-api",
-    },
+      "path": "../boero-api"
+    }
   ],
   "settings": {
     "java.compile.nullAnalysis.mode": "automatic",
-  },
+    "java.compile.nullAnalysis.nonnull": [
+      "org.jspecify.annotations.NonNull",
+      "org.springframework.lang.NonNull"
+    ],
+    "java.compile.nullAnalysis.nullable": [
+      "org.jspecify.annotations.Nullable",
+      "org.springframework.lang.Nullable"
+    ],
+    "java.compile.nullAnalysis.nonnullbydefault": [
+      "org.jspecify.annotations.NullMarked",
+      "org.springframework.lang.NonNullApi"
+    ]
+  }
 }
