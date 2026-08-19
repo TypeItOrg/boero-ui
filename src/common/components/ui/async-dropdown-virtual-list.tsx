@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { CircleAlertIcon, RefreshCwIcon } from "lucide-react";
+import { CircleAlertIcon, RefreshCwIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { CommandItem } from "@common/components/ui/command";
@@ -176,6 +176,35 @@ export function ErrorState({ message, retry }: { message: string; retry: () => v
           Reintentar
         </Button>
       </div>
+    </div>
+  );
+}
+
+export function DropdownEmptyState({
+  icon: Icon,
+  title,
+}: {
+  description?: string;
+  icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
+  title: string;
+}): React.ReactElement {
+  let iconElement: React.ReactNode = null;
+
+  if (React.isValidElement(Icon)) {
+    iconElement = Icon;
+  } else if (typeof Icon === "function") {
+    const IconComponent = Icon;
+    iconElement = <IconComponent className="size-4.5" aria-hidden="true" />;
+  } else {
+    iconElement = <SearchIcon className="size-4.5" aria-hidden="true" />;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
+      <div className="bg-background border-border/60 text-muted-foreground flex size-9 items-center justify-center rounded-full border shadow-xs">
+        {iconElement}
+      </div>
+      <p className="text-foreground text-sm font-medium">{title}</p>
     </div>
   );
 }

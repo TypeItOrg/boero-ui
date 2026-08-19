@@ -179,10 +179,10 @@ describe("AsyncDropdown", () => {
     expect(screen.queryByPlaceholderText("Buscar...")).not.toBeInTheDocument();
   });
 
-  it("renders the empty state", async () => {
+  it("renders the empty state with title", async () => {
     const user = userEvent.setup();
     const { fetchPage } = renderDropdown({
-      emptyMessage: "Sin resultados",
+      emptyTitle: "No hay elementos",
     });
 
     fetchPage.mockResolvedValueOnce({
@@ -192,7 +192,42 @@ describe("AsyncDropdown", () => {
 
     await user.click(getTrigger());
 
-    expect(await screen.findByText("Sin resultados")).toBeInTheDocument();
+    expect(await screen.findByText("No hay elementos")).toBeInTheDocument();
+  });
+
+  it("renders search empty state when searching yields no results", async () => {
+    jest.useFakeTimers();
+
+    const user = userEvent.setup({
+      advanceTimers: jest.advanceTimersByTime,
+    });
+    const { fetchPage } = renderDropdown({
+      emptyTitle: "No hay elementos",
+    });
+
+    fetchPage.mockResolvedValueOnce({
+      items: baseItems,
+      nextPage: null,
+    });
+
+    await user.click(getTrigger());
+    expect(await screen.findByText("Argentina")).toBeInTheDocument();
+
+    fetchPage.mockResolvedValueOnce({
+      items: [],
+      nextPage: null,
+    });
+
+    const searchInput = screen.getByPlaceholderText("Buscar...");
+    await user.type(searchInput, "Inexistente");
+
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+
+    expect(await screen.findByText("No se encontraron resultados")).toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 
   it("renders the error state and retries", async () => {

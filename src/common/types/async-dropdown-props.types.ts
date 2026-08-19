@@ -12,7 +12,10 @@ export type AsyncDropdownProps<TItem> = {
   debounceMs?: number;
   defaultOption?: AsyncDropdownDefaultOption;
   disabled?: boolean;
+  emptyDescription?: string;
+  emptyIcon?: React.ComponentType<{ className?: string }> | React.ReactNode;
   emptyMessage?: string;
+  emptyTitle?: string;
   errorMessage?: string;
   estimateSize?: number;
   fetchPage: (input: AsyncDropdownFetchPageInput) => Promise<AsyncDropdownPage<TItem>>;

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ChevronsUpDownIcon, XIcon } from "lucide-react";
+import { ChevronsUpDownIcon, SearchIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
@@ -14,7 +14,12 @@ import {
   CommandItem,
   CommandList,
 } from "@common/components/ui/command";
-import { ErrorState, LoadingState, VirtualizedDropdownItems } from "@common/components/ui/async-dropdown-virtual-list";
+import {
+  DropdownEmptyState,
+  ErrorState,
+  LoadingState,
+  VirtualizedDropdownItems,
+} from "@common/components/ui/async-dropdown-virtual-list";
 import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
 import type { AsyncDropdownDefaultOption } from "@common/types/async-dropdown-default-option.types";
 import type { AsyncDropdownProps } from "@common/types/async-dropdown-props.types";
@@ -49,7 +54,10 @@ export function AsyncDropdown<TItem>({
   debounceMs = DEFAULT_DEBOUNCE_MS,
   defaultOption,
   disabled = false,
+  emptyDescription,
+  emptyIcon,
   emptyMessage = "No se encontraron resultados.",
+  emptyTitle,
   errorMessage = COMMON_ERROR_MESSAGES.ASYNC_DROPDOWN_RESULTS,
   estimateSize = DEFAULT_ESTIMATED_ITEM_SIZE,
   fetchPage,
@@ -146,7 +154,18 @@ export function AsyncDropdown<TItem>({
   } else if (isError) {
     commandListContent = <ErrorState message={errorMessage} retry={() => void refetch()} />;
   } else if (items.length === 0 && !showDefaultOption) {
-    commandListContent = <CommandEmpty>{emptyMessage}</CommandEmpty>;
+    const isSearching = debouncedSearch.trim() !== "";
+    const activeIcon = isSearching ? SearchIcon : (emptyIcon ?? SearchIcon);
+    const activeTitle = isSearching ? "No se encontraron resultados" : (emptyTitle ?? emptyMessage);
+    const activeDescription = isSearching
+      ? `No encontramos resultados para "${debouncedSearch.trim()}".`
+      : emptyDescription;
+
+    commandListContent = (
+      <CommandEmpty className="p-0">
+        <DropdownEmptyState description={activeDescription} icon={activeIcon} title={activeTitle} />
+      </CommandEmpty>
+    );
   } else {
     commandListContent = (
       <CommandGroup className="px-1 pt-2 pb-1">
