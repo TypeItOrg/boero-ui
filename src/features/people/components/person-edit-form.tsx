@@ -43,7 +43,6 @@ export function PersonEditForm({
   );
   const destination =
     returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
-  const isInstitutional = PeopleScope.isInstitutional(scope);
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
