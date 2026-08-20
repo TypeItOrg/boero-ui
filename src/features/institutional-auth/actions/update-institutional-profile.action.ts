@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { institutionalProfileSchema } from "@features/institutional-auth/schemas/institutional-profile.schema";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
 export async function updateInstitutionalProfileAction(formData: FormData) {
   const payload = {
@@ -22,6 +23,8 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
 
   const parsed = institutionalProfileSchema.safeParse(payload);
   if (!parsed.success) return getValidationActionState(parsed.error.issues, PROFILE_FIELDS);
+
+  await requireInstitutionalUser();
 
   const requestBody: Record<string, unknown> = {
     firstName: parsed.data.firstName,

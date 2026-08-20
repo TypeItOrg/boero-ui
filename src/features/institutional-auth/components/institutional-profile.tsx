@@ -10,6 +10,7 @@ import { Button } from "@common/components/ui/button";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
+import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import {
   DateField,
   DropdownField,
@@ -50,9 +51,15 @@ export function InstitutionalProfileForm({
     setError(undefined);
     setFieldErrors({});
     const formData = new FormData(event.currentTarget);
+    const passwordChanged = String(formData.get("password") ?? "") !== "";
     startTransition(async () => {
       const result = await updateInstitutionalProfileAction(formData);
       if (result.success) {
+        if (passwordChanged) {
+          await logoutInstitutional();
+          return;
+        }
+
         router.replace(returnTo);
         return;
       }
