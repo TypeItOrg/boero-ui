@@ -29,6 +29,7 @@ export const PEOPLE_ERROR_MESSAGES = {
   MINIMUM_AGE: "La persona debe tener al menos 3 años.",
   PASSWORD_MIN_LENGTH: "La contraseña debe tener al menos 8 caracteres.",
   PASSWORD_MAX_LENGTH: "La contraseña no puede superar los 255 caracteres.",
+  REQUIRED_CURRENT_PASSWORD: "Ingresá tu contraseña actual.",
   REQUIRED_PASSWORD_CONFIRMATION: "Debés confirmar la contraseña.",
   PASSWORD_MISMATCH: "Las contraseñas no coinciden.",
   INVALID_ROLE: "Seleccioná un rol válido.",

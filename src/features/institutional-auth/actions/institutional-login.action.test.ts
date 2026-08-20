@@ -7,6 +7,7 @@ jest.mock("@features/institutional-auth/services/login-institutional.service", (
 }));
 
 jest.mock("@features/institutional-auth/utils/institutional-auth-cookies.util", () => ({
+  clearInstitutionalPasswordChangedCookie: jest.fn(),
   clearInstitutionalRegistrationSuccessCookie: jest.fn(),
   setInstitutionalAuthCookies: jest.fn(),
 }));
@@ -15,6 +16,7 @@ import { redirect } from "next/navigation";
 
 import { loginInstitutionalAccount } from "@features/institutional-auth/services/login-institutional.service";
 import {
+  clearInstitutionalPasswordChangedCookie,
   clearInstitutionalRegistrationSuccessCookie,
   setInstitutionalAuthCookies,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
@@ -40,12 +42,14 @@ function createLoginFormData(input: LoginFormInput = {}): FormData {
 
 describe("loginInstitutional", () => {
   const loginMock = jest.mocked(loginInstitutionalAccount);
+  const clearPasswordChangedCookieMock = jest.mocked(clearInstitutionalPasswordChangedCookie);
   const clearRegistrationCookieMock = jest.mocked(clearInstitutionalRegistrationSuccessCookie);
   const setCookiesMock = jest.mocked(setInstitutionalAuthCookies);
   const redirectMock = jest.mocked(redirect);
 
   beforeEach(() => {
     loginMock.mockReset();
+    clearPasswordChangedCookieMock.mockReset();
     clearRegistrationCookieMock.mockReset();
     setCookiesMock.mockReset();
     redirectMock.mockReset();
@@ -61,6 +65,7 @@ describe("loginInstitutional", () => {
     });
     expect(loginMock).not.toHaveBeenCalled();
     expect(clearRegistrationCookieMock).toHaveBeenCalled();
+    expect(clearPasswordChangedCookieMock).toHaveBeenCalled();
   });
 
   it("returns backend field and global errors", async () => {

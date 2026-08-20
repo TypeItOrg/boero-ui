@@ -13,10 +13,12 @@ type InstitutionalAuthCookieOptions = {
 export const INSTITUTIONAL_ACCESS_TOKEN_COOKIE = "institutional_access_token";
 export const INSTITUTIONAL_REFRESH_TOKEN_COOKIE = "institutional_refresh_token";
 export const INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE = "institutional_registration_success";
+export const INSTITUTIONAL_PASSWORD_CHANGED_COOKIE = "institutional_password_changed";
 export const INSTITUTIONAL_ACCESS_TOKEN_MAX_AGE = 60 * 15;
 export const INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 export const INSTITUTIONAL_REMEMBER_ME_MAX_AGE = 60 * 60 * 24 * 30;
 export const INSTITUTIONAL_REGISTRATION_SUCCESS_MAX_AGE = 15;
+export const INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE = 5;
 
 export function getInstitutionalAuthCookieOptions(maxAge: number): InstitutionalAuthCookieOptions {
   return {
@@ -68,4 +70,23 @@ export async function hasInstitutionalRegistrationSuccessCookie(): Promise<boole
 export async function clearInstitutionalRegistrationSuccessCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE);
+}
+
+export async function setInstitutionalPasswordChangedCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set(
+    INSTITUTIONAL_PASSWORD_CHANGED_COOKIE,
+    "true",
+    getInstitutionalAuthCookieOptions(INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE),
+  );
+}
+
+export async function hasInstitutionalPasswordChangedCookie(): Promise<boolean> {
+  const cookieStore = await cookies();
+  return cookieStore.get(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE)?.value === "true";
+}
+
+export async function clearInstitutionalPasswordChangedCookie(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE);
 }

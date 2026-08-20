@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRoundIcon, MapPinIcon, UserRoundIcon } from "lucide-react";
+import { CircleAlertIcon, KeyRoundIcon, MapPinIcon, UserRoundIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
@@ -73,7 +73,8 @@ export function InstitutionalProfileForm({
     <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col gap-4">
       {error ? (
         <Alert variant="destructive">
-          <AlertTitle>No se pudieron guardar los cambios</AlertTitle>
+          <CircleAlertIcon className="size-4" />
+          <AlertTitle>¡Ups! No se pudieron guardar los cambios</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
@@ -260,6 +261,19 @@ export function InstitutionalProfileForm({
         </header>
         <div className="mt-4 sm:mt-5">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
+            <Field data-invalid={!!fieldErrors.currentPassword} className="basis-full">
+              <FieldContent>
+                <FieldLabel htmlFor="profile-current-password">Contraseña actual</FieldLabel>
+              </FieldContent>
+              <PasswordInput
+                id="profile-current-password"
+                name="currentPassword"
+                aria-invalid={!!fieldErrors.currentPassword}
+                autoComplete="current-password"
+              />
+              <FieldError>{fieldErrors.currentPassword}</FieldError>
+            </Field>
+
             <Field data-invalid={!!fieldErrors.password} className="flex-[1_0_min(200px,100%)]">
               <FieldContent>
                 <FieldLabel htmlFor="profile-password">Nueva contraseña</FieldLabel>
@@ -302,7 +316,7 @@ export function InstitutionalProfileForm({
 }
 
 function getFormError(error: string | undefined, fieldErrors: Record<string, string> | undefined): string | undefined {
-  if (error) return error;
   if (fieldErrors && Object.keys(fieldErrors).length > 0) return undefined;
+  if (error) return error;
   return "Revisá los datos ingresados.";
 }

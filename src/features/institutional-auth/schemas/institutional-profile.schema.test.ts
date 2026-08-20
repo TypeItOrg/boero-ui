@@ -20,6 +20,7 @@ describe("institutionalProfileSchema", () => {
   it("validates valid input with matching password", () => {
     const result = institutionalProfileSchema.safeParse(
       createValidProfileInput({
+        currentPassword: "oldpassword123",
         password: "newpassword123",
         confirmPassword: "newpassword123",
       }),
@@ -30,6 +31,7 @@ describe("institutionalProfileSchema", () => {
   it("rejects password shorter than 8 characters", () => {
     const result = institutionalProfileSchema.safeParse(
       createValidProfileInput({
+        currentPassword: "oldpassword123",
         password: "short",
         confirmPassword: "short",
       }),
@@ -45,6 +47,7 @@ describe("institutionalProfileSchema", () => {
   it("rejects mismatching passwords", () => {
     const result = institutionalProfileSchema.safeParse(
       createValidProfileInput({
+        currentPassword: "oldpassword123",
         password: "password123",
         confirmPassword: "differentpassword",
       }),
@@ -53,6 +56,22 @@ describe("institutionalProfileSchema", () => {
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." }),
+      );
+    }
+  });
+
+  it("requires the current password when a new password is provided", () => {
+    const result = institutionalProfileSchema.safeParse(
+      createValidProfileInput({ password: "newpassword123", confirmPassword: "newpassword123" }),
+    );
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["currentPassword"],
+          message: "Ingresá tu contraseña actual.",
+        }),
       );
     }
   });

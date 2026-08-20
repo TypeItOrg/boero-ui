@@ -6,6 +6,7 @@ import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { loginInstitutionalAccount } from "@features/institutional-auth/services/login-institutional.service";
 import {
+  clearInstitutionalPasswordChangedCookie,
   clearInstitutionalRegistrationSuccessCookie,
   setInstitutionalAuthCookies,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
@@ -18,6 +19,7 @@ export async function loginInstitutional(
   formData: FormData,
 ): Promise<InstitutionalLoginActionState> {
   await clearInstitutionalRegistrationSuccessCookie();
+  await clearInstitutionalPasswordChangedCookie();
 
   const parsed = institutionalLoginSchema.safeParse({
     institutionId: formData.get("institutionId") ?? "",

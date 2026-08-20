@@ -14,5 +14,7 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   INVALID_FORM: "Revisá los datos ingresados.",
   INVALID_CREDENTIALS: "El número de documento o la contraseña no son correctos.",
   REGISTERED: "Tu cuenta fue creada correctamente. Ya podés iniciar sesión.",
+  PASSWORD_CHANGED_TITLE: "¡Listo! Contraseña actualizada",
+  PASSWORD_CHANGED_DESCRIPTION: "Ahora podés ingresar con tu nueva contraseña.",
   FETCH_INSTITUTIONS: "No se pudieron cargar las instituciones.",
 } as const;

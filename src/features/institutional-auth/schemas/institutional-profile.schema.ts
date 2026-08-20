@@ -29,14 +29,23 @@ export const institutionalProfileSchema = z
         additionalInfo: z.string().optional(),
       })
       .optional(),
+    currentPassword: z.string().max(255, PEOPLE_ERROR_MESSAGES.PASSWORD_MAX_LENGTH).optional().default(""),
     password: z.string().max(255, PEOPLE_ERROR_MESSAGES.PASSWORD_MAX_LENGTH).optional().default(""),
     confirmPassword: z.string().optional().default(""),
   })
   .superRefine((values, context) => {
-    const password = values.password ?? "";
-    const confirmPassword = values.confirmPassword ?? "";
+    const { currentPassword, password, confirmPassword } = values;
+    const isPasswordChange = password !== "";
 
-    if (password !== "" && password.length < 8) {
+    if (isPasswordChange && currentPassword === "") {
+      context.addIssue({
+        code: "custom",
+        path: ["currentPassword"],
+        message: PEOPLE_ERROR_MESSAGES.REQUIRED_CURRENT_PASSWORD,
+      });
+    }
+
+    if (isPasswordChange && password.length < 8) {
       context.addIssue({
         code: "custom",
         path: ["password"],

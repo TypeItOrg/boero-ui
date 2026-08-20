@@ -1,6 +1,6 @@
 "use client";
 
-import { SyntheticEvent, useActionState, useState, useTransition } from "react";
+import { SyntheticEvent, useActionState, useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
@@ -12,6 +12,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui
 import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
+import { consumeInstitutionalPasswordChangedFlash } from "@features/institutional-auth/actions/consume-institutional-password-changed-flash.action";
 import {
   InstitutionPicker,
   type InstitutionalInstitution,
@@ -24,15 +25,28 @@ const INITIAL_STATE: InstitutionalLoginActionState = {};
 
 type InstitutionalLoginFormProps = {
   registered?: boolean;
+  passwordChanged?: boolean;
 };
 
-export function InstitutionalLoginForm({ registered = false }: InstitutionalLoginFormProps): React.ReactElement {
+export function InstitutionalLoginForm({
+  registered = false,
+  passwordChanged = false,
+}: InstitutionalLoginFormProps): React.ReactElement {
   const [state, formAction] = useActionState<InstitutionalLoginActionState, FormData>(
     loginInstitutional,
     INITIAL_STATE,
   );
   const [isPending, startTransition] = useTransition();
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
+  const [showPasswordChanged] = useState(passwordChanged);
+  const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
+  const canShowSuccessMessage = !isPending && !state.error && !hasFieldErrors;
+
+  useEffect(() => {
+    if (!passwordChanged) return;
+
+    void consumeInstitutionalPasswordChangedFlash();
+  }, [passwordChanged]);
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -59,11 +73,19 @@ export function InstitutionalLoginForm({ registered = false }: InstitutionalLogi
       </header>
 
       <div className="mt-6 space-y-6">
-        {registered && !isPending && !state.error && Object.keys(state.fieldErrors ?? {}).length === 0 ? (
+        {registered && canShowSuccessMessage ? (
           <Alert variant="success">
             <CheckCircle2Icon className="size-4" />
             <AlertTitle>Cuenta creada</AlertTitle>
             <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.REGISTERED}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        {showPasswordChanged && canShowSuccessMessage ? (
+          <Alert variant="success">
+            <CheckCircle2Icon className="size-4" />
+            <AlertTitle>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSWORD_CHANGED_TITLE}</AlertTitle>
+            <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSWORD_CHANGED_DESCRIPTION}</AlertDescription>
           </Alert>
         ) : null}
 

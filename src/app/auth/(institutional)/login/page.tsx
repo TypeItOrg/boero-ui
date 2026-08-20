@@ -3,7 +3,10 @@ import Image from "next/image";
 
 import { Card, CardContent } from "@common/components/ui/card";
 import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
-import { hasInstitutionalRegistrationSuccessCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+import {
+  hasInstitutionalPasswordChangedCookie,
+  hasInstitutionalRegistrationSuccessCookie,
+} from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
@@ -11,12 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage(): Promise<React.ReactElement> {
-  const registered = await hasInstitutionalRegistrationSuccessCookie();
+  const [registered, passwordChanged] = await Promise.all([
+    hasInstitutionalRegistrationSuccessCookie(),
+    hasInstitutionalPasswordChangedCookie(),
+  ]);
 
   return (
     <Card className="animate-fade-in-up p-0">
       <CardContent className="grid-cols-2 p-0 md:grid">
-        <InstitutionalLoginForm registered={registered} />
+        <InstitutionalLoginForm registered={registered} passwordChanged={passwordChanged} />
         <section className="from-primary to-primary/80 relative hidden bg-linear-to-l md:flex md:items-center md:justify-center">
           <Image
             priority

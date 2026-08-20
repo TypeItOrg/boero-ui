@@ -6,6 +6,7 @@ import { getResponseErrorActionState, getValidationActionState } from "@common/u
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { institutionalProfileSchema } from "@features/institutional-auth/schemas/institutional-profile.schema";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 export async function updateInstitutionalProfileAction(formData: FormData) {
   const payload = {
@@ -17,6 +18,7 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
     birthCityId: formData.get("birthCityId") || undefined,
     nationalityCountryId: formData.get("nationalityCountryId") || undefined,
     address: parseAddress(formData),
+    currentPassword: formData.get("currentPassword") || "",
     password: formData.get("password") || "",
     confirmPassword: formData.get("confirmPassword") || "",
   };
@@ -38,6 +40,7 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
   };
 
   if (parsed.data.password) {
+    requestBody.currentPassword = parsed.data.currentPassword;
     requestBody.password = parsed.data.password;
   }
 
@@ -52,6 +55,8 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
     "No se pudieron actualizar tus datos.",
   );
   if (errorState) return errorState;
+
+  if (parsed.data.password) await setInstitutionalPasswordChangedCookie();
 
   revalidatePath("/");
   revalidatePath("/profile");
@@ -73,6 +78,7 @@ const PROFILE_FIELDS = [
   "address.apartment",
   "address.neighborhood",
   "address.additionalInfo",
+  "currentPassword",
   "password",
   "confirmPassword",
 ] as const;

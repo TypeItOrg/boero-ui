@@ -6,23 +6,30 @@ import { cookies } from "next/headers";
 
 import {
   clearInstitutionalAuthCookies,
+  clearInstitutionalPasswordChangedCookie,
+  hasInstitutionalPasswordChangedCookie,
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_ACCESS_TOKEN_MAX_AGE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE,
   INSTITUTIONAL_REMEMBER_ME_MAX_AGE,
+  INSTITUTIONAL_PASSWORD_CHANGED_COOKIE,
+  INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE,
+  setInstitutionalPasswordChangedCookie,
   setInstitutionalAuthCookies,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 describe("institutional auth cookies", () => {
   const cookieStore = {
     delete: jest.fn(),
+    get: jest.fn(),
     set: jest.fn(),
   };
 
   beforeEach(() => {
     jest.mocked(cookies).mockResolvedValue(cookieStore as never);
     cookieStore.delete.mockReset();
+    cookieStore.get.mockReset();
     cookieStore.set.mockReset();
   });
 
@@ -58,5 +65,24 @@ describe("institutional auth cookies", () => {
 
     expect(cookieStore.delete).toHaveBeenNthCalledWith(1, INSTITUTIONAL_ACCESS_TOKEN_COOKIE);
     expect(cookieStore.delete).toHaveBeenNthCalledWith(2, INSTITUTIONAL_REFRESH_TOKEN_COOKIE);
+  });
+
+  it("sets and reads the password changed flash cookie", async () => {
+    await setInstitutionalPasswordChangedCookie();
+
+    expect(cookieStore.set).toHaveBeenCalledWith(
+      INSTITUTIONAL_PASSWORD_CHANGED_COOKIE,
+      "true",
+      expect.objectContaining({ maxAge: INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE }),
+    );
+
+    cookieStore.get.mockReturnValue({ value: "true" });
+    await expect(hasInstitutionalPasswordChangedCookie()).resolves.toBe(true);
+  });
+
+  it("clears the password changed flash cookie", async () => {
+    await clearInstitutionalPasswordChangedCookie();
+
+    expect(cookieStore.delete).toHaveBeenCalledWith(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE);
   });
 });
