@@ -312,6 +312,7 @@ async function renderPrimaryDetail(
         item={item}
         resource={input.resource}
         statusAction={statusAction}
+        returnTo={returnTo}
       />
       {curriculum ? (
         <StudyPlanCurriculumView

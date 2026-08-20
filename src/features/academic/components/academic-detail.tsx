@@ -40,6 +40,7 @@ type AcademicDetailProps = {
   canEdit: boolean;
   academicSpaceUsage?: AcademicSpaceUsageData | null;
   statusAction?: ReactNode;
+  returnTo?: string;
 };
 
 export function AcademicDetail({
@@ -49,11 +50,39 @@ export function AcademicDetail({
   canEdit,
   academicSpaceUsage,
   statusAction,
+  returnTo,
 }: AcademicDetailProps): React.ReactElement {
-  if (resource === AcademicResource.STUDY_PLAN) return <StudyPlanSummary plan={item as StudyPlan} />;
+  const destination = returnTo ?? `${basePath}/${resource}`;
+  const detailPath = `${basePath}/${resource}/${item.id}`;
+
+  const headerActions = (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <Button asChild size="lg" variant="outline">
+        <Link href={destination}>Volver</Link>
+      </Button>
+      {canEdit || statusAction ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {canEdit ? (
+            <Button asChild size="lg">
+              <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
+            </Button>
+          ) : null}
+          {statusAction}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  if (resource === AcademicResource.STUDY_PLAN) {
+    return (
+      <div className="flex flex-col gap-4">
+        {headerActions}
+        <StudyPlanSummary plan={item as StudyPlan} />
+      </div>
+    );
+  }
 
   const detail = getDetail(resource, item);
-  const detailPath = `${basePath}/${resource}/${item.id}`;
   const academicSpaceWarning =
     resource === AcademicResource.ACADEMIC_SPACE && academicSpaceUsage?.summary.deactivationBlocked ? (
       <AcademicSpaceUsageWarning
@@ -63,16 +92,7 @@ export function AcademicDetail({
 
   return (
     <div className="flex flex-col gap-4">
-      {canEdit || statusAction ? (
-        <div className="flex justify-end gap-2">
-          {canEdit ? (
-            <Button asChild size="lg">
-              <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
-            </Button>
-          ) : null}
-          {statusAction}
-        </div>
-      ) : null}
+      {headerActions}
       {academicSpaceWarning}
       <section aria-labelledby="academic-detail-info-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="border-b pb-5">
