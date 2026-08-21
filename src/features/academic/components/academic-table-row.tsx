@@ -7,7 +7,7 @@ import { TableCell, TableRow } from "@common/components/ui/table";
 import { AcademicContextMenuActions, AcademicRowActions } from "@features/academic/components/academic-row-actions";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import { ACADEMIC_LIFECYCLE_ACTION_KIND, type AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
+import type { AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicRowAction } from "@features/academic/types/academic-row-action.types";
 import type { AcademicStatusSelection } from "@features/academic/types/academic-status-selection.types";

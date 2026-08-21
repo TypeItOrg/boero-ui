@@ -8,7 +8,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import type { LifecycleResource } from "@features/academic/types/lifecycle-resource.types";
 import type { ResourceActionConfig } from "@features/academic/types/resource-action-config.types";
 import type { StatusResource } from "@features/academic/types/status-resource.types";
-import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 
 export const ACADEMIC_ACTION_FIELDS = [
