@@ -27,14 +27,7 @@ const CARD_CONTENT_CLASS = {
   prominent: "items-stretch gap-4",
 } as const;
 
-export function NavigationCard({
-  className,
-  description,
-  href,
-  icon: Icon,
-  prominent = false,
-  title,
-}: NavigationCardProps): React.ReactElement {
+export function NavigationCard({ className, description, href, icon: Icon, prominent = false, title }: NavigationCardProps): React.ReactElement {
   const size = prominent ? "prominent" : "compact";
 
   return (
@@ -48,10 +41,7 @@ export function NavigationCard({
     >
       <span className={cn("flex min-w-0 flex-1", CARD_CONTENT_CLASS[size])}>
         <span
-          className={cn(
-            "bg-background text-primary flex shrink-0 items-center justify-center border shadow-xs",
-            ICON_CONTAINER_SIZE_CLASS[size],
-          )}
+          className={cn("bg-background text-primary flex shrink-0 items-center justify-center border shadow-xs", ICON_CONTAINER_SIZE_CLASS[size])}
         >
           <Icon aria-hidden="true" className={prominent ? "size-6" : "size-5"} />
         </span>
@@ -60,10 +50,7 @@ export function NavigationCard({
           <span className="text-muted-foreground mt-0.5 block text-sm leading-relaxed">{description}</span>
         </span>
       </span>
-      <ChevronRightIcon
-        aria-hidden="true"
-        className="text-muted-foreground size-4 shrink-0 transition-transform group-hover:translate-x-0.5"
-      />
+      <ChevronRightIcon aria-hidden="true" className="text-muted-foreground size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
     </Link>
   );
 }

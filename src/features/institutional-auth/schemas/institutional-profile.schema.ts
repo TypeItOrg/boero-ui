@@ -7,10 +7,7 @@ export const institutionalProfileSchema = z
   .object({
     firstName: z.string().trim().min(3, "El nombre debe tener al menos 3 caracteres."),
     lastName: z.string().trim().min(3, "El apellido debe tener al menos 3 caracteres."),
-    birthDate: z
-      .string()
-      .min(1, "La fecha de nacimiento es requerida.")
-      .refine(hasMinimumPersonAge, "La persona debe tener al menos 3 años."),
+    birthDate: z.string().min(1, "La fecha de nacimiento es requerida.").refine(hasMinimumPersonAge, "La persona debe tener al menos 3 años."),
     email: z
       .string()
       .trim()

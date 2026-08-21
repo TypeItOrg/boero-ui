@@ -9,11 +9,7 @@ import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
 import type { Person } from "@features/people/types/person.types";
 import type { PersonFormInput } from "@features/people/types/person-form-input.types";
-import {
-  formatBirthDateInput,
-  getLatestAllowedBirthDate,
-  parseBirthDateInput,
-} from "@features/people/utils/person-birth-date.util";
+import { formatBirthDateInput, getLatestAllowedBirthDate, parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
 
 type PersonFormFieldsProps = {
   errors: FieldErrors<PersonFormInput>;
@@ -29,19 +25,10 @@ type PersonCreateFieldsProps = PersonFormFieldsProps & {
   control: Control<PersonFormInput>;
 };
 
-export function PersonDetailsFields({
-  errors,
-  isEdit,
-  person,
-  register,
-}: PersonDetailsFieldsProps): React.ReactElement {
+export function PersonDetailsFields({ errors, isEdit, person, register }: PersonDetailsFieldsProps): React.ReactElement {
   return (
     <PersonFormCard>
-      <PersonFormSectionHeading
-        icon={UserRoundIcon}
-        title="Datos personales"
-        description="Información principal del usuario institucional."
-      />
+      <PersonFormSectionHeading icon={UserRoundIcon} title="Datos personales" description="Información principal del usuario institucional." />
       <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
         <Field data-invalid={!!errors.firstName} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
@@ -49,12 +36,7 @@ export function PersonDetailsFields({
               Nombre
             </FieldLabel>
           </FieldContent>
-          <Input
-            id="person-first-name"
-            aria-invalid={!!errors.firstName}
-            defaultValue={person?.firstName}
-            {...register("firstName")}
-          />
+          <Input id="person-first-name" aria-invalid={!!errors.firstName} defaultValue={person?.firstName} {...register("firstName")} />
           <FieldError errors={[errors.firstName]} />
         </Field>
 
@@ -64,12 +46,7 @@ export function PersonDetailsFields({
               Apellido
             </FieldLabel>
           </FieldContent>
-          <Input
-            id="person-last-name"
-            aria-invalid={!!errors.lastName}
-            defaultValue={person?.lastName}
-            {...register("lastName")}
-          />
+          <Input id="person-last-name" aria-invalid={!!errors.lastName} defaultValue={person?.lastName} {...register("lastName")} />
           <FieldError errors={[errors.lastName]} />
         </Field>
       </FieldGroup>
@@ -88,13 +65,7 @@ export function PersonDetailsFields({
           <FieldContent>
             <FieldLabel htmlFor="person-email">Email</FieldLabel>
           </FieldContent>
-          <Input
-            id="person-email"
-            type="email"
-            aria-invalid={!!errors.email}
-            defaultValue={person?.email ?? ""}
-            {...register("email")}
-          />
+          <Input id="person-email" type="email" aria-invalid={!!errors.email} defaultValue={person?.email ?? ""} {...register("email")} />
           <FieldError errors={[errors.email]} />
         </Field>
 
@@ -102,12 +73,7 @@ export function PersonDetailsFields({
           <FieldContent>
             <FieldLabel htmlFor="person-phone">Teléfono</FieldLabel>
           </FieldContent>
-          <PhoneInput
-            id="person-phone"
-            aria-invalid={!!errors.phoneNumber}
-            defaultValue={person?.phoneNumber ?? ""}
-            {...register("phoneNumber")}
-          />
+          <PhoneInput id="person-phone" aria-invalid={!!errors.phoneNumber} defaultValue={person?.phoneNumber ?? ""} {...register("phoneNumber")} />
           <FieldError errors={[errors.phoneNumber]} />
         </Field>
       </FieldGroup>
@@ -136,11 +102,7 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
           <FieldContent>
             <FieldLabel htmlFor="person-confirm-password">Confirmar nueva contraseña</FieldLabel>
           </FieldContent>
-          <PasswordInput
-            id="person-confirm-password"
-            aria-invalid={!!errors.confirmPassword}
-            {...register("confirmPassword")}
-          />
+          <PasswordInput id="person-confirm-password" aria-invalid={!!errors.confirmPassword} {...register("confirmPassword")} />
           <FieldError errors={[errors.confirmPassword]} />
         </Field>
       </FieldGroup>
@@ -151,11 +113,7 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
 export function PersonCreateFields({ control, errors, register }: PersonCreateFieldsProps): React.ReactElement {
   return (
     <PersonFormCard>
-      <PersonFormSectionHeading
-        icon={ShieldCheckIcon}
-        title="Cuenta de acceso"
-        description="Credenciales iniciales para iniciar sesión."
-      />
+      <PersonFormSectionHeading icon={ShieldCheckIcon} title="Cuenta de acceso" description="Credenciales iniciales para iniciar sesión." />
       <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
         <Field data-invalid={!!errors.documentNumber} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
@@ -205,11 +163,7 @@ export function PersonCreateFields({ control, errors, register }: PersonCreateFi
               Confirmar contraseña
             </FieldLabel>
           </FieldContent>
-          <PasswordInput
-            id="person-confirm-password"
-            aria-invalid={!!errors.confirmPassword}
-            {...register("confirmPassword")}
-          />
+          <PasswordInput id="person-confirm-password" aria-invalid={!!errors.confirmPassword} {...register("confirmPassword")} />
           <FieldError errors={[errors.confirmPassword]} />
         </Field>
       </FieldGroup>
@@ -217,15 +171,7 @@ export function PersonCreateFields({ control, errors, register }: PersonCreateFi
   );
 }
 
-function PersonFormSectionHeading({
-  description,
-  icon: Icon,
-  title,
-}: {
-  description: string;
-  icon: LucideIcon;
-  title: string;
-}): React.ReactElement {
+function PersonFormSectionHeading({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
       <div className="flex items-center gap-3.5">

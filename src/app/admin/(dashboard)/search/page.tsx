@@ -4,10 +4,7 @@ import { DataTableNavigationProvider } from "@common/components/ui/data-table-na
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { ContextualSearchPagination } from "@features/contextual-search/components/contextual-search-pagination";
 import { ContextualSearchResultsTable } from "@features/contextual-search/components/contextual-search-results-table";
-import {
-  CONTEXTUAL_SEARCH_PRESENTATION,
-  isAcademicSearchEntity,
-} from "@features/contextual-search/config/contextual-search.config";
+import { CONTEXTUAL_SEARCH_PRESENTATION, isAcademicSearchEntity } from "@features/contextual-search/config/contextual-search.config";
 import { fetchContextualSearchPage } from "@features/contextual-search/services/fetch-contextual-search-page.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -45,23 +42,14 @@ export default async function AdminSearchPage({
       {data && entityType ? (
         <DataTableNavigationProvider>
           <ContextualSearchResultsTable entityType={entityType} items={data.items} />
-          <ContextualSearchPagination
-            page={data.page}
-            size={data.size}
-            totalItems={data.totalItems}
-            totalPages={data.totalPages}
-          />
+          <ContextualSearchPagination page={data.page} size={data.size} totalItems={data.totalItems} totalPages={data.totalPages} />
         </DataTableNavigationProvider>
       ) : (
         <div className="text-muted-foreground flex min-h-64 flex-col items-center justify-center gap-3 rounded-xl border border-dashed text-center text-sm">
           <span className="bg-muted flex size-11 items-center justify-center rounded-full">
             <SearchIcon className="size-5" />
           </span>
-          <p>
-            {hasInvalidType
-              ? "El tipo de resultado solicitado no es válido."
-              : "Usá la búsqueda superior para encontrar registros."}
-          </p>
+          <p>{hasInvalidType ? "El tipo de resultado solicitado no es válido." : "Usá la búsqueda superior para encontrar registros."}</p>
         </div>
       )}
     </PlatformPageShell>

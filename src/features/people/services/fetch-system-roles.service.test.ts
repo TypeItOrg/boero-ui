@@ -22,16 +22,11 @@ describe("fetchSystemRoles", () => {
   });
 
   it("extracts roles from the institutional paginated response", async () => {
-    peopleApiFetchMock.mockResolvedValue(
-      Response.json({ items: ASSIGNABLE_ROLES, page: 0, size: 50, totalItems: 1, totalPages: 1 }),
-    );
+    peopleApiFetchMock.mockResolvedValue(Response.json({ items: ASSIGNABLE_ROLES, page: 0, size: 50, totalItems: 1, totalPages: 1 }));
     const { fetchSystemRoles } = await importService();
 
     await expect(fetchSystemRoles("institution-1", PeopleScope.INSTITUTIONAL)).resolves.toEqual(ASSIGNABLE_ROLES);
-    expect(peopleApiFetchMock).toHaveBeenCalledWith(
-      PeopleScope.INSTITUTIONAL,
-      "/api/v1/institutions/institution-1/roles?size=50",
-    );
+    expect(peopleApiFetchMock).toHaveBeenCalledWith(PeopleScope.INSTITUTIONAL, "/api/v1/institutions/institution-1/roles?size=50");
   });
 
   it("preserves the platform role-array response", async () => {
@@ -39,9 +34,6 @@ describe("fetchSystemRoles", () => {
     const { fetchSystemRoles } = await importService();
 
     await expect(fetchSystemRoles("institution-1", PeopleScope.ADMIN)).resolves.toEqual(ASSIGNABLE_ROLES);
-    expect(peopleApiFetchMock).toHaveBeenCalledWith(
-      PeopleScope.ADMIN,
-      "/api/v1/admin/institutions/institution-1/roles",
-    );
+    expect(peopleApiFetchMock).toHaveBeenCalledWith(PeopleScope.ADMIN, "/api/v1/admin/institutions/institution-1/roles");
   });
 });

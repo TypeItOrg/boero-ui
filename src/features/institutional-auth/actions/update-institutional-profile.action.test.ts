@@ -53,9 +53,7 @@ describe("updateInstitutionalProfileAction", () => {
   });
 
   it("requires the current password before calling the API", async () => {
-    const result = await updateInstitutionalProfileAction(
-      createFormData({ password: "new-password", confirmPassword: "new-password" }),
-    );
+    const result = await updateInstitutionalProfileAction(createFormData({ password: "new-password", confirmPassword: "new-password" }));
 
     expect("fieldErrors" in result ? result.fieldErrors : undefined).toEqual({
       currentPassword: "Ingresá tu contraseña actual.",
@@ -66,9 +64,7 @@ describe("updateInstitutionalProfileAction", () => {
   });
 });
 
-function createFormData(
-  overrides: Partial<Record<"currentPassword" | "password" | "confirmPassword", string>> = {},
-): FormData {
+function createFormData(overrides: Partial<Record<"currentPassword" | "password" | "confirmPassword", string>> = {}): FormData {
   const values = {
     firstName: "Matías",
     lastName: "Boero",

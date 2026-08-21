@@ -9,11 +9,7 @@ type PermissionHierarchyProps = {
   layout?: "tree" | "columns";
 };
 
-export function PermissionHierarchy({
-  nodes,
-  renderPermission,
-  layout = "tree",
-}: PermissionHierarchyProps): React.ReactElement {
+export function PermissionHierarchy({ nodes, renderPermission, layout = "tree" }: PermissionHierarchyProps): React.ReactElement {
   const renderedNodes = nodes.map((node) => {
     const content = (
       <>
@@ -35,9 +31,5 @@ export function PermissionHierarchy({
     );
   });
 
-  return layout === "columns" ? (
-    <div className="grid gap-x-8 gap-y-4 2xl:grid-cols-2">{renderedNodes}</div>
-  ) : (
-    <>{renderedNodes}</>
-  );
+  return layout === "columns" ? <div className="grid gap-x-8 gap-y-4 2xl:grid-cols-2">{renderedNodes}</div> : <>{renderedNodes}</>;
 }

@@ -55,14 +55,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <NextTopLoader
-          color="var(--primary)"
-          crawlSpeed={200}
-          height={2}
-          shadow={false}
-          showForHashAnchor={false}
-          showSpinner={false}
-        />
+        <NextTopLoader color="var(--primary)" crawlSpeed={200} height={2} shadow={false} showForHashAnchor={false} showSpinner={false} />
         <Providers>
           <TooltipProvider>{children}</TooltipProvider>
         </Providers>

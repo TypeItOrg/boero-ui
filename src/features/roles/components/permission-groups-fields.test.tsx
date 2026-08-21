@@ -164,9 +164,7 @@ describe("PermissionGroupsFields", () => {
     render(<PermissionGroupsFields groups={[mockAcademicPermissionGroup]} />);
 
     const createYearField = screen.getByText("Crear ciclos lectivos").closest<HTMLElement>('[data-slot="field"]');
-    const createTrainingPathField = screen
-      .getByText("Crear trayectos formativos")
-      .closest<HTMLElement>('[data-slot="field"]');
+    const createTrainingPathField = screen.getByText("Crear trayectos formativos").closest<HTMLElement>('[data-slot="field"]');
 
     expect(createYearField).not.toBeNull();
     expect(createTrainingPathField).not.toBeNull();

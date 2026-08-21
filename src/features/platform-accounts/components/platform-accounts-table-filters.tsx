@@ -14,11 +14,7 @@ type PlatformAccountsTableFiltersProps = {
   size: number;
 };
 
-export function PlatformAccountsTableFilters({
-  enabled,
-  search,
-  size,
-}: PlatformAccountsTableFiltersProps): React.ReactElement {
+export function PlatformAccountsTableFilters({ enabled, search, size }: PlatformAccountsTableFiltersProps): React.ReactElement {
   const enabledValue = enabled === undefined ? "all" : enabled ? "true" : "false";
   const selectFilters: DataTableSelectFilter<EnabledFilterValue>[] = [
     {
@@ -30,12 +26,5 @@ export function PlatformAccountsTableFilters({
     },
   ];
 
-  return (
-    <DataTableFilters
-      search={search}
-      searchPlaceholder="Buscar por nombre o correo electrónico..."
-      selectFilters={selectFilters}
-      size={size}
-    />
-  );
+  return <DataTableFilters search={search} searchPlaceholder="Buscar por nombre o correo electrónico..." selectFilters={selectFilters} size={size} />;
 }

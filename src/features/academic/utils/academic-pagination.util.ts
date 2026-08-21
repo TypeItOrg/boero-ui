@@ -15,17 +15,9 @@ import type { TrainingPath } from "@features/academic/types/training-path.types"
 import { parseAcademicDateFilter, parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
 
 export const ACADEMIC_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
-export const ACADEMIC_YEAR_SORT_FIELDS = [
-  "year",
-  "startDate",
-  "endDate",
-] as const satisfies readonly (keyof AcademicYear)[];
+export const ACADEMIC_YEAR_SORT_FIELDS = ["year", "startDate", "endDate"] as const satisfies readonly (keyof AcademicYear)[];
 export const TRAINING_PATH_SORT_FIELDS = ["name"] as const satisfies readonly (keyof TrainingPath)[];
-export const STUDY_PLAN_SORT_FIELDS = [
-  "name",
-  "effectiveFrom",
-  "effectiveTo",
-] as const satisfies readonly (keyof StudyPlan)[];
+export const STUDY_PLAN_SORT_FIELDS = ["name", "effectiveFrom", "effectiveTo"] as const satisfies readonly (keyof StudyPlan)[];
 
 export type AcademicYearSortField = (typeof ACADEMIC_YEAR_SORT_FIELDS)[number];
 export type TrainingPathSortField = (typeof TRAINING_PATH_SORT_FIELDS)[number];

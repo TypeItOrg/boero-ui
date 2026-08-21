@@ -13,15 +13,9 @@ describe("parseSortQuery", () => {
 
   it("uses the default when either query param is missing, repeated, or unsupported", () => {
     expect(parseSortQuery({ sortField: "name" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(DEFAULT_SORT);
-    expect(
-      parseSortQuery({ sortField: ["name", "createdAt"], sortDirection: "asc" }, SORT_FIELDS, DEFAULT_SORT),
-    ).toEqual(DEFAULT_SORT);
-    expect(parseSortQuery({ sortField: "active", sortDirection: "desc" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(
-      DEFAULT_SORT,
-    );
-    expect(parseSortQuery({ sortField: "name", sortDirection: "latest" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(
-      DEFAULT_SORT,
-    );
+    expect(parseSortQuery({ sortField: ["name", "createdAt"], sortDirection: "asc" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(DEFAULT_SORT);
+    expect(parseSortQuery({ sortField: "active", sortDirection: "desc" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(DEFAULT_SORT);
+    expect(parseSortQuery({ sortField: "name", sortDirection: "latest" }, SORT_FIELDS, DEFAULT_SORT)).toEqual(DEFAULT_SORT);
   });
 });
 

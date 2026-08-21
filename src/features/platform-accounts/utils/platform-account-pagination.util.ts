@@ -8,12 +8,7 @@ import type { PlatformAccountAdmin } from "@features/platform-accounts/types/pla
 
 export const DEFAULT_PLATFORM_ACCOUNT_PAGE_SIZE = 10;
 export const PLATFORM_ACCOUNT_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
-export const PLATFORM_ACCOUNT_SORT_FIELDS = [
-  "name",
-  "email",
-  "enabled",
-  "createdAt",
-] as const satisfies readonly (keyof PlatformAccountAdmin)[];
+export const PLATFORM_ACCOUNT_SORT_FIELDS = ["name", "email", "enabled", "createdAt"] as const satisfies readonly (keyof PlatformAccountAdmin)[];
 
 export type PlatformAccountSortField = (typeof PLATFORM_ACCOUNT_SORT_FIELDS)[number];
 export type PlatformAccountSort = Sort<PlatformAccountSortField>;
@@ -36,9 +31,7 @@ export type PlatformAccountPaginationParams = PaginationParams & {
   sort: PlatformAccountSort;
 };
 
-export function parsePlatformAccountPaginationParams(
-  searchParams: PlatformAccountSearchParams,
-): PlatformAccountPaginationParams {
+export function parsePlatformAccountPaginationParams(searchParams: PlatformAccountSearchParams): PlatformAccountPaginationParams {
   const { page, size, search } = parsePaginationQuery(searchParams, {
     allowedPageSizes: new Set<number>(PLATFORM_ACCOUNT_PAGE_SIZE_OPTIONS),
     defaultSize: DEFAULT_PLATFORM_ACCOUNT_PAGE_SIZE,

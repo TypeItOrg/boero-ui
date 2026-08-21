@@ -6,10 +6,7 @@ jest.mock("@features/academic/actions/academic-resource.action", () => ({
 }));
 
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
-import {
-  ActiveAcademicStatusButton,
-  ActiveAcademicStatusDialog,
-} from "@features/academic/components/active-academic-status-dialog";
+import { ActiveAcademicStatusButton, ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
@@ -66,9 +63,7 @@ describe("ActiveAcademicStatusDialog", () => {
   it("disables its controls while the update is pending", async () => {
     const user = userEvent.setup();
     let resolveUpdate: (state: object) => void = () => undefined;
-    jest
-      .mocked(updateAcademicStatusAction)
-      .mockImplementationOnce(() => new Promise((resolve) => (resolveUpdate = resolve)));
+    jest.mocked(updateAcademicStatusAction).mockImplementationOnce(() => new Promise((resolve) => (resolveUpdate = resolve)));
 
     render(<StatusDialog resource={AcademicResource.INSTRUMENT} resourceLabel="Piano" />);
 
@@ -89,10 +84,7 @@ describe("ActiveAcademicStatusDialog", () => {
 
   it("resets a returned error after the button closes and reopens the dialog", async () => {
     const user = userEvent.setup();
-    jest
-      .mocked(updateAcademicStatusAction)
-      .mockResolvedValueOnce({ error: "No se puede desactivar el instrumento." })
-      .mockResolvedValue({});
+    jest.mocked(updateAcademicStatusAction).mockResolvedValueOnce({ error: "No se puede desactivar el instrumento." }).mockResolvedValue({});
 
     render(
       <ActiveAcademicStatusButton

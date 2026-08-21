@@ -13,11 +13,7 @@ type UpdatePersonStatusActionState = {
   error?: string;
 };
 
-export async function updatePersonStatusAction(
-  institutionId: string,
-  personId: string,
-  enabled: boolean,
-): Promise<UpdatePersonStatusActionState> {
+export async function updatePersonStatusAction(institutionId: string, personId: string, enabled: boolean): Promise<UpdatePersonStatusActionState> {
   if (!isValidUuid(institutionId) || !isValidUuid(personId)) {
     return { error: INVALID_ACTION_ARGUMENTS };
   }

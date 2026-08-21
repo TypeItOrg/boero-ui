@@ -33,13 +33,7 @@ export type AcademicAccess = {
 };
 
 export function canReadAcademic(access: AcademicAccess): boolean {
-  return (
-    access.yearRead ||
-    access.trainingPathRead ||
-    access.studyPlanRead ||
-    access.academicSpaceRead ||
-    access.instrumentRead
-  );
+  return access.yearRead || access.trainingPathRead || access.studyPlanRead || access.academicSpaceRead || access.instrumentRead;
 }
 
 export const FULL_ACADEMIC_ACCESS: AcademicAccess = {

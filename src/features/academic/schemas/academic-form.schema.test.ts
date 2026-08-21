@@ -40,9 +40,7 @@ describe("academic form schemas", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ["startDate"], message: "Ingresá una fecha válida." }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ path: ["startDate"], message: "Ingresá una fecha válida." })]),
       );
     }
   });
@@ -196,9 +194,7 @@ describe("academic form schemas", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ["effectiveTo"], message: "Ingresá la fecha de finalización." }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ path: ["effectiveTo"], message: "Ingresá la fecha de finalización." })]),
       );
     }
   });

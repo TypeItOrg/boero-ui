@@ -1,10 +1,7 @@
 import { NextRequest, type NextResponse } from "next/server";
 import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
 
-import {
-  PLATFORM_ACCESS_TOKEN_COOKIE,
-  PLATFORM_REFRESH_TOKEN_COOKIE,
-} from "@features/platform-auth/utils/platform-auth-cookies.util";
+import { PLATFORM_ACCESS_TOKEN_COOKIE, PLATFORM_REFRESH_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
 import {
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
@@ -23,9 +20,7 @@ describe("proxy", () => {
 
   function expectPlatformLoginRedirect(response: NextResponse): void {
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe(
-      "https://app.example.test/admin/auth/login?next=%2Fadmin%2Forders%3Fpage%3D2",
-    );
+    expect(response.headers.get("location")).toBe("https://app.example.test/admin/auth/login?next=%2Fadmin%2Forders%3Fpage%3D2");
     expect(response.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBeUndefined();
     expect(response.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBeUndefined();
   }
@@ -137,12 +132,8 @@ describe("proxy", () => {
     expect(firstResponse.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
     expect(secondResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
     expect(secondResponse.cookies.get(PLATFORM_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh-token");
-    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(
-      PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token",
-    );
-    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(
-      PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token",
-    );
+    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
+    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(PLATFORM_REFRESH_TOKEN_COOKIE + "=new-refresh-token");
   });
 
   it("refreshes different admin tokens independently", async () => {
@@ -313,12 +304,8 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
     expect(response.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
     expect(response.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
-    expect(response.headers.get("x-middleware-request-cookie")).toContain(
-      INSTITUTIONAL_ACCESS_TOKEN_COOKIE + "=new-access",
-    );
-    expect(response.headers.get("x-middleware-request-cookie")).toContain(
-      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
-    );
+    expect(response.headers.get("x-middleware-request-cookie")).toContain(INSTITUTIONAL_ACCESS_TOKEN_COOKIE + "=new-access");
+    expect(response.headers.get("x-middleware-request-cookie")).toContain(INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh");
   });
 
   it("deduplicates concurrent institutional refreshes for the same token", async () => {
@@ -349,12 +336,8 @@ describe("proxy", () => {
     expect(firstResponse.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
     expect(secondResponse.cookies.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access");
     expect(secondResponse.cookies.get(INSTITUTIONAL_REFRESH_TOKEN_COOKIE)?.value).toBe("new-refresh");
-    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(
-      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
-    );
-    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(
-      INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh",
-    );
+    expect(firstResponse.headers.get("x-middleware-request-cookie")).toContain(INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh");
+    expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh");
   });
 
   it("keeps institutional registration public", async () => {

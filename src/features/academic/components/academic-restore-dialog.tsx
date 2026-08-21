@@ -39,14 +39,7 @@ const INITIAL_STATE: AcademicActionState = {};
 
 export function AcademicRestoreDialog(props: AcademicRestoreDialogProps): React.ReactElement {
   const [state, formAction, isPending] = useActionState(
-    restoreAcademicResourceAction.bind(
-      null,
-      props.scope,
-      props.institutionId,
-      props.resource,
-      props.id,
-      props.destination,
-    ),
+    restoreAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
   );
 

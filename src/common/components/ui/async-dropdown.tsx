@@ -6,20 +6,8 @@ import { ChevronsUpDownIcon, SearchIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@common/components/ui/command";
-import {
-  DropdownEmptyState,
-  ErrorState,
-  LoadingState,
-  VirtualizedDropdownItems,
-} from "@common/components/ui/async-dropdown-virtual-list";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@common/components/ui/command";
+import { DropdownEmptyState, ErrorState, LoadingState, VirtualizedDropdownItems } from "@common/components/ui/async-dropdown-virtual-list";
 import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
 import type { AsyncDropdownDefaultOption } from "@common/types/async-dropdown-default-option.types";
 import type { AsyncDropdownProps } from "@common/types/async-dropdown-props.types";
@@ -86,10 +74,7 @@ export function AsyncDropdown<TItem>({
   const debouncedSearch = useDebouncedValue(search, debounceMs);
   const virtualListKey = `${listRenderVersion}-${debouncedSearch}`;
 
-  const asyncQueryKey = React.useMemo(
-    () => [...queryKey, { search: debouncedSearch, size: pageSize }],
-    [debouncedSearch, pageSize, queryKey],
-  );
+  const asyncQueryKey = React.useMemo(() => [...queryKey, { search: debouncedSearch, size: pageSize }], [debouncedSearch, pageSize, queryKey]);
 
   const query = useInfiniteQuery({
     queryKey: asyncQueryKey,
@@ -103,10 +88,7 @@ export function AsyncDropdown<TItem>({
 
   const { data, fetchNextPage, hasNextPage, isError, isFetching, isFetchingNextPage, isPending, refetch } = query;
   const items = React.useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
-  const selectedItem = React.useMemo(
-    () => items.find((item) => getItemValue(item) === value),
-    [getItemValue, items, value],
-  );
+  const selectedItem = React.useMemo(() => items.find((item) => getItemValue(item) === value), [getItemValue, items, value]);
   const selectedText = getSelectedText({
     defaultOption,
     getItemLabel,
@@ -115,10 +97,7 @@ export function AsyncDropdown<TItem>({
     selectedLabel,
     value,
   });
-  const isSelected =
-    selectedItem !== undefined ||
-    selectedLabel !== undefined ||
-    (defaultOption !== undefined && value === defaultOption.value);
+  const isSelected = selectedItem !== undefined || selectedLabel !== undefined || (defaultOption !== undefined && value === defaultOption.value);
   const isPlaceholder = !isSelected;
   const canClear = clearable && value !== undefined;
 
@@ -145,8 +124,7 @@ export function AsyncDropdown<TItem>({
   }
 
   let commandListContent: React.ReactNode;
-  const showDefaultOption =
-    !!defaultOption && (!search || defaultOption.label.toLowerCase().includes(search.toLowerCase()));
+  const showDefaultOption = !!defaultOption && (!search || defaultOption.label.toLowerCase().includes(search.toLowerCase()));
   const isLoading = isPending || (isFetching && !isFetchingNextPage);
 
   if (isLoading) {
@@ -157,9 +135,7 @@ export function AsyncDropdown<TItem>({
     const isSearching = debouncedSearch.trim() !== "";
     const activeIcon = isSearching ? SearchIcon : (emptyIcon ?? SearchIcon);
     const activeTitle = isSearching ? "No se encontraron resultados" : (emptyTitle ?? emptyMessage);
-    const activeDescription = isSearching
-      ? `No encontramos resultados para "${debouncedSearch.trim()}".`
-      : emptyDescription;
+    const activeDescription = isSearching ? `No encontramos resultados para "${debouncedSearch.trim()}".` : emptyDescription;
 
     commandListContent = (
       <CommandEmpty className="p-0">
@@ -223,9 +199,7 @@ export function AsyncDropdown<TItem>({
               type="button"
               variant="outline"
             >
-              <span className={cn("truncate font-normal", isPlaceholder && "text-muted-foreground")}>
-                {selectedText}
-              </span>
+              <span className={cn("truncate font-normal", isPlaceholder && "text-muted-foreground")}>{selectedText}</span>
               <ChevronsUpDownIcon data-icon="inline-end" />
             </Button>
           </PopoverTrigger>
@@ -245,12 +219,7 @@ export function AsyncDropdown<TItem>({
         </div>
         <PopoverContent align="start" className={cn("w-(--radix-popover-trigger-width) gap-0 p-0", contentClassName)}>
           <Command shouldFilter={false} loop>
-            <CommandInput
-              disabled={disabled}
-              onValueChange={setSearch}
-              placeholder={searchPlaceholder}
-              value={search}
-            />
+            <CommandInput disabled={disabled} onValueChange={setSearch} placeholder={searchPlaceholder} value={search} />
             <CommandList className="max-h-none overflow-visible p-0">{commandListContent}</CommandList>
           </Command>
         </PopoverContent>
@@ -259,14 +228,7 @@ export function AsyncDropdown<TItem>({
   );
 }
 
-function getSelectedText<TItem>({
-  defaultOption,
-  getItemLabel,
-  placeholder,
-  selectedItem,
-  selectedLabel,
-  value,
-}: SelectedTextInput<TItem>): string {
+function getSelectedText<TItem>({ defaultOption, getItemLabel, placeholder, selectedItem, selectedLabel, value }: SelectedTextInput<TItem>): string {
   if (selectedItem) return getItemLabel(selectedItem);
   if (selectedLabel) return selectedLabel;
   if (defaultOption && value === defaultOption.value) return defaultOption.label;

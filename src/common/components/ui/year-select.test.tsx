@@ -12,9 +12,7 @@ describe("YearSelect", () => {
   });
 
   it("renders the label of the controlled all option in the initial HTML", () => {
-    const markup = renderToStaticMarkup(
-      <YearSelect allOptionLabel="Todos" minYear={2000} maxYear={2027} value="all" />,
-    );
+    const markup = renderToStaticMarkup(<YearSelect allOptionLabel="Todos" minYear={2000} maxYear={2027} value="all" />);
 
     expect(markup).toMatch(/data-slot="select-value"[^>]*>Todos<\/span>/);
   });

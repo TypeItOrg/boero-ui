@@ -50,8 +50,7 @@ const STATUS_DIALOG_CONFIG: Record<AcademicYearTransition, StatusDialogConfig> =
     actionLabel: "Activar ciclo lectivo",
     description: (academicYearLabel) => (
       <>
-        El ciclo lectivo <span className="text-foreground font-semibold">{academicYearLabel}</span> quedará disponible
-        como período académico vigente.
+        El ciclo lectivo <span className="text-foreground font-semibold">{academicYearLabel}</span> quedará disponible como período académico vigente.
       </>
     ),
     icon: CalendarCheckIcon,
@@ -64,8 +63,8 @@ const STATUS_DIALOG_CONFIG: Record<AcademicYearTransition, StatusDialogConfig> =
     actionLabel: "Finalizar ciclo lectivo",
     description: (academicYearLabel) => (
       <>
-        La finalización del ciclo lectivo <span className="text-foreground font-semibold">{academicYearLabel}</span> es
-        definitiva y no podrá reabrirse.
+        La finalización del ciclo lectivo <span className="text-foreground font-semibold">{academicYearLabel}</span> es definitiva y no podrá
+        reabrirse.
       </>
     ),
     icon: CalendarXIcon,

@@ -11,21 +11,14 @@ type InstitutionalRouteLayoutProps = {
   children: React.ReactNode;
 };
 
-export async function InstitutionalRouteLayout({
-  children,
-}: InstitutionalRouteLayoutProps): Promise<React.ReactElement> {
+export async function InstitutionalRouteLayout({ children }: InstitutionalRouteLayoutProps): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
   const [person, cookieStore, requestHeaders] = await Promise.all([fetchInstitutionalPerson(), cookies(), headers()]);
   const sidebarOpen = cookieStore.get("institutional-sidebar-open")?.value !== "false";
   const shortcutPlatform = getContextualSearchShortcutPlatform(requestHeaders.get("user-agent"));
 
   return (
-    <InstitutionalShell
-      user={user}
-      institutionName={person?.institutionName}
-      defaultSidebarOpen={sidebarOpen}
-      shortcutPlatform={shortcutPlatform}
-    >
+    <InstitutionalShell user={user} institutionName={person?.institutionName} defaultSidebarOpen={sidebarOpen} shortcutPlatform={shortcutPlatform}>
       <Suspense fallback={<InstitutionalRouteSkeleton />}>{children}</Suspense>
     </InstitutionalShell>
   );

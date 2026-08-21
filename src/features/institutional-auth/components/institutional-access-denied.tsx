@@ -2,14 +2,7 @@ import Link from "next/link";
 import { HouseIcon, ShieldXIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@common/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 
 type InstitutionalAccessDeniedProps = {
   description?: string;

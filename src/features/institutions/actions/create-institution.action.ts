@@ -35,11 +35,7 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
     body: JSON.stringify(parsed.data),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    INSTITUTION_FORM_FIELD_NAMES,
-    INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION,
-  );
+  const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION);
   if (errorState) return errorState;
 
   revalidatePath("/admin/institutions");

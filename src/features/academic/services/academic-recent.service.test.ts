@@ -70,9 +70,7 @@ describe("fetchAcademicRecentItems", () => {
     jest.mocked(fetchAcademicSpaces).mockResolvedValue(page([]));
     jest
       .mocked(fetchInstruments)
-      .mockResolvedValue(
-        page([{ id: "instrument-id", institutionId: INSTITUTION_ID, name: "Piano", description: null, active: true }]),
-      );
+      .mockResolvedValue(page([{ id: "instrument-id", institutionId: INSTITUTION_ID, name: "Piano", description: null, active: true }]));
 
     const items = await fetchAcademicRecentItems(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, ACCESS);
 

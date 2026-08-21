@@ -1,24 +1,17 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import {
-  Building2Icon,
-  BuildingIcon,
-  CalendarPlusIcon,
-  KeyRoundIcon,
-  MapPinIcon,
-  type LucideIcon,
-  UsersIcon,
-} from "lucide-react";
+import { Building2Icon, BuildingIcon, CalendarPlusIcon, MapPinIcon, type LucideIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Separator } from "@common/components/ui/separator";
 import { cn } from "@common/utils/cn.util";
 import { InstitutionRegistrationChart } from "@features/platform-dashboard/components/institution-registration-chart";
 import { InstitutionStatusChart } from "@features/platform-dashboard/components/institution-status-chart";
-import type { PlatformDashboardSummary } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
+import { PlatformDashboardSummary } from "@features/platform-dashboard/components/platform-dashboard-summary";
+import type { PlatformDashboardSummary as PlatformDashboardSummaryData } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
 import type { PlatformDashboard } from "@features/platform-dashboard/types/platform-dashboard.types";
 import type { RecentInstitution } from "@features/platform-dashboard/types/recent-institution.types";
 import { formatDashboardDate } from "@features/platform-dashboard/utils/dashboard-date.util";
@@ -34,7 +27,7 @@ export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps)
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardSummary summary={dashboard.summary} />
+      <PlatformDashboardSummary summary={dashboard.summary} />
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-3">
         <Card className="bg-background min-w-0 p-5 sm:p-6 lg:col-span-2">
@@ -63,68 +56,7 @@ export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps)
   );
 }
 
-function DashboardSummary({ summary }: { summary: PlatformDashboardSummary }): React.ReactElement {
-  const cards: SummaryCardProps[] = [
-    {
-      label: "Instituciones",
-      value: summary.institutions,
-      description: "Registradas en la plataforma",
-      icon: Building2Icon,
-    },
-    {
-      label: "Instituciones activas",
-      value: summary.activeInstitutions,
-      description: "Habilitadas para operar en la plataforma",
-      icon: BuildingIcon,
-    },
-    {
-      label: "Personas",
-      value: summary.people,
-      description: "Registros institucionales vigentes",
-      icon: UsersIcon,
-    },
-    {
-      label: "Usuarios con acceso",
-      value: summary.usersWithAccess,
-      description: "Cuentas habilitadas para ingresar",
-      icon: KeyRoundIcon,
-    },
-  ];
-
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => (
-        <SummaryCard key={card.label} {...card} />
-      ))}
-    </div>
-  );
-}
-
-type SummaryCardProps = {
-  label: string;
-  value: number;
-  description: string;
-  icon: LucideIcon;
-};
-
-function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps): React.ReactElement {
-  return (
-    <Card className="bg-background p-5 sm:p-6">
-      <CardHeader className="p-0">
-        <CardTitle>{label}</CardTitle>
-        <CardAction className="bg-muted flex size-9 items-center justify-center rounded-lg">
-          <Icon className="text-muted-foreground size-4" aria-hidden="true" />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-1 p-0">
-        <p className="text-4xl font-bold tracking-tight tabular-nums">{numberFormatter.format(value)}</p>
-        <p className="text-muted-foreground text-xs">{description}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function InstitutionStatusCard({ summary }: { summary: PlatformDashboardSummary }): React.ReactElement {
+function InstitutionStatusCard({ summary }: { summary: PlatformDashboardSummaryData }): React.ReactElement {
   return (
     <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="p-0">
@@ -176,9 +108,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
       <CardHeader className="flex items-center justify-between gap-4 p-0">
         <div className="flex min-w-0 flex-col gap-1">
           <CardTitle>Instituciones recientes</CardTitle>
-          <CardDescription className="truncate">
-            Las últimas instituciones incorporadas a la plataforma.
-          </CardDescription>
+          <CardDescription className="truncate">Las últimas instituciones incorporadas a la plataforma.</CardDescription>
         </div>
         <div className="shrink-0 self-end">
           <Button asChild size="lg">
@@ -220,9 +150,7 @@ function RecentInstitutionRow({ institution }: { institution: RecentInstitution 
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-2">
           <p className="truncate font-medium">{institution.name}</p>
-          <Badge variant={institution.active ? "success" : "destructive"}>
-            {institution.active ? "Activa" : "Inactiva"}
-          </Badge>
+          <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
         </div>
         <p className="text-muted-foreground mt-1 flex min-w-0 items-center gap-1.5 text-xs">
           <MapPinIcon className="size-3.5 shrink-0" aria-hidden="true" />
@@ -231,10 +159,7 @@ function RecentInstitutionRow({ institution }: { institution: RecentInstitution 
           </span>
         </p>
       </div>
-      <time
-        className="text-muted-foreground hidden shrink-0 text-xs tabular-nums sm:block"
-        dateTime={institution.createdAt}
-      >
+      <time className="text-muted-foreground hidden shrink-0 text-xs tabular-nums sm:block" dateTime={institution.createdAt}>
         {formatDashboardDate(institution.createdAt)}
       </time>
     </Link>

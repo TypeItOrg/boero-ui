@@ -14,10 +14,7 @@ type UpdatePlatformAccountStatusState = {
 
 const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
-export async function updatePlatformAccountStatusAction(
-  id: string,
-  enabled: boolean,
-): Promise<UpdatePlatformAccountStatusState> {
+export async function updatePlatformAccountStatusAction(id: string, enabled: boolean): Promise<UpdatePlatformAccountStatusState> {
   if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
 
   const errorState = await getResponseErrorActionState(

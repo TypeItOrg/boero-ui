@@ -48,9 +48,7 @@ export function InstitutionRoleDeleteButton({
           <AlertDialogTitle>
             Eliminar “<span className="text-foreground font-semibold">{roleName}</span>”
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            Esta acción es permanente y solo puede realizarse si el rol no tiene usuarios asignados.
-          </AlertDialogDescription>
+          <AlertDialogDescription>Esta acción es permanente y solo puede realizarse si el rol no tiene usuarios asignados.</AlertDialogDescription>
           {error ? (
             <Alert variant="destructive">
               <CircleAlertIcon />

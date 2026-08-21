@@ -109,13 +109,7 @@ export function AcademicResourceForm({
             </div>
           </header>
           <div className="mt-5 flex flex-wrap gap-4">
-            <AcademicFormFields
-              resource={resource}
-              fieldErrors={state.fieldErrors}
-              institutionId={institutionId}
-              scope={scope}
-              {...options}
-            />
+            <AcademicFormFields resource={resource} fieldErrors={state.fieldErrors} institutionId={institutionId} scope={scope} {...options} />
           </div>
         </section>
       </div>

@@ -6,14 +6,7 @@ import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@common/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Skeleton } from "@common/components/ui/skeleton";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
@@ -23,9 +16,7 @@ type InstitutionPeoplePreviewProps = {
   institutionId: string;
 };
 
-export async function InstitutionPeoplePreview({
-  institutionId,
-}: InstitutionPeoplePreviewProps): Promise<React.ReactElement> {
+export async function InstitutionPeoplePreview({ institutionId }: InstitutionPeoplePreviewProps): Promise<React.ReactElement> {
   const people = await fetchPeople(institutionId, {
     page: 0,
     size: 5,
@@ -82,9 +73,7 @@ export async function InstitutionPeoplePreview({
                         {additionalRoleCount > 0 && <Badge variant="secondary">+{additionalRoleCount}</Badge>}
                       </div>
                     ) : null}
-                    <p className="text-muted-foreground min-w-0 truncate text-xs">
-                      {person.email ?? "Sin correo electrónico"}
-                    </p>
+                    <p className="text-muted-foreground min-w-0 truncate text-xs">{person.email ?? "Sin correo electrónico"}</p>
                   </div>
                 </div>
               </ReturnToLink>

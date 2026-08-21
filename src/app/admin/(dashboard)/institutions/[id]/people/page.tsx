@@ -26,10 +26,7 @@ export const metadata: Metadata = {
   title: "Lista de usuarios",
 };
 
-export default async function InstitutionPeoplePage({
-  params,
-  searchParams,
-}: PeoplePageProps): Promise<React.ReactElement> {
+export default async function InstitutionPeoplePage({ params, searchParams }: PeoplePageProps): Promise<React.ReactElement> {
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
   const rolesPromise = fetchSystemRoles(id, PeopleScope.ADMIN);
@@ -55,15 +52,7 @@ export default async function InstitutionPeoplePage({
         <PeopleSearchForm search={search} size={size} roleId={roleId} roles={roles} />
 
         <Suspense fallback={<PeopleTableSkeleton />}>
-          <PeopleTableContainer
-            institutionId={id}
-            page={page}
-            size={size}
-            search={search}
-            sort={sort}
-            roleId={roleId}
-            dataPromise={peoplePromise}
-          />
+          <PeopleTableContainer institutionId={id} page={page} size={size} search={search} sort={sort} roleId={roleId} dataPromise={peoplePromise} />
         </Suspense>
       </DataTableNavigationProvider>
     </PlatformPageShell>

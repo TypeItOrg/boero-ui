@@ -16,10 +16,7 @@ import { hasInstitutionalPermission } from "@features/institutional-auth/utils/i
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { InstitutionRoleDeleteButton } from "@features/roles/components/institution-role-delete-button";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
-import {
-  fetchInstitutionPermissionGroups,
-  fetchInstitutionRole,
-} from "@features/roles/services/institution-role.service";
+import { fetchInstitutionPermissionGroups, fetchInstitutionRole } from "@features/roles/services/institution-role.service";
 
 import type { Metadata } from "next";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
@@ -70,9 +67,7 @@ export default async function RoleDetailPage({
           <Link href={destination}>Volver</Link>
         </Button>
         <div className="flex flex-wrap justify-end gap-3">
-          {canDelete ? (
-            <InstitutionRoleDeleteButton institutionId={user.institutionId} roleId={role.id} roleName={role.name} />
-          ) : null}
+          {canDelete ? <InstitutionRoleDeleteButton institutionId={user.institutionId} roleId={role.id} roleName={role.name} /> : null}
           {canUpdate ? (
             <Button asChild size="lg">
               <ReturnToLink href={`/roles/${role.id}/edit`} returnTo={destination}>
@@ -90,11 +85,7 @@ export default async function RoleDetailPage({
         <RoleSummaryCard
           icon={UserLockIcon}
           label="Tipo de rol"
-          value={
-            <Badge variant={role.technicalCode ? "secondary" : "outline"}>
-              {role.technicalCode ? "Sistema" : "Personalizado"}
-            </Badge>
-          }
+          value={<Badge variant={role.technicalCode ? "secondary" : "outline"}>{role.technicalCode ? "Sistema" : "Personalizado"}</Badge>}
         />
         <RoleSummaryCard icon={UsersIcon} label="Usuarios asignados" value={String(role.assignmentCount)} />
         <RoleSummaryCard icon={KeyRoundIcon} label="Permisos concedidos" value={String(role.permissions.length)} />

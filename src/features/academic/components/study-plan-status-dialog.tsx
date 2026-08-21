@@ -55,8 +55,7 @@ const STATUS_DIALOG_CONFIG: Record<StudyPlanStatusTransition, StatusDialogConfig
     actionLabel: "Activar plan de estudio",
     description: (studyPlanLabel) => (
       <>
-        El plan de estudio <span className="text-foreground font-semibold">{studyPlanLabel}</span> quedará disponible
-        como versión curricular vigente.
+        El plan de estudio <span className="text-foreground font-semibold">{studyPlanLabel}</span> quedará disponible como versión curricular vigente.
       </>
     ),
     icon: CalendarCheckIcon,
@@ -70,8 +69,8 @@ const STATUS_DIALOG_CONFIG: Record<StudyPlanStatusTransition, StatusDialogConfig
     actionLabel: "Desactivar plan de estudio",
     description: (studyPlanLabel) => (
       <>
-        El plan de estudio <span className="text-foreground font-semibold">{studyPlanLabel}</span> conservará su
-        currícula histórica y dejará de estar vigente.
+        El plan de estudio <span className="text-foreground font-semibold">{studyPlanLabel}</span> conservará su currícula histórica y dejará de estar
+        vigente.
       </>
     ),
     icon: CalendarXIcon,
@@ -105,11 +104,8 @@ export function StudyPlanStatusDialog({
   const [effectiveTo, setEffectiveTo] = useState<Date>();
   const [effectiveToDraft, setEffectiveToDraft] = useState("");
   const effectiveFromDate = parseDateInput(effectiveFrom);
-  const hasInvalidEffectiveTo =
-    effectiveFromDate !== undefined && effectiveTo !== undefined && effectiveTo < effectiveFromDate;
-  const effectiveToError = hasInvalidEffectiveTo
-    ? "La fecha final no puede ser anterior al inicio del plan."
-    : state.fieldErrors?.effectiveTo;
+  const hasInvalidEffectiveTo = effectiveFromDate !== undefined && effectiveTo !== undefined && effectiveTo < effectiveFromDate;
+  const effectiveToError = hasInvalidEffectiveTo ? "La fecha final no puede ser anterior al inicio del plan." : state.fieldErrors?.effectiveTo;
   const effectiveToId = React.useId();
 
   function handleOpenChange(nextOpen: boolean): void {
@@ -145,11 +141,7 @@ export function StudyPlanStatusDialog({
                 </FieldLabel>
               </FieldContent>
               <input type="hidden" name="effectiveFrom" value={effectiveFrom ?? ""} />
-              <input
-                type="hidden"
-                name="effectiveTo"
-                value={effectiveTo ? formatDateInput(effectiveTo) : effectiveToDraft}
-              />
+              <input type="hidden" name="effectiveTo" value={effectiveTo ? formatDateInput(effectiveTo) : effectiveToDraft} />
               <DatePicker
                 id={effectiveToId}
                 value={effectiveTo}

@@ -15,11 +15,7 @@ export function TextField({
   ...props
 }: React.ComponentProps<typeof Input> & { label: string; description?: string; error?: string }): React.ReactElement {
   return (
-    <Field
-      className={className ?? "flex-[1_0_min(240px,100%)]"}
-      data-disabled={props.disabled}
-      data-invalid={Boolean(error)}
-    >
+    <Field className={className ?? "flex-[1_0_min(240px,100%)]"} data-disabled={props.disabled} data-invalid={Boolean(error)}>
       <FieldContent>
         <FieldLabel htmlFor={id} required={props.required}>
           {label}
@@ -83,13 +79,7 @@ export function DateField({
         </FieldLabel>
       </FieldContent>
       <input type="hidden" name={name} value={formatBirthDateInput(value)} />
-      <DatePicker
-        id={id}
-        value={value}
-        onChange={onChange}
-        maxDate={getLatestAllowedBirthDate()}
-        aria-invalid={Boolean(error)}
-      />
+      <DatePicker id={id} value={value} onChange={onChange} maxDate={getLatestAllowedBirthDate()} aria-invalid={Boolean(error)} />
       <FieldError>{error}</FieldError>
     </Field>
   );

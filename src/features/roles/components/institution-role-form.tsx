@@ -24,12 +24,7 @@ type InstitutionRoleFormProps = {
 
 const initialState: RoleFormState = {};
 
-export function InstitutionRoleForm({
-  institutionId,
-  role,
-  permissionGroups,
-  returnTo,
-}: InstitutionRoleFormProps): React.ReactElement {
+export function InstitutionRoleForm({ institutionId, role, permissionGroups, returnTo }: InstitutionRoleFormProps): React.ReactElement {
   const destination = returnTo ?? (role ? `/roles/${role.id}` : "/roles");
   const action = saveInstitutionRoleAction.bind(null, institutionId, role?.id, destination);
   const [state, formAction, pending] = useActionState(action, initialState);
@@ -72,13 +67,7 @@ export function InstitutionRoleForm({
               <FieldLabel htmlFor="name" required>
                 Nombre
               </FieldLabel>
-              <Input
-                id="name"
-                name="name"
-                defaultValue={role?.name}
-                aria-invalid={Boolean(state.fieldErrors?.name)}
-                maxLength={100}
-              />
+              <Input id="name" name="name" defaultValue={role?.name} aria-invalid={Boolean(state.fieldErrors?.name)} maxLength={100} />
               <FieldError>{state.fieldErrors?.name}</FieldError>
             </Field>
           </FieldGroup>

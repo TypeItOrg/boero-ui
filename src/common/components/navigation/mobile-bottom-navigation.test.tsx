@@ -30,13 +30,7 @@ describe("MobileBottomNavigation", () => {
       />,
     );
 
-    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "Inicio",
-      "Instituciones",
-      "Crear",
-      "Usuarios",
-      "Roles",
-    ]);
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Inicio", "Instituciones", "Crear", "Usuarios", "Roles"]);
     expect(screen.getByRole("link", { name: "Crear institución" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Instituciones" })).not.toHaveAttribute("aria-current");
   });

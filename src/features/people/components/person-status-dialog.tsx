@@ -54,10 +54,7 @@ export function PersonStatusDialog({
     setError(undefined);
 
     startTransition(async () => {
-      const result = await safelyRunAction(
-        updatePersonStatusAction(institutionId, personId, nextEnabled),
-        PEOPLE_ERROR_MESSAGES.UPDATE_STATUS,
-      );
+      const result = await safelyRunAction(updatePersonStatusAction(institutionId, personId, nextEnabled), PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
       if (!result.success) {
         setError(result.error ?? PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
         return;
@@ -84,13 +81,11 @@ export function PersonStatusDialog({
           <AlertDialogDescription>
             {nextEnabled ? (
               <>
-                <span className="text-foreground font-semibold">{personName}</span> recuperará el acceso al portal
-                institucional.
+                <span className="text-foreground font-semibold">{personName}</span> recuperará el acceso al portal institucional.
               </>
             ) : (
               <>
-                <span className="text-foreground font-semibold">{personName}</span> perderá el acceso y se cerrarán
-                todas sus sesiones activas.
+                <span className="text-foreground font-semibold">{personName}</span> perderá el acceso y se cerrarán todas sus sesiones activas.
               </>
             )}
           </AlertDialogDescription>
@@ -107,12 +102,7 @@ export function PersonStatusDialog({
           <AlertDialogCancel size="lg" disabled={isPending}>
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction
-            size="lg"
-            variant={nextEnabled ? "default" : "destructive"}
-            disabled={isPending}
-            onClick={handleConfirm}
-          >
+          <AlertDialogAction size="lg" variant={nextEnabled ? "default" : "destructive"} disabled={isPending} onClick={handleConfirm}>
             {isPending ? "Actualizando…" : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -2,10 +2,7 @@
 
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
-import {
-  ACADEMIC_PAGE_SIZE_OPTIONS,
-  getAcademicRegistrationSummary,
-} from "@features/academic/utils/academic-pagination.util";
+import { ACADEMIC_PAGE_SIZE_OPTIONS, getAcademicRegistrationSummary } from "@features/academic/utils/academic-pagination.util";
 
 type AcademicTablePaginationProps = PaginationParams & {
   isPending: boolean;

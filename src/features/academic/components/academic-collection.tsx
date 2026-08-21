@@ -1,17 +1,11 @@
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
-import {
-  ACADEMIC_COLLECTION_CONFIG,
-  type AcademicTableColumns,
-} from "@features/academic/config/academic-collection.config";
+import { ACADEMIC_COLLECTION_CONFIG, type AcademicTableColumns } from "@features/academic/config/academic-collection.config";
 import { fetchTrainingPath } from "@features/academic/services/academic.service";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import {
-  parseAcademicPaginationParams,
-  type AcademicSearchParams,
-} from "@features/academic/utils/academic-pagination.util";
+import { parseAcademicPaginationParams, type AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type AcademicCollectionProps = {

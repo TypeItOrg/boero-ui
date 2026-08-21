@@ -32,9 +32,7 @@ export function formatBirthDateInput(date: Date | undefined): string {
 }
 
 function getArgentinaToday(): Date {
-  const dateParts = new Map(
-    ARGENTINA_DATE_FORMATTER.formatToParts(new Date()).map((part) => [part.type, Number(part.value)]),
-  );
+  const dateParts = new Map(ARGENTINA_DATE_FORMATTER.formatToParts(new Date()).map((part) => [part.type, Number(part.value)]));
 
   return new Date(dateParts.get("year")!, dateParts.get("month")! - 1, dateParts.get("day")!);
 }

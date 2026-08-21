@@ -39,10 +39,7 @@ describe("InstitutionalBreadcrumb", () => {
     jest.mocked(usePathname).mockReturnValue("/study-plans/plan-id/academic-levels/level-id/edit");
 
     render(
-      <InstitutionalBreadcrumb
-        hiddenSegments={["academic-levels", "level-id"]}
-        segmentLabels={{ "plan-id": "Plan 2026", edit: "Editar Nivel 1" }}
-      />,
+      <InstitutionalBreadcrumb hiddenSegments={["academic-levels", "level-id"]} segmentLabels={{ "plan-id": "Plan 2026", edit: "Editar Nivel 1" }} />,
     );
 
     expect(screen.getByRole("link", { name: "Plan 2026" })).toHaveAttribute("href", "/study-plans/plan-id");

@@ -51,9 +51,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
         <Alert>
           <InfoIcon />
           <AlertTitle>Permisos protegidos</AlertTitle>
-          <AlertDescription>
-            Estos permisos se mantienen porque son necesarios para la administración institucional del rol.
-          </AlertDescription>
+          <AlertDescription>Estos permisos se mantienen porque son necesarios para la administración institucional del rol.</AlertDescription>
         </Alert>
       ) : null}
       <Card className="bg-muted/25">
@@ -91,13 +89,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
               <FieldLabel htmlFor="platform-role-name" required>
                 Nombre
               </FieldLabel>
-              <Input
-                id="platform-role-name"
-                name="name"
-                defaultValue={role?.name}
-                aria-invalid={Boolean(state.fieldErrors?.name)}
-                maxLength={100}
-              />
+              <Input id="platform-role-name" name="name" defaultValue={role?.name} aria-invalid={Boolean(state.fieldErrors?.name)} maxLength={100} />
               <FieldError>{state.fieldErrors?.name}</FieldError>
             </Field>
           </FieldGroup>
@@ -162,12 +154,7 @@ function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }):
   );
 }
 
-async function fetchInstitutionPage({
-  page,
-  search,
-  signal,
-  size,
-}: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
+async function fetchInstitutionPage({ page, search, signal, size }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
   const params = buildPaginationSearchParams({ page, size, search });
   params.set("active", "true");
   params.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));

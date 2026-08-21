@@ -1,10 +1,7 @@
 import { LayoutDashboardIcon } from "lucide-react";
 
 import { AcademicRecentItems } from "@features/academic/components/academic-recent-items";
-import {
-  AcademicResourceLinks,
-  getReadableAcademicResources,
-} from "@features/academic/components/academic-resource-links";
+import { AcademicResourceLinks, getReadableAcademicResources } from "@features/academic/components/academic-resource-links";
 import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
 import { fetchAcademicRecentItems } from "@features/academic/services/academic-recent.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
@@ -26,18 +23,9 @@ const STRUCTURE_RESOURCES: readonly AcademicCollectionResource[] = [
   AcademicResource.STUDY_PLAN,
 ];
 
-const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [
-  AcademicResource.ACADEMIC_SPACE,
-  AcademicResource.INSTRUMENT,
-];
+const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [AcademicResource.ACADEMIC_SPACE, AcademicResource.INSTRUMENT];
 
-export async function AcademicOverview({
-  access,
-  basePath,
-  breadcrumb,
-  institutionId,
-  scope,
-}: AcademicOverviewProps): Promise<React.ReactElement> {
+export async function AcademicOverview({ access, basePath, breadcrumb, institutionId, scope }: AcademicOverviewProps): Promise<React.ReactElement> {
   const resources = getReadableAcademicResources(access);
   const structureResources = STRUCTURE_RESOURCES.filter((resource) => resources.includes(resource));
   const catalogResources = CATALOG_RESOURCES.filter((resource) => resources.includes(resource));
@@ -54,10 +42,7 @@ export async function AcademicOverview({
     >
       <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
         {structureResources.length > 0 ? (
-          <AcademicGroup
-            title="Estructura académica"
-            description="Ciclos, trayectos y planes que ordenan la propuesta formativa."
-          >
+          <AcademicGroup title="Estructura académica" description="Ciclos, trayectos y planes que ordenan la propuesta formativa.">
             <AcademicResourceLinks basePath={basePath} resources={structureResources} />
           </AcademicGroup>
         ) : null}
@@ -74,15 +59,7 @@ export async function AcademicOverview({
   );
 }
 
-function AcademicGroup({
-  children,
-  description,
-  title,
-}: {
-  children: React.ReactNode;
-  description: string;
-  title: string;
-}): React.ReactElement {
+function AcademicGroup({ children, description, title }: { children: React.ReactNode; description: string; title: string }): React.ReactElement {
   return (
     <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
       <h2 className="text-base font-semibold">{title}</h2>

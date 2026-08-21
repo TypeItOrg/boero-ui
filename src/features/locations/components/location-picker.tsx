@@ -156,18 +156,12 @@ async function fetchCountries(input: AsyncDropdownFetchPageInput): Promise<Async
   return fetchLocationPage<Country>("/api/countries", input);
 }
 
-async function fetchProvinces(
-  input: AsyncDropdownFetchPageInput,
-  countryId: string | undefined,
-): Promise<AsyncDropdownPage<Province>> {
+async function fetchProvinces(input: AsyncDropdownFetchPageInput, countryId: string | undefined): Promise<AsyncDropdownPage<Province>> {
   if (!countryId) return { items: [], nextPage: null };
   return fetchLocationPage<Province>(`/api/countries/${countryId}/provinces`, input);
 }
 
-async function fetchCities(
-  input: AsyncDropdownFetchPageInput,
-  provinceId: string | undefined,
-): Promise<AsyncDropdownPage<City>> {
+async function fetchCities(input: AsyncDropdownFetchPageInput, provinceId: string | undefined): Promise<AsyncDropdownPage<City>> {
   if (!provinceId) return { items: [], nextPage: null };
   return fetchLocationPage<City>(`/api/provinces/${provinceId}/cities`, input);
 }

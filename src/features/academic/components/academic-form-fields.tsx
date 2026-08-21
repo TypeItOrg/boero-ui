@@ -2,18 +2,9 @@
 
 import type { ComponentType } from "react";
 
-import {
-  AcademicSpaceFields,
-  InstrumentFields,
-  TrainingPathFields,
-} from "@features/academic/components/academic-catalog-form-fields";
+import { AcademicSpaceFields, InstrumentFields, TrainingPathFields } from "@features/academic/components/academic-catalog-form-fields";
 import { AcademicYearFields } from "@features/academic/components/academic-year-form-fields";
-import {
-  AcademicLevelFields,
-  PrerequisiteFields,
-  StudyPlanFields,
-  StudyPlanSpaceFields,
-} from "@features/academic/components/study-plan-form-fields";
+import { AcademicLevelFields, PrerequisiteFields, StudyPlanFields, StudyPlanSpaceFields } from "@features/academic/components/study-plan-form-fields";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 

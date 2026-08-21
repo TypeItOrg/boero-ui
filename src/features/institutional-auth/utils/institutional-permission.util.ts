@@ -3,23 +3,14 @@ import type { InstitutionalUser } from "@features/institutional-auth/types/insti
 
 type InstitutionalPermissionSource = Pick<InstitutionalUser, "permissions"> | null | undefined;
 
-export function hasInstitutionalPermission(
-  user: InstitutionalPermissionSource,
-  permission: InstitutionalPermission,
-): boolean {
+export function hasInstitutionalPermission(user: InstitutionalPermissionSource, permission: InstitutionalPermission): boolean {
   return user?.permissions.includes(permission) ?? false;
 }
 
-export function hasAnyInstitutionalPermission(
-  user: InstitutionalPermissionSource,
-  permissions: readonly InstitutionalPermission[],
-): boolean {
+export function hasAnyInstitutionalPermission(user: InstitutionalPermissionSource, permissions: readonly InstitutionalPermission[]): boolean {
   return permissions.some((permission) => hasInstitutionalPermission(user, permission));
 }
 
-export function hasAllInstitutionalPermissions(
-  user: InstitutionalPermissionSource,
-  permissions: readonly InstitutionalPermission[],
-): boolean {
+export function hasAllInstitutionalPermissions(user: InstitutionalPermissionSource, permissions: readonly InstitutionalPermission[]): boolean {
   return permissions.every((permission) => hasInstitutionalPermission(user, permission));
 }

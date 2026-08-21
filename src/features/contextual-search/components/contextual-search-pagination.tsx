@@ -11,12 +11,7 @@ type ContextualSearchPaginationProps = {
   totalPages: number;
 };
 
-export function ContextualSearchPagination({
-  page,
-  size,
-  totalItems,
-  totalPages,
-}: ContextualSearchPaginationProps): React.ReactElement {
+export function ContextualSearchPagination({ page, size, totalItems, totalPages }: ContextualSearchPaginationProps): React.ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
   return (
     <DataTablePagination

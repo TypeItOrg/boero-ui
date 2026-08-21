@@ -26,21 +26,12 @@ export function PermissionGroupsFields({
   protectedPermissions = [],
   inputIdPrefix = "permission",
 }: PermissionGroupsFieldsProps): React.ReactElement {
-  const visibleGroups = React.useMemo(
-    () => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)),
-    [groups],
-  );
+  const visibleGroups = React.useMemo(() => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)), [groups]);
   const permissions = React.useMemo(() => getPermissionMap(visibleGroups), [visibleGroups]);
   const [explicitCodes, setExplicitCodes] = React.useState<Set<string>>(() => new Set(selectedPermissions));
-  const selectedCodes = React.useMemo(
-    () => expandSelectedPermissions(explicitCodes, permissions),
-    [explicitCodes, permissions],
-  );
+  const selectedCodes = React.useMemo(() => expandSelectedPermissions(explicitCodes, permissions), [explicitCodes, permissions]);
   const protectedCodeSet = React.useMemo(() => new Set(protectedPermissions), [protectedPermissions]);
-  const requiredCodeSet = React.useMemo(
-    () => getRequiredPermissionCodes(selectedCodes, permissions),
-    [permissions, selectedCodes],
-  );
+  const requiredCodeSet = React.useMemo(() => getRequiredPermissionCodes(selectedCodes, permissions), [permissions, selectedCodes]);
 
   function handlePermissionChange(code: string, checked: boolean): void {
     setExplicitCodes((currentCodes) => {
@@ -109,10 +100,7 @@ export function PermissionGroupsFields({
   }
 }
 
-function expandSelectedPermissions(
-  selectedPermissions: Iterable<string>,
-  permissions: ReadonlyMap<string, InstitutionPermission>,
-): Set<string> {
+function expandSelectedPermissions(selectedPermissions: Iterable<string>, permissions: ReadonlyMap<string, InstitutionPermission>): Set<string> {
   const selectedCodes = new Set(selectedPermissions);
   for (const code of selectedPermissions) {
     addRequiredPermissions(code, selectedCodes, permissions);
@@ -120,11 +108,7 @@ function expandSelectedPermissions(
   return selectedCodes;
 }
 
-function addRequiredPermissions(
-  code: string,
-  selectedCodes: Set<string>,
-  permissions: ReadonlyMap<string, InstitutionPermission>,
-): void {
+function addRequiredPermissions(code: string, selectedCodes: Set<string>, permissions: ReadonlyMap<string, InstitutionPermission>): void {
   const permission = permissions.get(code);
   if (!permission) return;
 
@@ -135,10 +119,7 @@ function addRequiredPermissions(
   }
 }
 
-function getRequiredPermissionCodes(
-  selectedCodes: ReadonlySet<string>,
-  permissions: ReadonlyMap<string, InstitutionPermission>,
-): Set<string> {
+function getRequiredPermissionCodes(selectedCodes: ReadonlySet<string>, permissions: ReadonlyMap<string, InstitutionPermission>): Set<string> {
   const requiredCodes = new Set<string>();
   for (const code of selectedCodes) {
     const permission = permissions.get(code);

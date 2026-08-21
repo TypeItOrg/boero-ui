@@ -38,11 +38,7 @@ export async function updatePlatformAccountAction(id: string, formData: FormData
     }),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-    PLATFORM_ACCOUNT_ERROR_MESSAGES.UPDATE_ACCOUNT,
-  );
+  const errorState = await getResponseErrorActionState(response, PLATFORM_ACCOUNT_FORM_FIELD_NAMES, PLATFORM_ACCOUNT_ERROR_MESSAGES.UPDATE_ACCOUNT);
   if (errorState) return errorState;
 
   revalidatePath(PLATFORM_ACCOUNTS_PATH);

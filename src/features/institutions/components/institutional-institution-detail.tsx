@@ -11,11 +11,7 @@ type InstitutionalInstitutionDetailProps = {
   returnTo: string;
 };
 
-export function InstitutionalInstitutionDetail({
-  canUpdate,
-  institution,
-  returnTo,
-}: InstitutionalInstitutionDetailProps): React.ReactElement {
+export function InstitutionalInstitutionDetail({ canUpdate, institution, returnTo }: InstitutionalInstitutionDetailProps): React.ReactElement {
   const address = formatAddress(institution);
 
   return (
@@ -33,11 +29,7 @@ export function InstitutionalInstitutionDetail({
         ) : null}
       </div>
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
-        <InstitutionSectionHeader
-          description="Datos de localización de la institución."
-          icon={MapPinIcon}
-          title="Ubicación"
-        />
+        <InstitutionSectionHeader description="Datos de localización de la institución." icon={MapPinIcon} title="Ubicación" />
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <LocationDetail label="Dirección" value={address} />
@@ -48,11 +40,7 @@ export function InstitutionalInstitutionDetail({
       </div>
 
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
-        <InstitutionSectionHeader
-          description="Canales principales para comunicarse con la institución."
-          icon={PhoneIcon}
-          title="Contacto"
-        />
+        <InstitutionSectionHeader description="Canales principales para comunicarse con la institución." icon={PhoneIcon} title="Contacto" />
 
         <div className="mt-5 grid gap-6 sm:grid-cols-2">
           <ContactDetail label="Teléfono" value={institution.phoneNumber} />
@@ -74,15 +62,7 @@ export function InstitutionalInstitutionDetail({
   );
 }
 
-function InstitutionSectionHeader({
-  description,
-  icon: Icon,
-  title,
-}: {
-  description: string;
-  icon: LucideIcon;
-  title: string;
-}): React.ReactElement {
+function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
       <div className="flex items-center gap-3.5">
@@ -122,12 +102,7 @@ function ContactDetail({ label, value }: { label: string; value: string | null }
 }
 
 function formatAddress(institution: Institution): string {
-  const street = [institution.street, institution.number]
-    .filter((part): part is string => Boolean(part?.trim()))
-    .join(" ");
+  const street = [institution.street, institution.number].filter((part): part is string => Boolean(part?.trim())).join(" ");
 
-  return (
-    [street, institution.neighborhood].filter((part): part is string => Boolean(part?.trim())).join(", ") ||
-    "Dirección no informada"
-  );
+  return [street, institution.neighborhood].filter((part): part is string => Boolean(part?.trim())).join(", ") || "Dirección no informada";
 }

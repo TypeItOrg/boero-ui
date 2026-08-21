@@ -6,9 +6,7 @@ type PlatformPeopleTableContainerProps = PlatformPeoplePaginationParams & {
   dataPromise: ReturnType<typeof fetchPlatformPeople>;
 };
 
-export async function PlatformPeopleTableContainer(
-  props: PlatformPeopleTableContainerProps,
-): Promise<React.ReactElement> {
+export async function PlatformPeopleTableContainer(props: PlatformPeopleTableContainerProps): Promise<React.ReactElement> {
   const { dataPromise, ...params } = props;
   const data = await dataPromise;
 

@@ -50,12 +50,7 @@ describe("Academic Option Dropdowns", () => {
 
       render(
         <QueryClientProvider client={queryClient}>
-          <TrainingPathDropdown
-            ariaInvalid={false}
-            institutionId="test-inst-id"
-            name="trainingPathId"
-            scope={AcademicScope.INSTITUTIONAL}
-          />
+          <TrainingPathDropdown ariaInvalid={false} institutionId="test-inst-id" name="trainingPathId" scope={AcademicScope.INSTITUTIONAL} />
         </QueryClientProvider>,
       );
 
@@ -76,12 +71,7 @@ describe("Academic Option Dropdowns", () => {
 
       render(
         <QueryClientProvider client={queryClient}>
-          <AcademicSpaceDropdown
-            ariaInvalid={false}
-            institutionId="test-inst-id"
-            name="academicSpaceId"
-            scope={AcademicScope.INSTITUTIONAL}
-          />
+          <AcademicSpaceDropdown ariaInvalid={false} institutionId="test-inst-id" name="academicSpaceId" scope={AcademicScope.INSTITUTIONAL} />
         </QueryClientProvider>,
       );
 

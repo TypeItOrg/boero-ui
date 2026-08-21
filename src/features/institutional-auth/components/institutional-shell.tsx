@@ -60,9 +60,7 @@ export function InstitutionalShell({
           institutionName={institutionName}
           shortcutPlatform={shortcutPlatform}
         />
-        <div className="bg-muted flex min-w-0 flex-1 flex-col overflow-x-hidden rounded-none md:rounded-2xl">
-          {children}
-        </div>
+        <div className="bg-muted flex min-w-0 flex-1 flex-col overflow-x-hidden rounded-none md:rounded-2xl">{children}</div>
       </SidebarInset>
       <MobileBottomNavigation items={navigationItems} primaryItem={INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM} />
     </SidebarProvider>

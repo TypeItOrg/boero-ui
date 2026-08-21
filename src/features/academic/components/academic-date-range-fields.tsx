@@ -55,12 +55,8 @@ export function DateRangeFields({
   startMinDate,
   startName,
 }: DateRangeFieldsProps): React.ReactElement {
-  const [internalStartDate, setInternalStartDate] = useState<Date | undefined>(() =>
-    parseInitialDate(initialValues, startName),
-  );
-  const [internalEndDate, setInternalEndDate] = useState<Date | undefined>(() =>
-    parseInitialDate(initialValues, endName),
-  );
+  const [internalStartDate, setInternalStartDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, startName));
+  const [internalEndDate, setInternalEndDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, endName));
   const isControlled = controlledRange !== undefined;
   const startDate = isControlled ? controlledRange.startDate : internalStartDate;
   const endDate = isControlled ? controlledRange.endDate : internalEndDate;

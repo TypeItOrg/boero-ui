@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller, type UseFormSetError } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
 
@@ -20,20 +20,15 @@ import {
 } from "@features/institutions/schemas/institutional-institution-form.schema";
 import { updateInstitutionalInstitutionAction } from "@features/institutions/actions/update-institutional-institution.action";
 import type { Institution } from "@features/institutions/types/institution.types";
-import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import { createInstitutionFormData } from "@features/institutions/utils/institution-form-data.util";
+import { applyServerErrors, getDefaultValues, getInitialLocation } from "@features/institutions/utils/institutional-institution-form.util";
 
 type InstitutionalInstitutionFormProps = {
   institution: Institution;
   returnTo?: string;
 };
 
-type InitialLocation = React.ComponentProps<typeof LocationPicker>["initialLocation"];
-
-export function InstitutionalInstitutionForm({
-  institution,
-  returnTo = "/institution",
-}: InstitutionalInstitutionFormProps): React.ReactElement {
+export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): React.ReactElement {
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
@@ -99,11 +94,7 @@ export function InstitutionalInstitutionForm({
               control={control}
               name="cityId"
               render={({ field, fieldState }) => (
-                <LocationPicker
-                  error={fieldState.error?.message}
-                  initialLocation={initialLocation}
-                  onValueChange={field.onChange}
-                />
+                <LocationPicker error={fieldState.error?.message} initialLocation={initialLocation} onValueChange={field.onChange} />
               )}
             />
 
@@ -141,12 +132,7 @@ export function InstitutionalInstitutionForm({
                 <FieldContent>
                   <FieldLabel htmlFor="institution-neighborhood">Barrio</FieldLabel>
                 </FieldContent>
-                <Input
-                  id="institution-neighborhood"
-                  defaultValue={defaultValues.neighborhood}
-                  placeholder="Centro"
-                  {...register("neighborhood")}
-                />
+                <Input id="institution-neighborhood" defaultValue={defaultValues.neighborhood} placeholder="Centro" {...register("neighborhood")} />
               </Field>
             </FieldGroup>
 
@@ -202,14 +188,7 @@ export function InstitutionalInstitutionForm({
       </div>
 
       <div className="border-border/40 flex flex-row flex-wrap items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className="flex-1 sm:flex-none"
-          disabled={isPending}
-          onClick={() => router.push(returnTo)}
-        >
+        <Button type="button" variant="outline" size="lg" className="flex-1 sm:flex-none" disabled={isPending} onClick={() => router.push(returnTo)}>
           Cancelar
         </Button>
 
@@ -228,52 +207,4 @@ function FormCard({ title, children }: { title: string; children: React.ReactNod
       {children}
     </div>
   );
-}
-
-function getDefaultValues(institution: Institution): InstitutionalInstitutionFormInput {
-  return {
-    name: institution.name,
-    cityId: institution.city.cityId,
-    street: institution.street ?? "",
-    number: institution.number ?? "",
-    neighborhood: institution.neighborhood ?? "",
-    additionalInfo: institution.additionalInfo ?? "",
-    phoneNumber: institution.phoneNumber ?? "",
-    email: institution.email ?? "",
-  };
-}
-
-function getInitialLocation(institution: Institution): InitialLocation {
-  return {
-    country: {
-      id: institution.country.countryId,
-      isoCode: institution.country.isoCode,
-      name: institution.country.name,
-    },
-    province: {
-      id: institution.province.provinceId,
-      name: institution.province.name,
-    },
-    city: {
-      id: institution.city.cityId,
-      name: institution.city.name,
-      province: institution.province.name,
-      provinceId: institution.province.provinceId,
-    },
-  };
-}
-
-function applyServerErrors(
-  state: InstitutionActionState,
-  setError: UseFormSetError<InstitutionalInstitutionFormInput>,
-  setFormError: (error: string) => void,
-): void {
-  if (state.error) setFormError(state.error);
-  if (!state.fieldErrors) return;
-
-  for (const [field, message] of Object.entries(state.fieldErrors)) {
-    if (message) {
-      setError(field as keyof InstitutionalInstitutionFormInput, { type: "server", message });
-    }
-  }
 }

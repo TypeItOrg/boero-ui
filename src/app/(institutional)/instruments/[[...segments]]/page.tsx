@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 
-import {
-  getInstitutionalAcademicMetadata,
-  renderInstitutionalAcademicRoute,
-} from "@features/academic/components/institutional-academic-route";
+import { getInstitutionalAcademicMetadata, renderInstitutionalAcademicRoute } from "@features/academic/components/institutional-academic-route";
 import type { InstitutionalAcademicPageProps } from "@features/academic/types/institutional-academic-page-props.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 

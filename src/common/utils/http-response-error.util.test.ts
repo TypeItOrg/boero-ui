@@ -8,10 +8,7 @@ describe("http response errors", () => {
   });
 
   it("throws an HttpResponseError for unsuccessful responses", async () => {
-    const response = Response.json(
-      { message: "El backend no está disponible." },
-      { status: 503, headers: { "X-Request-Id": "request-123" } },
-    );
+    const response = Response.json({ message: "El backend no está disponible." }, { status: 503, headers: { "X-Request-Id": "request-123" } });
 
     await expect(parseHttpResponse(response, "Service unavailable")).rejects.toEqual(
       new HttpResponseError("El backend no está disponible.", 503, "request-123"),
@@ -21,9 +18,7 @@ describe("http response errors", () => {
   it("uses the fallback for malformed error payloads", async () => {
     const response = new Response("not-json", { status: 502 });
 
-    await expect(parseHttpResponse(response, "Respuesta inválida")).rejects.toEqual(
-      new HttpResponseError("Respuesta inválida", 502),
-    );
+    await expect(parseHttpResponse(response, "Respuesta inválida")).rejects.toEqual(new HttpResponseError("Respuesta inválida", 502));
   });
 
   it("matches only the requested HttpResponseError status", () => {

@@ -24,14 +24,7 @@ type InstitutionsTablePresentationProps = PaginationParams & {
   active: boolean | undefined;
 };
 
-export function InstitutionsTablePresentation({
-  data,
-  page,
-  size,
-  sort,
-  search,
-  active,
-}: InstitutionsTablePresentationProps): React.ReactElement {
+export function InstitutionsTablePresentation({ data, page, size, sort, search, active }: InstitutionsTablePresentationProps): React.ReactElement {
   const router = useRouter();
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
   const [statusTargetInstitution, setStatusTargetInstitution] = useState<InstitutionSummary>();
@@ -49,15 +42,7 @@ export function InstitutionsTablePresentation({
   }
 
   if (data.items.length === 0) {
-    return (
-      <InstitutionsTableEmptyState
-        active={active}
-        isNavigating={isNavigating}
-        search={search}
-        size={size}
-        totalItems={data.totalItems}
-      />
-    );
+    return <InstitutionsTableEmptyState active={active} isNavigating={isNavigating} search={search} size={size} totalItems={data.totalItems} />;
   }
 
   return (
@@ -66,12 +51,7 @@ export function InstitutionsTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-240">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 border-b transition-colors">
-              <DataTableSortableHead<InstitutionSortField>
-                field="name"
-                label="Nombre"
-                sort={sort}
-                onSortChange={updateSort}
-              />
+              <DataTableSortableHead<InstitutionSortField> field="name" label="Nombre" sort={sort} onSortChange={updateSort} />
               <TableHead>País</TableHead>
               <TableHead>Provincia</TableHead>
               <TableHead>Ciudad</TableHead>
@@ -90,21 +70,13 @@ export function InstitutionsTablePresentation({
           </TableHeader>
           <TableBody>
             {data.items.map((institution) => (
-              <InstitutionsTableRow
-                key={institution.id}
-                institution={institution}
-                onStatusChange={setStatusTargetInstitution}
-              />
+              <InstitutionsTableRow key={institution.id} institution={institution} onStatusChange={setStatusTargetInstitution} />
             ))}
           </TableBody>
         </Table>
         {isNavigating && (
           <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
-            <Loader2Icon
-              className="text-muted-foreground size-5 animate-spin"
-              aria-label="Cargando instituciones"
-              role="status"
-            />
+            <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando instituciones" role="status" />
           </div>
         )}
       </div>

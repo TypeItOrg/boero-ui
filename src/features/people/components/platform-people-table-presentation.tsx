@@ -12,10 +12,7 @@ import { PlatformPeoplePagination } from "@features/people/components/platform-p
 import { PlatformPeopleTableRow } from "@features/people/components/platform-people-table-row";
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
-import type {
-  PlatformPeopleSort,
-  PlatformPeopleSortField,
-} from "@features/people/utils/platform-people-pagination.util";
+import type { PlatformPeopleSort, PlatformPeopleSortField } from "@features/people/utils/platform-people-pagination.util";
 
 type PlatformPeopleTablePresentationProps = PaginationParams & {
   data: PaginatedResponse<PlatformPersonSummary>;
@@ -52,11 +49,7 @@ export function PlatformPeopleTablePresentation({
         />
         {isPending ? (
           <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center rounded-lg backdrop-blur-[1px]">
-            <Loader2Icon
-              className="text-muted-foreground size-5 animate-spin"
-              aria-label="Cargando usuarios"
-              role="status"
-            />
+            <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando usuarios" role="status" />
           </div>
         ) : null}
       </div>
@@ -69,24 +62,9 @@ export function PlatformPeopleTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-260">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="h-11">
-              <DataTableSortableHead<PlatformPeopleSortField>
-                field="lastName"
-                label="Nombre"
-                sort={sort}
-                onSortChange={updateSort}
-              />
-              <DataTableSortableHead<PlatformPeopleSortField>
-                field="documentNumber"
-                label="Documento"
-                sort={sort}
-                onSortChange={updateSort}
-              />
-              <DataTableSortableHead<PlatformPeopleSortField>
-                field="institutionName"
-                label="Institución"
-                sort={sort}
-                onSortChange={updateSort}
-              />
+              <DataTableSortableHead<PlatformPeopleSortField> field="lastName" label="Nombre" sort={sort} onSortChange={updateSort} />
+              <DataTableSortableHead<PlatformPeopleSortField> field="documentNumber" label="Documento" sort={sort} onSortChange={updateSort} />
+              <DataTableSortableHead<PlatformPeopleSortField> field="institutionName" label="Institución" sort={sort} onSortChange={updateSort} />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Roles</TableHead>
@@ -104,11 +82,7 @@ export function PlatformPeopleTablePresentation({
 
         {isPending ? (
           <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
-            <Loader2Icon
-              className="text-muted-foreground size-5 animate-spin"
-              aria-label="Cargando usuarios"
-              role="status"
-            />
+            <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando usuarios" role="status" />
           </div>
         ) : null}
       </div>

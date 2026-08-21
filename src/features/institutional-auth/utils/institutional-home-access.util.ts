@@ -2,10 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { Building2Icon, KeyRoundIcon, UserRoundIcon, UserRoundPlusIcon, UsersIcon } from "lucide-react";
 
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
-import {
-  INSTITUTIONAL_PERMISSION,
-  type InstitutionalPermission,
-} from "@features/institutional-auth/types/institutional-permission.types";
+import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 
 export type InstitutionalHomeLink = {

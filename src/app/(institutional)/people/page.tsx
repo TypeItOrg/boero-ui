@@ -24,11 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Usuarios");
 }
 
-export default async function PeoplePage({
-  searchParams,
-}: {
-  searchParams: Promise<PeopleSearchParams>;
-}): Promise<React.ReactElement> {
+export default async function PeoplePage({ searchParams }: { searchParams: Promise<PeopleSearchParams> }): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) {
@@ -38,17 +34,12 @@ export default async function PeoplePage({
   const resolvedSearchParams = await searchParams;
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
   const rolesPromise = fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL);
-  const peoplePromise = fetchPeople(
-    user.institutionId,
-    { page, size, search, sort, roleId },
-    PeopleScope.INSTITUTIONAL,
-  );
+  const peoplePromise = fetchPeople(user.institutionId, { page, size, search, sort, roleId }, PeopleScope.INSTITUTIONAL);
   const [roles, canCreate, canUpdate, canManageRoles] = await Promise.all([
     rolesPromise,
     hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE),
     hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY),
-    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN) ||
-      hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE),
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN) || hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE),
   ]);
 
   return (

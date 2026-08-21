@@ -8,11 +8,7 @@ import { formatDisplayDate } from "@common/utils/date-input.util";
 import { AcademicSpaceUsagePagination } from "@features/academic/components/academic-space-usage-pagination";
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
-import {
-  approvalModeLabels,
-  requirementTypeLabels,
-  studyPlanStatusLabels,
-} from "@features/academic/utils/academic-labels.util";
+import { approvalModeLabels, requirementTypeLabels, studyPlanStatusLabels } from "@features/academic/utils/academic-labels.util";
 
 type AcademicSpaceUsageProps = {
   basePath: string;
@@ -34,9 +30,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
             <h2 id="academic-space-usage-title" className="text-base font-semibold">
               Uso en planes de estudio
             </h2>
-            <p className="text-muted-foreground text-sm">
-              Consultá dónde aparece este espacio y qué impacto tiene sobre la estructura curricular.
-            </p>
+            <p className="text-muted-foreground text-sm">Consultá dónde aparece este espacio y qué impacto tiene sobre la estructura curricular.</p>
           </div>
         </div>
       </header>
@@ -52,9 +46,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
           <div className="bg-background text-primary mb-5 flex size-14 items-center justify-center rounded-full border shadow-xs">
             <Layers3Icon className="size-7" aria-hidden="true" />
           </div>
-          <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">
-            Este espacio todavía no está incorporado a ningún plan
-          </h3>
+          <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">Este espacio todavía no está incorporado a ningún plan</h3>
           <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">
             Cuando forme parte de una estructura curricular, vas a poder consultar sus ubicaciones acá.
           </p>
@@ -68,12 +60,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
           </div>
           {plans.totalPages > 1 ? (
             <div className="mt-5 border-t pt-5">
-              <AcademicSpaceUsagePagination
-                page={plans.page}
-                size={plans.size}
-                totalItems={plans.totalItems}
-                totalPages={plans.totalPages}
-              />
+              <AcademicSpaceUsagePagination page={plans.page} size={plans.size} totalItems={plans.totalItems} totalPages={plans.totalPages} />
             </div>
           ) : null}
         </>
@@ -88,9 +75,8 @@ export function AcademicSpaceUsageWarning({ blockingPlanCount }: { blockingPlanC
       <CircleAlertIcon />
       <AlertTitle>No se puede desactivar este espacio</AlertTitle>
       <AlertDescription>
-        Está siendo utilizado por {blockingPlanCount}{" "}
-        {blockingPlanCount === 1 ? "plan activo o en edición" : "planes activos o en edición"}. Primero tenés que
-        modificar esos planes.
+        Está siendo utilizado por {blockingPlanCount} {blockingPlanCount === 1 ? "plan activo o en edición" : "planes activos o en edición"}. Primero
+        tenés que modificar esos planes.
       </AlertDescription>
     </Alert>
   );

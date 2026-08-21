@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { Separator } from "@common/components/ui/separator";
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@common/components/ui/sidebar";
+import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@common/components/ui/sidebar";
 import type { MobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import type { InstitutionalNavigationSection } from "@features/institutional-auth/utils/institutional-navigation.util";
 
@@ -22,10 +15,7 @@ export function InstitutionalSidebarNav({ sections, navigation }: InstitutionalS
   return (
     <div className="flex flex-col gap-3 group-data-[collapsible=icon]:gap-2">
       {sections.map((section, index) => (
-        <SidebarGroup
-          key={section.label ?? section.items[0]?.url}
-          className="gap-1 p-0 group-data-[collapsible=icon]:gap-0"
-        >
+        <SidebarGroup key={section.label ?? section.items[0]?.url} className="gap-1 p-0 group-data-[collapsible=icon]:gap-0">
           {index > 0 ? <Separator className="my-2 hidden group-data-[collapsible=icon]:block" /> : null}
           {section.label ? (
             <SidebarGroupLabel className="text-muted-foreground h-7 pr-2 pl-0 text-xs font-bold group-data-[collapsible=icon]:hidden">

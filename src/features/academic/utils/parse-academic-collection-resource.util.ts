@@ -1,7 +1,4 @@
-import {
-  ACADEMIC_COLLECTION_RESOURCES,
-  type AcademicCollectionResource,
-} from "@features/academic/types/academic-collection-resource.types";
+import { ACADEMIC_COLLECTION_RESOURCES, type AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 
 const academicCollectionResourceSet = new Set<string>(ACADEMIC_COLLECTION_RESOURCES);
 

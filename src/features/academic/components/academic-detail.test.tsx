@@ -34,9 +34,7 @@ describe("AcademicDetail", () => {
     render(<AcademicDetail item={TRAINING_PATH} resource={AcademicResource.TRAINING_PATH} basePath="" canEdit />);
 
     const info = screen.getByRole("region", { name: "Información" });
-    expect(
-      within(info).getByText("Consultá los datos generales y el estado del trayecto formativo."),
-    ).toBeInTheDocument();
+    expect(within(info).getByText("Consultá los datos generales y el estado del trayecto formativo.")).toBeInTheDocument();
     expect(within(info).getByText("Formación docente.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/training-paths");
     expect(screen.getByRole("link", { name: "Editar" })).toHaveAttribute(
@@ -64,9 +62,7 @@ describe("AcademicDetail", () => {
     );
 
     const info = screen.getByRole("region", { name: "Información" });
-    expect(
-      within(info).getByText("Consultá los datos generales y el estado del espacio académico."),
-    ).toBeInTheDocument();
+    expect(within(info).getByText("Consultá los datos generales y el estado del espacio académico.")).toBeInTheDocument();
     expect(within(info).getByText("Activo")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/academic-spaces");
     expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
@@ -105,19 +101,12 @@ describe("AcademicDetail", () => {
       type: "SUBJECT" as const,
       active: true,
     };
-    const { rerender } = render(
-      <AcademicDetail item={academicSpace} resource={AcademicResource.ACADEMIC_SPACE} basePath="" canEdit={false} />,
-    );
+    const { rerender } = render(<AcademicDetail item={academicSpace} resource={AcademicResource.ACADEMIC_SPACE} basePath="" canEdit={false} />);
 
     expect(screen.getByText("Estudio de relaciones entre sonidos.")).toBeInTheDocument();
 
     rerender(
-      <AcademicDetail
-        item={{ ...academicSpace, description: null }}
-        resource={AcademicResource.ACADEMIC_SPACE}
-        basePath=""
-        canEdit={false}
-      />,
+      <AcademicDetail item={{ ...academicSpace, description: null }} resource={AcademicResource.ACADEMIC_SPACE} basePath="" canEdit={false} />,
     );
 
     expect(screen.getByText("Sin descripción")).toBeInTheDocument();
@@ -146,14 +135,7 @@ describe("AcademicDetail", () => {
     { effectiveFrom: null, effectiveTo: "2026-12-31", expected: "Hasta 31/12/2026" },
     { effectiveFrom: "2026-01-01", effectiveTo: "2026-12-31", expected: "01/01/2026 — 31/12/2026" },
   ])("shows study-plan validity as $expected", ({ effectiveFrom, effectiveTo, expected }) => {
-    render(
-      <AcademicDetail
-        item={{ ...STUDY_PLAN, effectiveFrom, effectiveTo }}
-        resource={AcademicResource.STUDY_PLAN}
-        basePath=""
-        canEdit
-      />,
-    );
+    render(<AcademicDetail item={{ ...STUDY_PLAN, effectiveFrom, effectiveTo }} resource={AcademicResource.STUDY_PLAN} basePath="" canEdit />);
 
     const summary = screen.getByRole("region", { name: "Resumen" });
     const validity = within(summary).getByText("Vigencia").nextElementSibling;

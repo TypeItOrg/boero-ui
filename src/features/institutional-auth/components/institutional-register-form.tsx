@@ -14,20 +14,14 @@ import { NumericInput } from "@common/components/ui/restricted-input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
 import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
-import {
-  InstitutionPicker,
-  type InstitutionalInstitution,
-} from "@features/institutional-auth/components/institution-picker";
+import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
 import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
 export function InstitutionalRegisterForm(): React.ReactElement {
-  const [state, formAction] = useActionState<InstitutionalRegisterActionState, FormData>(
-    registerInstitutional,
-    INITIAL_STATE,
-  );
+  const [state, formAction] = useActionState<InstitutionalRegisterActionState, FormData>(registerInstitutional, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
   const [birthDate, setBirthDate] = useState<Date>();
@@ -42,13 +36,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
   return (
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
       <header className="flex flex-col items-center space-y-1 text-center">
-        <Image
-          width={875}
-          height={1202}
-          src="/boero-logo.webp"
-          alt="Logo de la institución"
-          className="h-auto w-20 md:hidden"
-        />
+        <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-20 md:hidden" />
         <h1 className="text-2xl font-bold">Formá parte</h1>
         <p className="text-muted-foreground text-sm">
           <span className="hidden md:block">Completá tus datos para registrarte en una institución.</span>
@@ -77,9 +65,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
               selectedLabel={institution?.name}
               value={institution?.id}
             />
-            <FieldError
-              errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined} />
           </Field>
         </FieldGroup>
 
@@ -96,12 +82,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
             <FieldLabel htmlFor="register-last-name" required>
               Apellido
             </FieldLabel>
-            <Input
-              aria-invalid={!!state.fieldErrors?.lastName}
-              autoComplete="family-name"
-              id="register-last-name"
-              name="lastName"
-            />
+            <Input aria-invalid={!!state.fieldErrors?.lastName} autoComplete="family-name" id="register-last-name" name="lastName" />
             <FieldError errors={state.fieldErrors?.lastName ? [{ message: state.fieldErrors.lastName }] : undefined} />
           </Field>
         </div>
@@ -118,9 +99,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
               maxLength={8}
               name="documentNumber"
             />
-            <FieldError
-              errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined} />
           </Field>
 
           <Field data-invalid={!!state.fieldErrors?.birthDate}>
@@ -135,9 +114,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
               onChange={setBirthDate}
               value={birthDate}
             />
-            <FieldError
-              errors={state.fieldErrors?.birthDate ? [{ message: state.fieldErrors.birthDate }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.birthDate ? [{ message: state.fieldErrors.birthDate }] : undefined} />
           </Field>
         </div>
 
@@ -146,12 +123,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
             <FieldLabel htmlFor="register-password" required>
               Contraseña
             </FieldLabel>
-            <PasswordInput
-              aria-invalid={!!state.fieldErrors?.password}
-              autoComplete="new-password"
-              id="register-password"
-              name="password"
-            />
+            <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="new-password" id="register-password" name="password" />
             <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
           </Field>
 
@@ -165,17 +137,13 @@ export function InstitutionalRegisterForm(): React.ReactElement {
               id="register-confirm-password"
               name="confirmPassword"
             />
-            <FieldError
-              errors={state.fieldErrors?.confirmPassword ? [{ message: state.fieldErrors.confirmPassword }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.confirmPassword ? [{ message: state.fieldErrors.confirmPassword }] : undefined} />
           </Field>
         </div>
 
         <footer className="mt-6 flex w-full flex-col gap-4">
           <Button aria-busy={isPending} className="relative w-full" disabled={isPending} size="lg" type="submit">
-            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>
-              Crear cuenta
-            </span>
+            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>Crear cuenta</span>
             {isPending ? (
               <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
                 <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />

@@ -26,10 +26,7 @@ const passwordConfirmationSchema = {
 
 export const platformAccountFormSchema = platformAccountIdentitySchema
   .extend({
-    password: z
-      .string()
-      .min(8, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
-      .max(255, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
+    password: z.string().min(8, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH).max(255, PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
     confirmPassword: z.string().min(1, PLATFORM_ACCOUNT_ERROR_MESSAGES.REQUIRED_PASSWORD_CONFIRMATION),
   })
   .refine((values) => values.password === values.confirmPassword, {
@@ -37,25 +34,23 @@ export const platformAccountFormSchema = platformAccountIdentitySchema
     path: ["confirmPassword"],
   });
 
-export const platformAccountUpdateFormSchema = platformAccountIdentitySchema
-  .extend(passwordConfirmationSchema)
-  .superRefine((values, context) => {
-    if (values.password !== "" && values.password.length < 8) {
-      context.addIssue({
-        code: "custom",
-        path: ["password"],
-        message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH,
-      });
-    }
+export const platformAccountUpdateFormSchema = platformAccountIdentitySchema.extend(passwordConfirmationSchema).superRefine((values, context) => {
+  if (values.password !== "" && values.password.length < 8) {
+    context.addIssue({
+      code: "custom",
+      path: ["password"],
+      message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MIN_LENGTH,
+    });
+  }
 
-    if (values.password !== values.confirmPassword) {
-      context.addIssue({
-        code: "custom",
-        path: ["confirmPassword"],
-        message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MISMATCH,
-      });
-    }
-  });
+  if (values.password !== values.confirmPassword) {
+    context.addIssue({
+      code: "custom",
+      path: ["confirmPassword"],
+      message: PLATFORM_ACCOUNT_ERROR_MESSAGES.PASSWORD_MISMATCH,
+    });
+  }
+});
 
 export type PlatformAccountFormInput = z.input<typeof platformAccountFormSchema>;
 export type PlatformAccountFormValues = z.output<typeof platformAccountFormSchema>;

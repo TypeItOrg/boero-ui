@@ -43,13 +43,7 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps) {
                 <span className="truncate text-xs">{user.email}</span>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => logout.mutate()}
-              disabled={logout.isPending}
-              aria-label="Cerrar sesión"
-            >
+            <Button variant="ghost" size="icon-sm" onClick={() => logout.mutate()} disabled={logout.isPending} aria-label="Cerrar sesión">
               <LogOutIcon />
             </Button>
           </div>

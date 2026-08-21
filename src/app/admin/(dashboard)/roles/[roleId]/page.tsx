@@ -48,9 +48,7 @@ export default async function PlatformRoleDetailPage({
           <Link href={destination}>Volver</Link>
         </Button>
         <div className="flex flex-wrap justify-end gap-3">
-          {role.deletable ? (
-            <PlatformRoleDeleteButton roleId={role.id} institutionId={role.institution.id} roleName={role.name} />
-          ) : null}
+          {role.deletable ? <PlatformRoleDeleteButton roleId={role.id} institutionId={role.institution.id} roleName={role.name} /> : null}
           {role.editable ? (
             <Button asChild size="lg">
               <ReturnToLink href={`/admin/roles/${role.id}/edit`} returnTo={destination}>
@@ -75,11 +73,7 @@ export default async function PlatformRoleDetailPage({
         <RoleSummaryCard
           icon={ShieldCheckIcon}
           label="Tipo de rol"
-          value={
-            <Badge variant={role.technicalCode ? "secondary" : "outline"}>
-              {role.technicalCode ? "Sistema" : "Personalizado"}
-            </Badge>
-          }
+          value={<Badge variant={role.technicalCode ? "secondary" : "outline"}>{role.technicalCode ? "Sistema" : "Personalizado"}</Badge>}
         />
         <RoleSummaryCard icon={UsersIcon} label="Usuarios asignados" value={String(role.assignmentCount)} />
         <RoleSummaryCard icon={KeyRoundIcon} label="Permisos concedidos" value={String(role.permissions.length)} />

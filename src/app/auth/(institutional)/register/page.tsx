@@ -15,14 +15,7 @@ export default function RegisterPage(): React.ReactElement {
       <CardContent className="grid-cols-2 p-0 md:grid">
         <InstitutionalRegisterForm />
         <section className="from-primary to-primary/80 relative hidden bg-linear-to-l md:flex md:items-center md:justify-center">
-          <Image
-            priority
-            width={875}
-            height={1202}
-            src="/boero-logo.webp"
-            alt="Logo de la institución"
-            className="h-auto w-56"
-          />
+          <Image priority width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-56" />
         </section>
       </CardContent>
     </Card>

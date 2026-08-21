@@ -14,10 +14,7 @@ type PlatformAccountStatusControlProps = {
   enabled: boolean;
 };
 
-export function PlatformAccountStatusControl({
-  accountId,
-  enabled,
-}: PlatformAccountStatusControlProps): React.ReactElement {
+export function PlatformAccountStatusControl({ accountId, enabled }: PlatformAccountStatusControlProps): React.ReactElement {
   const router = useRouter();
   const { account: currentAccount } = usePlatformAccount();
   const [isPending, startTransition] = React.useTransition();
@@ -57,11 +54,7 @@ export function PlatformAccountStatusControl({
       ) : null}
 
       <div className="flex justify-end">
-        <Button
-          variant={enabled ? "destructive" : "default"}
-          onClick={updateStatus}
-          disabled={isPending || (isCurrentAccount && enabled)}
-        >
+        <Button variant={enabled ? "destructive" : "default"} onClick={updateStatus} disabled={isPending || (isCurrentAccount && enabled)}>
           {isPending ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : null}
           {getStatusActionLabel(enabled, isPending)}
         </Button>

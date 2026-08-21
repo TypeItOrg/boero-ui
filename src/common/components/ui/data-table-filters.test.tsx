@@ -79,9 +79,7 @@ describe("DataTableFilters", () => {
   });
 
   it("keeps the date picker mounted when the external filter value changes", () => {
-    const { rerender } = render(
-      <DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: undefined }]} />,
-    );
+    const { rerender } = render(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: undefined }]} />);
     const input = screen.getByRole("textbox");
 
     rerender(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2035-01-01" }]} />);

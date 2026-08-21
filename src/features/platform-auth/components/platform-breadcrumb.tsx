@@ -4,14 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@common/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
 const ROUTE_LABELS: Readonly<Record<string, string>> = {
   institutions: "Instituciones",
@@ -78,18 +71,9 @@ function getSegments(
   return segments;
 }
 
-export function PlatformBreadcrumb({
-  hiddenSegments = EMPTY_SEGMENTS,
-  segmentHrefs,
-  segmentLabels,
-}: PlatformBreadcrumbProps): React.ReactElement {
+export function PlatformBreadcrumb({ hiddenSegments = EMPTY_SEGMENTS, segmentHrefs, segmentLabels }: PlatformBreadcrumbProps): React.ReactElement {
   const pathname = usePathname();
-  const segments = getSegments(
-    pathname,
-    segmentLabels ?? EMPTY_SEGMENT_LABELS,
-    segmentHrefs ?? EMPTY_SEGMENT_LABELS,
-    hiddenSegments,
-  );
+  const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS, segmentHrefs ?? EMPTY_SEGMENT_LABELS, hiddenSegments);
 
   return (
     <Breadcrumb className="text-muted-foreground max-w-full min-w-0">

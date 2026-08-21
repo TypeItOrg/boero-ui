@@ -76,19 +76,18 @@ describe("parseAcademicPaginationParams", () => {
   it("defaults training path sorting to name ascending", () => {
     expect(parseAcademicPaginationParams({}, AcademicResource.TRAINING_PATH).sort).toEqual(DEFAULT_TRAINING_PATH_SORT);
 
-    expect(
-      parseAcademicPaginationParams({ sortDirection: "desc", sortField: "name" }, AcademicResource.TRAINING_PATH).sort,
-    ).toEqual({ field: "name", direction: "desc" });
+    expect(parseAcademicPaginationParams({ sortDirection: "desc", sortField: "name" }, AcademicResource.TRAINING_PATH).sort).toEqual({
+      field: "name",
+      direction: "desc",
+    });
 
-    expect(
-      parseAcademicPaginationParams({ sortDirection: "asc", sortField: "year" }, AcademicResource.TRAINING_PATH).sort,
-    ).toEqual(DEFAULT_TRAINING_PATH_SORT);
+    expect(parseAcademicPaginationParams({ sortDirection: "asc", sortField: "year" }, AcademicResource.TRAINING_PATH).sort).toEqual(
+      DEFAULT_TRAINING_PATH_SORT,
+    );
   });
 
   it("uses singular and plural agreement in the registration summary", () => {
     expect(getAcademicRegistrationSummary(1, "ciclo lectivo", "ciclos lectivos")).toBe("1 ciclo lectivo registrado.");
-    expect(getAcademicRegistrationSummary(2, "ciclo lectivo", "ciclos lectivos")).toBe(
-      "2 ciclos lectivos registrados.",
-    );
+    expect(getAcademicRegistrationSummary(2, "ciclo lectivo", "ciclos lectivos")).toBe("2 ciclos lectivos registrados.");
   });
 });

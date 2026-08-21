@@ -23,18 +23,11 @@ export const metadata: Metadata = {
   title: "Editar usuario",
 };
 
-export default async function EditPersonPage({
-  params,
-  searchParams,
-}: EditPersonPageProps): Promise<React.ReactElement> {
+export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<React.ReactElement> {
   const { id, personId } = await params;
   const { returnTo } = await searchParams;
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
-  const [person, assignedRoles, systemRoles] = await Promise.all([
-    fetchPerson(id, personId),
-    fetchPersonRoles(id, personId),
-    fetchSystemRoles(id),
-  ]);
+  const [person, assignedRoles, systemRoles] = await Promise.all([fetchPerson(id, personId), fetchPersonRoles(id, personId), fetchSystemRoles(id)]);
   if (!person) notFound();
   const personName = `${person.firstName} ${person.lastName}`;
 

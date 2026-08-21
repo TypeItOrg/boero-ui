@@ -16,11 +16,7 @@ import type { AcademicYear } from "@features/academic/types/academic-year.types"
 import type { Instrument } from "@features/academic/types/instrument.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import {
-  academicSpaceTypeLabels,
-  academicYearStatusLabels,
-  studyPlanStatusLabels,
-} from "@features/academic/utils/academic-labels.util";
+import { academicSpaceTypeLabels, academicYearStatusLabels, studyPlanStatusLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 export type AcademicRecentItem = {
@@ -36,11 +32,7 @@ type RecentPageFetcher<T> = () => Promise<PaginatedResponse<T>>;
 
 const RECENT_QUERY = { page: 0, size: 1, sort: "createdAt,desc" } as const;
 
-export async function fetchAcademicRecentItems(
-  scope: AcademicScope,
-  institutionId: string,
-  access: AcademicAccess,
-): Promise<AcademicRecentItem[]> {
+export async function fetchAcademicRecentItems(scope: AcademicScope, institutionId: string, access: AcademicAccess): Promise<AcademicRecentItem[]> {
   const requests: Array<Promise<AcademicRecentItem | null>> = [];
 
   if (access.yearRead) {
@@ -65,12 +57,7 @@ export async function fetchAcademicRecentItems(
   }
   if (access.studyPlanRead) {
     requests.push(
-      loadRecentItem(
-        () => fetchStudyPlans(scope, institutionId, RECENT_QUERY),
-        AcademicResource.STUDY_PLAN,
-        "Planes de estudio",
-        mapStudyPlan,
-      ),
+      loadRecentItem(() => fetchStudyPlans(scope, institutionId, RECENT_QUERY), AcademicResource.STUDY_PLAN, "Planes de estudio", mapStudyPlan),
     );
   }
   if (access.academicSpaceRead) {
@@ -85,12 +72,7 @@ export async function fetchAcademicRecentItems(
   }
   if (access.instrumentRead) {
     requests.push(
-      loadRecentItem(
-        () => fetchInstruments(scope, institutionId, RECENT_QUERY),
-        AcademicResource.INSTRUMENT,
-        "Instrumentos",
-        mapInstrument,
-      ),
+      loadRecentItem(() => fetchInstruments(scope, institutionId, RECENT_QUERY), AcademicResource.INSTRUMENT, "Instrumentos", mapInstrument),
     );
   }
 

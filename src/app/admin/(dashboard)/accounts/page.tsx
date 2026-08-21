@@ -23,9 +23,7 @@ type PlatformAccountsPageProps = {
   searchParams: Promise<PlatformAccountSearchParams>;
 };
 
-export default async function PlatformAccountsPage({
-  searchParams,
-}: PlatformAccountsPageProps): Promise<React.ReactElement> {
+export default async function PlatformAccountsPage({ searchParams }: PlatformAccountsPageProps): Promise<React.ReactElement> {
   const { page, size, search, enabled, sort } = parsePlatformAccountPaginationParams(await searchParams);
 
   return (

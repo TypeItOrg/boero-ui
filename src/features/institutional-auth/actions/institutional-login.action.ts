@@ -14,10 +14,7 @@ import { institutionalLoginSchema } from "@features/institutional-auth/schemas/i
 import type { InstitutionalLoginActionState } from "@features/institutional-auth/types/institutional-login-state.types";
 import { INSTITUTIONAL_LOGIN_FIELD_NAMES } from "@features/institutional-auth/types/institutional-login-state.types";
 
-export async function loginInstitutional(
-  _previousState: InstitutionalLoginActionState,
-  formData: FormData,
-): Promise<InstitutionalLoginActionState> {
+export async function loginInstitutional(_previousState: InstitutionalLoginActionState, formData: FormData): Promise<InstitutionalLoginActionState> {
   await clearInstitutionalRegistrationSuccessCookie();
   await clearInstitutionalPasswordChangedCookie();
 

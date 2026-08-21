@@ -11,24 +11,14 @@ import { peopleApiFetch } from "@features/people/services/people-api-fetch.servi
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
 import { PERSON_FORM_FIELD_NAMES } from "@features/people/types/person-form-field-name.types";
-import {
-  getPeoplePath,
-  PeopleScope,
-  type PeopleScope as PeopleScopeType,
-} from "@features/people/utils/people-scope.util";
+import { getPeoplePath, PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
-export async function createInstitutionalPersonAction(
-  institutionId: string,
-  formData: FormData,
-): Promise<PersonActionState> {
+export async function createInstitutionalPersonAction(institutionId: string, formData: FormData): Promise<PersonActionState> {
   await requireInstitutionalUser();
   return createPersonActionInternal(institutionId, formData, PeopleScope.INSTITUTIONAL);
 }
 
-export async function createPlatformPersonAction(
-  institutionId: string,
-  formData: FormData,
-): Promise<PersonActionState> {
+export async function createPlatformPersonAction(institutionId: string, formData: FormData): Promise<PersonActionState> {
   await requirePlatformAccount();
   return createPersonActionInternal(institutionId, formData, PeopleScope.ADMIN);
 }
@@ -73,11 +63,7 @@ async function createPersonActionInternal(
     }),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    PERSON_FORM_FIELD_NAMES,
-    PEOPLE_ERROR_MESSAGES.CREATE_PERSON,
-  );
+  const errorState = await getResponseErrorActionState(response, PERSON_FORM_FIELD_NAMES, PEOPLE_ERROR_MESSAGES.CREATE_PERSON);
   if (errorState) return errorState;
 
   revalidatePath(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);

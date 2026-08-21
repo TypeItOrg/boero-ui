@@ -36,10 +36,7 @@ type ActiveAcademicStatusDialogProps = {
   targetStatus: ActiveStatus;
 };
 
-type ActiveAcademicStatusButtonProps = Omit<
-  ActiveAcademicStatusDialogProps,
-  "onOpenChange" | "open" | "targetStatus"
-> & {
+type ActiveAcademicStatusButtonProps = Omit<ActiveAcademicStatusDialogProps, "onOpenChange" | "open" | "targetStatus"> & {
   active: boolean;
   disabled?: boolean;
 };
@@ -56,17 +53,14 @@ type ActiveStatusDialogConfig = {
 
 const INITIAL_STATE: AcademicActionState = {};
 
-const ACTIVE_STATUS_DIALOG_CONFIG: Record<
-  ActiveAcademicStatusResource,
-  Record<ActiveStatus, ActiveStatusDialogConfig>
-> = {
+const ACTIVE_STATUS_DIALOG_CONFIG: Record<ActiveAcademicStatusResource, Record<ActiveStatus, ActiveStatusDialogConfig>> = {
   [AcademicResource.TRAINING_PATH]: {
     ACTIVE: {
       actionLabel: "Activar trayecto formativo",
       description: (resourceLabel) => (
         <>
-          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar
-          disponible para nuevas configuraciones.
+          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
+          configuraciones.
         </>
       ),
       icon: RouteIcon,
@@ -79,8 +73,8 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
       actionLabel: "Desactivar trayecto formativo",
       description: (resourceLabel) => (
         <>
-          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar
-          disponible para nuevas configuraciones.
+          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
+          configuraciones.
         </>
       ),
       icon: RouteIcon,
@@ -95,8 +89,8 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
       actionLabel: "Activar espacio académico",
       description: (resourceLabel) => (
         <>
-          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar
-          disponible para nuevas configuraciones curriculares.
+          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
+          configuraciones curriculares.
         </>
       ),
       icon: LibraryBigIcon,
@@ -109,9 +103,8 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
       actionLabel: "Desactivar espacio académico",
       description: (resourceLabel) => (
         <>
-          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar
-          disponible para nuevas configuraciones curriculares. No se podrá desactivar si está utilizado en un plan de
-          estudio borrador o activo.
+          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
+          configuraciones curriculares. No se podrá desactivar si está utilizado en un plan de estudio borrador o activo.
         </>
       ),
       icon: LibraryBigIcon,
@@ -126,8 +119,8 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
       actionLabel: "Activar instrumento",
       description: (resourceLabel) => (
         <>
-          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar
-          disponible para nuevas configuraciones.
+          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
+          configuraciones.
         </>
       ),
       icon: Music2Icon,
@@ -140,8 +133,8 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<
       actionLabel: "Desactivar instrumento",
       description: (resourceLabel) => (
         <>
-          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar
-          disponible para nuevas configuraciones.
+          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
+          configuraciones.
         </>
       ),
       icon: Music2Icon,
@@ -211,11 +204,7 @@ export function ActiveAcademicStatusDialog({
   );
 }
 
-export function ActiveAcademicStatusButton({
-  active,
-  disabled = false,
-  ...props
-}: ActiveAcademicStatusButtonProps): React.ReactElement {
+export function ActiveAcademicStatusButton({ active, disabled = false, ...props }: ActiveAcademicStatusButtonProps): React.ReactElement {
   const [open, setOpen] = React.useState(false);
   const targetStatus = active ? "INACTIVE" : "ACTIVE";
 

@@ -15,15 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@common/components/ui/dropdown-menu";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@common/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@common/components/ui/sidebar";
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
@@ -36,23 +28,13 @@ type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
   navigationSections: readonly InstitutionalNavigationSection[];
 };
 
-export function InstitutionalSidebar({
-  user,
-  navigationSections,
-  className,
-  ...props
-}: InstitutionalSidebarProps): React.ReactElement {
+export function InstitutionalSidebar({ user, navigationSections, className, ...props }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
   const navigation = useMobileSidebarNavigation();
   const { isMobile } = useSidebar();
 
   return (
-    <Sidebar
-      collapsible="icon"
-      variant="sidebar"
-      className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)}
-      {...props}
-    >
+    <Sidebar collapsible="icon" variant="sidebar" className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)} {...props}>
       <SidebarContent className="p-4">
         <InstitutionalSidebarNav sections={navigationSections} navigation={navigation} />
       </SidebarContent>
@@ -96,9 +78,7 @@ export function InstitutionalSidebar({
                     <span className="block truncate text-sm font-medium">
                       {user.name} {user.lastName}
                     </span>
-                    <span className="text-muted-foreground block truncate text-xs font-normal">
-                      {user.documentNumber}
-                    </span>
+                    <span className="text-muted-foreground block truncate text-xs font-normal">{user.documentNumber}</span>
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -135,9 +115,7 @@ export function InstitutionalSidebar({
 function InstitutionalUserAvatar({ user }: { user: InstitutionalUser }): React.ReactElement {
   return (
     <Avatar className="size-[34px] rounded-md group-data-[collapsible=icon]:size-8!">
-      <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">
-        {getInitials(user.name, user.lastName)}
-      </AvatarFallback>
+      <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">{getInitials(user.name, user.lastName)}</AvatarFallback>
     </Avatar>
   );
 }

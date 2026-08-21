@@ -13,8 +13,6 @@ describe("return-to.util", () => {
   });
 
   it("encodes the return path in a destination", () => {
-    expect(appendReturnTo("/roles/role-1/edit", "/roles?page=2")).toBe(
-      "/roles/role-1/edit?returnTo=%2Froles%3Fpage%3D2",
-    );
+    expect(appendReturnTo("/roles/role-1/edit", "/roles?page=2")).toBe("/roles/role-1/edit?returnTo=%2Froles%3Fpage%3D2");
   });
 });

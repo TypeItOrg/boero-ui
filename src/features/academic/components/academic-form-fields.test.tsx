@@ -25,13 +25,7 @@ jest.mock("@common/components/ui/year-select", () => ({
     required?: boolean;
     value?: string;
   }) => (
-    <select
-      id={id}
-      name={name}
-      required={required}
-      value={value ?? ""}
-      onChange={(event) => onValueChange?.(event.currentTarget.value)}
-    >
+    <select id={id} name={name} required={required} value={value ?? ""} onChange={(event) => onValueChange?.(event.currentTarget.value)}>
       {Array.from({ length: maxYear - minYear + 1 }, (_, index) => maxYear - index).map((year) => (
         <option key={year} value={String(year)}>
           {year}
@@ -277,9 +271,7 @@ describe("AcademicFormFields", () => {
   it("preserves an invalid manual date so the project schema can report it", async () => {
     const user = userEvent.setup();
     const year = getCurrentAcademicYear();
-    const { container } = render(
-      <AcademicFormFields resource={AcademicResource.ACADEMIC_YEAR} initialValues={{ year }} />,
-    );
+    const { container } = render(<AcademicFormFields resource={AcademicResource.ACADEMIC_YEAR} initialValues={{ year }} />);
 
     await user.type(screen.getByLabelText("Fecha de inicio"), `3102${year}`);
 

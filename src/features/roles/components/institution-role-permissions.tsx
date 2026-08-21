@@ -14,10 +14,7 @@ type InstitutionRolePermissionsProps = {
   groups: readonly InstitutionPermissionGroup[];
 };
 
-export function InstitutionRolePermissions({
-  permissionCodes,
-  groups,
-}: InstitutionRolePermissionsProps): React.ReactElement {
+export function InstitutionRolePermissions({ permissionCodes, groups }: InstitutionRolePermissionsProps): React.ReactElement {
   const assignedPermissionCodes = new Set(permissionCodes);
   const visibleGroups = groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code));
   const permissionMap = getPermissionMap(visibleGroups);
@@ -35,9 +32,7 @@ export function InstitutionRolePermissions({
           <KeyRoundIcon className="size-7" aria-hidden="true" />
         </div>
         <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">Sin permisos asignados</h3>
-        <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">
-          Este rol todavía no concede acceso a ninguna operación.
-        </p>
+        <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">Este rol todavía no concede acceso a ninguna operación.</p>
       </div>
     );
   }
@@ -61,10 +56,7 @@ export function InstitutionRolePermissions({
               </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
-              <PermissionHierarchy
-                nodes={getPermissionTree(group.permissions, permissionMap)}
-                renderPermission={renderPermissionRow}
-              />
+              <PermissionHierarchy nodes={getPermissionTree(group.permissions, permissionMap)} renderPermission={renderPermissionRow} />
             </CardContent>
           </Card>
         );

@@ -10,10 +10,7 @@ import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/ins
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { InstitutionRoleForm } from "@features/roles/components/institution-role-form";
-import {
-  fetchInstitutionPermissionGroups,
-  fetchInstitutionRole,
-} from "@features/roles/services/institution-role.service";
+import { fetchInstitutionPermissionGroups, fetchInstitutionRole } from "@features/roles/services/institution-role.service";
 
 import type { Metadata } from "next";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
@@ -57,12 +54,7 @@ export default async function EditRolePage({
         </div>
       }
     >
-      <InstitutionRoleForm
-        institutionId={user.institutionId}
-        role={role}
-        permissionGroups={permissionGroups}
-        returnTo={destination}
-      />
+      <InstitutionRoleForm institutionId={user.institutionId} role={role} permissionGroups={permissionGroups} returnTo={destination} />
     </PlatformPageShell>
   );
 }

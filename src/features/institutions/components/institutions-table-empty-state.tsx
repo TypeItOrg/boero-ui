@@ -63,22 +63,14 @@ export function InstitutionsTableEmptyState({
       {content}
       {isNavigating ? (
         <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center rounded-lg backdrop-blur-[1px]">
-          <Loader2Icon
-            className="text-muted-foreground size-5 animate-spin"
-            aria-label="Cargando instituciones"
-            role="status"
-          />
+          <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando instituciones" role="status" />
         </div>
       ) : null}
     </div>
   );
 }
 
-function EmptyState({
-  children,
-  icon,
-  title,
-}: React.PropsWithChildren<{ icon: React.ReactNode; title: string }>): React.ReactElement {
+function EmptyState({ children, icon, title }: React.PropsWithChildren<{ icon: React.ReactNode; title: string }>): React.ReactElement {
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
       <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">

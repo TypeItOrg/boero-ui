@@ -37,12 +37,7 @@ describe("AcademicTableRow", () => {
     });
 
     await openActions(user, "Plan 2027");
-    expect(screen.getAllByRole("menuitem").map((item) => item.textContent?.trim())).toEqual([
-      "Ver detalle",
-      "Editar",
-      "Activar",
-      "Eliminar",
-    ]);
+    expect(screen.getAllByRole("menuitem").map((item) => item.textContent?.trim())).toEqual(["Ver detalle", "Editar", "Activar", "Eliminar"]);
     await user.click(screen.getByRole("menuitem", { name: "Eliminar" }));
 
     expect(onLifecycleAction).toHaveBeenCalledWith(ROW_ID, "Plan 2027", "delete");
@@ -55,31 +50,28 @@ describe("AcademicTableRow", () => {
     [AcademicResource.ACADEMIC_SPACE, "Armonía", false, "Activar", "ACTIVE"],
     [AcademicResource.INSTRUMENT, "Piano", true, "Desactivar", "INACTIVE"],
     [AcademicResource.INSTRUMENT, "Piano", false, "Activar", "ACTIVE"],
-  ] as const)(
-    "offers %s for %s with its dedicated status permission",
-    async (resource, primaryValue, active, action, targetStatus) => {
-      const user = userEvent.setup();
-      const onStatusAction = jest.fn();
-      renderRow({
-        canChangeStatus: true,
-        onStatusAction,
-        resource,
-        row: createRow({ active, primaryValue, status: active ? "Activo" : "Inactivo" }),
-      });
+  ] as const)("offers %s for %s with its dedicated status permission", async (resource, primaryValue, active, action, targetStatus) => {
+    const user = userEvent.setup();
+    const onStatusAction = jest.fn();
+    renderRow({
+      canChangeStatus: true,
+      onStatusAction,
+      resource,
+      row: createRow({ active, primaryValue, status: active ? "Activo" : "Inactivo" }),
+    });
 
-      await openActions(user, primaryValue);
-      const statusAction = screen.getByRole("menuitem", { name: action });
+    await openActions(user, primaryValue);
+    const statusAction = screen.getByRole("menuitem", { name: action });
 
-      expect(statusAction).toHaveAttribute("data-variant", targetStatus === "INACTIVE" ? "destructive" : "default");
-      await user.click(statusAction);
-      expect(onStatusAction).toHaveBeenCalledWith({
-        id: ROW_ID,
-        resource,
-        resourceLabel: primaryValue,
-        targetStatus,
-      });
-    },
-  );
+    expect(statusAction).toHaveAttribute("data-variant", targetStatus === "INACTIVE" ? "destructive" : "default");
+    await user.click(statusAction);
+    expect(onStatusAction).toHaveBeenCalledWith({
+      id: ROW_ID,
+      resource,
+      resourceLabel: primaryValue,
+      targetStatus,
+    });
+  });
 
   it.each([
     [AcademicResource.ACADEMIC_SPACE, "Armonía"],
@@ -102,10 +94,7 @@ describe("AcademicTableRow", () => {
 
     await openActions(user, primaryValue);
 
-    expect(screen.getByRole("menuitem", { name: "Editar" })).toHaveAttribute(
-      "href",
-      `/${resource}/${ROW_ID}/edit?returnTo=%2Fstudy-plans`,
-    );
+    expect(screen.getByRole("menuitem", { name: "Editar" })).toHaveAttribute("href", `/${resource}/${ROW_ID}/edit?returnTo=%2Fstudy-plans`);
   });
 });
 

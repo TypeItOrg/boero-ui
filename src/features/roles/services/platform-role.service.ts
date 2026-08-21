@@ -13,9 +13,7 @@ import type { PlatformRolesPaginationParams } from "@features/roles/utils/platfo
 
 const ROLES_ERROR = "No se pudieron obtener los roles.";
 
-export async function fetchPlatformRoles(
-  params: PlatformRolesPaginationParams,
-): Promise<PaginatedResponse<PlatformRoleListItem>> {
+export async function fetchPlatformRoles(params: PlatformRolesPaginationParams): Promise<PaginatedResponse<PlatformRoleListItem>> {
   const query = buildPaginationSearchParams(params);
   query.set("sort", serializeSpringSort(params.sort));
   if (params.institutionId) query.set("institutionId", params.institutionId);
@@ -32,10 +30,7 @@ export async function fetchPlatformRole(roleId: string): Promise<PlatformRole | 
 
 export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermissionGroup[]> {
   const response = await platformApiFetch("/api/v1/admin/permissions");
-  const catalog = await parseHttpResponse<PlatformPermissionCatalogItem[]>(
-    response,
-    "No se pudo obtener el catálogo de permisos.",
-  );
+  const catalog = await parseHttpResponse<PlatformPermissionCatalogItem[]>(response, "No se pudo obtener el catálogo de permisos.");
   const groups = new Map<string, MutablePermissionGroup>();
   for (const permission of catalog) {
     const group = groups.get(permission.group);

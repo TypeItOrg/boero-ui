@@ -9,10 +9,7 @@ import { institutionalInstitutionFormSchema } from "@features/institutions/schem
 import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
 
-export async function updateInstitutionalInstitutionAction(
-  institutionId: string,
-  formData: FormData,
-): Promise<InstitutionActionState> {
+export async function updateInstitutionalInstitutionAction(institutionId: string, formData: FormData): Promise<InstitutionActionState> {
   if (!isValidUuid(institutionId)) return { error: INVALID_ACTION_ARGUMENTS };
 
   const payload = {
@@ -39,11 +36,7 @@ export async function updateInstitutionalInstitutionAction(
     body: JSON.stringify(parsed.data),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    INSTITUTION_FORM_FIELD_NAMES,
-    INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION,
-  );
+  const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION);
   if (errorState) return errorState;
 
   revalidatePath("/institution");

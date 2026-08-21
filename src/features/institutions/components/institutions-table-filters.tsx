@@ -27,11 +27,6 @@ export function InstitutionsTableFilters({ active, search, size }: InstitutionsT
   ];
 
   return (
-    <DataTableFilters
-      search={search}
-      searchPlaceholder="Buscar por nombre, ciudad, provincia o país..."
-      selectFilters={selectFilters}
-      size={size}
-    />
+    <DataTableFilters search={search} searchPlaceholder="Buscar por nombre, ciudad, provincia o país..." selectFilters={selectFilters} size={size} />
   );
 }

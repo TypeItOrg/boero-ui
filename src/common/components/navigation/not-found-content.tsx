@@ -6,14 +6,7 @@ import { HouseIcon, SearchXIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card } from "@common/components/ui/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@common/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 
 export function NotFoundContent(): React.ReactElement {
   const pathname = usePathname();
@@ -29,9 +22,7 @@ export function NotFoundContent(): React.ReactElement {
               <SearchXIcon className="size-8" />
             </EmptyMedia>
             <EmptyTitle className="text-lg">Página no encontrada</EmptyTitle>
-            <EmptyDescription>
-              La página que estás buscando no existe, fue movida o la dirección ingresada no es correcta.
-            </EmptyDescription>
+            <EmptyDescription>La página que estás buscando no existe, fue movida o la dirección ingresada no es correcta.</EmptyDescription>
           </EmptyHeader>
 
           <EmptyContent className="flex-row justify-center">

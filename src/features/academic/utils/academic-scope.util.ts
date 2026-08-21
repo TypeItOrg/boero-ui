@@ -20,11 +20,7 @@ export function getAcademicRouteBase(scope: AcademicScope, institutionId: string
   return AcademicScope.isAdmin(scope) ? `/admin/institutions/${institutionId}/academic` : "";
 }
 
-export function getAcademicResourceRoute(
-  scope: AcademicScope,
-  institutionId: string,
-  resource: AcademicResource,
-): string {
+export function getAcademicResourceRoute(scope: AcademicScope, institutionId: string, resource: AcademicResource): string {
   return `${getAcademicRouteBase(scope, institutionId)}/${getCollectionResource(resource)}`;
 }
 

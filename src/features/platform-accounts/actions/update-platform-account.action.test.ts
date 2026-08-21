@@ -39,20 +39,14 @@ describe("updatePlatformAccountAction", () => {
   it("includes a new password when provided", async () => {
     platformApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    await updatePlatformAccountAction(
-      ACCOUNT_ID,
-      createFormData({ password: "new-password", confirmPassword: "new-password" }),
-    );
+    await updatePlatformAccountAction(ACCOUNT_ID, createFormData({ password: "new-password", confirmPassword: "new-password" }));
 
     const [, request] = platformApiFetchMock.mock.calls[0];
     expect(JSON.parse(request?.body as string)).toMatchObject({ password: "new-password" });
   });
 
   it("returns validation errors before calling the API", async () => {
-    const result = await updatePlatformAccountAction(
-      ACCOUNT_ID,
-      createFormData({ password: "short", confirmPassword: "different" }),
-    );
+    const result = await updatePlatformAccountAction(ACCOUNT_ID, createFormData({ password: "short", confirmPassword: "different" }));
 
     expect(result.fieldErrors).toMatchObject({
       password: "La contraseña debe tener al menos 8 caracteres.",
@@ -62,9 +56,7 @@ describe("updatePlatformAccountAction", () => {
   });
 });
 
-function createFormData(
-  overrides: Partial<Record<"name" | "lastName" | "email" | "password" | "confirmPassword", string>> = {},
-): FormData {
+function createFormData(overrides: Partial<Record<"name" | "lastName" | "email" | "password" | "confirmPassword", string>> = {}): FormData {
   const values = {
     name: "María",
     lastName: "González",

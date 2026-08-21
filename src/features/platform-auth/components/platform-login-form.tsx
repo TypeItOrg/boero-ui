@@ -49,13 +49,7 @@ export function PlatformLoginForm({ next }: { next?: string }): React.ReactEleme
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
-            <Input
-              aria-invalid={!!state.fieldErrors?.email}
-              autoComplete="email"
-              id="email"
-              name="email"
-              placeholder="correo@ejemplo.com"
-            />
+            <Input aria-invalid={!!state.fieldErrors?.email} autoComplete="email" id="email" name="email" placeholder="correo@ejemplo.com" />
             <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
           </Field>
         </FieldGroup>
@@ -63,28 +57,14 @@ export function PlatformLoginForm({ next }: { next?: string }): React.ReactEleme
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-            <PasswordInput
-              aria-invalid={!!state.fieldErrors?.password}
-              autoComplete="current-password"
-              id="password"
-              name="password"
-            />
+            <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="current-password" id="password" name="password" />
             <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
           </Field>
         </FieldGroup>
 
         <footer className="mt-6 flex w-full flex-col gap-4">
-          <Button
-            aria-busy={isPending}
-            className="relative w-full"
-            disabled={isPending}
-            size="lg"
-            type="submit"
-            variant="default"
-          >
-            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>
-              Iniciar sesión
-            </span>
+          <Button aria-busy={isPending} className="relative w-full" disabled={isPending} size="lg" type="submit" variant="default">
+            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>Iniciar sesión</span>
             {isPending ? (
               <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
                 <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />

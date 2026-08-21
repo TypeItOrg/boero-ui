@@ -6,9 +6,7 @@ type PlatformRolesTableContainerProps = PlatformRolesPaginationParams & {
   dataPromise: ReturnType<typeof fetchPlatformRoles>;
 };
 
-export async function PlatformRolesTableContainer(
-  props: PlatformRolesTableContainerProps,
-): Promise<React.ReactElement> {
+export async function PlatformRolesTableContainer(props: PlatformRolesTableContainerProps): Promise<React.ReactElement> {
   const { dataPromise, ...params } = props;
   const data = await dataPromise;
   return <PlatformRolesTablePresentation data={data} {...params} />;

@@ -5,30 +5,12 @@ import { EllipsisVerticalIcon } from "lucide-react";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuGroup,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@common/components/ui/context-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 
-export function PlatformPeopleTableRow({
-  canUpdate,
-  person,
-}: {
-  canUpdate: boolean;
-  person: PlatformPersonSummary;
-}): React.ReactElement {
+export function PlatformPeopleTableRow({ canUpdate, person }: { canUpdate: boolean; person: PlatformPersonSummary }): React.ReactElement {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
@@ -90,13 +72,7 @@ export function PlatformPeopleTableRow({
   );
 }
 
-function PlatformPersonActions({
-  person,
-  canUpdate,
-}: {
-  person: PlatformPersonSummary;
-  canUpdate: boolean;
-}): React.ReactElement {
+function PlatformPersonActions({ person, canUpdate }: { person: PlatformPersonSummary; canUpdate: boolean }): React.ReactElement {
   return (
     <div className="flex justify-end">
       <DropdownMenu>

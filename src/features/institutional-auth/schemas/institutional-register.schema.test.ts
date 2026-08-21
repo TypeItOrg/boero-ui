@@ -20,9 +20,7 @@ describe("institutional register schema", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({ path: ["birthDate"], message: "La fecha de nacimiento es requerida." }),
-      );
+      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La fecha de nacimiento es requerida." }));
     }
   });
 
@@ -39,9 +37,7 @@ describe("institutional register schema", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({ path: ["birthDate"], message: "La persona debe tener al menos 3 años." }),
-      );
+      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La persona debe tener al menos 3 años." }));
     }
   });
 });

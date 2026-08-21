@@ -15,10 +15,7 @@ import {
 } from "@features/academic/actions/academic-resource.action";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import {
-  INSTITUTIONAL_PERMISSION,
-  type InstitutionalPermission,
-} from "@features/institutional-auth/types/institutional-permission.types";
+import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
@@ -96,10 +93,7 @@ describe("academic resource actions", () => {
       documentNumber: "12345678",
       institutionId: INSTITUTION_ID,
       roles: [],
-      permissions: [
-        INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE,
-        INSTITUTIONAL_PERMISSION.TRAINING_PATH_STATUS_UPDATE,
-      ],
+      permissions: [INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE, INSTITUTIONAL_PERMISSION.TRAINING_PATH_STATUS_UPDATE],
     });
     jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 200 }));
 
@@ -158,11 +152,9 @@ describe("academic resource actions", () => {
       new FormData(),
     );
 
-    expect(academicApiFetch).toHaveBeenCalledWith(
-      AcademicScope.INSTITUTIONAL,
-      `/api/v1/institutions/${institutionId}/study-plans/${studyPlanId}`,
-      { method: "DELETE" },
-    );
+    expect(academicApiFetch).toHaveBeenCalledWith(AcademicScope.INSTITUTIONAL, `/api/v1/institutions/${institutionId}/study-plans/${studyPlanId}`, {
+      method: "DELETE",
+    });
   });
 
   it("updates an academic-space status with the dedicated permission", async () => {
@@ -242,31 +234,20 @@ describe("academic resource actions", () => {
     ["false", false, AcademicResource.ACADEMIC_SPACE, INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_STATUS_UPDATE],
     ["true", true, AcademicResource.INSTRUMENT, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE],
     ["false", false, AcademicResource.INSTRUMENT, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE],
-  ] as const)(
-    "sends %s as active=%s for %s only after validating the raw form value",
-    async (rawActive, active, resource, permission) => {
-      mockInstitutionalUser(permission);
-      jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 204 }));
-      const formData = new FormData();
-      formData.set("active", rawActive);
+  ] as const)("sends %s as active=%s for %s only after validating the raw form value", async (rawActive, active, resource, permission) => {
+    mockInstitutionalUser(permission);
+    jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 204 }));
+    const formData = new FormData();
+    formData.set("active", rawActive);
 
-      await updateAcademicStatusAction(
-        AcademicScope.INSTITUTIONAL,
-        INSTITUTION_ID,
-        resource,
-        RESOURCE_ID,
-        `/${resource}`,
-        {},
-        formData,
-      );
+    await updateAcademicStatusAction(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, resource, RESOURCE_ID, `/${resource}`, {}, formData);
 
-      expect(academicApiFetch).toHaveBeenLastCalledWith(
-        AcademicScope.INSTITUTIONAL,
-        `/api/v1/institutions/${INSTITUTION_ID}/${resource}/${RESOURCE_ID}/status`,
-        expect.objectContaining({ body: JSON.stringify({ active }), method: "PATCH" }),
-      );
-    },
-  );
+    expect(academicApiFetch).toHaveBeenLastCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      `/api/v1/institutions/${INSTITUTION_ID}/${resource}/${RESOURCE_ID}/status`,
+      expect.objectContaining({ body: JSON.stringify({ active }), method: "PATCH" }),
+    );
+  });
 
   it.each([
     [AcademicResource.TRAINING_PATH, INSTITUTIONAL_PERMISSION.TRAINING_PATH_STATUS_UPDATE, undefined],
@@ -278,15 +259,7 @@ describe("academic resource actions", () => {
     if (active !== undefined) formData.set("active", active);
     jest.mocked(academicApiFetch).mockClear();
 
-    const result = await updateAcademicStatusAction(
-      AcademicScope.INSTITUTIONAL,
-      INSTITUTION_ID,
-      resource,
-      RESOURCE_ID,
-      `/${resource}`,
-      {},
-      formData,
-    );
+    const result = await updateAcademicStatusAction(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, resource, RESOURCE_ID, `/${resource}`, {}, formData);
 
     expect(result?.fieldErrors?.active).toBeDefined();
     expect(academicApiFetch).not.toHaveBeenCalled();

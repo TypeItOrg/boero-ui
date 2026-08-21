@@ -39,9 +39,7 @@ export type PlatformPeoplePaginationParams = PaginationParams & {
   sort: PlatformPeopleSort;
 };
 
-export function parsePlatformPeoplePaginationParams(
-  searchParams: PlatformPeopleSearchParams,
-): PlatformPeoplePaginationParams {
+export function parsePlatformPeoplePaginationParams(searchParams: PlatformPeopleSearchParams): PlatformPeoplePaginationParams {
   const { page, size, search } = parsePaginationQuery(searchParams, {
     allowedPageSizes: new Set<number>(PLATFORM_PEOPLE_PAGE_SIZE_OPTIONS),
     defaultSize: DEFAULT_PLATFORM_PEOPLE_PAGE_SIZE,

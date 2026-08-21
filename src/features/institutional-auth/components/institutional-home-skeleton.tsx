@@ -9,10 +9,7 @@ export function InstitutionalHomeSkeleton(): React.ReactElement {
           aria-hidden="true"
           className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/25 sm:from-black/85 sm:via-black/60 sm:via-[65%] sm:to-black/15 sm:to-[90%] 2xl:from-black/85 2xl:via-black/50 2xl:via-[50%] 2xl:to-black/5 2xl:to-[100%] dark:bg-black/20"
         />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent dark:from-black/35"
-        />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent dark:from-black/35" />
         <div className="relative flex max-w-3xl min-w-0 items-center gap-4 p-5 text-white sm:p-6 lg:p-8">
           <Skeleton className="h-32 w-24 shrink-0 rounded-lg bg-white/15 ring-1 ring-white/10" />
           <div className="flex h-32 min-w-0 flex-col justify-center gap-4 py-1 sm:h-36 sm:py-2">

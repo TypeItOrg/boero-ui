@@ -9,16 +9,9 @@ export function PlatformLogoutButton() {
   const logout = useLogoutPlatform();
 
   return (
-    <Button
-      variant="outline"
-      className="w-full justify-start"
-      onClick={() => logout.mutate()}
-      disabled={logout.isPending}
-    >
+    <Button variant="outline" className="w-full justify-start" onClick={() => logout.mutate()} disabled={logout.isPending}>
       <LogOutIcon data-icon="inline-start" />
-      <span className="group-data-[collapsible=icon]:hidden">
-        {logout.isPending ? "Cerrando sesión..." : "Cerrar sesión"}
-      </span>
+      <span className="group-data-[collapsible=icon]:hidden">{logout.isPending ? "Cerrando sesión..." : "Cerrar sesión"}</span>
     </Button>
   );
 }

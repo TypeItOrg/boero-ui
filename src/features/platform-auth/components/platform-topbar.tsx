@@ -21,9 +21,7 @@ import type { ContextualSearchShortcutPlatform } from "@features/contextual-sear
 import { useLogoutPlatform } from "@features/platform-auth/hooks/use-logout-platform.hook";
 import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
 
-const PLATFORM_CONTEXTUAL_SEARCH_SECTIONS = [
-  { items: PLATFORM_NAVIGATION_ITEMS },
-] satisfies readonly ContextualSearchAccessSection[];
+const PLATFORM_CONTEXTUAL_SEARCH_SECTIONS = [{ items: PLATFORM_NAVIGATION_ITEMS }] satisfies readonly ContextualSearchAccessSection[];
 
 type PlatformTopbarProps = {
   shortcutPlatform: ContextualSearchShortcutPlatform;

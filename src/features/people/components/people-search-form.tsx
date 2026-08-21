@@ -17,19 +17,9 @@ export function PeopleSearchForm({ search, size, roleId, roles = [] }: PeopleSea
     defaultValue: ALL_ROLES,
     label: "Rol",
     name: "roleId",
-    options: [
-      { value: ALL_ROLES, label: "Todos los roles" },
-      ...roles.map((role) => ({ value: role.id, label: role.name })),
-    ],
+    options: [{ value: ALL_ROLES, label: "Todos los roles" }, ...roles.map((role) => ({ value: role.id, label: role.name }))],
     value: roleId ?? ALL_ROLES,
   };
 
-  return (
-    <DataTableFilters
-      search={search}
-      searchPlaceholder="Buscar por nombre, apellido o documento..."
-      selectFilters={[roleFilter]}
-      size={size}
-    />
-  );
+  return <DataTableFilters search={search} searchPlaceholder="Buscar por nombre, apellido o documento..." selectFilters={[roleFilter]} size={size} />;
 }

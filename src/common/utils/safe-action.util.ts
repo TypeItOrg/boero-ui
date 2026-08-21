@@ -1,7 +1,4 @@
-export async function safelyRunAction<T extends { error?: string }>(
-  action: Promise<T>,
-  fallbackMessage: string,
-): Promise<T> {
+export async function safelyRunAction<T extends { error?: string }>(action: Promise<T>, fallbackMessage: string): Promise<T> {
   try {
     return await action;
   } catch {

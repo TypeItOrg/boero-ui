@@ -93,18 +93,8 @@ export function PeopleTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-190">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
-              <DataTableSortableHead<PeopleSortField>
-                field="lastName"
-                label="Nombre"
-                sort={sort}
-                onSortChange={updateSort}
-              />
-              <DataTableSortableHead<PeopleSortField>
-                field="documentNumber"
-                label="Documento"
-                sort={sort}
-                onSortChange={updateSort}
-              />
+              <DataTableSortableHead<PeopleSortField> field="lastName" label="Nombre" sort={sort} onSortChange={updateSort} />
+              <DataTableSortableHead<PeopleSortField> field="documentNumber" label="Documento" sort={sort} onSortChange={updateSort} />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
               {PeopleScope.isInstitutional(scope) ? <TableHead>Estado</TableHead> : null}
@@ -135,11 +125,7 @@ export function PeopleTablePresentation({
 
         {isNavigating && (
           <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
-            <Loader2Icon
-              className="text-muted-foreground size-5 animate-spin"
-              aria-label="Cargando usuarios"
-              role="status"
-            />
+            <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando usuarios" role="status" />
           </div>
         )}
       </div>

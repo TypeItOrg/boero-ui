@@ -17,9 +17,7 @@ const ACADEMIC_YEAR_STATUS_OPTIONS = ACADEMIC_YEAR_STATUS.filter((status) => sta
 export function AcademicYearFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const initialYear = Number(toOptionalFormString(initialValues.year));
   const initialStatus = toOptionalFormString(initialValues.status);
-  const [selectedYear, setSelectedYear] = useState<number | undefined>(
-    Number.isInteger(initialYear) ? initialYear : undefined,
-  );
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(Number.isInteger(initialYear) ? initialYear : undefined);
   const [startDate, setStartDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, "startDate"));
   const [endDate, setEndDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, "endDate"));
   const hasSelectedYear = selectedYear !== undefined;
@@ -35,13 +33,7 @@ export function AcademicYearFields({ initialValues = {}, fieldErrors }: Academic
 
   return (
     <>
-      <FormField
-        label="Año"
-        name="year"
-        error={fieldErrors?.year}
-        className="flex-[1_0_min(200px,100%)] sm:col-span-2"
-        required
-      >
+      <FormField label="Año" name="year" error={fieldErrors?.year} className="flex-[1_0_min(200px,100%)] sm:col-span-2" required>
         <YearSelect
           id="year"
           name="year"
@@ -54,13 +46,7 @@ export function AcademicYearFields({ initialValues = {}, fieldErrors }: Academic
         />
       </FormField>
       {initialStatus ? (
-        <FormField
-          label="Estado"
-          name="status"
-          error={fieldErrors?.status}
-          className="flex-[1_0_min(200px,100%)] sm:col-span-2"
-          required
-        >
+        <FormField label="Estado" name="status" error={fieldErrors?.status} className="flex-[1_0_min(200px,100%)] sm:col-span-2" required>
           <FormSelect name="status" defaultValue={initialStatus} options={ACADEMIC_YEAR_STATUS_OPTIONS} />
         </FormField>
       ) : null}

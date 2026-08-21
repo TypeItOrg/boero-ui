@@ -2,17 +2,10 @@ import { z } from "zod";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
 export const institutionalInstitutionFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, INSTITUTION_ERROR_MESSAGES.REQUIRED_NAME)
-    .max(255, INSTITUTION_ERROR_MESSAGES.NAME_MAX_LENGTH),
+  name: z.string().trim().min(1, INSTITUTION_ERROR_MESSAGES.REQUIRED_NAME).max(255, INSTITUTION_ERROR_MESSAGES.NAME_MAX_LENGTH),
   cityId: z.uuid(INSTITUTION_ERROR_MESSAGES.REQUIRED_CITY),
   street: z.string(),
-  number: z
-    .string()
-    .max(50, INSTITUTION_ERROR_MESSAGES.NUMBER_MAX_LENGTH)
-    .regex(/^\d*$/, INSTITUTION_ERROR_MESSAGES.INVALID_NUMBER),
+  number: z.string().max(50, INSTITUTION_ERROR_MESSAGES.NUMBER_MAX_LENGTH).regex(/^\d*$/, INSTITUTION_ERROR_MESSAGES.INVALID_NUMBER),
   neighborhood: z.string(),
   additionalInfo: z.string(),
   phoneNumber: z

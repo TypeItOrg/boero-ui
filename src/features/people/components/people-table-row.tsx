@@ -5,20 +5,8 @@ import { EllipsisVerticalIcon } from "lucide-react";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@common/components/ui/context-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { PersonSummary } from "@features/people/types/person-summary.types";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
@@ -70,9 +58,7 @@ export function PeopleTableRow({
         )}
       </TableCell>
       <TableCell>{person.documentNumber}</TableCell>
-      <TableCell>
-        {person.phoneNumber ? person.phoneNumber : <span className="text-muted-foreground/60">Sin teléfono</span>}
-      </TableCell>
+      <TableCell>{person.phoneNumber ? person.phoneNumber : <span className="text-muted-foreground/60">Sin teléfono</span>}</TableCell>
       <TableCell>{person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}</TableCell>
       {PeopleScope.isInstitutional(scope) ? (
         <TableCell>
@@ -208,34 +194,28 @@ type PersonNavigationLinkProps = React.ComponentProps<typeof Link> & {
   returnTo?: string;
 };
 
-const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigationLinkProps>(
-  function PersonNavigationLink({ href, children, returnTo, ...props }, ref): React.ReactElement {
-    const hrefString = typeof href === "string" ? href : (href.pathname ?? "");
-    if (hrefString === "/profile") {
-      return (
-        <Link ref={ref} href={href} {...props}>
-          {children}
-        </Link>
-      );
-    }
-
+const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigationLinkProps>(function PersonNavigationLink(
+  { href, children, returnTo, ...props },
+  ref,
+): React.ReactElement {
+  const hrefString = typeof href === "string" ? href : (href.pathname ?? "");
+  if (hrefString === "/profile") {
     return (
-      <ReturnToLink ref={ref} href={hrefString} returnTo={returnTo} {...props}>
+      <Link ref={ref} href={href} {...props}>
         {children}
-      </ReturnToLink>
+      </Link>
     );
-  },
-);
+  }
+
+  return (
+    <ReturnToLink ref={ref} href={hrefString} returnTo={returnTo} {...props}>
+      {children}
+    </ReturnToLink>
+  );
+});
 PersonNavigationLink.displayName = "PersonNavigationLink";
 
-function getPersonHref(
-  scope: PeopleScopeType,
-  institutionId: string,
-  personId: string,
-  selfPersonId?: string | null,
-): string {
+function getPersonHref(scope: PeopleScopeType, institutionId: string, personId: string, selfPersonId?: string | null): string {
   if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/profile";
-  return PeopleScope.isInstitutional(scope)
-    ? `/people/${personId}`
-    : `/admin/institutions/${institutionId}/people/${personId}`;
+  return PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
 }

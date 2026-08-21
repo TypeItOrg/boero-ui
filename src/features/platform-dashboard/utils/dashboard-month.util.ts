@@ -15,10 +15,7 @@ const MONTH_NAMES = [
   "diciembre",
 ] as const;
 
-export function formatDashboardMonth(
-  registration: Pick<MonthlyInstitutionRegistration, "year" | "month">,
-  style: "short" | "long",
-): string {
+export function formatDashboardMonth(registration: Pick<MonthlyInstitutionRegistration, "year" | "month">, style: "short" | "long"): string {
   const monthName = MONTH_NAMES[registration.month - 1];
 
   if (!monthName) {

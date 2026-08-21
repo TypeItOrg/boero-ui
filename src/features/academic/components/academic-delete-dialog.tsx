@@ -42,14 +42,7 @@ const INITIAL_STATE: AcademicActionState = {};
 
 export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.ReactElement {
   const [state, formAction, isPending] = useActionState(
-    deleteAcademicResourceAction.bind(
-      null,
-      props.scope,
-      props.institutionId,
-      props.resource,
-      props.id,
-      props.destination,
-    ),
+    deleteAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
   );
   const isRootResource =

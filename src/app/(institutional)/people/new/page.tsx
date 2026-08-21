@@ -43,12 +43,7 @@ export default async function NewPersonPage({
         </div>
       }
     >
-      <PersonForm
-        mode="create"
-        institutionId={user.institutionId}
-        scope={PeopleScope.INSTITUTIONAL}
-        returnTo={destination}
-      />
+      <PersonForm mode="create" institutionId={user.institutionId} scope={PeopleScope.INSTITUTIONAL} returnTo={destination} />
     </PlatformPageShell>
   );
 }

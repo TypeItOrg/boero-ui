@@ -26,44 +26,39 @@ describe("academic options routes", () => {
       backendBasePath: `/api/v1/institutions/${institutionId}`,
       conflictingScope: AcademicScope.ADMIN,
     },
-  ])(
-    "uses the $scope session selected by the route",
-    async ({ get, routePath, scope, backendBasePath, conflictingScope }) => {
-      academicApiFetchMock.mockResolvedValue(Response.json({ items: [], page: 1, totalPages: 1 }));
-      const request = new Request(
-        `http://localhost${routePath}?institutionId=${institutionId}&page=1&size=20&search=Tecnicatura&scope=${conflictingScope}`,
-      );
+  ])("uses the $scope session selected by the route", async ({ get, routePath, scope, backendBasePath, conflictingScope }) => {
+    academicApiFetchMock.mockResolvedValue(Response.json({ items: [], page: 1, totalPages: 1 }));
+    const request = new Request(
+      `http://localhost${routePath}?institutionId=${institutionId}&page=1&size=20&search=Tecnicatura&scope=${conflictingScope}`,
+    );
 
-      const response = await get(request, { params: Promise.resolve({ resource: "training-paths" }) });
+    const response = await get(request, { params: Promise.resolve({ resource: "training-paths" }) });
 
-      expect(response.status).toBe(200);
-      expect(academicApiFetchMock).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(academicApiFetchMock).toHaveBeenCalledTimes(1);
 
-      const call = academicApiFetchMock.mock.calls[0];
-      expect(call).toBeDefined();
-      if (!call) return;
+    const call = academicApiFetchMock.mock.calls[0];
+    expect(call).toBeDefined();
+    if (!call) return;
 
-      const [receivedScope, receivedPath, receivedInit] = call;
-      const receivedUrl = new URL(receivedPath, "http://localhost");
+    const [receivedScope, receivedPath, receivedInit] = call;
+    const receivedUrl = new URL(receivedPath, "http://localhost");
 
-      expect(receivedScope).toBe(scope);
-      expect(receivedUrl.pathname).toBe(`${backendBasePath}/training-paths`);
-      expect(Object.fromEntries(receivedUrl.searchParams)).toEqual({
-        active: "true",
-        deleted: "false",
-        page: "1",
-        search: "Tecnicatura",
-        size: "20",
-        sort: "name,asc",
-      });
-      expect(receivedInit).toEqual({ signal: request.signal });
-    },
-  );
+    expect(receivedScope).toBe(scope);
+    expect(receivedUrl.pathname).toBe(`${backendBasePath}/training-paths`);
+    expect(Object.fromEntries(receivedUrl.searchParams)).toEqual({
+      active: "true",
+      deleted: "false",
+      page: "1",
+      search: "Tecnicatura",
+      size: "20",
+      sort: "name,asc",
+    });
+    expect(receivedInit).toEqual({ signal: request.signal });
+  });
 
   it("rejects an unsupported option resource", async () => {
-    const request = new Request(
-      `http://localhost/api/institutional/academic/options/instruments?institutionId=${institutionId}`,
-    );
+    const request = new Request(`http://localhost/api/institutional/academic/options/instruments?institutionId=${institutionId}`);
 
     const response = await getInstitutionalAcademicOptions(request, {
       params: Promise.resolve({ resource: "instruments" }),

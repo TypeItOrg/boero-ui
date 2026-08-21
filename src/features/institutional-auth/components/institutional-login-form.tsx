@@ -13,10 +13,7 @@ import { PasswordInput } from "@common/components/ui/password-input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
 import { consumeInstitutionalPasswordChangedFlash } from "@features/institutional-auth/actions/consume-institutional-password-changed-flash.action";
-import {
-  InstitutionPicker,
-  type InstitutionalInstitution,
-} from "@features/institutional-auth/components/institution-picker";
+import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { loginInstitutional } from "@features/institutional-auth/actions/institutional-login.action";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { InstitutionalLoginActionState } from "@features/institutional-auth/types/institutional-login-state.types";
@@ -28,14 +25,8 @@ type InstitutionalLoginFormProps = {
   passwordChanged?: boolean;
 };
 
-export function InstitutionalLoginForm({
-  registered = false,
-  passwordChanged = false,
-}: InstitutionalLoginFormProps): React.ReactElement {
-  const [state, formAction] = useActionState<InstitutionalLoginActionState, FormData>(
-    loginInstitutional,
-    INITIAL_STATE,
-  );
+export function InstitutionalLoginForm({ registered = false, passwordChanged = false }: InstitutionalLoginFormProps): React.ReactElement {
+  const [state, formAction] = useActionState<InstitutionalLoginActionState, FormData>(loginInstitutional, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
   const [showPasswordChanged] = useState(passwordChanged);
@@ -58,13 +49,7 @@ export function InstitutionalLoginForm({
   return (
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
       <header className="flex flex-col items-center space-y-1 text-center">
-        <Image
-          width={875}
-          height={1202}
-          src={"/boero-logo.webp"}
-          alt={"Logo de la institución"}
-          className="h-auto w-20 md:hidden"
-        />
+        <Image width={875} height={1202} src={"/boero-logo.webp"} alt={"Logo de la institución"} className="h-auto w-20 md:hidden" />
         <h1 className="text-2xl font-bold">Bienvenido de nuevo</h1>
         <p className="text-muted-foreground text-sm">
           <span className="hidden md:block">Ingresá tus credenciales para acceder a tu institución.</span>
@@ -109,9 +94,7 @@ export function InstitutionalLoginForm({
               selectedLabel={institution?.name}
               value={institution?.id}
             />
-            <FieldError
-              errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined} />
           </Field>
         </FieldGroup>
 
@@ -127,9 +110,7 @@ export function InstitutionalLoginForm({
               maxLength={8}
               name="documentNumber"
             />
-            <FieldError
-              errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined}
-            />
+            <FieldError errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined} />
           </Field>
         </FieldGroup>
 
@@ -138,12 +119,7 @@ export function InstitutionalLoginForm({
             <FieldLabel htmlFor="password" required>
               Contraseña
             </FieldLabel>
-            <PasswordInput
-              aria-invalid={!!state.fieldErrors?.password}
-              autoComplete="current-password"
-              id="password"
-              name="password"
-            />
+            <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="current-password" id="password" name="password" />
             <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
           </Field>
         </FieldGroup>
@@ -157,9 +133,7 @@ export function InstitutionalLoginForm({
 
         <footer className="mt-6 flex w-full flex-col gap-4">
           <Button aria-busy={isPending} className="relative w-full" disabled={isPending} size="lg" type="submit">
-            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>
-              Iniciar sesión
-            </span>
+            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>Iniciar sesión</span>
             {isPending ? (
               <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
                 <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />

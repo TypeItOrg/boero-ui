@@ -244,15 +244,7 @@ function LoadingSkeletonRow({ itemSize }: { itemSize: number }): React.ReactElem
   );
 }
 
-function getViewportHeight({
-  itemCount,
-  itemSize,
-  maxHeight,
-}: {
-  itemCount: number;
-  itemSize: number;
-  maxHeight: number;
-}): number {
+function getViewportHeight({ itemCount, itemSize, maxHeight }: { itemCount: number; itemSize: number; maxHeight: number }): number {
   if (itemCount === 0) return itemSize;
   return Math.min(maxHeight, Math.max(itemSize, itemCount * itemSize));
 }

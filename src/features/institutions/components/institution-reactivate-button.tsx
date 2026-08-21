@@ -14,18 +14,12 @@ type InstitutionReactivateButtonProps = {
   institutionName: string;
 };
 
-export function InstitutionReactivateButton({
-  institutionId,
-  institutionName,
-}: InstitutionReactivateButtonProps): React.ReactElement {
+export function InstitutionReactivateButton({ institutionId, institutionName }: InstitutionReactivateButtonProps): React.ReactElement {
   const [isPending, startTransition] = useTransition();
 
   function reactivateInstitution(): void {
     startTransition(async () => {
-      const result = await safelyRunAction(
-        updateInstitutionStatusAction(institutionId, true),
-        INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(true),
-      );
+      const result = await safelyRunAction(updateInstitutionStatusAction(institutionId, true), INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(true));
 
       if (result.error) {
         toast.error(result.error);
@@ -38,11 +32,7 @@ export function InstitutionReactivateButton({
 
   return (
     <Button type="button" size="lg" onClick={reactivateInstitution} disabled={isPending}>
-      {isPending ? (
-        <Loader2Icon data-icon="inline-start" className="animate-spin" />
-      ) : (
-        <RotateCcwIcon data-icon="inline-start" />
-      )}
+      {isPending ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : <RotateCcwIcon data-icon="inline-start" />}
       Reactivar institución
     </Button>
   );

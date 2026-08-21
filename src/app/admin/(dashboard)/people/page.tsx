@@ -7,10 +7,7 @@ import { PlatformPeopleTableFilters } from "@features/people/components/platform
 import { PlatformPeopleTableSkeleton } from "@features/people/components/platform-people-table-skeleton";
 import { fetchPlatformPeople } from "@features/people/services/fetch-platform-people.service";
 import { fetchSystemRolesCatalog } from "@features/people/services/fetch-system-roles.service";
-import {
-  parsePlatformPeoplePaginationParams,
-  type PlatformPeopleSearchParams,
-} from "@features/people/utils/platform-people-pagination.util";
+import { parsePlatformPeoplePaginationParams, type PlatformPeopleSearchParams } from "@features/people/utils/platform-people-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -23,15 +20,10 @@ type PlatformPeoplePageProps = {
   searchParams: Promise<PlatformPeopleSearchParams>;
 };
 
-export default async function PlatformPeoplePage({
-  searchParams,
-}: PlatformPeoplePageProps): Promise<React.ReactElement> {
+export default async function PlatformPeoplePage({ searchParams }: PlatformPeoplePageProps): Promise<React.ReactElement> {
   const params = parsePlatformPeoplePaginationParams(await searchParams);
   const peoplePromise = fetchPlatformPeople(params);
-  const [roleList, selectedInstitutionName] = await Promise.all([
-    fetchSystemRolesCatalog(),
-    getSelectedInstitutionName(params.institutionId),
-  ]);
+  const [roleList, selectedInstitutionName] = await Promise.all([fetchSystemRolesCatalog(), getSelectedInstitutionName(params.institutionId)]);
 
   return (
     <PlatformPageShell

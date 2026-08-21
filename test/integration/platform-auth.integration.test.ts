@@ -134,10 +134,7 @@ const server = setupServer(
   http.get(`${API_URL}/api/v1/admin/auth/me`, ({ request }) => {
     lastAccountAuthorization = request.headers.get("authorization");
 
-    if (
-      lastAccountAuthorization !== `Bearer ${loginTokens.accessToken}` &&
-      lastAccountAuthorization !== `Bearer ${refreshedTokens.accessToken}`
-    ) {
+    if (lastAccountAuthorization !== `Bearer ${loginTokens.accessToken}` && lastAccountAuthorization !== `Bearer ${refreshedTokens.accessToken}`) {
       return HttpResponse.json({ status: 401, message: "Unauthorized" }, { status: 401 });
     }
 

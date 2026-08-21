@@ -2,14 +2,7 @@
 
 import * as React from "react";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@common/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { cn } from "@common/utils/cn.util";
 
 type YearSelectProps = Omit<React.ComponentProps<typeof Select>, "children"> & {
@@ -40,12 +33,7 @@ export function YearSelect({
 
   return (
     <Select {...props} value={value ?? ""}>
-      <SelectTrigger
-        id={id}
-        aria-invalid={ariaInvalid}
-        aria-labelledby={ariaLabelledBy}
-        className={cn("w-full", className)}
-      >
+      <SelectTrigger id={id} aria-invalid={ariaInvalid} aria-labelledby={ariaLabelledBy} className={cn("w-full", className)}>
         <SelectValue placeholder={placeholder}>{selectedLabel}</SelectValue>
       </SelectTrigger>
       <SelectContent>

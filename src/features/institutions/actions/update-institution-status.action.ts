@@ -14,10 +14,7 @@ type UpdateInstitutionStatusActionState = {
 
 const INSTITUTIONS_PATH = "/admin/institutions";
 
-export async function updateInstitutionStatusAction(
-  id: string,
-  nextActive: boolean,
-): Promise<UpdateInstitutionStatusActionState> {
+export async function updateInstitutionStatusAction(id: string, nextActive: boolean): Promise<UpdateInstitutionStatusActionState> {
   if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
 
   const errorState = await getResponseErrorActionState(

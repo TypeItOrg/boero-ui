@@ -11,21 +11,14 @@ import { PlatformRolesTableContainer } from "@features/roles/components/platform
 import { PlatformRolesTableFilters } from "@features/roles/components/platform-roles-table-filters";
 import { PlatformRolesTableSkeleton } from "@features/roles/components/platform-roles-table-skeleton";
 import { fetchPlatformRoles } from "@features/roles/services/platform-role.service";
-import {
-  parsePlatformRolesPaginationParams,
-  type PlatformRolesSearchParams,
-} from "@features/roles/utils/platform-role-pagination.util";
+import { parsePlatformRolesPaginationParams, type PlatformRolesSearchParams } from "@features/roles/utils/platform-role-pagination.util";
 
 export const metadata = {
   title: "Roles",
   description: "Consultá y administrá los roles de todas las instituciones.",
 };
 
-export default async function PlatformRolesPage({
-  searchParams,
-}: {
-  searchParams: Promise<PlatformRolesSearchParams>;
-}): Promise<React.ReactElement> {
+export default async function PlatformRolesPage({ searchParams }: { searchParams: Promise<PlatformRolesSearchParams> }): Promise<React.ReactElement> {
   const params = parsePlatformRolesPaginationParams(await searchParams);
   const rolesPromise = fetchPlatformRoles(params);
   const institutionNamePromise = getInstitutionName(params.institutionId);

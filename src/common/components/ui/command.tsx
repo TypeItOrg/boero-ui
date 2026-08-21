@@ -14,8 +14,7 @@ type CommandInputProps = React.ComponentProps<typeof CommandPrimitive.Input> & {
   shortcut?: string;
 };
 
-const DEFAULT_COMMAND_INPUT_CLASS_NAME =
-  "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50";
+const DEFAULT_COMMAND_INPUT_CLASS_NAME = "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50";
 const PALETTE_COMMAND_INPUT_CLASS_NAME =
   "placeholder:text-muted-foreground/70 h-14 min-w-0 flex-1 bg-transparent px-0 text-base font-medium tracking-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50";
 const COMMAND_INPUT_CLASS_NAMES = {
@@ -27,10 +26,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
   return (
     <CommandPrimitive
       data-slot="command"
-      className={cn(
-        "bg-popover text-popover-foreground flex size-full flex-col overflow-hidden rounded-xl! p-1",
-        className,
-      )}
+      className={cn("bg-popover text-popover-foreground flex size-full flex-col overflow-hidden rounded-xl! p-1", className)}
       {...props}
     />
   );
@@ -69,26 +65,13 @@ function CommandDialog({
 }
 
 function CommandInput({ className, shortcut, variant = "default", ...props }: CommandInputProps): React.ReactElement {
-  const commandInput = (
-    <CommandPrimitive.Input
-      data-slot="command-input"
-      className={cn(COMMAND_INPUT_CLASS_NAMES[variant], className)}
-      {...props}
-    />
-  );
+  const commandInput = <CommandPrimitive.Input data-slot="command-input" className={cn(COMMAND_INPUT_CLASS_NAMES[variant], className)} {...props} />;
 
   if (variant === "palette") {
     return (
-      <div
-        data-slot="command-input-wrapper"
-        className="border-border/70 flex h-14 w-full items-center border-b pr-3 pl-3 sm:pr-4 sm:pl-4"
-      >
+      <div data-slot="command-input-wrapper" className="border-border/70 flex h-14 w-full items-center border-b pr-3 pl-3 sm:pr-4 sm:pl-4">
         {commandInput}
-        {shortcut ? (
-          <Kbd className="bg-muted/70 border-border/60 hidden shrink-0 border px-1.5 text-[11px] sm:inline-flex">
-            {shortcut}
-          </Kbd>
-        ) : null}
+        {shortcut ? <Kbd className="bg-muted/70 border-border/60 hidden shrink-0 border px-1.5 text-[11px] sm:inline-flex">{shortcut}</Kbd> : null}
       </div>
     );
   }
@@ -116,13 +99,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
 }
 
 function CommandEmpty({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Empty>) {
-  return (
-    <CommandPrimitive.Empty
-      data-slot="command-empty"
-      className={cn("py-6 text-center text-sm", className)}
-      {...props}
-    />
-  );
+  return <CommandPrimitive.Empty data-slot="command-empty" className={cn("py-6 text-center text-sm", className)} {...props} />;
 }
 
 function CommandGroup({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Group>) {
@@ -139,13 +116,7 @@ function CommandGroup({ className, ...props }: React.ComponentProps<typeof Comma
 }
 
 function CommandSeparator({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Separator>) {
-  return (
-    <CommandPrimitive.Separator
-      data-slot="command-separator"
-      className={cn("bg-border -mx-1 h-px", className)}
-      {...props}
-    />
-  );
+  return <CommandPrimitive.Separator data-slot="command-separator" className={cn("bg-border -mx-1 h-px", className)} {...props} />;
 }
 
 function CommandItem({ className, children, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
@@ -168,23 +139,10 @@ function CommandShortcut({ className, ...props }: React.ComponentProps<"span">) 
   return (
     <span
       data-slot="command-shortcut"
-      className={cn(
-        "text-muted-foreground group-data-selected/command-item:text-foreground ml-auto text-xs tracking-widest",
-        className,
-      )}
+      className={cn("text-muted-foreground group-data-selected/command-item:text-foreground ml-auto text-xs tracking-widest", className)}
       {...props}
     />
   );
 }
 
-export {
-  Command,
-  CommandDialog,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandShortcut,
-  CommandSeparator,
-};
+export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, CommandSeparator };

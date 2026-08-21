@@ -1,6 +1,5 @@
 describe("getInstitutionalUser", () => {
-  type GetInstitutionalUserModule =
-    typeof import("@features/institutional-auth/services/get-institutional-user.service");
+  type GetInstitutionalUserModule = typeof import("@features/institutional-auth/services/get-institutional-user.service");
 
   const originalApiUrl = process.env.BOERO_API_URL;
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();

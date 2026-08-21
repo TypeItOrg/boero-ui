@@ -25,23 +25,8 @@ describe("institutional permission helpers", () => {
   });
 
   it("checks any and all permissions", () => {
-    expect(
-      hasAnyInstitutionalPermission(user, [
-        INSTITUTIONAL_PERMISSION.PERSON_DELETE,
-        INSTITUTIONAL_PERMISSION.ROLE_ASSIGN,
-      ]),
-    ).toBe(true);
-    expect(
-      hasAllInstitutionalPermissions(user, [
-        INSTITUTIONAL_PERMISSION.PERSON_READ_ANY,
-        INSTITUTIONAL_PERMISSION.ROLE_ASSIGN,
-      ]),
-    ).toBe(true);
-    expect(
-      hasAllInstitutionalPermissions(user, [
-        INSTITUTIONAL_PERMISSION.PERSON_READ_ANY,
-        INSTITUTIONAL_PERMISSION.PERSON_DELETE,
-      ]),
-    ).toBe(false);
+    expect(hasAnyInstitutionalPermission(user, [INSTITUTIONAL_PERMISSION.PERSON_DELETE, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN])).toBe(true);
+    expect(hasAllInstitutionalPermissions(user, [INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN])).toBe(true);
+    expect(hasAllInstitutionalPermissions(user, [INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, INSTITUTIONAL_PERMISSION.PERSON_DELETE])).toBe(false);
   });
 });

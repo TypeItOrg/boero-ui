@@ -31,10 +31,7 @@ describe("GET /api/admin/search", () => {
 
   it("preserves backend authorization failures", async () => {
     platformApiFetchMock.mockResolvedValue(
-      Response.json(
-        { message: "No autorizado." },
-        { status: 401, headers: { "x-request-id": "request-platform-search" } },
-      ),
+      Response.json({ message: "No autorizado." }, { status: 401, headers: { "x-request-id": "request-platform-search" } }),
     );
 
     const response = await GET(new Request("http://localhost/api/admin/search?search=admin"));

@@ -4,14 +4,7 @@ import type { ComponentProps } from "react";
 import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@common/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@common/components/ui/sidebar";
 import { cn } from "@common/utils/cn.util";
 import {
   PlatformSidebarItemIcon,
@@ -45,12 +38,7 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
         <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
           <SidebarMenuItem>
-            <SidebarMenuButton
-              aria-label="Cambiar tema"
-              className={platformSidebarItemButtonClassName}
-              onClick={toggleTheme}
-              tooltip="Cambiar tema"
-            >
+            <SidebarMenuButton aria-label="Cambiar tema" className={platformSidebarItemButtonClassName} onClick={toggleTheme} tooltip="Cambiar tema">
               <PlatformSidebarItemIcon>
                 <SunIcon className="hidden dark:block" />
                 <MoonIcon className="dark:hidden" />
@@ -69,9 +57,7 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
               <PlatformSidebarItemIcon>
                 <LogOutIcon />
               </PlatformSidebarItemIcon>
-              <span className="group-data-[collapsible=icon]:hidden">
-                {logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}
-              </span>
+              <span className="group-data-[collapsible=icon]:hidden">{logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

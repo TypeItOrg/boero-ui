@@ -11,12 +11,7 @@ type InstitutionRolesPaginationProps = {
   totalPages: number;
 };
 
-export function InstitutionRolesPagination({
-  page,
-  size,
-  totalItems,
-  totalPages,
-}: InstitutionRolesPaginationProps): React.ReactElement {
+export function InstitutionRolesPagination({ page, size, totalItems, totalPages }: InstitutionRolesPaginationProps): React.ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
   return (
     <DataTablePagination

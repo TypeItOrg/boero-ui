@@ -19,11 +19,7 @@ export async function renderInstitutionalAcademicRoute(
   resource: AcademicCollectionResource,
   { params, searchParams }: InstitutionalAcademicPageProps,
 ): Promise<React.ReactElement> {
-  const [user, resolvedParams, resolvedSearchParams] = await Promise.all([
-    requireInstitutionalUser(),
-    params,
-    searchParams,
-  ]);
+  const [user, resolvedParams, resolvedSearchParams] = await Promise.all([requireInstitutionalUser(), params, searchParams]);
   const segments = [resource, ...(resolvedParams.segments ?? [])];
 
   return (

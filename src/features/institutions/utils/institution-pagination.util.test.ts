@@ -43,18 +43,14 @@ describe("parseInstitutionPaginationParams", () => {
       sort: { field: "active", direction: "desc" },
     });
 
-    expect(
-      parseInstitutionPaginationParams({ active: "false", sortField: "name", sortDirection: "desc" }),
-    ).toMatchObject({
+    expect(parseInstitutionPaginationParams({ active: "false", sortField: "name", sortDirection: "desc" })).toMatchObject({
       active: false,
       sort: { field: "name", direction: "desc" },
     });
   });
 
   it("rejects unsupported active and sort values", () => {
-    expect(
-      parseInstitutionPaginationParams({ active: "all", sortField: "userCount", sortDirection: "desc" }),
-    ).toMatchObject({
+    expect(parseInstitutionPaginationParams({ active: "all", sortField: "userCount", sortDirection: "desc" })).toMatchObject({
       active: undefined,
       sort: { field: "name", direction: "asc" },
     });

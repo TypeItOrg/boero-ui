@@ -47,10 +47,7 @@ export function PlatformPeopleTableFilters({
     defaultValue: ALL_ROLES,
     label: "Rol",
     name: "roleCode",
-    options: [
-      { value: ALL_ROLES, label: "Todos los roles" },
-      ...roles.map((role) => ({ value: role.code, label: role.displayName })),
-    ],
+    options: [{ value: ALL_ROLES, label: "Todos los roles" }, ...roles.map((role) => ({ value: role.code, label: role.displayName }))],
     value: roleCode ?? ALL_ROLES,
   };
 
@@ -59,12 +56,7 @@ export function PlatformPeopleTableFilters({
   }
 
   return (
-    <DataTableFilters
-      search={search}
-      searchPlaceholder="Buscar por nombre, apellido, documento o email..."
-      selectFilters={[roleFilter]}
-      size={size}
-    >
+    <DataTableFilters search={search} searchPlaceholder="Buscar por nombre, apellido, documento o email..." selectFilters={[roleFilter]} size={size}>
       <div className="flex min-w-0 flex-col gap-1.5">
         <span className="text-foreground text-sm font-medium">Institución</span>
         <div className="flex min-w-0 gap-2">
@@ -84,9 +76,7 @@ export function PlatformPeopleTableFilters({
             placeholder="Seleccionar institución"
             queryKey={INSTITUTION_FILTER_QUERY_KEY}
             searchPlaceholder="Buscar institución..."
-            selectedLabel={
-              institutionName ?? (institutionId ? PEOPLE_ERROR_MESSAGES.INSTITUTION_UNAVAILABLE : undefined)
-            }
+            selectedLabel={institutionName ?? (institutionId ? PEOPLE_ERROR_MESSAGES.INSTITUTION_UNAVAILABLE : undefined)}
             value={institutionId}
           />
           <Button
@@ -105,20 +95,12 @@ export function PlatformPeopleTableFilters({
   );
 }
 
-async function fetchInstitutionPage({
-  page,
-  search,
-  signal,
-  size,
-}: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
+async function fetchInstitutionPage({ page, search, signal, size }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
   const searchParams = buildPaginationSearchParams({ page, size, search });
   searchParams.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
   const response = await fetch(`/api/admin/institutions?${searchParams.toString()}`, { signal });
 
-  const data = await parseHttpResponse<PaginatedResponse<InstitutionSummary>>(
-    response,
-    LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS,
-  );
+  const data = await parseHttpResponse<PaginatedResponse<InstitutionSummary>>(response, LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS);
   return toAsyncDropdownPage(data);
 }
 

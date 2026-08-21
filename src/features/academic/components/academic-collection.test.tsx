@@ -79,10 +79,7 @@ describe("AcademicCollectionView", () => {
       }),
     );
     expect(fetchTrainingPath).not.toHaveBeenCalled();
-    expect(jest.mocked(AcademicTableFilters)).toHaveBeenCalledWith(
-      expect.objectContaining({ trainingPathFilter: undefined }),
-      undefined,
-    );
+    expect(jest.mocked(AcademicTableFilters)).toHaveBeenCalledWith(expect.objectContaining({ trainingPathFilter: undefined }), undefined);
     expect(jest.mocked(AcademicTablePresentation)).toHaveBeenCalledWith(
       expect.objectContaining({
         hasFilters: false,
@@ -182,14 +179,7 @@ describe("AcademicCollectionView", () => {
 
     render(result);
 
-    expect(fetchStudyPlans).toHaveBeenLastCalledWith(
-      AcademicScope.INSTITUTIONAL,
-      INSTITUTION_ID,
-      expect.objectContaining({ deleted: true }),
-    );
-    expect(jest.mocked(AcademicTablePresentation)).toHaveBeenLastCalledWith(
-      expect.objectContaining({ canCreate: true, deleted: true }),
-      undefined,
-    );
+    expect(fetchStudyPlans).toHaveBeenLastCalledWith(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, expect.objectContaining({ deleted: true }));
+    expect(jest.mocked(AcademicTablePresentation)).toHaveBeenLastCalledWith(expect.objectContaining({ canCreate: true, deleted: true }), undefined);
   });
 });

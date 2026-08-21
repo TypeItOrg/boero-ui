@@ -6,18 +6,12 @@ import { Building2Icon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from
 import { NavigationCard } from "@common/components/navigation/navigation-card";
 import { Separator } from "@common/components/ui/separator";
 import { cn } from "@common/utils/cn.util";
-import {
-  AcademicResourceLinks,
-  getReadableAcademicResources,
-} from "@features/academic/components/academic-resource-links";
+import { AcademicResourceLinks, getReadableAcademicResources } from "@features/academic/components/academic-resource-links";
 import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { InstitutionalHomeSkeleton } from "@features/institutional-auth/components/institutional-home-skeleton";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import {
-  getInstitutionalHomeLinks,
-  type InstitutionalHomeLink,
-} from "@features/institutional-auth/utils/institutional-home-access.util";
+import { getInstitutionalHomeLinks, type InstitutionalHomeLink } from "@features/institutional-auth/utils/institutional-home-access.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 type HomeAccessRowProps = {
@@ -67,23 +61,12 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   return (
     <main className="flex min-h-full flex-1 flex-col gap-4">
       <header className="relative flex h-56 min-w-0 items-center overflow-hidden shadow-sm sm:h-64">
-        <Image
-          src="/encabezado-institucional.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          quality={90}
-          preload
-          className="object-cover object-center"
-        />
+        <Image src="/encabezado-institucional.webp" alt="" fill sizes="100vw" quality={90} preload className="object-cover object-center" />
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/25 sm:from-black/85 sm:via-black/60 sm:via-[65%] sm:to-black/15 sm:to-[90%] 2xl:from-black/85 2xl:via-black/50 2xl:via-[50%] 2xl:to-black/5 2xl:to-[100%] dark:bg-black/20"
         />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent dark:from-black/35"
-        />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent dark:from-black/35" />
         <div className="relative flex max-w-3xl min-w-0 items-center gap-4 p-5 text-white sm:p-6 lg:p-8">
           <Image
             width={875}
@@ -94,10 +77,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
           />
           <div className="flex h-32 min-w-0 flex-col justify-center gap-4 py-1 sm:h-36 sm:py-2">
             <div>
-              <h1
-                id="institution-home-title"
-                className="text-2xl font-bold tracking-tight text-pretty drop-shadow-sm sm:text-4xl"
-              >
+              <h1 id="institution-home-title" className="text-2xl font-bold tracking-tight text-pretty drop-shadow-sm sm:text-4xl">
                 <span className="sm:hidden">Hola,</span>
                 <span className="hidden sm:inline">{greeting},</span> {user.name}
               </h1>
@@ -142,12 +122,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             imageSrc="/gestion-academica.webp"
             imageSide="right"
           >
-            <AcademicResourceLinks
-              basePath=""
-              resources={academicResources}
-              prominent
-              className="[&>a]:bg-background"
-            />
+            <AcademicResourceLinks basePath="" resources={academicResources} prominent className="[&>a]:bg-background" />
           </HomeSubsection>
         ) : null}
 
@@ -169,20 +144,10 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
 }
 
 function HomeAccessRow({ link }: HomeAccessRowProps): React.ReactElement {
-  return (
-    <NavigationCard href={link.href} icon={link.icon} title={link.title} description={link.description} prominent />
-  );
+  return <NavigationCard href={link.href} icon={link.icon} title={link.title} description={link.description} prominent />;
 }
 
-function HomeSubsection({
-  children,
-  description,
-  icon: Icon,
-  id,
-  imageSide = "left",
-  imageSrc,
-  title,
-}: HomeSubsectionProps): React.ReactElement {
+function HomeSubsection({ children, description, icon: Icon, id, imageSide = "left", imageSrc, title }: HomeSubsectionProps): React.ReactElement {
   return (
     <section aria-labelledby={id} className="bg-background flex flex-col gap-4 rounded-xl border p-4 shadow-xs sm:p-5">
       <div className="flex items-stretch justify-between gap-4">
@@ -200,17 +165,10 @@ function HomeSubsection({
         <div
           className={cn(
             "grid gap-4",
-            imageSide === "right"
-              ? "lg:grid-cols-[minmax(0,2fr)_minmax(200px,0.7fr)]"
-              : "lg:grid-cols-[minmax(200px,0.7fr)_minmax(0,2fr)]",
+            imageSide === "right" ? "lg:grid-cols-[minmax(0,2fr)_minmax(200px,0.7fr)]" : "lg:grid-cols-[minmax(200px,0.7fr)_minmax(0,2fr)]",
           )}
         >
-          <div
-            className={cn(
-              "bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-92",
-              imageSide === "right" && "lg:order-2",
-            )}
-          >
+          <div className={cn("bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-92", imageSide === "right" && "lg:order-2")}>
             <Image src={imageSrc} alt="" fill sizes="(max-width: 1023px) 100vw, 28vw" className="object-cover" />
           </div>
           <div className={cn("min-w-0", imageSide === "right" && "lg:order-1")}>{children}</div>

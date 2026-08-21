@@ -33,13 +33,7 @@ export function DataTableSortableHead<TField extends string>({
 
   return (
     <TableHead aria-sort={getSortAriaValue(direction)} className={cn("group/sort-head", className)} {...props}>
-      <Button
-        type="button"
-        variant="ghost"
-        className="-ml-2 px-2 font-medium"
-        onClick={updateSort}
-        aria-label={`Ordenar por ${label}`}
-      >
+      <Button type="button" variant="ghost" className="-ml-2 px-2 font-medium" onClick={updateSort} aria-label={`Ordenar por ${label}`}>
         {label}
         <SortIcon direction={direction} />
       </Button>

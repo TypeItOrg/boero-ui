@@ -14,10 +14,7 @@ type EditInstitutionPageProps = {
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
 
-export default async function EditInstitutionPage({
-  params,
-  searchParams,
-}: EditInstitutionPageProps): Promise<React.ReactElement> {
+export default async function EditInstitutionPage({ params, searchParams }: EditInstitutionPageProps): Promise<React.ReactElement> {
   const { id } = await params;
   const { returnTo } = await searchParams;
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}`);

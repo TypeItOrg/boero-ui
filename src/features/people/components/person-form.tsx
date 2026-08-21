@@ -2,31 +2,26 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useForm, type Resolver, type UseFormSetError } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import {
-  createInstitutionalPersonAction,
-  createPlatformPersonAction,
-} from "@features/people/actions/create-person.action";
-import {
-  updateInstitutionalPersonAction,
-  updatePlatformPersonAction,
-} from "@features/people/actions/update-person.action";
-import {
-  PersonCreateFields,
-  PersonDetailsFields,
-  PersonPasswordFields,
-} from "@features/people/components/person-form-fields";
-import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
+import { createInstitutionalPersonAction, createPlatformPersonAction } from "@features/people/actions/create-person.action";
+import { updateInstitutionalPersonAction, updatePlatformPersonAction } from "@features/people/actions/update-person.action";
+import { PersonCreateFields, PersonDetailsFields, PersonPasswordFields } from "@features/people/components/person-form-fields";
 import type { Person } from "@features/people/types/person.types";
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
-import type { PersonFormFieldName } from "@features/people/types/person-form-field-name.types";
 import type { PersonFormInput } from "@features/people/types/person-form-input.types";
+import { FORM_MODE } from "@common/types/form-mode.types";
+import {
+  getDefaultValues,
+  getErrorTitle,
+  getFormData,
+  getPersonFormResolver,
+  getSubmitLabel,
+  setActionFieldErrors,
+} from "@features/people/utils/person-form.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonFormCommonProps = {
@@ -38,31 +33,20 @@ type PersonFormCommonProps = {
 };
 
 type CreateMode = PersonFormCommonProps & {
-  mode: "create";
+  mode: typeof FORM_MODE.CREATE;
   person?: never;
   roleIds?: never;
   canEdit?: never;
 };
 
 type EditMode = PersonFormCommonProps & {
-  mode: "edit";
+  mode: typeof FORM_MODE.EDIT;
   person: Person;
   roleIds?: readonly string[];
   canEdit?: boolean;
 };
 
 type PersonFormProps = CreateMode | EditMode;
-
-const EMPTY_FORM_VALUES: PersonFormInput = {
-  firstName: "",
-  lastName: "",
-  documentNumber: "",
-  email: "",
-  phoneNumber: "",
-  birthDate: "",
-  password: "",
-  confirmPassword: "",
-};
 
 export function PersonForm({
   mode,
@@ -76,7 +60,7 @@ export function PersonForm({
   returnTo,
 }: PersonFormProps): React.ReactElement {
   const router = useRouter();
-  const isEdit = mode === "edit";
+  const isEdit = mode === FORM_MODE.EDIT;
   const [isPending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string>();
   const listPath = PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`;
@@ -154,14 +138,7 @@ export function PersonForm({
 
       {!hideActions && (
         <div className="flex flex-row flex-wrap items-center justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="flex-1 sm:flex-none"
-            onClick={handleCancel}
-            disabled={isPending}
-          >
+          <Button type="button" variant="outline" size="lg" className="flex-1 sm:flex-none" onClick={handleCancel} disabled={isPending}>
             Cancelar
           </Button>
           <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
@@ -171,84 +148,4 @@ export function PersonForm({
       )}
     </form>
   );
-}
-
-function getPersonFormResolver(isEdit: boolean): Resolver<PersonFormInput> {
-  const schema = isEdit ? updatePersonFormSchema : createPersonFormSchema;
-
-  return zodResolver(schema) as unknown as Resolver<PersonFormInput>;
-}
-
-function getDefaultValues(person: Person | undefined): PersonFormInput {
-  if (!person) return { ...EMPTY_FORM_VALUES };
-
-  return {
-    firstName: person.firstName,
-    lastName: person.lastName,
-    documentNumber: person.documentNumber,
-    email: person.email ?? "",
-    phoneNumber: person.phoneNumber ?? "",
-    birthDate: person.birthDate ?? "",
-    password: "",
-    confirmPassword: "",
-  };
-}
-
-function getFormData(
-  values: PersonFormInput,
-  isEdit: boolean,
-  canEdit: boolean,
-  roleIds?: readonly string[],
-): FormData {
-  const formData = new FormData();
-
-  if (!isEdit || canEdit) {
-    const keys: Array<keyof PersonFormInput> = isEdit
-      ? ["firstName", "lastName", "email", "phoneNumber", "password", "confirmPassword"]
-      : ["firstName", "lastName", "documentNumber", "email", "phoneNumber", "birthDate", "password", "confirmPassword"];
-
-    for (const key of keys) {
-      formData.append(key, values[key]);
-    }
-  }
-
-  if (isEdit && roleIds) {
-    formData.append("roleIds", JSON.stringify(roleIds));
-  }
-
-  return formData;
-}
-
-function setActionFieldErrors(result: PersonActionState, setError: UseFormSetError<PersonFormInput>): boolean {
-  if (!result.fieldErrors) return false;
-
-  let hasFieldErrors = false;
-
-  for (const [field, message] of Object.entries(result.fieldErrors)) {
-    if (message) {
-      setError(field as PersonFormFieldName, { message });
-      hasFieldErrors = true;
-    }
-  }
-
-  return hasFieldErrors;
-}
-
-function getErrorTitle(isEdit: boolean): string {
-  return isEdit ? PEOPLE_ERROR_MESSAGES.UPDATE_TITLE : PEOPLE_ERROR_MESSAGES.CREATE_TITLE;
-}
-
-function getSubmitLabel({
-  isEdit,
-  isPending,
-  canEdit = true,
-}: {
-  isEdit: boolean;
-  isPending: boolean;
-  canEdit?: boolean;
-}): string {
-  if (isPending) return "Guardando...";
-  if (isEdit) return canEdit ? "Guardar cambios" : "Guardar roles";
-
-  return "Crear usuario";
 }

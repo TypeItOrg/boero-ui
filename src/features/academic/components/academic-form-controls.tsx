@@ -2,14 +2,7 @@ import { useState } from "react";
 
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@common/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { Textarea } from "@common/components/ui/textarea";
 import type { FormValue } from "@common/types/form-value.types";
 import { cn } from "@common/utils/cn.util";
@@ -44,21 +37,8 @@ type FormSelectProps = {
 
 export function NameField({ initialValues, error, fullWidth = true }: NameFieldProps): React.ReactElement {
   return (
-    <FormField
-      label="Nombre"
-      name="name"
-      error={error}
-      className={fullWidth ? "w-full flex-[1_0_100%]" : undefined}
-      required
-    >
-      <Input
-        aria-invalid={Boolean(error)}
-        defaultValue={toFormControlValue(initialValues.name)}
-        id="name"
-        maxLength={150}
-        name="name"
-        required
-      />
+    <FormField label="Nombre" name="name" error={error} className={fullWidth ? "w-full flex-[1_0_100%]" : undefined} required>
+      <Input aria-invalid={Boolean(error)} defaultValue={toFormControlValue(initialValues.name)} id="name" maxLength={150} name="name" required />
     </FormField>
   );
 }
@@ -78,14 +58,7 @@ export function DescriptionField({ initialValues, error }: SharedFieldProps): Re
   );
 }
 
-export function FormField({
-  label,
-  name,
-  error,
-  className,
-  children,
-  required = false,
-}: FormFieldProps): React.ReactElement {
+export function FormField({ label, name, error, className, children, required = false }: FormFieldProps): React.ReactElement {
   return (
     <Field data-invalid={Boolean(error)} className={cn("flex-[1_0_min(350px,100%)] self-start", className)}>
       <FieldContent>

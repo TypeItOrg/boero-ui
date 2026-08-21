@@ -16,9 +16,7 @@ export const metadata: Metadata = {
   title: "Detalle de cuenta",
 };
 
-export default async function PlatformAccountDetailPage({
-  params,
-}: PlatformAccountDetailPageProps): Promise<React.ReactElement> {
+export default async function PlatformAccountDetailPage({ params }: PlatformAccountDetailPageProps): Promise<React.ReactElement> {
   const { id } = await params;
   const account = await fetchPlatformAccountAdmin(id);
   if (!account) notFound();

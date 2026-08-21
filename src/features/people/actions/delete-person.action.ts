@@ -5,11 +5,7 @@ import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argu
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
-import {
-  getPeoplePath,
-  PeopleScope,
-  type PeopleScope as PeopleScopeType,
-} from "@features/people/utils/people-scope.util";
+import { getPeoplePath, PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type DeletePersonActionState = {
   success?: boolean;
@@ -21,11 +17,7 @@ export async function deletePersonAction(
   personId: string,
   scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<DeletePersonActionState> {
-  if (
-    !isValidUuid(institutionId) ||
-    !isValidUuid(personId) ||
-    (!PeopleScope.isAdmin(scope) && !PeopleScope.isInstitutional(scope))
-  ) {
+  if (!isValidUuid(institutionId) || !isValidUuid(personId) || (!PeopleScope.isAdmin(scope) && !PeopleScope.isInstitutional(scope))) {
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
@@ -37,11 +29,7 @@ export async function deletePersonAction(
   if (errorState) return errorState;
 
   revalidatePath(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
-  revalidatePath(
-    PeopleScope.isInstitutional(scope)
-      ? `/people/${personId}`
-      : `/admin/institutions/${institutionId}/people/${personId}`,
-  );
+  revalidatePath(PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`);
   revalidatePath("/admin/people");
   return { success: true };
 }

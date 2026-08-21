@@ -79,10 +79,7 @@ describe("loginInstitutional", () => {
     });
 
     await expect(
-      loginInstitutional(
-        {},
-        createLoginFormData({ institutionId: "institution-id", documentNumber: "12345678", password: "secret" }),
-      ),
+      loginInstitutional({}, createLoginFormData({ institutionId: "institution-id", documentNumber: "12345678", password: "secret" })),
     ).resolves.toEqual({ fieldErrors: { institutionId: "Institución inválida" } });
 
     loginMock.mockResolvedValueOnce({
@@ -91,10 +88,7 @@ describe("loginInstitutional", () => {
     });
 
     await expect(
-      loginInstitutional(
-        {},
-        createLoginFormData({ institutionId: "institution-id", documentNumber: "12345678", password: "secret" }),
-      ),
+      loginInstitutional({}, createLoginFormData({ institutionId: "institution-id", documentNumber: "12345678", password: "secret" })),
     ).resolves.toEqual({ error: "Credenciales inválidas" });
   });
 

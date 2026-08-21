@@ -4,14 +4,7 @@ import type * as React from "react";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@common/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import type { PaginationParams } from "@common/types/pagination-params.types";
 
 type DataTablePaginationProps = PaginationParams & {
@@ -92,14 +85,7 @@ export function DataTablePagination({
   );
 }
 
-function PageSizeSelect({
-  compactLabel,
-  disabled,
-  label,
-  options,
-  size,
-  onSizeChange,
-}: PageSizeSelectProps): React.ReactElement {
+function PageSizeSelect({ compactLabel, disabled, label, options, size, onSizeChange }: PageSizeSelectProps): React.ReactElement {
   return (
     <div className="flex min-w-0 items-center gap-2">
       <p className="text-foreground text-sm font-medium whitespace-nowrap">

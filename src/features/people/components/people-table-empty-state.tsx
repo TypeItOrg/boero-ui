@@ -37,13 +37,7 @@ export function PeopleTableEmptyState({
           La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
         </p>
         <Button asChild variant="outline" size="sm">
-          <Link
-            href={
-              PeopleScope.isInstitutional(scope)
-                ? `/people?size=${size}`
-                : `/admin/institutions/${institutionId}/people?size=${size}`
-            }
-          >
+          <Link href={PeopleScope.isInstitutional(scope) ? `/people?size=${size}` : `/admin/institutions/${institutionId}/people?size=${size}`}>
             Volver a la primera página
           </Link>
         </Button>
@@ -69,17 +63,11 @@ export function PeopleTableEmptyState({
         </div>
         <h3 className="text-foreground text-base font-semibold">No hay usuarios registrados</h3>
         <p className={`text-muted-foreground mt-1.5 max-w-sm text-sm ${canCreate ? "mb-6" : ""}`}>
-          {canCreate
-            ? "Comenzá creando un nuevo usuario para esta institución."
-            : "Todavía no hay usuarios registrados en esta institución."}
+          {canCreate ? "Comenzá creando un nuevo usuario para esta institución." : "Todavía no hay usuarios registrados en esta institución."}
         </p>
         {canCreate ? (
           <Button asChild size="sm">
-            <ReturnToLink
-              href={
-                PeopleScope.isInstitutional(scope) ? "/people/new" : `/admin/institutions/${institutionId}/people/new`
-              }
-            >
+            <ReturnToLink href={PeopleScope.isInstitutional(scope) ? "/people/new" : `/admin/institutions/${institutionId}/people/new`}>
               <PlusIcon className="mr-2 size-4" />
               Nuevo usuario
             </ReturnToLink>
@@ -94,11 +82,7 @@ export function PeopleTableEmptyState({
       {content}
       {isNavigating ? (
         <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center rounded-lg backdrop-blur-[1px]">
-          <Loader2Icon
-            className="text-muted-foreground size-5 animate-spin"
-            aria-label="Cargando usuarios"
-            role="status"
-          />
+          <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando usuarios" role="status" />
         </div>
       ) : null}
     </div>

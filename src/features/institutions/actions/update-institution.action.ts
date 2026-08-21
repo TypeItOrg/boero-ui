@@ -42,11 +42,7 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
     }),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    INSTITUTION_FORM_FIELD_NAMES,
-    INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION,
-  );
+  const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION);
   if (errorState) return errorState;
 
   revalidatePath("/admin/institutions");

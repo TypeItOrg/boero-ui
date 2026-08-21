@@ -38,15 +38,11 @@ export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): 
       <div className="bg-muted/25 col-span-12 flex flex-col gap-4 rounded-xl border p-5 md:p-6 lg:col-span-4">
         <div>
           <h2 className="text-foreground text-lg leading-none font-semibold">Estado de acceso</h2>
-          <p className="text-muted-foreground mt-1.5 text-sm">
-            Al deshabilitarlo se cerrarán sus sesiones y no podrá volver a ingresar.
-          </p>
+          <p className="text-muted-foreground mt-1.5 text-sm">Al deshabilitarlo se cerrarán sus sesiones y no podrá volver a ingresar.</p>
         </div>
         <div className="bg-background mt-2 flex items-center justify-between gap-4 rounded-lg border p-4">
           <span className="text-base font-medium">Acceso a la plataforma</span>
-          <Badge variant={account.enabled ? "success" : "destructive"}>
-            {account.enabled ? "Habilitado" : "Deshabilitado"}
-          </Badge>
+          <Badge variant={account.enabled ? "success" : "destructive"}>{account.enabled ? "Habilitado" : "Deshabilitado"}</Badge>
         </div>
         <div className="mt-auto pt-4">
           <PlatformAccountStatusControl accountId={account.platformAccountId} enabled={account.enabled} />

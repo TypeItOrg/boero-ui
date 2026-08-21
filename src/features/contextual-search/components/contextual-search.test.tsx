@@ -80,25 +80,19 @@ describe("ContextualSearch", () => {
   });
 
   it("shows the command shortcut on Mac", async () => {
-    renderWithQueryClient(
-      <ContextualSearch accessSections={platformAccessSections} scope="platform" shortcutPlatform="mac" />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={platformAccessSections} scope="platform" shortcutPlatform="mac" />);
 
     expect(await screen.findByText("\u2318 K")).toBeInTheDocument();
   });
 
   it("shows the control shortcut on Windows", async () => {
-    renderWithQueryClient(
-      <ContextualSearch accessSections={platformAccessSections} scope="platform" shortcutPlatform="windows" />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={platformAccessSections} scope="platform" shortcutPlatform="windows" />);
 
     expect(await screen.findByText("Ctrl K")).toBeInTheDocument();
   });
 
   it("can render an expanded search trigger on mobile", () => {
-    renderWithQueryClient(
-      <ContextualSearch accessSections={platformAccessSections} scope="platform" mobileVariant="input" />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={platformAccessSections} scope="platform" mobileVariant="input" />);
 
     const trigger = screen.getByRole("button", { name: "Buscar en la plataforma" });
     expect(trigger).toHaveClass("w-full", "justify-start", "pl-9");
@@ -108,13 +102,7 @@ describe("ContextualSearch", () => {
   it("opens the modal and focuses the contextual input", async () => {
     const user = userEvent.setup();
 
-    renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />);
 
     const trigger = screen.getByRole("button", { name: "Buscar en la institución" });
     expect(trigger).toHaveAttribute("aria-expanded", "false");
@@ -186,13 +174,7 @@ describe("ContextualSearch", () => {
     const user = userEvent.setup();
     mockedFetchContextualSearch.mockResolvedValue(userSearchSummary);
 
-    renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />);
 
     await user.click(screen.getByRole("button", { name: "Buscar en la institución" }));
     await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
@@ -201,10 +183,7 @@ describe("ContextualSearch", () => {
     expect(await screen.findByText("Matías Delgado")).toBeInTheDocument();
     expect(screen.getByText("44741306")).toBeInTheDocument();
     expect(screen.getByText("Habilitado")).toBeInTheDocument();
-    expect(mockedFetchContextualSearch).toHaveBeenCalledWith(
-      { scope: "institutional", institutionId, search: "ma" },
-      expect.any(AbortSignal),
-    );
+    expect(mockedFetchContextualSearch).toHaveBeenCalledWith({ scope: "institutional", institutionId, search: "ma" }, expect.any(AbortSignal));
   });
 
   it("refreshes results after each reopening for deletion and restoration changes", async () => {
@@ -214,13 +193,7 @@ describe("ContextualSearch", () => {
       .mockResolvedValueOnce(emptySearchSummary)
       .mockResolvedValueOnce(userSearchSummary);
 
-    renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />);
 
     const trigger = screen.getByRole("button", { name: "Buscar en la institución" });
     await user.click(trigger);
@@ -247,11 +220,7 @@ describe("ContextualSearch", () => {
   it("clears only the active scope and institution search cache when opening", async () => {
     const user = userEvent.setup();
     const { queryClient } = renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
+      <ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />,
     );
     const platformKey = ["contextual-search", "platform", null, "ma"] as const;
     const institutionalKey = ["contextual-search", "institutional", institutionId, "ma"] as const;
@@ -272,13 +241,7 @@ describe("ContextualSearch", () => {
     const user = userEvent.setup();
     mockedFetchContextualSearch.mockImplementation(() => new Promise<ContextualSearchSummary>(() => {}));
 
-    renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />);
 
     await user.click(screen.getByRole("button", { name: "Buscar en la institución" }));
     await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
@@ -293,13 +256,7 @@ describe("ContextualSearch", () => {
     const user = userEvent.setup();
     mockedFetchContextualSearch.mockResolvedValue(userSearchSummary);
 
-    renderWithQueryClient(
-      <ContextualSearch
-        accessSections={institutionalAccessSections}
-        scope="institutional"
-        institutionId={institutionId}
-      />,
-    );
+    renderWithQueryClient(<ContextualSearch accessSections={institutionalAccessSections} scope="institutional" institutionId={institutionId} />);
 
     await user.click(screen.getByRole("button", { name: "Buscar en la institución" }));
     const input = screen.getByRole("combobox", { name: "Buscar en la institución" });

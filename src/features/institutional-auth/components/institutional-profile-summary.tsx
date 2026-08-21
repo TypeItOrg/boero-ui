@@ -12,11 +12,7 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
     <div className="flex flex-col gap-4">
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <ProfileSectionHeader
-            description="Información principal de tu cuenta institucional."
-            icon={UserRoundIcon}
-            title="Datos personales"
-          />
+          <ProfileSectionHeader description="Información principal de tu cuenta institucional." icon={UserRoundIcon} title="Datos personales" />
         </header>
         <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -32,11 +28,7 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
       </div>
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <ProfileSectionHeader
-            description="Dirección registrada en tu institución."
-            icon={HomeIcon}
-            title="Domicilio"
-          />
+          <ProfileSectionHeader description="Dirección registrada en tu institución." icon={HomeIcon} title="Domicilio" />
         </header>
         <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2">
@@ -50,15 +42,7 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
   );
 }
 
-function ProfileSectionHeader({
-  description,
-  icon: Icon,
-  title,
-}: {
-  description: string;
-  icon: LucideIcon;
-  title: string;
-}): React.ReactElement {
+function ProfileSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <div className="flex items-center gap-3.5">
       <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">

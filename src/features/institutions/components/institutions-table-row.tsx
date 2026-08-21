@@ -6,13 +6,7 @@ import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@common/components/ui/context-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,9 +48,7 @@ export function InstitutionsTableRow({ institution, onStatusChange }: Institutio
             <InstitutionUsersCell institution={institution} />
           </TableCell>
           <TableCell>
-            <Badge variant={institution.active ? "success" : "destructive"}>
-              {institution.active ? "Activa" : "Inactiva"}
-            </Badge>
+            <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
           </TableCell>
           <TableCell className="pr-4">
             <InstitutionActionsMenu institution={institution} onStatusChange={() => onStatusChange(institution)} />
@@ -156,11 +148,7 @@ function InstitutionActionsMenu({
             ))}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant={institution.active ? "destructive" : "default"}
-            className="px-2.5 py-1.5"
-            onSelect={onStatusChange}
-          >
+          <DropdownMenuItem variant={institution.active ? "destructive" : "default"} className="px-2.5 py-1.5" onSelect={onStatusChange}>
             {institution.active ? "Desactivar" : "Activar"}
           </DropdownMenuItem>
         </DropdownMenuContent>

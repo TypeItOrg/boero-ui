@@ -19,10 +19,7 @@ type BuildPaginationSearchParamsInput = PaginationParams & {
   search?: string;
 };
 
-export function parsePaginationQuery(
-  searchParams: PaginationSearchParams,
-  options: ParsePaginationQueryOptions = {},
-): PaginationQuery {
+export function parsePaginationQuery(searchParams: PaginationSearchParams, options: ParsePaginationQueryOptions = {}): PaginationQuery {
   const allowedPageSizes = options.allowedPageSizes ?? DEFAULT_ALLOWED_PAGE_SIZES;
   const defaultPage = options.defaultPage ?? DEFAULT_PAGE;
   const defaultSize = options.defaultSize ?? DEFAULT_SIZE;

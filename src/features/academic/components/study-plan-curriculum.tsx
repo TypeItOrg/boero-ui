@@ -29,8 +29,7 @@ export function StudyPlanCurriculumView({
   scope,
 }: StudyPlanCurriculumProps): React.ReactElement {
   const planPath = `${basePath}/study-plans/${curriculum.studyPlan.id}`;
-  const hasSpaces =
-    curriculum.levels.some((level) => level.spaces.length > 0) || curriculum.unassignedSpaces.length > 0;
+  const hasSpaces = curriculum.levels.some((level) => level.spaces.length > 0) || curriculum.unassignedSpaces.length > 0;
   const isEmpty = !hasSpaces && curriculum.levels.length === 0;
 
   return (
@@ -44,9 +43,7 @@ export function StudyPlanCurriculumView({
             <h2 id="study-plan-curriculum-title" className="text-base font-semibold">
               Estructura curricular
             </h2>
-            <p className="text-muted-foreground text-sm">
-              Organizá los niveles y espacios académicos que forman parte de este plan.
-            </p>
+            <p className="text-muted-foreground text-sm">Organizá los niveles y espacios académicos que forman parte de este plan.</p>
           </div>
         </div>
         {canEditCurriculum ? (
@@ -70,18 +67,11 @@ export function StudyPlanCurriculumView({
       {isEmpty ? (
         <Empty className="bg-background mt-5 min-h-72 border-0">
           <EmptyHeader className="max-w-md">
-            <EmptyMedia
-              className="bg-background text-primary mb-5 size-14 rounded-full border shadow-xs"
-              variant="default"
-            >
+            <EmptyMedia className="bg-background text-primary mb-5 size-14 rounded-full border shadow-xs" variant="default">
               <BookOpenCheckIcon />
             </EmptyMedia>
-            <EmptyTitle className="text-foreground font-heading text-lg font-medium tracking-tight">
-              La currícula todavía está vacía
-            </EmptyTitle>
-            <EmptyDescription className="text-sm/relaxed">
-              Creá los niveles y luego incorporá espacios académicos al plan.
-            </EmptyDescription>
+            <EmptyTitle className="text-foreground font-heading text-lg font-medium tracking-tight">La currícula todavía está vacía</EmptyTitle>
+            <EmptyDescription className="text-sm/relaxed">Creá los niveles y luego incorporá espacios académicos al plan.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
@@ -168,21 +158,12 @@ type CurriculumSpaceCardProps = {
   space: StudyPlanSpace;
 };
 
-function CurriculumSpaceCard({
-  canEditCurriculum,
-  institutionId,
-  planPath,
-  scope,
-  space,
-}: CurriculumSpaceCardProps): React.ReactElement {
+function CurriculumSpaceCard({ canEditCurriculum, institutionId, planPath, scope, space }: CurriculumSpaceCardProps): React.ReactElement {
   const spacePath = `${planPath}/spaces/${space.id}`;
 
   return (
     <Card size="sm" className="bg-background h-full">
-      <Link
-        className="flex flex-1 flex-col gap-3 rounded-t-xl focus-visible:ring-2 focus-visible:outline-none"
-        href={spacePath}
-      >
+      <Link className="flex flex-1 flex-col gap-3 rounded-t-xl focus-visible:ring-2 focus-visible:outline-none" href={spacePath}>
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <CardTitle className="text-base font-semibold">{space.academicSpaceName}</CardTitle>
@@ -190,9 +171,7 @@ function CurriculumSpaceCard({
           </div>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Badge variant={space.requirementType === "REQUIRED" ? "default" : "outline"}>
-            {requirementTypeLabels[space.requirementType]}
-          </Badge>
+          <Badge variant={space.requirementType === "REQUIRED" ? "default" : "outline"}>{requirementTypeLabels[space.requirementType]}</Badge>
           <Badge variant="secondary">{approvalModeLabels[space.approvalMode]}</Badge>
         </CardContent>
       </Link>

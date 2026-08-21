@@ -45,9 +45,7 @@ describe("AcademicDeleteDialog", () => {
   it("disables its controls while deletion is pending", async () => {
     const user = userEvent.setup();
     let resolveDelete: (state: object) => void = () => undefined;
-    jest
-      .mocked(deleteAcademicResourceAction)
-      .mockImplementationOnce(() => new Promise((resolve) => (resolveDelete = resolve)));
+    jest.mocked(deleteAcademicResourceAction).mockImplementationOnce(() => new Promise((resolve) => (resolveDelete = resolve)));
 
     render(<AcademicDeleteDialog {...PROPS} onOpenChange={jest.fn()} open />);
 

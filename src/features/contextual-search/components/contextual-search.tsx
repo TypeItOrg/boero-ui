@@ -17,8 +17,7 @@ import type { ContextualSearchShortcutPlatform } from "@features/contextual-sear
 import { omitContextualSearchAccessItems } from "@features/contextual-search/utils/contextual-search-access.util";
 
 type ContextualSearchScopeProps =
-  | { scope: "platform"; institutionId?: never; className?: string }
-  | { scope: "institutional"; institutionId: string; className?: string };
+  { scope: "platform"; institutionId?: never; className?: string } | { scope: "institutional"; institutionId: string; className?: string };
 
 type ContextualSearchProps = ContextualSearchScopeProps & {
   accessSections: readonly ContextualSearchAccessSection[];
@@ -52,14 +51,8 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
   const institutionId = props.scope === "institutional" ? props.institutionId : null;
   const debouncedSearch = useDebouncedValue(value.trim(), 300);
   const canSearch = debouncedSearch.length >= 2;
-  const contextualSearchQueryKey = React.useMemo(
-    () => ["contextual-search", scope, institutionId] as const,
-    [institutionId, scope],
-  );
-  const visibleAccessSections = omitContextualSearchAccessItems(
-    accessSections,
-    CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope],
-  );
+  const contextualSearchQueryKey = React.useMemo(() => ["contextual-search", scope, institutionId] as const, [institutionId, scope]);
+  const visibleAccessSections = omitContextualSearchAccessItems(accessSections, CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope]);
   const openSearch = React.useCallback(() => {
     queryClient.removeQueries({ queryKey: contextualSearchQueryKey });
     setOpen(true);
@@ -122,12 +115,7 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
         )}
         onClick={openSearch}
       >
-        <SearchIcon
-          className={cn(
-            "pointer-events-none size-4 md:absolute md:left-3",
-            mobileVariant === "input" && "absolute left-3",
-          )}
-        />
+        <SearchIcon className={cn("pointer-events-none size-4 md:absolute md:left-3", mobileVariant === "input" && "absolute left-3")} />
         <span className={cn("hidden truncate md:block", mobileVariant === "input" && "block")}>{copy.placeholder}</span>
         <span className="hidden md:contents">
           <ContextualSearchShortcut platform={shortcutPlatform} />

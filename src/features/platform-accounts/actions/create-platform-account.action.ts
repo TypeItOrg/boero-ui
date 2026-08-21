@@ -36,11 +36,7 @@ export async function createPlatformAccountAction(formData: FormData): Promise<P
     body: JSON.stringify(payload),
   });
 
-  const errorState = await getResponseErrorActionState(
-    response,
-    PLATFORM_ACCOUNT_FORM_FIELD_NAMES,
-    PLATFORM_ACCOUNT_ERROR_MESSAGES.CREATE_ACCOUNT,
-  );
+  const errorState = await getResponseErrorActionState(response, PLATFORM_ACCOUNT_FORM_FIELD_NAMES, PLATFORM_ACCOUNT_ERROR_MESSAGES.CREATE_ACCOUNT);
   if (errorState) return errorState;
 
   revalidatePath(PLATFORM_ACCOUNTS_PATH);

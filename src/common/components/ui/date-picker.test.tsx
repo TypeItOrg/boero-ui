@@ -96,9 +96,7 @@ describe("DatePicker", () => {
   it("disables calendar days outside the input range", async () => {
     const user = userEvent.setup();
 
-    render(
-      <DatePicker value={new Date(2035, 6, 25)} minDate={new Date(2035, 6, 24)} maxDate={new Date(2035, 6, 26)} />,
-    );
+    render(<DatePicker value={new Date(2035, 6, 25)} minDate={new Date(2035, 6, 24)} maxDate={new Date(2035, 6, 26)} />);
 
     await user.click(screen.getByRole("button", { name: "Abrir calendario" }));
 

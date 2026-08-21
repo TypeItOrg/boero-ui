@@ -18,11 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Nuevo rol");
 }
 
-export default async function NewRolePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+export default async function NewRolePage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<React.ReactElement> {
   const { returnTo } = await searchParams;
   const destination = getSafeReturnTo(returnTo, "/roles");
   const user = await requireInstitutionalUser();
@@ -43,11 +39,7 @@ export default async function NewRolePage({
         </div>
       }
     >
-      <InstitutionRoleForm
-        institutionId={user.institutionId}
-        permissionGroups={permissionGroups}
-        returnTo={destination}
-      />
+      <InstitutionRoleForm institutionId={user.institutionId} permissionGroups={permissionGroups} returnTo={destination} />
     </PlatformPageShell>
   );
 }

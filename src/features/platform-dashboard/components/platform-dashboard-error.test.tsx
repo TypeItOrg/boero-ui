@@ -17,9 +17,7 @@ describe("PlatformDashboardErrorBoundary", () => {
           <button type="button" onClick={() => setShouldThrow(false)}>
             Preparar recuperación
           </button>
-          <PlatformDashboardErrorBoundary>
-            {shouldThrow ? <ThrowingChild /> : <p>Contenido recuperado</p>}
-          </PlatformDashboardErrorBoundary>
+          <PlatformDashboardErrorBoundary>{shouldThrow ? <ThrowingChild /> : <p>Contenido recuperado</p>}</PlatformDashboardErrorBoundary>
         </>
       );
     }

@@ -13,11 +13,7 @@ const academicOptionsRequestSchema = z.object({
   search: z.string().trim().max(100).default(""),
 });
 
-export async function proxyAcademicOptionsGet(
-  request: Request,
-  resourceSegment: string,
-  scope: AcademicScope,
-): Promise<Response> {
+export async function proxyAcademicOptionsGet(request: Request, resourceSegment: string, scope: AcademicScope): Promise<Response> {
   const { searchParams } = new URL(request.url);
   const parsed = academicOptionsRequestSchema.safeParse({
     resource: resourceSegment,

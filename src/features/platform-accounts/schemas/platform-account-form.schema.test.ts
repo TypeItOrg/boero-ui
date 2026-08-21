@@ -1,7 +1,4 @@
-import {
-  platformAccountFormSchema,
-  platformAccountUpdateFormSchema,
-} from "@features/platform-accounts/schemas/platform-account-form.schema";
+import { platformAccountFormSchema, platformAccountUpdateFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
 
 const validAccount = {
   name: "María",
@@ -32,9 +29,7 @@ describe("platformAccountFormSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." })]),
       );
     }
   });
@@ -72,10 +67,7 @@ describe("platformAccountUpdateFormSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ["password"] }),
-          expect.objectContaining({ path: ["confirmPassword"] }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ path: ["password"] }), expect.objectContaining({ path: ["confirmPassword"] })]),
       );
     }
   });

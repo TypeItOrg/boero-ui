@@ -6,10 +6,7 @@ import * as React from "react";
 import { BlockingError } from "@common/components/blocking-error";
 import { PLATFORM_DASHBOARD_ERROR_MESSAGES } from "@features/platform-dashboard/constants/error-messages.constants";
 
-function PlatformDashboardErrorFallback(
-  _props: Record<string, unknown>,
-  { error, retry }: ErrorInfo,
-): React.ReactElement {
+function PlatformDashboardErrorFallback(_props: Record<string, unknown>, { error, retry }: ErrorInfo): React.ReactElement {
   React.useEffect(() => {
     console.error(error);
   }, [error]);

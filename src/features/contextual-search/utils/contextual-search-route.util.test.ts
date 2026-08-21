@@ -1,8 +1,5 @@
 import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
-import {
-  getContextualSearchResultHref,
-  getContextualSearchViewAllHref,
-} from "@features/contextual-search/utils/contextual-search-route.util";
+import { getContextualSearchResultHref, getContextualSearchViewAllHref } from "@features/contextual-search/utils/contextual-search-route.util";
 
 const result: ContextualSearchResult = {
   id: "result-1",
@@ -20,9 +17,7 @@ describe("contextual search routes", () => {
     expect(getContextualSearchResultHref("platform", "institution", result)).toBe("/admin/institutions/result-1");
     expect(getContextualSearchResultHref("platform", "platform-account", result)).toBe("/admin/accounts/result-1");
     expect(getContextualSearchResultHref("platform", "role", result)).toBe("/admin/roles/result-1");
-    expect(getContextualSearchResultHref("platform", "user", result)).toBe(
-      "/admin/institutions/institution-1/people/result-1",
-    );
+    expect(getContextualSearchResultHref("platform", "user", result)).toBe("/admin/institutions/institution-1/people/result-1");
   });
 
   it.each([
@@ -40,9 +35,7 @@ describe("contextual search routes", () => {
     ["academic-space", "academic-spaces"],
     ["instrument", "instruments"],
   ] as const)("builds detail routes for the %s academic entity", (entityType, resource) => {
-    expect(getContextualSearchResultHref("platform", entityType, result)).toBe(
-      `/admin/institutions/institution-1/academic/${resource}/result-1`,
-    );
+    expect(getContextualSearchResultHref("platform", entityType, result)).toBe(`/admin/institutions/institution-1/academic/${resource}/result-1`);
     expect(getContextualSearchResultHref("institutional", entityType, result)).toBe(`/${resource}/result-1`);
   });
 
@@ -59,9 +52,7 @@ describe("contextual search routes", () => {
   });
 
   it("maps an institutional academic-year search to the year filter", () => {
-    expect(getContextualSearchViewAllHref("institutional", "academic-year", " 2025 ")).toBe(
-      "/academic-years?year=2025",
-    );
+    expect(getContextualSearchViewAllHref("institutional", "academic-year", " 2025 ")).toBe("/academic-years?year=2025");
   });
 
   it("does not offer an unfiltered academic-year collection for an invalid year search", () => {
@@ -69,20 +60,14 @@ describe("contextual search routes", () => {
   });
 
   it("rejects platform-only entities in an institutional scope", () => {
-    expect(() => getContextualSearchResultHref("institutional", "institution", result)).toThrow(
-      "no pertenece a la búsqueda institucional",
-    );
-    expect(() => getContextualSearchViewAllHref("institutional", "platform-account", "admin")).toThrow(
-      "no pertenece a la búsqueda institucional",
-    );
+    expect(() => getContextualSearchResultHref("institutional", "institution", result)).toThrow("no pertenece a la búsqueda institucional");
+    expect(() => getContextualSearchViewAllHref("institutional", "platform-account", "admin")).toThrow("no pertenece a la búsqueda institucional");
   });
 
   it("rejects platform results that require a missing institution", () => {
-    expect(() =>
-      getContextualSearchResultHref("platform", "academic-space", { ...result, institutionId: null }),
-    ).toThrow("no tiene una institución asociada");
-    expect(() => getContextualSearchResultHref("platform", "user", { ...result, institutionId: null })).toThrow(
+    expect(() => getContextualSearchResultHref("platform", "academic-space", { ...result, institutionId: null })).toThrow(
       "no tiene una institución asociada",
     );
+    expect(() => getContextualSearchResultHref("platform", "user", { ...result, institutionId: null })).toThrow("no tiene una institución asociada");
   });
 });

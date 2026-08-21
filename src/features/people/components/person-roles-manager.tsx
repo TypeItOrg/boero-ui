@@ -6,10 +6,7 @@ import { PlusIcon, ShieldCheckIcon, XIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
 import type { AssignableRole } from "@features/people/types/assignable-role.types";
 import type { PersonRole } from "@features/people/types/person-role.types";
-import {
-  SystemRoleCode,
-  type SystemRoleCode as SystemRoleCodeType,
-} from "@features/people/types/system-role-code.types";
+import { SystemRoleCode, type SystemRoleCode as SystemRoleCodeType } from "@features/people/types/system-role-code.types";
 import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
@@ -43,10 +40,7 @@ export function PersonRolesManager({
   const initialRoleCodes = React.useMemo(() => assignedRoles.map((role) => role.roleId), [assignedRoles]);
   const initialRoleCodeSet = React.useMemo(() => new Set(initialRoleCodes), [initialRoleCodes]);
   const selectedRoleCodeSet = React.useMemo(() => new Set(selectedRoleCodes), [selectedRoleCodes]);
-  const assignedRolesByCode = React.useMemo(
-    () => new Map(assignedRoles.map((role) => [role.roleId, role])),
-    [assignedRoles],
-  );
+  const assignedRolesByCode = React.useMemo(() => new Map(assignedRoles.map((role) => [role.roleId, role])), [assignedRoles]);
   const rolesByCode = React.useMemo(() => new Map(roles.map((role) => [role.id, role])), [roles]);
   const selectedRoles = React.useMemo(
     () => getSelectedRoles(selectedRoleCodeSet, rolesByCode, assignedRolesByCode),
@@ -56,11 +50,7 @@ export function PersonRolesManager({
   const protectedRoleIds = React.useMemo(
     () =>
       PeopleScope.isInstitutional(scope)
-        ? new Set(
-            assignedRoles
-              .filter((role) => role.technicalCode === SystemRoleCode.INSTITUTIONAL_AUTHORITY)
-              .map((role) => role.roleId),
-          )
+        ? new Set(assignedRoles.filter((role) => role.technicalCode === SystemRoleCode.INSTITUTIONAL_AUTHORITY).map((role) => role.roleId))
         : new Set<string>(),
     [assignedRoles, scope],
   );
@@ -103,8 +93,7 @@ export function PersonRolesManager({
   } {
     const candidate = rolesByCode.get(roleId);
     const replacesSelectedRoles =
-      candidate?.technicalCode === SystemRoleCode.APPLICANT ||
-      (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
+      candidate?.technicalCode === SystemRoleCode.APPLICANT || (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
     const roleIds = replacesSelectedRoles ? [roleId] : [...selectedRoleCodes, roleId];
 
     if (candidate?.technicalCode === SystemRoleCode.APPLICANT) {
@@ -147,9 +136,7 @@ export function PersonRolesManager({
                     <div className="flex min-w-0 flex-col gap-1">
                       <span className="font-medium">{role.displayName}</span>
                       <span className="text-muted-foreground text-xs">
-                        {isPendingAssignment
-                          ? "Se asignará al guardar."
-                          : `Asignado: ${formatAssignedAt(role.assignedAt)}`}
+                        {isPendingAssignment ? "Se asignará al guardar." : `Asignado: ${formatAssignedAt(role.assignedAt)}`}
                       </span>
                     </div>
                     <Button
@@ -167,9 +154,7 @@ export function PersonRolesManager({
               })}
             </div>
           ) : (
-            <p className="text-muted-foreground rounded-lg border p-4 text-sm">
-              Este usuario no tendrá roles asignados.
-            </p>
+            <p className="text-muted-foreground rounded-lg border p-4 text-sm">Este usuario no tendrá roles asignados.</p>
           )}
         </section>
 
@@ -185,9 +170,7 @@ export function PersonRolesManager({
                   <div key={role.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
                     <div className="min-w-0">
                       <p className="font-medium">{role.name}</p>
-                      {isPendingRevocation ? (
-                        <p className="text-muted-foreground mt-1 text-xs">Se revocará al guardar.</p>
-                      ) : null}
+                      {isPendingRevocation ? <p className="text-muted-foreground mt-1 text-xs">Se revocará al guardar.</p> : null}
                     </div>
                     <Button
                       type="button"

@@ -235,12 +235,7 @@ describe("AcademicRouteView", () => {
     expect(screen.getByRole("heading", { name: "Uso en planes de estudio" })).toBeInTheDocument();
     expect(screen.getByText("No se puede desactivar este espacio")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Desactivar" })).toBeDisabled();
-    expect(fetchAcademicSpaceUsage).toHaveBeenCalledWith(
-      AcademicScope.INSTITUTIONAL,
-      INSTITUTION_ID,
-      ACADEMIC_SPACE_ID,
-      { page: 0, size: 10 },
-    );
+    expect(fetchAcademicSpaceUsage).toHaveBeenCalledWith(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, ACADEMIC_SPACE_ID, { page: 0, size: 10 });
   });
 
   it("shows the instrument status action without the edit permission", async () => {
@@ -331,13 +326,7 @@ describe("AcademicRouteView", () => {
       institutionId: INSTITUTION_ID,
       renderBreadcrumb,
       scope: AcademicScope.INSTITUTIONAL,
-      segments: [
-        AcademicResource.STUDY_PLAN,
-        STUDY_PLAN_ID,
-        AcademicResource.ACADEMIC_LEVEL,
-        LEVEL_ID,
-        ACADEMIC_ROUTE_SEGMENT.EDIT,
-      ],
+      segments: [AcademicResource.STUDY_PLAN, STUDY_PLAN_ID, AcademicResource.ACADEMIC_LEVEL, LEVEL_ID, ACADEMIC_ROUTE_SEGMENT.EDIT],
       searchParams: {},
     });
 

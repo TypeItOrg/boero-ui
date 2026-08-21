@@ -11,11 +11,7 @@ type PlatformPeopleEmptyStateProps = {
   onFirstPage: () => void;
 };
 
-export function PlatformPeopleEmptyState({
-  data,
-  hasFilters,
-  onFirstPage,
-}: PlatformPeopleEmptyStateProps): React.ReactElement {
+export function PlatformPeopleEmptyState({ data, hasFilters, onFirstPage }: PlatformPeopleEmptyStateProps): React.ReactElement {
   if (data.totalItems > 0) {
     return (
       <EmptyState

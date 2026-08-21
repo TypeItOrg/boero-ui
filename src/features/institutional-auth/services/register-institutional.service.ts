@@ -4,9 +4,7 @@ import type { InstitutionalRegisterInput } from "@features/institutional-auth/ty
 import type { InstitutionalRegisterResult } from "@features/institutional-auth/types/institutional-register-result.types";
 import type { RegisterInstitutionalOutput } from "@features/institutional-auth/types/register-institutional-output.types";
 
-export async function registerInstitutionalAccount(
-  input: InstitutionalRegisterInput,
-): Promise<RegisterInstitutionalOutput> {
+export async function registerInstitutionalAccount(input: InstitutionalRegisterInput): Promise<RegisterInstitutionalOutput> {
   try {
     const response = await fetch(new URL("/api/v1/auth/register", getApiUrlOrThrow()), {
       body: JSON.stringify(input),

@@ -32,11 +32,7 @@ export function getSortDirection<TField extends string>(sort: Sort<TField>, fiel
   return sort.field === field ? sort.direction : undefined;
 }
 
-export function getNextSort<TField extends string>(
-  sort: Sort<TField>,
-  field: TField,
-  defaultDirection: SortDirection = "asc",
-): Sort<TField> {
+export function getNextSort<TField extends string>(sort: Sort<TField>, field: TField, defaultDirection: SortDirection = "asc"): Sort<TField> {
   const direction = sort.field === field ? getOppositeSortDirection(sort.direction) : defaultDirection;
 
   return { field, direction };

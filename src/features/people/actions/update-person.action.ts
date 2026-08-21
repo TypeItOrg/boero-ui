@@ -11,26 +11,14 @@ import { peopleApiFetch } from "@features/people/services/people-api-fetch.servi
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
 import { PERSON_FORM_FIELD_NAMES } from "@features/people/types/person-form-field-name.types";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
-import {
-  getPeoplePath,
-  PeopleScope,
-  type PeopleScope as PeopleScopeType,
-} from "@features/people/utils/people-scope.util";
+import { getPeoplePath, PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
-export async function updateInstitutionalPersonAction(
-  institutionId: string,
-  personId: string,
-  formData: FormData,
-): Promise<PersonActionState> {
+export async function updateInstitutionalPersonAction(institutionId: string, personId: string, formData: FormData): Promise<PersonActionState> {
   await requireInstitutionalUser();
   return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.INSTITUTIONAL);
 }
 
-export async function updatePlatformPersonAction(
-  institutionId: string,
-  personId: string,
-  formData: FormData,
-): Promise<PersonActionState> {
+export async function updatePlatformPersonAction(institutionId: string, personId: string, formData: FormData): Promise<PersonActionState> {
   await requirePlatformAccount();
   return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.ADMIN);
 }
@@ -120,9 +108,5 @@ function parseRoleIds(value: FormDataEntryValue | null): string[] | null | undef
 
 function revalidatePersonPaths(institutionId: string, personId: string, scope: PeopleScope): void {
   revalidatePath(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
-  revalidatePath(
-    PeopleScope.isInstitutional(scope)
-      ? `/people/${personId}`
-      : `/admin/institutions/${institutionId}/people/${personId}`,
-  );
+  revalidatePath(PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`);
 }

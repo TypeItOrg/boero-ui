@@ -36,10 +36,7 @@ export async function TrainingPathStudyPlans({
   const createHref = `${basePath}/${AcademicResource.STUDY_PLAN}/new?trainingPathId=${encodeURIComponent(trainingPath.id)}`;
 
   return (
-    <section
-      aria-labelledby="training-path-study-plans-title"
-      className="bg-muted/25 flex flex-col gap-5 rounded-xl border p-5 md:p-6"
-    >
+    <section aria-labelledby="training-path-study-plans-title" className="bg-muted/25 flex flex-col gap-5 rounded-xl border p-5 md:p-6">
       <header className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3.5">
           <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">

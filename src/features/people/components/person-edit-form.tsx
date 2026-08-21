@@ -38,20 +38,12 @@ export function PersonEditForm({
   returnTo,
 }: PersonEditFormProps): React.ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
-  const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() =>
-    assignedRoles.map((role) => role.roleId),
-  );
-  const destination =
-    returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
+  const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() => assignedRoles.map((role) => role.roleId));
+  const destination = returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
-      <div
-        className={cn(
-          "grid items-start gap-4",
-          canManageRoles && "xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]",
-        )}
-      >
+      <div className={cn("grid items-start gap-4", canManageRoles && "xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]")}>
         <PersonForm
           mode="edit"
           institutionId={institutionId}

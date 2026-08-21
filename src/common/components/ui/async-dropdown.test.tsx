@@ -43,9 +43,7 @@ const baseItems: Item[] = [
   { id: "uy", name: "Uruguay" },
 ];
 
-function renderDropdown(
-  overrides: Partial<React.ComponentProps<typeof AsyncDropdown<Item>>> = {},
-): RenderDropdownResult {
+function renderDropdown(overrides: Partial<React.ComponentProps<typeof AsyncDropdown<Item>>> = {}): RenderDropdownResult {
   const fetchPage = jest.fn<Promise<FetchPageResult>, [AsyncDropdownFetchPageInput]>();
   const onValueChange = jest.fn();
 

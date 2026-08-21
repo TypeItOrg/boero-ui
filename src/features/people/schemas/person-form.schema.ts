@@ -24,10 +24,7 @@ export const createPersonFormSchema = basePersonSchema
       .string()
       .min(1, { message: PEOPLE_ERROR_MESSAGES.REQUIRED_BIRTH_DATE, abort: true })
       .refine(hasMinimumPersonAge, PEOPLE_ERROR_MESSAGES.MINIMUM_AGE),
-    password: z
-      .string()
-      .min(8, PEOPLE_ERROR_MESSAGES.PASSWORD_MIN_LENGTH)
-      .max(255, PEOPLE_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
+    password: z.string().min(8, PEOPLE_ERROR_MESSAGES.PASSWORD_MIN_LENGTH).max(255, PEOPLE_ERROR_MESSAGES.PASSWORD_MAX_LENGTH),
     confirmPassword: z.string().min(1, PEOPLE_ERROR_MESSAGES.REQUIRED_PASSWORD_CONFIRMATION),
   })
   .refine((values) => values.password === values.confirmPassword, {

@@ -1,12 +1,7 @@
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { toFormControlValue, toOptionalFormString } from "@common/utils/form-value.util";
 import { DateRangeFields } from "@features/academic/components/academic-date-range-fields";
-import {
-  DescriptionField,
-  FormField,
-  FormSelect,
-  NameField,
-} from "@features/academic/components/academic-form-controls";
+import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
 import { AcademicSpaceDropdown, TrainingPathDropdown } from "@features/academic/components/academic-option-dropdown";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { APPROVAL_MODE } from "@features/academic/types/approval-mode.types";
@@ -33,13 +28,7 @@ export function StudyPlanFields({
   return (
     <>
       <NameField initialValues={initialValues} error={fieldErrors?.name} />
-      <FormField
-        label="Trayecto formativo"
-        name="trainingPathId"
-        error={fieldErrors?.trainingPathId}
-        className="sm:col-span-2"
-        required
-      >
+      <FormField label="Trayecto formativo" name="trainingPathId" error={fieldErrors?.trainingPathId} className="sm:col-span-2" required>
         {institutionId && scope ? (
           <TrainingPathDropdown
             ariaInvalid={Boolean(fieldErrors?.trainingPathId)}
@@ -75,13 +64,7 @@ export function AcademicLevelFields({ initialValues = {}, fieldErrors }: Academi
   return (
     <>
       <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={false} />
-      <FormField
-        label="Orden"
-        name="displayOrder"
-        error={fieldErrors?.displayOrder}
-        className="w-full flex-none sm:max-w-48"
-        required
-      >
+      <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} className="w-full flex-none sm:max-w-48" required>
         <NumericInput
           aria-invalid={Boolean(fieldErrors?.displayOrder)}
           defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
@@ -106,13 +89,7 @@ export function StudyPlanSpaceFields({
   const initialAcademicSpaceId = toOptionalFormString(initialValues.academicSpaceId);
   return (
     <>
-      <FormField
-        label="Espacio académico"
-        name="academicSpaceId"
-        error={fieldErrors?.academicSpaceId}
-        className="sm:col-span-2"
-        required
-      >
+      <FormField label="Espacio académico" name="academicSpaceId" error={fieldErrors?.academicSpaceId} className="sm:col-span-2" required>
         {institutionId && scope ? (
           <AcademicSpaceDropdown
             ariaInvalid={Boolean(fieldErrors?.academicSpaceId)}
@@ -138,10 +115,7 @@ export function StudyPlanSpaceFields({
         <FormSelect
           name="academicLevelId"
           defaultValue={toFormControlValue(initialValues.academicLevelId) || "unassigned"}
-          options={[
-            { value: "unassigned", label: "Sin nivel" },
-            ...levels.map((level) => ({ value: level.id, label: level.name })),
-          ]}
+          options={[{ value: "unassigned", label: "Sin nivel" }, ...levels.map((level) => ({ value: level.id, label: level.name }))]}
         />
       </FormField>
       <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} required>

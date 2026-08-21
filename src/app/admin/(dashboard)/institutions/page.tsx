@@ -7,10 +7,7 @@ import { DataTableNavigationProvider } from "@common/components/ui/data-table-na
 import { InstitutionsTableFilters } from "@features/institutions/components/institutions-table-filters";
 import { InstitutionsTableContainer } from "@features/institutions/components/institutions-table-container";
 import { InstitutionsTableSkeleton } from "@features/institutions/components/institutions-table-skeleton";
-import {
-  parseInstitutionPaginationParams,
-  type InstitutionSearchParams,
-} from "@features/institutions/utils/institution-pagination.util";
+import { parseInstitutionPaginationParams, type InstitutionSearchParams } from "@features/institutions/utils/institution-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 

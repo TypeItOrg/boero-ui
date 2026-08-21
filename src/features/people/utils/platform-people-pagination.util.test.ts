@@ -1,7 +1,4 @@
-import {
-  DEFAULT_PLATFORM_PEOPLE_SORT,
-  parsePlatformPeoplePaginationParams,
-} from "@features/people/utils/platform-people-pagination.util";
+import { DEFAULT_PLATFORM_PEOPLE_SORT, parsePlatformPeoplePaginationParams } from "@features/people/utils/platform-people-pagination.util";
 
 describe("parsePlatformPeoplePaginationParams", () => {
   it("parses valid filters and sort", () => {

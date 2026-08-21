@@ -59,10 +59,7 @@ export function PersonDeleteDialog({
     setError(undefined);
 
     startTransition(async () => {
-      const result = await safelyRunAction(
-        deletePersonAction(institutionId, personId, scope),
-        PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK,
-      );
+      const result = await safelyRunAction(deletePersonAction(institutionId, personId, scope), PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK);
 
       if (!result.success) {
         setError(result.error ?? PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK);
@@ -83,8 +80,8 @@ export function PersonDeleteDialog({
           </div>
           <AlertDialogTitle>Eliminar usuario</AlertDialogTitle>
           <AlertDialogDescription>
-            <span className="text-foreground font-semibold">{personName}</span> dejará de tener acceso y ya no aparecerá
-            en los listados de la institución. Esta acción no elimina físicamente sus datos.
+            <span className="text-foreground font-semibold">{personName}</span> dejará de tener acceso y ya no aparecerá en los listados de la
+            institución. Esta acción no elimina físicamente sus datos.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

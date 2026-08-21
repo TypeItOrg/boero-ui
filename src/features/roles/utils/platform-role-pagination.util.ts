@@ -4,13 +4,11 @@ import type { QueryParamValue } from "@common/types/query-param.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { getQueryParamValue, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
-import type { PlatformRoleType } from "@features/roles/types/platform-role-type.types";
+import { PLATFORM_ROLE_TYPE, type PlatformRoleType } from "@features/roles/types/platform-role-type.types";
 
 export const DEFAULT_PLATFORM_ROLES_PAGE_SIZE = 10;
 export const PLATFORM_ROLES_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
-export const PLATFORM_ROLES_SORT_FIELDS = ["name", "institutionName"] as const satisfies readonly (
-  "name" | "institutionName"
-)[];
+export const PLATFORM_ROLES_SORT_FIELDS = ["name", "institutionName"] as const satisfies readonly ("name" | "institutionName")[];
 export type PlatformRoleSortField = (typeof PLATFORM_ROLES_SORT_FIELDS)[number];
 export type PlatformRoleSort = Sort<PlatformRoleSortField>;
 export type PlatformRolesSearchParams = PaginationSearchParams &
@@ -30,12 +28,10 @@ export const DEFAULT_PLATFORM_ROLES_SORT = {
   direction: "asc",
 } as const satisfies PlatformRoleSort;
 
-const ROLE_TYPES = new Set<PlatformRoleType>(["SYSTEM", "CUSTOM"]);
+const ROLE_TYPES = new Set<PlatformRoleType>([PLATFORM_ROLE_TYPE.SYSTEM, PLATFORM_ROLE_TYPE.CUSTOM]);
 const SORT_FIELDS = new Set<PlatformRoleSortField>(PLATFORM_ROLES_SORT_FIELDS);
 
-export function parsePlatformRolesPaginationParams(
-  searchParams: PlatformRolesSearchParams,
-): PlatformRolesPaginationParams {
+export function parsePlatformRolesPaginationParams(searchParams: PlatformRolesSearchParams): PlatformRolesPaginationParams {
   const { page, size, search } = parsePaginationQuery(searchParams, {
     allowedPageSizes: new Set<number>(PLATFORM_ROLES_PAGE_SIZE_OPTIONS),
     defaultSize: DEFAULT_PLATFORM_ROLES_PAGE_SIZE,

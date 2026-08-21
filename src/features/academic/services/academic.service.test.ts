@@ -117,9 +117,7 @@ describe("academic service pagination", () => {
     ).resolves.toEqual(payload);
 
     const requestUrl = new URL(academicApiFetchMock.mock.calls[0][1], "http://localhost");
-    expect(requestUrl.pathname).toBe(
-      `/api/v1/admin/institutions/${institutionId}/academic-spaces/2d9ec931-453c-4778-86a9-dc40a06d0247/usage`,
-    );
+    expect(requestUrl.pathname).toBe(`/api/v1/admin/institutions/${institutionId}/academic-spaces/2d9ec931-453c-4778-86a9-dc40a06d0247/usage`);
     expect(Object.fromEntries(requestUrl.searchParams)).toEqual({ page: "1", size: "20" });
   });
 });

@@ -10,10 +10,7 @@ import type { QueryParamValue } from "@common/types/query-param.types";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionDetail } from "@features/institutions/components/institution-detail";
-import {
-  InstitutionPeoplePreview,
-  InstitutionPeoplePreviewSkeleton,
-} from "@features/institutions/components/institution-people-preview";
+import { InstitutionPeoplePreview, InstitutionPeoplePreviewSkeleton } from "@features/institutions/components/institution-people-preview";
 import { InstitutionReactivateButton } from "@features/institutions/components/institution-reactivate-button";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -28,10 +25,7 @@ export const metadata: Metadata = {
   title: "Detalle de institución",
 };
 
-export default async function InstitutionDetailPage({
-  params,
-  searchParams,
-}: InstitutionDetailPageProps): Promise<React.ReactElement> {
+export default async function InstitutionDetailPage({ params, searchParams }: InstitutionDetailPageProps): Promise<React.ReactElement> {
   const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/admin/institutions");
   const institution = await fetchInstitution(id);
@@ -43,9 +37,7 @@ export default async function InstitutionDetailPage({
       <header className="bg-background flex min-w-0 flex-row items-center justify-between gap-4 rounded-xl p-4 shadow-xs sm:p-6">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
-          <h1 className="text-foreground mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">
-            {institution.name}
-          </h1>
+          <h1 className="text-foreground mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">{institution.name}</h1>
         </div>
         <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
           <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
@@ -93,9 +85,7 @@ export default async function InstitutionDetailPage({
               <div>
                 <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Estado</dt>
                 <dd className="mt-1.5">
-                  <Badge variant={institution.active ? "success" : "destructive"}>
-                    {institution.active ? "Activa" : "Inactiva"}
-                  </Badge>
+                  <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
                 </dd>
               </div>
               <div>
@@ -117,11 +107,7 @@ export default async function InstitutionDetailPage({
         </Card>
 
         <div
-          className={
-            institution.active
-              ? "grid flex-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]"
-              : "flex flex-1 flex-col"
-          }
+          className={institution.active ? "grid flex-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]" : "flex flex-1 flex-col"}
         >
           <InstitutionDetail institution={institution} />
 

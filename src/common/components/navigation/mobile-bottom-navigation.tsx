@@ -35,9 +35,7 @@ export function MobileBottomNavigation({ items, primaryItem }: MobileBottomNavig
       <ul className="flex min-w-0 items-stretch px-2">
         {orderedItems.map(({ item, isPrimary }) => {
           const Icon = item.icon;
-          const isActive = isPrimary
-            ? primaryIsActive
-            : !primaryIsActive && isNavigationItemActive(pathname, item.url, item.exact);
+          const isActive = isPrimary ? primaryIsActive : !primaryIsActive && isNavigationItemActive(pathname, item.url, item.exact);
 
           return (
             <li key={item.url} className="flex min-w-0 flex-1 justify-center">
@@ -59,11 +57,7 @@ export function MobileBottomNavigation({ items, primaryItem }: MobileBottomNavig
                     !isPrimary && isActive && "bg-primary/10",
                   )}
                 >
-                  <Icon
-                    aria-hidden="true"
-                    className={isPrimary ? "size-6" : "size-5"}
-                    strokeWidth={isActive || isPrimary ? 2.5 : 2}
-                  />
+                  <Icon aria-hidden="true" className={isPrimary ? "size-6" : "size-5"} strokeWidth={isActive || isPrimary ? 2.5 : 2} />
                 </span>
                 <span className="w-full truncate px-0.5">{item.title}</span>
               </Link>

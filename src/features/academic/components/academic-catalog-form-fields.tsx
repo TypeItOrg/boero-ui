@@ -1,10 +1,5 @@
 import { toFormControlValue } from "@common/utils/form-value.util";
-import {
-  DescriptionField,
-  FormField,
-  FormSelect,
-  NameField,
-} from "@features/academic/components/academic-form-controls";
+import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
 import { ACADEMIC_SPACE_TYPE } from "@features/academic/types/academic-space-type.types";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
@@ -20,8 +15,7 @@ type ActiveStatusFieldProps = {
 };
 
 export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
-  const hasActiveState =
-    initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
+  const hasActiveState = initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
   return (
@@ -33,11 +27,7 @@ export function TrainingPathFields({ initialValues = {}, fieldErrors }: Academic
   );
 }
 
-export function InstrumentFields({
-  canChangeStatus = true,
-  initialValues = {},
-  fieldErrors,
-}: AcademicFieldsProps): React.ReactElement {
+export function InstrumentFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
@@ -50,11 +40,7 @@ export function InstrumentFields({
   );
 }
 
-export function AcademicSpaceFields({
-  canChangeStatus = true,
-  initialValues = {},
-  fieldErrors,
-}: AcademicFieldsProps): React.ReactElement {
+export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 

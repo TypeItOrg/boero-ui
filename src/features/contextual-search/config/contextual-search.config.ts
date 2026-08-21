@@ -53,13 +53,7 @@ export const CONTEXTUAL_SEARCH_CATEGORY_LABELS: Record<string, string> = {
   OTHER: "Otro",
 };
 
-const ACADEMIC_SEARCH_ENTITIES = new Set<string>([
-  "academic-year",
-  "training-path",
-  "study-plan",
-  "academic-space",
-  "instrument",
-]);
+const ACADEMIC_SEARCH_ENTITIES = new Set<string>(["academic-year", "training-path", "study-plan", "academic-space", "instrument"]);
 
 export function isAcademicSearchEntity(value: string | undefined): value is AcademicContextualSearchEntity {
   return value !== undefined && ACADEMIC_SEARCH_ENTITIES.has(value);

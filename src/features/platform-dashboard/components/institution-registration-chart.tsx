@@ -32,9 +32,7 @@ export function InstitutionRegistrationChart({ registrations }: InstitutionRegis
         <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={40} />
         <ChartTooltip
           cursor={false}
-          content={
-            <ChartTooltipContent labelFormatter={(_value, payload) => payload[0]?.payload.fullLabel} indicator="line" />
-          }
+          content={<ChartTooltipContent labelFormatter={(_value, payload) => payload[0]?.payload.fullLabel} indicator="line" />}
         />
         <Bar dataKey="count" fill="var(--color-count)" radius={[6, 6, 2, 2]} />
       </BarChart>

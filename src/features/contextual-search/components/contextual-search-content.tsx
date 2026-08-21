@@ -3,27 +3,18 @@
 import * as React from "react";
 import { CircleAlertIcon, SearchIcon, type LucideIcon } from "lucide-react";
 
-import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { CommandGroup, CommandItem, CommandSeparator } from "@common/components/ui/command";
 import { Skeleton } from "@common/components/ui/skeleton";
 import { cn } from "@common/utils/cn.util";
 import { ContextualSearchAccessList } from "@features/contextual-search/components/contextual-search-access-list";
-import {
-  CONTEXTUAL_SEARCH_CATEGORY_LABELS,
-  CONTEXTUAL_SEARCH_PRESENTATION,
-  CONTEXTUAL_SEARCH_STATUS_LABELS,
-  hasPositiveContextualSearchStatus,
-} from "@features/contextual-search/config/contextual-search.config";
+import { ContextualSearchResultMetadata } from "@features/contextual-search/components/contextual-search-result-metadata";
+import { CONTEXTUAL_SEARCH_PRESENTATION } from "@features/contextual-search/config/contextual-search.config";
 import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
 import type { ContextualSearchGroup } from "@features/contextual-search/types/contextual-search-group.types";
-import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
 import type { ContextualSearchScope } from "@features/contextual-search/types/contextual-search-scope.types";
 import { filterContextualSearchAccessSections } from "@features/contextual-search/utils/contextual-search-access.util";
-import {
-  getContextualSearchResultHref,
-  getContextualSearchViewAllHref,
-} from "@features/contextual-search/utils/contextual-search-route.util";
+import { getContextualSearchResultHref, getContextualSearchViewAllHref } from "@features/contextual-search/utils/contextual-search-route.util";
 
 type ContextualSearchContentProps = {
   accessSections: readonly ContextualSearchAccessSection[];
@@ -134,7 +125,7 @@ export function ContextualSearchContent({
                   </span>
                   <span className="grid min-w-0 flex-1 grid-rows-2 gap-0.5">
                     <span className="truncate font-medium">{item.title}</span>
-                    <ResultMetadata item={item} scope={scope} />
+                    <ContextualSearchResultMetadata item={item} scope={scope} />
                   </span>
                 </CommandItem>
               ))}
@@ -170,52 +161,7 @@ function SearchContentWithAccess({ children, onNavigate, sections }: SearchConte
   );
 }
 
-function ResultMetadata({
-  item,
-  scope,
-}: {
-  item: ContextualSearchResult;
-  scope: ContextualSearchScope;
-}): React.ReactElement {
-  const metadata = [item.subtitle, scope === "platform" ? item.institutionName : null].filter(Boolean).join(" · ");
-  const statusLabel = item.status ? (CONTEXTUAL_SEARCH_STATUS_LABELS[item.status] ?? item.status) : null;
-  const categoryLabel = item.category ? (CONTEXTUAL_SEARCH_CATEGORY_LABELS[item.category] ?? item.category) : null;
-
-  return (
-    <span className="flex min-w-0 items-center gap-1.5 overflow-hidden">
-      {metadata ? <span className="text-muted-foreground truncate text-xs">{metadata}</span> : null}
-      <span className="flex shrink-0 items-center gap-1">
-        {statusLabel ? (
-          <Badge
-            variant={hasPositiveContextualSearchStatus(item.status) ? "success" : "secondary"}
-            className="h-4 px-1.5 text-[10px]"
-          >
-            {statusLabel}
-          </Badge>
-        ) : null}
-        {categoryLabel ? (
-          <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
-            {categoryLabel}
-          </Badge>
-        ) : null}
-        {item.institutionActive === false ? (
-          <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
-            Institución inactiva
-          </Badge>
-        ) : null}
-      </span>
-    </span>
-  );
-}
-
-function SearchMessage({
-  action,
-  compact = false,
-  icon: Icon,
-  role = "status",
-  title,
-  children,
-}: SearchMessageProps): React.ReactElement {
+function SearchMessage({ action, compact = false, icon: Icon, role = "status", title, children }: SearchMessageProps): React.ReactElement {
   return (
     <div
       role={role}
@@ -239,12 +185,7 @@ function SearchMessage({
 
 function SearchSkeleton(): React.ReactElement {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-label="Buscando resultados"
-      className="flex flex-col gap-2 px-3 pt-2.5 pb-2.5 sm:px-4"
-    >
+    <div role="status" aria-live="polite" aria-label="Buscando resultados" className="flex flex-col gap-2 px-3 pt-2.5 pb-2.5 sm:px-4">
       <Skeleton className="bg-muted-foreground/15 h-3 w-16" />
       {SEARCH_SKELETON_ROWS.map((item) => (
         <div key={item} className="bg-muted flex h-13.5 items-stretch gap-3 rounded-lg px-2 py-1.5">

@@ -1,7 +1,4 @@
-import {
-  DEFAULT_PLATFORM_ROLES_SORT,
-  parsePlatformRolesPaginationParams,
-} from "@features/roles/utils/platform-role-pagination.util";
+import { DEFAULT_PLATFORM_ROLES_SORT, parsePlatformRolesPaginationParams } from "@features/roles/utils/platform-role-pagination.util";
 
 describe("parsePlatformRolesPaginationParams", () => {
   it("parses valid filters and sort", () => {

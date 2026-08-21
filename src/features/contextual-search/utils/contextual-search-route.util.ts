@@ -1,7 +1,7 @@
 import type { AcademicContextualSearchEntity } from "@features/contextual-search/types/academic-contextual-search-entity.types";
 import type { ContextualSearchEntity } from "@features/contextual-search/types/contextual-search-entity.types";
 import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
-import type { ContextualSearchScope } from "@features/contextual-search/types/contextual-search-scope.types";
+import { CONTEXTUAL_SEARCH_SCOPE, type ContextualSearchScope } from "@features/contextual-search/types/contextual-search-scope.types";
 import { parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
 
 const ACADEMIC_RESOURCE_BY_ENTITY: Record<AcademicContextualSearchEntity, string> = {
@@ -17,18 +17,12 @@ export function getContextualSearchResultHref(
   entityType: ContextualSearchEntity,
   item: ContextualSearchResult,
 ): string {
-  return scope === "institutional"
-    ? getInstitutionalResultHref(entityType, item)
-    : getPlatformResultHref(entityType, item);
+  return scope === CONTEXTUAL_SEARCH_SCOPE.INSTITUTIONAL ? getInstitutionalResultHref(entityType, item) : getPlatformResultHref(entityType, item);
 }
 
-export function getContextualSearchViewAllHref(
-  scope: ContextualSearchScope,
-  entityType: ContextualSearchEntity,
-  search: string,
-): string | null {
+export function getContextualSearchViewAllHref(scope: ContextualSearchScope, entityType: ContextualSearchEntity, search: string): string | null {
   const searchParams = new URLSearchParams({ search });
-  return scope === "institutional"
+  return scope === CONTEXTUAL_SEARCH_SCOPE.INSTITUTIONAL
     ? getInstitutionalCollectionHref(entityType, searchParams)
     : getPlatformCollectionHref(entityType, searchParams);
 }
@@ -92,10 +86,7 @@ function getPlatformCollectionHref(entityType: ContextualSearchEntity, searchPar
   }
 }
 
-function getInstitutionalCollectionHref(
-  entityType: ContextualSearchEntity,
-  searchParams: URLSearchParams,
-): string | null {
+function getInstitutionalCollectionHref(entityType: ContextualSearchEntity, searchParams: URLSearchParams): string | null {
   switch (entityType) {
     case "user":
       return `/people?${searchParams}`;

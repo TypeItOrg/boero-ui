@@ -9,10 +9,7 @@ import { loginPlatformAccount } from "@features/platform-auth/services/login-pla
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
 
-export async function loginPlatform(
-  _previousState: PlatformLoginActionState,
-  formData: FormData,
-): Promise<PlatformLoginActionState> {
+export async function loginPlatform(_previousState: PlatformLoginActionState, formData: FormData): Promise<PlatformLoginActionState> {
   const parsed = platformLoginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),

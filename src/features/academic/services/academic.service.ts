@@ -41,11 +41,7 @@ export async function fetchAcademicYears(
   return fetchPage(scope, institutionId, "academic-years", params);
 }
 
-export async function fetchAcademicYear(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<AcademicYear | null> {
+export async function fetchAcademicYear(scope: AcademicScope, institutionId: string, id: string): Promise<AcademicYear | null> {
   return fetchDetail(scope, institutionId, `academic-years/${id}`);
 }
 
@@ -57,11 +53,7 @@ export async function fetchTrainingPaths(
   return fetchPage(scope, institutionId, "training-paths", params);
 }
 
-export async function fetchTrainingPath(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<TrainingPath | null> {
+export async function fetchTrainingPath(scope: AcademicScope, institutionId: string, id: string): Promise<TrainingPath | null> {
   return fetchDetail(scope, institutionId, `training-paths/${id}`);
 }
 
@@ -77,19 +69,11 @@ export async function fetchStudyPlans(
   return fetchPage(scope, institutionId, "study-plans", params);
 }
 
-export async function fetchStudyPlan(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<StudyPlan | null> {
+export async function fetchStudyPlan(scope: AcademicScope, institutionId: string, id: string): Promise<StudyPlan | null> {
   return fetchDetail(scope, institutionId, `study-plans/${id}`);
 }
 
-export async function fetchStudyPlanCurriculum(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<StudyPlanCurriculum | null> {
+export async function fetchStudyPlanCurriculum(scope: AcademicScope, institutionId: string, id: string): Promise<StudyPlanCurriculum | null> {
   return fetchDetail(scope, institutionId, `study-plans/${id}/curriculum`);
 }
 
@@ -101,11 +85,7 @@ export async function fetchAcademicSpaces(
   return fetchPage(scope, institutionId, "academic-spaces", params);
 }
 
-export async function fetchAcademicSpace(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<AcademicSpace | null> {
+export async function fetchAcademicSpace(scope: AcademicScope, institutionId: string, id: string): Promise<AcademicSpace | null> {
   return fetchDetail(scope, institutionId, `academic-spaces/${id}`);
 }
 
@@ -126,27 +106,15 @@ export async function fetchInstruments(
   return fetchPage(scope, institutionId, "instruments", params);
 }
 
-export async function fetchInstrument(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<Instrument | null> {
+export async function fetchInstrument(scope: AcademicScope, institutionId: string, id: string): Promise<Instrument | null> {
   return fetchDetail(scope, institutionId, `instruments/${id}`);
 }
 
-export async function fetchStudyPlanSpace(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<StudyPlanSpace | null> {
+export async function fetchStudyPlanSpace(scope: AcademicScope, institutionId: string, id: string): Promise<StudyPlanSpace | null> {
   return fetchDetail(scope, institutionId, `study-plan-spaces/${id}`);
 }
 
-export async function fetchPrerequisite(
-  scope: AcademicScope,
-  institutionId: string,
-  id: string,
-): Promise<Prerequisite | null> {
+export async function fetchPrerequisite(scope: AcademicScope, institutionId: string, id: string): Promise<Prerequisite | null> {
   return fetchDetail(scope, institutionId, `prerequisites/${id}`);
 }
 

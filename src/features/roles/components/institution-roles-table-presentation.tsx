@@ -18,11 +18,7 @@ type InstitutionRolesTablePresentationProps = {
   canUpdate: boolean;
 };
 
-export function InstitutionRolesTablePresentation({
-  roles,
-  search,
-  canUpdate,
-}: InstitutionRolesTablePresentationProps): React.ReactElement {
+export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: InstitutionRolesTablePresentationProps): React.ReactElement {
   const { isPending } = useDataTableNavigation();
 
   return (
@@ -39,11 +35,7 @@ export function InstitutionRolesTablePresentation({
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <CardTitle className="truncate">{role.name}</CardTitle>
-                      {role.technicalCode ? (
-                        <Badge variant="secondary">Sistema</Badge>
-                      ) : (
-                        <Badge variant="outline">Personalizado</Badge>
-                      )}
+                      {role.technicalCode ? <Badge variant="secondary">Sistema</Badge> : <Badge variant="outline">Personalizado</Badge>}
                     </div>
                   </div>
                 </CardHeader>
@@ -96,21 +88,12 @@ export function InstitutionRolesTablePresentation({
 
         {isPending ? (
           <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center rounded-lg backdrop-blur-[1px]">
-            <Loader2Icon
-              className="text-muted-foreground size-5 animate-spin"
-              aria-label="Cargando roles"
-              role="status"
-            />
+            <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando roles" role="status" />
           </div>
         ) : null}
       </div>
 
-      <InstitutionRolesPagination
-        page={roles.page}
-        size={roles.size}
-        totalItems={roles.totalItems}
-        totalPages={roles.totalPages}
-      />
+      <InstitutionRolesPagination page={roles.page} size={roles.size} totalItems={roles.totalItems} totalPages={roles.totalPages} />
     </div>
   );
 }

@@ -6,11 +6,7 @@ import type { PersonSummary } from "@features/people/types/person-summary.types"
 
 export const DEFAULT_PEOPLE_PAGE_SIZE = 10;
 export const PEOPLE_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
-export const PEOPLE_SORT_FIELDS = [
-  "lastName",
-  "firstName",
-  "documentNumber",
-] as const satisfies readonly (keyof PersonSummary)[];
+export const PEOPLE_SORT_FIELDS = ["lastName", "firstName", "documentNumber"] as const satisfies readonly (keyof PersonSummary)[];
 
 export type PeopleSortField = (typeof PEOPLE_SORT_FIELDS)[number];
 export type PeopleSort = Sort<PeopleSortField>;

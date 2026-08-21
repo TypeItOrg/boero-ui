@@ -4,14 +4,7 @@ import { HouseIcon, RefreshCwIcon, ServerCrashIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card } from "@common/components/ui/card";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@common/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { cn } from "@common/utils/cn.util";
 

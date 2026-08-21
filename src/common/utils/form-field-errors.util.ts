@@ -22,10 +22,7 @@ function getIssueField<T extends string>(path: PropertyKey[], fields: readonly T
   return undefined;
 }
 
-export function pickFieldErrors<T extends string>(
-  fieldErrors: Record<string, string> | undefined,
-  fields: readonly T[],
-): Partial<Record<T, string>> {
+export function pickFieldErrors<T extends string>(fieldErrors: Record<string, string> | undefined, fields: readonly T[]): Partial<Record<T, string>> {
   const result = {} as Partial<Record<T, string>>;
 
   for (const field of fields) {

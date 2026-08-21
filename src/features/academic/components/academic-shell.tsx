@@ -65,14 +65,8 @@ function getBackAction(backHref: string | undefined): React.ReactNode {
 
 export function AcademicAccessDenied({ breadcrumb }: { breadcrumb: React.ReactNode }): React.ReactElement {
   return (
-    <AcademicShell
-      title="Acceso restringido"
-      description="No tenés permisos para modificar esta configuración."
-      breadcrumb={breadcrumb}
-    >
-      <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center">
-        Solicitá un rol con permisos de gestión académica.
-      </div>
+    <AcademicShell title="Acceso restringido" description="No tenés permisos para modificar esta configuración." breadcrumb={breadcrumb}>
+      <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center">Solicitá un rol con permisos de gestión académica.</div>
     </AcademicShell>
   );
 }

@@ -116,21 +116,13 @@ function removeInFlightRefresh(requestKey: string, refreshRequest: Promise<Refre
   }
 }
 
-function createLoginRedirectResponse(
-  request: NextRequest,
-  policy: AuthProxyPolicy,
-  refreshStatus?: number,
-): NextResponse {
+function createLoginRedirectResponse(request: NextRequest, policy: AuthProxyPolicy, refreshStatus?: number): NextResponse {
   const response = NextResponse.redirect(policy.getLoginRedirect(request));
   if (refreshStatus === 401) policy.clearCookies(response);
   return response;
 }
 
-function createRefreshedSessionResponse(
-  request: NextRequest,
-  policy: AuthProxyPolicy,
-  tokens: RefreshedTokens,
-): NextResponse {
+function createRefreshedSessionResponse(request: NextRequest, policy: AuthProxyPolicy, tokens: RefreshedTokens): NextResponse {
   request.cookies.set(policy.accessTokenCookie, tokens.accessToken);
   request.cookies.set(policy.refreshTokenCookie, tokens.refreshToken);
 

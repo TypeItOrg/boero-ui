@@ -122,10 +122,7 @@ describe("StudyPlanCurriculumView", () => {
     const deleteAction = within(card).getByRole("button", { name: "Eliminar" });
 
     expect(detailLink).toHaveAttribute("href", `/study-plans/${STUDY_PLAN_ID}/spaces/${SPACE_ID}`);
-    expect(editAction).toHaveAttribute(
-      "href",
-      `/study-plans/${STUDY_PLAN_ID}/spaces/${SPACE_ID}/edit?returnTo=%2Fstudy-plans%2F${STUDY_PLAN_ID}`,
-    );
+    expect(editAction).toHaveAttribute("href", `/study-plans/${STUDY_PLAN_ID}/spaces/${SPACE_ID}/edit?returnTo=%2Fstudy-plans%2F${STUDY_PLAN_ID}`);
     expect(deleteAction).toBeEnabled();
   });
 });

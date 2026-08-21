@@ -57,18 +57,8 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
             if (!item.items?.length) {
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className={platformSidebarItemButtonClassName}
-                    tooltip={item.title}
-                    isActive={itemIsActive}
-                  >
-                    <Link
-                      href={item.url}
-                      prefetch
-                      aria-current={itemIsActive ? "page" : undefined}
-                      onClick={() => handleNavigation(item.url)}
-                    >
+                  <SidebarMenuButton asChild className={platformSidebarItemButtonClassName} tooltip={item.title} isActive={itemIsActive}>
+                    <Link href={item.url} prefetch aria-current={itemIsActive ? "page" : undefined} onClick={() => handleNavigation(item.url)}>
                       <PlatformSidebarNavigationIcon icon={ItemIcon} />
                       <PlatformSidebarItemLabel>{item.title}</PlatformSidebarItemLabel>
                     </Link>
@@ -81,11 +71,7 @@ export function PlatformSidebarNav({ items }: PlatformSidebarNavProps): ReactEle
               <Collapsible key={item.title} asChild defaultOpen={itemIsActive} className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      className={platformSidebarItemButtonClassName}
-                      tooltip={item.title}
-                      isActive={itemIsActive}
-                    >
+                    <SidebarMenuButton className={platformSidebarItemButtonClassName} tooltip={item.title} isActive={itemIsActive}>
                       <PlatformSidebarNavigationIcon icon={ItemIcon} />
                       <PlatformSidebarItemLabel>{item.title}</PlatformSidebarItemLabel>
                       <ChevronRightIcon className="absolute right-2 bottom-2 group-data-[collapsible=icon]:hidden group-data-[state=open]/collapsible:rotate-90" />

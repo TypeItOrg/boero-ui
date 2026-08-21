@@ -4,11 +4,7 @@ import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 
 const API_REQUEST_TIMEOUT_MS = 15_000;
 
-export function authenticatedApiFetch(
-  path: string,
-  accessToken: string | undefined,
-  init: RequestInit = {},
-): Promise<Response> {
+export function authenticatedApiFetch(path: string, accessToken: string | undefined, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);

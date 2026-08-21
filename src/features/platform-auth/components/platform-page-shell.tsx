@@ -26,19 +26,14 @@ export function PlatformPageShell({
   actionsClassName,
 }: PlatformPageShellProps): React.ReactElement {
   return (
-    <section
-      className={cn(
-        "flex h-full max-w-full min-w-0 flex-col gap-4 p-3 md:p-4",
-        minViewportHeight && "min-h-full flex-1",
-      )}
-    >
+    <section className={cn("flex h-full max-w-full min-w-0 flex-col gap-4 p-3 md:p-4", minViewportHeight && "min-h-full flex-1")}>
       <header
         className={cn(
           "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 lg:flex-row lg:items-end lg:justify-between",
           headerClassName,
         )}
       >
-        <div className="flex min-w-0 flex-col gap-1 sm:gap-2">
+        <div className="flex min-w-0 flex-col gap-1">
           {breadcrumb ? <div>{breadcrumb}</div> : null}
           <div>
             <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>

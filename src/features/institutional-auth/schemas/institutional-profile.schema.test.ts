@@ -54,16 +54,12 @@ describe("institutionalProfileSchema", () => {
     );
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." }),
-      );
+      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." }));
     }
   });
 
   it("requires the current password when a new password is provided", () => {
-    const result = institutionalProfileSchema.safeParse(
-      createValidProfileInput({ password: "newpassword123", confirmPassword: "newpassword123" }),
-    );
+    const result = institutionalProfileSchema.safeParse(createValidProfileInput({ password: "newpassword123", confirmPassword: "newpassword123" }));
 
     expect(result.success).toBe(false);
     if (!result.success) {

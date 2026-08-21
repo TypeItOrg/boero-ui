@@ -83,13 +83,11 @@ export function InstitutionStatusDialog({
           <AlertDialogDescription>
             {nextActive ? (
               <>
-                <span className="text-foreground font-semibold">{institutionName}</span> volverá a estar activa en la
-                plataforma.
+                <span className="text-foreground font-semibold">{institutionName}</span> volverá a estar activa en la plataforma.
               </>
             ) : (
               <>
-                <span className="text-foreground font-semibold">{institutionName}</span> perderá el acceso y se
-                suspenderán sus operaciones.
+                <span className="text-foreground font-semibold">{institutionName}</span> perderá el acceso y se suspenderán sus operaciones.
               </>
             )}
           </AlertDialogDescription>
@@ -106,12 +104,7 @@ export function InstitutionStatusDialog({
           <AlertDialogCancel size="lg" disabled={isPending}>
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction
-            size="lg"
-            variant={nextActive ? "default" : "destructive"}
-            disabled={isPending}
-            onClick={handleConfirm}
-          >
+          <AlertDialogAction size="lg" variant={nextActive ? "default" : "destructive"} disabled={isPending} onClick={handleConfirm}>
             {isPending ? (nextActive ? "Activando…" : "Desactivando…") : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

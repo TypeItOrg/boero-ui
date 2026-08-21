@@ -6,10 +6,7 @@ type NavigationCardSkeletonProps = {
   prominent?: boolean;
 };
 
-export function NavigationCardSkeleton({
-  className,
-  prominent = false,
-}: NavigationCardSkeletonProps): React.ReactElement {
+export function NavigationCardSkeleton({ className, prominent = false }: NavigationCardSkeletonProps): React.ReactElement {
   return (
     <div
       aria-hidden="true"
