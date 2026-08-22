@@ -7,6 +7,7 @@ import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
+import { PersonDetailView } from "@features/people/components/person-detail-view";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
@@ -16,7 +17,7 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 
 type EditPersonPageProps = {
   params: Promise<{ id: string; personId: string }>;
-  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+  searchParams: Promise<{ returnTo?: QueryParamValue; view?: QueryParamValue }>;
 };
 
 export const metadata: Metadata = {
@@ -25,15 +26,20 @@ export const metadata: Metadata = {
 
 export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<React.ReactElement> {
   const { id, personId } = await params;
-  const { returnTo } = await searchParams;
+  const { returnTo, view } = await searchParams;
+  const isDetailView = view === "detail";
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
-  const [person, assignedRoles, systemRoles] = await Promise.all([fetchPerson(id, personId), fetchPersonRoles(id, personId), fetchSystemRoles(id)]);
+  const [person, assignedRoles, systemRoles] = await Promise.all([
+    fetchPerson(id, personId),
+    fetchPersonRoles(id, personId),
+    isDetailView ? Promise.resolve([]) : fetchSystemRoles(id),
+  ]);
   if (!person) notFound();
   const personName = `${person.firstName} ${person.lastName}`;
 
   return (
     <PlatformPageShell
-      title="Editar usuario"
+      title={isDetailView ? "Detalle de usuario" : "Editar usuario"}
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: person.institutionName, [personId]: personName }} />}
       headerClassName="flex-row items-center justify-between"
@@ -48,17 +54,21 @@ export default async function EditPersonPage({ params, searchParams }: EditPerso
         <Button asChild variant="outline">
           <Link href={destination}>Volver</Link>
         </Button>
-        <PersonDeleteButton institutionId={id} personId={personId} personName={personName} />
+        {!isDetailView ? <PersonDeleteButton institutionId={id} personId={personId} personName={personName} /> : null}
       </div>
 
-      <PersonEditForm
-        formId="person-edit-form"
-        institutionId={id}
-        person={person}
-        roles={systemRoles}
-        assignedRoles={assignedRoles}
-        returnTo={destination}
-      />
+      {isDetailView ? (
+        <PersonDetailView person={person} assignedRoles={assignedRoles} />
+      ) : (
+        <PersonEditForm
+          formId="person-edit-form"
+          institutionId={id}
+          person={person}
+          roles={systemRoles}
+          assignedRoles={assignedRoles}
+          returnTo={destination}
+        />
+      )}
     </PlatformPageShell>
   );
 }
