@@ -8,6 +8,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
+import { PersonDetailView } from "@features/people/components/person-detail-view";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
 import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
@@ -24,7 +25,7 @@ import type { Metadata } from "next";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Editar usuario");
+  return getInstitutionalMetadata("Detalle de usuario");
 }
 
 export default async function PersonPage({
@@ -32,11 +33,12 @@ export default async function PersonPage({
   searchParams,
 }: {
   params: Promise<{ personId: string }>;
-  searchParams: Promise<{ returnTo?: QueryParamValue }>;
+  searchParams: Promise<{ returnTo?: QueryParamValue; view?: QueryParamValue }>;
 }): Promise<React.ReactElement> {
   const { personId } = await params;
-  const { returnTo } = await searchParams;
+  const { returnTo, view } = await searchParams;
   const destination = getSafeReturnTo(returnTo, "/people");
+  const isDetailView = view === "detail";
   const user = await requireInstitutionalUser();
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) {
     return <InstitutionalAccessDenied />;
@@ -45,25 +47,26 @@ export default async function PersonPage({
   const canRevokeRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const personPromise = fetchPerson(user.institutionId, personId, PeopleScope.INSTITUTIONAL);
-  const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = canManageRoles
-    ? Promise.all([
-        fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL),
-        canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
-      ])
-    : Promise.resolve([[], []]);
+  const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = isDetailView
+    ? fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL).then((assignedRoles) => [assignedRoles, []])
+    : canManageRoles
+      ? Promise.all([
+          fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL),
+          canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
+        ])
+      : Promise.resolve([[], []]);
   const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
   if (!person) notFound();
   const assignableRoles = systemRoles.filter((role) => role.technicalCode !== "INSTITUTIONAL_AUTHORITY");
   const personName = `${person.firstName} ${person.lastName}`;
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
-  const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
-  if (!canUpdate && !canManageRoles) {
-    return <InstitutionalAccessDenied />;
-  }
-
+  const canDelete =
+    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
   return (
     <PlatformPageShell
-      title={canUpdate ? "Editar usuario" : "Administrar roles"}
+      title={
+        isDetailView ? "Detalle de usuario" : canUpdate ? "Editar usuario" : "Administrar roles"
+      }
       minViewportHeight
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
       headerClassName="flex-row items-center justify-between"
@@ -78,22 +81,31 @@ export default async function PersonPage({
         <Button asChild variant="outline" size="lg">
           <Link href={destination}>Volver</Link>
         </Button>
-        {canDelete ? (
-          <PersonDeleteButton institutionId={user.institutionId} personId={personId} personName={personName} scope={PeopleScope.INSTITUTIONAL} />
+        {canDelete && !isDetailView ? (
+          <PersonDeleteButton
+            institutionId={user.institutionId}
+            personId={personId}
+            personName={personName}
+            scope={PeopleScope.INSTITUTIONAL}
+          />
         ) : null}
       </div>
-      <PersonEditForm
-        formId="institutional-person-edit-form"
-        institutionId={user.institutionId}
-        person={person}
-        roles={assignableRoles}
-        assignedRoles={assignedRoles}
-        scope={PeopleScope.INSTITUTIONAL}
-        canEdit={canUpdate}
-        canAssignRoles={canAssignRoles}
-        canRevokeRoles={canRevokeRoles}
-        returnTo={destination}
-      />
+      {isDetailView ? (
+        <PersonDetailView person={person} assignedRoles={assignedRoles} />
+      ) : (
+        <PersonEditForm
+          formId="institutional-person-edit-form"
+          institutionId={user.institutionId}
+          person={person}
+          roles={assignableRoles}
+          assignedRoles={assignedRoles}
+          scope={PeopleScope.INSTITUTIONAL}
+          canEdit={canUpdate}
+          canAssignRoles={canAssignRoles}
+          canRevokeRoles={canRevokeRoles}
+          returnTo={destination}
+        />
+      )}
     </PlatformPageShell>
   );
 }

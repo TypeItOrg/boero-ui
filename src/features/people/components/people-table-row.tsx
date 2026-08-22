@@ -38,8 +38,9 @@ export function PeopleTableRow({
 }: PeopleTableRowProps): React.ReactElement {
   const isSelf = person.id === selfPersonId;
   const personHref = getPersonHref(scope, institutionId, person.id, selfPersonId);
+  const personDetailHref = getPersonHref(scope, institutionId, person.id, selfPersonId, true);
   const canEditPerson = canUpdate;
-  const canOpenPerson = canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf);
+  const canOpenPerson = true;
   const canDeletePerson = canDelete && !isSelf;
   const canUpdatePersonStatus = canUpdateStatus && !isSelf;
   const hasActions = canOpenPerson || canDeletePerson || canUpdatePersonStatus;
@@ -48,7 +49,7 @@ export function PeopleTableRow({
     <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
       <TableCell className="font-medium">
         {canOpenPerson ? (
-          <PersonNavigationLink className="hover:underline" href={personHref}>
+          <PersonNavigationLink className="hover:underline" href={personDetailHref}>
             {person.lastName}, {person.firstName}
           </PersonNavigationLink>
         ) : (
@@ -85,7 +86,7 @@ export function PeopleTableRow({
             institutionId={institutionId}
             scope={scope}
             isSelf={isSelf}
-            canEdit={canOpenPerson}
+            canEdit={canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf)}
             editLabel={canEditPerson ? "Editar" : "Administrar"}
             canDelete={canDeletePerson}
             canUpdateStatus={canUpdatePersonStatus}
@@ -105,8 +106,21 @@ export function PeopleTableRow({
       <ContextMenuContent className="w-44 p-1.5">
         {canOpenPerson ? (
           <ContextMenuItem asChild>
+            <PersonNavigationLink href={personDetailHref} className="px-2.5 py-1.5">
+              Ver detalle
+            </PersonNavigationLink>
+          </ContextMenuItem>
+        ) : null}
+        {canEditPerson ? (
+          <ContextMenuItem asChild>
             <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
-              {canEditPerson ? "Editar" : "Administrar"}
+              Editar
+            </PersonNavigationLink>
+          </ContextMenuItem>
+        ) : PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf ? (
+          <ContextMenuItem asChild>
+            <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
+              Administrar
             </PersonNavigationLink>
           </ContextMenuItem>
         ) : null}
@@ -154,6 +168,7 @@ function PersonActionsMenu({
   scope,
 }: PersonActionsMenuProps): React.ReactElement {
   const personHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined);
+  const personDetailHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined, true);
 
   return (
     <div className="flex justify-end">
@@ -164,6 +179,11 @@ function PersonActionsMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 p-1.5">
+          <DropdownMenuItem asChild>
+            <PersonNavigationLink href={personDetailHref} className="px-2.5 py-1.5">
+              Ver detalle
+            </PersonNavigationLink>
+          </DropdownMenuItem>
           {canEdit ? (
             <DropdownMenuItem asChild>
               <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
@@ -215,7 +235,16 @@ const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigatio
 });
 PersonNavigationLink.displayName = "PersonNavigationLink";
 
-function getPersonHref(scope: PeopleScopeType, institutionId: string, personId: string, selfPersonId?: string | null): string {
+function getPersonHref(
+  scope: PeopleScopeType,
+  institutionId: string,
+  personId: string,
+  selfPersonId?: string | null,
+  detailView = false,
+): string {
   if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/account";
-  return PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
+  const personPath = PeopleScope.isInstitutional(scope)
+    ? `/people/${personId}`
+    : `/admin/institutions/${institutionId}/people/${personId}`;
+  return detailView ? `${personPath}?view=detail` : personPath;
 }
