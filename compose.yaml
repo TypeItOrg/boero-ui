@@ -12,6 +12,8 @@ services:
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
       CI: "true"
+    volumes:
+      - next-dev-cache:/app/.next
     logging:
       driver: "local"
       options:
@@ -53,3 +55,6 @@ services:
           path: ./pnpm-lock.yaml
         - action: rebuild
           path: ./pnpm-workspace.yaml
+
+volumes:
+  next-dev-cache:
