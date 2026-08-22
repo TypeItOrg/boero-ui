@@ -142,7 +142,12 @@ export function getAcademicRowActions(
 }
 
 export function isActiveStatusResource(resource: AcademicCollectionResource): resource is ActiveAcademicStatusResource {
-  return resource === AcademicResource.TRAINING_PATH || resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT;
+  return (
+    resource === AcademicResource.TRAINING_PATH ||
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT
+  );
 }
 
 export function isDestructiveStatusAction(action: Extract<AcademicRowAction, { kind: typeof ACADEMIC_ROW_ACTION_KIND.STATUS }>): boolean {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { CircleAlertIcon, GraduationCapIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
+import { CircleAlertIcon, ClockIcon, GraduationCapIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
@@ -170,6 +170,34 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<ActiveAcademicStatusResource, Record<A
       iconClassName: "bg-destructive/10 text-destructive",
       pendingLabel: "Desactivando…",
       title: "Desactivar curso",
+      variant: "destructive",
+    },
+  },
+  [AcademicResource.SHIFT]: {
+    ACTIVE: {
+      actionLabel: "Activar turno",
+      description: (resourceLabel) => (
+        <>
+          El turno <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas configuraciones.
+        </>
+      ),
+      icon: ClockIcon,
+      iconClassName: "bg-primary/10 text-primary",
+      pendingLabel: "Activando…",
+      title: "Activar turno",
+      variant: "default",
+    },
+    INACTIVE: {
+      actionLabel: "Desactivar turno",
+      description: (resourceLabel) => (
+        <>
+          El turno <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas configuraciones.
+        </>
+      ),
+      icon: ClockIcon,
+      iconClassName: "bg-destructive/10 text-destructive",
+      pendingLabel: "Desactivando…",
+      title: "Desactivar turno",
       variant: "destructive",
     },
   },

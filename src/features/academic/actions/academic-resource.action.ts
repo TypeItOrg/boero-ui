@@ -167,6 +167,7 @@ export async function deleteAcademicResourceAction(
     | AcademicResource.ACADEMIC_SPACE
     | AcademicResource.INSTRUMENT
     | AcademicResource.COURSE
+    | AcademicResource.SHIFT
     | AcademicResource.ACADEMIC_LEVEL
     | AcademicResource.STUDY_PLAN_SPACE
     | AcademicResource.PREREQUISITE,

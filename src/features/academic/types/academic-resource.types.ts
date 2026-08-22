@@ -8,4 +8,5 @@ export enum AcademicResource {
   ACADEMIC_SPACE = "academic-spaces",
   INSTRUMENT = "instruments",
   COURSE = "courses",
+  SHIFT = "shifts",
 }

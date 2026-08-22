@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  ClockIcon,
   GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
@@ -57,6 +58,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
       ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
       : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
   ];
 
   return [

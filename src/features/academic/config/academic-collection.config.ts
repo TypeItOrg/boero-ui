@@ -3,6 +3,7 @@ import "server-only";
 import { academicSpaceCollectionConfig } from "@features/academic/config/academic-space-collection.config";
 import { academicYearCollectionConfig } from "@features/academic/config/academic-year-collection.config";
 import { courseCollectionConfig } from "@features/academic/config/course-collection.config";
+import { shiftCollectionConfig } from "@features/academic/config/shift-collection.config";
 import { instrumentCollectionConfig } from "@features/academic/config/instrument-collection.config";
 import { studyPlanCollectionConfig } from "@features/academic/config/study-plan-collection.config";
 import { trainingPathCollectionConfig } from "@features/academic/config/training-path-collection.config";
@@ -21,4 +22,5 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
   [AcademicResource.ACADEMIC_SPACE]: academicSpaceCollectionConfig,
   [AcademicResource.INSTRUMENT]: instrumentCollectionConfig,
   [AcademicResource.COURSE]: courseCollectionConfig,
+  [AcademicResource.SHIFT]: shiftCollectionConfig,
 };

@@ -24,6 +24,7 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   "academic-spaces": "Espacios académicos",
   instruments: "Instrumentos",
   courses: "Cursos",
+  shifts: "Turnos",
 };
 
 type BreadcrumbSegment = {

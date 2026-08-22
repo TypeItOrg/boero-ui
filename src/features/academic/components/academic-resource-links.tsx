@@ -20,6 +20,7 @@ const ACADEMIC_RESOURCE_DESCRIPTIONS: Record<AcademicCollectionResource, string>
   [AcademicResource.ACADEMIC_SPACE]: "Gestioná las materias y espacios de formación.",
   [AcademicResource.INSTRUMENT]: "Administrá los instrumentos disponibles en la institución.",
   [AcademicResource.COURSE]: "Creá instancias de espacios académicos por ciclo lectivo.",
+  [AcademicResource.SHIFT]: "Organizá los turnos disponibles para la oferta académica.",
 };
 
 export function getReadableAcademicResources(access: AcademicAccess): AcademicCollectionResource[] {

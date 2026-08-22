@@ -2,7 +2,7 @@
 
 import type { ComponentType } from "react";
 
-import { AcademicSpaceFields, InstrumentFields, TrainingPathFields } from "@features/academic/components/academic-catalog-form-fields";
+import { AcademicSpaceFields, InstrumentFields, ShiftFields, TrainingPathFields } from "@features/academic/components/academic-catalog-form-fields";
 import { AcademicYearFields } from "@features/academic/components/academic-year-form-fields";
 import { CourseFields } from "@features/academic/components/course-form-fields";
 import { AcademicLevelFields, PrerequisiteFields, StudyPlanFields, StudyPlanSpaceFields } from "@features/academic/components/study-plan-form-fields";
@@ -23,6 +23,7 @@ const FIELD_COMPONENTS: Record<AcademicResource, ComponentType<AcademicFieldsPro
   [AcademicResource.PREREQUISITE]: PrerequisiteFields,
   [AcademicResource.INSTRUMENT]: InstrumentFields,
   [AcademicResource.COURSE]: CourseFields,
+  [AcademicResource.SHIFT]: ShiftFields,
 };
 
 export function AcademicFormFields({ resource, ...props }: AcademicFormFieldsProps): React.ReactElement {

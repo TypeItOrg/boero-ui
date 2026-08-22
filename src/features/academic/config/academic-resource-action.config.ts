@@ -98,6 +98,12 @@ export const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConf
       classes: data.classes,
     }),
   },
+  [AcademicResource.SHIFT]: {
+    createPath: directPath(AcademicResource.SHIFT),
+    createPermission: INSTITUTIONAL_PERMISSION.SHIFT_CREATE,
+    updatePermission: INSTITUTIONAL_PERMISSION.SHIFT_UPDATE,
+    prepareBody: withoutActiveStatus,
+  },
 };
 
 export const academicScopeSchema = z.enum([AcademicScope.ADMIN, AcademicScope.INSTITUTIONAL]);
@@ -109,6 +115,7 @@ export const statusResourceSchema = z.enum([
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
   AcademicResource.COURSE,
+  AcademicResource.SHIFT,
 ]);
 
 export const STATUS_PERMISSIONS: Record<StatusResource, InstitutionalPermission> = {
@@ -118,6 +125,7 @@ export const STATUS_PERMISSIONS: Record<StatusResource, InstitutionalPermission>
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_STATUS_UPDATE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE,
   [AcademicResource.COURSE]: INSTITUTIONAL_PERMISSION.COURSE_STATUS_UPDATE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE,
 };
 
 export const deletableResourceSchema = z.enum([
@@ -127,6 +135,7 @@ export const deletableResourceSchema = z.enum([
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
   AcademicResource.COURSE,
+  AcademicResource.SHIFT,
   AcademicResource.ACADEMIC_LEVEL,
   AcademicResource.STUDY_PLAN_SPACE,
   AcademicResource.PREREQUISITE,
@@ -139,6 +148,7 @@ export const restorableResourceSchema = z.enum([
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
   AcademicResource.COURSE,
+  AcademicResource.SHIFT,
 ]);
 
 export const DELETE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
@@ -148,6 +158,7 @@ export const DELETE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermissi
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_DELETE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_DELETE,
   [AcademicResource.COURSE]: INSTITUTIONAL_PERMISSION.COURSE_DELETE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_DELETE,
 };
 
 export const RESTORE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
@@ -157,6 +168,7 @@ export const RESTORE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermiss
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_RESTORE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_RESTORE,
   [AcademicResource.COURSE]: INSTITUTIONAL_PERMISSION.COURSE_RESTORE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_RESTORE,
 };
 
 export const actionContextSchema = z.object({
@@ -186,6 +198,7 @@ export const STATUS_INPUT_BUILDERS: Record<StatusResource, (formData: FormData) 
     resource: AcademicResource.COURSE,
     status: formData.get("status"),
   }),
+  [AcademicResource.SHIFT]: activeStatusInput(AcademicResource.SHIFT),
 };
 
 export function activeStatusInput(resource: ActiveAcademicStatusResource): (formData: FormData) => Record<string, unknown> {
@@ -200,10 +213,13 @@ export function isValidActiveStatusValue(value: FormDataEntryValue | null): valu
   return value === "true" || value === "false";
 }
 
-export function isFormStatusResource(
-  resource: AcademicResource,
-): resource is AcademicResource.TRAINING_PATH | AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT {
-  return resource === AcademicResource.TRAINING_PATH || resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT;
+export function isFormStatusResource(resource: AcademicResource): resource is ActiveAcademicStatusResource {
+  return (
+    resource === AcademicResource.TRAINING_PATH ||
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT
+  );
 }
 
 export function getStatusRequestBody(data: z.infer<typeof academicStatusSchema>): Record<string, unknown> {

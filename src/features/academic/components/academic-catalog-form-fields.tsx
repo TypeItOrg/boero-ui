@@ -41,6 +41,19 @@ export function InstrumentFields({ canChangeStatus = true, initialValues = {}, f
   );
 }
 
+export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+  const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+  const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
+
+  return (
+    <>
+      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={!hasActiveState} />
+      {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
+      <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
+    </>
+  );
+}
+
 export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";

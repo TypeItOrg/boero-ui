@@ -177,5 +177,10 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
 }
 
 function isDetailStatusResource(resource: AcademicCollectionResource): resource is ActiveAcademicStatusResource {
-  return resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT || resource === AcademicResource.TRAINING_PATH;
+  return (
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.TRAINING_PATH ||
+    resource === AcademicResource.SHIFT
+  );
 }
