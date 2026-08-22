@@ -45,7 +45,6 @@ export default async function PeoplePage({ searchParams }: { searchParams: Promi
   return (
     <PlatformPageShell
       title="Usuarios"
-      description="Consultá y administrá las personas de tu institución."
       breadcrumb={<InstitutionalBreadcrumb />}
       actions={
         canCreate ? (

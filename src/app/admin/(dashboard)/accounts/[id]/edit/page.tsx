@@ -24,7 +24,6 @@ export default async function EditPlatformAccountPage({ params, searchParams }: 
   return (
     <PlatformPageShell
       title="Editar administrador"
-      description={`Actualizá la identidad y las credenciales de ${fullName}.`}
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       headerClassName="flex-row items-center justify-between"

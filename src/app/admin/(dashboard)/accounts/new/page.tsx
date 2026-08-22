@@ -21,7 +21,6 @@ export default async function NewPlatformAccountPage({
   return (
     <PlatformPageShell
       title="Nuevo administrador"
-      description="Definí la identidad y las credenciales del nuevo administrador."
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb />}
       headerClassName="flex-row items-center justify-between"

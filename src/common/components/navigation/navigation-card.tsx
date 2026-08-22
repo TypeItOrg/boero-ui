@@ -5,7 +5,7 @@ import { cn } from "@common/utils/cn.util";
 
 type NavigationCardProps = {
   className?: string;
-  description: string;
+  description?: string;
   href: string;
   icon: LucideIcon;
   prominent?: boolean;
@@ -47,7 +47,7 @@ export function NavigationCard({ className, description, href, icon: Icon, promi
         </span>
         <span className="min-w-0 flex-1">
           <span className={cn("block font-semibold", prominent && "text-base tracking-tight sm:text-lg")}>{title}</span>
-          <span className="text-muted-foreground mt-0.5 block text-sm leading-relaxed">{description}</span>
+          {description ? <span className="text-muted-foreground mt-0.5 block text-sm leading-relaxed">{description}</span> : null}
         </span>
       </span>
       <ChevronRightIcon aria-hidden="true" className="text-muted-foreground size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />

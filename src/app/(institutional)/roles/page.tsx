@@ -37,7 +37,6 @@ export default async function RolesPage({
   return (
     <PlatformPageShell
       title="Roles"
-      description="Definí las responsabilidades y accesos de tu equipo."
       breadcrumb={<InstitutionalBreadcrumb />}
       actions={
         canCreate ? (

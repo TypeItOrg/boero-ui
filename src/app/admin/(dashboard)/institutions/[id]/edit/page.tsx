@@ -25,7 +25,6 @@ export default async function EditInstitutionPage({ params, searchParams }: Edit
     return (
       <PlatformPageShell
         title="Institución inactiva"
-        description="Reactivá la institución desde su ficha antes de editar sus datos."
         breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
         actions={
           <Button asChild variant="outline" size="lg">
@@ -39,7 +38,6 @@ export default async function EditInstitutionPage({ params, searchParams }: Edit
   return (
     <PlatformPageShell
       title="Editar institución"
-      description={`Editá los datos de ${institution.name}.`}
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg">

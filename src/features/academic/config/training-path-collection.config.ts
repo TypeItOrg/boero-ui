@@ -19,7 +19,6 @@ export const trainingPathCollectionConfig: AcademicCollectionConfig = activeReso
     detailLabels: ["Descripción"],
     sortableFields: TRAINING_PATH_SORT_FIELDS,
   },
-  description: "Carreras, orientaciones y recorridos formativos.",
   canRead: (access) => access.trainingPathRead,
   canCreate: (access) => access.trainingPathCreate,
   canDelete: (access) => access.trainingPathDelete,

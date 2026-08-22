@@ -28,17 +28,7 @@ export default async function AdminSearchPage({
   const hasInvalidType = requestedType !== undefined && entityType === undefined;
 
   return (
-    <PlatformPageShell
-      title={title}
-      description={
-        pagination.search ? (
-          <>Coincidencias para “{pagination.search}” en todas las instituciones.</>
-        ) : (
-          "Realizá una búsqueda desde la barra superior."
-        )
-      }
-      breadcrumb={<PlatformBreadcrumb segmentLabels={{ search: "Búsqueda" }} />}
-    >
+    <PlatformPageShell title={title} breadcrumb={<PlatformBreadcrumb segmentLabels={{ search: "Búsqueda" }} />}>
       {data && entityType ? (
         <DataTableNavigationProvider>
           <ContextualSearchResultsTable entityType={entityType} items={data.items} />

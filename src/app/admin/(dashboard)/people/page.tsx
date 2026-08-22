@@ -26,11 +26,7 @@ export default async function PlatformPeoplePage({ searchParams }: PlatformPeopl
   const [roleList, selectedInstitutionName] = await Promise.all([fetchSystemRolesCatalog(), getSelectedInstitutionName(params.institutionId)]);
 
   return (
-    <PlatformPageShell
-      title="Usuarios"
-      description="Consultá los usuarios de todas las instituciones y accedé a su gestión."
-      breadcrumb={<PlatformBreadcrumb />}
-    >
+    <PlatformPageShell title="Usuarios" breadcrumb={<PlatformBreadcrumb />}>
       <DataTableNavigationProvider>
         <PlatformPeopleTableFilters
           institutionId={params.institutionId}

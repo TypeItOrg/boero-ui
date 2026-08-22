@@ -22,7 +22,6 @@ export type AcademicCollectionConfig = {
   createLabel: string;
   createIcon: LucideIcon;
   dateFilters?: (params: AcademicPaginationParams) => readonly DataTableDateFilter[];
-  description: string;
   fetchDetail: (scope: AcademicScope, institutionId: string, id: string) => Promise<AcademicCollection | null>;
   fetchPage: (input: AcademicFetchInput) => Promise<PaginatedResponse<AcademicCollection>>;
   filters: (params: AcademicPaginationParams) => readonly DataTableSelectFilter[];

@@ -9,7 +9,6 @@ type AcademicShellProps = {
   backHref?: string;
   breadcrumb: React.ReactNode;
   children: React.ReactNode;
-  description?: string;
   actionsClassName?: string;
   headerClassName?: string;
   minViewportHeight?: boolean;
@@ -18,7 +17,6 @@ type AcademicShellProps = {
 
 export function AcademicShell({
   title,
-  description,
   breadcrumb,
   backHref,
   children,
@@ -31,7 +29,6 @@ export function AcademicShell({
   return (
     <PlatformPageShell
       title={title}
-      description={description}
       breadcrumb={breadcrumb}
       actions={headerActions}
       actionsClassName={actionsClassName}
@@ -65,7 +62,7 @@ function getBackAction(backHref: string | undefined): React.ReactNode {
 
 export function AcademicAccessDenied({ breadcrumb }: { breadcrumb: React.ReactNode }): React.ReactElement {
   return (
-    <AcademicShell title="Acceso restringido" description="No tenés permisos para modificar esta configuración." breadcrumb={breadcrumb}>
+    <AcademicShell title="Acceso restringido" breadcrumb={breadcrumb}>
       <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center">Solicitá un rol con permisos de gestión académica.</div>
     </AcademicShell>
   );

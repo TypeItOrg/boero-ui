@@ -34,7 +34,6 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
   return (
     <AcademicShell
       title="Resumen académico"
-      description="Accedé a la estructura académica y a la actividad reciente de la institución."
       breadcrumb={breadcrumb}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
@@ -42,13 +41,13 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
     >
       <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
         {structureResources.length > 0 ? (
-          <AcademicGroup title="Estructura académica" description="Ciclos, trayectos y planes que ordenan la propuesta formativa.">
+          <AcademicGroup title="Estructura académica">
             <AcademicResourceLinks basePath={basePath} resources={structureResources} />
           </AcademicGroup>
         ) : null}
 
         {catalogResources.length > 0 ? (
-          <AcademicGroup title="Catálogos" description="Elementos reutilizables de la oferta institucional.">
+          <AcademicGroup title="Catálogos">
             <AcademicResourceLinks basePath={basePath} resources={catalogResources} />
           </AcademicGroup>
         ) : null}
@@ -59,11 +58,10 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
   );
 }
 
-function AcademicGroup({ children, description, title }: { children: React.ReactNode; description: string; title: string }): React.ReactElement {
+function AcademicGroup({ children, title }: { children: React.ReactNode; title: string }): React.ReactElement {
   return (
     <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
       <h2 className="text-base font-semibold">{title}</h2>
-      <p className="text-muted-foreground mt-1 text-sm">{description}</p>
       <div className="mt-4">{children}</div>
     </section>
   );

@@ -15,7 +15,6 @@ export const academicSpaceCollectionConfig: AcademicCollectionConfig = {
   singular: "espacio académico",
   plural: "espacios académicos",
   columns: { primaryLabel: "Nombre", detailLabels: ["Tipo", "Descripción"] },
-  description: "Catálogo de asignaturas, talleres y seminarios.",
   canRead: (access) => access.academicSpaceRead,
   canCreate: (access) => access.academicSpaceCreate,
   canDelete: (access) => access.academicSpaceDelete,

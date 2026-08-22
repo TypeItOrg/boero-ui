@@ -27,7 +27,6 @@ export default async function PlatformRolesPage({ searchParams }: { searchParams
   return (
     <PlatformPageShell
       title="Roles"
-      description="Consultá y administrá las responsabilidades y permisos de todas las instituciones."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg" className="w-full">

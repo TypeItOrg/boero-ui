@@ -20,7 +20,6 @@ type HomeAccessRowProps = {
 
 type HomeSubsectionProps = {
   children: React.ReactNode;
-  description: string;
   icon: LucideIcon;
   id: string;
   imageSide?: "left" | "right";
@@ -101,7 +100,6 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
           <HomeSubsection
             id="institutional-management-title"
             title="Gestión institucional"
-            description="Administrá las personas y los accesos de la institución."
             icon={Building2Icon}
             imageSrc="/gestion-institucional.webp"
           >
@@ -117,7 +115,6 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
           <HomeSubsection
             id="academic-management-title"
             title="Gestión académica"
-            description="Organizá la estructura curricular y los catálogos de la institución."
             icon={GraduationCapIcon}
             imageSrc="/gestion-academica.webp"
             imageSide="right"
@@ -127,12 +124,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
         ) : null}
 
         {!hasManagementTools && personalLink ? (
-          <HomeSubsection
-            id="personal-space-title"
-            title="Mi espacio"
-            description="Consultá la información disponible para tu cuenta."
-            icon={UserRoundIcon}
-          >
+          <HomeSubsection id="personal-space-title" title="Mi espacio" icon={UserRoundIcon}>
             <nav aria-label="Herramientas personales" className="[&>a]:bg-background grid gap-4">
               <HomeAccessRow link={personalLink} />
             </nav>
@@ -147,7 +139,7 @@ function HomeAccessRow({ link }: HomeAccessRowProps): React.ReactElement {
   return <NavigationCard href={link.href} icon={link.icon} title={link.title} description={link.description} prominent />;
 }
 
-function HomeSubsection({ children, description, icon: Icon, id, imageSide = "left", imageSrc, title }: HomeSubsectionProps): React.ReactElement {
+function HomeSubsection({ children, icon: Icon, id, imageSide = "left", imageSrc, title }: HomeSubsectionProps): React.ReactElement {
   return (
     <section aria-labelledby={id} className="bg-background flex flex-col gap-4 rounded-xl border p-4 shadow-xs sm:p-5">
       <div className="flex items-stretch justify-between gap-4">
@@ -155,7 +147,6 @@ function HomeSubsection({ children, description, icon: Icon, id, imageSide = "le
           <h2 id={id} className="text-xl leading-none font-bold tracking-tight">
             {title}
           </h2>
-          <p className="text-muted-foreground mt-1 text-sm">{description}</p>
         </div>
         <div className="from-primary to-primary/80 text-primary-foreground flex h-full shrink-0 items-center justify-center rounded-xl bg-linear-to-br p-3 shadow-xs">
           <Icon aria-hidden="true" />

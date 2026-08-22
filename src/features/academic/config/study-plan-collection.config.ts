@@ -23,7 +23,7 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
     detailLabels: ["Trayecto formativo", "Vigente desde", "Vigente hasta"],
     sortableFields: [STUDY_PLAN_SORT_FIELDS[0], undefined, STUDY_PLAN_SORT_FIELDS[1], STUDY_PLAN_SORT_FIELDS[2]],
   },
-  description: "Versiones curriculares y sus estados de vigencia.",
+  searchPlaceholder: "Buscar por nombre, código o trayecto formativo...",
   hasCurriculum: true,
   canRead: (access) => access.studyPlanRead,
   canCreate: (access) => access.studyPlanCreate,

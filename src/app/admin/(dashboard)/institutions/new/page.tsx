@@ -21,7 +21,6 @@ export default async function NewInstitutionPage({
   return (
     <PlatformPageShell
       title="Nueva institución"
-      description="Completá los datos esenciales para sumarla a la plataforma."
       minViewportHeight
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ new: "Nueva" }} />}
       headerClassName="flex-row items-center justify-between"

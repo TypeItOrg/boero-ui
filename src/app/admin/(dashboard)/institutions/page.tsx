@@ -26,7 +26,6 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
   return (
     <PlatformPageShell
       title="Instituciones"
-      description="Visualizá, buscá y administrá todas las instituciones registradas en la plataforma."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg" className="w-full">

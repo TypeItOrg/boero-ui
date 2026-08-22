@@ -13,7 +13,6 @@ export const instrumentCollectionConfig: AcademicCollectionConfig = activeResour
   singular: "instrumento",
   plural: "instrumentos",
   columns: { primaryLabel: "Nombre", detailLabels: ["Descripción"] },
-  description: "Catálogo institucional de instrumentos.",
   canRead: (access) => access.instrumentRead,
   canCreate: (access) => access.instrumentCreate,
   canDelete: (access) => access.instrumentDelete,

@@ -30,7 +30,6 @@ export function AcademicResourceLinks({ basePath, className, prominent = false, 
             href={`${basePath}/${resource}`}
             icon={icon}
             title={config.title}
-            description={config.description}
             prominent={prominent}
             className={prominent && isLastOddResource ? "sm:col-span-2" : undefined}
           />

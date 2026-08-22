@@ -25,7 +25,6 @@ export default async function PlatformAccountDetailPage({ params }: PlatformAcco
   return (
     <PlatformPageShell
       title={fullName}
-      description="Consultá la identidad, el rol y el estado de acceso de esta cuenta."
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       actions={
         <Button asChild size="lg">

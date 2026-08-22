@@ -24,7 +24,6 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
     detailLabels: ["Fecha de inicio", "Fecha de finalización"],
     sortableFields: ACADEMIC_YEAR_SORT_FIELDS,
   },
-  description: "Calendario académico de la institución.",
   searchPlaceholder: "Buscar por año, fecha o estado...",
   canRead: (access) => access.yearRead,
   canCreate: (access) => access.yearCreate,

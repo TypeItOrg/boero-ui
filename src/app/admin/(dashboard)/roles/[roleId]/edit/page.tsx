@@ -24,7 +24,6 @@ export default async function EditPlatformRolePage({
   return (
     <PlatformPageShell
       title={`Editar rol ${role.name}`}
-      description="Actualizá el nombre y los permisos del rol."
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ roles: "Roles", [roleId]: role.name, edit: "Editar" }} />}
     >
       <PlatformRoleForm role={role} permissionGroups={permissionGroups} returnTo={destination} />

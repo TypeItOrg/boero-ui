@@ -29,7 +29,6 @@ export default async function PlatformAccountsPage({ searchParams }: PlatformAcc
   return (
     <PlatformPageShell
       title="Administradores"
-      description="Administrá quiénes pueden ingresar y operar en la plataforma."
       breadcrumb={<PlatformBreadcrumb />}
       actions={
         <Button asChild size="lg" className="w-full">

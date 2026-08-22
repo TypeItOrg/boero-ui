@@ -31,7 +31,6 @@ export default async function EditInstitutionalInstitutionPage(): Promise<React.
   return (
     <PlatformPageShell
       title="Editar información"
-      description="Actualizá la ubicación y los datos de contacto institucionales."
       breadcrumb={<InstitutionalBreadcrumb />}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"

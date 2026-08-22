@@ -15,7 +15,6 @@ export default function PlatformPage(): React.ReactElement {
   return (
     <PlatformPageShell
       title="Inicio"
-      description="Una vista general del alcance y la actividad de la plataforma."
       contentVariant="plain"
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"

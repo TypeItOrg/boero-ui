@@ -60,7 +60,7 @@ export async function AcademicRouteView({
         </Button>
       ) : undefined;
       return (
-        <AcademicShell title={config.title} description={config.description} breadcrumb={breadcrumb} actions={createAction}>
+        <AcademicShell title={config.title} breadcrumb={breadcrumb} actions={createAction}>
           <AcademicCollectionView
             basePath={basePath}
             canCreate={config.canCreate(access)}

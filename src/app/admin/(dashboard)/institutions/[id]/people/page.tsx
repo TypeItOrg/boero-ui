@@ -37,7 +37,6 @@ export default async function InstitutionPeoplePage({ params, searchParams }: Pe
   return (
     <PlatformPageShell
       title="Lista de usuarios"
-      description="Creá usuarios, editá sus datos básicos y administrá sus roles."
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={
         <Button asChild size="lg" className="w-full">

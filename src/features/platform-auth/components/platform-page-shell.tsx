@@ -4,7 +4,6 @@ import { cn } from "@common/utils/cn.util";
 
 type PlatformPageShellProps = {
   title: React.ReactNode;
-  description?: React.ReactNode;
   actions?: React.ReactNode;
   children?: React.ReactNode;
   minViewportHeight?: boolean;
@@ -16,7 +15,6 @@ type PlatformPageShellProps = {
 
 export function PlatformPageShell({
   title,
-  description,
   actions,
   children,
   minViewportHeight = false,
@@ -37,7 +35,6 @@ export function PlatformPageShell({
           {breadcrumb ? <div>{breadcrumb}</div> : null}
           <div>
             <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-            {description ? <div className="text-muted-foreground mt-1 text-sm">{description}</div> : null}
           </div>
         </div>
         {actions ? <div className={cn("flex shrink-0 items-center gap-3", actionsClassName)}>{actions}</div> : null}

@@ -44,7 +44,6 @@ export default async function EditRolePage({
   return (
     <PlatformPageShell
       title={`Editar rol ${role.name}`}
-      description="Actualizá el nombre y los permisos concedidos por este rol."
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [roleId]: role.name }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
