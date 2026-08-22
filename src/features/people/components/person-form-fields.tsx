@@ -63,7 +63,9 @@ export function PersonDetailsFields({ errors, isEdit, person, register }: Person
 
         <Field data-invalid={!!errors.email} className="flex-[1_0_min(200px,100%)]">
           <FieldContent>
-            <FieldLabel htmlFor="person-email">Email</FieldLabel>
+          <FieldLabel htmlFor="person-email" required>
+            Email
+          </FieldLabel>
           </FieldContent>
           <Input id="person-email" type="email" aria-invalid={!!errors.email} defaultValue={person?.email ?? ""} {...register("email")} />
           <FieldError errors={[errors.email]} />

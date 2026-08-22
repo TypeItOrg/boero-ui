@@ -340,12 +340,15 @@ describe("proxy", () => {
     expect(secondResponse.headers.get("x-middleware-request-cookie")).toContain(INSTITUTIONAL_REFRESH_TOKEN_COOKIE + "=new-refresh");
   });
 
-  it("keeps institutional registration public", async () => {
-    const response = await proxy(createRequest("/auth/register", ""));
+  it.each(["/auth/register", "/auth/password-recovery", "/auth/password-recovery/reset"])(
+    "keeps the institutional public route %s accessible",
+    async (pathname) => {
+      const response = await proxy(createRequest(pathname, ""));
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(response.headers.get("x-middleware-next")).toBe("1");
-  });
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+    },
+  );
 
   it("redirects an authenticated institutional user away from login", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));

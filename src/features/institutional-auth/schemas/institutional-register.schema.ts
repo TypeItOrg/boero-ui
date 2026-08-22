@@ -27,6 +27,12 @@ export const institutionalRegisterSchema = z
       .string()
       .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_DOCUMENT, abort: true })
       .regex(/^\d{8}$/, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_DOCUMENT),
+    email: z
+      .string()
+      .trim()
+      .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_EMAIL, abort: true })
+      .email(INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_EMAIL)
+      .max(150, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_EMAIL),
     password: z
       .string()
       .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_PASSWORD, abort: true })

@@ -22,6 +22,7 @@ export const PEOPLE_ERROR_MESSAGES = {
   INSTITUTION_UNAVAILABLE: "Institución no disponible",
   FIRST_NAME_MIN_LENGTH: "El nombre debe tener al menos 3 caracteres.",
   LAST_NAME_MIN_LENGTH: "El apellido debe tener al menos 3 caracteres.",
+  REQUIRED_EMAIL: "El email es requerido.",
   INVALID_EMAIL: "Ingresá un email válido.",
   INVALID_PHONE: "El teléfono solo admite números y guiones.",
   INVALID_DOCUMENT: "El documento debe tener exactamente 8 dígitos.",

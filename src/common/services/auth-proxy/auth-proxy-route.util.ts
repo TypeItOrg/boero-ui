@@ -2,7 +2,7 @@ import { INSTITUTIONAL_LOGIN_PATH } from "@features/institutional-auth/utils/ins
 import { PLATFORM_LOGIN_PATH } from "@features/platform-auth/utils/platform-auth-proxy-policy.util";
 
 const ADMIN_SESSION_ROOT_PATHS = ["/admin", "/api/admin"] as const;
-const INSTITUTIONAL_REGISTER_PATH = "/auth/register";
+const INSTITUTIONAL_PUBLIC_ROOT_PATHS = ["/auth/register", "/auth/password-recovery"] as const;
 
 export enum RouteAccess {
   Public,
@@ -15,7 +15,9 @@ export enum RouteAccess {
 export function getRouteAccess(pathname: string): RouteAccess {
   if (pathname === PLATFORM_LOGIN_PATH) return RouteAccess.AdminGuestOnly;
   if (pathname === INSTITUTIONAL_LOGIN_PATH) return RouteAccess.InstitutionalGuestOnly;
-  if (pathname === INSTITUTIONAL_REGISTER_PATH) return RouteAccess.Public;
+  if (INSTITUTIONAL_PUBLIC_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
+    return RouteAccess.Public;
+  }
   if (ADMIN_SESSION_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
     return RouteAccess.AdminSession;
   }
