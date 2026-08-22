@@ -199,7 +199,7 @@ const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigatio
   ref,
 ): React.ReactElement {
   const hrefString = typeof href === "string" ? href : (href.pathname ?? "");
-  if (hrefString === "/profile") {
+  if (hrefString === "/account") {
     return (
       <Link ref={ref} href={href} {...props}>
         {children}
@@ -216,6 +216,6 @@ const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigatio
 PersonNavigationLink.displayName = "PersonNavigationLink";
 
 function getPersonHref(scope: PeopleScopeType, institutionId: string, personId: string, selfPersonId?: string | null): string {
-  if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/profile";
+  if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/account";
   return PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
 }

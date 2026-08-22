@@ -8,11 +8,9 @@ import { CircleAlertIcon, UserRoundIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { FieldGroup } from "@common/components/ui/field";
-import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
 import { DateField, TextField } from "@features/institutional-auth/components/institutional-profile-fields";
 import { InstitutionalProfileLocationSection } from "@features/institutional-auth/components/institutional-profile-location-section";
-import { InstitutionalProfilePasswordSection } from "@features/institutional-auth/components/institutional-profile-password-section";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
 
@@ -21,7 +19,7 @@ type InstitutionalProfileFormProps = {
   returnTo?: string;
 };
 
-export function InstitutionalProfileForm({ person, returnTo = "/profile" }: InstitutionalProfileFormProps): React.ReactElement {
+export function InstitutionalProfileForm({ person, returnTo = "/account" }: InstitutionalProfileFormProps): React.ReactElement {
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string>();
@@ -36,15 +34,9 @@ export function InstitutionalProfileForm({ person, returnTo = "/profile" }: Inst
     setError(undefined);
     setFieldErrors({});
     const formData = new FormData(event.currentTarget);
-    const passwordChanged = String(formData.get("password") ?? "") !== "";
     startTransition(async () => {
       const result = await updateInstitutionalProfileAction(formData);
       if (result.success) {
-        if (passwordChanged) {
-          await logoutInstitutional();
-          return;
-        }
-
         router.replace(returnTo);
         return;
       }
@@ -117,8 +109,6 @@ export function InstitutionalProfileForm({ person, returnTo = "/profile" }: Inst
         onAddressCityChange={(value) => setAddressCityId(value ?? "")}
         onAddressStreetChange={setAddressStreet}
       />
-
-      <InstitutionalProfilePasswordSection fieldErrors={fieldErrors} />
 
       <div className="mt-auto flex flex-row flex-wrap justify-end gap-3">
         <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none">

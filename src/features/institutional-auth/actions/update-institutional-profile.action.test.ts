@@ -10,70 +10,45 @@ jest.mock("@features/institutional-auth/services/get-institutional-user.service"
   requireInstitutionalUser: jest.fn(),
 }));
 
-jest.mock("@features/institutional-auth/utils/institutional-auth-cookies.util", () => ({
-  setInstitutionalPasswordChangedCookie: jest.fn(),
-}));
-
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 describe("updateInstitutionalProfileAction", () => {
   const institutionalApiFetchMock = jest.mocked(institutionalApiFetch);
   const requireInstitutionalUserMock = jest.mocked(requireInstitutionalUser);
-  const setPasswordChangedCookieMock = jest.mocked(setInstitutionalPasswordChangedCookie);
 
   beforeEach(() => {
     institutionalApiFetchMock.mockReset();
     requireInstitutionalUserMock.mockReset();
-    setPasswordChangedCookieMock.mockReset();
   });
 
-  it("sends the current password with a new password", async () => {
+  it("updates personal data without password fields", async () => {
     institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    await expect(
-      updateInstitutionalProfileAction(
-        createFormData({
-          currentPassword: "old-password",
-          password: "new-password",
-          confirmPassword: "new-password",
-        }),
-      ),
-    ).resolves.toEqual({ success: true });
+    await expect(updateInstitutionalProfileAction(createFormData())).resolves.toEqual({ success: true });
 
-    const [, request] = institutionalApiFetchMock.mock.calls[0];
-    expect(JSON.parse(request?.body as string)).toMatchObject({
-      currentPassword: "old-password",
-      password: "new-password",
-    });
+    expect(JSON.parse(institutionalApiFetchMock.mock.calls[0][1]?.body as string)).not.toHaveProperty("password");
     expect(requireInstitutionalUserMock).toHaveBeenCalled();
-    expect(setPasswordChangedCookieMock).toHaveBeenCalled();
   });
 
-  it("requires the current password before calling the API", async () => {
-    const result = await updateInstitutionalProfileAction(createFormData({ password: "new-password", confirmPassword: "new-password" }));
+  it("rejects invalid input before calling the API", async () => {
+    const result = await updateInstitutionalProfileAction(createFormData({ firstName: "Al" }));
 
     expect("fieldErrors" in result ? result.fieldErrors : undefined).toEqual({
-      currentPassword: "Ingresá tu contraseña actual.",
+      firstName: "El nombre debe tener al menos 3 caracteres.",
     });
     expect(institutionalApiFetchMock).not.toHaveBeenCalled();
-    expect(requireInstitutionalUserMock).not.toHaveBeenCalled();
-    expect(setPasswordChangedCookieMock).not.toHaveBeenCalled();
   });
 });
 
-function createFormData(overrides: Partial<Record<"currentPassword" | "password" | "confirmPassword", string>> = {}): FormData {
+function createFormData(overrides: Partial<Record<"firstName" | "lastName" | "birthDate" | "email" | "phoneNumber", string>> = {}): FormData {
   const values = {
     firstName: "Matías",
     lastName: "Boero",
     birthDate: "1995-05-15",
     email: "matias@example.com",
     phoneNumber: "12345678",
-    currentPassword: "",
-    password: "",
-    confirmPassword: "",
     ...overrides,
   };
 

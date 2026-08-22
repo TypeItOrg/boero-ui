@@ -48,8 +48,8 @@ export default function Home(): React.ReactElement {
 async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
   const links = getInstitutionalHomeLinks(user);
-  const managementLinks = links.filter((link) => link.href !== "/profile");
-  const personalLink = links.find((link) => link.href === "/profile");
+  const managementLinks = links.filter((link) => link.href !== "/account");
+  const personalLink = links.find((link) => link.href === "/account");
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
   const hasInstitutionalAccess = managementLinks.length > 0;
   const hasAcademicAccess = academicResources.length > 0;

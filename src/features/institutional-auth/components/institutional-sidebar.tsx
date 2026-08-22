@@ -84,7 +84,7 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" onClick={() => navigation.handleNavigation("/profile")}>
+                    <Link href="/account" onClick={() => navigation.handleNavigation("/account")}>
                       <UserRoundIcon />
                       Perfil
                     </Link>

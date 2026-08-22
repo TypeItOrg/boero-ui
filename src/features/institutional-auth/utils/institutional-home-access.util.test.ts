@@ -5,7 +5,7 @@ describe("institutional home access", () => {
   it("always includes the personal profile", () => {
     const links = getInstitutionalHomeLinks({ permissions: [] });
 
-    expect(links.map(({ href }) => href)).toEqual(["/profile"]);
+    expect(links.map(({ href }) => href)).toEqual(["/account"]);
   });
 
   it("includes only the management capabilities granted to the user", () => {
@@ -13,7 +13,7 @@ describe("institutional home access", () => {
       permissions: [INSTITUTIONAL_PERMISSION.INSTITUTION_READ, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, INSTITUTIONAL_PERMISSION.ROLE_READ],
     });
 
-    expect(links.map(({ href }) => href)).toEqual(["/profile", "/institution", "/people", "/roles"]);
+    expect(links.map(({ href }) => href)).toEqual(["/account", "/institution", "/people", "/roles"]);
   });
 
   it("keeps creation tasks separate from navigation links", () => {

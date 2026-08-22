@@ -9,8 +9,10 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   people: "Usuarios",
   new: "Nuevo usuario",
-  profile: "Perfil",
+  account: "Cuenta",
   edit: "Editar",
+  password: "Contraseña",
+  sessions: "Sesiones",
   roles: "Roles",
   institution: "Institución",
   "academic-years": "Ciclos lectivos",

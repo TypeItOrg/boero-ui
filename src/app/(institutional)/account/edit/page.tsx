@@ -1,17 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { UserRoundPenIcon } from "lucide-react";
+
+import type { Metadata } from "next";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
-import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
 import { InstitutionalProfileForm } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-
-import type { Metadata } from "next";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,25 +21,15 @@ export default async function EditProfilePage({
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 }): Promise<React.ReactElement> {
   const { returnTo } = await searchParams;
-  const destination = getSafeReturnTo(returnTo, "/profile");
-  await requireInstitutionalUser();
+  const destination = getSafeReturnTo(returnTo, "/account");
 
   const person = await fetchInstitutionalPerson();
   if (!person) notFound();
 
   return (
-    <PlatformPageShell
-      title="Editar perfil"
-      minViewportHeight
-      breadcrumb={<InstitutionalBreadcrumb />}
-      headerClassName="flex-row items-center justify-between"
-      actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <UserRoundPenIcon className="size-6 sm:size-7" />
-        </div>
-      }
-    >
+    <>
+      <InstitutionalAccountHeader />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">
           <Link href={destination}>Volver</Link>
@@ -50,6 +37,6 @@ export default async function EditProfilePage({
       </div>
 
       <InstitutionalProfileForm person={person} returnTo={destination} />
-    </PlatformPageShell>
+    </>
   );
 }

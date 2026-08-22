@@ -257,7 +257,7 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe("https://app.example.test/auth/login");
   });
 
-  it.each(["/profile", "/people", "/people/person-1", "/roles", "/future-portal-route"])(
+  it.each(["/account", "/people", "/people/person-1", "/roles", "/future-portal-route"])(
     "protects the institutional route %s with the institutional session",
     async (pathname) => {
       const request = createRequest(pathname, "");

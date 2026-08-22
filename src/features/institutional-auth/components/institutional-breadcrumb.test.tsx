@@ -35,6 +35,16 @@ describe("InstitutionalBreadcrumb", () => {
     expect(screen.getByRole("link", { name: "2026" })).toHaveAttribute("href", "/academic-years");
   });
 
+  it("labels account pages below Cuenta", () => {
+    jest.mocked(usePathname).mockReturnValue("/account/password");
+
+    render(<InstitutionalBreadcrumb />);
+
+    expect(screen.getByRole("link", { name: "Inicio" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Cuenta" })).toHaveAttribute("href", "/account");
+    expect(screen.getByText("Contraseña")).toBeInTheDocument();
+  });
+
   it("omits non-navigable academic level segments", () => {
     jest.mocked(usePathname).mockReturnValue("/study-plans/plan-id/academic-levels/level-id/edit");
 

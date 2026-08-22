@@ -75,4 +75,11 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
     expect(sections.map((section) => section.label)).toEqual([undefined, "General"]);
   });
+
+  it("links the account area once for every authenticated user", () => {
+    const sections = getInstitutionalNavigationSections(USER);
+    const generalSection = sections.find((section) => section.label === "General");
+
+    expect(generalSection).toEqual({ label: "General", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
+  });
 });

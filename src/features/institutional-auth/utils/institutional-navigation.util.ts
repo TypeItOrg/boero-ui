@@ -63,7 +63,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(academicItems.length > 0 ? [{ label: "Académico", items: academicItems }] : []),
     {
       label: "General",
-      items: [{ title: "Perfil", url: "/profile", icon: UserRoundIcon }],
+      items: [{ title: "Cuenta", url: "/account", icon: UserRoundIcon }],
     },
   ];
 }
