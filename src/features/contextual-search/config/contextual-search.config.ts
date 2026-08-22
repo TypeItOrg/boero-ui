@@ -2,6 +2,7 @@ import {
   BookOpenIcon,
   Building2Icon,
   CalendarDaysIcon,
+  ClockIcon,
   FileStackIcon,
   GraduationCapIcon,
   KeyRoundIcon,
@@ -30,6 +31,7 @@ export const CONTEXTUAL_SEARCH_PRESENTATION: Record<ContextualSearchEntity, Enti
   "study-plan": { singular: "Plan de estudio", plural: "Planes de estudio", icon: FileStackIcon },
   "academic-space": { singular: "Espacio académico", plural: "Espacios académicos", icon: BookOpenIcon },
   instrument: { singular: "Instrumento", plural: "Instrumentos", icon: WrenchIcon },
+  shift: { singular: "Turno", plural: "Turnos", icon: ClockIcon },
 };
 
 export const CONTEXTUAL_SEARCH_STATUS_LABELS: Record<string, string> = {
@@ -59,6 +61,7 @@ const ACADEMIC_SEARCH_ENTITIES = new Set<string>([
   "study-plan",
   "academic-space",
   "instrument",
+  "shift",
 ]);
 
 export function isAcademicSearchEntity(value: string | undefined): value is AcademicContextualSearchEntity {

@@ -378,6 +378,8 @@ function getEmptyStateSupportingDescription(resource: AcademicCollectionResource
       return "Creá un espacio académico para construir el catálogo de asignaturas, talleres y seminarios.";
     case AcademicResource.INSTRUMENT:
       return "Agregá instrumentos al catálogo institucional para mantenerlos disponibles en tus propuestas académicas.";
+    case AcademicResource.SHIFT:
+      return "Creá turnos para ordenar la oferta académica según los horarios de la institución.";
     default:
       return `Creá tu primer ${singular} para comenzar a organizar la información académica.`;
   }

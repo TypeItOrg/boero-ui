@@ -10,6 +10,7 @@ import type { AcademicYearStatus } from "@features/academic/types/academic-year-
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { StudyPlanCurriculum } from "@features/academic/types/study-plan-curriculum.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
@@ -132,6 +133,18 @@ export async function fetchInstrument(
   id: string,
 ): Promise<Instrument | null> {
   return fetchDetail(scope, institutionId, `instruments/${id}`);
+}
+
+export async function fetchShifts(
+  scope: AcademicScope,
+  institutionId: string,
+  params: PageParams & { active?: boolean } = {},
+): Promise<PaginatedResponse<Shift>> {
+  return fetchPage(scope, institutionId, "shifts", params);
+}
+
+export async function fetchShift(scope: AcademicScope, institutionId: string, id: string): Promise<Shift | null> {
+  return fetchDetail(scope, institutionId, `shifts/${id}`);
 }
 
 export async function fetchStudyPlanSpace(

@@ -381,7 +381,8 @@ function isActiveStatusResource(resource: AcademicCollectionResource): resource 
   return (
     resource === AcademicResource.TRAINING_PATH ||
     resource === AcademicResource.ACADEMIC_SPACE ||
-    resource === AcademicResource.INSTRUMENT
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT
   );
 }
 

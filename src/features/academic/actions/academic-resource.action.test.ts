@@ -242,6 +242,8 @@ describe("academic resource actions", () => {
     ["false", false, AcademicResource.ACADEMIC_SPACE, INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_STATUS_UPDATE],
     ["true", true, AcademicResource.INSTRUMENT, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE],
     ["false", false, AcademicResource.INSTRUMENT, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE],
+    ["true", true, AcademicResource.SHIFT, INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE],
+    ["false", false, AcademicResource.SHIFT, INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE],
   ] as const)(
     "sends %s as active=%s for %s only after validating the raw form value",
     async (rawActive, active, resource, permission) => {
@@ -272,6 +274,7 @@ describe("academic resource actions", () => {
     [AcademicResource.TRAINING_PATH, INSTITUTIONAL_PERMISSION.TRAINING_PATH_STATUS_UPDATE, undefined],
     [AcademicResource.ACADEMIC_SPACE, INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_STATUS_UPDATE, "unknown"],
     [AcademicResource.INSTRUMENT, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE, "falsey"],
+    [AcademicResource.SHIFT, INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE, "falsey"],
   ] as const)("rejects malformed active input for %s without calling the API", async (resource, permission, active) => {
     mockInstitutionalUser(permission);
     const formData = new FormData();

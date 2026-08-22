@@ -32,6 +32,7 @@ export type AcademicDeleteDialogProps = {
     | AcademicResource.STUDY_PLAN
     | AcademicResource.ACADEMIC_SPACE
     | AcademicResource.INSTRUMENT
+    | AcademicResource.SHIFT
     | AcademicResource.ACADEMIC_LEVEL
     | AcademicResource.STUDY_PLAN_SPACE
     | AcademicResource.PREREQUISITE;
@@ -57,7 +58,8 @@ export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.Re
     props.resource === AcademicResource.TRAINING_PATH ||
     props.resource === AcademicResource.STUDY_PLAN ||
     props.resource === AcademicResource.ACADEMIC_SPACE ||
-    props.resource === AcademicResource.INSTRUMENT;
+    props.resource === AcademicResource.INSTRUMENT ||
+    props.resource === AcademicResource.SHIFT;
   const description = isRootResource
     ? "El registro dejará de estar disponible en la operación habitual, pero conservará su historial y podrá restaurarse."
     : "Esta acción no se puede deshacer. Las relaciones protegidas impedirán la eliminación.";

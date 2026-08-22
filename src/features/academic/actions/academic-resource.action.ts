@@ -102,6 +102,12 @@ const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConfig> = {
     updatePermission: INSTITUTIONAL_PERMISSION.INSTRUMENT_UPDATE,
     prepareBody: withoutActiveStatus,
   },
+  [AcademicResource.SHIFT]: {
+    createPath: directPath(AcademicResource.SHIFT),
+    createPermission: INSTITUTIONAL_PERMISSION.SHIFT_CREATE,
+    updatePermission: INSTITUTIONAL_PERMISSION.SHIFT_UPDATE,
+    prepareBody: withoutActiveStatus,
+  },
 };
 
 type StatusResource =
@@ -109,7 +115,8 @@ type StatusResource =
   | AcademicResource.TRAINING_PATH
   | AcademicResource.STUDY_PLAN
   | AcademicResource.ACADEMIC_SPACE
-  | AcademicResource.INSTRUMENT;
+  | AcademicResource.INSTRUMENT
+  | AcademicResource.SHIFT;
 
 const academicScopeSchema = z.enum([AcademicScope.ADMIN, AcademicScope.INSTITUTIONAL]);
 const academicResourceSchema = z.enum(AcademicResource);
@@ -119,6 +126,7 @@ const statusResourceSchema = z.enum([
   AcademicResource.STUDY_PLAN,
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
+  AcademicResource.SHIFT,
 ]);
 const STATUS_PERMISSIONS: Record<StatusResource, InstitutionalPermission> = {
   [AcademicResource.ACADEMIC_YEAR]: INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_STATUS_UPDATE,
@@ -126,6 +134,7 @@ const STATUS_PERMISSIONS: Record<StatusResource, InstitutionalPermission> = {
   [AcademicResource.STUDY_PLAN]: INSTITUTIONAL_PERMISSION.STUDY_PLAN_STATUS_UPDATE,
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_STATUS_UPDATE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE,
 };
 const deletableResourceSchema = z.enum([
   AcademicResource.ACADEMIC_YEAR,
@@ -133,6 +142,7 @@ const deletableResourceSchema = z.enum([
   AcademicResource.STUDY_PLAN,
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
+  AcademicResource.SHIFT,
   AcademicResource.ACADEMIC_LEVEL,
   AcademicResource.STUDY_PLAN_SPACE,
   AcademicResource.PREREQUISITE,
@@ -143,6 +153,7 @@ const restorableResourceSchema = z.enum([
   AcademicResource.STUDY_PLAN,
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
+  AcademicResource.SHIFT,
 ]);
 type LifecycleResource = z.infer<typeof restorableResourceSchema>;
 const DELETE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
@@ -151,6 +162,7 @@ const DELETE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
   [AcademicResource.STUDY_PLAN]: INSTITUTIONAL_PERMISSION.STUDY_PLAN_DELETE,
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_DELETE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_DELETE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_DELETE,
 };
 const RESTORE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = {
   [AcademicResource.ACADEMIC_YEAR]: INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_RESTORE,
@@ -158,6 +170,7 @@ const RESTORE_PERMISSIONS: Record<LifecycleResource, InstitutionalPermission> = 
   [AcademicResource.STUDY_PLAN]: INSTITUTIONAL_PERMISSION.STUDY_PLAN_RESTORE,
   [AcademicResource.ACADEMIC_SPACE]: INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_RESTORE,
   [AcademicResource.INSTRUMENT]: INSTITUTIONAL_PERMISSION.INSTRUMENT_RESTORE,
+  [AcademicResource.SHIFT]: INSTITUTIONAL_PERMISSION.SHIFT_RESTORE,
 };
 const actionContextSchema = z.object({
   scope: academicScopeSchema,
@@ -182,6 +195,7 @@ const STATUS_INPUT_BUILDERS: Record<StatusResource, (formData: FormData) => Reco
   [AcademicResource.TRAINING_PATH]: activeStatusInput(AcademicResource.TRAINING_PATH),
   [AcademicResource.ACADEMIC_SPACE]: activeStatusInput(AcademicResource.ACADEMIC_SPACE),
   [AcademicResource.INSTRUMENT]: activeStatusInput(AcademicResource.INSTRUMENT),
+  [AcademicResource.SHIFT]: activeStatusInput(AcademicResource.SHIFT),
 };
 
 export async function saveAcademicResourceAction(
@@ -320,6 +334,7 @@ export async function deleteAcademicResourceAction(
     | AcademicResource.STUDY_PLAN
     | AcademicResource.ACADEMIC_SPACE
     | AcademicResource.INSTRUMENT
+    | AcademicResource.SHIFT
     | AcademicResource.ACADEMIC_LEVEL
     | AcademicResource.STUDY_PLAN_SPACE
     | AcademicResource.PREREQUISITE,
@@ -426,11 +441,16 @@ function isValidActiveStatusValue(value: FormDataEntryValue | null): value is "t
 
 function isFormStatusResource(
   resource: AcademicResource,
-): resource is AcademicResource.TRAINING_PATH | AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT {
+): resource is
+  | AcademicResource.TRAINING_PATH
+  | AcademicResource.ACADEMIC_SPACE
+  | AcademicResource.INSTRUMENT
+  | AcademicResource.SHIFT {
   return (
     resource === AcademicResource.TRAINING_PATH ||
     resource === AcademicResource.ACADEMIC_SPACE ||
-    resource === AcademicResource.INSTRUMENT
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT
   );
 }
 

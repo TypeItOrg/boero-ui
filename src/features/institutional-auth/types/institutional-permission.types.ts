@@ -45,6 +45,12 @@ export const INSTITUTIONAL_PERMISSION = {
   INSTRUMENT_STATUS_UPDATE: "institution:instrument:update-status",
   INSTRUMENT_DELETE: "institution:instrument:delete",
   INSTRUMENT_RESTORE: "institution:instrument:restore",
+  SHIFT_READ: "institution:shift:read",
+  SHIFT_CREATE: "institution:shift:create",
+  SHIFT_UPDATE: "institution:shift:update",
+  SHIFT_STATUS_UPDATE: "institution:shift:update-status",
+  SHIFT_DELETE: "institution:shift:delete",
+  SHIFT_RESTORE: "institution:shift:restore",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];

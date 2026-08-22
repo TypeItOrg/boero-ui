@@ -134,6 +134,17 @@ describe("academic form schemas", () => {
     if (result.success) expect(result.data).toEqual({ name: "Piano", description: null });
   });
 
+  it("parses a shift with a required name and optional description", () => {
+    const formData = new FormData();
+    formData.set("name", "Turno mañana");
+    formData.set("description", "De 8 a 12.");
+
+    const result = parseAcademicForm(AcademicResource.SHIFT, formData);
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toEqual({ name: "Turno mañana", description: "De 8 a 12." });
+  });
+
   it("accepts an open-ended study-plan validity", () => {
     const formData = new FormData();
     formData.set("name", "Plan 2027");

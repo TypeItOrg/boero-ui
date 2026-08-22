@@ -14,6 +14,8 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicYears: jest.fn(),
   fetchInstrument: jest.fn(),
   fetchInstruments: jest.fn(),
+  fetchShift: jest.fn(),
+  fetchShifts: jest.fn(),
   fetchStudyPlan: jest.fn(),
   fetchStudyPlans: jest.fn(),
   fetchTrainingPath: jest.fn(),
@@ -164,6 +166,29 @@ describe("AcademicCollectionView", () => {
         active: true,
       }).detailValues,
     ).toEqual(["Asignatura", "Sin descripción"]);
+  });
+
+  it("maps shift rows with their description and active status", () => {
+    const config = ACADEMIC_COLLECTION_CONFIG[AcademicResource.SHIFT];
+
+    expect(config.title).toBe("Turnos");
+    expect(config.columns.detailLabels).toEqual(["Descripción"]);
+    expect(
+      config.toRow({
+        id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+        institutionId: INSTITUTION_ID,
+        name: "Turno mañana",
+        description: null,
+        active: true,
+      }),
+    ).toEqual({
+      id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+      primaryValue: "Turno mañana",
+      detailValues: ["Sin descripción"],
+      status: "Activo",
+      active: true,
+      deletedAt: null,
+    });
   });
 
   it("shows deleted records without offering a create action", async () => {

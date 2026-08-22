@@ -160,6 +160,33 @@ describe("AcademicFormFields", () => {
     expect(formData.get("initialActive")).toBe("true");
   });
 
+  it("hides the shift status selector when creating and shows it while editing", () => {
+    const { container, rerender } = render(
+      <form>
+        <AcademicFormFields resource={AcademicResource.SHIFT} initialValues={{ name: "Turno mañana" }} />
+      </form>,
+    );
+
+    expect(screen.queryByRole("combobox", { name: "Estado" })).not.toBeInTheDocument();
+    expect(new FormData(container.querySelector("form")!).get("initialActive")).toBeNull();
+
+    rerender(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.SHIFT}
+          initialValues={{
+            id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+            name: "Turno mañana",
+            description: null,
+            active: false,
+          }}
+        />
+      </form>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Inactivo");
+  });
+
   it("renders the academic-space status selector while editing", () => {
     const { container } = render(
       <form>

@@ -2,6 +2,7 @@ import {
   fetchAcademicSpaces,
   fetchAcademicYears,
   fetchInstruments,
+  fetchShifts,
   fetchStudyPlans,
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
@@ -14,6 +15,7 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicSpaces: jest.fn(),
   fetchAcademicYears: jest.fn(),
   fetchInstruments: jest.fn(),
+  fetchShifts: jest.fn(),
   fetchStudyPlans: jest.fn(),
   fetchTrainingPaths: jest.fn(),
 }));
@@ -51,6 +53,12 @@ const ACCESS: AcademicAccess = {
   instrumentStatusUpdate: false,
   instrumentDelete: false,
   instrumentRestore: false,
+  shiftRead: false,
+  shiftCreate: false,
+  shiftUpdate: false,
+  shiftStatusUpdate: false,
+  shiftDelete: false,
+  shiftRestore: false,
 };
 
 describe("fetchAcademicRecentItems", () => {
@@ -83,9 +91,32 @@ describe("fetchAcademicRecentItems", () => {
     });
     expect(fetchTrainingPaths).not.toHaveBeenCalled();
     expect(fetchStudyPlans).not.toHaveBeenCalled();
+    expect(fetchShifts).not.toHaveBeenCalled();
     expect(items).toEqual([
       expect.objectContaining({ resource: AcademicResource.ACADEMIC_YEAR, label: "2028" }),
       expect.objectContaining({ resource: AcademicResource.INSTRUMENT, label: "Piano" }),
+    ]);
+  });
+
+  it("loads recent shifts when the user can read them", async () => {
+    jest
+      .mocked(fetchShifts)
+      .mockResolvedValue(
+        page([
+          { id: "shift-id", institutionId: INSTITUTION_ID, name: "Turno mañana", description: null, active: true },
+        ]),
+      );
+
+    const items = await fetchAcademicRecentItems(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, {
+      ...ACCESS,
+      shiftRead: true,
+      yearRead: false,
+      academicSpaceRead: false,
+      instrumentRead: false,
+    });
+
+    expect(items).toEqual([
+      expect.objectContaining({ resource: AcademicResource.SHIFT, section: "Turnos", label: "Turno mañana" }),
     ]);
   });
 });

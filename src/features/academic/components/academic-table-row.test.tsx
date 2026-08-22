@@ -55,6 +55,8 @@ describe("AcademicTableRow", () => {
     [AcademicResource.ACADEMIC_SPACE, "Armonía", false, "Activar", "ACTIVE"],
     [AcademicResource.INSTRUMENT, "Piano", true, "Desactivar", "INACTIVE"],
     [AcademicResource.INSTRUMENT, "Piano", false, "Activar", "ACTIVE"],
+    [AcademicResource.SHIFT, "Turno mañana", true, "Desactivar", "INACTIVE"],
+    [AcademicResource.SHIFT, "Turno mañana", false, "Activar", "ACTIVE"],
   ] as const)(
     "offers %s for %s with its dedicated status permission",
     async (resource, primaryValue, active, action, targetStatus) => {
@@ -84,6 +86,7 @@ describe("AcademicTableRow", () => {
   it.each([
     [AcademicResource.ACADEMIC_SPACE, "Armonía"],
     [AcademicResource.INSTRUMENT, "Piano"],
+    [AcademicResource.SHIFT, "Turno mañana"],
   ] as const)("does not offer status changes for %s without permission", async (resource, primaryValue) => {
     const user = userEvent.setup();
     renderRow({ resource, row: createRow({ primaryValue }) });
@@ -96,6 +99,7 @@ describe("AcademicTableRow", () => {
   it.each([
     [AcademicResource.ACADEMIC_SPACE, "Armonía"],
     [AcademicResource.INSTRUMENT, "Piano"],
+    [AcademicResource.SHIFT, "Turno mañana"],
   ] as const)("preserves returnTo when editing %s", async (resource, primaryValue) => {
     const user = userEvent.setup();
     renderRow({ canUpdate: true, resource, row: createRow({ primaryValue }) });

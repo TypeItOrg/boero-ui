@@ -29,6 +29,7 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   prerequisites: "Correlatividades",
   "academic-spaces": "Espacios académicos",
   instruments: "Instrumentos",
+  shifts: "Turnos",
 };
 
 type BreadcrumbSegment = {

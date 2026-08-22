@@ -5,6 +5,7 @@ import {
   fetchAcademicSpaces,
   fetchAcademicYears,
   fetchInstruments,
+  fetchShifts,
   fetchStudyPlans,
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
@@ -14,6 +15,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import {
@@ -93,6 +95,11 @@ export async function fetchAcademicRecentItems(
       ),
     );
   }
+  if (access.shiftRead) {
+    requests.push(
+      loadRecentItem(() => fetchShifts(scope, institutionId, RECENT_QUERY), AcademicResource.SHIFT, "Turnos", mapShift),
+    );
+  }
 
   return (await Promise.all(requests)).filter((item): item is AcademicRecentItem => item !== null);
 }
@@ -146,6 +153,15 @@ function mapAcademicSpace(item: AcademicSpace): Omit<AcademicRecentItem, "resour
 }
 
 function mapInstrument(item: Instrument): Omit<AcademicRecentItem, "resource" | "section"> {
+  return {
+    id: item.id,
+    label: item.name,
+    detail: item.active ? "Activo" : "Inactivo",
+    active: item.active,
+  };
+}
+
+function mapShift(item: Shift): Omit<AcademicRecentItem, "resource" | "section"> {
   return {
     id: item.id,
     label: item.name,

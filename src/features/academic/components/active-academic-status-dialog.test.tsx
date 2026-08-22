@@ -25,6 +25,7 @@ describe("ActiveAcademicStatusDialog", () => {
     [AcademicResource.TRAINING_PATH, "Profesorado", "Desactivar trayecto formativo"],
     [AcademicResource.ACADEMIC_SPACE, "Armonía", "Desactivar espacio académico"],
     [AcademicResource.INSTRUMENT, "Piano", "Desactivar instrumento"],
+    [AcademicResource.SHIFT, "Turno mañana", "Desactivar turno"],
   ] as const)("submits %s deactivation with the boolean contract", async (resource, resourceLabel, actionLabel) => {
     const user = userEvent.setup();
 

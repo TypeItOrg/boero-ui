@@ -411,6 +411,26 @@ function getDetail(
         ],
       };
     }
+    case AcademicResource.SHIFT: {
+      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      return {
+        status: item.active ? "Activo" : "Inactivo",
+        active: item.active,
+        description: "Consultá los datos generales y el estado del turno.",
+        gridColsClass: "sm:grid-cols-2",
+        fields: [
+          {
+            label: "Estado",
+            value: (
+              <Badge key="status" variant={item.active ? "success" : "secondary"}>
+                {item.active ? "Activo" : "Inactivo"}
+              </Badge>
+            ),
+          },
+          { label: "Descripción", value: item.description || "Sin descripción" },
+        ],
+      };
+    }
   }
 }
 

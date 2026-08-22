@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   BookPlusIcon,
   CalendarRangeIcon,
+  ClockIcon,
   GitBranchPlusIcon,
   Layers3Icon,
   LibraryBigIcon,
@@ -21,4 +22,5 @@ export const ACADEMIC_RESOURCE_ICONS: Readonly<Record<AcademicResource, LucideIc
   [AcademicResource.PREREQUISITE]: GitBranchPlusIcon,
   [AcademicResource.ACADEMIC_SPACE]: LibraryBigIcon,
   [AcademicResource.INSTRUMENT]: Music2Icon,
+  [AcademicResource.SHIFT]: ClockIcon,
 };

@@ -332,6 +332,7 @@ function isDetailStatusResource(resource: AcademicCollectionResource): resource 
   return (
     resource === AcademicResource.ACADEMIC_SPACE ||
     resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT ||
     resource === AcademicResource.TRAINING_PATH
   );
 }

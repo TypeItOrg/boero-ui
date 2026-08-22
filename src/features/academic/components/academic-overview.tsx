@@ -29,6 +29,7 @@ const STRUCTURE_RESOURCES: readonly AcademicCollectionResource[] = [
 const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
+  AcademicResource.SHIFT,
 ];
 
 export async function AcademicOverview({

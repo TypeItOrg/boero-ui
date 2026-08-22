@@ -1,6 +1,14 @@
 import "server-only";
 
-import { BookPlusIcon, CalendarPlusIcon, LibraryBigIcon, Music2Icon, RouteIcon, type LucideIcon } from "lucide-react";
+import {
+  BookPlusIcon,
+  CalendarPlusIcon,
+  ClockIcon,
+  LibraryBigIcon,
+  Music2Icon,
+  RouteIcon,
+  type LucideIcon,
+} from "lucide-react";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type {
@@ -17,6 +25,8 @@ import {
   fetchAcademicYears,
   fetchInstrument,
   fetchInstruments,
+  fetchShift,
+  fetchShifts,
   fetchStudyPlan,
   fetchStudyPlans,
   fetchTrainingPath,
@@ -333,6 +343,25 @@ export const ACADEMIC_COLLECTION_CONFIG: Record<AcademicCollectionResource, Acad
     fetchPage: ({ scope, institutionId, page, size, search, active, deleted }) =>
       fetchInstruments(scope, institutionId, { page, size, search, active, deleted }),
     fetchDetail: fetchInstrument,
+  }),
+  [AcademicResource.SHIFT]: activeResource({
+    resource: AcademicResource.SHIFT,
+    title: "Turnos",
+    createLabel: "Nuevo turno",
+    createIcon: ClockIcon,
+    singular: "turno",
+    plural: "turnos",
+    columns: { primaryLabel: "Nombre", detailLabels: ["Descripción"] },
+    description: "Catálogo institucional de turnos.",
+    canRead: (access) => access.shiftRead,
+    canCreate: (access) => access.shiftCreate,
+    canDelete: (access) => access.shiftDelete,
+    canUpdate: (access) => access.shiftUpdate,
+    canChangeStatus: (access) => access.shiftStatusUpdate,
+    canRestore: (access) => access.shiftRestore,
+    fetchPage: ({ scope, institutionId, page, size, search, active, deleted }) =>
+      fetchShifts(scope, institutionId, { page, size, search, active, deleted }),
+    fetchDetail: fetchShift,
   }),
 };
 

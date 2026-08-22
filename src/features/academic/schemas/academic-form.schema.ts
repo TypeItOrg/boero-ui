@@ -82,6 +82,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     }),
   [AcademicResource.TRAINING_PATH]: namedResourceSchema,
   [AcademicResource.INSTRUMENT]: namedResourceSchema,
+  [AcademicResource.SHIFT]: namedResourceSchema,
   [AcademicResource.STUDY_PLAN]: z
     .object({ name, trainingPathId: z.string().uuid("Seleccioná un trayecto formativo.") })
     .and(studyPlanValiditySchema),
@@ -141,7 +142,12 @@ export const academicStatusSchema = z.discriminatedUnion("resource", [
       });
     }),
   z.object({
-    resource: z.enum([AcademicResource.TRAINING_PATH, AcademicResource.ACADEMIC_SPACE, AcademicResource.INSTRUMENT]),
+    resource: z.enum([
+      AcademicResource.TRAINING_PATH,
+      AcademicResource.ACADEMIC_SPACE,
+      AcademicResource.INSTRUMENT,
+      AcademicResource.SHIFT,
+    ]),
     active: z.enum(["true", "false"]).transform((value) => value === "true"),
   }),
 ]);

@@ -30,6 +30,12 @@ export type AcademicAccess = {
   instrumentStatusUpdate: boolean;
   instrumentDelete: boolean;
   instrumentRestore: boolean;
+  shiftRead: boolean;
+  shiftCreate: boolean;
+  shiftUpdate: boolean;
+  shiftStatusUpdate: boolean;
+  shiftDelete: boolean;
+  shiftRestore: boolean;
 };
 
 export function canReadAcademic(access: AcademicAccess): boolean {
@@ -38,7 +44,8 @@ export function canReadAcademic(access: AcademicAccess): boolean {
     access.trainingPathRead ||
     access.studyPlanRead ||
     access.academicSpaceRead ||
-    access.instrumentRead
+    access.instrumentRead ||
+    access.shiftRead
   );
 }
 
@@ -74,4 +81,10 @@ export const FULL_ACADEMIC_ACCESS: AcademicAccess = {
   instrumentStatusUpdate: true,
   instrumentDelete: true,
   instrumentRestore: true,
+  shiftRead: true,
+  shiftCreate: true,
+  shiftUpdate: true,
+  shiftStatusUpdate: true,
+  shiftDelete: true,
+  shiftRestore: true,
 };

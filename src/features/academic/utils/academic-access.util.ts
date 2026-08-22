@@ -36,5 +36,11 @@ export function getAcademicAccess(user: InstitutionalUser): AcademicAccess {
     instrumentStatusUpdate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE),
     instrumentDelete: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_DELETE),
     instrumentRestore: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_RESTORE),
+    shiftRead: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ),
+    shiftCreate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_CREATE),
+    shiftUpdate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_UPDATE),
+    shiftStatusUpdate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_STATUS_UPDATE),
+    shiftDelete: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_DELETE),
+    shiftRestore: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_RESTORE),
   };
 }

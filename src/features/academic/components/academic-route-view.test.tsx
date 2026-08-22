@@ -13,6 +13,7 @@ import {
   fetchAcademicSpace,
   fetchAcademicSpaceUsage,
   fetchInstrument,
+  fetchShift,
   fetchStudyPlan,
   fetchStudyPlanCurriculum,
   fetchTrainingPath,
@@ -27,6 +28,7 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicSpace: jest.fn(),
   fetchAcademicSpaceUsage: jest.fn(),
   fetchInstrument: jest.fn(),
+  fetchShift: jest.fn(),
   fetchStudyPlan: jest.fn(),
   fetchStudyPlanCurriculum: jest.fn(),
   fetchTrainingPath: jest.fn(),
@@ -40,6 +42,7 @@ const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const STUDY_PLAN_ID = "019f9c3d-9663-77da-a21b-5c811c040616";
 const TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 const INSTRUMENT_ID = "3b9ec931-453c-4778-86a9-dc40a06d0247";
+const SHIFT_ID = "5c9ec931-453c-4778-86a9-dc40a06d0247";
 const ACADEMIC_SPACE_ID = "4c9ec931-453c-4778-86a9-dc40a06d0247";
 const LEVEL_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
 
@@ -67,6 +70,14 @@ const INSTRUMENT = {
   institutionId: INSTITUTION_ID,
   name: "Piano",
   description: "Instrumento de teclas.",
+  active: true,
+};
+
+const SHIFT = {
+  id: SHIFT_ID,
+  institutionId: INSTITUTION_ID,
+  name: "Turno mañana",
+  description: "De 8 a 12.",
   active: true,
 };
 
@@ -127,6 +138,7 @@ describe("AcademicRouteView", () => {
     });
     jest.mocked(fetchTrainingPath).mockResolvedValue(TRAINING_PATH);
     jest.mocked(fetchInstrument).mockResolvedValue(INSTRUMENT);
+    jest.mocked(fetchShift).mockResolvedValue(SHIFT);
   });
 
   it("renders a training-path detail with its related study plans", async () => {
@@ -257,6 +269,26 @@ describe("AcademicRouteView", () => {
 
     expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Editar" })).not.toBeInTheDocument();
+  });
+
+  it("renders the shift detail with its status action and description", async () => {
+    const result = await AcademicRouteView({
+      access: FULL_ACADEMIC_ACCESS,
+      institutionId: INSTITUTION_ID,
+      renderBreadcrumb: () => null,
+      scope: AcademicScope.INSTITUTIONAL,
+      segments: [AcademicResource.SHIFT, SHIFT_ID],
+      searchParams: {},
+    });
+
+    expect(result).toHaveProperty("props.title", "Turno mañana");
+
+    render(result);
+
+    expect(screen.getByText("Consultá los datos generales y el estado del turno.")).toBeInTheDocument();
+    expect(screen.getByText("De 8 a 12.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Desactivar" })).toBeInTheDocument();
+    expect(fetchShift).toHaveBeenCalledWith(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, SHIFT_ID);
   });
 
   it("shows the training-path status action without the edit permission", async () => {
