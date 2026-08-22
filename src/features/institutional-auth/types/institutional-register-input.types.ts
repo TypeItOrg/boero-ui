@@ -4,5 +4,6 @@ export type InstitutionalRegisterInput = {
   lastName: string;
   birthDate: string;
   documentNumber: string;
+  email: string;
   password: string;
 };

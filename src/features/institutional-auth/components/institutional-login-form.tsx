@@ -143,6 +143,12 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
               </span>
             ) : null}
           </Button>
+          <Link
+            className="text-primary text-center text-sm font-medium underline underline-offset-4"
+            href="/auth/password-recovery"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
           <p className="text-muted-foreground text-center text-sm">
             ¿No tenés una cuenta?{" "}
             <Link className="text-primary font-medium underline underline-offset-4" href="/auth/register">
@@ -154,3 +160,5 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
     </form>
   );
 }
+
+

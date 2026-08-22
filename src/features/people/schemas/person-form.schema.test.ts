@@ -6,7 +6,7 @@ describe("person form schemas", () => {
     const result = updatePersonFormSchema.safeParse({
       firstName: "Ana",
       lastName: "Pérez",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "353-4619146",
     });
 
@@ -17,7 +17,7 @@ describe("person form schemas", () => {
     const result = updatePersonFormSchema.safeParse({
       firstName: "Ana",
       lastName: "Pérez",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "+54 353 4619146",
     });
 
@@ -29,7 +29,7 @@ describe("person form schemas", () => {
       firstName: "Ana",
       lastName: "Pérez",
       documentNumber: "1234A678",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       birthDate: "",
       password: "contraseña-segura",
@@ -52,7 +52,7 @@ describe("person form schemas", () => {
       firstName: "Ana",
       lastName: "Pérez",
       documentNumber: "12345678",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       birthDate,
       password: "contraseña-segura",
@@ -67,7 +67,7 @@ describe("person form schemas", () => {
       firstName: "Ana",
       lastName: "Pérez",
       documentNumber: "12345678",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       birthDate: "",
       password: "contraseña-segura",
@@ -82,7 +82,7 @@ describe("person form schemas", () => {
       firstName: "Ana",
       lastName: "Pérez",
       documentNumber: "12345678",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       birthDate: "2000-01-01",
       password: "contraseña-segura",
@@ -112,7 +112,7 @@ describe("person form schemas", () => {
     const shortPasswordResult = updatePersonFormSchema.safeParse({
       firstName: "Ana",
       lastName: "Pérez",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       password: "123",
       confirmPassword: "123",
@@ -122,7 +122,7 @@ describe("person form schemas", () => {
     const mismatchResult = updatePersonFormSchema.safeParse({
       firstName: "Ana",
       lastName: "Pérez",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       password: "contraseña-nueva",
       confirmPassword: "otra-contraseña",
@@ -132,7 +132,7 @@ describe("person form schemas", () => {
     const validResult = updatePersonFormSchema.safeParse({
       firstName: "Ana",
       lastName: "Pérez",
-      email: "",
+      email: "ana@example.com",
       phoneNumber: "",
       password: "contraseña-nueva",
       confirmPassword: "contraseña-nueva",

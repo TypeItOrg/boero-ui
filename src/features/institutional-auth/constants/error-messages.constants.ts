@@ -8,6 +8,8 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   INVALID_BIRTH_DATE: "La persona debe tener al menos 3 años.",
   REQUIRED_DOCUMENT: "El documento es requerido.",
   INVALID_DOCUMENT: "El número de documento debe tener exactamente 8 dígitos.",
+  REQUIRED_EMAIL: "El email es requerido.",
+  INVALID_EMAIL: "El email debe tener un formato válido.",
   REQUIRED_PASSWORD: "La contraseña es requerida.",
   INVALID_PASSWORD: "La contraseña debe tener al menos 8 caracteres.",
   INVALID_PASSWORD_CONFIRMATION: "Las contraseñas no coinciden.",
@@ -17,4 +19,8 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   PASSWORD_CHANGED_TITLE: "¡Listo! Contraseña actualizada",
   PASSWORD_CHANGED_DESCRIPTION: "Ahora podés ingresar con tu nueva contraseña.",
   FETCH_INSTITUTIONS: "No se pudieron cargar las instituciones.",
+  PASSWORD_RECOVERY_SENT:
+    "Si los datos corresponden a una cuenta con correo configurado, recibirás un enlace para restablecer la contraseña.",
+  PASSWORD_RECOVERY_INVALID_TOKEN: "El enlace de recuperación es inválido o ha expirado.",
 } as const;
+

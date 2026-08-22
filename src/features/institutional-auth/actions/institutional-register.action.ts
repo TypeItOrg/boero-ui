@@ -20,6 +20,7 @@ export async function registerInstitutional(
     lastName: formData.get("lastName") ?? "",
     birthDate: formData.get("birthDate") ?? "",
     documentNumber: formData.get("documentNumber") ?? "",
+    email: formData.get("email") ?? "",
     password: formData.get("password") ?? "",
     confirmPassword: formData.get("confirmPassword") ?? "",
   });
@@ -34,6 +35,7 @@ export async function registerInstitutional(
     lastName: parsed.data.lastName,
     birthDate: parsed.data.birthDate,
     documentNumber: parsed.data.documentNumber,
+    email: parsed.data.email,
     password: parsed.data.password,
   };
   const output = await registerInstitutionalAccount(input);

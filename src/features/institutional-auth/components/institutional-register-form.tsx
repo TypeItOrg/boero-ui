@@ -118,6 +118,20 @@ export function InstitutionalRegisterForm(): React.ReactElement {
           </Field>
         </div>
 
+        <Field data-invalid={!!state.fieldErrors?.email}>
+          <FieldLabel htmlFor="register-email" required>
+            Email
+          </FieldLabel>
+          <Input
+            aria-invalid={!!state.fieldErrors?.email}
+            autoComplete="email"
+            id="register-email"
+            name="email"
+            type="email"
+          />
+          <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
+        </Field>
+
         <div className="grid gap-6 sm:grid-cols-2">
           <Field data-invalid={!!state.fieldErrors?.password}>
             <FieldLabel htmlFor="register-password" required>
