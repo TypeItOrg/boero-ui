@@ -76,7 +76,7 @@ export function PeopleTablePresentation({
   if (data.items.length === 0) {
     return (
       <PeopleTableEmptyState
-                canCreate={canCreate}
+        canCreate={canCreate}
         institutionId={institutionId}
         isNavigating={isNavigating}
         scope={scope}
