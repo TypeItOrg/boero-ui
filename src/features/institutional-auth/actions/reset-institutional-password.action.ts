@@ -10,10 +10,7 @@ import type { ResetPasswordActionState } from "@features/institutional-auth/type
 
 const RESET_PASSWORD_FIELDS = ["password", "confirmPassword"] as const;
 
-export async function resetPassword(
-  _previousState: ResetPasswordActionState,
-  formData: FormData,
-): Promise<ResetPasswordActionState> {
+export async function resetPassword(_previousState: ResetPasswordActionState, formData: FormData): Promise<ResetPasswordActionState> {
   const parsed = resetInstitutionalPasswordSchema.safeParse({
     token: formData.get("token") ?? "",
     password: formData.get("password") ?? "",
@@ -37,4 +34,3 @@ export async function resetPassword(
 
   return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM };
 }
-

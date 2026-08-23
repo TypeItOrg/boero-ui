@@ -9,5 +9,3 @@ export const institutionalPasswordRecoverySchema = z.object({
     .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_DOCUMENT, abort: true })
     .regex(/^\d{8}$/, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_DOCUMENT),
 });
-
-

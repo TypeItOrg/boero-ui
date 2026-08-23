@@ -122,13 +122,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
           <FieldLabel htmlFor="register-email" required>
             Email
           </FieldLabel>
-          <Input
-            aria-invalid={!!state.fieldErrors?.email}
-            autoComplete="email"
-            id="register-email"
-            name="email"
-            type="email"
-          />
+          <Input aria-invalid={!!state.fieldErrors?.email} autoComplete="email" id="register-email" name="email" type="email" />
           <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
         </Field>
 

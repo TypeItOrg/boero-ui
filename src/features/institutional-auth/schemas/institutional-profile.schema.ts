@@ -5,16 +5,8 @@ import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.ut
 export const institutionalProfileSchema = z.object({
   firstName: z.string().trim().min(3, "El nombre debe tener al menos 3 caracteres."),
   lastName: z.string().trim().min(3, "El apellido debe tener al menos 3 caracteres."),
-  birthDate: z
-    .string()
-    .min(1, "La fecha de nacimiento es requerida.")
-    .refine(hasMinimumPersonAge, "La persona debe tener al menos 3 años."),
-  email: z
-    .string()
-    .trim()
-    .min(1, "El email es requerido.")
-    .email("Ingresá un email válido.")
-    .max(150, "Ingresá un email válido."),
+  birthDate: z.string().min(1, "La fecha de nacimiento es requerida.").refine(hasMinimumPersonAge, "La persona debe tener al menos 3 años."),
+  email: z.string().trim().min(1, "El email es requerido.").email("Ingresá un email válido.").max(150, "Ingresá un email válido."),
   phoneNumber: z.string().regex(/^[\d-]*$/, "El teléfono solo admite números y guiones."),
   birthCityId: z.string().optional(),
   nationalityCountryId: z.string().optional(),

@@ -3,4 +3,3 @@ export type ResetInstitutionalPasswordInput = {
   password: string;
   token: string;
 };
-

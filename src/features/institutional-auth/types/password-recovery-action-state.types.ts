@@ -3,5 +3,3 @@ export type PasswordRecoveryActionState = {
   fieldErrors?: Partial<Record<"institutionId" | "documentNumber", string>>;
   success?: boolean;
 };
-
-
