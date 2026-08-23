@@ -8,10 +8,7 @@ import type { PasswordRecoveryActionState } from "@features/institutional-auth/t
 
 const PASSWORD_RECOVERY_FIELDS = ["institutionId", "documentNumber"] as const;
 
-export async function requestPasswordRecovery(
-  _previousState: PasswordRecoveryActionState,
-  formData: FormData,
-): Promise<PasswordRecoveryActionState> {
+export async function requestPasswordRecovery(_previousState: PasswordRecoveryActionState, formData: FormData): Promise<PasswordRecoveryActionState> {
   const parsed = institutionalPasswordRecoverySchema.safeParse({
     institutionId: formData.get("institutionId") ?? "",
     documentNumber: formData.get("documentNumber") ?? "",
@@ -30,5 +27,3 @@ export async function requestPasswordRecovery(
 
   return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM };
 }
-
-

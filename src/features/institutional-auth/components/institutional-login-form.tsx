@@ -116,16 +116,21 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
 
         <FieldGroup>
           <Field data-invalid={!!state.fieldErrors?.password}>
-            <FieldLabel htmlFor="password" required>
-              Contraseña
-            </FieldLabel>
+            <div className="flex items-center justify-between">
+              <FieldLabel htmlFor="password" required>
+                Contraseña
+              </FieldLabel>
+              <Link className="text-primary text-sm font-medium underline underline-offset-4" href="/auth/password-recovery">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
             <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="current-password" id="password" name="password" />
             <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
           </Field>
         </FieldGroup>
 
-        <Field orientation="horizontal" className="gap-2">
-          <Checkbox id="remember-me" name="rememberMe" />
+        <Field orientation="horizontal">
+          <Checkbox id="remember-me" name="rememberMe" className="mt-px" />
           <FieldLabel htmlFor="remember-me" className="font-normal">
             Recordarme
           </FieldLabel>
@@ -143,12 +148,6 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
               </span>
             ) : null}
           </Button>
-          <Link
-            className="text-primary text-center text-sm font-medium underline underline-offset-4"
-            href="/auth/password-recovery"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
           <p className="text-muted-foreground text-center text-sm">
             ¿No tenés una cuenta?{" "}
             <Link className="text-primary font-medium underline underline-offset-4" href="/auth/register">
@@ -160,5 +159,3 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
     </form>
   );
 }
-
-

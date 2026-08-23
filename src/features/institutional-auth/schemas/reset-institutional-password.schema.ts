@@ -12,5 +12,3 @@ export const resetInstitutionalPasswordSchema = z
     message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_PASSWORD_CONFIRMATION,
     path: ["confirmPassword"],
   });
-
-

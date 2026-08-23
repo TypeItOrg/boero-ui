@@ -20,5 +20,3 @@ export async function resetInstitutionalPassword(
     return { success: false, error: { status: 500, message: "No se pudo conectar con el servidor." } };
   }
 }
-
-
