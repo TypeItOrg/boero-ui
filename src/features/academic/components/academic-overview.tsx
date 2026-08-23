@@ -1,4 +1,4 @@
-import { LayoutDashboardIcon } from "lucide-react";
+import { LayoutDashboardIcon, LibraryBigIcon, NetworkIcon, type LucideIcon } from "lucide-react";
 
 import { AcademicRecentItems } from "@features/academic/components/academic-recent-items";
 import { AcademicResourceLinks, getReadableAcademicResources } from "@features/academic/components/academic-resource-links";
@@ -41,13 +41,13 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
     >
       <div className="grid items-start gap-4 lg:grid-cols-[3fr_2fr]">
         {structureResources.length > 0 ? (
-          <AcademicGroup title="Estructura académica">
+          <AcademicGroup title="Estructura académica" description="Organizá ciclos lectivos, trayectos y planes de estudio." icon={NetworkIcon}>
             <AcademicResourceLinks basePath={basePath} resources={structureResources} />
           </AcademicGroup>
         ) : null}
 
         {catalogResources.length > 0 ? (
-          <AcademicGroup title="Catálogos">
+          <AcademicGroup title="Catálogos" description="Administrá espacios académicos e instrumentos." icon={LibraryBigIcon}>
             <AcademicResourceLinks basePath={basePath} resources={catalogResources} />
           </AcademicGroup>
         ) : null}
@@ -58,11 +58,31 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
   );
 }
 
-function AcademicGroup({ children, title }: { children: React.ReactNode; title: string }): React.ReactElement {
+function AcademicGroup({
+  children,
+  description,
+  icon: Icon,
+  title,
+}: {
+  children: React.ReactNode;
+  description: string;
+  icon: LucideIcon;
+  title: string;
+}): React.ReactElement {
   return (
-    <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
-      <h2 className="text-base font-semibold">{title}</h2>
-      <div className="mt-4">{children}</div>
+    <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+      <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+            <Icon className="size-5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold">{title}</h2>
+            <p className="text-muted-foreground text-sm">{description}</p>
+          </div>
+        </div>
+      </header>
+      <div className="mt-5">{children}</div>
     </section>
   );
 }

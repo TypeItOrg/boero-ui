@@ -14,16 +14,23 @@ type AcademicRecentItemsProps = {
 
 export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProps): React.ReactElement {
   return (
-    <section aria-labelledby="academic-recent-title" className="border-t pt-5">
-      <div>
-        <h2 id="academic-recent-title" className="text-base font-semibold">
-          Actividad reciente
-        </h2>
-        <p className="text-muted-foreground mt-1 text-sm">Los últimos registros incorporados.</p>
-      </div>
+    <section aria-labelledby="academic-recent-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
+      <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+        <div className="flex items-center gap-3.5">
+          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+            <HistoryIcon aria-hidden="true" className="size-5" />
+          </div>
+          <div>
+            <h2 id="academic-recent-title" className="text-base font-semibold">
+              Actividad reciente
+            </h2>
+            <p className="text-muted-foreground text-sm">Los últimos registros incorporados.</p>
+          </div>
+        </div>
+      </header>
       {items.length === 0 ? (
-        <div className="bg-muted/25 mt-4 flex items-center gap-3 rounded-xl border p-4">
-          <span className="bg-background text-muted-foreground flex min-h-10 w-10 shrink-0 items-center justify-center self-stretch rounded-lg border shadow-xs">
+        <div className="bg-background mt-5 flex items-center gap-3 rounded-xl border p-4">
+          <span className="bg-muted text-muted-foreground flex min-h-10 w-10 shrink-0 items-center justify-center self-stretch rounded-lg border shadow-xs">
             <HistoryIcon aria-hidden="true" className="size-5" />
           </span>
           <div>
@@ -32,7 +39,7 @@ export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProp
           </div>
         </div>
       ) : (
-        <div className="bg-muted/25 mt-4 flex flex-col rounded-xl border px-4">
+        <div className="bg-background mt-5 flex flex-col rounded-xl border px-4">
           {items.map((item, index) => (
             <Fragment key={item.resource}>
               {index > 0 ? <Separator /> : null}
