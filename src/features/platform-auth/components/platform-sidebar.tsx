@@ -1,26 +1,16 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 
-import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@common/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter } from "@common/components/ui/sidebar";
 import { cn } from "@common/utils/cn.util";
-import {
-  PlatformSidebarItemIcon,
-  PlatformSidebarNav,
-  platformSidebarItemButtonClassName,
-} from "@features/platform-auth/components/platform-sidebar-nav";
-import { useLogoutPlatform } from "@features/platform-auth/hooks/use-logout-platform.hook";
-import { PLATFORM_NAVIGATION_ITEMS } from "@features/platform-auth/constants/platform-navigation.constants";
+import { PlatformSidebarNav } from "@features/platform-auth/components/platform-sidebar-nav";
+import { PlatformSidebarUser } from "@features/platform-auth/components/platform-sidebar-user";
+import { PLATFORM_NAVIGATION_SECTIONS } from "@features/platform-auth/constants/platform-navigation.constants";
+import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
 
 export function PlatformSidebar({ className, ...props }: ComponentProps<typeof Sidebar>) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const logout = useLogoutPlatform();
-
-  const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
+  const { account } = usePlatformAccount();
 
   return (
     <Sidebar
@@ -33,34 +23,10 @@ export function PlatformSidebar({ className, ...props }: ComponentProps<typeof S
       {...props}
     >
       <SidebarContent className="p-4">
-        <PlatformSidebarNav items={PLATFORM_NAVIGATION_ITEMS} />
+        <PlatformSidebarNav sections={PLATFORM_NAVIGATION_SECTIONS} />
       </SidebarContent>
       <SidebarFooter className="border-sidebar-border border-t p-4 group-data-[collapsible=icon]:items-center">
-        <SidebarMenu className="gap-0 group-data-[collapsible=icon]:gap-2">
-          <SidebarMenuItem>
-            <SidebarMenuButton aria-label="Cambiar tema" className={platformSidebarItemButtonClassName} onClick={toggleTheme} tooltip="Cambiar tema">
-              <PlatformSidebarItemIcon>
-                <SunIcon className="hidden dark:block" />
-                <MoonIcon className="dark:hidden" />
-              </PlatformSidebarItemIcon>
-              <span className="group-data-[collapsible=icon]:hidden">Cambiar tema</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              aria-label={logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}
-              className={platformSidebarItemButtonClassName}
-              disabled={logout.isPending}
-              onClick={() => logout.mutate()}
-              tooltip="Cerrar sesión"
-            >
-              <PlatformSidebarItemIcon>
-                <LogOutIcon />
-              </PlatformSidebarItemIcon>
-              <span className="group-data-[collapsible=icon]:hidden">{logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {account ? <PlatformSidebarUser user={account} /> : null}
       </SidebarFooter>
     </Sidebar>
   );

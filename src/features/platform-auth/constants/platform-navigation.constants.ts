@@ -34,3 +34,17 @@ export const PLATFORM_NAVIGATION_ITEMS = [
 export const PLATFORM_PRIMARY_NAVIGATION_ITEM = PLATFORM_NAVIGATION_ITEMS[0];
 
 export const PLATFORM_BOTTOM_NAVIGATION_ITEMS = PLATFORM_NAVIGATION_ITEMS.slice(1);
+
+export const PLATFORM_NAVIGATION_SECTIONS = [
+  {
+    items: [PLATFORM_NAVIGATION_ITEMS[0]],
+  },
+  {
+    label: "Gestión",
+    items: PLATFORM_NAVIGATION_ITEMS.slice(1, 4),
+  },
+  {
+    label: "Plataforma",
+    items: [PLATFORM_NAVIGATION_ITEMS[4]],
+  },
+] as const;
