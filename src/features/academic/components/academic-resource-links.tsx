@@ -4,12 +4,21 @@ import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-c
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import { ACADEMIC_COLLECTION_RESOURCES, type AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
 
 type AcademicResourceLinksProps = {
   basePath: string;
   className?: string;
   prominent?: boolean;
   resources: readonly AcademicCollectionResource[];
+};
+
+const ACADEMIC_RESOURCE_DESCRIPTIONS: Record<AcademicCollectionResource, string> = {
+  [AcademicResource.ACADEMIC_YEAR]: "Organizá los períodos y fechas del calendario académico.",
+  [AcademicResource.TRAINING_PATH]: "Definí las propuestas formativas de la institución.",
+  [AcademicResource.STUDY_PLAN]: "Administrá la estructura curricular de cada trayecto.",
+  [AcademicResource.ACADEMIC_SPACE]: "Gestioná las materias y espacios de formación.",
+  [AcademicResource.INSTRUMENT]: "Administrá los instrumentos disponibles en la institución.",
 };
 
 export function getReadableAcademicResources(access: AcademicAccess): AcademicCollectionResource[] {
@@ -30,6 +39,7 @@ export function AcademicResourceLinks({ basePath, className, prominent = false, 
             href={`${basePath}/${resource}`}
             icon={icon}
             title={config.title}
+            description={prominent ? ACADEMIC_RESOURCE_DESCRIPTIONS[resource] : undefined}
             prominent={prominent}
             className={prominent && isLastOddResource ? "sm:col-span-2" : undefined}
           />
