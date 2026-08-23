@@ -165,6 +165,13 @@ beforeEach(() => {
 
   jest.doMock("next/headers", () => ({
     cookies: jest.fn(async () => cookieJar.asCookieStore()),
+    headers: jest.fn(
+      async () =>
+        new Headers({
+          "user-agent": "Mozilla/5.0",
+          "x-real-ip": "203.0.113.20",
+        }),
+    ),
   }));
 
   jest.doMock("next/navigation", () => ({

@@ -39,10 +39,13 @@ describe("loginPlatformAccount", () => {
     );
 
     await expect(
-      loginPlatformAccount({
-        email: "user@example.com",
-        password: "secret",
-      }),
+      loginPlatformAccount(
+        {
+          email: "user@example.com",
+          password: "secret",
+        },
+        new Headers({ "user-agent": "Mozilla/5.0", "x-forwarded-for": "203.0.113.20" }),
+      ),
     ).resolves.toEqual({ success: true, data: payload });
 
     expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/admin/auth/login", "https://api.example.test"), {
@@ -51,7 +54,12 @@ describe("loginPlatformAccount", () => {
         password: "secret",
       }),
       cache: "no-store",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0",
+        "X-Forwarded-For": "203.0.113.20",
+        "X-Real-IP": "203.0.113.20",
+      },
       method: "POST",
     });
   });
@@ -71,10 +79,13 @@ describe("loginPlatformAccount", () => {
     );
 
     await expect(
-      loginPlatformAccount({
-        email: "user@example.com",
-        password: "secret",
-      }),
+      loginPlatformAccount(
+        {
+          email: "user@example.com",
+          password: "secret",
+        },
+        new Headers(),
+      ),
     ).resolves.toEqual({ success: false, error: backendError });
   });
 });

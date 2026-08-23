@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
@@ -29,7 +30,7 @@ export async function loginInstitutional(_previousState: InstitutionalLoginActio
     return { fieldErrors: getFieldErrors(parsed.error.issues, INSTITUTIONAL_LOGIN_FIELD_NAMES) };
   }
 
-  const output = await loginInstitutionalAccount(parsed.data);
+  const output = await loginInstitutionalAccount(parsed.data, await headers());
 
   if (!output.success) {
     if (output.error.fieldErrors) {

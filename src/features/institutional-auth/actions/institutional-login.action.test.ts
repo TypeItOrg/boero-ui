@@ -1,3 +1,7 @@
+jest.mock("next/headers", () => ({
+  headers: jest.fn(),
+}));
+
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
@@ -12,6 +16,7 @@ jest.mock("@features/institutional-auth/utils/institutional-auth-cookies.util", 
   setInstitutionalAuthCookies: jest.fn(),
 }));
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { loginInstitutionalAccount } from "@features/institutional-auth/services/login-institutional.service";
@@ -29,6 +34,8 @@ type LoginFormInput = {
   rememberMe?: boolean;
 };
 
+const requestHeaders = new Headers({ "user-agent": "Mozilla/5.0", "x-real-ip": "203.0.113.20" });
+
 function createLoginFormData(input: LoginFormInput = {}): FormData {
   const formData = new FormData();
 
@@ -42,12 +49,15 @@ function createLoginFormData(input: LoginFormInput = {}): FormData {
 
 describe("loginInstitutional", () => {
   const loginMock = jest.mocked(loginInstitutionalAccount);
+  const headersMock = jest.mocked(headers);
   const clearPasswordChangedCookieMock = jest.mocked(clearInstitutionalPasswordChangedCookie);
   const clearRegistrationCookieMock = jest.mocked(clearInstitutionalRegistrationSuccessCookie);
   const setCookiesMock = jest.mocked(setInstitutionalAuthCookies);
   const redirectMock = jest.mocked(redirect);
 
   beforeEach(() => {
+    headersMock.mockReset();
+    headersMock.mockResolvedValue(requestHeaders);
     loginMock.mockReset();
     clearPasswordChangedCookieMock.mockReset();
     clearRegistrationCookieMock.mockReset();
@@ -121,6 +131,15 @@ describe("loginInstitutional", () => {
     );
 
     expect(setCookiesMock).toHaveBeenCalledWith(tokens, true);
+    expect(loginMock).toHaveBeenCalledWith(
+      {
+        institutionId: "institution-id",
+        documentNumber: "12345678",
+        password: "secret",
+        rememberMe: true,
+      },
+      requestHeaders,
+    );
     expect(redirectMock).toHaveBeenCalledWith("/");
   });
 });

@@ -1,5 +1,7 @@
 "use server";
 
+import { headers } from "next/headers";
+
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
 
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
@@ -21,7 +23,7 @@ export async function loginPlatform(_previousState: PlatformLoginActionState, fo
     };
   }
 
-  const output = await loginPlatformAccount(parsed.data);
+  const output = await loginPlatformAccount(parsed.data, await headers());
 
   if (!output.success) {
     if (output.error.fieldErrors) {

@@ -35,14 +35,20 @@ describe("loginInstitutionalAccount", () => {
       password: "secret",
       rememberMe: true,
     };
+    const requestHeaders = new Headers({ "user-agent": "Mozilla/5.0", "x-real-ip": "203.0.113.20" });
 
     fetchMock.mockResolvedValue(new Response(JSON.stringify(payload), { status: 200 }));
 
-    await expect(loginInstitutionalAccount(input)).resolves.toEqual({ success: true, data: payload });
+    await expect(loginInstitutionalAccount(input, requestHeaders)).resolves.toEqual({ success: true, data: payload });
     expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/login", "https://api.example.test"), {
       body: JSON.stringify(input),
       cache: "no-store",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0",
+        "X-Forwarded-For": "203.0.113.20",
+        "X-Real-IP": "203.0.113.20",
+      },
       method: "POST",
     });
   });
@@ -52,12 +58,15 @@ describe("loginInstitutionalAccount", () => {
     fetchMock.mockResolvedValue(new Response(JSON.stringify(error), { status: 401 }));
 
     await expect(
-      loginInstitutionalAccount({
-        institutionId: "institution-id",
-        documentNumber: "12345678",
-        password: "secret",
-        rememberMe: false,
-      }),
+      loginInstitutionalAccount(
+        {
+          institutionId: "institution-id",
+          documentNumber: "12345678",
+          password: "secret",
+          rememberMe: false,
+        },
+        new Headers(),
+      ),
     ).resolves.toEqual({ success: false, error });
   });
 
@@ -65,12 +74,15 @@ describe("loginInstitutionalAccount", () => {
     fetchMock.mockRejectedValue(new Error("network"));
 
     await expect(
-      loginInstitutionalAccount({
-        institutionId: "institution-id",
-        documentNumber: "12345678",
-        password: "secret",
-        rememberMe: false,
-      }),
+      loginInstitutionalAccount(
+        {
+          institutionId: "institution-id",
+          documentNumber: "12345678",
+          password: "secret",
+          rememberMe: false,
+        },
+        new Headers(),
+      ),
     ).resolves.toEqual({ success: false, error: { status: 500, message: "No se pudo conectar con el servidor." } });
   });
 });

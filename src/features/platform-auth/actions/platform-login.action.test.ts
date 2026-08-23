@@ -1,3 +1,7 @@
+jest.mock("next/headers", () => ({
+  headers: jest.fn(),
+}));
+
 jest.mock("@features/platform-auth/services/login-platform-account.service", () => ({
   loginPlatformAccount: jest.fn(),
 }));
@@ -10,6 +14,8 @@ jest.mock("@features/platform-auth/utils/platform-auth-redirect.util", () => ({
   redirectToNext: jest.fn(),
 }));
 
+import { headers } from "next/headers";
+
 import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
 import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
 import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
@@ -20,6 +26,8 @@ type LoginFormInput = {
   password?: string;
   next?: string;
 };
+
+const requestHeaders = new Headers({ "user-agent": "Mozilla/5.0", "x-real-ip": "203.0.113.20" });
 
 function createLoginFormData(input: LoginFormInput = {}): FormData {
   const formData = new FormData();
@@ -33,10 +41,13 @@ function createLoginFormData(input: LoginFormInput = {}): FormData {
 
 describe("loginPlatform", () => {
   const loginPlatformAccountMock = jest.mocked(loginPlatformAccount);
+  const headersMock = jest.mocked(headers);
   const setPlatformAuthCookiesMock = jest.mocked(setPlatformAuthCookies);
   const redirectToNextMock = jest.mocked(redirectToNext);
 
   beforeEach(() => {
+    headersMock.mockReset();
+    headersMock.mockResolvedValue(requestHeaders);
     loginPlatformAccountMock.mockReset();
     setPlatformAuthCookiesMock.mockReset();
     redirectToNextMock.mockReset();
@@ -133,6 +144,7 @@ describe("loginPlatform", () => {
     );
 
     expect(setPlatformAuthCookiesMock).toHaveBeenCalledWith(tokens);
+    expect(loginPlatformAccountMock).toHaveBeenCalledWith({ email: "user@example.com", password: "secret" }, requestHeaders);
     expect(redirectToNextMock).toHaveBeenCalledWith("/admin/orders");
   });
 });
