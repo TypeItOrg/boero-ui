@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Building2Icon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
@@ -39,12 +40,22 @@ export default async function EditInstitutionPage({ params, searchParams }: Edit
     <PlatformPageShell
       title="Editar institución"
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
+      headerClassName="flex-row items-center justify-between"
+      actionsClassName="self-stretch"
       actions={
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
+          <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
+        </div>
+      }
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href={destination}>Volver</Link>
+        </Button>
         <Button asChild size="lg">
           <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>
         </Button>
-      }
-    >
+      </div>
       <InstitutionForm mode="edit" institution={institution} returnTo={destination} />
     </PlatformPageShell>
   );

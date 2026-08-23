@@ -37,7 +37,7 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
       <header className="bg-background flex min-w-0 flex-row items-center justify-between gap-4 rounded-xl p-4 shadow-xs sm:p-6">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
-          <h1 className="text-foreground mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">{institution.name}</h1>
+          <h1 className="text-foreground max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">{institution.name}</h1>
         </div>
         <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
           <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />

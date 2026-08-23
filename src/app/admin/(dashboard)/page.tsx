@@ -16,11 +16,11 @@ export default function PlatformPage(): React.ReactElement {
     <PlatformPageShell
       title="Inicio"
       contentVariant="plain"
-      headerClassName="flex-row items-center justify-between"
+      headerClassName="flex-row items-center justify-between lg:items-center"
       actionsClassName="self-stretch"
       actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <Building2Icon className="size-6 sm:size-7" />
+        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
+          <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
         </div>
       }
     >
