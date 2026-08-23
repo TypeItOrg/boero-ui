@@ -35,6 +35,21 @@ describe("InstitutionalBreadcrumb", () => {
     expect(screen.getByRole("link", { name: "2026" })).toHaveAttribute("href", "/academic-years");
   });
 
+  it("appends an explicit current level for modes not represented in the path", () => {
+    jest.mocked(usePathname).mockReturnValue("/people/person-1");
+
+    render(
+      <InstitutionalBreadcrumb
+        segmentHrefs={{ "person-1": "/people/person-1?view=detail" }}
+        segmentLabels={{ "person-1": "Matías Delgado" }}
+        trailingLabel="Editar"
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Matías Delgado" })).toHaveAttribute("href", "/people/person-1?view=detail");
+    expect(screen.getByText("Editar")).toHaveAttribute("aria-current", "page");
+  });
+
   it("labels account pages below Cuenta", () => {
     jest.mocked(usePathname).mockReturnValue("/account/password");
 

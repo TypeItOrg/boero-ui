@@ -33,6 +33,7 @@ type PlatformBreadcrumbProps = {
   hiddenSegments?: readonly string[];
   segmentHrefs?: Readonly<Record<string, string>>;
   segmentLabels?: Readonly<Record<string, string>>;
+  trailingLabel?: string;
 };
 
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
@@ -43,6 +44,7 @@ function getSegments(
   segmentLabels: Readonly<Record<string, string>>,
   segmentHrefs: Readonly<Record<string, string>>,
   hiddenSegments: readonly string[],
+  trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const withoutPlatform = pathname.replace(/^\/admin\/?/, "");
   const parts = withoutPlatform.split("/").filter(Boolean);
@@ -61,19 +63,26 @@ function getSegments(
     accumulatedPath = `${accumulatedPath}/${part}`;
     if (hiddenSegmentSet.has(part)) continue;
 
-    const isLast = visiblePartIndex === visiblePartCount - 1;
+    const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
     const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
 
     segments.push({ label, href: isLast ? undefined : (segmentHrefs[part] ?? accumulatedPath) });
     visiblePartIndex += 1;
   }
 
+  if (trailingLabel) segments.push({ label: trailingLabel });
+
   return segments;
 }
 
-export function PlatformBreadcrumb({ hiddenSegments = EMPTY_SEGMENTS, segmentHrefs, segmentLabels }: PlatformBreadcrumbProps): React.ReactElement {
+export function PlatformBreadcrumb({
+  hiddenSegments = EMPTY_SEGMENTS,
+  segmentHrefs,
+  segmentLabels,
+  trailingLabel,
+}: PlatformBreadcrumbProps): React.ReactElement {
   const pathname = usePathname();
-  const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS, segmentHrefs ?? EMPTY_SEGMENT_LABELS, hiddenSegments);
+  const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS, segmentHrefs ?? EMPTY_SEGMENT_LABELS, hiddenSegments, trailingLabel);
 
   return (
     <Breadcrumb className="text-muted-foreground max-w-full min-w-0">

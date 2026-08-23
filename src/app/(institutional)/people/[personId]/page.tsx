@@ -4,7 +4,7 @@ import { UserRoundPenIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { appendReturnTo, getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
@@ -65,7 +65,13 @@ export default async function PersonPage({
     <PlatformPageShell
       title={isDetailView ? "Detalle de usuario" : canUpdate ? "Editar usuario" : "Administrar roles"}
       minViewportHeight
-      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
+      breadcrumb={
+        <InstitutionalBreadcrumb
+          segmentHrefs={{ [personId]: appendReturnTo(`/people/${personId}?view=detail`, destination) }}
+          segmentLabels={{ [personId]: personName }}
+          trailingLabel={isDetailView ? undefined : canUpdate ? "Editar" : "Administrar roles"}
+        />
+      }
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={

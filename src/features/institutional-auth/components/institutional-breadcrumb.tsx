@@ -34,6 +34,7 @@ type InstitutionalBreadcrumbProps = {
   hiddenSegments?: readonly string[];
   segmentHrefs?: Readonly<Record<string, string>>;
   segmentLabels?: Readonly<Record<string, string>>;
+  trailingLabel?: string;
 };
 
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
@@ -43,9 +44,10 @@ export function InstitutionalBreadcrumb({
   hiddenSegments = EMPTY_SEGMENTS,
   segmentHrefs = EMPTY_SEGMENT_LABELS,
   segmentLabels = EMPTY_SEGMENT_LABELS,
+  trailingLabel,
 }: InstitutionalBreadcrumbProps): React.ReactElement {
   const pathname = usePathname();
-  const segments = getSegments(pathname, segmentLabels, segmentHrefs, hiddenSegments);
+  const segments = getSegments(pathname, segmentLabels, segmentHrefs, hiddenSegments, trailingLabel);
 
   return (
     <Breadcrumb className="text-muted-foreground max-w-full min-w-0">
@@ -78,6 +80,7 @@ function getSegments(
   customSegmentLabels: Readonly<Record<string, string>>,
   segmentHrefs: Readonly<Record<string, string>>,
   hiddenSegments: readonly string[],
+  trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const parts = pathname.split("/").filter(Boolean);
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/" }];
@@ -90,7 +93,7 @@ function getSegments(
     accumulatedPath = `${accumulatedPath}/${part}`;
     if (hiddenSegmentSet.has(part)) continue;
 
-    const isLast = visiblePartIndex === visiblePartCount - 1;
+    const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
     const label = customSegmentLabels[part] ?? SEGMENT_LABELS[part] ?? "Editar";
 
     segments.push({
@@ -99,6 +102,8 @@ function getSegments(
     });
     visiblePartIndex += 1;
   }
+
+  if (trailingLabel) segments.push({ label: trailingLabel });
 
   return segments;
 }
