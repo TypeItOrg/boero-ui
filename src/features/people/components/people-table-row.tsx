@@ -235,16 +235,8 @@ const PersonNavigationLink = React.forwardRef<HTMLAnchorElement, PersonNavigatio
 });
 PersonNavigationLink.displayName = "PersonNavigationLink";
 
-function getPersonHref(
-  scope: PeopleScopeType,
-  institutionId: string,
-  personId: string,
-  selfPersonId?: string | null,
-  detailView = false,
-): string {
+function getPersonHref(scope: PeopleScopeType, institutionId: string, personId: string, selfPersonId?: string | null, detailView = false): string {
   if (PeopleScope.isInstitutional(scope) && personId === selfPersonId) return "/account";
-  const personPath = PeopleScope.isInstitutional(scope)
-    ? `/people/${personId}`
-    : `/admin/institutions/${institutionId}/people/${personId}`;
+  const personPath = PeopleScope.isInstitutional(scope) ? `/people/${personId}` : `/admin/institutions/${institutionId}/people/${personId}`;
   return detailView ? `${personPath}?view=detail` : personPath;
 }

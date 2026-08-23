@@ -15,11 +15,7 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
     <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
       <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <DetailSectionHeader
-            description="Información principal del usuario institucional."
-            icon={UserRoundIcon}
-            title="Datos personales"
-          />
+          <DetailSectionHeader description="Información principal del usuario institucional." icon={UserRoundIcon} title="Datos personales" />
         </header>
         <dl className="mt-4 grid gap-4 sm:mt-5 sm:grid-cols-2 lg:grid-cols-3">
           <DetailValue label="Nombre" value={person.firstName} />
@@ -33,11 +29,7 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
 
       <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <DetailSectionHeader
-            description="Permisos asignados actualmente a esta persona."
-            icon={ShieldCheckIcon}
-            title="Roles asignados"
-          />
+          <DetailSectionHeader description="Permisos asignados actualmente a esta persona." icon={ShieldCheckIcon} title="Roles asignados" />
         </header>
         <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
           {assignedRoles.length > 0 ? (
@@ -55,15 +47,7 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
   );
 }
 
-function DetailSectionHeader({
-  description,
-  icon: Icon,
-  title,
-}: {
-  description: string;
-  icon: LucideIcon;
-  title: string;
-}): React.ReactElement {
+function DetailSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <div className="flex items-center gap-3.5">
       <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">

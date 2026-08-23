@@ -60,13 +60,10 @@ export default async function PersonPage({
   const assignableRoles = systemRoles.filter((role) => role.technicalCode !== "INSTITUTIONAL_AUTHORITY");
   const personName = `${person.firstName} ${person.lastName}`;
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
-  const canDelete =
-    hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
+  const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
   return (
     <PlatformPageShell
-      title={
-        isDetailView ? "Detalle de usuario" : canUpdate ? "Editar usuario" : "Administrar roles"
-      }
+      title={isDetailView ? "Detalle de usuario" : canUpdate ? "Editar usuario" : "Administrar roles"}
       minViewportHeight
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [personId]: personName }} />}
       headerClassName="flex-row items-center justify-between"
@@ -82,12 +79,7 @@ export default async function PersonPage({
           <Link href={destination}>Volver</Link>
         </Button>
         {canDelete && !isDetailView ? (
-          <PersonDeleteButton
-            institutionId={user.institutionId}
-            personId={personId}
-            personName={personName}
-            scope={PeopleScope.INSTITUTIONAL}
-          />
+          <PersonDeleteButton institutionId={user.institutionId} personId={personId} personName={personName} scope={PeopleScope.INSTITUTIONAL} />
         ) : null}
       </div>
       {isDetailView ? (
