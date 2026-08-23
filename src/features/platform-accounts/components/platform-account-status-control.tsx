@@ -41,7 +41,7 @@ export function PlatformAccountStatusControl({ accountId, enabled }: PlatformAcc
         <Alert>
           <InfoIcon />
           <AlertTitle>Esta es tu cuenta</AlertTitle>
-          <AlertDescription>No podés deshabilitar la cuenta con la que estás trabajando.</AlertDescription>
+          <AlertDescription>No podés deshabilitar tu propia cuenta.</AlertDescription>
         </Alert>
       ) : null}
 

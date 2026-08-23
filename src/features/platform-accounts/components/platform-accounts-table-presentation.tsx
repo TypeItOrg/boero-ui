@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { EllipsisVerticalIcon, Loader2Icon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -92,9 +91,9 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuTrigger asChild>
                   <TableRow>
                     <TableCell className="font-medium">
-                      <Link className="hover:underline" href={`/admin/accounts/${account.platformAccountId}`}>
+                      <ReturnToLink className="hover:underline" href={`/admin/accounts/${account.platformAccountId}`}>
                         {account.name} {account.lastName}
-                      </Link>
+                      </ReturnToLink>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{account.email}</TableCell>
                     <TableCell>
@@ -112,9 +111,9 @@ export function PlatformAccountsTablePresentation({
                 <ContextMenuContent className="w-40 p-1.5">
                   <ContextMenuGroup>
                     <ContextMenuItem asChild>
-                      <Link href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+                      <ReturnToLink href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                         Ver detalle
-                      </Link>
+                      </ReturnToLink>
                     </ContextMenuItem>
                     <ContextMenuItem asChild>
                       <ReturnToLink href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">
@@ -162,9 +161,9 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
         <DropdownMenuContent align="end" className="w-40 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <Link href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
+              <ReturnToLink href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">
                 Ver detalle
-              </Link>
+              </ReturnToLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <ReturnToLink href={`/admin/accounts/${account.platformAccountId}/edit`} className="px-2.5 py-1.5">

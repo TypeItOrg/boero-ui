@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { FingerprintIcon } from "lucide-react";
 
+import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { PlatformAccountForm } from "@features/platform-accounts/components/platform-account-form";
@@ -34,6 +36,11 @@ export default async function EditPlatformAccountPage({ params, searchParams }: 
         </div>
       }
     >
+      <div>
+        <Button asChild variant="outline" size="lg">
+          <Link href={destination}>Volver</Link>
+        </Button>
+      </div>
       <PlatformAccountForm mode="edit" account={account} returnTo={destination} />
     </PlatformPageShell>
   );

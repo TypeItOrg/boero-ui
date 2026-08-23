@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleAlertIcon, Loader2Icon } from "lucide-react";
+import { CircleAlertIcon, Loader2Icon, UserRoundCogIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -107,12 +107,19 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {errorAlert}
 
-        <div className="bg-muted/25 rounded-xl border p-5 md:p-6">
-          <div>
-            <h2 className="text-base font-semibold">Identidad y acceso</h2>
-            <p className="text-muted-foreground mt-1 text-sm">{getSectionDescription(isEdit)}</p>
-          </div>
-          <FieldGroup className="mt-4 gap-4">
+        <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+          <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+            <div className="flex items-center gap-3.5">
+              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+                <UserRoundCogIcon className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">Identidad y acceso</h2>
+                <p className="text-muted-foreground text-sm">{getSectionDescription(isEdit)}</p>
+              </div>
+            </div>
+          </header>
+          <FieldGroup className="mt-5 gap-4">
             <FieldGroup className="grid items-start gap-4 md:grid-cols-2">
               <Field data-invalid={!!errors.name}>
                 <FieldLabel htmlFor="platform-account-name" required>
@@ -201,7 +208,7 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
               </Field>
             </FieldGroup>
           </FieldGroup>
-        </div>
+        </section>
       </div>
 
       <div
