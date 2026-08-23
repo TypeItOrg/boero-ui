@@ -51,6 +51,7 @@ export type AcademicSearchParams = PaginationSearchParams &
     active?: QueryParamValue;
     deleted?: QueryParamValue;
     endDate?: QueryParamValue;
+    institutionId?: QueryParamValue;
     trainingPathId?: QueryParamValue;
     validOn?: QueryParamValue;
     status?: QueryParamValue;
@@ -63,6 +64,7 @@ export type AcademicPaginationParams = PaginationParams & {
   active: boolean | undefined;
   deleted: boolean;
   endDate: string | undefined;
+  institutionId: string | undefined;
   search: string;
   sort: AcademicSort;
   startDate: string | undefined;
@@ -87,6 +89,7 @@ export function parseAcademicPaginationParams(
     active: parseOptionalBooleanQueryParam(searchParams.active),
     deleted: parseOptionalBooleanQueryParam(searchParams.deleted) ?? false,
     endDate: parseAcademicDateFilter(searchParams.endDate),
+    institutionId: parseUuidQueryParam(searchParams.institutionId),
     startDate: parseAcademicDateFilter(searchParams.startDate),
     sort: parseAcademicSort(searchParams, resource),
     status: parseEnum(searchParams.status, [...ACADEMIC_YEAR_STATUS, ...STUDY_PLAN_STATUS]),

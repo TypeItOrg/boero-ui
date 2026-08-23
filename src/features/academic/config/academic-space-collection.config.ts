@@ -21,8 +21,16 @@ export const academicSpaceCollectionConfig: AcademicCollectionConfig = {
   canUpdate: (access) => access.academicSpaceUpdate,
   canChangeStatus: (access) => access.academicSpaceStatusUpdate,
   canRestore: (access) => access.academicSpaceRestore,
-  fetchPage: ({ scope, institutionId, page, size, search, active, type, deleted }) =>
-    fetchAcademicSpaces(scope, institutionId, { page, size, search, active, type, deleted }),
+  fetchPage: ({ scope, global, institutionId, page, size, search, active, type, deleted }) =>
+    fetchAcademicSpaces(scope, global ? undefined : institutionId, {
+      page,
+      size,
+      search,
+      active,
+      type,
+      deleted,
+      institutionId: global ? institutionId : undefined,
+    }),
   fetchDetail: fetchAcademicSpace,
   getTitle: (item) => (item as Extract<AcademicCollection, { type: string }>).name,
   filters: ({ active, type, deleted }) => [
@@ -40,6 +48,8 @@ export const academicSpaceCollectionConfig: AcademicCollectionConfig = {
     const space = item as Extract<AcademicCollection, { type: string }>;
     return {
       id: space.id,
+      institutionId: space.institutionId,
+      institutionName: space.institutionName,
       primaryValue: space.name,
       detailValues: [academicSpaceTypeLabels[space.type], space.description || "Sin descripción"],
       status: space.active ? "Activo" : "Inactivo",

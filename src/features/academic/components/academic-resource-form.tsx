@@ -1,21 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import { AcademicFormFields } from "@features/academic/components/academic-form-fields";
+import { PlatformInstitutionFormField } from "@features/academic/components/platform-institution-form-field";
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import type { AcademicFormOptions } from "@features/academic/types/academic-form-options.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 
 type AcademicResourceFormProps = AcademicFormOptions & {
   scope: AcademicScope;
-  institutionId: string;
+  institutionId?: string;
+  allowInstitutionSelection?: boolean;
   resource: AcademicResource;
   id?: string;
   parentId?: string;
@@ -73,12 +76,15 @@ const FORM_SECTION_COPY: Record<AcademicResource, { title: string; description: 
 export function AcademicResourceForm({
   scope,
   institutionId,
+  allowInstitutionSelection = false,
   resource,
   id,
   parentId,
   returnTo,
   ...options
 }: AcademicResourceFormProps): React.ReactElement {
+  const [institution, setInstitution] = useState<InstitutionSummary>();
+  const effectiveInstitutionId = institutionId ?? institution?.id;
   const action = saveAcademicResourceAction.bind(null, scope, institutionId, resource, id, parentId, returnTo);
   const [state, formAction, pending] = useActionState(action, initialState);
   const section = FORM_SECTION_COPY[resource];
@@ -109,7 +115,16 @@ export function AcademicResourceForm({
             </div>
           </header>
           <div className="mt-5 flex flex-wrap gap-4">
-            <AcademicFormFields resource={resource} fieldErrors={state.fieldErrors} institutionId={institutionId} scope={scope} {...options} />
+            {allowInstitutionSelection ? (
+              <PlatformInstitutionFormField error={state.fieldErrors?.institutionId} institution={institution} onChange={setInstitution} />
+            ) : null}
+            <AcademicFormFields
+              resource={resource}
+              fieldErrors={state.fieldErrors}
+              institutionId={effectiveInstitutionId}
+              scope={scope}
+              {...options}
+            />
           </div>
         </section>
       </div>

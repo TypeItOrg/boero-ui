@@ -1,5 +1,7 @@
 export type AcademicTableRow = {
   id: string;
+  institutionId?: string;
+  institutionName?: string;
   primaryValue: string;
   detailValues: readonly string[];
   status: string;

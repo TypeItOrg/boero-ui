@@ -55,6 +55,13 @@ describe("parseAcademicPaginationParams", () => {
     });
   });
 
+  it("accepts only valid institution filters", () => {
+    expect(parseAcademicPaginationParams({ institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b" }).institutionId).toBe(
+      "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+    );
+    expect(parseAcademicPaginationParams({ institutionId: "invalid" }).institutionId).toBeUndefined();
+  });
+
   it("parses supported academic year sort values and rejects unsupported fields", () => {
     expect(parseAcademicPaginationParams({}).sort).toEqual({ field: "year", direction: "asc" });
 

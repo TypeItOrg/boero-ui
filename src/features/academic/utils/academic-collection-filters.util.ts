@@ -44,6 +44,8 @@ export function activeResource(config: Omit<AcademicCollectionConfig, "filters" 
       const activeItem = item as Extract<AcademicCollection, { active: boolean }>;
       return {
         id: activeItem.id,
+        institutionId: activeItem.institutionId,
+        institutionName: activeItem.institutionName,
         primaryValue: activeItem.name,
         detailValues: [activeItem.description || "Sin descripción"],
         status: activeItem.active ? "Activo" : "Inactivo",

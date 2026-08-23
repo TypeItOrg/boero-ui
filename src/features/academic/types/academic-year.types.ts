@@ -3,6 +3,7 @@ import type { AcademicYearStatus } from "@features/academic/types/academic-year-
 export type AcademicYear = {
   id: string;
   institutionId: string;
+  institutionName?: string;
   year: number;
   startDate: string | null;
   endDate: string | null;

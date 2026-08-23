@@ -19,7 +19,14 @@ export const instrumentCollectionConfig: AcademicCollectionConfig = activeResour
   canUpdate: (access) => access.instrumentUpdate,
   canChangeStatus: (access) => access.instrumentStatusUpdate,
   canRestore: (access) => access.instrumentRestore,
-  fetchPage: ({ scope, institutionId, page, size, search, active, deleted }) =>
-    fetchInstruments(scope, institutionId, { page, size, search, active, deleted }),
+  fetchPage: ({ scope, global, institutionId, page, size, search, active, deleted }) =>
+    fetchInstruments(scope, global ? undefined : institutionId, {
+      page,
+      size,
+      search,
+      active,
+      deleted,
+      institutionId: global ? institutionId : undefined,
+    }),
   fetchDetail: fetchInstrument,
 });

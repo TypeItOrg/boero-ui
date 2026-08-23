@@ -3,6 +3,7 @@ import type { AcademicSpaceType } from "@features/academic/types/academic-space-
 export type AcademicSpace = {
   id: string;
   institutionId: string;
+  institutionName?: string;
   name: string;
   description: string | null;
   type: AcademicSpaceType;

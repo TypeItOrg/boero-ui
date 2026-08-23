@@ -11,11 +11,7 @@ import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
-import { serializeSpringSort } from "@common/utils/sort-query.util";
+import { fetchActivePlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import { savePlatformRoleAction } from "@features/roles/actions/save-platform-role.action";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
@@ -141,7 +137,7 @@ function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }):
       emptyMessage="No se encontraron instituciones."
       emptyTitle="No hay instituciones"
       errorMessage="No se pudieron cargar las instituciones."
-      fetchPage={fetchInstitutionPage}
+      fetchPage={fetchActivePlatformInstitutionOptions}
       getItemLabel={(item) => item.name}
       getItemValue={(item) => item.id}
       onValueChange={(_value, item) => setInstitution(item)}
@@ -152,16 +148,4 @@ function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }):
       value={institution?.id}
     />
   );
-}
-
-async function fetchInstitutionPage({ page, search, signal, size }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
-  const params = buildPaginationSearchParams({ page, size, search });
-  params.set("active", "true");
-  params.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
-  const response = await fetch(`/api/admin/institutions?${params.toString()}`, { signal });
-  const data = await parseHttpResponse<{ items: InstitutionSummary[]; page: number; totalPages: number }>(
-    response,
-    "No se pudieron cargar las instituciones.",
-  );
-  return { items: data.items, nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null };
 }

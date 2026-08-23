@@ -21,6 +21,7 @@ const FETCH_ERROR = "No se pudo obtener la información académica.";
 
 type PageParams = {
   deleted?: boolean;
+  institutionId?: string;
   page?: number;
   size?: number;
   search?: string;
@@ -29,7 +30,7 @@ type PageParams = {
 
 export async function fetchAcademicYears(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   params: PageParams & {
     endDate?: string;
     startDate?: string;
@@ -47,7 +48,7 @@ export async function fetchAcademicYear(scope: AcademicScope, institutionId: str
 
 export async function fetchTrainingPaths(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   params: PageParams & { active?: boolean } = {},
 ): Promise<PaginatedResponse<TrainingPath>> {
   return fetchPage(scope, institutionId, "training-paths", params);
@@ -59,7 +60,7 @@ export async function fetchTrainingPath(scope: AcademicScope, institutionId: str
 
 export async function fetchStudyPlans(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   params: PageParams & {
     status?: StudyPlanStatus;
     trainingPathId?: string;
@@ -79,7 +80,7 @@ export async function fetchStudyPlanCurriculum(scope: AcademicScope, institution
 
 export async function fetchAcademicSpaces(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   params: PageParams & { active?: boolean; type?: AcademicSpaceType } = {},
 ): Promise<PaginatedResponse<AcademicSpace>> {
   return fetchPage(scope, institutionId, "academic-spaces", params);
@@ -100,7 +101,7 @@ export async function fetchAcademicSpaceUsage(
 
 export async function fetchInstruments(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   params: PageParams & { active?: boolean } = {},
 ): Promise<PaginatedResponse<Instrument>> {
   return fetchPage(scope, institutionId, "instruments", params);
@@ -120,7 +121,7 @@ export async function fetchPrerequisite(scope: AcademicScope, institutionId: str
 
 async function fetchPage<T>(
   scope: AcademicScope,
-  institutionId: string,
+  institutionId: string | undefined,
   resource: string,
   params: Record<string, string | number | boolean | undefined>,
 ): Promise<PaginatedResponse<T>> {
@@ -129,7 +130,8 @@ async function fetchPage<T>(
     if (value !== undefined && value !== "") searchParams.set(key, String(value));
   });
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
-  const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
+  const base = institutionId ? getAcademicApiBase(scope, institutionId) : "/api/v1/admin";
+  const response = await academicApiFetch(scope, `${base}/${resource}${query}`);
   return parseHttpResponse(response, FETCH_ERROR);
 }
 

@@ -1,10 +1,7 @@
 import { SidebarTrigger } from "@common/components/ui/sidebar";
 import { ContextualSearch } from "@features/contextual-search/components/contextual-search";
-import { PLATFORM_NAVIGATION_ITEMS } from "@features/platform-auth/constants/platform-navigation.constants";
-import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
+import { PLATFORM_NAVIGATION_SECTIONS } from "@features/platform-auth/constants/platform-navigation.constants";
 import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
-
-const PLATFORM_CONTEXTUAL_SEARCH_SECTIONS = [{ items: PLATFORM_NAVIGATION_ITEMS }] satisfies readonly ContextualSearchAccessSection[];
 
 type PlatformTopbarProps = {
   shortcutPlatform: ContextualSearchShortcutPlatform;
@@ -20,7 +17,7 @@ export function PlatformTopbar({ shortcutPlatform }: PlatformTopbarProps): React
         />
         <div className="max-w-lg min-w-0 flex-1">
           <ContextualSearch
-            accessSections={PLATFORM_CONTEXTUAL_SEARCH_SECTIONS}
+            accessSections={PLATFORM_NAVIGATION_SECTIONS}
             scope="platform"
             mobileVariant="input"
             shortcutPlatform={shortcutPlatform}

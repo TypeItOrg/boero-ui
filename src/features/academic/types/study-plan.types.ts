@@ -3,6 +3,7 @@ import type { StudyPlanStatus } from "@features/academic/types/study-plan-status
 export type StudyPlan = {
   id: string;
   institutionId: string;
+  institutionName?: string;
   trainingPathId: string;
   trainingPathName: string;
   name: string;

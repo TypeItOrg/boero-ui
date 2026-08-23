@@ -7,12 +7,7 @@ import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
-import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
-import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
-import { serializeSpringSort } from "@common/utils/sort-query.util";
+import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import { PLATFORM_ROLE_TYPE, type PlatformRoleType } from "@features/roles/types/platform-role-type.types";
@@ -65,7 +60,7 @@ export function PlatformRolesTableFilters({
             emptyMessage="No se encontraron instituciones."
             emptyTitle="No hay instituciones"
             errorMessage={LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS}
-            fetchPage={fetchInstitutionPage}
+            fetchPage={fetchPlatformInstitutionOptions}
             getItemLabel={(institution) => institution.name}
             getItemValue={(institution) => institution.id}
             onValueChange={updateInstitution}
@@ -90,12 +85,4 @@ export function PlatformRolesTableFilters({
       </div>
     </DataTableFilters>
   );
-}
-
-async function fetchInstitutionPage({ page, search, signal, size }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionSummary>> {
-  const params = buildPaginationSearchParams({ page, size, search });
-  params.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
-  const response = await fetch(`/api/admin/institutions?${params.toString()}`, { signal });
-  const data = await parseHttpResponse<PaginatedResponse<InstitutionSummary>>(response, LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS);
-  return { items: data.items, nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null };
 }

@@ -25,10 +25,11 @@ export const trainingPathCollectionConfig: AcademicCollectionConfig = activeReso
   canUpdate: (access) => access.trainingPathUpdate,
   canChangeStatus: (access) => access.trainingPathStatusUpdate,
   canRestore: (access) => access.trainingPathRestore,
-  fetchPage: ({ scope, institutionId, page, size, search, sort, active, deleted }) =>
-    fetchTrainingPaths(scope, institutionId, {
+  fetchPage: ({ scope, global, institutionId, page, size, search, sort, active, deleted }) =>
+    fetchTrainingPaths(scope, global ? undefined : institutionId, {
       active,
       deleted,
+      institutionId: global ? institutionId : undefined,
       page,
       search,
       size,

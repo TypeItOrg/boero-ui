@@ -24,6 +24,53 @@ const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const RESOURCE_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 
 describe("academic resource actions", () => {
+  it("requires an institution when creating from a global platform form", async () => {
+    const formData = new FormData();
+    formData.set("name", "Piano");
+    formData.set("description", "");
+
+    const result = await saveAcademicResourceAction(
+      AcademicScope.ADMIN,
+      undefined,
+      AcademicResource.INSTRUMENT,
+      undefined,
+      undefined,
+      "/admin/instruments",
+      {},
+      formData,
+    );
+
+    expect(result).toEqual({ fieldErrors: { institutionId: "Seleccioná una institución." } });
+    expect(requirePlatformAccount).not.toHaveBeenCalled();
+    expect(academicApiFetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the institution submitted by a global platform form", async () => {
+    jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 201 }));
+    const formData = new FormData();
+    formData.set("institutionId", INSTITUTION_ID);
+    formData.set("name", "Piano");
+    formData.set("description", "");
+
+    await saveAcademicResourceAction(
+      AcademicScope.ADMIN,
+      undefined,
+      AcademicResource.INSTRUMENT,
+      undefined,
+      undefined,
+      "/admin/instruments",
+      {},
+      formData,
+    );
+
+    expect(requirePlatformAccount).toHaveBeenCalled();
+    expect(academicApiFetch).toHaveBeenCalledWith(
+      AcademicScope.ADMIN,
+      `/api/v1/admin/institutions/${INSTITUTION_ID}/instruments`,
+      expect.objectContaining({ body: JSON.stringify({ name: "Piano", description: null }), method: "POST" }),
+    );
+  });
+
   it("rejects a forged context before authentication or API access", async () => {
     const result = await saveAcademicResourceAction(
       AcademicScope.ADMIN,

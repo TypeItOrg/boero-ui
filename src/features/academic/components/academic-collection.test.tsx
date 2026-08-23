@@ -93,6 +93,33 @@ describe("AcademicCollectionView", () => {
     );
   });
 
+  it("loads a global collection with the institution filter and global table mode", async () => {
+    const createAction = <button type="button">Nuevo registro</button>;
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: false,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      createAction,
+      canRestore: true,
+      global: true,
+      institutionName: "Conservatorio",
+      resource: AcademicResource.STUDY_PLAN,
+      scope: AcademicScope.ADMIN,
+      searchParams: { institutionId: INSTITUTION_ID },
+    });
+
+    render(result);
+
+    expect(fetchStudyPlans).toHaveBeenCalledWith(AcademicScope.ADMIN, undefined, expect.objectContaining({ institutionId: INSTITUTION_ID }));
+    expect(jest.mocked(AcademicTableFilters)).toHaveBeenCalledWith(
+      expect.objectContaining({ institutionFilter: { selectedLabel: "Conservatorio", value: INSTITUTION_ID } }),
+      undefined,
+    );
+    expect(jest.mocked(AcademicTablePresentation)).toHaveBeenCalledWith(expect.objectContaining({ createAction, global: true }), undefined);
+  });
+
   it("removes the redundant training-path value from contextual study-plan rows", async () => {
     jest.mocked(AcademicTablePresentation).mockClear();
     jest.mocked(fetchStudyPlans).mockResolvedValue({

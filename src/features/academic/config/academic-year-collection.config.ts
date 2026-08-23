@@ -31,10 +31,11 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
   canUpdate: (access) => access.yearUpdate,
   canChangeStatus: (access) => access.yearStatusUpdate,
   canRestore: (access) => access.yearRestore,
-  fetchPage: ({ scope, institutionId, page, search, size, sort, status, year, startDate, endDate, validOn, deleted }) =>
-    fetchAcademicYears(scope, institutionId, {
+  fetchPage: ({ scope, global, institutionId, page, search, size, sort, status, year, startDate, endDate, validOn, deleted }) =>
+    fetchAcademicYears(scope, global ? undefined : institutionId, {
       deleted,
       endDate,
+      institutionId: global ? institutionId : undefined,
       page,
       search,
       size,
@@ -71,6 +72,8 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
     const year = item as Extract<AcademicCollection, { year: number }>;
     return {
       id: year.id,
+      institutionId: year.institutionId,
+      institutionName: year.institutionName,
       primaryValue: String(year.year),
       detailValues: [formatDisplayDate(year.startDate, "Sin definir"), formatDisplayDate(year.endDate, "Sin definir")],
       status: academicYearStatusLabels[year.status],

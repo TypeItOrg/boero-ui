@@ -32,10 +32,12 @@ type AcademicTablePresentationProps = PaginationParams & {
   canRestore: boolean;
   canChangeStatus: boolean;
   columns: AcademicTableColumns;
+  createAction?: React.ReactNode;
   data: PaginatedResponse<AcademicTableRowData>;
   deleted: boolean;
   hasFilters: boolean;
-  institutionId: string;
+  global?: boolean;
+  institutionId?: string;
   canUpdate: boolean;
   plural: string;
   resource: AcademicCollectionResource;
@@ -51,9 +53,11 @@ export function AcademicTablePresentation({
   canRestore,
   canChangeStatus,
   columns,
+  createAction,
   data,
   deleted,
   hasFilters,
+  global = false,
   institutionId,
   canUpdate,
   page,
@@ -67,11 +71,12 @@ export function AcademicTablePresentation({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isPending, navigate } = useDataTableNavigation();
-  const [statusAction, setStatusAction] = React.useState<AcademicStatusSelection>();
+  const [statusAction, setStatusAction] = React.useState<{ institutionId: string; selection: AcademicStatusSelection }>();
   const [lifecycleAction, setLifecycleAction] = React.useState<{
     id: string;
     kind: AcademicLifecycleActionKind;
     label: string;
+    institutionId: string;
   }>();
   const returnTo = getCurrentPath(pathname, searchParams.toString());
   const lifecycleRow = lifecycleAction ? data.items.find((row) => row.id === lifecycleAction.id) : undefined;
@@ -82,9 +87,13 @@ export function AcademicTablePresentation({
     navigate({ page: "0", sortField: nextSort.field, sortDirection: nextSort.direction });
   }
 
+  function getInstitutionId(rowId: string): string {
+    return data.items.find((row) => row.id === rowId)?.institutionId ?? institutionId ?? "";
+  }
+
   if (data.items.length === 0) {
     const isInitialEmptyState = !hasFilters && data.totalItems === 0;
-    const allowCreate = canCreate && !deleted;
+    const allowCreate = !deleted && (canCreate || createAction !== undefined);
 
     return (
       <div className="relative h-full" aria-busy={isPending}>
@@ -95,7 +104,9 @@ export function AcademicTablePresentation({
           onFirstPage={() => navigate({ page: "0", size: String(size) })}
           supportingDescription={isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined}
           createAction={
-            allowCreate ? (
+            allowCreate && createAction ? (
+              <div className="mt-6">{createAction}</div>
+            ) : allowCreate ? (
               <Button asChild size="lg" className="mt-6">
                 <ReturnToLink href={`${basePath}/${resource}/new`}>
                   <PlusIcon data-icon="inline-start" />
@@ -116,6 +127,7 @@ export function AcademicTablePresentation({
         <Table containerClassName="table-scrollbar" className={columns.detailLabels.length > 1 ? "min-w-220" : "min-w-180"}>
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow>
+              {global ? <TableHead>Institución</TableHead> : null}
               {[columns.primaryLabel, ...columns.detailLabels].map((label, index) => {
                 const field = columns.sortableFields?.[index];
                 if (field) {
@@ -142,14 +154,19 @@ export function AcademicTablePresentation({
             {data.items.map((row) => (
               <AcademicTableRow
                 key={row.id}
-                basePath={basePath}
+                basePath={global ? `/admin/institutions/${row.institutionId}/academic` : basePath}
                 canChangeStatus={canChangeStatus}
                 canDelete={canDelete}
                 canRestore={canRestore}
                 canUpdate={canUpdate}
                 columns={columns}
-                onLifecycleAction={(id, label, kind) => setLifecycleAction({ id, kind, label })}
-                onStatusAction={setStatusAction}
+                global={global}
+                onLifecycleAction={(id, label, kind) => {
+                  setLifecycleAction({ id, institutionId: getInstitutionId(id), kind, label });
+                }}
+                onStatusAction={(selection) => {
+                  setStatusAction({ institutionId: getInstitutionId(selection.id), selection });
+                }}
                 resource={resource}
                 row={row}
               />
@@ -171,20 +188,20 @@ export function AcademicTablePresentation({
       />
       {statusAction ? (
         <AcademicStatusDialogRouter
-          institutionId={institutionId}
+          institutionId={statusAction.institutionId}
           onOpenChange={(open) => {
             if (!open) setStatusAction(undefined);
           }}
           returnTo={returnTo}
           scope={scope}
-          selection={statusAction}
+          selection={statusAction.selection}
         />
       ) : null}
       {showDeleteDialog ? (
         <AcademicDeleteDialog
           destination={returnTo}
           id={lifecycleAction.id}
-          institutionId={institutionId}
+          institutionId={lifecycleAction.institutionId}
           label={`${singular} ${lifecycleAction.label}`}
           onOpenChange={(open) => {
             if (!open) setLifecycleAction(undefined);
@@ -198,7 +215,7 @@ export function AcademicTablePresentation({
         <AcademicRestoreDialog
           destination={returnTo}
           id={lifecycleAction.id}
-          institutionId={institutionId}
+          institutionId={lifecycleAction.institutionId}
           label={`${singular} ${lifecycleAction.label}`}
           onOpenChange={(open) => {
             if (!open) setLifecycleAction(undefined);

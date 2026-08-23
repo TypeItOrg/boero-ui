@@ -1,14 +1,26 @@
-import { BuildingIcon, FingerprintIcon, HouseIcon, UserLockIcon, UsersIcon } from "lucide-react";
+import {
+  BookMarkedIcon,
+  BuildingIcon,
+  CalendarRangeIcon,
+  FingerprintIcon,
+  HouseIcon,
+  LibraryBigIcon,
+  Music2Icon,
+  RouteIcon,
+  UserLockIcon,
+  UsersIcon,
+} from "lucide-react";
 
 import type { NavigationItem } from "@common/utils/navigation.util";
 
-export const PLATFORM_NAVIGATION_ITEMS = [
-  {
-    title: "Inicio",
-    url: "/admin",
-    icon: HouseIcon,
-    exact: true,
-  },
+const PRIMARY_NAVIGATION_ITEM = {
+  title: "Inicio",
+  url: "/admin",
+  icon: HouseIcon,
+  exact: true,
+} as const satisfies NavigationItem;
+
+const MANAGEMENT_NAVIGATION_ITEMS = [
   {
     title: "Instituciones",
     url: "/admin/institutions",
@@ -24,27 +36,67 @@ export const PLATFORM_NAVIGATION_ITEMS = [
     url: "/admin/roles",
     icon: UserLockIcon,
   },
+] as const satisfies readonly NavigationItem[];
+
+const ACADEMIC_NAVIGATION_ITEMS = [
   {
-    title: "Administradores",
-    url: "/admin/accounts",
-    icon: FingerprintIcon,
+    title: "Ciclos lectivos",
+    url: "/admin/academic-years",
+    icon: CalendarRangeIcon,
+  },
+  {
+    title: "Trayectos formativos",
+    url: "/admin/training-paths",
+    icon: RouteIcon,
+  },
+  {
+    title: "Planes de estudio",
+    url: "/admin/study-plans",
+    icon: BookMarkedIcon,
+  },
+  {
+    title: "Espacios académicos",
+    url: "/admin/academic-spaces",
+    icon: LibraryBigIcon,
+  },
+  {
+    title: "Instrumentos",
+    url: "/admin/instruments",
+    icon: Music2Icon,
   },
 ] as const satisfies readonly NavigationItem[];
 
-export const PLATFORM_PRIMARY_NAVIGATION_ITEM = PLATFORM_NAVIGATION_ITEMS[0];
+const PLATFORM_NAVIGATION_ITEM = {
+  title: "Administradores",
+  url: "/admin/accounts",
+  icon: FingerprintIcon,
+} as const satisfies NavigationItem;
 
-export const PLATFORM_BOTTOM_NAVIGATION_ITEMS = PLATFORM_NAVIGATION_ITEMS.slice(1);
+export const PLATFORM_NAVIGATION_ITEMS = [
+  PRIMARY_NAVIGATION_ITEM,
+  ...MANAGEMENT_NAVIGATION_ITEMS,
+  ...ACADEMIC_NAVIGATION_ITEMS,
+  PLATFORM_NAVIGATION_ITEM,
+] as const satisfies readonly NavigationItem[];
+
+export const PLATFORM_PRIMARY_NAVIGATION_ITEM = PRIMARY_NAVIGATION_ITEM;
+
+export const PLATFORM_BOTTOM_NAVIGATION_ITEMS = [...MANAGEMENT_NAVIGATION_ITEMS, PLATFORM_NAVIGATION_ITEM] as const;
 
 export const PLATFORM_NAVIGATION_SECTIONS = [
   {
-    items: [PLATFORM_NAVIGATION_ITEMS[0]],
+    items: [PRIMARY_NAVIGATION_ITEM],
   },
   {
     label: "Gestión",
-    items: PLATFORM_NAVIGATION_ITEMS.slice(1, 4),
+    items: MANAGEMENT_NAVIGATION_ITEMS,
+  },
+  {
+    label: "Académico",
+    items: ACADEMIC_NAVIGATION_ITEMS,
   },
   {
     label: "Plataforma",
-    items: [PLATFORM_NAVIGATION_ITEMS[4]],
+    items: [PLATFORM_NAVIGATION_ITEM],
   },
 ] as const;

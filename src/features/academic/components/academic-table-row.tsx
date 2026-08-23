@@ -24,6 +24,7 @@ type AcademicTableRowProps = {
   canRestore: boolean;
   canUpdate: boolean;
   columns: AcademicTableColumns;
+  global?: boolean;
   onLifecycleAction: (id: string, itemLabel: string, kind: AcademicLifecycleActionKind) => void;
   onStatusAction: (selection: AcademicStatusSelection) => void;
   resource: AcademicCollectionResource;
@@ -37,11 +38,13 @@ export function AcademicTableRow({
   canRestore,
   canUpdate,
   columns,
+  global = false,
   onLifecycleAction,
   onStatusAction,
   resource,
   row,
 }: AcademicTableRowProps): React.ReactElement {
+  const institutionId = row.institutionId ?? "";
   const detailHref = `${basePath}/${resource}/${row.id}`;
   const actions = getAcademicRowActions(basePath, resource, row, canUpdate, canChangeStatus, canDelete, canRestore);
 
@@ -83,6 +86,13 @@ export function AcademicTableRow({
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <TableRow>
+          {global ? (
+            <TableCell>
+              <Link href={`/admin/institutions/${institutionId}`} className="font-medium hover:underline">
+                {row.institutionName}
+              </Link>
+            </TableCell>
+          ) : null}
           <TableCell className="font-medium">
             {resource === AcademicResource.ACADEMIC_YEAR || row.deletedAt ? (
               row.primaryValue

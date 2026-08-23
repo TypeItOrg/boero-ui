@@ -34,7 +34,7 @@ import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/ins
 
 export async function saveAcademicResourceAction(
   scope: AcademicScopeType,
-  institutionId: string,
+  institutionId: string | undefined,
   resource: AcademicResource,
   id: string | undefined,
   parentId: string | undefined,
@@ -42,7 +42,19 @@ export async function saveAcademicResourceAction(
   _state: AcademicActionState,
   formData: FormData,
 ): Promise<AcademicActionState> {
-  const context = actionContextSchema.safeParse({ scope, institutionId, resource, id, parentId, returnTo });
+  const resolvedInstitutionId = institutionId ?? formData.get("institutionId");
+  if (institutionId === undefined && !z.uuid().safeParse(resolvedInstitutionId).success) {
+    return { fieldErrors: { institutionId: "Seleccioná una institución." } };
+  }
+
+  const context = actionContextSchema.safeParse({
+    scope,
+    institutionId: resolvedInstitutionId,
+    resource,
+    id,
+    parentId,
+    returnTo,
+  });
   if (!context.success) return invalidActionState();
 
   const config = RESOURCE_ACTION_CONFIG[context.data.resource];

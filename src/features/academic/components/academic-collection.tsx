@@ -16,8 +16,11 @@ type AcademicCollectionProps = {
   canUpdate: boolean;
   canRestore: boolean;
   columns?: AcademicTableColumns;
+  createAction?: React.ReactNode;
   fixedTrainingPathId?: string;
-  institutionId: string;
+  global?: boolean;
+  institutionId?: string;
+  institutionName?: string;
   resource: AcademicCollectionResource;
   scope: AcademicScope;
   searchParams: AcademicSearchParams;
@@ -31,8 +34,11 @@ export async function AcademicCollectionView({
   canUpdate,
   canRestore,
   columns,
+  createAction,
   fixedTrainingPathId,
+  global = false,
   institutionId,
+  institutionName,
   resource,
   scope,
   searchParams,
@@ -41,11 +47,12 @@ export async function AcademicCollectionView({
   const isTrainingPathFixed = fixedTrainingPathId !== undefined;
   const parsedParams = parseAcademicPaginationParams(searchParams, resource);
   const params = isTrainingPathFixed ? { ...parsedParams, trainingPathId: fixedTrainingPathId } : parsedParams;
-  const dataPromise = config.fetchPage({ ...params, institutionId, scope });
+  const effectiveInstitutionId = global ? params.institutionId : institutionId;
+  const dataPromise = config.fetchPage({ ...params, global, institutionId: effectiveInstitutionId, scope });
+  const trainingPathId = params.trainingPathId;
+  const shouldFetchTrainingPath = resource === AcademicResource.STUDY_PLAN && trainingPathId && !isTrainingPathFixed;
   const selectedTrainingPathPromise =
-    resource === AcademicResource.STUDY_PLAN && params.trainingPathId && !isTrainingPathFixed
-      ? fetchTrainingPath(scope, institutionId, params.trainingPathId)
-      : Promise.resolve(null);
+    shouldFetchTrainingPath && effectiveInstitutionId ? fetchTrainingPath(scope, effectiveInstitutionId, trainingPathId) : Promise.resolve(null);
   const [data, selectedTrainingPath] = await Promise.all([dataPromise, selectedTrainingPathPromise]);
   const rows = data.items.map(config.toRow).map((row) => {
     if (!isTrainingPathFixed || resource !== AcademicResource.STUDY_PLAN) return row;
@@ -56,6 +63,7 @@ export async function AcademicCollectionView({
   const dateFilters = config.dateFilters?.(params) ?? [];
   const hasFilters =
     params.search.length > 0 ||
+    params.institutionId !== undefined ||
     (!isTrainingPathFixed && params.trainingPathId !== undefined) ||
     filters.some((filter) => filter.value !== filter.defaultValue) ||
     yearFilters.some((filter) => filter.value !== filter.defaultValue) ||
@@ -69,14 +77,22 @@ export async function AcademicCollectionView({
         <AcademicTableFilters
           dateFilters={dateFilters}
           filters={filters}
+          institutionFilter={
+            global
+              ? {
+                  selectedLabel: institutionName,
+                  value: params.institutionId,
+                }
+              : undefined
+          }
           search={params.search}
           searchable={config.searchable !== false}
-          searchPlaceholder={config.searchPlaceholder}
+          searchPlaceholder={global ? "Buscar por registro o institución..." : config.searchPlaceholder}
           size={params.size}
           trainingPathFilter={
-            resource === AcademicResource.STUDY_PLAN && !isTrainingPathFixed
+            resource === AcademicResource.STUDY_PLAN && !isTrainingPathFixed && effectiveInstitutionId
               ? {
-                  institutionId,
+                  institutionId: effectiveInstitutionId,
                   selectedLabel: selectedTrainingPath?.name,
                   scope,
                   value: params.trainingPathId,
@@ -92,7 +108,8 @@ export async function AcademicCollectionView({
           canRestore={canRestore}
           canUpdate={canUpdate}
           data={{ ...data, items: rows }}
-          institutionId={institutionId}
+          global={global}
+          institutionId={effectiveInstitutionId}
           canCreate={canCreate && !isTrainingPathFixed}
           deleted={params.deleted}
           page={params.page}
@@ -104,6 +121,7 @@ export async function AcademicCollectionView({
           plural={config.plural}
           singular={config.singular}
           columns={columns ?? config.columns}
+          createAction={createAction}
         />
       </DataTableNavigationProvider>
     </div>

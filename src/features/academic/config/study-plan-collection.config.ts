@@ -31,10 +31,11 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
   canUpdate: (access) => access.studyPlanUpdate,
   canChangeStatus: (access) => access.studyPlanStatusUpdate,
   canRestore: (access) => access.studyPlanRestore,
-  fetchPage: ({ scope, institutionId, page, size, search, sort, status, trainingPathId, validOn, deleted }) =>
-    fetchStudyPlans(scope, institutionId, {
+  fetchPage: ({ scope, global, institutionId, page, size, search, sort, status, trainingPathId, validOn, deleted }) =>
+    fetchStudyPlans(scope, global ? undefined : institutionId, {
       deleted,
       page,
+      institutionId: global ? institutionId : undefined,
       size,
       search,
       sort: serializeSpringSort(sort),
@@ -59,6 +60,8 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
     const plan = item as Extract<AcademicCollection, { trainingPathId: string }>;
     return {
       id: plan.id,
+      institutionId: plan.institutionId,
+      institutionName: plan.institutionName,
       primaryValue: plan.name,
       detailValues: [plan.trainingPathName, formatDisplayDate(plan.effectiveFrom, "Sin definir"), formatDisplayDate(plan.effectiveTo, "Sin definir")],
       status: studyPlanStatusLabels[plan.status],

@@ -31,6 +31,7 @@ export function StudyPlanFields({
       <FormField label="Trayecto formativo" name="trainingPathId" error={fieldErrors?.trainingPathId} className="sm:col-span-2" required>
         {institutionId && scope ? (
           <TrainingPathDropdown
+            key={institutionId}
             ariaInvalid={Boolean(fieldErrors?.trainingPathId)}
             disabled={trainingPathLocked}
             institutionId={institutionId}
@@ -41,9 +42,10 @@ export function StudyPlanFields({
           />
         ) : (
           <FormSelect
+            disabled={Boolean(scope)}
             name="trainingPathId"
             defaultValue={initialTrainingPathId ?? ""}
-            placeholder="Seleccionar trayecto"
+            placeholder={scope ? "Seleccioná una institución primero" : "Seleccionar trayecto"}
             options={trainingPaths.map((path) => ({ value: path.id, label: path.name }))}
           />
         )}

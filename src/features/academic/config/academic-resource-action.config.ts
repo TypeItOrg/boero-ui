@@ -12,6 +12,7 @@ import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 
 export const ACADEMIC_ACTION_FIELDS = [
+  "institutionId",
   "name",
   "trainingPathId",
   "description",

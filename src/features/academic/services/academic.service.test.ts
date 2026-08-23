@@ -87,6 +87,33 @@ describe("academic service pagination", () => {
     });
   });
 
+  it("uses the global admin collection and serializes the institution filter", async () => {
+    const payload = { items: [], page: 0, size: 10, totalItems: 0, totalPages: 0 };
+    academicApiFetchMock.mockResolvedValue(
+      new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+
+    const { fetchTrainingPaths } = await importService();
+    await fetchTrainingPaths(AcademicScope.ADMIN, undefined, {
+      institutionId,
+      page: 0,
+      search: "conservatorio",
+      size: 10,
+    });
+
+    const requestUrl = new URL(academicApiFetchMock.mock.calls[0][1], "http://localhost");
+    expect(requestUrl.pathname).toBe("/api/v1/admin/training-paths");
+    expect(Object.fromEntries(requestUrl.searchParams)).toEqual({
+      institutionId,
+      page: "0",
+      search: "conservatorio",
+      size: "10",
+    });
+  });
+
   it("serializes academic space usage pagination for the admin endpoint", async () => {
     const payload = {
       summary: {
