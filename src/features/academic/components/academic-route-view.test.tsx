@@ -76,6 +76,7 @@ const ACADEMIC_SPACE = {
   name: "Armonía",
   description: "Lenguaje musical aplicado.",
   type: "SUBJECT" as const,
+  format: "INDIVIDUAL" as const,
   active: true,
 };
 

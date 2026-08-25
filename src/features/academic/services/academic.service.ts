@@ -3,6 +3,7 @@ import "server-only";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import type { AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
@@ -81,7 +82,7 @@ export async function fetchStudyPlanCurriculum(scope: AcademicScope, institution
 export async function fetchAcademicSpaces(
   scope: AcademicScope,
   institutionId: string | undefined,
-  params: PageParams & { active?: boolean; type?: AcademicSpaceType } = {},
+  params: PageParams & { active?: boolean; type?: AcademicSpaceType; format?: AcademicSpaceFormat } = {},
 ): Promise<PaginatedResponse<AcademicSpace>> {
   return fetchPage(scope, institutionId, "academic-spaces", params);
 }

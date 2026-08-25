@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { parseDateInput } from "@common/utils/date-input.util";
+import { ACADEMIC_SPACE_FORMAT } from "@features/academic/types/academic-space-format.types";
 import { ACADEMIC_SPACE_TYPE } from "@features/academic/types/academic-space-type.types";
 import { ACADEMIC_YEAR_STATUS } from "@features/academic/types/academic-year-status.types";
 import { APPROVAL_MODE } from "@features/academic/types/approval-mode.types";
@@ -94,6 +95,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     name,
     description: optionalText(1000),
     type: z.enum(ACADEMIC_SPACE_TYPE),
+    format: z.enum(ACADEMIC_SPACE_FORMAT),
     active: activeSchema,
   }),
   [AcademicResource.STUDY_PLAN_SPACE]: z.object({

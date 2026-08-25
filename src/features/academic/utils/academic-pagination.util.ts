@@ -13,6 +13,7 @@ import { STUDY_PLAN_STATUS, type StudyPlanStatus } from "@features/academic/type
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { parseAcademicDateFilter, parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
+import { ACADEMIC_SPACE_FORMAT, type AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 
 export const ACADEMIC_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 export const ACADEMIC_YEAR_SORT_FIELDS = ["year", "startDate", "endDate"] as const satisfies readonly (keyof AcademicYear)[];
@@ -51,6 +52,7 @@ export type AcademicSearchParams = PaginationSearchParams &
     active?: QueryParamValue;
     deleted?: QueryParamValue;
     endDate?: QueryParamValue;
+    format?: QueryParamValue;
     institutionId?: QueryParamValue;
     trainingPathId?: QueryParamValue;
     validOn?: QueryParamValue;
@@ -64,6 +66,7 @@ export type AcademicPaginationParams = PaginationParams & {
   active: boolean | undefined;
   deleted: boolean;
   endDate: string | undefined;
+  format: AcademicSpaceFormat | undefined;
   institutionId: string | undefined;
   search: string;
   sort: AcademicSort;
@@ -89,6 +92,7 @@ export function parseAcademicPaginationParams(
     active: parseOptionalBooleanQueryParam(searchParams.active),
     deleted: parseOptionalBooleanQueryParam(searchParams.deleted) ?? false,
     endDate: parseAcademicDateFilter(searchParams.endDate),
+    format: parseEnum(searchParams.format, ACADEMIC_SPACE_FORMAT),
     institutionId: parseUuidQueryParam(searchParams.institutionId),
     startDate: parseAcademicDateFilter(searchParams.startDate),
     sort: parseAcademicSort(searchParams, resource),

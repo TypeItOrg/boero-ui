@@ -1,8 +1,9 @@
 import { toFormControlValue } from "@common/utils/form-value.util";
 import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
+import { ACADEMIC_SPACE_FORMAT } from "@features/academic/types/academic-space-format.types";
 import { ACADEMIC_SPACE_TYPE } from "@features/academic/types/academic-space-type.types";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
-import { academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
+import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 
 const ACTIVE_STATUS_OPTIONS = [
   { value: "true", label: "Activo" },
@@ -52,6 +53,13 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
           name="type"
           defaultValue={toFormControlValue(initialValues.type ?? ACADEMIC_SPACE_TYPE[0])}
           options={ACADEMIC_SPACE_TYPE.map((type) => ({ value: type, label: academicSpaceTypeLabels[type] }))}
+        />
+      </FormField>
+      <FormField label="Formato" name="format" error={fieldErrors?.format} required>
+        <FormSelect
+          name="format"
+          defaultValue={toFormControlValue(initialValues.format ?? ACADEMIC_SPACE_FORMAT[0])}
+          options={ACADEMIC_SPACE_FORMAT.map((format) => ({ value: format, label: academicSpaceFormatLabels[format] }))}
         />
       </FormField>
       {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}

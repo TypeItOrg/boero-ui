@@ -54,6 +54,7 @@ describe("AcademicDetail", () => {
           name: "Armonía",
           description: null,
           type: "SUBJECT",
+          format: "INDIVIDUAL",
           active: true,
         }}
         resource={AcademicResource.ACADEMIC_SPACE}
@@ -99,6 +100,7 @@ describe("AcademicDetail", () => {
       name: "Armonía",
       description: "Estudio de relaciones entre sonidos.",
       type: "SUBJECT" as const,
+      format: "INDIVIDUAL" as const,
       active: true,
     };
     const { rerender } = render(<AcademicDetail item={academicSpace} resource={AcademicResource.ACADEMIC_SPACE} basePath="" canEdit={false} />);
