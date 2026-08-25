@@ -1,3 +1,4 @@
+import type { AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
 import type { ApprovalMode } from "@features/academic/types/approval-mode.types";
@@ -24,6 +25,11 @@ export const academicSpaceTypeLabels: Record<AcademicSpaceType, string> = {
   SEMINAR: "Seminario",
   PRACTICE: "Práctica",
   OTHER: "Otro",
+};
+
+export const academicSpaceFormatLabels: Record<AcademicSpaceFormat, string> = {
+  INDIVIDUAL: "Individual",
+  GRUPAL: "Grupal",
 };
 
 export const requirementTypeLabels: Record<RequirementType, string> = {

@@ -9,6 +9,7 @@ import { REQUIRED_CONDITION } from "@features/academic/types/required-condition.
 import { REQUIREMENT_STAGE } from "@features/academic/types/requirement-stage.types";
 import { REQUIREMENT_TYPE } from "@features/academic/types/requirement-type.types";
 import {
+  academicSpaceFormatLabels,
   academicSpaceTypeLabels,
   approvalModeLabels,
   requiredConditionLabels,
@@ -108,7 +109,7 @@ export function StudyPlanSpaceFields({
             placeholder="Seleccionar espacio"
             options={academicSpaces.map((space) => ({
               value: space.id,
-              label: `${space.name} · ${academicSpaceTypeLabels[space.type]}`,
+              label: `${space.name} · ${academicSpaceTypeLabels[space.type]} · ${academicSpaceFormatLabels[space.format]}`,
             }))}
           />
         )}

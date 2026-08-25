@@ -80,5 +80,33 @@ describe("Academic Option Dropdowns", () => {
 
       expect(await screen.findByText("No hay espacios académicos")).toBeInTheDocument();
     });
+
+    it("labels each option with its name, type and format", async () => {
+      const user = userEvent.setup();
+      jest.mocked(fetchAcademicOptionPage).mockResolvedValueOnce({
+        items: [
+          {
+            id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+            institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+            name: "Armonía",
+            description: null,
+            type: "SUBJECT",
+            format: "INDIVIDUAL",
+            active: true,
+          },
+        ],
+        nextPage: null,
+      });
+
+      render(
+        <QueryClientProvider client={queryClient}>
+          <AcademicSpaceDropdown ariaInvalid={false} institutionId="test-inst-id" name="academicSpaceId" scope={AcademicScope.INSTITUTIONAL} />
+        </QueryClientProvider>,
+      );
+
+      await user.click(screen.getByRole("combobox"));
+
+      expect(await screen.findByText("Armonía · Asignatura · Individual")).toBeInTheDocument();
+    });
   });
 });

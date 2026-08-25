@@ -165,6 +165,7 @@ describe("AcademicFormFields", () => {
             name: "Armonía",
             description: "Relaciones entre sonidos.",
             type: "SUBJECT",
+            format: "INDIVIDUAL",
             active: true,
           }}
         />

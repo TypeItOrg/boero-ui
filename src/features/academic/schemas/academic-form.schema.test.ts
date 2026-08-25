@@ -152,6 +152,33 @@ describe("academic form schemas", () => {
     }
   });
 
+  it("parses the academic-space format from the form data", () => {
+    const formData = academicSpaceFormData("Armonía", "SUBJECT", "GRUPAL");
+
+    const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual({
+        name: "Armonía",
+        description: null,
+        type: "SUBJECT",
+        format: "GRUPAL",
+      });
+    }
+  });
+
+  it("rejects an unknown academic-space format", () => {
+    const formData = academicSpaceFormData("Armonía", "SUBJECT", "HYBRID");
+
+    const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["format"] })]));
+    }
+  });
+
   it("rejects a study-plan final date without a start date", () => {
     const formData = new FormData();
     formData.set("name", "Plan 2027");
@@ -226,5 +253,14 @@ function academicYearFormData(year: number, startDate: string, endDate: string):
   formData.set("year", String(year));
   formData.set("startDate", startDate);
   formData.set("endDate", endDate);
+  return formData;
+}
+
+function academicSpaceFormData(name: string, type: string, format: string): FormData {
+  const formData = new FormData();
+  formData.set("name", name);
+  formData.set("description", "");
+  formData.set("type", type);
+  formData.set("format", format);
   return formData;
 }
