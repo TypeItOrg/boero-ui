@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, UsersIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
@@ -19,6 +19,8 @@ import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.s
 import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Usuarios");
@@ -43,20 +45,17 @@ export default async function PeoplePage({ searchParams }: { searchParams: Promi
   ]);
 
   return (
-    <PlatformPageShell
-      title="Usuarios"
-      breadcrumb={<InstitutionalBreadcrumb />}
-      actions={
-        canCreate ? (
+    <PlatformPageShell title="Usuarios" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UsersIcon} />}>
+      <PlatformCollectionActions>
+        {canCreate ? (
           <Button asChild size="lg" className="w-full">
             <ReturnToLink href="/people/new">
               <PlusIcon data-icon="inline-start" />
               Nuevo usuario
             </ReturnToLink>
           </Button>
-        ) : undefined
-      }
-    >
+        ) : undefined}
+      </PlatformCollectionActions>
       <DataTableNavigationProvider>
         <PeopleSearchForm search={search} size={size} roleId={roleId} roles={roles} />
         <Suspense fallback={<PeopleTableSkeleton />}>

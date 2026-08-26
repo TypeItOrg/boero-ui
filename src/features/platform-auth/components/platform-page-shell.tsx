@@ -27,7 +27,7 @@ export function PlatformPageShell({
     <section className={cn("flex h-full max-w-full min-w-0 flex-col gap-4 p-3 md:p-4", minViewportHeight && "min-h-full flex-1")}>
       <header
         className={cn(
-          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6 lg:flex-row lg:items-end lg:justify-between",
+          "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs sm:flex-row sm:items-end sm:justify-between sm:p-6",
           headerClassName,
         )}
       >
@@ -37,7 +37,11 @@ export function PlatformPageShell({
             <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
           </div>
         </div>
-        {actions ? <div className={cn("flex shrink-0 items-center gap-3", actionsClassName)}>{actions}</div> : null}
+        {actions ? (
+          <div className={cn("flex shrink-0 items-center gap-3 max-sm:has-data-[slot=platform-page-icon]:hidden sm:self-stretch", actionsClassName)}>
+            {actions}
+          </div>
+        ) : null}
       </header>
 
       {children ? (

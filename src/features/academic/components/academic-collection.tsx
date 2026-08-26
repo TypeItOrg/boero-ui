@@ -7,6 +7,7 @@ import type { AcademicCollectionResource } from "@features/academic/types/academ
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { parseAcademicPaginationParams, type AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
 
 type AcademicCollectionProps = {
   basePath: string;
@@ -74,6 +75,7 @@ export async function AcademicCollectionView({
   return (
     <div className="flex h-full flex-col gap-4">
       <DataTableNavigationProvider>
+        <PlatformCollectionActions>{createAction}</PlatformCollectionActions>
         <AcademicTableFilters
           dateFilters={dateFilters}
           filters={filters}

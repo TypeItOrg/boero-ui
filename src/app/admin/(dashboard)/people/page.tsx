@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { UsersIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
@@ -10,6 +11,7 @@ import { fetchSystemRolesCatalog } from "@features/people/services/fetch-system-
 import { parsePlatformPeoplePaginationParams, type PlatformPeopleSearchParams } from "@features/people/utils/platform-people-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 export const metadata = {
   title: "Usuarios",
@@ -26,7 +28,7 @@ export default async function PlatformPeoplePage({ searchParams }: PlatformPeopl
   const [roleList, selectedInstitutionName] = await Promise.all([fetchSystemRolesCatalog(), getSelectedInstitutionName(params.institutionId)]);
 
   return (
-    <PlatformPageShell title="Usuarios" breadcrumb={<PlatformBreadcrumb />}>
+    <PlatformPageShell title="Usuarios" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={UsersIcon} />}>
       <DataTableNavigationProvider>
         <PlatformPeopleTableFilters
           institutionId={params.institutionId}

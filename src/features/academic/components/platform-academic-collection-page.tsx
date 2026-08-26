@@ -1,5 +1,6 @@
 import { parseUuidQueryParam } from "@common/utils/query-param.util";
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
+import { AcademicPageIcon } from "@features/academic/components/academic-shell";
 import { PlatformAcademicCreateButton } from "@features/academic/components/platform-academic-create-button";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
@@ -22,11 +23,7 @@ export async function PlatformAcademicCollectionPage({
   const institution = institutionId ? await fetchInstitution(institutionId) : null;
 
   return (
-    <PlatformPageShell
-      title={config.title}
-      breadcrumb={<PlatformBreadcrumb />}
-      actions={<PlatformAcademicCreateButton label={config.createLabel} resource={resource} />}
-    >
+    <PlatformPageShell title={config.title} breadcrumb={<PlatformBreadcrumb />} actions={<AcademicPageIcon icon={config.createIcon} />}>
       <AcademicCollectionView
         basePath="/admin"
         canChangeStatus={config.canChangeStatus(FULL_ACADEMIC_ACCESS)}
