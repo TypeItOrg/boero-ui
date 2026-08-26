@@ -19,7 +19,7 @@ Los secretos SSH, la instalación inicial de la VPS y la operación manual está
 
 - `Dockerfile`: construcción y runtime de la imagen.
 - `compose.yaml`: desarrollo local.
-- `.env.dev.example`: configuración local.
+- `.env.example`: configuración local.
 - `.github/workflows/ci.yaml`: validación, publicación y disparo del despliegue de UI.
 
 No deben agregarse aquí configuraciones de Nginx ni Compose de ambientes compartidos.
