@@ -10,6 +10,7 @@ const ACADEMIC_RESOURCE_BY_ENTITY: Record<AcademicContextualSearchEntity, string
   "study-plan": "study-plans",
   "academic-space": "academic-spaces",
   instrument: "instruments",
+  course: "courses",
 };
 
 export function getContextualSearchResultHref(
@@ -43,6 +44,7 @@ function getPlatformResultHref(entityType: ContextualSearchEntity, item: Context
     case "study-plan":
     case "academic-space":
     case "instrument":
+    case "course":
       return `/admin/institutions/${getRequiredInstitutionId(item)}/academic/${getAcademicResource(entityType)}/${item.id}`;
   }
 }
@@ -59,6 +61,7 @@ function getInstitutionalResultHref(entityType: ContextualSearchEntity, item: Co
     case "study-plan":
     case "academic-space":
     case "instrument":
+    case "course":
       return `/${getAcademicResource(entityType)}/${item.id}`;
     case "institution":
     case "platform-account":
@@ -81,6 +84,7 @@ function getPlatformCollectionHref(entityType: ContextualSearchEntity, searchPar
     case "study-plan":
     case "academic-space":
     case "instrument":
+    case "course":
       searchParams.set("type", entityType);
       return `/admin/search?${searchParams}`;
   }
@@ -103,6 +107,7 @@ function getInstitutionalCollectionHref(entityType: ContextualSearchEntity, sear
     case "study-plan":
     case "academic-space":
     case "instrument":
+    case "course":
       return `/${getAcademicResource(entityType)}?${searchParams}`;
     case "institution":
     case "platform-account":

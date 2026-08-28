@@ -79,7 +79,9 @@ export async function saveAcademicResourceAction(
 
   const data = parsed.data as ParsedFormData;
   const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
-  const path = context.data.id ? `${apiBase}/${context.data.resource}/${context.data.id}` : config.createPath(apiBase, context.data.parentId, data);
+  const path = context.data.id
+    ? (config.updatePath?.(apiBase, context.data.id) ?? `${apiBase}/${context.data.resource}/${context.data.id}`)
+    : config.createPath(apiBase, context.data.parentId, data);
   const body = config.prepareBody?.(data) ?? data;
   const error = await getResponseErrorActionState(
     academicApiFetch(context.data.scope, path, {
@@ -164,6 +166,7 @@ export async function deleteAcademicResourceAction(
     | AcademicResource.STUDY_PLAN
     | AcademicResource.ACADEMIC_SPACE
     | AcademicResource.INSTRUMENT
+    | AcademicResource.COURSE
     | AcademicResource.ACADEMIC_LEVEL
     | AcademicResource.STUDY_PLAN_SPACE
     | AcademicResource.PREREQUISITE,

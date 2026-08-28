@@ -23,6 +23,7 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   prerequisites: "Correlatividades",
   "academic-spaces": "Espacios académicos",
   instruments: "Instrumentos",
+  courses: "Cursos",
 };
 
 type BreadcrumbSegment = {

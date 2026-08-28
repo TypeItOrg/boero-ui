@@ -36,6 +36,67 @@ jest.mock("@common/components/ui/year-select", () => ({
 }));
 
 describe("AcademicFormFields", () => {
+  it("renders the course builder with locked plan and space once a class exists", () => {
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AcademicFormFields
+          resource={AcademicResource.COURSE}
+          institutionId="05b84ac4-66aa-409f-a813-012d15b8cb9b"
+          scope={AcademicScope.INSTITUTIONAL}
+          initialValues={{
+            studyPlanId: "8c56005e-d58f-49ac-9498-7b18551952d0",
+            studyPlanName: "Plan 2027",
+            academicSpaceId: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+            academicSpaceName: "Armonía",
+            academicSpaceType: "SUBJECT",
+            academicSpaceFormat: "INDIVIDUAL",
+            academicYearId: "3b9ec931-453c-4778-86a9-dc40a06d0247",
+            year: 2027,
+            classes: JSON.stringify([
+              {
+                id: "4c9ec931-453c-4778-86a9-dc40a06d0247",
+                teachers: [{ personId: "5c9ec931-453c-4778-86a9-dc40a06d0247", fullName: "Ana García" }],
+                days: [
+                  {
+                    dayOfWeek: "MONDAY",
+                    capacity: null,
+                    periodDurationMinutes: 60,
+                    schedules: [{ startTime: "14:00", endTime: "18:00" }],
+                  },
+                ],
+              },
+            ]),
+          }}
+        />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Plan de estudio" })).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "Espacio académico" })).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "Ciclo lectivo" })).toBeEnabled();
+    expect(screen.getByText("Clase 1")).toBeInTheDocument();
+    expect(screen.getByText("Ana García")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("60")).toBeInTheDocument();
+    expect(screen.getByLabelText("Inicio Lunes 1")).toHaveValue("14:00");
+
+    const classesInput = document.querySelector<HTMLInputElement>('input[name="classes"]');
+    expect(classesInput).toHaveValue(
+      JSON.stringify([
+        {
+          teacherIds: ["5c9ec931-453c-4778-86a9-dc40a06d0247"],
+          days: [
+            {
+              dayOfWeek: "MONDAY",
+              capacity: null,
+              periodDurationMinutes: 60,
+              schedules: [{ startTime: "14:00", endTime: "18:00" }],
+            },
+          ],
+        },
+      ]),
+    );
+  });
+
   it("keeps a contextual study-plan trayecto fixed while preserving its hidden value", () => {
     const trainingPathId = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 

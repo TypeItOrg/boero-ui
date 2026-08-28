@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { CircleAlertIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
+import { CircleAlertIcon, GraduationCapIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
@@ -141,6 +141,35 @@ const ACTIVE_STATUS_DIALOG_CONFIG: Record<ActiveAcademicStatusResource, Record<A
       iconClassName: "bg-destructive/10 text-destructive",
       pendingLabel: "Desactivando…",
       title: "Desactivar instrumento",
+      variant: "destructive",
+    },
+  },
+  [AcademicResource.COURSE]: {
+    ACTIVE: {
+      actionLabel: "Activar curso",
+      description: (resourceLabel) => (
+        <>
+          El curso <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar activo para la institución.
+        </>
+      ),
+      icon: GraduationCapIcon,
+      iconClassName: "bg-primary/10 text-primary",
+      pendingLabel: "Activando…",
+      title: "Activar curso",
+      variant: "default",
+    },
+    INACTIVE: {
+      actionLabel: "Desactivar curso",
+      description: (resourceLabel) => (
+        <>
+          El curso <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar activo. Los planes de estudio asociados no
+          podrán desactivarse mientras tenga cursos activos.
+        </>
+      ),
+      icon: GraduationCapIcon,
+      iconClassName: "bg-destructive/10 text-destructive",
+      pendingLabel: "Desactivando…",
+      title: "Desactivar curso",
       variant: "destructive",
     },
   },

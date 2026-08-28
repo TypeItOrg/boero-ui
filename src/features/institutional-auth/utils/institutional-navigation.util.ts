@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
   Music2Icon,
@@ -38,6 +39,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
+      ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
       ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
       : []),

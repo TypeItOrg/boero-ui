@@ -36,6 +36,7 @@ const CREATE_ACTION_LABELS: Record<AcademicResource, string> = {
   [AcademicResource.STUDY_PLAN_SPACE]: "Incorporar espacio",
   [AcademicResource.PREREQUISITE]: "Crear correlatividad",
   [AcademicResource.INSTRUMENT]: "Crear instrumento",
+  [AcademicResource.COURSE]: "Crear curso",
 };
 
 const FORM_SECTION_COPY: Record<AcademicResource, { title: string; description: string }> = {
@@ -70,6 +71,10 @@ const FORM_SECTION_COPY: Record<AcademicResource, { title: string; description: 
   [AcademicResource.INSTRUMENT]: {
     title: "Datos del instrumento",
     description: "Ingresá la información con la que se identificará en el catálogo institucional.",
+  },
+  [AcademicResource.COURSE]: {
+    title: "Datos del curso",
+    description: "Instanciá un espacio académico de un plan activo, elegí el ciclo lectivo y armá sus clases.",
   },
 };
 

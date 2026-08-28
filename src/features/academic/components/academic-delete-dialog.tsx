@@ -32,6 +32,7 @@ export type AcademicDeleteDialogProps = {
     | AcademicResource.STUDY_PLAN
     | AcademicResource.ACADEMIC_SPACE
     | AcademicResource.INSTRUMENT
+    | AcademicResource.COURSE
     | AcademicResource.ACADEMIC_LEVEL
     | AcademicResource.STUDY_PLAN_SPACE
     | AcademicResource.PREREQUISITE;

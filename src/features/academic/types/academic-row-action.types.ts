@@ -2,6 +2,7 @@ import type { AcademicResource } from "@features/academic/types/academic-resourc
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
 import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
+import type { CourseStatus } from "@features/academic/types/course-status.types";
 
 export type AcademicRowAction =
   | {
@@ -25,7 +26,13 @@ export type AcademicRowAction =
   | {
       kind: typeof ACADEMIC_ROW_ACTION_KIND.STATUS;
       label: string;
-      resource: ActiveAcademicStatusResource;
+      resource: AcademicResource.COURSE;
+      targetStatus: CourseStatus;
+    }
+  | {
+      kind: typeof ACADEMIC_ROW_ACTION_KIND.STATUS;
+      label: string;
+      resource: Exclude<ActiveAcademicStatusResource, AcademicResource.COURSE>;
       targetStatus: "ACTIVE" | "INACTIVE";
     }
   | {

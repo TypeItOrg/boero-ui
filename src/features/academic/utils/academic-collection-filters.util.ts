@@ -38,10 +38,10 @@ export function toOptions(labels: Record<string, string>): { value: string; labe
 export function activeResource(config: Omit<AcademicCollectionConfig, "filters" | "getTitle" | "toRow">): AcademicCollectionConfig {
   return {
     ...config,
-    getTitle: (item) => (item as Extract<AcademicCollection, { active: boolean }>).name,
+    getTitle: (item) => (item as Extract<AcademicCollection, { description: string | null; name: string }>).name,
     filters: ({ active, deleted }) => [activeFilter(active), deletionFilter(deleted)],
     toRow: (item) => {
-      const activeItem = item as Extract<AcademicCollection, { active: boolean }>;
+      const activeItem = item as Extract<AcademicCollection, { description: string | null; name: string }>;
       return {
         id: activeItem.id,
         institutionId: activeItem.institutionId,
