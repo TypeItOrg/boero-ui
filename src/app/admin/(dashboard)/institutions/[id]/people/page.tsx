@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, UsersIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
@@ -10,6 +10,8 @@ import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PeopleSearchForm } from "@features/people/components/people-search-form";
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
@@ -38,15 +40,16 @@ export default async function InstitutionPeoplePage({ params, searchParams }: Pe
     <PlatformPageShell
       title="Lista de usuarios"
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
-      actions={
+      actions={<PlatformPageIcon icon={UsersIcon} />}
+    >
+      <PlatformCollectionActions>
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href={`/admin/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />
             Nuevo usuario
           </ReturnToLink>
         </Button>
-      }
-    >
+      </PlatformCollectionActions>
       <DataTableNavigationProvider>
         <PeopleSearchForm search={search} size={size} roleId={roleId} roles={roles} />
 

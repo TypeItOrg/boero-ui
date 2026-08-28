@@ -1,11 +1,13 @@
 import { Suspense } from "react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, UserLockIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformRolesTableContainer } from "@features/roles/components/platform-roles-table-container";
 import { PlatformRolesTableFilters } from "@features/roles/components/platform-roles-table-filters";
@@ -25,18 +27,15 @@ export default async function PlatformRolesPage({ searchParams }: { searchParams
   const institutionName = await institutionNamePromise;
 
   return (
-    <PlatformPageShell
-      title="Roles"
-      breadcrumb={<PlatformBreadcrumb />}
-      actions={
+    <PlatformPageShell title="Roles" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={UserLockIcon} />}>
+      <PlatformCollectionActions>
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/roles/new">
             <PlusIcon data-icon="inline-start" />
             Nuevo rol
           </ReturnToLink>
         </Button>
-      }
-    >
+      </PlatformCollectionActions>
       <DataTableNavigationProvider>
         <PlatformRolesTableFilters
           institutionId={params.institutionId}

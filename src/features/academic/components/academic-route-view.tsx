@@ -7,7 +7,7 @@ import { AcademicCollectionView } from "@features/academic/components/academic-c
 import { AcademicOverview } from "@features/academic/components/academic-overview";
 import { renderPrimaryDetail } from "@features/academic/components/academic-route-detail";
 import { renderPrimaryForm } from "@features/academic/components/academic-route-form";
-import { AcademicShell } from "@features/academic/components/academic-shell";
+import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
 import { StudyPlanRoute } from "@features/academic/components/study-plan-route";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
@@ -60,7 +60,7 @@ export async function AcademicRouteView({
         </Button>
       ) : undefined;
       return (
-        <AcademicShell title={config.title} breadcrumb={breadcrumb} actions={createAction}>
+        <AcademicShell title={config.title} breadcrumb={breadcrumb} actions={<AcademicPageIcon icon={config.createIcon} />}>
           <AcademicCollectionView
             basePath={basePath}
             canCreate={config.canCreate(access)}
@@ -68,6 +68,7 @@ export async function AcademicRouteView({
             canDelete={config.canDelete(access)}
             canRestore={config.canRestore(access)}
             canUpdate={config.canUpdate(access)}
+            createAction={createAction}
             institutionId={institutionId}
             resource={collectionResource}
             scope={scope}

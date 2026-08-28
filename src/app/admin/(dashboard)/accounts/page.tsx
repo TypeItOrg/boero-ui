@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { PlusIcon } from "lucide-react";
+import { FingerprintIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
@@ -12,6 +12,8 @@ import {
   type PlatformAccountSearchParams,
 } from "@features/platform-accounts/utils/platform-account-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
@@ -27,18 +29,15 @@ export default async function PlatformAccountsPage({ searchParams }: PlatformAcc
   const { page, size, search, enabled, sort } = parsePlatformAccountPaginationParams(await searchParams);
 
   return (
-    <PlatformPageShell
-      title="Administradores"
-      breadcrumb={<PlatformBreadcrumb />}
-      actions={
+    <PlatformPageShell title="Administradores" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={FingerprintIcon} />}>
+      <PlatformCollectionActions>
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/accounts/new">
             <PlusIcon data-icon="inline-start" />
             Nueva cuenta
           </ReturnToLink>
         </Button>
-      }
-    >
+      </PlatformCollectionActions>
       <DataTableNavigationProvider>
         <PlatformAccountsTableFilters search={search} enabled={enabled} size={size} />
 

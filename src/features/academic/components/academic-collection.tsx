@@ -8,6 +8,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import { parseAcademicPaginationParams, type AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
 
 type AcademicCollectionProps = {
   basePath: string;
@@ -87,6 +88,7 @@ export async function AcademicCollectionView({
   return (
     <div className="flex h-full flex-col gap-4">
       <DataTableNavigationProvider>
+        <PlatformCollectionActions>{createAction}</PlatformCollectionActions>
         <AcademicTableFilters
           academicSpaceFilter={
             resource === AcademicResource.COURSE && effectiveInstitutionId

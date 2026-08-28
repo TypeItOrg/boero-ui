@@ -8,7 +8,7 @@
 ## Inicio rápido
 
 ```bash
-cp .env.dev.example .env.dev
+cp .env.example .env.dev
 make
 ```
 

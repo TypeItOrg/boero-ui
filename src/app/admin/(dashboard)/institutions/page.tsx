@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { PlusIcon } from "lucide-react";
+import { BuildingIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
@@ -9,6 +9,8 @@ import { InstitutionsTableContainer } from "@features/institutions/components/in
 import { InstitutionsTableSkeleton } from "@features/institutions/components/institutions-table-skeleton";
 import { parseInstitutionPaginationParams, type InstitutionSearchParams } from "@features/institutions/utils/institution-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
@@ -24,18 +26,15 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
   const { page, size, search, active, sort } = parseInstitutionPaginationParams(await searchParams);
 
   return (
-    <PlatformPageShell
-      title="Instituciones"
-      breadcrumb={<PlatformBreadcrumb />}
-      actions={
+    <PlatformPageShell title="Instituciones" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={BuildingIcon} />}>
+      <PlatformCollectionActions>
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/institutions/new">
             <PlusIcon data-icon="inline-start" />
             Nueva Institución
           </ReturnToLink>
         </Button>
-      }
-    >
+      </PlatformCollectionActions>
       <DataTableNavigationProvider>
         <InstitutionsTableFilters search={search} active={active} size={size} />
 
