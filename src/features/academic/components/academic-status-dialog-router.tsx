@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicYearStatusDialog } from "@features/academic/components/academic-year-status-dialog";
+import { CourseStatusDialog } from "@features/academic/components/course-status-dialog";
 import { StudyPlanStatusDialog } from "@features/academic/components/study-plan-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicStatusSelection } from "@features/academic/types/academic-status-selection.types";
@@ -54,6 +55,21 @@ export function AcademicStatusDialogRouter({
     );
   }
 
+  if (selection.resource === AcademicResource.COURSE) {
+    return (
+      <CourseStatusDialog
+        id={selection.id}
+        institutionId={institutionId}
+        onOpenChange={onOpenChange}
+        open
+        resourceLabel={selection.resourceLabel}
+        returnTo={returnTo}
+        scope={scope}
+        targetStatus={selection.targetStatus}
+      />
+    );
+  }
+
   return (
     <ActiveAcademicStatusDialog
       id={selection.id}
@@ -64,7 +80,7 @@ export function AcademicStatusDialogRouter({
       resourceLabel={selection.resourceLabel}
       returnTo={returnTo}
       scope={scope}
-      targetStatus={selection.targetStatus}
+      targetStatus={selection.targetStatus as "ACTIVE" | "INACTIVE"}
     />
   );
 }

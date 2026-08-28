@@ -3,6 +3,7 @@ import {
   BuildingIcon,
   CalendarRangeIcon,
   FingerprintIcon,
+  GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
   Music2Icon,
@@ -39,6 +40,11 @@ const MANAGEMENT_NAVIGATION_ITEMS = [
 ] as const satisfies readonly NavigationItem[];
 
 const ACADEMIC_NAVIGATION_ITEMS = [
+  {
+    title: "Cursos",
+    url: "/admin/courses",
+    icon: GraduationCapIcon,
+  },
   {
     title: "Ciclos lectivos",
     url: "/admin/academic-years",

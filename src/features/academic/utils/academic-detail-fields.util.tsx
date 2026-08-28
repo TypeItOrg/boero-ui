@@ -19,7 +19,7 @@ export type AcademicDetailInfo = {
 };
 
 export function getAcademicDetailInfo(
-  resource: Exclude<AcademicCollectionResource, AcademicResource.STUDY_PLAN>,
+  resource: Exclude<AcademicCollectionResource, AcademicResource.STUDY_PLAN | AcademicResource.COURSE>,
   item: AcademicCollection,
 ): AcademicDetailInfo {
   switch (resource) {
@@ -71,7 +71,7 @@ export function getAcademicDetailInfo(
       };
     }
     case AcademicResource.TRAINING_PATH: {
-      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
@@ -91,7 +91,7 @@ export function getAcademicDetailInfo(
       };
     }
     case AcademicResource.INSTRUMENT: {
-      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,

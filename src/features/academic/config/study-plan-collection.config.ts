@@ -44,7 +44,7 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
       validOn,
     }),
   fetchDetail: fetchStudyPlan,
-  getTitle: (item) => (item as Extract<AcademicCollection, { trainingPathId: string }>).name,
+  getTitle: (item) => (item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>).name,
   filters: ({ status, deleted }) => [
     {
       defaultValue: "all",
@@ -57,7 +57,7 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
   ],
   dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
   toRow: (item) => {
-    const plan = item as Extract<AcademicCollection, { trainingPathId: string }>;
+    const plan = item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>;
     return {
       id: plan.id,
       institutionId: plan.institutionId,

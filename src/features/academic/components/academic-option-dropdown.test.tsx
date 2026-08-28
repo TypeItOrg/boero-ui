@@ -83,18 +83,17 @@ describe("Academic Option Dropdowns", () => {
 
     it("labels each option with its name, type and format", async () => {
       const user = userEvent.setup();
+      const space = {
+        id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+        institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+        name: "Armonía",
+        description: null,
+        type: "SUBJECT",
+        format: "INDIVIDUAL",
+        active: true,
+      };
       jest.mocked(fetchAcademicOptionPage).mockResolvedValueOnce({
-        items: [
-          {
-            id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
-            institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
-            name: "Armonía",
-            description: null,
-            type: "SUBJECT",
-            format: "INDIVIDUAL",
-            active: true,
-          },
-        ],
+        items: [space],
         nextPage: null,
       });
 

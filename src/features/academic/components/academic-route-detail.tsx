@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+import type { FormValue } from "@common/types/form-value.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { AcademicDetail } from "@features/academic/components/academic-detail";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicAccessDenied, AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
 import { ActiveAcademicStatusButton } from "@features/academic/components/active-academic-status-dialog";
+import { CourseDetailStatusActions } from "@features/academic/components/course-status-dialog";
 import { StudyPlanCurriculumView } from "@features/academic/components/study-plan-curriculum";
 import { TrainingPathStudyPlans } from "@features/academic/components/training-path-study-plans";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
@@ -74,7 +76,23 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
     item.active &&
     academicSpaceUsage?.summary.deactivationBlocked === true;
   let statusAction: React.ReactNode;
-  if (config.canChangeStatus(input.access) && isDetailStatusResource(currentResource) && hasActiveAcademicStatus(item)) {
+  if (currentResource === AcademicResource.COURSE) {
+    const course = item as import("@features/academic/types/course.types").Course;
+    const courseStatus = (course.status ??
+      (course.active ? "ACTIVE" : "INACTIVE")) as import("@features/academic/types/course-status.types").CourseStatus;
+    if (config.canChangeStatus(input.access) && courseStatus !== "CLOSED") {
+      statusAction = (
+        <CourseDetailStatusActions
+          courseStatus={courseStatus}
+          id={item.id}
+          institutionId={input.institutionId}
+          resourceLabel={config.getTitle(item)}
+          returnTo={detailPath}
+          scope={input.scope}
+        />
+      );
+    }
+  } else if (config.canChangeStatus(input.access) && isDetailStatusResource(currentResource) && hasActiveAcademicStatus(item)) {
     statusAction = (
       <ActiveAcademicStatusButton
         active={item.active}
@@ -121,7 +139,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           resource={input.resource}
           id={input.id}
           returnTo={returnTo}
-          initialValues={{ ...item }}
+          initialValues={{ ...item, classes: JSON.stringify("classes" in item ? item.classes : []) } as Record<string, FormValue>}
         />
       </AcademicShell>
     );
