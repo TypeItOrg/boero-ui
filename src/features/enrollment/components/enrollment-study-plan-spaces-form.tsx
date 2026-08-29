@@ -2,23 +2,23 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon, RouteIcon } from "lucide-react";
+import { AlertCircleIcon, BookMarkedIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { FieldError, FieldGroup } from "@common/components/ui/field";
 import { cn } from "@common/utils/cn.util";
-import { saveEnrollmentApplicationTrainingPathAction } from "@features/enrollment/actions/save-enrollment-application-training-path.action";
+import { saveEnrollmentApplicationStudyPlanSpacesAction } from "@features/enrollment/actions/save-enrollment-application-study-plan-spaces.action";
 import type { EnrollmentApplicationActionState } from "@features/enrollment/types/enrollment-application-action-state.types";
 import type { EnrollmentApplicationDraftData } from "@features/enrollment/types/enrollment-application-draft-data.types";
-import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 
-type EnrollmentTrainingPathFormProps = {
+type EnrollmentStudyPlanSpacesFormProps = {
   applicationId: string;
   applicationEditable: boolean;
   currentData: EnrollmentApplicationDraftData;
-  trainingPaths: readonly TrainingPath[];
+  studyPlanSpaces: readonly StudyPlanSpace[];
   returnTo: string;
   academicYearLabel: string;
   studyPlanName: string;
@@ -26,39 +26,49 @@ type EnrollmentTrainingPathFormProps = {
 
 const INITIAL_STATE: EnrollmentApplicationActionState = {};
 
-export function EnrollmentTrainingPathForm({
+export function EnrollmentStudyPlanSpacesForm({
   applicationId,
   applicationEditable,
   currentData,
-  trainingPaths,
+  studyPlanSpaces,
   returnTo,
   academicYearLabel,
   studyPlanName,
-}: EnrollmentTrainingPathFormProps): React.ReactElement {
-  const action = saveEnrollmentApplicationTrainingPathAction.bind(null, applicationId);
+}: EnrollmentStudyPlanSpacesFormProps): React.ReactElement {
+  const action = saveEnrollmentApplicationStudyPlanSpacesAction.bind(null, applicationId);
   const [state, formAction, isPending] = React.useActionState(action, INITIAL_STATE);
-  const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState(currentData.careerSelection?.trainingPathId ?? "");
+  const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>(
+    () => currentData.academicSpaceSelection?.studyPlanSpaceIds ?? [],
+  );
   const [dataSnapshot, setDataSnapshot] = React.useState(currentData);
 
   React.useEffect(() => {
-    if (!state.success || !selectedTrainingPathId) return;
-    setDataSnapshot((previous) => buildNextDraftData(previous, selectedTrainingPathId));
-  }, [selectedTrainingPathId, state.success]);
+    if (!state.success) return;
+    setDataSnapshot((previous) => buildNextDraftData(previous, selectedStudyPlanSpaceIds));
+  }, [selectedStudyPlanSpaceIds, state.success]);
 
-  const fieldErrors = state.fieldErrors?.trainingPathId ? [{ message: state.fieldErrors.trainingPathId }] : undefined;
-  const canSubmit = applicationEditable && selectedTrainingPathId.length > 0 && !isPending;
+  const fieldErrors = state.fieldErrors?.studyPlanSpaceIds ? [{ message: state.fieldErrors.studyPlanSpaceIds }] : undefined;
+  const canSubmit = applicationEditable && !isPending;
+
+  function toggleStudyPlanSpace(studyPlanSpaceId: string): void {
+    setSelectedStudyPlanSpaceIds((previous) =>
+      previous.includes(studyPlanSpaceId) ? previous.filter((id) => id !== studyPlanSpaceId) : [...previous, studyPlanSpaceId],
+    );
+  }
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
       <input type="hidden" name="currentData" value={JSON.stringify(dataSnapshot)} />
-      <input type="hidden" name="trainingPathId" value={selectedTrainingPathId} />
+      {selectedStudyPlanSpaceIds.map((studyPlanSpaceId) => (
+        <input key={studyPlanSpaceId} type="hidden" name="studyPlanSpaceIds" value={studyPlanSpaceId} />
+      ))}
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,0.9fr)]">
         <div className="space-y-4">
           {state.error ? (
             <Alert variant="destructive">
               <AlertCircleIcon className="size-4" />
-              <AlertTitle>No se pudo guardar la selección</AlertTitle>
+              <AlertTitle>No se pudo guardar la seleccion</AlertTitle>
               <AlertDescription>{state.error}</AlertDescription>
             </Alert>
           ) : null}
@@ -66,8 +76,8 @@ export function EnrollmentTrainingPathForm({
           {state.success ? (
             <Alert>
               <CheckCircle2Icon className="size-4" />
-              <AlertTitle>Trayecto guardado</AlertTitle>
-              <AlertDescription>La selección quedó asociada al borrador de tu solicitud.</AlertDescription>
+              <AlertTitle>Espacios guardados</AlertTitle>
+              <AlertDescription>La seleccion quedo asociada al borrador de tu solicitud.</AlertDescription>
             </Alert>
           ) : null}
 
@@ -75,29 +85,29 @@ export function EnrollmentTrainingPathForm({
             <Alert>
               <AlertCircleIcon className="size-4" />
               <AlertTitle>Solicitud no editable</AlertTitle>
-              <AlertDescription>Esta solicitud ya no admite cambios, por lo que no podés modificar su trayecto formativo.</AlertDescription>
+              <AlertDescription>Esta solicitud ya no admite cambios, por lo que no podes modificar sus espacios academicos.</AlertDescription>
             </Alert>
           ) : null}
 
-          <FieldGroup role="radiogroup" aria-label="Trayectos formativos disponibles">
-            {trainingPaths.length === 0 ? (
+          <FieldGroup role="group" aria-label="Espacios academicos disponibles">
+            {studyPlanSpaces.length === 0 ? (
               <Card className="border-dashed">
                 <CardHeader>
-                  <CardTitle>No hay trayectos disponibles</CardTitle>
-                  <CardDescription>La institución todavía no tiene trayectos habilitados para esta solicitud.</CardDescription>
+                  <CardTitle>No hay espacios disponibles</CardTitle>
+                  <CardDescription>El plan de estudio no tiene espacios habilitados para esta solicitud.</CardDescription>
                 </CardHeader>
               </Card>
             ) : (
-              trainingPaths.map((trainingPath) => {
-                const checked = trainingPath.id === selectedTrainingPathId;
+              studyPlanSpaces.map((studyPlanSpace) => {
+                const checked = selectedStudyPlanSpaceIds.includes(studyPlanSpace.id);
                 return (
                   <button
-                    key={trainingPath.id}
+                    key={studyPlanSpace.id}
                     type="button"
-                    role="radio"
+                    role="checkbox"
                     aria-checked={checked}
                     disabled={!applicationEditable || isPending}
-                    onClick={() => setSelectedTrainingPathId(trainingPath.id)}
+                    onClick={() => toggleStudyPlanSpace(studyPlanSpace.id)}
                     className={cn("text-left transition-transform disabled:cursor-not-allowed disabled:opacity-60", checked && "translate-y-px")}
                   >
                     <Card
@@ -109,8 +119,8 @@ export function EnrollmentTrainingPathForm({
                       <CardHeader>
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <CardTitle>{trainingPath.name}</CardTitle>
-                            <CardDescription>{trainingPath.description ?? "Trayecto sin descripción institucional."}</CardDescription>
+                            <CardTitle>{studyPlanSpace.academicSpaceName}</CardTitle>
+                            <CardDescription>{studyPlanSpace.academicLevelName ?? "Sin nivel academico asociado."}</CardDescription>
                           </div>
                           <span
                             aria-hidden="true"
@@ -123,9 +133,13 @@ export function EnrollmentTrainingPathForm({
                           </span>
                         </div>
                       </CardHeader>
+                      <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
+                        <InfoPill label="Modalidad de aprobacion" value={studyPlanSpace.approvalMode} />
+                        <InfoPill label="Requisito" value={studyPlanSpace.requirementType} />
+                      </CardContent>
                       <CardFooter className="text-muted-foreground justify-between text-xs sm:text-sm">
-                        <span>{trainingPath.active ? "Habilitado para inscripción" : "No habilitado"}</span>
-                        <span>{checked ? "Seleccionado" : "Seleccionar"}</span>
+                        <span>{checked ? "Seleccionado" : "Disponible para seleccionar"}</span>
+                        <span>Orden #{studyPlanSpace.displayOrder}</span>
                       </CardFooter>
                     </Card>
                   </button>
@@ -140,7 +154,7 @@ export function EnrollmentTrainingPathForm({
           <Card>
             <CardHeader>
               <CardTitle>Contexto de la solicitud</CardTitle>
-              <CardDescription>Tu selección de trayecto queda guardada dentro de este borrador.</CardDescription>
+              <CardDescription>Tu seleccion de espacios queda guardada dentro de este borrador.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <ContextRow label="Plan de estudio" value={studyPlanName} />
@@ -151,12 +165,16 @@ export function EnrollmentTrainingPathForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Antes de continuar</CardTitle>
-              <CardDescription>Elegí un único trayecto para definir la propuesta académica de esta inscripción.</CardDescription>
+              <CardTitle>Seleccion actual</CardTitle>
+              <CardDescription>Podes guardar una seleccion parcial y volver a editarla mientras la solicitud siga abierta.</CardDescription>
             </CardHeader>
             <CardContent className="text-muted-foreground space-y-2 text-sm">
-              <p>La selección se guarda en el borrador actual.</p>
-              <p>Si cambiás de trayecto más adelante, esta pantalla reflejará la última opción guardada.</p>
+              <p>
+                {selectedStudyPlanSpaceIds.length === 0
+                  ? "Todavia no seleccionaste espacios academicos."
+                  : `${selectedStudyPlanSpaceIds.length} espacio(s) seleccionado(s).`}
+              </p>
+              <p>La validacion final para continuar al siguiente paso se definira cuando exista esa pantalla.</p>
             </CardContent>
           </Card>
         </aside>
@@ -166,30 +184,19 @@ export function EnrollmentTrainingPathForm({
         <Button asChild type="button" size="lg" variant="outline">
           <Link href={returnTo}>Volver</Link>
         </Button>
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          {selectedTrainingPathId.length > 0 ? (
-            <Button asChild type="button" size="lg" variant="secondary">
-              <Link
-                href={`/enrollment-applications/${applicationId}/study-plan-spaces?returnTo=${encodeURIComponent(`/enrollment-applications/${applicationId}/training-path`)}`}
-              >
-                Ver espacios academicos
-              </Link>
-            </Button>
-          ) : null}
-          <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
-            {isPending ? (
-              <>
-                <Loader2Icon className="animate-spin" data-icon="inline-start" />
-                Guardando…
-              </>
-            ) : (
-              <>
-                <RouteIcon data-icon="inline-start" />
-                Guardar trayecto
-              </>
-            )}
-          </Button>
-        </div>
+        <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
+          {isPending ? (
+            <>
+              <Loader2Icon className="animate-spin" data-icon="inline-start" />
+              Guardando...
+            </>
+          ) : (
+            <>
+              <BookMarkedIcon data-icon="inline-start" />
+              Guardar seleccion
+            </>
+          )}
+        </Button>
       </div>
     </form>
   );
@@ -204,12 +211,21 @@ function ContextRow({ label, value }: { label: string; value: string }): React.R
   );
 }
 
-function buildNextDraftData(currentData: EnrollmentApplicationDraftData, trainingPathId: string): EnrollmentApplicationDraftData {
+function InfoPill({ label, value }: { label: string; value: string }): React.ReactElement {
+  return (
+    <div className="bg-muted/40 rounded-lg border px-3 py-2">
+      <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</p>
+      <p className="mt-1 font-medium">{value}</p>
+    </div>
+  );
+}
+
+function buildNextDraftData(currentData: EnrollmentApplicationDraftData, studyPlanSpaceIds: string[]): EnrollmentApplicationDraftData {
   return {
     ...currentData,
-    careerSelection: {
-      ...(currentData.careerSelection ?? {}),
-      trainingPathId,
+    academicSpaceSelection: {
+      ...(currentData.academicSpaceSelection ?? {}),
+      studyPlanSpaceIds,
     },
   };
 }
