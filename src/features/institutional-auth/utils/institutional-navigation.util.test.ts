@@ -23,16 +23,21 @@ describe("getInstitutionalNavigationSections", () => {
       expect.arrayContaining([
         expect.objectContaining({
           label: "Académico",
-          items: [expect.objectContaining({ title: "Planes de estudio", url: "/study-plans" })],
+          items: [
+            expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
+            expect.objectContaining({ title: "Planes de estudio", url: "/study-plans" }),
+          ],
         }),
       ]),
     );
   });
 
-  it("hides the academic hub without academic read permissions", () => {
+  it("hides the academic hub without academic read permissions or enrollment", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
-    expect(sections).not.toEqual(expect.arrayContaining([expect.objectContaining({ label: "Académico" })]));
+    expect(sections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
+    ]);
   });
 
   it("shows the applicant academic offer without management resources", () => {
@@ -61,9 +66,11 @@ describe("getInstitutionalNavigationSections", () => {
     });
 
     expect(spaceSections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Espacios académicos", url: "/academic-spaces" }),
     ]);
     expect(instrumentSections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Instrumentos", url: "/instruments" }),
     ]);
     expect(shiftSections.find((section) => section.label === "Académico")?.items).toEqual([
@@ -91,7 +98,7 @@ describe("getInstitutionalNavigationSections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
     expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
-    expect(sections.map((section) => section.label)).toEqual([undefined, "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "Académico", "General"]);
   });
 
   it("links the account area once for every authenticated user", () => {
