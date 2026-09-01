@@ -107,31 +107,48 @@ export function AcademicResourceForm({
           </Alert>
         ) : null}
 
-        <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
-          <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-            <div className="flex items-center gap-3.5">
-              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                <Icon className="size-5" aria-hidden="true" />
+        {resource === AcademicResource.COURSE ? (
+          <AcademicFormFields
+            key={`${resource}-${effectiveInstitutionId ?? "no-institution"}`}
+            fieldErrors={state.fieldErrors}
+            institutionField={
+              allowInstitutionSelection ? (
+                <PlatformInstitutionFormField error={state.fieldErrors?.institutionId} institution={institution} onChange={setInstitution} />
+              ) : null
+            }
+            institutionId={effectiveInstitutionId}
+            resource={resource}
+            scope={scope}
+            {...options}
+          />
+        ) : (
+          <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+            <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+              <div className="flex items-center gap-3.5">
+                <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+                  <Icon className="size-5" aria-hidden="true" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold">{section.title}</h2>
+                  <p className="text-muted-foreground text-sm">{section.description}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base font-semibold">{section.title}</h2>
-                <p className="text-muted-foreground text-sm">{section.description}</p>
-              </div>
+            </header>
+            <div className="mt-5 flex flex-wrap gap-4">
+              {allowInstitutionSelection ? (
+                <PlatformInstitutionFormField error={state.fieldErrors?.institutionId} institution={institution} onChange={setInstitution} />
+              ) : null}
+              <AcademicFormFields
+                key={`${resource}-${effectiveInstitutionId ?? "no-institution"}`}
+                fieldErrors={state.fieldErrors}
+                institutionId={effectiveInstitutionId}
+                resource={resource}
+                scope={scope}
+                {...options}
+              />
             </div>
-          </header>
-          <div className="mt-5 flex flex-wrap gap-4">
-            {allowInstitutionSelection ? (
-              <PlatformInstitutionFormField error={state.fieldErrors?.institutionId} institution={institution} onChange={setInstitution} />
-            ) : null}
-            <AcademicFormFields
-              resource={resource}
-              fieldErrors={state.fieldErrors}
-              institutionId={effectiveInstitutionId}
-              scope={scope}
-              {...options}
-            />
-          </div>
-        </section>
+          </section>
+        )}
       </div>
 
       <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">

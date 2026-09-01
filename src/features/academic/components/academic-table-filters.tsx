@@ -74,7 +74,7 @@ export function AcademicTableFilters({
     <DataTableFilters
       dateFilters={dateFilters}
       search={searchable ? search : undefined}
-      searchPlaceholder={searchable ? (searchPlaceholder ?? "Buscar por nombre...") : undefined}
+      searchPlaceholder={searchable ? (searchPlaceholder ?? "Buscar por nombre…") : undefined}
       selectFilters={filters}
       size={size}
       yearFilters={yearFilters}
@@ -88,7 +88,7 @@ export function AcademicTableFilters({
           label="Plan de estudio"
           navigateKey="studyPlanId"
           resource="study-plans"
-          searchPlaceholder="Buscar plan..."
+          searchPlaceholder="Buscar plan…"
           size={size}
         />
       ) : null}
@@ -99,7 +99,7 @@ export function AcademicTableFilters({
           label="Espacio académico"
           navigateKey="academicSpaceId"
           resource="academic-spaces"
-          searchPlaceholder="Buscar espacio..."
+          searchPlaceholder="Buscar espacio…"
           size={size}
         />
       ) : null}
@@ -112,6 +112,21 @@ const INSTITUTION_FILTER_QUERY_KEY = ["platform", "academic", "institution-filte
 
 function InstitutionFilterControl({ filter, size }: { filter: { selectedLabel?: string; value?: string }; size: number }): React.ReactElement {
   const { navigate } = useDataTableNavigation();
+
+  function updateInstitution(value: string | undefined): void {
+    navigate(
+      {
+        academicSpaceId: undefined,
+        institutionId: value,
+        page: "0",
+        size: String(size),
+        studyPlanId: undefined,
+        trainingPathId: undefined,
+        year: undefined,
+      },
+      { replace: true },
+    );
+  }
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
@@ -129,11 +144,11 @@ function InstitutionFilterControl({ filter, size }: { filter: { selectedLabel?: 
         fetchPage={fetchPlatformInstitutionOptions}
         getItemLabel={(item) => item.name}
         getItemValue={(item) => item.id}
-        onValueChange={(value) => navigate({ institutionId: value, page: "0", size: String(size), trainingPathId: undefined }, { replace: true })}
+        onValueChange={updateInstitution}
         pageSize={20}
         placeholder="Seleccionar institución"
         queryKey={INSTITUTION_FILTER_QUERY_KEY}
-        searchPlaceholder="Buscar institución..."
+        searchPlaceholder="Buscar institución…"
         selectedLabel={filter.selectedLabel}
         value={filter.value}
       />
@@ -178,7 +193,7 @@ function CycleFilterControl({ filter, size }: { filter: CourseDropdownFilter; si
         onValueChange={updateCycle}
         placeholder="Seleccionar ciclo"
         queryKey={queryKey}
-        searchPlaceholder="Buscar año..."
+        searchPlaceholder="Buscar año…"
         selectedLabel={filter.selectedLabel ?? (filter.value ? "Ciclo no disponible" : undefined)}
         value={filter.value}
       />
@@ -198,6 +213,7 @@ function CourseDropdownFilterControl({
   size,
 }: CourseDropdownFilterControlPropsWithKey): React.ReactElement {
   const { navigate } = useDataTableNavigation();
+  const defaultLabel = resource === "study-plans" ? "Todos los planes de estudio" : "Todos los espacios académicos";
   const queryKey = React.useMemo(
     () => ["academic", "course-filter", resource, filter.scope, filter.institutionId],
     [filter.institutionId, filter.scope, resource],
@@ -221,7 +237,7 @@ function CourseDropdownFilterControl({
         className="min-w-0"
         clearLabel={`Limpiar ${label.toLowerCase()}`}
         clearable
-        defaultOption={{ label: `Todos los ${label.toLowerCase()}s`, value: undefined }}
+        defaultOption={{ label: defaultLabel, value: undefined }}
         emptyMessage="No se encontraron opciones."
         emptyIcon={emptyIcon}
         errorMessage="No se pudieron cargar las opciones."
@@ -288,7 +304,7 @@ function TrainingPathFilterControl({ filter, size }: TrainingPathFilterControlPr
         onValueChange={updateTrainingPath}
         placeholder="Seleccionar trayecto"
         queryKey={queryKey}
-        searchPlaceholder="Buscar trayecto..."
+        searchPlaceholder="Buscar trayecto…"
         selectedLabel={filter.selectedLabel ?? (filter.value ? "Trayecto no disponible" : undefined)}
         value={filter.value}
       />

@@ -97,7 +97,7 @@ const courseClassDaySchema = z
       }))
       .sort((a, b) => a.start - b.start);
     for (let index = 1; index < slots.length; index += 1) {
-      if (slots[index].start <= slots[index - 1].end) {
+      if (slots[index].start < slots[index - 1].end) {
         context.addIssue({
           code: "custom",
           message: "Los horarios del mismo día no pueden superponerse.",
