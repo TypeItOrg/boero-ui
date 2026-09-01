@@ -23,13 +23,20 @@ export default async function EnrollmentPage(): Promise<React.ReactElement> {
   }
 
   // 1. Obtener un Plan de Estudio activo y el Ciclo Lectivo activo para presentar en el flujo
-  const [plansResponse, yearsResponse] = await Promise.all([
-    fetchStudyPlans(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
-    fetchAcademicYears(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
-  ]);
+  let activePlan;
+  let activeYear;
 
-  const activePlan = plansResponse.items[0];
-  const activeYear = yearsResponse.items[0];
+  try {
+    const [plansResponse, yearsResponse] = await Promise.all([
+      fetchStudyPlans(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
+      fetchAcademicYears(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
+    ]);
+    activePlan = plansResponse.items[0];
+    activeYear = yearsResponse.items[0];
+  } catch {
+    // Si el usuario no tiene permisos para listar la oferta académica o falla la consulta,
+    // se deja sin plan/año activo para mostrar la alerta adecuada.
+  }
 
   if (!activePlan || !activeYear) {
     return (

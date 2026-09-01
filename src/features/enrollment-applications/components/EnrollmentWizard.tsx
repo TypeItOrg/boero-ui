@@ -8,7 +8,7 @@ import { Field, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@common/components/ui/tabs";
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
-import { startOrGetEnrollmentApplication, updateEnrollmentDraft } from "../services/enrollment-application.service";
+import { startOrGetEnrollmentApplicationAction, updateEnrollmentDraftAction } from "../actions/enrollment-application.actions";
 import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
 
 interface EnrollmentWizardProps {
@@ -31,7 +31,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
   // Initial fetch/creation
   React.useEffect(() => {
-    startOrGetEnrollmentApplication({ studyPlanId, academicYearId })
+    startOrGetEnrollmentApplicationAction({ studyPlanId, academicYearId })
       .then((data) => {
         setApplication(data);
         const appData = data.data || {};
@@ -78,7 +78,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       if (!active) return;
       setSaving(true);
       try {
-        const updated = await updateEnrollmentDraft(application!.applicationId, { data: debouncedData });
+        const updated = await updateEnrollmentDraftAction(application!.applicationId, { data: debouncedData });
         if (active) {
           setApplication(updated);
         }
