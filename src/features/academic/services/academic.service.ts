@@ -3,11 +3,13 @@ import "server-only";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import type { AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
+import type { Course } from "@features/academic/types/course.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
 import type { StudyPlanCurriculum } from "@features/academic/types/study-plan-curriculum.types";
@@ -15,6 +17,7 @@ import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.t
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { CourseStatus } from "@features/academic/types/course-status.types";
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 const FETCH_ERROR = "No se pudo obtener la información académica.";
@@ -81,7 +84,7 @@ export async function fetchStudyPlanCurriculum(scope: AcademicScope, institution
 export async function fetchAcademicSpaces(
   scope: AcademicScope,
   institutionId: string | undefined,
-  params: PageParams & { active?: boolean; type?: AcademicSpaceType } = {},
+  params: PageParams & { active?: boolean; type?: AcademicSpaceType; format?: AcademicSpaceFormat } = {},
 ): Promise<PaginatedResponse<AcademicSpace>> {
   return fetchPage(scope, institutionId, "academic-spaces", params);
 }
@@ -97,6 +100,24 @@ export async function fetchAcademicSpaceUsage(
   params: Pick<PageParams, "page" | "size"> = {},
 ): Promise<AcademicSpaceUsage | null> {
   return fetchDetailWithParams(scope, institutionId, `academic-spaces/${id}/usage`, params);
+}
+
+export async function fetchCourses(
+  scope: AcademicScope,
+  institutionId: string | undefined,
+  params: PageParams & {
+    status?: CourseStatus;
+    academicSpaceId?: string;
+    trainingPathId?: string;
+    studyPlanId?: string;
+    year?: number;
+  } = {},
+): Promise<PaginatedResponse<Course>> {
+  return fetchPage(scope, institutionId, "courses", params);
+}
+
+export async function fetchCourse(scope: AcademicScope, institutionId: string, id: string): Promise<Course | null> {
+  return fetchDetail(scope, institutionId, `courses/${id}`);
 }
 
 export async function fetchInstruments(

@@ -33,6 +33,7 @@ type VirtualizedDropdownItemsProps<TItem> = {
   loadNextPage: () => void;
   onSelect: (item: TItem | undefined) => void;
   renderItem?: (item: TItem, state: AsyncDropdownRenderItemState) => React.ReactNode;
+  selectedValues?: readonly string[];
   showDefaultOption: boolean;
   value?: string;
 };
@@ -50,11 +51,13 @@ export function VirtualizedDropdownItems<TItem>({
   loadNextPage,
   onSelect,
   renderItem,
+  selectedValues,
   showDefaultOption,
   value,
 }: VirtualizedDropdownItemsProps<TItem>): React.ReactElement {
   const parentRef = React.useRef<HTMLDivElement | null>(null);
   const hasDefault = defaultOption !== undefined && showDefaultOption;
+  const selectedValueSet = React.useMemo(() => new Set(selectedValues ?? (value ? [value] : [])), [selectedValues, value]);
   const offset = hasDefault ? 1 : 0;
   const virtualCount = hasNextPage ? items.length + offset + 1 : items.length + offset;
   const viewportHeight = getViewportHeight({
@@ -145,7 +148,7 @@ export function VirtualizedDropdownItems<TItem>({
                 item={item}
                 onSelect={onSelect}
                 renderItem={renderItem}
-                selected={getItemValue(item) === value}
+                selected={selectedValueSet.has(getItemValue(item))}
               />
             </div>
           );

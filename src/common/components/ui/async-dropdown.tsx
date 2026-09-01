@@ -39,6 +39,7 @@ export function AsyncDropdown<TItem>({
   contentClassName,
   clearLabel = "Limpiar selección",
   clearable = false,
+  closeOnSelect = true,
   debounceMs = DEFAULT_DEBOUNCE_MS,
   defaultOption,
   disabled = false,
@@ -65,6 +66,7 @@ export function AsyncDropdown<TItem>({
   resetSearchOnClose = true,
   searchPlaceholder = "Buscar...",
   selectedLabel,
+  selectedValues,
   value,
 }: AsyncDropdownProps<TItem>): React.ReactElement {
   const [internalOpen, setInternalOpen] = React.useState(false);
@@ -114,7 +116,7 @@ export function AsyncDropdown<TItem>({
     } else {
       onValueChange(getItemValue(item), item);
     }
-    setOpen(false);
+    if (closeOnSelect) setOpen(false);
   }
 
   function clearValue(event: React.MouseEvent<HTMLButtonElement>): void {
@@ -168,6 +170,7 @@ export function AsyncDropdown<TItem>({
             loadNextPage={() => void fetchNextPage({ cancelRefetch: false })}
             onSelect={selectItem}
             renderItem={renderItem}
+            selectedValues={selectedValues}
             value={value}
             defaultOption={defaultOption}
             showDefaultOption={showDefaultOption}
@@ -220,7 +223,9 @@ export function AsyncDropdown<TItem>({
         <PopoverContent align="start" className={cn("w-(--radix-popover-trigger-width) gap-0 p-0", contentClassName)}>
           <Command shouldFilter={false} loop>
             <CommandInput disabled={disabled} onValueChange={setSearch} placeholder={searchPlaceholder} value={search} />
-            <CommandList className="max-h-none overflow-visible p-0">{commandListContent}</CommandList>
+            <CommandList aria-multiselectable={selectedValues !== undefined || undefined} className="max-h-none overflow-visible p-0">
+              {commandListContent}
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

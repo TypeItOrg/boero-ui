@@ -23,7 +23,11 @@ const STRUCTURE_RESOURCES: readonly AcademicCollectionResource[] = [
   AcademicResource.STUDY_PLAN,
 ];
 
-const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [AcademicResource.ACADEMIC_SPACE, AcademicResource.INSTRUMENT];
+const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [
+  AcademicResource.ACADEMIC_SPACE,
+  AcademicResource.INSTRUMENT,
+  AcademicResource.COURSE,
+];
 
 export async function AcademicOverview({ access, basePath, breadcrumb, institutionId, scope }: AcademicOverviewProps): Promise<React.ReactElement> {
   const resources = getReadableAcademicResources(access);
@@ -47,7 +51,7 @@ export async function AcademicOverview({ access, basePath, breadcrumb, instituti
         ) : null}
 
         {catalogResources.length > 0 ? (
-          <AcademicGroup title="Catálogos" description="Administrá espacios académicos e instrumentos." icon={LibraryBigIcon}>
+          <AcademicGroup title="Catálogos" description="Administrá espacios académicos, instrumentos y cursos." icon={LibraryBigIcon}>
             <AcademicResourceLinks basePath={basePath} resources={catalogResources} />
           </AcademicGroup>
         ) : null}

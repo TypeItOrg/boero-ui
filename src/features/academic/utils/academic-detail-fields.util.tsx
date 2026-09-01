@@ -7,7 +7,7 @@ import type { AcademicCollection } from "@features/academic/types/academic-colle
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import { academicSpaceTypeLabels, academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
+import { academicSpaceFormatLabels, academicSpaceTypeLabels, academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { hasActiveAcademicStatus } from "@features/academic/utils/has-active-academic-status.util";
 
 export type AcademicDetailInfo = {
@@ -19,7 +19,7 @@ export type AcademicDetailInfo = {
 };
 
 export function getAcademicDetailInfo(
-  resource: Exclude<AcademicCollectionResource, AcademicResource.STUDY_PLAN>,
+  resource: Exclude<AcademicCollectionResource, AcademicResource.STUDY_PLAN | AcademicResource.COURSE>,
   item: AcademicCollection,
 ): AcademicDetailInfo {
   switch (resource) {
@@ -50,9 +50,10 @@ export function getAcademicDetailInfo(
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
         description: "Consultá los datos generales y el estado del espacio académico.",
-        gridColsClass: "sm:grid-cols-2",
+        gridColsClass: "sm:grid-cols-3",
         fields: [
           { label: "Tipo", value: academicSpaceTypeLabels[item.type] },
+          { label: "Formato", value: academicSpaceFormatLabels[item.format] },
           {
             label: "Estado",
             value: (
@@ -64,13 +65,13 @@ export function getAcademicDetailInfo(
           {
             label: "Descripción",
             value: item.description || "Sin descripción",
-            className: "sm:col-span-2",
+            className: "sm:col-span-3",
           },
         ],
       };
     }
     case AcademicResource.TRAINING_PATH: {
-      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
@@ -90,7 +91,7 @@ export function getAcademicDetailInfo(
       };
     }
     case AcademicResource.INSTRUMENT: {
-      if (!hasActiveAcademicStatus(item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,

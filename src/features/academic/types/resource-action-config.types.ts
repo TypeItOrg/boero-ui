@@ -4,5 +4,6 @@ export type ResourceActionConfig = {
   createPath: (base: string, parentId: string | undefined, data: Record<string, unknown>) => string;
   createPermission: InstitutionalPermission;
   updatePermission: InstitutionalPermission;
+  updatePath?: (base: string, id: string) => string;
   prepareBody?: (data: Record<string, unknown>) => Record<string, unknown>;
 };

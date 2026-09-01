@@ -177,7 +177,7 @@ describe("AcademicCollectionView", () => {
   it("maps academic-space descriptions into their table column", () => {
     const config = ACADEMIC_COLLECTION_CONFIG[AcademicResource.ACADEMIC_SPACE];
 
-    expect(config.columns.detailLabels).toEqual(["Tipo", "Descripción"]);
+    expect(config.columns.detailLabels).toEqual(["Tipo", "Formato", "Descripción"]);
     expect(
       config.toRow({
         id: "2d9ec931-453c-4778-86a9-dc40a06d0247",
@@ -185,9 +185,10 @@ describe("AcademicCollectionView", () => {
         name: "Armonía",
         description: null,
         type: "SUBJECT",
+        format: "INDIVIDUAL",
         active: true,
       }).detailValues,
-    ).toEqual(["Asignatura", "Sin descripción"]);
+    ).toEqual(["Asignatura", "Individual", "Sin descripción"]);
   });
 
   it("shows deleted records without offering a create action", async () => {

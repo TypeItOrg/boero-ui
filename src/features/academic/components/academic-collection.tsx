@@ -2,10 +2,11 @@ import { DataTableNavigationProvider } from "@common/components/ui/data-table-na
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
 import { ACADEMIC_COLLECTION_CONFIG, type AcademicTableColumns } from "@features/academic/config/academic-collection.config";
-import { fetchTrainingPath } from "@features/academic/services/academic.service";
+import { fetchAcademicSpace, fetchStudyPlan, fetchTrainingPath } from "@features/academic/services/academic.service";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { parseAcademicPaginationParams, type AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
+import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
 
@@ -55,6 +56,15 @@ export async function AcademicCollectionView({
   const selectedTrainingPathPromise =
     shouldFetchTrainingPath && effectiveInstitutionId ? fetchTrainingPath(scope, effectiveInstitutionId, trainingPathId) : Promise.resolve(null);
   const [data, selectedTrainingPath] = await Promise.all([dataPromise, selectedTrainingPathPromise]);
+  const selectedStudyPlanPromise =
+    resource === AcademicResource.COURSE && params.studyPlanId && effectiveInstitutionId
+      ? fetchStudyPlan(scope, effectiveInstitutionId, params.studyPlanId)
+      : Promise.resolve(null);
+  const selectedSpacePromise =
+    resource === AcademicResource.COURSE && params.academicSpaceId && effectiveInstitutionId
+      ? fetchAcademicSpace(scope, effectiveInstitutionId, params.academicSpaceId)
+      : Promise.resolve(null);
+  const [selectedStudyPlan, selectedAcademicSpace] = await Promise.all([selectedStudyPlanPromise, selectedSpacePromise]);
   const rows = data.items.map(config.toRow).map((row) => {
     if (!isTrainingPathFixed || resource !== AcademicResource.STUDY_PLAN) return row;
     return { ...row, detailValues: row.detailValues.slice(1) };
@@ -66,6 +76,9 @@ export async function AcademicCollectionView({
     params.search.length > 0 ||
     params.institutionId !== undefined ||
     (!isTrainingPathFixed && params.trainingPathId !== undefined) ||
+    params.academicSpaceId !== undefined ||
+    params.studyPlanId !== undefined ||
+    params.year !== undefined ||
     filters.some((filter) => filter.value !== filter.defaultValue) ||
     yearFilters.some((filter) => filter.value !== filter.defaultValue) ||
     dateFilters.some((filter) => filter.value !== undefined) ||
@@ -77,6 +90,28 @@ export async function AcademicCollectionView({
       <DataTableNavigationProvider>
         <PlatformCollectionActions>{createAction}</PlatformCollectionActions>
         <AcademicTableFilters
+          academicSpaceFilter={
+            resource === AcademicResource.COURSE && effectiveInstitutionId
+              ? {
+                  institutionId: effectiveInstitutionId,
+                  selectedLabel: selectedAcademicSpace
+                    ? `${selectedAcademicSpace.name} · ${academicSpaceTypeLabels[selectedAcademicSpace.type]} · ${academicSpaceFormatLabels[selectedAcademicSpace.format]}`
+                    : undefined,
+                  scope,
+                  value: params.academicSpaceId,
+                }
+              : undefined
+          }
+          cycleFilter={
+            resource === AcademicResource.COURSE && effectiveInstitutionId
+              ? {
+                  institutionId: effectiveInstitutionId,
+                  selectedLabel: params.year !== undefined ? String(params.year) : undefined,
+                  scope,
+                  value: params.year !== undefined ? String(params.year) : undefined,
+                }
+              : undefined
+          }
           dateFilters={dateFilters}
           filters={filters}
           institutionFilter={
@@ -91,6 +126,16 @@ export async function AcademicCollectionView({
           searchable={config.searchable !== false}
           searchPlaceholder={global ? "Buscar por registro o institución..." : config.searchPlaceholder}
           size={params.size}
+          studyPlanFilter={
+            resource === AcademicResource.COURSE && effectiveInstitutionId
+              ? {
+                  institutionId: effectiveInstitutionId,
+                  selectedLabel: selectedStudyPlan?.name,
+                  scope,
+                  value: params.studyPlanId,
+                }
+              : undefined
+          }
           trainingPathFilter={
             resource === AcademicResource.STUDY_PLAN && !isTrainingPathFixed && effectiveInstitutionId
               ? {

@@ -8,7 +8,7 @@ import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-f
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import { academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
+import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type AcademicOptionDropdownProps = {
@@ -74,13 +74,13 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
       emptyTitle="No hay espacios académicos"
       errorMessage="No se pudieron cargar los espacios académicos."
       fetchPage={fetchPage}
-      getItemLabel={(item) => `${item.name} · ${academicSpaceTypeLabels[item.type]}`}
+      getItemLabel={(item) => `${item.name} · ${academicSpaceTypeLabels[item.type]} · ${academicSpaceFormatLabels[item.format]}`}
       getItemValue={(item) => item.id}
       id={props.name}
       name={props.name}
       onValueChange={(nextValue, item) => {
         setValue(nextValue);
-        setSelectedLabel(item ? `${item.name} · ${academicSpaceTypeLabels[item.type]}` : undefined);
+        setSelectedLabel(item ? `${item.name} · ${academicSpaceTypeLabels[item.type]} · ${academicSpaceFormatLabels[item.format]}` : undefined);
       }}
       placeholder="Seleccionar espacio"
       queryKey={["academic-options", "academic-spaces", props.scope, props.institutionId]}

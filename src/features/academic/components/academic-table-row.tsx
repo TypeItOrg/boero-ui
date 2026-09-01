@@ -10,6 +10,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import type { AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicRowAction } from "@features/academic/types/academic-row-action.types";
+import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import type { AcademicStatusSelection } from "@features/academic/types/academic-status-selection.types";
 import type { AcademicTableColumns } from "@features/academic/types/academic-table-columns.types";
 import type { AcademicTableRow as AcademicTableRowData } from "@features/academic/types/academic-table-row.types";
@@ -70,11 +71,21 @@ export function AcademicTableRow({
       return;
     }
 
+    if (action.resource === AcademicResource.COURSE) {
+      onStatusAction({
+        id: row.id,
+        resource: action.resource,
+        resourceLabel: row.primaryValue,
+        targetStatus: action.targetStatus,
+      });
+      return;
+    }
+
     onStatusAction({
       id: row.id,
-      resource: action.resource,
+      resource: action.resource as Exclude<ActiveAcademicStatusResource, AcademicResource.COURSE>,
       resourceLabel: row.primaryValue,
-      targetStatus: action.targetStatus,
+      targetStatus: action.targetStatus as "ACTIVE" | "INACTIVE",
     });
   }
 
