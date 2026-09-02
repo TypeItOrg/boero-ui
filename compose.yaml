@@ -12,6 +12,9 @@ services:
     environment:
       NEXT_TELEMETRY_DISABLED: "1"
       CI: "true"
+      BOERO_API_URL: ${BOERO_API_URL:-http://host.docker.internal:8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - next-dev-cache:/app/.next
     logging:

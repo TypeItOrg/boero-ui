@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BookMarkedIcon, GraduationCapIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
+import { isHttpResponseError } from "@common/utils/http-response-error.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { fetchAcademicYear, fetchStudyPlan } from "@features/academic/services/academic.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -41,8 +42,8 @@ export default async function EnrollmentApplicationStudyPlanSpacesPage({
 
   const [studyPlanSpaces, studyPlan, academicYear] = await Promise.all([
     fetchEnrollmentApplicationStudyPlanSpaces(applicationId),
-    fetchStudyPlan(AcademicScope.INSTITUTIONAL, user.institutionId, application.studyPlanId),
-    fetchAcademicYear(AcademicScope.INSTITUTIONAL, user.institutionId, application.academicYearId),
+    safeFetchStudyPlan(user.institutionId, application.studyPlanId),
+    safeFetchAcademicYear(user.institutionId, application.academicYearId),
   ]);
 
   return (
@@ -100,4 +101,22 @@ export default async function EnrollmentApplicationStudyPlanSpacesPage({
       </section>
     </PlatformPageShell>
   );
+}
+
+async function safeFetchStudyPlan(institutionId: string, studyPlanId: string) {
+  try {
+    return await fetchStudyPlan(AcademicScope.INSTITUTIONAL, institutionId, studyPlanId);
+  } catch (error) {
+    if (isHttpResponseError(error, 403) || isHttpResponseError(error, 404)) return null;
+    throw error;
+  }
+}
+
+async function safeFetchAcademicYear(institutionId: string, academicYearId: string) {
+  try {
+    return await fetchAcademicYear(AcademicScope.INSTITUTIONAL, institutionId, academicYearId);
+  } catch (error) {
+    if (isHttpResponseError(error, 403) || isHttpResponseError(error, 404)) return null;
+    throw error;
+  }
 }
