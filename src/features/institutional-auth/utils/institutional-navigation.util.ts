@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  FileTextIcon,
   HouseIcon,
   LibraryBigIcon,
   Music2Icon,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 
 import type { NavigationItem } from "@common/utils/navigation.util";
+import { isApplicantInstitutionalUser } from "@features/enrollment/utils/is-applicant-institutional-user.util";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -32,6 +34,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
   const canReadInstitution = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ);
+  const isApplicant = isApplicantInstitutionalUser(user);
   const platformItems: NavigationItem[] = [
     ...(canReadInstitution ? [{ title: "Institución", url: "/institution", icon: Building2Icon }] : []),
     ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
@@ -59,6 +62,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     {
       items: [INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM],
     },
+    ...(isApplicant ? [{ label: "Inscripción", items: [{ title: "Solicitudes", url: "/enrollment-applications", icon: FileTextIcon }] }] : []),
     ...(platformItems.length > 0 ? [{ label: "Plataforma", items: platformItems }] : []),
     ...(academicItems.length > 0 ? [{ label: "Académico", items: academicItems }] : []),
     {

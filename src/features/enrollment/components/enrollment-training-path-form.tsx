@@ -91,19 +91,21 @@ export function EnrollmentTrainingPathForm({
               trainingPaths.map((trainingPath) => {
                 const checked = trainingPath.id === selectedTrainingPathId;
                 return (
-                    <button
-                      key={trainingPath.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={checked}
-                      disabled={!applicationEditable || isPending}
-                      onClick={() => setSelectedTrainingPathId(trainingPath.id)}
-                    className={cn(
-                      "text-left transition-transform disabled:cursor-not-allowed disabled:opacity-60",
-                      checked && "translate-y-px",
-                    )}
+                  <button
+                    key={trainingPath.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={checked}
+                    disabled={!applicationEditable || isPending}
+                    onClick={() => setSelectedTrainingPathId(trainingPath.id)}
+                    className={cn("text-left transition-transform disabled:cursor-not-allowed disabled:opacity-60", checked && "translate-y-px")}
                   >
-                    <Card className={cn("border-border hover:border-primary/40 hover:bg-primary/3 min-h-40 border", checked && "border-primary bg-primary/5 ring-primary/15 ring-3")}>
+                    <Card
+                      className={cn(
+                        "border-border hover:border-primary/40 hover:bg-primary/3 min-h-40 border",
+                        checked && "border-primary bg-primary/5 ring-primary/15 ring-3",
+                      )}
+                    >
                       <CardHeader>
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -164,19 +166,30 @@ export function EnrollmentTrainingPathForm({
         <Button asChild type="button" size="lg" variant="outline">
           <Link href={returnTo}>Volver</Link>
         </Button>
-        <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
-          {isPending ? (
-            <>
-              <Loader2Icon className="animate-spin" data-icon="inline-start" />
-              Guardando…
-            </>
-          ) : (
-            <>
-              <RouteIcon data-icon="inline-start" />
-              Guardar trayecto
-            </>
-          )}
-        </Button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          {selectedTrainingPathId.length > 0 ? (
+            <Button asChild type="button" size="lg" variant="secondary">
+              <Link
+                href={`/enrollment-applications/${applicationId}/study-plan-spaces?returnTo=${encodeURIComponent(`/enrollment-applications/${applicationId}/training-path`)}`}
+              >
+                Ver espacios academicos
+              </Link>
+            </Button>
+          ) : null}
+          <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
+            {isPending ? (
+              <>
+                <Loader2Icon className="animate-spin" data-icon="inline-start" />
+                Guardando…
+              </>
+            ) : (
+              <>
+                <RouteIcon data-icon="inline-start" />
+                Guardar trayecto
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );
@@ -185,7 +198,7 @@ export function EnrollmentTrainingPathForm({
 function ContextRow({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
     <div className="flex flex-col gap-1 rounded-lg border px-3 py-2">
-      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">{label}</span>
+      <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</span>
       <span className="text-sm font-medium">{value}</span>
     </div>
   );
