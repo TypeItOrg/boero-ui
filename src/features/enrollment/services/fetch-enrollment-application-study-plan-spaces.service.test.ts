@@ -28,6 +28,8 @@ describe("fetchEnrollmentApplicationStudyPlanSpaces", () => {
         requirementType: "REQUIRED",
         displayOrder: 1,
         approvalMode: "PROMOTION",
+        requiresInstrument: true,
+        allowedInstruments: [{ instrumentId: "instrument-1", name: "Piano" }],
       },
     ];
     institutionalApiFetchMock.mockResolvedValue(

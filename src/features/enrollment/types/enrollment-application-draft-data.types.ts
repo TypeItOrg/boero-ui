@@ -5,4 +5,7 @@ export type EnrollmentApplicationDraftData = Record<string, unknown> & {
   academicSpaceSelection?: {
     studyPlanSpaceIds?: string[] | null;
   };
+  instrumentSelection?: {
+    studyPlanSpaceInstrumentIds?: Record<string, string> | null;
+  };
 };
