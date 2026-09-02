@@ -40,6 +40,8 @@ const CURRICULUM: StudyPlanCurriculum = {
           requirementType: "REQUIRED",
           displayOrder: 1,
           approvalMode: "PROMOTION",
+          requiresInstrument: false,
+          allowedInstruments: [],
         },
       ],
     },
