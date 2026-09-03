@@ -2,6 +2,7 @@ import Link from "next/link";
 import { GitBranchPlusIcon, LibraryBigIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
@@ -82,6 +83,52 @@ export function StudyPlanSpaceDetail({
           <CurriculumDetailValue label="Aprobación" value={approvalModeLabels[space.approvalMode]} />
           <CurriculumDetailValue label="Orden" value={String(space.displayOrder)} />
         </dl>
+      </section>
+
+      <section aria-labelledby="study-plan-space-instruments-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
+        <header className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
+          <div>
+            <h2 id="study-plan-space-instruments-title" className="text-base font-semibold">
+              Instrumentos asociados
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Definí qué instrumentos puede seleccionar el postulante cuando este espacio lo requiera.
+            </p>
+          </div>
+          {canEditCurriculum ? (
+            <Button asChild size="lg">
+              <Link href={`${planPath}/spaces/${space.id}/edit`}>Gestionar instrumentos</Link>
+            </Button>
+          ) : null}
+        </header>
+        <div className="mt-5">
+          <Table>
+            <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
+              <TableRow className="h-11">
+                <TableHead>Instrumento</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Uso en la solicitud</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {space.allowedInstruments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-muted-foreground py-6 text-sm">
+                    Este espacio no tiene instrumentos asociados. Si querés que el postulante elija uno, usá `Gestionar instrumentos`.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                space.allowedInstruments.map((instrument) => (
+                  <TableRow key={instrument.instrumentId}>
+                    <TableCell className="font-medium">{instrument.name}</TableCell>
+                    <TableCell className="text-muted-foreground">Disponible para selección en la solicitud.</TableCell>
+                    <TableCell>{space.requiresInstrument ? "Requerido al seleccionar este espacio" : "Opcional"}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </section>
 
       <section aria-labelledby="study-plan-space-prerequisites-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">

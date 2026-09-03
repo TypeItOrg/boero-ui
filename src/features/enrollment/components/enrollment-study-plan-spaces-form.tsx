@@ -8,7 +8,6 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { FieldError, FieldGroup } from "@common/components/ui/field";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { cn } from "@common/utils/cn.util";
 import { saveEnrollmentApplicationStudyPlanSpacesAction } from "@features/enrollment/actions/save-enrollment-application-study-plan-spaces.action";
 import type { EnrollmentApplicationActionState } from "@features/enrollment/types/enrollment-application-action-state.types";
@@ -143,24 +142,24 @@ export function EnrollmentStudyPlanSpacesForm({
               studyPlanSpaces.map((studyPlanSpace) => {
                 const checked = selectedStudyPlanSpaceIds.includes(studyPlanSpace.id);
                 return (
-                  <div key={studyPlanSpace.id} className={cn("text-left", checked && "translate-y-px")}>
-                    <Card
-                      className={cn(
-                        "border-border hover:border-primary/40 hover:bg-primary/3 min-h-40 border",
-                        checked && "border-primary bg-primary/5 ring-primary/15 ring-3",
-                      )}
-                    >
-                      <button
+                    <div key={studyPlanSpace.id} className={cn("text-left", checked && "translate-y-px")}>
+                      <Card
+                        className={cn(
+                          "border-border hover:border-primary/40 hover:bg-primary/3 min-h-[15.5rem] border",
+                          checked && "border-primary bg-primary/5 ring-primary/15 ring-3",
+                        )}
+                      >
+                        <button
                         type="button"
                         role="checkbox"
                         aria-checked={checked}
-                        aria-disabled={!applicationEditable || isPending}
-                        disabled={!applicationEditable || isPending}
-                        onClick={() => toggleStudyPlanSpace(studyPlanSpace.id)}
-                        className="w-full text-left disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-3">
+                          aria-disabled={!applicationEditable || isPending}
+                          disabled={!applicationEditable || isPending}
+                          onClick={() => toggleStudyPlanSpace(studyPlanSpace.id)}
+                          className="flex w-full flex-1 flex-col text-left disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <CardHeader>
+                            <div className="flex items-start justify-between gap-3">
                             <div>
                               <CardTitle>{studyPlanSpace.academicSpaceName}</CardTitle>
                               <CardDescription>{studyPlanSpace.academicLevelName ?? "Sin nivel academico asociado."}</CardDescription>
@@ -176,49 +175,52 @@ export function EnrollmentStudyPlanSpacesForm({
                             </span>
                           </div>
                         </CardHeader>
-                        <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
+                        <CardContent className="grid gap-x-4 gap-y-2 pb-5 text-sm sm:grid-cols-2">
                           <InfoPill label="Modalidad de aprobacion" value={studyPlanSpace.approvalMode} />
                           <InfoPill label="Requisito" value={studyPlanSpace.requirementType} />
                         </CardContent>
-                        <CardFooter className="text-muted-foreground justify-between text-xs sm:text-sm">
+                        <CardFooter className="text-muted-foreground mt-auto pt-0 pb-4 justify-between text-xs sm:text-sm">
                           <span>{checked ? "Seleccionado" : "Disponible para seleccionar"}</span>
                           <span>Orden #{studyPlanSpace.displayOrder}</span>
                         </CardFooter>
                       </button>
-                      {checked ? (
-                        <CardContent className="pt-0">
-                          {studyPlanSpace.requiresInstrument ? (
-                            <div className="bg-muted/30 space-y-3 rounded-lg border p-3">
-                              <div className="space-y-1">
-                                <p className="text-sm font-medium">Instrumento requerido</p>
+                        {studyPlanSpace.requiresInstrument ? (
+                          <CardContent className="pt-1 pb-4">
+                            <div className="bg-muted/30 flex min-h-24 flex-col justify-center gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="mb-2 space-y-1 sm:mb-0 sm:flex-1">
+                                <p className="text-sm font-medium leading-none">Instrumento requerido</p>
                                 <p className="text-muted-foreground text-sm">
-                                  Selecciona uno de los instrumentos habilitados para este espacio academico.
+                                  {checked
+                                    ? "Selecciona uno de los instrumentos habilitados para este espacio academico."
+                                    : "Marca este espacio para habilitar la seleccion del instrumento."}
                                 </p>
                               </div>
-                              <Select
-                                disabled={!applicationEditable || isPending}
-                                value={selectedInstrumentIdsByStudyPlanSpaceId[studyPlanSpace.id] ?? ""}
-                                onValueChange={(value) => setSelectedInstrument(studyPlanSpace.id, value)}
-                              >
-                                <SelectTrigger className="w-full" aria-label={`Instrumento para ${studyPlanSpace.academicSpaceName}`}>
-                                  <SelectValue placeholder="Seleccionar instrumento" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {studyPlanSpace.allowedInstruments.map((instrument) => (
-                                    <SelectItem key={instrument.instrumentId} value={instrument.instrumentId} className="px-2.5 py-1.5">
-                                      {instrument.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          ) : (
-                            <div className="bg-muted/20 text-muted-foreground rounded-lg border px-3 py-2 text-sm">
-                              Este espacio no requiere instrumento.
-                            </div>
-                          )}
-                        </CardContent>
-                      ) : null}
+                              <label className="flex w-full items-center sm:w-auto sm:min-w-56 sm:justify-end">
+                                <span className="sr-only">{`Instrumento para ${studyPlanSpace.academicSpaceName}`}</span>
+                                <select
+                                  aria-label={`Instrumento para ${studyPlanSpace.academicSpaceName}`}
+                                  className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 w-full items-center rounded-lg border px-3 py-2 text-sm outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-56"
+                                  disabled={!checked || !applicationEditable || isPending}
+                                  value={selectedInstrumentIdsByStudyPlanSpaceId[studyPlanSpace.id] ?? ""}
+                                  onChange={(event) => setSelectedInstrument(studyPlanSpace.id, event.currentTarget.value)}
+                               >
+                                 <option value="">Seleccionar instrumento</option>
+                                 {studyPlanSpace.allowedInstruments.map((instrument) => (
+                                   <option key={instrument.instrumentId} value={instrument.instrumentId}>
+                                     {instrument.name}
+                                   </option>
+                                 ))}
+                               </select>
+                             </label>
+                           </div>
+                         </CardContent>
+                       ) : checked ? (
+                          <CardContent className="pb-4">
+                            <div className="bg-muted/20 text-muted-foreground rounded-lg border p-4 text-sm">
+                             Este espacio no requiere instrumento.
+                           </div>
+                         </CardContent>
+                       ) : null}
                     </Card>
                   </div>
                 );

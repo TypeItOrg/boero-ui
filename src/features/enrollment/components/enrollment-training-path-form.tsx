@@ -37,16 +37,23 @@ export function EnrollmentTrainingPathForm({
 }: EnrollmentTrainingPathFormProps): React.ReactElement {
   const action = saveEnrollmentApplicationTrainingPathAction.bind(null, applicationId);
   const [state, formAction, isPending] = React.useActionState(action, INITIAL_STATE);
+  const initialTrainingPathId = currentData.careerSelection?.trainingPathId ?? "";
   const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState(currentData.careerSelection?.trainingPathId ?? "");
   const [dataSnapshot, setDataSnapshot] = React.useState(currentData);
+  const [savedTrainingPathId, setSavedTrainingPathId] = React.useState(initialTrainingPathId);
+
+  React.useEffect(() => {
+    setDataSnapshot(buildNextDraftData(currentData, selectedTrainingPathId));
+  }, [currentData, selectedTrainingPathId]);
 
   React.useEffect(() => {
     if (!state.success || !selectedTrainingPathId) return;
-    setDataSnapshot((previous) => buildNextDraftData(previous, selectedTrainingPathId));
+    setSavedTrainingPathId(selectedTrainingPathId);
   }, [selectedTrainingPathId, state.success]);
 
   const fieldErrors = state.fieldErrors?.trainingPathId ? [{ message: state.fieldErrors.trainingPathId }] : undefined;
   const canSubmit = applicationEditable && selectedTrainingPathId.length > 0 && !isPending;
+  const canOpenStudyPlanSpaces = savedTrainingPathId.length > 0 && selectedTrainingPathId === savedTrainingPathId;
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
@@ -152,11 +159,11 @@ export function EnrollmentTrainingPathForm({
           <Card>
             <CardHeader>
               <CardTitle>Antes de continuar</CardTitle>
-              <CardDescription>Elegí un único trayecto para definir la propuesta académica de esta inscripción.</CardDescription>
+              <CardDescription>Elegí y guardá un único trayecto antes de pasar a los espacios académicos.</CardDescription>
             </CardHeader>
             <CardContent className="text-muted-foreground space-y-2 text-sm">
               <p>La selección se guarda en el borrador actual.</p>
-              <p>Si cambiás de trayecto más adelante, esta pantalla reflejará la última opción guardada.</p>
+              <p>Si cambiás de trayecto, los espacios e instrumentos seleccionados previamente se reinician.</p>
             </CardContent>
           </Card>
         </aside>
@@ -167,7 +174,7 @@ export function EnrollmentTrainingPathForm({
           <Link href={returnTo}>Volver</Link>
         </Button>
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          {selectedTrainingPathId.length > 0 ? (
+          {canOpenStudyPlanSpaces ? (
             <Button asChild type="button" size="lg" variant="secondary">
               <Link
                 href={`/enrollment-applications/${applicationId}/study-plan-spaces?returnTo=${encodeURIComponent(`/enrollment-applications/${applicationId}/training-path`)}`}
@@ -205,11 +212,26 @@ function ContextRow({ label, value }: { label: string; value: string }): React.R
 }
 
 function buildNextDraftData(currentData: EnrollmentApplicationDraftData, trainingPathId: string): EnrollmentApplicationDraftData {
+  const currentTrainingPathId = currentData.careerSelection?.trainingPathId;
+  const trainingPathChanged = currentTrainingPathId !== trainingPathId;
+
   return {
     ...currentData,
     careerSelection: {
       ...(currentData.careerSelection ?? {}),
       trainingPathId,
     },
+    academicSpaceSelection: trainingPathChanged
+      ? {
+          ...(currentData.academicSpaceSelection ?? {}),
+          studyPlanSpaceIds: [],
+        }
+      : currentData.academicSpaceSelection,
+    instrumentSelection: trainingPathChanged
+      ? {
+          ...(currentData.instrumentSelection ?? {}),
+          studyPlanSpaceInstrumentIds: {},
+        }
+      : currentData.instrumentSelection,
   };
 }

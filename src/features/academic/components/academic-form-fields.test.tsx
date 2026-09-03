@@ -76,6 +76,23 @@ describe("AcademicFormFields", () => {
     expect(screen.getByText("Aprobación").parentElement).toHaveTextContent("Aprobación*");
   });
 
+  it("renders instrument assignment options for study plan spaces", () => {
+    render(
+      <AcademicFormFields
+        resource={AcademicResource.STUDY_PLAN_SPACE}
+        instruments={[
+          { id: "instrument-1", institutionId: "institution-1", name: "Piano", description: "Teclas", active: true },
+          { id: "instrument-2", institutionId: "institution-1", name: "Órgano", description: null, active: true },
+        ]}
+        selectedInstrumentIds={["instrument-1"]}
+      />,
+    );
+
+    expect(screen.getByText("Instrumentos habilitados").parentElement).toHaveTextContent("Instrumentos habilitados");
+    expect(screen.getByRole("checkbox", { name: /Piano/i })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /Órgano/i })).not.toBeChecked();
+  });
+
   it("offers the supported academic year range", async () => {
     const user = userEvent.setup();
     render(<AcademicFormFields resource={AcademicResource.ACADEMIC_YEAR} />);

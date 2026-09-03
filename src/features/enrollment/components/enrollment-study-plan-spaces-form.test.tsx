@@ -68,7 +68,7 @@ describe("EnrollmentStudyPlanSpacesForm", () => {
     expect(container.querySelectorAll('input[name="studyPlanSpaceIds"]')).toHaveLength(1);
   });
 
-  it("renders the instrument selector only for selected spaces that require it", async () => {
+  it("renders the instrument selector for spaces that require it and enables it when selected", async () => {
     const user = userEvent.setup();
 
     render(
@@ -83,11 +83,11 @@ describe("EnrollmentStudyPlanSpacesForm", () => {
       />,
     );
 
-    expect(screen.queryByLabelText(/instrumento para matematica i/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/instrumento para matematica i/i)).toBeDisabled();
 
     await user.click(screen.getByRole("checkbox", { name: /Matematica I/i }));
 
-    expect(screen.getByLabelText(/instrumento para matematica i/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/instrumento para matematica i/i)).toBeEnabled();
     expect(screen.getByText(/instrumento requerido/i)).toBeInTheDocument();
     expect(screen.getByText(/1 instrumento\(s\) pendiente\(s\)/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /guardar seleccion/i })).toBeDisabled();
@@ -118,6 +118,27 @@ describe("EnrollmentStudyPlanSpacesForm", () => {
 
     await user.click(screen.getByRole("checkbox", { name: /Matematica I/i }));
     expect(screen.queryByLabelText(/instrumento para matematica i/i)).not.toBeInTheDocument();
+  });
+
+  it("allows choosing an instrument for a selected space", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <EnrollmentStudyPlanSpacesForm
+        applicationId="application-1"
+        applicationEditable
+        currentData={{}}
+        studyPlanSpaces={studyPlanSpaces}
+        returnTo="/"
+        studyPlanName="Profesorado"
+        academicYearLabel="2026"
+      />,
+    );
+
+    await user.click(screen.getByRole("checkbox", { name: /Matematica I/i }));
+    await user.selectOptions(screen.getByLabelText(/instrumento para matematica i/i), "instrument-1");
+
+    expect(screen.getByRole("button", { name: /guardar seleccion/i })).toBeEnabled();
   });
 
   it("disables selection when the application is not editable", () => {

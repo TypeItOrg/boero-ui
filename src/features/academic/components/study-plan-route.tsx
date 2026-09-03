@@ -13,7 +13,7 @@ import {
   NewPrerequisite,
 } from "@features/academic/components/study-plan-route-forms";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
-import { fetchStudyPlanCurriculum, fetchStudyPlanSpace } from "@features/academic/services/academic.service";
+import { fetchInstruments, fetchStudyPlanCurriculum, fetchStudyPlanSpace } from "@features/academic/services/academic.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicBreadcrumbOptions } from "@features/academic/types/academic-breadcrumb-options.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -40,6 +40,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
   const canEditCurriculum = props.access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
   const levels = curriculum.levels.map(({ level }) => level);
+  const instruments = canEditCurriculum ? (await fetchInstruments(props.scope, props.institutionId, { active: true, size: 100 })).items : [];
 
   if (props.action === AcademicResource.ACADEMIC_LEVEL) {
     if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
@@ -78,6 +79,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
           breadcrumb={breadcrumb}
           id={props.id}
           institutionId={props.institutionId}
+          instruments={instruments}
           levels={levels}
           planPath={planPath}
           scope={props.scope}
@@ -131,6 +133,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
           breadcrumb={editSpaceBreadcrumb}
           id={props.id}
           institutionId={props.institutionId}
+          instruments={instruments}
           levels={levels}
           planPath={planPath}
           scope={props.scope}

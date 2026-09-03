@@ -29,6 +29,7 @@ export const ACADEMIC_ACTION_FIELDS = [
   "academicLevelId",
   "requirementType",
   "approvalMode",
+  "instrumentIds",
   "requiredStudyPlanSpaceId",
   "requirementStage",
   "requiredCondition",

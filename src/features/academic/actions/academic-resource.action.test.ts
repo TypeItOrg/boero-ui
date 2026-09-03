@@ -239,6 +239,58 @@ describe("academic resource actions", () => {
     );
   });
 
+  it("sends selected instrument ids when saving a study-plan space", async () => {
+    const institutionId = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
+    const studyPlanId = "2d9ec931-453c-4778-86a9-dc40a06d0247";
+    jest.mocked(requireInstitutionalUser).mockResolvedValue({
+      userId: "user-id",
+      personId: "person-id",
+      name: "Ana",
+      lastName: "García",
+      documentNumber: "12345678",
+      institutionId,
+      roles: [],
+      permissions: [INSTITUTIONAL_PERMISSION.STUDY_PLAN_CURRICULUM_UPDATE],
+    });
+    jest.mocked(academicApiFetch).mockResolvedValue(new Response(null, { status: 201 }));
+
+    const formData = new FormData();
+    formData.set("academicSpaceId", "3d9ec931-453c-4778-86a9-dc40a06d0247");
+    formData.set("academicLevelId", "unassigned");
+    formData.set("requirementType", "REQUIRED");
+    formData.set("displayOrder", "1");
+    formData.set("approvalMode", "FINAL_EXAM");
+    formData.append("instrumentIds", "4d9ec931-453c-4778-86a9-dc40a06d0247");
+    formData.append("instrumentIds", "5d9ec931-453c-4778-86a9-dc40a06d0247");
+
+    await saveAcademicResourceAction(
+      AcademicScope.INSTITUTIONAL,
+      institutionId,
+      AcademicResource.STUDY_PLAN_SPACE,
+      undefined,
+      studyPlanId,
+      `/study-plans/${studyPlanId}`,
+      {},
+      formData,
+    );
+
+    expect(academicApiFetch).toHaveBeenCalledWith(
+      AcademicScope.INSTITUTIONAL,
+      `/api/v1/institutions/${institutionId}/study-plans/${studyPlanId}/spaces`,
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          academicSpaceId: "3d9ec931-453c-4778-86a9-dc40a06d0247",
+          academicLevelId: null,
+          requirementType: "REQUIRED",
+          displayOrder: 1,
+          approvalMode: "FINAL_EXAM",
+          instrumentIds: ["4d9ec931-453c-4778-86a9-dc40a06d0247", "5d9ec931-453c-4778-86a9-dc40a06d0247"],
+        }),
+      }),
+    );
+  });
+
   it("updates an instrument status with the dedicated permission", async () => {
     const institutionId = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
     const instrumentId = "2d9ec931-453c-4778-86a9-dc40a06d0247";

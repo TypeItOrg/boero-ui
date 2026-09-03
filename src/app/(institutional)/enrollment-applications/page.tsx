@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookMarkedIcon, ChevronRightIcon, FileTextIcon, RouteIcon } from "lucide-react";
+import { BookMarkedIcon, ChevronRightIcon, FilePlus2Icon, FileTextIcon, RouteIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
@@ -35,8 +35,16 @@ export default async function EnrollmentApplicationsPage(): Promise<React.ReactE
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={
-        <div data-slot="platform-page-icon" className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <FileTextIcon className="size-6 sm:size-7" />
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-stretch">
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/enrollment-applications/new">
+              Nueva solicitud
+              <FilePlus2Icon />
+            </Link>
+          </Button>
+          <div data-slot="platform-page-icon" className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
+            <FileTextIcon className="size-6 sm:size-7" />
+          </div>
         </div>
       }
     >
@@ -47,6 +55,14 @@ export default async function EnrollmentApplicationsPage(): Promise<React.ReactE
               <CardTitle>No hay solicitudes disponibles</CardTitle>
               <CardDescription>Todavía no tenés solicitudes de inscripción para continuar desde este portal.</CardDescription>
             </CardHeader>
+            <CardFooter>
+              <Button asChild>
+                <Link href="/enrollment-applications/new">
+                  Crear solicitud
+                  <FilePlus2Icon />
+                </Link>
+              </Button>
+            </CardFooter>
           </Card>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
