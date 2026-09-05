@@ -39,9 +39,6 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
-      ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
-      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
       ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
       : []),
@@ -56,6 +53,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
       : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_READ)
       ? [{ title: "Instrumentos", url: "/instruments", icon: Music2Icon }]
+      : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
+      ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
       : []),
   ];
 
