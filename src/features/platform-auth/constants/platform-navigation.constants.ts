@@ -41,11 +41,6 @@ const MANAGEMENT_NAVIGATION_ITEMS = [
 
 const ACADEMIC_NAVIGATION_ITEMS = [
   {
-    title: "Cursos",
-    url: "/admin/courses",
-    icon: GraduationCapIcon,
-  },
-  {
     title: "Ciclos lectivos",
     url: "/admin/academic-years",
     icon: CalendarRangeIcon,
@@ -69,6 +64,11 @@ const ACADEMIC_NAVIGATION_ITEMS = [
     title: "Instrumentos",
     url: "/admin/instruments",
     icon: Music2Icon,
+  },
+  {
+    title: "Cursos",
+    url: "/admin/courses",
+    icon: GraduationCapIcon,
   },
 ] as const satisfies readonly NavigationItem[];
 
