@@ -48,41 +48,49 @@ export function PlatformRolesTableFilters({
   }
 
   return (
-    <DataTableFilters search={search} searchPlaceholder="Buscar por rol o institución..." selectFilters={[roleTypeFilter]} size={size}>
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <span className="text-foreground text-sm font-medium">Institución</span>
-        <div className="flex min-w-0 gap-2">
-          <AsyncDropdown<InstitutionSummary>
-            className="min-w-0 flex-1"
-            defaultOption={{ label: "Todas las instituciones", value: undefined }}
-            emptyDescription="No hay instituciones disponibles para filtrar."
-            emptyIcon={BuildingIcon}
-            emptyMessage="No se encontraron instituciones."
-            emptyTitle="No hay instituciones"
-            errorMessage={LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS}
-            fetchPage={fetchPlatformInstitutionOptions}
-            getItemLabel={(institution) => institution.name}
-            getItemValue={(institution) => institution.id}
-            onValueChange={updateInstitution}
-            pageSize={20}
-            placeholder="Seleccionar institución"
-            queryKey={INSTITUTION_FILTER_QUERY_KEY}
-            searchPlaceholder="Buscar institución..."
-            selectedLabel={institutionName}
-            value={institutionId}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-lg"
-            aria-label="Limpiar institución"
-            onClick={() => updateInstitution(undefined)}
-            disabled={!institutionId}
-          >
-            <XIcon />
-          </Button>
+    <DataTableFilters
+      activeAdvancedCount={institutionId !== undefined ? 1 : 0}
+      advancedFilters={
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-foreground text-sm font-medium">Institución</span>
+          <div className="flex min-w-0 gap-2">
+            <AsyncDropdown<InstitutionSummary>
+              className="min-w-0 flex-1"
+              defaultOption={{ label: "Todas las instituciones", value: undefined }}
+              emptyDescription="No hay instituciones disponibles para filtrar."
+              emptyIcon={BuildingIcon}
+              emptyMessage="No se encontraron instituciones."
+              emptyTitle="No hay instituciones"
+              errorMessage={LOCATION_ERROR_MESSAGES.FETCH_INSTITUTIONS}
+              fetchPage={fetchPlatformInstitutionOptions}
+              getItemLabel={(institution) => institution.name}
+              getItemValue={(institution) => institution.id}
+              onValueChange={updateInstitution}
+              pageSize={20}
+              placeholder="Seleccionar institución"
+              queryKey={INSTITUTION_FILTER_QUERY_KEY}
+              searchPlaceholder="Buscar institución..."
+              selectedLabel={institutionName}
+              value={institutionId}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-lg"
+              aria-label="Limpiar institución"
+              onClick={() => updateInstitution(undefined)}
+              disabled={!institutionId}
+            >
+              <XIcon />
+            </Button>
+          </div>
         </div>
-      </div>
-    </DataTableFilters>
+      }
+      advancedResetKeys={["institutionId"]}
+      search={search}
+      searchPlaceholder="Buscar por rol o institución..."
+      selectFilters={[roleTypeFilter]}
+      size={size}
+    />
   );
 }

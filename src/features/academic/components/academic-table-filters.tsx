@@ -7,6 +7,7 @@ import {
   DataTableFilters,
   type DataTableDateFilter,
   type DataTableSelectFilter,
+  type DataTableTriggerPosition,
   type DataTableYearFilter,
 } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
@@ -20,6 +21,11 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 
 type AcademicTableFiltersProps = {
   academicSpaceFilter?: CourseDropdownFilter;
+  activeAdvancedCount?: number;
+  advancedDateFilters?: readonly DataTableDateFilter[];
+  advancedResetKeys?: readonly string[];
+  advancedSelectFilters?: readonly DataTableSelectFilter[];
+  advancedYearFilters?: readonly DataTableYearFilter[];
   cycleFilter?: CourseDropdownFilter;
   dateFilters: readonly DataTableDateFilter[];
   filters: readonly DataTableSelectFilter[];
@@ -30,6 +36,7 @@ type AcademicTableFiltersProps = {
   size: number;
   studyPlanFilter?: CourseDropdownFilter;
   trainingPathFilter?: TrainingPathFilter;
+  triggerPosition?: DataTableTriggerPosition;
   yearFilters: readonly DataTableYearFilter[];
 };
 
@@ -51,6 +58,7 @@ type CourseDropdownFilterControlProps = {
   emptyIcon: typeof LibraryBigIcon;
   filter: CourseDropdownFilter;
   label: string;
+  navigateKey: "studyPlanId" | "academicSpaceId";
   resource: "study-plans" | "academic-spaces";
   searchPlaceholder: string;
   size: number;
@@ -58,6 +66,11 @@ type CourseDropdownFilterControlProps = {
 
 export function AcademicTableFilters({
   academicSpaceFilter,
+  activeAdvancedCount = 0,
+  advancedDateFilters = [],
+  advancedResetKeys,
+  advancedSelectFilters = [],
+  advancedYearFilters = [],
   cycleFilter,
   dateFilters,
   filters,
@@ -68,41 +81,63 @@ export function AcademicTableFilters({
   size,
   studyPlanFilter,
   trainingPathFilter,
+  triggerPosition = "inline",
   yearFilters,
 }: AcademicTableFiltersProps): React.ReactElement {
+  const useAdvancedLayout =
+    triggerPosition === "external" || advancedSelectFilters.length > 0 || advancedDateFilters.length > 0 || advancedYearFilters.length > 0;
+  const institutionNode = institutionFilter ? <InstitutionFilterControl filter={institutionFilter} size={size} /> : null;
+  const studyPlanNode = studyPlanFilter ? (
+    <CourseDropdownFilterControl
+      emptyIcon={RouteIcon}
+      filter={studyPlanFilter}
+      label="Plan de estudio"
+      navigateKey="studyPlanId"
+      resource="study-plans"
+      searchPlaceholder="Buscar plan…"
+      size={size}
+    />
+  ) : null;
+  const academicSpaceNode = academicSpaceFilter ? (
+    <CourseDropdownFilterControl
+      emptyIcon={LibraryBigIcon}
+      filter={academicSpaceFilter}
+      label="Espacio académico"
+      navigateKey="academicSpaceId"
+      resource="academic-spaces"
+      searchPlaceholder="Buscar espacio…"
+      size={size}
+    />
+  ) : null;
+
   return (
     <DataTableFilters
+      activeAdvancedCount={activeAdvancedCount}
+      advancedDateFilters={advancedDateFilters}
+      advancedFilters={
+        useAdvancedLayout ? (
+          <>
+            {institutionNode}
+            {studyPlanNode}
+            {academicSpaceNode}
+          </>
+        ) : undefined
+      }
+      advancedResetKeys={advancedResetKeys}
+      advancedSelectFilters={advancedSelectFilters}
+      advancedYearFilters={advancedYearFilters}
       dateFilters={dateFilters}
       search={searchable ? search : undefined}
       searchPlaceholder={searchable ? (searchPlaceholder ?? "Buscar por nombre…") : undefined}
       selectFilters={filters}
       size={size}
+      triggerPosition={triggerPosition}
       yearFilters={yearFilters}
     >
-      {institutionFilter ? <InstitutionFilterControl filter={institutionFilter} size={size} /> : null}
+      {useAdvancedLayout ? null : institutionNode}
       {trainingPathFilter ? <TrainingPathFilterControl filter={trainingPathFilter} size={size} /> : null}
-      {studyPlanFilter ? (
-        <CourseDropdownFilterControl
-          emptyIcon={RouteIcon}
-          filter={studyPlanFilter}
-          label="Plan de estudio"
-          navigateKey="studyPlanId"
-          resource="study-plans"
-          searchPlaceholder="Buscar plan…"
-          size={size}
-        />
-      ) : null}
-      {academicSpaceFilter ? (
-        <CourseDropdownFilterControl
-          emptyIcon={LibraryBigIcon}
-          filter={academicSpaceFilter}
-          label="Espacio académico"
-          navigateKey="academicSpaceId"
-          resource="academic-spaces"
-          searchPlaceholder="Buscar espacio…"
-          size={size}
-        />
-      ) : null}
+      {useAdvancedLayout ? null : studyPlanNode}
+      {useAdvancedLayout ? null : academicSpaceNode}
       {cycleFilter ? <CycleFilterControl filter={cycleFilter} size={size} /> : null}
     </DataTableFilters>
   );
@@ -201,8 +236,6 @@ function CycleFilterControl({ filter, size }: { filter: CourseDropdownFilter; si
   );
 }
 
-type CourseDropdownFilterControlPropsWithKey = CourseDropdownFilterControlProps & { navigateKey: "studyPlanId" | "academicSpaceId" };
-
 function CourseDropdownFilterControl({
   emptyIcon,
   filter,
@@ -211,7 +244,7 @@ function CourseDropdownFilterControl({
   resource,
   searchPlaceholder,
   size,
-}: CourseDropdownFilterControlPropsWithKey): React.ReactElement {
+}: CourseDropdownFilterControlProps): React.ReactElement {
   const { navigate } = useDataTableNavigation();
   const defaultLabel = resource === "study-plans" ? "Todos los planes de estudio" : "Todos los espacios académicos";
   const queryKey = React.useMemo(

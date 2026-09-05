@@ -12,6 +12,8 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicSpaces: jest.fn(),
   fetchAcademicYear: jest.fn(),
   fetchAcademicYears: jest.fn(),
+  fetchCourse: jest.fn(),
+  fetchCourses: jest.fn(),
   fetchInstrument: jest.fn(),
   fetchInstruments: jest.fn(),
   fetchStudyPlan: jest.fn(),
@@ -20,17 +22,19 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchTrainingPaths: jest.fn(),
 }));
 
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
-import { fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
+import { fetchCourses, fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
+const STUDY_PLAN_ID = "6f8e2c9a-3b4d-4e5f-a6b7-c8d9e0f1a2b3";
+const ACADEMIC_SPACE_ID = "7a9b3d5e-4c6f-4a8b-b9c0-d1e2f3a4b5c6";
 const FIXED_TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 const OTHER_TRAINING_PATH_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
 
@@ -40,6 +44,13 @@ describe("AcademicCollectionView", () => {
       items: [],
       page: 0,
       size: 20,
+      totalItems: 0,
+      totalPages: 0,
+    });
+    jest.mocked(fetchCourses).mockResolvedValue({
+      items: [],
+      page: 0,
+      size: 10,
       totalItems: 0,
       totalPages: 0,
     });
@@ -209,5 +220,146 @@ describe("AcademicCollectionView", () => {
 
     expect(fetchStudyPlans).toHaveBeenLastCalledWith(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, expect.objectContaining({ deleted: true }));
     expect(jest.mocked(AcademicTablePresentation)).toHaveBeenLastCalledWith(expect.objectContaining({ canCreate: true, deleted: true }), undefined);
+  });
+
+  it("splits course select filters into primary state and advanced records", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: false,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      global: true,
+      institutionId: undefined,
+      resource: AcademicResource.COURSE,
+      scope: AcademicScope.ADMIN,
+      searchParams: { size: "10" },
+    });
+
+    render(result);
+
+    const filtersProps = jest.mocked(AcademicTableFilters).mock.calls.at(-1)?.[0];
+    expect(filtersProps?.filters.map((filter) => filter.name)).toEqual(["courseStatus"]);
+    expect(filtersProps?.advancedSelectFilters?.map((filter) => filter.name)).toEqual(["deleted"]);
+    expect(filtersProps?.activeAdvancedCount).toBe(0);
+    expect(filtersProps?.advancedResetKeys).toEqual(["academicSpaceId", "institutionId", "studyPlanId"]);
+  });
+
+  it("counts applied custom course filters as active advanced filters", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: false,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      global: true,
+      institutionId: undefined,
+      resource: AcademicResource.COURSE,
+      scope: AcademicScope.ADMIN,
+      searchParams: {
+        academicSpaceId: ACADEMIC_SPACE_ID,
+        institutionId: INSTITUTION_ID,
+        size: "10",
+        studyPlanId: STUDY_PLAN_ID,
+      },
+    });
+
+    render(result);
+
+    const filtersProps = jest.mocked(AcademicTableFilters).mock.calls.at(-1)?.[0];
+    expect(filtersProps?.activeAdvancedCount).toBe(3);
+  });
+
+  it("renders the advanced filters trigger in the header for courses", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: false,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      global: true,
+      institutionId: undefined,
+      resource: AcademicResource.COURSE,
+      scope: AcademicScope.ADMIN,
+      searchParams: { size: "10" },
+    });
+
+    render(result);
+
+    expect(screen.getByRole("button", { name: /filtros avanzados/i })).toBeInTheDocument();
+    expect(jest.mocked(AcademicTableFilters)).toHaveBeenLastCalledWith(expect.objectContaining({ triggerPosition: "external" }), undefined);
+  });
+
+  it("shows the active advanced count on the course header trigger", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: false,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      global: true,
+      institutionId: undefined,
+      resource: AcademicResource.COURSE,
+      scope: AcademicScope.ADMIN,
+      searchParams: {
+        academicSpaceId: ACADEMIC_SPACE_ID,
+        institutionId: INSTITUTION_ID,
+        size: "10",
+        studyPlanId: STUDY_PLAN_ID,
+      },
+    });
+
+    render(result);
+
+    expect(screen.getByTestId("advanced-filters-badge")).toHaveTextContent("3");
+  });
+
+  it("renders the advanced filters trigger for study plans", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "",
+      canCreate: true,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      institutionId: INSTITUTION_ID,
+      resource: AcademicResource.STUDY_PLAN,
+      scope: AcademicScope.INSTITUTIONAL,
+      searchParams: { size: "20" },
+    });
+
+    render(result);
+
+    expect(screen.getByRole("button", { name: /filtros avanzados/i })).toBeInTheDocument();
+  });
+
+  it("renders create action and advanced trigger with justify-between in the course collection header", async () => {
+    const result = await AcademicCollectionView({
+      basePath: "/admin",
+      canCreate: true,
+      canDelete: true,
+      canChangeStatus: true,
+      canUpdate: true,
+      canRestore: true,
+      createAction: <button type="button">Nuevo curso</button>,
+      global: true,
+      institutionId: INSTITUTION_ID,
+      resource: AcademicResource.COURSE,
+      scope: AcademicScope.ADMIN,
+      searchParams: { size: "10" },
+    });
+
+    render(result);
+
+    const createBtn = screen.getByRole("button", { name: "Nuevo curso" });
+    const triggerBtn = screen.getByRole("button", { name: /filtros avanzados/i });
+
+    expect(createBtn).toBeInTheDocument();
+    expect(triggerBtn).toBeInTheDocument();
+    expect(createBtn.parentElement).toHaveClass("sm:justify-between");
   });
 });

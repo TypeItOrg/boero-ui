@@ -1,5 +1,7 @@
-export function PlatformCollectionActions({ children }: { children?: React.ReactNode }): React.ReactElement | null {
+import { cn } from "@common/utils/cn.util";
+
+export function PlatformCollectionActions({ children, className }: { children?: React.ReactNode; className?: string }): React.ReactElement | null {
   if (!children) return null;
 
-  return <div className="flex shrink-0 justify-end [&>*]:w-full sm:[&>*]:w-auto">{children}</div>;
+  return <div className={cn("flex shrink-0 flex-col gap-2 sm:flex-row sm:justify-end [&>*]:w-full sm:[&>*]:w-auto", className)}>{children}</div>;
 }
