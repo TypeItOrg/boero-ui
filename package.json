@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.7.1",
+    "@internationalized/date": "^3.12.4",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-virtual": "^3.14.9",
     "class-variance-authority": "^0.7.1",
@@ -30,6 +31,7 @@
     "nextjs-toploader": "^3.9.17",
     "radix-ui": "^1.6.7",
     "react": "19.2.8",
+    "react-aria-components": "^1.21.0",
     "react-day-picker": "^10.0.1",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.84.0",

@@ -7,6 +7,7 @@ import { render, screen, within } from "@testing-library/react";
 
 import { AcademicDetail } from "@features/academic/components/academic-detail";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import type { Course } from "@features/academic/types/course.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 
@@ -27,6 +28,37 @@ const TRAINING_PATH: TrainingPath = {
   name: "CAVI",
   description: "Formación docente.",
   active: true,
+};
+
+const COURSE: Course = {
+  id: "019f9c3d-9663-77da-a21b-5c811c040699",
+  institutionId: "05b84ac4-66aa-409f-a813-012d15b8cb9b",
+  studyPlanId: "019f9c3d-9663-77da-a21b-5c811c040616",
+  studyPlanName: "Plan 2026",
+  trainingPathId: "2d9ec931-453c-4778-86a9-dc40a06d0247",
+  trainingPathName: "CAVI",
+  academicSpaceId: "space-1",
+  academicSpaceName: "Lenguaje Musical I",
+  academicSpaceType: "SUBJECT",
+  academicSpaceFormat: "INDIVIDUAL",
+  academicYearId: "year-2027",
+  year: 2027,
+  status: "ACTIVE",
+  active: true,
+  classes: [
+    {
+      id: "class-1",
+      teachers: [{ personId: "teacher-1", fullName: "Ana Garcia" }],
+      days: [
+        {
+          dayOfWeek: "MONDAY",
+          capacity: 4,
+          periodDurationMinutes: 60,
+          schedules: [{ startTime: "08:00:00", endTime: "12:00:00" }],
+        },
+      ],
+    },
+  ],
 };
 
 describe("AcademicDetail", () => {
@@ -143,5 +175,64 @@ describe("AcademicDetail", () => {
     const validity = within(summary).getByText("Vigencia").nextElementSibling;
 
     expect(validity).toHaveTextContent(expected);
+  });
+
+  it("renders course summary and classes section with styled icon, teachers, days, period, cupo, and schedules", () => {
+    render(<AcademicDetail item={COURSE} resource={AcademicResource.COURSE} basePath="" canEdit />);
+
+    const info = screen.getByRole("region", { name: "Información del curso" });
+    expect(within(info).getByText("Lenguaje Musical I · Asignatura · Individual")).toBeInTheDocument();
+    expect(within(info).getByText("CAVI")).toBeInTheDocument();
+
+    const classesRegion = screen.getByRole("region", { name: "Clases" });
+    expect(within(classesRegion).getByText("1 clase registrada.")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("Clase 1")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("Ana Garcia")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("Lunes")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("60 min")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("4")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("08:00 — 12:00")).toBeInTheDocument();
+  });
+
+  it("renders empty states for a course without classes", () => {
+    render(<AcademicDetail item={{ ...COURSE, classes: [] }} resource={AcademicResource.COURSE} basePath="" canEdit />);
+
+    const classesRegion = screen.getByRole("region", { name: "Clases" });
+    expect(within(classesRegion).getByText("Este curso aún no tiene clases registradas.")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("Sin clases para mostrar.")).toBeInTheDocument();
+  });
+
+  it("renders group course with capacity without period and multiple schedules", () => {
+    const groupCourse: Course = {
+      ...COURSE,
+      academicSpaceFormat: "GRUPAL",
+      classes: [
+        {
+          id: "class-1",
+          teachers: [],
+          days: [
+            {
+              dayOfWeek: "TUESDAY",
+              capacity: 25,
+              periodDurationMinutes: null,
+              schedules: [
+                { startTime: "08:00:00", endTime: "10:00:00" },
+                { startTime: "14:00:00", endTime: "16:00:00" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    render(<AcademicDetail item={groupCourse} resource={AcademicResource.COURSE} basePath="" canEdit />);
+
+    const classesRegion = screen.getByRole("region", { name: "Clases" });
+    expect(within(classesRegion).getByText("Sin docentes asignados")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("Martes")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("25")).toBeInTheDocument();
+    expect(within(classesRegion).queryByText(/Período:/)).not.toBeInTheDocument();
+    expect(within(classesRegion).getByText("08:00 — 10:00")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("14:00 — 16:00")).toBeInTheDocument();
   });
 });
