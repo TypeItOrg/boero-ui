@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowRightIcon, CalendarDaysIcon, GraduationCapIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
+import { CalendarDaysIcon, GraduationCapIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -9,7 +9,9 @@ import { Badge } from "@common/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Input } from "@common/components/ui/input";
-import { NumericInput, TimeInput } from "@common/components/ui/restricted-input";
+import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { NumericInput } from "@common/components/ui/restricted-input";
+import { TimeInputWithIcon } from "@common/components/ui/time-input-with-icon";
 import { ToggleGroup, ToggleGroupItem } from "@common/components/ui/toggle-group";
 import { cn } from "@common/utils/cn.util";
 import { toOptionalFormString } from "@common/utils/form-value.util";
@@ -422,30 +424,31 @@ function ClassCard({ courseClass, fieldErrors, format, institutionId, onRemove, 
           return (
             <FormField label="Docentes" name={teachersFieldId} error={teacherError} required>
               <div className="mt-1 flex flex-col gap-3">
-                {courseClass.teachers.length > 0 ? (
-                  <div className="bg-muted/20 flex flex-wrap gap-2 rounded-xl border px-3 py-2.5">
-                    {courseClass.teachers.map((teacher) => (
-                      <Badge className="h-7 gap-2 px-3" key={teacher.personId} size="lg" variant="secondary">
-                        <span className="max-w-full truncate">{teacher.fullName}</span>
-                        <Button
-                          aria-label={`Quitar a ${teacher.fullName}`}
-                          className="text-muted-foreground hover:text-foreground -mr-1"
-                          onClick={() =>
-                            onUpdate((draft) => ({
-                              ...draft,
-                              teachers: draft.teachers.filter((candidate) => candidate.personId !== teacher.personId),
-                            }))
-                          }
-                          size="icon-xs"
-                          type="button"
-                          variant="ghost"
-                        >
-                          <XIcon />
-                        </Button>
-                      </Badge>
-                    ))}
-                  </div>
-                ) : null}
+                <div className="bg-muted/20 flex min-h-12 flex-wrap items-center gap-2 rounded-xl border px-3 py-2.5">
+                  {courseClass.teachers.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">Los docentes seleccionados se mostrarán aquí.</p>
+                  ) : null}
+                  {courseClass.teachers.map((teacher) => (
+                    <Badge className="h-7 gap-2 px-3" key={teacher.personId} size="lg" variant="secondary">
+                      <span className="max-w-full truncate">{teacher.fullName}</span>
+                      <Button
+                        aria-label={`Quitar a ${teacher.fullName}`}
+                        className="text-muted-foreground hover:text-foreground -mr-1"
+                        onClick={() =>
+                          onUpdate((draft) => ({
+                            ...draft,
+                            teachers: draft.teachers.filter((candidate) => candidate.personId !== teacher.personId),
+                          }))
+                        }
+                        size="icon-xs"
+                        type="button"
+                        variant="ghost"
+                      >
+                        <XIcon />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
                 {institutionId && scope ? (
                   <AsyncDropdown<CourseTeacherOption>
                     ariaInvalid={Boolean(teacherError)}
@@ -627,7 +630,13 @@ function DayEditor({
 
       <div className="flex flex-col gap-6 p-4 sm:p-5">
         {individual ? (
-          <FormField label="Duración del período" name={`period-${day.dayOfWeek}`} error={periodError} className="w-full flex-[1_0_100%]" required>
+          <FormField
+            label="Duración del período"
+            name={`period-${day.dayOfWeek}`}
+            error={periodError}
+            className="w-full flex-none self-stretch"
+            required
+          >
             <div
               className={cn(
                 "border-input bg-background focus-within:border-ring focus-within:ring-ring/50 flex h-9 w-full items-center overflow-hidden rounded-lg border shadow-2xs transition focus-within:ring-3",
@@ -637,7 +646,7 @@ function DayEditor({
               <NumericInput
                 aria-invalid={Boolean(periodError)}
                 aria-label={`Duración del período en minutos para ${WEEK_DAY_LABELS[day.dayOfWeek]}`}
-                className="h-full w-full border-0 bg-transparent px-3 text-sm tabular-nums shadow-none focus-visible:ring-0"
+                className="h-full min-w-0 flex-1 border-0 bg-transparent px-3 text-sm tabular-nums shadow-none focus-visible:ring-0"
                 id={`period-${day.dayOfWeek}`}
                 maxLength={4}
                 onChange={(event) => {
@@ -646,7 +655,7 @@ function DayEditor({
                 }}
                 value={day.periodDurationMinutes}
               />
-              <span className="bg-muted/40 text-muted-foreground flex h-full items-center border-l px-3 text-xs font-medium select-none">
+              <span className="bg-muted/40 text-muted-foreground flex h-full shrink-0 items-center border-l px-3 text-xs font-medium select-none">
                 minutos
               </span>
             </div>
@@ -766,42 +775,28 @@ function ScheduleRangeEditor({
         ) : null}
       </div>
 
-      <div
-        className={cn(
-          "border-input bg-muted/10 focus-within:bg-background focus-within:border-ring focus-within:ring-ring/50 grid grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)] overflow-hidden rounded-xl border shadow-2xs transition focus-within:ring-3",
-          scheduleError && "border-destructive ring-destructive/20",
-        )}
-      >
-        <div className="min-w-0 px-4 py-3">
-          <label className="text-muted-foreground mb-1 block text-sm font-medium" htmlFor={`schedule-${dayLabel}-${index}-start`}>
-            Desde
-          </label>
-          <TimeInput
+      <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field className="min-w-0" data-invalid={Boolean(scheduleError)}>
+          <FieldLabel htmlFor={`schedule-${dayLabel}-${index}-start`}>Hora de inicio</FieldLabel>
+          <TimeInputWithIcon
             aria-invalid={Boolean(scheduleError)}
             aria-label={`Inicio ${dayLabel} ${index + 1}`}
-            className="h-8 border-0 bg-transparent px-0 text-base font-semibold tabular-nums shadow-none focus-visible:ring-0"
             id={`schedule-${dayLabel}-${index}-start`}
-            onChange={(event) => onStartTimeChange(event.currentTarget.value)}
+            onValueChange={onStartTimeChange}
             value={schedule.startTime}
           />
-        </div>
-        <div className="bg-muted/30 text-muted-foreground flex items-center justify-center border-x">
-          <ArrowRightIcon className="size-4" />
-        </div>
-        <div className="min-w-0 px-4 py-3">
-          <label className="text-muted-foreground mb-1 block text-sm font-medium" htmlFor={`schedule-${dayLabel}-${index}-end`}>
-            Hasta
-          </label>
-          <TimeInput
+        </Field>
+        <Field className="min-w-0" data-invalid={Boolean(scheduleError)}>
+          <FieldLabel htmlFor={`schedule-${dayLabel}-${index}-end`}>Hora de fin</FieldLabel>
+          <TimeInputWithIcon
             aria-invalid={Boolean(scheduleError)}
             aria-label={`Fin ${dayLabel} ${index + 1}`}
-            className="h-8 border-0 bg-transparent px-0 text-base font-semibold tabular-nums shadow-none focus-visible:ring-0"
             id={`schedule-${dayLabel}-${index}-end`}
-            onChange={(event) => onEndTimeChange(event.currentTarget.value)}
+            onValueChange={onEndTimeChange}
             value={schedule.endTime}
           />
-        </div>
-      </div>
+        </Field>
+      </FieldGroup>
       {scheduleError ? <p className="text-destructive mt-2 text-xs">{scheduleError}</p> : null}
     </div>
   );
