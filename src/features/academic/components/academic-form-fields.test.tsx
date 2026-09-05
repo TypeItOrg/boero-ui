@@ -77,7 +77,7 @@ describe("AcademicFormFields", () => {
     expect(screen.getByText("Clase 1")).toBeInTheDocument();
     expect(screen.getByText("Ana García")).toBeInTheDocument();
     expect(screen.getByDisplayValue("60")).toBeInTheDocument();
-    expect(screen.getByLabelText("Inicio Lunes 1")).toHaveValue("14:00");
+    expect(screen.getByLabelText("Inicio Lunes 1")).toHaveTextContent("14:00");
 
     const classesInput = document.querySelector<HTMLInputElement>('input[name="classes"]');
     expect(classesInput).toHaveValue(
