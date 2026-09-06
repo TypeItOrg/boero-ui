@@ -17,6 +17,7 @@ import {
 import type { NavigationItem } from "@common/utils/navigation.util";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import { canViewOwnEnrollmentApplications } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 
 export type InstitutionalNavigationSection = {
@@ -62,7 +63,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
 
   const enrollmentItems: NavigationItem[] = [
-    { title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon },
+    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
       ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
       : []),
