@@ -11,8 +11,10 @@ import {
   parseEnrollmentApplicationPaginationParams,
   type EnrollmentApplicationSearchParams,
 } from "@features/enrollment-applications/utils/enrollment-application-pagination.util";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { canViewOwnEnrollmentApplications } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -27,6 +29,10 @@ export default async function MyEnrollmentApplicationsPage({
   searchParams: Promise<EnrollmentApplicationSearchParams>;
 }): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
+
+  if (!canViewOwnEnrollmentApplications(user)) {
+    return <InstitutionalAccessDenied description="No tenés inscripciones como postulante." />;
+  }
 
   const resolvedSearchParams = await searchParams;
   const { page, size, status } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);

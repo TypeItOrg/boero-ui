@@ -39,6 +39,13 @@ export function EnrollmentApplicationTableRow({
       <TableCell>
         <EnrollmentApplicationStatusBadge status={application.status} />
       </TableCell>
+      <TableCell className="max-w-72">
+        {application.status === "REJECTED" && application.rejectionReason ? (
+          <span className="text-destructive">{application.rejectionReason}</span>
+        ) : (
+          <span className="text-muted-foreground/60">—</span>
+        )}
+      </TableCell>
       <TableCell>
         {canResolve ? (
           <div className="flex justify-end">
