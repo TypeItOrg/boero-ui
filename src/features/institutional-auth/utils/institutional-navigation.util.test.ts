@@ -69,6 +69,26 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles"]);
   });
 
+  it("shows the applicant section for applicant roles", () => {
+    const sections = getInstitutionalNavigationSections({ ...USER, roles: ["Postulante"] });
+
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+    ]);
+  });
+
+  it("hides the applicant section for staff roles even with the management permission", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Administrador Institucional"],
+      permissions: [INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ],
+    });
+
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Solicitudes de inscripción", url: "/enrollment-applications" }),
+    ]);
+  });
+
   it("keeps Inicio outside labeled navigation sections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 

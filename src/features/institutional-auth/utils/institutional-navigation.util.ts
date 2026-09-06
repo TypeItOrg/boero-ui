@@ -2,12 +2,14 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  ClipboardListIcon,
   GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
   Music2Icon,
   RouteIcon,
   UserLockIcon,
+  UserRoundCheckIcon,
   UserRoundIcon,
   UsersIcon,
 } from "lucide-react";
@@ -15,6 +17,7 @@ import {
 import type { NavigationItem } from "@common/utils/navigation.util";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import { canViewOwnEnrollmentApplications } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 
 export type InstitutionalNavigationSection = {
@@ -59,12 +62,20 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
       : []),
   ];
 
+  const enrollmentItems: NavigationItem[] = [
+    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
+      ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
+      : []),
+  ];
+
   return [
     {
       items: [INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM],
     },
     ...(platformItems.length > 0 ? [{ label: "Plataforma", items: platformItems }] : []),
     ...(academicItems.length > 0 ? [{ label: "Académico", items: academicItems }] : []),
+    ...(enrollmentItems.length > 0 ? [{ label: "Inscripciones", items: enrollmentItems }] : []),
     {
       label: "General",
       items: [{ title: "Cuenta", url: "/account", icon: UserRoundIcon }],
