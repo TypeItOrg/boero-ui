@@ -64,16 +64,35 @@ describe("getInstitutionalNavigationSections", () => {
       ],
     });
 
-    expect(sections.map((section) => section.label)).toEqual([undefined, "Plataforma", "Académico", "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "Plataforma", "Académico", "Inscripciones", "General"]);
     expect(sections[0]?.items.map((item) => item.title)).toEqual(["Inicio"]);
     expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles"]);
+    expect(sections[3]?.items.map((item) => item.title)).toEqual(["Mis inscripciones"]);
+  });
+
+  it("shows the enrollment applications section only with read permission", () => {
+    const sections = getInstitutionalNavigationSections(USER);
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+    ]);
+
+    const withRead = getInstitutionalNavigationSections({
+      ...USER,
+      permissions: [INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ],
+    });
+    expect(withRead.find((section) => section.label === "Inscripciones")?.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+        expect.objectContaining({ title: "Solicitudes de inscripción", url: "/enrollment-applications" }),
+      ]),
+    );
   });
 
   it("keeps Inicio outside labeled navigation sections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
     expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
-    expect(sections.map((section) => section.label)).toEqual([undefined, "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "Inscripciones", "General"]);
   });
 
   it("links the account area once for every authenticated user", () => {

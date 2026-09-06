@@ -51,6 +51,9 @@ export const INSTITUTIONAL_PERMISSION = {
   COURSE_STATUS_UPDATE: "institution:course:update-status",
   COURSE_DELETE: "institution:course:delete",
   COURSE_RESTORE: "institution:course:restore",
+  ENROLLMENT_APPLICATION_READ: "institution:enrollment-application:read",
+  ENROLLMENT_APPLICATION_APPROVE: "institution:enrollment-application:approve",
+  ENROLLMENT_APPLICATION_REJECT: "institution:enrollment-application:reject",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];
