@@ -28,6 +28,8 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   enrollments: "Inscripciones",
   courses: "Cursos",
   shifts: "Turnos",
+  "enrollment-applications": "Solicitudes de inscripción",
+  "my-enrollment-applications": "Mis inscripciones",
 };
 
 type BreadcrumbSegment = {

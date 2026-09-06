@@ -62,6 +62,9 @@ export const INSTITUTIONAL_PERMISSION = {
   SHIFT_STATUS_UPDATE: "institution:shift:update-status",
   SHIFT_DELETE: "institution:shift:delete",
   SHIFT_RESTORE: "institution:shift:restore",
+  ENROLLMENT_APPLICATION_READ: "institution:enrollment-application:read",
+  ENROLLMENT_APPLICATION_APPROVE: "institution:enrollment-application:approve",
+  ENROLLMENT_APPLICATION_REJECT: "institution:enrollment-application:reject",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];
