@@ -101,22 +101,12 @@ export async function submitEnrollmentApplication(applicationId: string): Promis
     method: "POST",
   });
 
-  if (response.ok) {
-    return response.json();
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Error al enviar la solicitud de inscripción");
   }
 
-  if (response.status === 404 || response.status === 405) {
-    const current = await getEnrollmentApplication(applicationId);
-    return {
-      ...current,
-      status: "SUBMITTED",
-      isEditable: false,
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  const errorData = await response.json().catch(() => ({}));
-  throw new Error(errorData.message || "Error al enviar la solicitud de inscripción");
+  return response.json();
 }
 
 export async function cancelEnrollmentApplication(applicationId: string): Promise<EnrollmentApplicationResponse> {
@@ -124,22 +114,12 @@ export async function cancelEnrollmentApplication(applicationId: string): Promis
     method: "POST",
   });
 
-  if (response.ok) {
-    return response.json();
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Error al cancelar la solicitud de inscripción");
   }
 
-  if (response.status === 404 || response.status === 405) {
-    const current = await getEnrollmentApplication(applicationId);
-    return {
-      ...current,
-      status: "CANCELLED",
-      isEditable: false,
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
-  const errorData = await response.json().catch(() => ({}));
-  throw new Error(errorData.message || "Error al cancelar la solicitud de inscripción");
+  return response.json();
 }
 
 export async function uploadEnrollmentAttachment(
@@ -151,42 +131,17 @@ export async function uploadEnrollmentAttachment(
   formData.append("file", file);
   formData.append("documentType", documentType);
 
-  try {
-    const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/attachments`, {
-      method: "POST",
-      body: formData,
-    });
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/attachments`, {
+    method: "POST",
+    body: formData,
+  });
 
-    if (response.ok) {
-      return await response.json();
-    }
-
-    if (response.status === 404 || response.status === 405) {
-      return {
-        id: crypto.randomUUID(),
-        documentType,
-        fileName: file.name,
-        contentType: file.type,
-        fileSize: file.size,
-        uploadedAt: new Date().toISOString(),
-      };
-    }
-
+  if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || "Error al subir el archivo adjunto");
-  } catch (err: unknown) {
-    if (err instanceof Error && err.message.includes("Error al subir el archivo adjunto")) {
-      throw err;
-    }
-    return {
-      id: crypto.randomUUID(),
-      documentType,
-      fileName: file.name,
-      contentType: file.type,
-      fileSize: file.size,
-      uploadedAt: new Date().toISOString(),
-    };
   }
+
+  return response.json();
 }
 
 export async function deleteEnrollmentAttachment(applicationId: string, attachmentId: string): Promise<void> {
@@ -194,7 +149,7 @@ export async function deleteEnrollmentAttachment(applicationId: string, attachme
     method: "DELETE",
   });
 
-  if (!response.ok && response.status !== 404 && response.status !== 405) {
+  if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || "Error al eliminar el archivo adjunto");
   }

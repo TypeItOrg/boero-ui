@@ -97,4 +97,126 @@ describe("enrollment-application.service administrative queries", () => {
       await expect(fetchEnrollmentApplicationById("app-999")).rejects.toThrow("No encontrada");
     });
   });
+
+  describe("submitEnrollmentApplication", () => {
+    it("returns the parsed response when the backend confirms submission", async () => {
+      institutionalApiFetchMock.mockResolvedValue(Response.json(MOCK_APPLICATION));
+      const { submitEnrollmentApplication } = await importService();
+
+      const result = await submitEnrollmentApplication("app-456");
+
+      expect(result).toEqual(MOCK_APPLICATION);
+    });
+
+    it("propagates the error instead of fabricating a submitted response on 404", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrada" }), { status: 404 }));
+      const { submitEnrollmentApplication } = await importService();
+
+      await expect(submitEnrollmentApplication("app-456")).rejects.toThrow("No encontrada");
+    });
+
+    it("propagates the error instead of fabricating a submitted response on 405", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
+      const { submitEnrollmentApplication } = await importService();
+
+      await expect(submitEnrollmentApplication("app-456")).rejects.toThrow("Método no permitido");
+    });
+
+    it("propagates the error on a server failure", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Error del servidor" }), { status: 500 }));
+      const { submitEnrollmentApplication } = await importService();
+
+      await expect(submitEnrollmentApplication("app-456")).rejects.toThrow("Error del servidor");
+    });
+  });
+
+  describe("cancelEnrollmentApplication", () => {
+    it("returns the parsed response when the backend confirms cancellation", async () => {
+      institutionalApiFetchMock.mockResolvedValue(Response.json(MOCK_APPLICATION));
+      const { cancelEnrollmentApplication } = await importService();
+
+      const result = await cancelEnrollmentApplication("app-456");
+
+      expect(result).toEqual(MOCK_APPLICATION);
+    });
+
+    it("propagates the error instead of fabricating a cancelled response on 404", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrada" }), { status: 404 }));
+      const { cancelEnrollmentApplication } = await importService();
+
+      await expect(cancelEnrollmentApplication("app-456")).rejects.toThrow("No encontrada");
+    });
+
+    it("propagates the error instead of fabricating a cancelled response on 405", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
+      const { cancelEnrollmentApplication } = await importService();
+
+      await expect(cancelEnrollmentApplication("app-456")).rejects.toThrow("Método no permitido");
+    });
+  });
+
+  describe("uploadEnrollmentAttachment", () => {
+    const file = new File(["contenido"], "dni.pdf", { type: "application/pdf" });
+
+    it("returns the parsed attachment when the upload succeeds", async () => {
+      const mockAttachment = {
+        id: "att-1",
+        documentType: "DNI_FRONT" as const,
+        fileName: "dni.pdf",
+        contentType: "application/pdf",
+        fileSize: 9,
+        uploadedAt: "2026-03-01T10:00:00Z",
+      };
+      institutionalApiFetchMock.mockResolvedValue(Response.json(mockAttachment));
+      const { uploadEnrollmentAttachment } = await importService();
+
+      const result = await uploadEnrollmentAttachment("app-456", "DNI_FRONT", file);
+
+      expect(result).toEqual(mockAttachment);
+    });
+
+    it("propagates the error instead of fabricating an attachment on 404", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrada" }), { status: 404 }));
+      const { uploadEnrollmentAttachment } = await importService();
+
+      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("No encontrada");
+    });
+
+    it("propagates the error instead of fabricating an attachment on 405", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
+      const { uploadEnrollmentAttachment } = await importService();
+
+      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("Método no permitido");
+    });
+
+    it("propagates a network failure instead of fabricating an attachment", async () => {
+      institutionalApiFetchMock.mockRejectedValue(new Error("Network error"));
+      const { uploadEnrollmentAttachment } = await importService();
+
+      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("Network error");
+    });
+  });
+
+  describe("deleteEnrollmentAttachment", () => {
+    it("resolves without error when the backend confirms deletion", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+      const { deleteEnrollmentAttachment } = await importService();
+
+      await expect(deleteEnrollmentAttachment("app-456", "att-1")).resolves.toBeUndefined();
+    });
+
+    it("propagates the error instead of silently succeeding on 404", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrado" }), { status: 404 }));
+      const { deleteEnrollmentAttachment } = await importService();
+
+      await expect(deleteEnrollmentAttachment("app-456", "att-1")).rejects.toThrow("No encontrado");
+    });
+
+    it("propagates the error instead of silently succeeding on 405", async () => {
+      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
+      const { deleteEnrollmentAttachment } = await importService();
+
+      await expect(deleteEnrollmentAttachment("app-456", "att-1")).rejects.toThrow("Método no permitido");
+    });
+  });
 });
