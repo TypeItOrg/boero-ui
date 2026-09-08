@@ -2,6 +2,7 @@ import "server-only";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { fetchStudyPlans, fetchAcademicYears } from "@features/academic/services/academic.service";
+import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
@@ -22,29 +23,30 @@ export default async function EnrollmentPage(): Promise<React.ReactElement> {
     );
   }
 
-  // 1. Obtener un Plan de Estudio activo y el Ciclo Lectivo activo para presentar en el flujo
+  // 1. Obtener Plan de Estudio y Ciclo Lectivo / Período abierto para la postulación
   let activePlan;
-  let activeYear;
+  let activeYearId;
 
   try {
-    const [plansResponse, yearsResponse] = await Promise.all([
-      fetchStudyPlans(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
-      fetchAcademicYears(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1, status: "ACTIVE" }),
+    const [plansResponse, openPeriodsResponse, yearsResponse] = await Promise.all([
+      fetchStudyPlans(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1 }),
+      listEnrollmentPeriods(person.institutionId, { status: "OPEN", size: 1 }).catch(() => ({ items: [] })),
+      fetchAcademicYears(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 1 }),
     ]);
+
     activePlan = plansResponse.items[0];
-    activeYear = yearsResponse.items[0];
+    activeYearId = openPeriodsResponse.items[0]?.academicYearId ?? yearsResponse.items[0]?.id;
   } catch {
-    // Si el usuario no tiene permisos para listar la oferta académica o falla la consulta,
-    // se deja sin plan/año activo para mostrar la alerta adecuada.
+    // Si ocurre algún fallo de permisos en la consulta, se mantiene sin plan
   }
 
-  if (!activePlan || !activeYear) {
+  if (!activePlan || !activeYearId) {
     return (
       <main className="flex-1 p-6">
         <Alert variant="destructive">
           <AlertCircleIcon className="size-4" />
           <AlertTitle>Inscripción no disponible</AlertTitle>
-          <AlertDescription>No hay planes de estudio o ciclos lectivos activos en este momento para la institución.</AlertDescription>
+          <AlertDescription>No hay planes de estudio o períodos de inscripción habilitados en este momento para la institución.</AlertDescription>
         </Alert>
       </main>
     );
@@ -52,7 +54,7 @@ export default async function EnrollmentPage(): Promise<React.ReactElement> {
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-6">
-      <EnrollmentWizard studyPlanId={activePlan.id} academicYearId={activeYear.id} />
+      <EnrollmentWizard studyPlanId={activePlan.id} academicYearId={activeYearId} />
     </main>
   );
 }
