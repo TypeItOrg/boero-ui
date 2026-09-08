@@ -59,7 +59,7 @@ describe("EnrollmentDetailView", () => {
     updatedAt: "2026-03-01T12:00:00Z",
   };
 
-  it("renders header summary and future administrative actions", () => {
+  it("renders header summary and keeps Approve/Reject disabled pending CSMFB-128/129", () => {
     render(<EnrollmentDetailView application={sampleApplication} studyPlanName="Profesorado de Música" academicYearName="2026" />);
 
     expect(screen.getByText("Lucas Martínez")).toBeInTheDocument();
@@ -67,7 +67,8 @@ describe("EnrollmentDetailView", () => {
     expect(screen.getByText("Profesorado de Música")).toBeInTheDocument();
     expect(screen.getAllByText(/2026/).length).toBeGreaterThan(0);
 
-    // Future administrative actions
+    // Aprobar/Rechazar quedan visibles pero deshabilitados: la decisión de negocio
+    // (CSMFB-128/129) todavía no tiene endpoint ni dueño en ninguno de los dos repos.
     const approveBtn = screen.getByRole("button", { name: /aprobar inscripción/i });
     const rejectBtn = screen.getByRole("button", { name: /rechazar/i });
     expect(approveBtn).toBeDisabled();
