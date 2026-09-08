@@ -40,6 +40,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
   const academicItems: NavigationItem[] = [
     { title: "Inscripciones", url: "/enrollment", icon: FilePenLineIcon },
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_READ)
+      ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
       ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
       : []),
