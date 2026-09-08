@@ -46,7 +46,7 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
       year,
     }),
   fetchDetail: fetchAcademicYear,
-  getTitle: (item) => String((item as Extract<AcademicCollection, { year: number }>).year),
+  getTitle: (item) => String((item as Extract<AcademicCollection, { startDate: string | null }>).year),
   filters: ({ status, deleted }) => [
     {
       defaultValue: "all",
@@ -69,7 +69,7 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
   ],
   dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
   toRow: (item) => {
-    const year = item as Extract<AcademicCollection, { year: number }>;
+    const year = item as Extract<AcademicCollection, { startDate: string | null }>;
     return {
       id: year.id,
       institutionId: year.institutionId,

@@ -50,6 +50,18 @@ export const INSTITUTIONAL_PERMISSION = {
   ENROLLMENT_PERIOD_UPDATE: "institution:enrollment-period:update",
   ENROLLMENT_PERIOD_STATUS_UPDATE: "institution:enrollment-period:update-status",
   ENROLLMENT_PERIOD_DELETE: "institution:enrollment-period:delete",
+  COURSE_READ: "institution:course:read",
+  COURSE_CREATE: "institution:course:create",
+  COURSE_UPDATE: "institution:course:update",
+  COURSE_STATUS_UPDATE: "institution:course:update-status",
+  COURSE_DELETE: "institution:course:delete",
+  COURSE_RESTORE: "institution:course:restore",
+  SHIFT_READ: "institution:shift:read",
+  SHIFT_CREATE: "institution:shift:create",
+  SHIFT_UPDATE: "institution:shift:update",
+  SHIFT_STATUS_UPDATE: "institution:shift:update-status",
+  SHIFT_DELETE: "institution:shift:delete",
+  SHIFT_RESTORE: "institution:shift:restore",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];

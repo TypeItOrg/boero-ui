@@ -51,6 +51,18 @@ const ACCESS: AcademicAccess = {
   instrumentStatusUpdate: false,
   instrumentDelete: false,
   instrumentRestore: false,
+  courseRead: false,
+  courseCreate: false,
+  courseUpdate: false,
+  courseStatusUpdate: false,
+  courseDelete: false,
+  courseRestore: false,
+  shiftRead: false,
+  shiftCreate: false,
+  shiftUpdate: false,
+  shiftStatusUpdate: false,
+  shiftDelete: false,
+  shiftRestore: false,
 };
 
 describe("fetchAcademicRecentItems", () => {

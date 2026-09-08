@@ -93,6 +93,29 @@ export function AcademicYearStatusDialog({
   );
   const config = STATUS_DIALOG_CONFIG[targetStatus];
   const Icon = config.icon;
+  const [courseCount, setCourseCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (!open || targetStatus !== "CLOSED") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset transient count when dialog closes
+      setCourseCount(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?institutionId=${institutionId}`, {
+      cache: "no-store",
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.count === "number") setCourseCount(data.count);
+      })
+      .catch(() => {
+        if (!cancelled) setCourseCount(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, targetStatus, scope, institutionId, id]);
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) return;
@@ -109,6 +132,15 @@ export function AcademicYearStatusDialog({
             </div>
             <AlertDialogTitle>{config.title}</AlertDialogTitle>
             <AlertDialogDescription>{config.description(academicYearLabel)}</AlertDialogDescription>
+            {targetStatus === "CLOSED" ? (
+              <p className="text-muted-foreground mt-2 text-sm">
+                {courseCount === null
+                  ? "Cargando cursos asociados..."
+                  : courseCount === 0
+                    ? "No hay cursos asociados para cerrar."
+                    : `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`}
+              </p>
+            ) : null}
           </AlertDialogHeader>
 
           {state.error ? (

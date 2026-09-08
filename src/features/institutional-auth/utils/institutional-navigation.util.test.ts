@@ -49,6 +49,10 @@ describe("getInstitutionalNavigationSections", () => {
       ...USER,
       permissions: [INSTITUTIONAL_PERMISSION.INSTRUMENT_READ],
     });
+    const shiftSections = getInstitutionalNavigationSections({
+      ...USER,
+      permissions: [INSTITUTIONAL_PERMISSION.SHIFT_READ],
+    });
 
     expect(spaceSections.find((section) => section.label === "Académico")?.items).toEqual([
       expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
@@ -57,6 +61,10 @@ describe("getInstitutionalNavigationSections", () => {
     expect(instrumentSections.find((section) => section.label === "Académico")?.items).toEqual([
       expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Instrumentos", url: "/instruments" }),
+    ]);
+    expect(shiftSections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
+      expect.objectContaining({ title: "Turnos", url: "/shifts" }),
     ]);
   });
 

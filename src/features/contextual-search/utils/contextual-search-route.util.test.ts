@@ -34,6 +34,7 @@ describe("contextual search routes", () => {
     ["study-plan", "study-plans"],
     ["academic-space", "academic-spaces"],
     ["instrument", "instruments"],
+    ["shift", "shifts"],
   ] as const)("builds detail routes for the %s academic entity", (entityType, resource) => {
     expect(getContextualSearchResultHref("platform", entityType, result)).toBe(`/admin/institutions/institution-1/academic/${resource}/result-1`);
     expect(getContextualSearchResultHref("institutional", entityType, result)).toBe(`/${resource}/result-1`);

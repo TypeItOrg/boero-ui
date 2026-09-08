@@ -1,9 +1,12 @@
+import type { AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
+import type { CourseStatus } from "@features/academic/types/course-status.types";
 import type { ApprovalMode } from "@features/academic/types/approval-mode.types";
 import type { RequiredCondition } from "@features/academic/types/required-condition.types";
 import type { RequirementStage } from "@features/academic/types/requirement-stage.types";
 import type { RequirementType } from "@features/academic/types/requirement-type.types";
+import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
 
 export const academicYearStatusLabels: Record<AcademicYearStatus, string> = {
@@ -26,6 +29,11 @@ export const academicSpaceTypeLabels: Record<AcademicSpaceType, string> = {
   OTHER: "Otro",
 };
 
+export const academicSpaceFormatLabels: Record<AcademicSpaceFormat, string> = {
+  INDIVIDUAL: "Individual",
+  GRUPAL: "Grupal",
+};
+
 export const requirementTypeLabels: Record<RequirementType, string> = {
   REQUIRED: "Obligatorio",
   OPTIONAL: "Optativo",
@@ -45,4 +53,18 @@ export const requirementStageLabels: Record<RequirementStage, string> = {
 export const requiredConditionLabels: Record<RequiredCondition, string> = {
   REGULAR: "Regularizada",
   PASSED: "Aprobada",
+};
+
+export const courseWeekDayLabels: Record<CourseWeekDay, string> = {
+  MONDAY: "Lunes",
+  TUESDAY: "Martes",
+  WEDNESDAY: "Miércoles",
+  THURSDAY: "Jueves",
+  FRIDAY: "Viernes",
+};
+
+export const courseStatusLabels: Record<CourseStatus, string> = {
+  ACTIVE: "Activo",
+  INACTIVE: "Inactivo",
+  CLOSED: "Cerrado",
 };

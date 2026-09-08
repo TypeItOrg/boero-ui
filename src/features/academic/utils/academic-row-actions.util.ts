@@ -86,6 +86,37 @@ export function getAcademicRowActions(
     return actions;
   }
 
+  if (resource === AcademicResource.COURSE) {
+    const status = (row.statusValue as string) ?? (row.active ? "ACTIVE" : "INACTIVE");
+    if (status === "CLOSED") {
+      return [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
+    }
+    const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
+    if (canUpdate)
+      actions.push({
+        href: `${detailHref}/edit`,
+        kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE,
+        label: "Editar",
+        preserveReturnTo: true,
+      });
+    if (canChangeStatus) {
+      actions.push({
+        kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
+        label: row.active ? "Desactivar" : "Activar",
+        resource,
+        targetStatus: row.active ? "INACTIVE" : "ACTIVE",
+      });
+      actions.push({
+        kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
+        label: "Finalizar",
+        resource: AcademicResource.COURSE,
+        targetStatus: "CLOSED",
+      });
+    }
+    if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    return actions;
+  }
+
   if (isActiveStatusResource(resource)) {
     const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
     if (canUpdate)
@@ -111,7 +142,12 @@ export function getAcademicRowActions(
 }
 
 export function isActiveStatusResource(resource: AcademicCollectionResource): resource is ActiveAcademicStatusResource {
-  return resource === AcademicResource.TRAINING_PATH || resource === AcademicResource.ACADEMIC_SPACE || resource === AcademicResource.INSTRUMENT;
+  return (
+    resource === AcademicResource.TRAINING_PATH ||
+    resource === AcademicResource.ACADEMIC_SPACE ||
+    resource === AcademicResource.INSTRUMENT ||
+    resource === AcademicResource.SHIFT
+  );
 }
 
 export function isDestructiveStatusAction(action: Extract<AcademicRowAction, { kind: typeof ACADEMIC_ROW_ACTION_KIND.STATUS }>): boolean {

@@ -6,6 +6,8 @@ export const ACADEMIC_COLLECTION_RESOURCES = [
   AcademicResource.STUDY_PLAN,
   AcademicResource.ACADEMIC_SPACE,
   AcademicResource.INSTRUMENT,
+  AcademicResource.COURSE,
+  AcademicResource.SHIFT,
 ] as const;
 
 export type AcademicCollectionResource = (typeof ACADEMIC_COLLECTION_RESOURCES)[number];

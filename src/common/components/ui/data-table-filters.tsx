@@ -3,13 +3,17 @@
 import * as React from "react";
 import { SearchIcon, XIcon } from "lucide-react";
 
+import { Button } from "@common/components/ui/button";
+import { DataTableAdvancedFiltersTrigger } from "@common/components/ui/data-table-advanced-filters-trigger";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@common/components/ui/sheet";
 import { YearSelect } from "@common/components/ui/year-select";
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
 import { cn } from "@common/utils/cn.util";
+import { countActiveAdvancedFilters } from "@common/utils/count-active-advanced-filters.util";
 import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
 
 export type DataTableFilterOption<TValue extends string = string> = {
@@ -41,6 +45,14 @@ export type DataTableYearFilter = {
 };
 
 type DataTableFiltersProps = {
+  activeAdvancedCount?: number;
+  advancedDateFilters?: readonly DataTableDateFilter[];
+  advancedDescription?: string;
+  advancedFilters?: React.ReactNode;
+  advancedResetKeys?: readonly string[];
+  advancedSelectFilters?: readonly DataTableSelectFilter[];
+  advancedTitle?: string;
+  advancedYearFilters?: readonly DataTableYearFilter[];
   children?: React.ReactNode;
   className?: string;
   dateFilters?: readonly DataTableDateFilter[];
@@ -48,6 +60,7 @@ type DataTableFiltersProps = {
   searchPlaceholder?: string;
   selectFilters?: readonly DataTableSelectFilter[];
   size?: number;
+  triggerPosition?: DataTableTriggerPosition;
   yearFilters?: readonly DataTableYearFilter[];
 };
 
@@ -69,7 +82,17 @@ type PendingDateFilterValue = {
 const SEARCH_DEBOUNCE_MS = 350;
 const DATE_FILTER_DEBOUNCE_MS = 350;
 
+export type DataTableTriggerPosition = "inline" | "external";
+
 export function DataTableFilters({
+  activeAdvancedCount = 0,
+  advancedDateFilters = [],
+  advancedDescription = "Refiná la búsqueda con filtros adicionales.",
+  advancedFilters,
+  advancedResetKeys = [],
+  advancedSelectFilters = [],
+  advancedTitle = "Filtros avanzados",
+  advancedYearFilters = [],
   children,
   className,
   dateFilters = [],
@@ -77,6 +100,7 @@ export function DataTableFilters({
   searchPlaceholder,
   selectFilters = [],
   size,
+  triggerPosition = "inline",
   yearFilters = [],
 }: DataTableFiltersProps): React.ReactElement {
   const { navigate } = useDataTableNavigation();
@@ -94,34 +118,143 @@ export function DataTableFilters({
     [navigate, size],
   );
   const updateSearch = React.useCallback((value: string): void => updateQueryParam("search", value), [updateQueryParam]);
+  const advancedTriggerLabelId = React.useId();
 
-  return (
-    <form className={cn("bg-muted/25 flex flex-row flex-wrap gap-3 rounded-lg border p-4 md:items-end [&>*]:flex-[1_0_min(250px,100%)]", className)}>
+  function renderYearFilters(list: readonly DataTableYearFilter[]): React.ReactNode {
+    return list.map((filter) => (
+      <DataTableFilterYear
+        key={filter.name}
+        filter={filter}
+        onValueChange={(value) => updateQueryParam(filter.name, value === filter.defaultValue ? undefined : value)}
+      />
+    ));
+  }
+
+  function renderDateFilters(list: readonly DataTableDateFilter[]): React.ReactNode {
+    return list.map((filter) => <DataTableFilterDate key={filter.name} filter={filter} updateQueryParam={updateQueryParam} />);
+  }
+
+  function renderSelectFilters(list: readonly DataTableSelectFilter[]): React.ReactNode {
+    return list.map((filter) => (
+      <DataTableFilterSelect
+        key={filter.name}
+        filter={filter}
+        onValueChange={(value) => updateQueryParam(filter.name, value === filter.defaultValue ? undefined : value)}
+      />
+    ));
+  }
+
+  const filterFields = (
+    <>
       {search !== undefined && searchPlaceholder !== undefined ? (
         <DataTableSearchFilter initialValue={search} onValueChange={updateSearch} placeholder={searchPlaceholder} />
       ) : null}
 
       {children}
 
-      {yearFilters.map((filter) => (
-        <DataTableFilterYear
-          key={filter.name}
-          filter={filter}
-          onValueChange={(value) => updateQueryParam(filter.name, value === filter.defaultValue ? undefined : value)}
-        />
-      ))}
+      {renderYearFilters(yearFilters)}
 
-      {dateFilters.map((filter) => (
-        <DataTableFilterDate key={filter.name} filter={filter} updateQueryParam={updateQueryParam} />
-      ))}
+      {renderDateFilters(dateFilters)}
 
-      {selectFilters.map((filter) => (
-        <DataTableFilterSelect
-          key={filter.name}
-          filter={filter}
-          onValueChange={(value) => updateQueryParam(filter.name, value === filter.defaultValue ? undefined : value)}
-        />
-      ))}
+      {renderSelectFilters(selectFilters)}
+    </>
+  );
+
+  const hasAdvanced =
+    advancedFilters !== undefined || advancedSelectFilters.length > 0 || advancedYearFilters.length > 0 || advancedDateFilters.length > 0;
+
+  if (!hasAdvanced) {
+    return (
+      <form
+        className={cn("bg-muted/25 flex flex-row flex-wrap gap-3 rounded-lg border p-4 md:items-end [&>*]:flex-[1_0_min(250px,100%)]", className)}
+      >
+        {filterFields}
+      </form>
+    );
+  }
+
+  const advancedBadgeCount = countActiveAdvancedFilters({
+    activeAdvancedCount,
+    advancedDateFilters,
+    advancedSelectFilters,
+    advancedYearFilters,
+  });
+
+  function clearAdvanced(): void {
+    const updates: Record<string, string | undefined> = { page: "0" };
+
+    for (const key of advancedResetKeys) {
+      updates[key] = undefined;
+    }
+
+    for (const filter of [...advancedSelectFilters, ...advancedYearFilters, ...advancedDateFilters]) {
+      updates[filter.name] = undefined;
+    }
+
+    if (size !== undefined) {
+      updates.size = String(size);
+    }
+
+    navigate(updates, { replace: true });
+  }
+
+  const advancedSheetContent = (
+    <SheetContent side="right" showCloseButton={false}>
+      <SheetHeader>
+        <SheetTitle>{advancedTitle}</SheetTitle>
+        <SheetDescription>{advancedDescription}</SheetDescription>
+      </SheetHeader>
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 [&>*]:w-full [&>*]:!flex-none">
+        {advancedFilters}
+
+        {renderYearFilters(advancedYearFilters)}
+
+        {renderDateFilters(advancedDateFilters)}
+
+        {renderSelectFilters(advancedSelectFilters)}
+      </div>
+      <SheetFooter className="flex-row flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="flex-[1_0_min(120px,100%)]"
+          disabled={advancedBadgeCount === 0}
+          onClick={clearAdvanced}
+        >
+          Limpiar filtros
+        </Button>
+        <SheetClose asChild>
+          <Button type="button" size="lg" className="flex-[1_0_min(120px,100%)]">
+            Ver resultados
+          </Button>
+        </SheetClose>
+      </SheetFooter>
+    </SheetContent>
+  );
+
+  return (
+    <form
+      className={cn(
+        "bg-muted/25 flex flex-row flex-wrap items-end gap-3 rounded-lg border p-4 [&>*:not([data-filter-trigger])]:flex-[1_1_min(200px,100%)]",
+        className,
+      )}
+    >
+      {filterFields}
+
+      {triggerPosition === "external" ? (
+        advancedSheetContent
+      ) : (
+        <div data-filter-trigger className="ml-auto flex !flex-none shrink-0 flex-col gap-1.5">
+          <span id={advancedTriggerLabelId} className="text-foreground text-sm font-medium">
+            Filtros
+          </span>
+          <Sheet>
+            <DataTableAdvancedFiltersTrigger count={advancedBadgeCount} labelledBy={advancedTriggerLabelId} />
+            {advancedSheetContent}
+          </Sheet>
+        </div>
+      )}
     </form>
   );
 }

@@ -31,7 +31,9 @@ type AcademicRestoreDialogProps = {
     | AcademicResource.TRAINING_PATH
     | AcademicResource.STUDY_PLAN
     | AcademicResource.ACADEMIC_SPACE
-    | AcademicResource.INSTRUMENT;
+    | AcademicResource.INSTRUMENT
+    | AcademicResource.COURSE
+    | AcademicResource.SHIFT;
   scope: AcademicScope;
 };
 

@@ -31,6 +31,24 @@ export function PhoneInput({ onChange, ...props }: RestrictedInputProps): React.
   );
 }
 
+export function TimeInput({ onChange, ...props }: RestrictedInputProps): React.ReactElement {
+  return (
+    <Input
+      type="text"
+      inputMode="numeric"
+      placeholder="HH:mm"
+      maxLength={5}
+      onChange={(event) => {
+        const digits = event.currentTarget.value.replace(/\D/g, "").slice(0, 4);
+        const formatted = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+        event.currentTarget.value = formatted;
+        onChange?.(event);
+      }}
+      {...props}
+    />
+  );
+}
+
 function handleRestrictedChange(
   event: React.ChangeEvent<HTMLInputElement>,
   disallowedCharacters: RegExp,

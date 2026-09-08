@@ -9,6 +9,7 @@ export type AsyncDropdownProps<TItem> = {
   contentClassName?: string;
   clearLabel?: string;
   clearable?: boolean;
+  closeOnSelect?: boolean;
   debounceMs?: number;
   defaultOption?: AsyncDropdownDefaultOption;
   disabled?: boolean;
@@ -35,5 +36,6 @@ export type AsyncDropdownProps<TItem> = {
   resetSearchOnClose?: boolean;
   searchPlaceholder?: string;
   selectedLabel?: string;
+  selectedValues?: readonly string[];
   value?: string;
 };

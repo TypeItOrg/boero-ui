@@ -4,13 +4,17 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import {
   fetchAcademicSpaces,
   fetchAcademicYears,
+  fetchCourses,
   fetchInstruments,
+  fetchShifts,
   fetchStudyPlans,
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import type { Course } from "@features/academic/types/course.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
@@ -75,6 +79,13 @@ export async function fetchAcademicRecentItems(scope: AcademicScope, institution
       loadRecentItem(() => fetchInstruments(scope, institutionId, RECENT_QUERY), AcademicResource.INSTRUMENT, "Instrumentos", mapInstrument),
     );
   }
+  if (access.courseRead) {
+    requests.push(loadRecentItem(() => fetchCourses(scope, institutionId, RECENT_QUERY), AcademicResource.COURSE, "Cursos", mapCourse));
+  }
+
+  if (access.shiftRead) {
+    requests.push(loadRecentItem(() => fetchShifts(scope, institutionId, RECENT_QUERY), AcademicResource.SHIFT, "Turnos", mapShift));
+  }
 
   return (await Promise.all(requests)).filter((item): item is AcademicRecentItem => item !== null);
 }
@@ -128,6 +139,24 @@ function mapAcademicSpace(item: AcademicSpace): Omit<AcademicRecentItem, "resour
 }
 
 function mapInstrument(item: Instrument): Omit<AcademicRecentItem, "resource" | "section"> {
+  return {
+    id: item.id,
+    label: item.name,
+    detail: item.active ? "Activo" : "Inactivo",
+    active: item.active,
+  };
+}
+
+function mapCourse(item: Course): Omit<AcademicRecentItem, "resource" | "section"> {
+  return {
+    id: item.id,
+    label: `${item.academicSpaceName} · ${item.studyPlanName}`,
+    detail: `${item.year}`,
+    active: item.active,
+  };
+}
+
+function mapShift(item: Shift): Omit<AcademicRecentItem, "resource" | "section"> {
   return {
     id: item.id,
     label: item.name,

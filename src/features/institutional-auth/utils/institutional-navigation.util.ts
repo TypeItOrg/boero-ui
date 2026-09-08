@@ -2,7 +2,9 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  ClockIcon,
   FilePenLineIcon,
+  GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
   Music2Icon,
@@ -58,6 +60,10 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_READ)
       ? [{ title: "Instrumentos", url: "/instruments", icon: Music2Icon }]
       : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
+      ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
+      : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
   ];
 
   return [
