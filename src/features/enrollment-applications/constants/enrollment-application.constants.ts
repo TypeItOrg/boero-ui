@@ -35,7 +35,7 @@ export const ENROLLMENT_DOCUMENT_TYPE_LABELS: Record<EnrollmentDocumentType, str
   DNI_BACK: "DNI Dorso",
   SECONDARY_CERTIFICATE: "Título Secundario",
   HEALTH_REPORT: "Informe de Salud",
-  PHOTO_4X4: "Foto 4x4",
+  PHOTO_ID: "Foto 4x4",
 };
 
 export const SHIFT_OPTIONS = [

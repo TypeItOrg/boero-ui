@@ -53,11 +53,11 @@ export async function cancelEnrollmentApplicationAction(applicationId: string): 
 
 export async function uploadEnrollmentAttachmentAction(applicationId: string, formData: FormData): Promise<EnrollmentAttachment> {
   const file = formData.get("file") as File;
-  const documentType = formData.get("documentType") as EnrollmentDocumentType;
+  const attachmentType = formData.get("attachmentType") as EnrollmentDocumentType;
   if (!file) {
     throw new Error("No se ha seleccionado ningún archivo");
   }
-  return uploadEnrollmentAttachment(applicationId, documentType, file);
+  return uploadEnrollmentAttachment(applicationId, attachmentType, file);
 }
 
 export async function deleteEnrollmentAttachmentAction(applicationId: string, attachmentId: string): Promise<void> {

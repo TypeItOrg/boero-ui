@@ -16,8 +16,8 @@ export async function fetchEnrollmentApplications(
   params?: FetchEnrollmentApplicationsParams,
 ): Promise<PaginatedResponse<EnrollmentApplicationResponse>> {
   const queryParams = new URLSearchParams();
-  if (params?.enrollmentPeriodId && params.enrollmentPeriodId !== "all") {
-    queryParams.set("enrollmentPeriodId", params.enrollmentPeriodId);
+  if (params?.periodId && params.periodId !== "all") {
+    queryParams.set("periodId", params.periodId);
   }
   if (params?.status && params.status !== "all") {
     queryParams.set("status", params.status);
@@ -129,7 +129,7 @@ export async function uploadEnrollmentAttachment(
 ): Promise<EnrollmentAttachment> {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("documentType", documentType);
+  formData.append("attachmentType", documentType);
 
   const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/attachments`, {
     method: "POST",

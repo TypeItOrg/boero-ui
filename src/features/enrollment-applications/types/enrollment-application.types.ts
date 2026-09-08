@@ -1,15 +1,15 @@
 export type EnrollmentApplicationStatus = "DRAFT" | "SUBMITTED" | "APPROVED" | "CANCELLED" | "REJECTED";
 
-export type EnrollmentDocumentType = "DNI_FRONT" | "DNI_BACK" | "SECONDARY_CERTIFICATE" | "HEALTH_REPORT" | "PHOTO_4X4";
+export type EnrollmentDocumentType = "DNI_FRONT" | "DNI_BACK" | "SECONDARY_CERTIFICATE" | "HEALTH_REPORT" | "PHOTO_ID";
 
 export interface EnrollmentAttachment {
   id: string;
-  documentType: EnrollmentDocumentType;
-  fileName: string;
+  attachmentType: EnrollmentDocumentType;
+  originalFileName: string;
   contentType?: string;
-  fileSize?: number;
+  size?: number;
   url?: string;
-  uploadedAt?: string;
+  createdAt?: string;
 }
 
 export interface EnrollmentPersonalData {
@@ -17,47 +17,45 @@ export interface EnrollmentPersonalData {
   lastName: string;
   documentNumber: string;
   birthDate: string;
-  address: string;
-  city: string;
-  phone: string;
+  phoneNumber: string;
   email: string;
 }
 
-export interface EnrollmentEducationBackground {
+export interface EnrollmentAcademicBackground {
   secondarySchool: string;
-  graduationYear?: string;
-  isSecondaryComplete: boolean;
-  secondaryTitle?: string;
+  schoolOrigin?: string;
+  currentGradeYear?: string;
+  secondaryCompleted: boolean;
+  secondaryDegreeTitle?: string;
 }
 
 export interface EnrollmentHealthInclusion {
-  requiresSupport: boolean;
-  supportDetails?: string;
+  receivesReasonableAdjustments: boolean;
+  adjustmentDetails?: string;
 }
 
 export interface EnrollmentResponsible {
   fullName: string;
   documentNumber: string;
-  phone: string;
+  phoneNumber: string;
   email: string;
   occupation: string;
   educationLevel: string;
 }
 
-export interface EnrollmentPreferences {
+export interface EnrollmentPreference {
   preferredShift: string;
-  imageAuthorization: boolean;
-  isReentering: boolean;
+  allowsImageUse: boolean;
+  isReenrolling: boolean;
   previousTeacher?: string;
 }
 
 export interface EnrollmentApplicationData {
   personalData?: Partial<EnrollmentPersonalData>;
-  educationBackground?: Partial<EnrollmentEducationBackground>;
-  academicBackground?: { secondarySchool?: string };
+  academicBackground?: Partial<EnrollmentAcademicBackground>;
   healthInclusion?: Partial<EnrollmentHealthInclusion>;
   responsible?: Partial<EnrollmentResponsible>;
-  preferences?: Partial<EnrollmentPreferences>;
+  preference?: Partial<EnrollmentPreference>;
   attachments?: EnrollmentAttachment[];
   [key: string]: unknown;
 }
@@ -92,8 +90,7 @@ export interface UpdateEnrollmentDraftInput {
 }
 
 export interface FetchEnrollmentApplicationsParams {
-  institutionId?: string;
-  enrollmentPeriodId?: string;
+  periodId?: string;
   status?: EnrollmentApplicationStatus | string;
   search?: string;
   page?: number;

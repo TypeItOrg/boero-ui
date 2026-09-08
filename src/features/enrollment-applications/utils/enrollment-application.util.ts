@@ -86,5 +86,5 @@ export function formatFileSize(bytes?: number): string {
 }
 
 export function getAttachmentDownloadUrl(applicationId: string, attachmentId: string): string {
-  return `/api/v1/enrollment-applications/${applicationId}/attachments/${attachmentId}`;
+  return `/api/enrollment-applications/${applicationId}/attachments/${attachmentId}/content`;
 }

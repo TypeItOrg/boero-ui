@@ -42,25 +42,24 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
 
   const data = (application.data || {}) as EnrollmentApplicationData;
   const personal = data.personalData || {};
-  const education = data.educationBackground || {};
   const academic = data.academicBackground || {};
   const health = data.healthInclusion || {};
   const responsible = data.responsible || {};
-  const preferences = data.preferences || {};
+  const preference = data.preference || {};
   const attachments = (data.attachments || []) as EnrollmentAttachment[];
 
   // Formatted fields
-  const secondarySchool = education.secondarySchool || academic.secondarySchool || "—";
-  const graduationYear = education.graduationYear || "—";
-  const isComplete = education.isSecondaryComplete;
-  const secondaryTitle = education.secondaryTitle || "—";
+  const secondarySchool = academic.secondarySchool || "—";
+  const currentGradeYear = academic.currentGradeYear || "—";
+  const isComplete = academic.secondaryCompleted;
+  const secondaryDegreeTitle = academic.secondaryDegreeTitle || "—";
 
-  const requiresSupport = health.requiresSupport;
-  const supportDetails = health.supportDetails?.trim() || "";
+  const receivesReasonableAdjustments = health.receivesReasonableAdjustments;
+  const adjustmentDetails = health.adjustmentDetails?.trim() || "";
 
-  const hasResponsible = responsible.fullName || responsible.documentNumber || responsible.phone;
+  const hasResponsible = responsible.fullName || responsible.documentNumber || responsible.phoneNumber;
 
-  const shiftLabel = SHIFT_OPTIONS.find((s) => s.value === preferences.preferredShift)?.label || preferences.preferredShift || "—";
+  const shiftLabel = SHIFT_OPTIONS.find((s) => s.value === preference.preferredShift)?.label || preference.preferredShift || "—";
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,8 +118,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             <DetailValue label="Apellido" value={personal.lastName || "—"} />
             <DetailValue label="Documento (DNI)" value={personal.documentNumber || "—"} />
             <DetailValue label="Fecha de nacimiento" value={formatBirthDate(personal.birthDate)} />
-            <DetailValue label="Domicilio" value={personal.address ? `${personal.address}${personal.city ? `, ${personal.city}` : ""}` : "—"} />
-            <DetailValue label="Teléfono" value={personal.phone || "—"} />
+            <DetailValue label="Teléfono" value={personal.phoneNumber || "—"} />
             <DetailValue label="Email" value={personal.email || "—"} />
           </dl>
         </section>
@@ -136,7 +134,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
           </header>
           <dl className="mt-4 grid gap-4 sm:mt-5 sm:grid-cols-2">
             <DetailValue label="Colegio de origen" value={secondarySchool} />
-            <DetailValue label="Año de egreso / Curso" value={graduationYear} />
+            <DetailValue label="Año de egreso / Curso" value={currentGradeYear} />
             <div>
               <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Secundario completo</dt>
               <dd className="mt-1.5">
@@ -151,7 +149,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
                 )}
               </dd>
             </div>
-            <DetailValue label="Título obtenido" value={secondaryTitle} />
+            <DetailValue label="Título obtenido" value={secondaryDegreeTitle} />
           </dl>
         </section>
 
@@ -168,8 +166,8 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             <div>
               <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Ajustes razonables</dt>
               <dd className="mt-1.5">
-                {requiresSupport !== undefined ? (
-                  requiresSupport ? (
+                {receivesReasonableAdjustments !== undefined ? (
+                  receivesReasonableAdjustments ? (
                     <Badge variant="destructive">Requiere ajustes razonables</Badge>
                   ) : (
                     <Badge variant="secondary">No requiere ajustes</Badge>
@@ -181,7 +179,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             </div>
             <div>
               <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Detalle de accesibilidad</dt>
-              <dd className="mt-1 text-sm font-medium">{supportDetails || "Sin requerimientos adicionales declarados."}</dd>
+              <dd className="mt-1 text-sm font-medium">{adjustmentDetails || "Sin requerimientos adicionales declarados."}</dd>
             </div>
           </dl>
         </section>
@@ -200,7 +198,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
               <DetailValue label="Nombre y Apellido" value={responsible.fullName || "—"} />
               <DetailValue label="DNI" value={responsible.documentNumber || "—"} />
               <DetailValue label="Ocupación" value={responsible.occupation || "—"} />
-              <DetailValue label="Teléfono" value={responsible.phone || "—"} />
+              <DetailValue label="Teléfono" value={responsible.phoneNumber || "—"} />
               <DetailValue label="Email" value={responsible.email || "—"} />
               <DetailValue label="Nivel educativo" value={responsible.educationLevel || "—"} />
             </dl>
@@ -225,8 +223,8 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             <div>
               <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Uso de imagen</dt>
               <dd className="mt-1.5">
-                {preferences.imageAuthorization !== undefined ? (
-                  preferences.imageAuthorization ? (
+                {preference.allowsImageUse !== undefined ? (
+                  preference.allowsImageUse ? (
                     <Badge variant="success">Autorizado</Badge>
                   ) : (
                     <Badge variant="outline">No autorizado</Badge>
@@ -239,8 +237,8 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             <div>
               <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Condición de ingreso</dt>
               <dd className="mt-1.5">
-                {preferences.isReentering !== undefined ? (
-                  preferences.isReentering ? (
+                {preference.isReenrolling !== undefined ? (
+                  preference.isReenrolling ? (
                     <Badge variant="secondary">Reingresante</Badge>
                   ) : (
                     <Badge variant="outline">Nuevo aspirante</Badge>
@@ -250,7 +248,7 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
                 )}
               </dd>
             </div>
-            <DetailValue label="Docente previo / Referencia" value={preferences.previousTeacher || "Ninguno"} />
+            <DetailValue label="Docente previo / Referencia" value={preference.previousTeacher || "Ninguno"} />
           </dl>
         </section>
 
@@ -268,10 +266,10 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
               <div className="divide-border/60 divide-y rounded-lg border">
                 {attachments.map((attachment) => {
                   const docTypeLabel =
-                    ENROLLMENT_DOCUMENT_TYPE_LABELS[attachment.documentType as keyof typeof ENROLLMENT_DOCUMENT_TYPE_LABELS] ||
-                    attachment.documentType ||
+                    ENROLLMENT_DOCUMENT_TYPE_LABELS[attachment.attachmentType as keyof typeof ENROLLMENT_DOCUMENT_TYPE_LABELS] ||
+                    attachment.attachmentType ||
                     "Documento";
-                  const downloadUrl = attachment.url || getAttachmentDownloadUrl(application.applicationId, attachment.id);
+                  const downloadUrl = getAttachmentDownloadUrl(application.applicationId, attachment.id);
 
                   return (
                     <div key={attachment.id} className="hover:bg-muted/30 flex items-center justify-between gap-3 p-3 transition-colors">
@@ -282,18 +280,18 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
                         <div className="min-w-0">
                           <p className="text-foreground truncate text-sm font-medium">{docTypeLabel}</p>
                           <p className="text-muted-foreground truncate text-xs">
-                            {attachment.fileName}
-                            {attachment.fileSize && (
+                            {attachment.originalFileName}
+                            {attachment.size && (
                               <>
                                 <span className="mx-1">•</span>
-                                {formatFileSize(attachment.fileSize)}
+                                {formatFileSize(attachment.size)}
                               </>
                             )}
                           </p>
                         </div>
                       </div>
                       <Button asChild variant="outline" size="sm" className="shrink-0 gap-1.5">
-                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download={attachment.fileName}>
+                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download={attachment.originalFileName}>
                           <DownloadIcon className="size-3.5" />
                           <span className="hidden sm:inline">Descargar</span>
                         </a>

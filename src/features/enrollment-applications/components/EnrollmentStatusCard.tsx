@@ -22,6 +22,7 @@ import { Badge } from "@common/components/ui/badge";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { ENROLLMENT_APPLICATION_STATUS_LABELS, ENROLLMENT_DOCUMENT_TYPE_LABELS } from "../constants/enrollment-application.constants";
+import { getAttachmentDownloadUrl } from "../utils/enrollment-application.util";
 import type { EnrollmentApplicationResponse, EnrollmentApplicationStatus } from "../types/enrollment-application.types";
 
 interface EnrollmentStatusCardProps {
@@ -126,10 +127,10 @@ function formatDateSafe(dateStr?: string): string {
 export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps): React.ReactElement {
   const data = application.data || {};
   const personal = data.personalData || {};
-  const education = data.educationBackground || {};
+  const academic = data.academicBackground || {};
   const health = data.healthInclusion || {};
   const responsible = data.responsible || {};
-  const preferences = data.preferences || {};
+  const preference = data.preference || {};
   const attachments = data.attachments || [];
 
   return (
@@ -175,15 +176,11 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Teléfono:</dt>
-                  <dd className="text-foreground font-medium">{personal.phone || "-"}</dd>
+                  <dd className="text-foreground font-medium">{personal.phoneNumber || "-"}</dd>
                 </div>
                 <div className="col-span-2">
                   <dt className="text-muted-foreground">Email:</dt>
                   <dd className="text-foreground font-medium">{personal.email || "-"}</dd>
-                </div>
-                <div className="col-span-2">
-                  <dt className="text-muted-foreground">Domicilio y Localidad:</dt>
-                  <dd className="text-foreground font-medium">{[personal.address, personal.city].filter(Boolean).join(", ") || "-"}</dd>
                 </div>
               </dl>
             </div>
@@ -197,20 +194,20 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
               <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
                 <div className="col-span-2">
                   <dt className="text-muted-foreground">Colegio de origen:</dt>
-                  <dd className="text-foreground font-medium">{education.secondarySchool || "-"}</dd>
+                  <dd className="text-foreground font-medium">{academic.secondarySchool || "-"}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Secundario completo:</dt>
-                  <dd className="text-foreground font-medium">{education.isSecondaryComplete ? "Sí" : "No"}</dd>
+                  <dd className="text-foreground font-medium">{academic.secondaryCompleted ? "Sí" : "No"}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Año de egreso:</dt>
-                  <dd className="text-foreground font-medium">{education.graduationYear || "-"}</dd>
+                  <dd className="text-foreground font-medium">{academic.currentGradeYear || "-"}</dd>
                 </div>
-                {education.secondaryTitle && (
+                {academic.secondaryDegreeTitle && (
                   <div className="col-span-2">
                     <dt className="text-muted-foreground">Título secundario:</dt>
-                    <dd className="text-foreground font-medium">{education.secondaryTitle}</dd>
+                    <dd className="text-foreground font-medium">{academic.secondaryDegreeTitle}</dd>
                   </div>
                 )}
               </dl>
@@ -225,12 +222,14 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
               <dl className="space-y-2 text-xs">
                 <div>
                   <dt className="text-muted-foreground">¿Requiere ajustes razonables?</dt>
-                  <dd className="text-foreground font-medium">{health.requiresSupport ? "Sí, requiere ajustes" : "No requiere ajustes"}</dd>
+                  <dd className="text-foreground font-medium">
+                    {health.receivesReasonableAdjustments ? "Sí, requiere ajustes" : "No requiere ajustes"}
+                  </dd>
                 </div>
-                {health.requiresSupport && health.supportDetails && (
+                {health.receivesReasonableAdjustments && health.adjustmentDetails && (
                   <div>
                     <dt className="text-muted-foreground">Detalle de los ajustes:</dt>
-                    <dd className="text-foreground bg-muted/40 mt-0.5 rounded-md p-2 font-medium">{health.supportDetails}</dd>
+                    <dd className="text-foreground bg-muted/40 mt-0.5 rounded-md p-2 font-medium">{health.adjustmentDetails}</dd>
                   </div>
                 )}
               </dl>
@@ -254,7 +253,7 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Teléfono:</dt>
-                    <dd className="text-foreground font-medium">{responsible.phone || "-"}</dd>
+                    <dd className="text-foreground font-medium">{responsible.phoneNumber || "-"}</dd>
                   </div>
                   <div className="col-span-2">
                     <dt className="text-muted-foreground">Email:</dt>
@@ -284,23 +283,23 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
                 <div>
                   <dt className="text-muted-foreground">Turno preferente:</dt>
                   <dd className="text-foreground font-medium">
-                    {preferences.preferredShift === "MORNING"
+                    {preference.preferredShift === "MORNING"
                       ? "Mañana"
-                      : preferences.preferredShift === "AFTERNOON"
+                      : preference.preferredShift === "AFTERNOON"
                         ? "Tarde"
-                        : preferences.preferredShift === "EVENING"
+                        : preference.preferredShift === "EVENING"
                           ? "Noche"
-                          : preferences.preferredShift || "-"}
+                          : preference.preferredShift || "-"}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Autorización de uso de imagen:</dt>
-                  <dd className="text-foreground font-medium">{preferences.imageAuthorization ? "Autorizada" : "No autorizada"}</dd>
+                  <dd className="text-foreground font-medium">{preference.allowsImageUse ? "Autorizada" : "No autorizada"}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">¿Estudiante reingresante?</dt>
                   <dd className="text-foreground font-medium">
-                    {preferences.isReentering ? `Sí (Docente previo: ${preferences.previousTeacher || "No indicado"})` : "No"}
+                    {preference.isReenrolling ? `Sí (Docente previo: ${preference.previousTeacher || "No indicado"})` : "No"}
                   </dd>
                 </div>
               </dl>
@@ -323,22 +322,22 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
                     <div className="flex items-center gap-2 overflow-hidden">
                       <FileTextIcon className="text-primary size-4 shrink-0" />
                       <div className="min-w-0">
-                        <p className="truncate font-medium">{att.fileName}</p>
-                        <p className="text-muted-foreground text-[10px]">{ENROLLMENT_DOCUMENT_TYPE_LABELS[att.documentType] || att.documentType}</p>
+                        <p className="truncate font-medium">{att.originalFileName}</p>
+                        <p className="text-muted-foreground text-[10px]">
+                          {ENROLLMENT_DOCUMENT_TYPE_LABELS[att.attachmentType] || att.attachmentType}
+                        </p>
                       </div>
                     </div>
-                    {att.url && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 shrink-0 px-2 text-xs"
-                        onClick={() => window.open(att.url, "_blank")}
-                      >
-                        <ExternalLinkIcon className="mr-1 size-3" />
-                        Ver
-                      </Button>
-                    )}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 shrink-0 px-2 text-xs"
+                      onClick={() => window.open(getAttachmentDownloadUrl(application.applicationId, att.id), "_blank")}
+                    >
+                      <ExternalLinkIcon className="mr-1 size-3" />
+                      Ver
+                    </Button>
                   </div>
                 ))}
               </div>

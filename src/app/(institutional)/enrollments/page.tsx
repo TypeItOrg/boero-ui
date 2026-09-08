@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 interface Props {
   searchParams: Promise<{
     status?: string;
-    enrollmentPeriodId?: string;
+    periodId?: string;
     search?: string;
     page?: string;
     size?: string;
@@ -38,25 +38,18 @@ export default async function EnrollmentsPage({ searchParams }: Props): Promise<
     return <InstitutionalAccessDenied description="No tenés permisos para gestionar las solicitudes de inscripción de esta institución." />;
   }
 
-  const { status, enrollmentPeriodId, search, page, size } = await searchParams;
+  const { status, periodId, search, page, size } = await searchParams;
   const currentPage = page ? parseInt(page, 10) : 0;
   const currentSize = size ? parseInt(size, 10) : 10;
 
   const [applicationsData, enrollmentPeriodsData, studyPlansData, academicYearsData] = await Promise.all([
     fetchEnrollmentApplications({
-      institutionId: user.institutionId,
       status: status !== "all" ? status : undefined,
-      enrollmentPeriodId: enrollmentPeriodId !== "all" ? enrollmentPeriodId : undefined,
+      periodId: periodId !== "all" ? periodId : undefined,
       search,
       page: currentPage,
       size: currentSize,
-    }).catch(() => ({
-      items: [],
-      totalItems: 0,
-      totalPages: 0,
-      page: currentPage,
-      size: currentSize,
-    })),
+    }),
     listEnrollmentPeriods(user.institutionId, { size: 100 }).catch(() => ({ items: [] })),
     fetchStudyPlans(AcademicScope.INSTITUTIONAL, user.institutionId, { size: 100 }).catch(() => ({ items: [] })),
     fetchAcademicYears(AcademicScope.INSTITUTIONAL, user.institutionId, { size: 100 }).catch(() => ({ items: [] })),
@@ -83,7 +76,7 @@ export default async function EnrollmentsPage({ searchParams }: Props): Promise<
           search={search}
           size={currentSize}
           status={status}
-          enrollmentPeriodId={enrollmentPeriodId}
+          periodId={periodId}
           enrollmentPeriods={enrollmentPeriodsData.items.map((p) => ({ id: p.id, name: p.name }))}
         />
         <Suspense fallback={<div className="text-muted-foreground p-8 text-center text-sm">Cargando inscripciones...</div>}>

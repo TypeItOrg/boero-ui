@@ -13,7 +13,7 @@ interface EnrollmentsTableFiltersProps {
   search?: string;
   size?: number;
   status?: string;
-  enrollmentPeriodId?: string;
+  periodId?: string;
   enrollmentPeriods?: EnrollmentPeriodOption[];
 }
 
@@ -23,7 +23,7 @@ export function EnrollmentsTableFilters({
   search,
   size,
   status,
-  enrollmentPeriodId,
+  periodId,
   enrollmentPeriods = [],
 }: EnrollmentsTableFiltersProps): React.ReactElement {
   const statusFilter: DataTableSelectFilter = {
@@ -37,9 +37,9 @@ export function EnrollmentsTableFilters({
   const periodFilter: DataTableSelectFilter = {
     defaultValue: ALL_OPTION,
     label: "Período de inscripción",
-    name: "enrollmentPeriodId",
+    name: "periodId",
     options: [{ value: ALL_OPTION, label: "Todos los períodos" }, ...enrollmentPeriods.map((period) => ({ value: period.id, label: period.name }))],
-    value: enrollmentPeriodId ?? ALL_OPTION,
+    value: periodId ?? ALL_OPTION,
   };
 
   return (

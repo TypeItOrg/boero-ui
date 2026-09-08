@@ -1,9 +1,9 @@
 import {
   calculateAge,
   personalDataSchema,
-  educationBackgroundSchema,
+  academicBackgroundSchema,
   healthInclusionSchema,
-  preferencesSchema,
+  preferenceSchema,
   enrollmentApplicationSubmissionSchema,
 } from "./enrollment-application.schema";
 
@@ -36,9 +36,7 @@ describe("enrollment-application.schema", () => {
         lastName: "Pérez",
         documentNumber: "40123456",
         birthDate: "2000-01-01",
-        address: "San Martín 123",
-        city: "Villa María",
-        phone: "3534123456",
+        phoneNumber: "3534123456",
         email: "juan@example.com",
       };
       expect(personalDataSchema.safeParse(valid).success).toBe(true);
@@ -47,16 +45,16 @@ describe("enrollment-application.schema", () => {
       expect(personalDataSchema.safeParse(invalidEmail).success).toBe(false);
     });
 
-    it("validates educationBackgroundSchema", () => {
+    it("validates academicBackgroundSchema", () => {
       expect(
-        educationBackgroundSchema.safeParse({
+        academicBackgroundSchema.safeParse({
           secondarySchool: "Colegio Nacional",
-          isSecondaryComplete: true,
+          secondaryCompleted: true,
         }).success,
       ).toBe(true);
 
       expect(
-        educationBackgroundSchema.safeParse({
+        academicBackgroundSchema.safeParse({
           secondarySchool: "",
         }).success,
       ).toBe(false);
@@ -65,22 +63,22 @@ describe("enrollment-application.schema", () => {
     it("validates healthInclusionSchema", () => {
       expect(
         healthInclusionSchema.safeParse({
-          requiresSupport: false,
+          receivesReasonableAdjustments: false,
         }).success,
       ).toBe(true);
     });
 
-    it("validates preferencesSchema", () => {
+    it("validates preferenceSchema", () => {
       expect(
-        preferencesSchema.safeParse({
+        preferenceSchema.safeParse({
           preferredShift: "MORNING",
-          imageAuthorization: true,
-          isReentering: false,
+          allowsImageUse: true,
+          isReenrolling: false,
         }).success,
       ).toBe(true);
 
       expect(
-        preferencesSchema.safeParse({
+        preferenceSchema.safeParse({
           preferredShift: "",
         }).success,
       ).toBe(false);
@@ -94,30 +92,28 @@ describe("enrollment-application.schema", () => {
         lastName: "García",
         documentNumber: "35123456",
         birthDate: "1995-05-15",
-        address: "Mitre 456",
-        city: "Córdoba",
-        phone: "3514001122",
+        phoneNumber: "3514001122",
         email: "ana@example.com",
       },
-      educationBackground: {
+      academicBackground: {
         secondarySchool: "Instituto San José",
-        graduationYear: "2013",
-        isSecondaryComplete: true,
-        secondaryTitle: "Bachiller",
+        currentGradeYear: "2013",
+        secondaryCompleted: true,
+        secondaryDegreeTitle: "Bachiller",
       },
       healthInclusion: {
-        requiresSupport: false,
+        receivesReasonableAdjustments: false,
       },
       responsible: {},
-      preferences: {
+      preference: {
         preferredShift: "AFTERNOON",
-        imageAuthorization: true,
-        isReentering: false,
+        allowsImageUse: true,
+        isReenrolling: false,
       },
       attachments: [
-        { id: "1", documentType: "DNI_FRONT", fileName: "dni-frente.jpg" },
-        { id: "2", documentType: "DNI_BACK", fileName: "dni-dorso.jpg" },
-        { id: "3", documentType: "PHOTO_4X4", fileName: "foto.jpg" },
+        { id: "1", attachmentType: "DNI_FRONT", originalFileName: "dni-frente.jpg" },
+        { id: "2", attachmentType: "DNI_BACK", originalFileName: "dni-dorso.jpg" },
+        { id: "3", attachmentType: "PHOTO_ID", originalFileName: "foto.jpg" },
       ],
     };
 
@@ -155,7 +151,7 @@ describe("enrollment-application.schema", () => {
         responsible: {
           fullName: "Carlos García",
           documentNumber: "18123456",
-          phone: "3514998877",
+          phoneNumber: "3514998877",
           email: "carlos@example.com",
           occupation: "Docente",
           educationLevel: "TERTIARY_COMPLETE",
@@ -166,12 +162,12 @@ describe("enrollment-application.schema", () => {
       expect(result.success).toBe(true);
     });
 
-    it("requires health report attachment and support details if requiresSupport is true", () => {
+    it("requires health report attachment and support details if receivesReasonableAdjustments is true", () => {
       const healthSupportData = {
         ...baseValidAdult,
         healthInclusion: {
-          requiresSupport: true,
-          supportDetails: "",
+          receivesReasonableAdjustments: true,
+          adjustmentDetails: "",
         },
       };
 
@@ -179,7 +175,7 @@ describe("enrollment-application.schema", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         const paths = result.error.issues.map((i) => i.path.join("."));
-        expect(paths).toContain("healthInclusion.supportDetails");
+        expect(paths).toContain("healthInclusion.adjustmentDetails");
         expect(paths).toContain("attachments.HEALTH_REPORT");
       }
     });
@@ -188,31 +184,31 @@ describe("enrollment-application.schema", () => {
       const healthSupportData = {
         ...baseValidAdult,
         healthInclusion: {
-          requiresSupport: true,
-          supportDetails: "Adaptación de material en macrotipo",
+          receivesReasonableAdjustments: true,
+          adjustmentDetails: "Adaptación de material en macrotipo",
         },
-        attachments: [...baseValidAdult.attachments, { id: "4", documentType: "HEALTH_REPORT", fileName: "informe-medico.pdf" }],
+        attachments: [...baseValidAdult.attachments, { id: "4", attachmentType: "HEALTH_REPORT", originalFileName: "informe-medico.pdf" }],
       };
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(healthSupportData);
       expect(result.success).toBe(true);
     });
 
-    it("requires previousTeacher when isReentering is true", () => {
-      const reenteringData = {
+    it("requires previousTeacher when isReenrolling is true", () => {
+      const reenrollingData = {
         ...baseValidAdult,
-        preferences: {
-          ...baseValidAdult.preferences,
-          isReentering: true,
+        preference: {
+          ...baseValidAdult.preference,
+          isReenrolling: true,
           previousTeacher: "",
         },
       };
 
-      const result = enrollmentApplicationSubmissionSchema.safeParse(reenteringData);
+      const result = enrollmentApplicationSubmissionSchema.safeParse(reenrollingData);
       expect(result.success).toBe(false);
       if (!result.success) {
         const paths = result.error.issues.map((i) => i.path.join("."));
-        expect(paths).toContain("preferences.previousTeacher");
+        expect(paths).toContain("preference.previousTeacher");
       }
     });
 
@@ -228,7 +224,7 @@ describe("enrollment-application.schema", () => {
         const paths = result.error.issues.map((i) => i.path.join("."));
         expect(paths).toContain("attachments.DNI_FRONT");
         expect(paths).toContain("attachments.DNI_BACK");
-        expect(paths).toContain("attachments.PHOTO_4X4");
+        expect(paths).toContain("attachments.PHOTO_ID");
       }
     });
   });

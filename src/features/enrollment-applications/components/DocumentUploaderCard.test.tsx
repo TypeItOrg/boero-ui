@@ -36,9 +36,9 @@ describe("DocumentUploaderCard", () => {
   it("renders attachment info and action buttons when attachment is present", () => {
     const attachment = {
       id: "att-1",
-      documentType: "DNI_FRONT" as const,
-      fileName: "dni-frente.pdf",
-      fileSize: 1024 * 50,
+      attachmentType: "DNI_FRONT" as const,
+      originalFileName: "dni-frente.pdf",
+      size: 1024 * 50,
     };
 
     render(<DocumentUploaderCard {...defaultProps} attachment={attachment} />);
@@ -55,8 +55,8 @@ describe("DocumentUploaderCard", () => {
 
     const attachment = {
       id: "att-1",
-      documentType: "DNI_FRONT" as const,
-      fileName: "dni-frente.pdf",
+      attachmentType: "DNI_FRONT" as const,
+      originalFileName: "dni-frente.pdf",
     };
 
     render(<DocumentUploaderCard {...defaultProps} attachment={attachment} />);
@@ -73,8 +73,8 @@ describe("DocumentUploaderCard", () => {
   it("hides delete button when readOnly is true", () => {
     const attachment = {
       id: "att-1",
-      documentType: "DNI_FRONT" as const,
-      fileName: "dni-frente.pdf",
+      attachmentType: "DNI_FRONT" as const,
+      originalFileName: "dni-frente.pdf",
     };
 
     render(<DocumentUploaderCard {...defaultProps} attachment={attachment} readOnly />);
