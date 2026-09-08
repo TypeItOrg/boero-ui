@@ -10,7 +10,6 @@ import {
   ChevronLeftIcon,
   SendIcon,
   BanIcon,
-  SparklesIcon,
 } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { Button } from "@common/components/ui/button";
@@ -91,33 +90,31 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   const [lastName, setLastName] = React.useState("");
   const [documentNumber, setDocumentNumber] = React.useState("");
   const [birthDate, setBirthDate] = React.useState<Date | undefined>(undefined);
-  const [address, setAddress] = React.useState("");
-  const [city, setCity] = React.useState("");
-  const [phone, setPhone] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
   const [email, setEmail] = React.useState("");
 
   // 2. Escolaridad de Base
   const [secondarySchool, setSecondarySchool] = React.useState("");
-  const [graduationYear, setGraduationYear] = React.useState("");
-  const [isSecondaryComplete, setIsSecondaryComplete] = React.useState(false);
-  const [secondaryTitle, setSecondaryTitle] = React.useState("");
+  const [currentGradeYear, setCurrentGradeYear] = React.useState("");
+  const [secondaryCompleted, setSecondaryCompleted] = React.useState(false);
+  const [secondaryDegreeTitle, setSecondaryDegreeTitle] = React.useState("");
 
   // 3. Salud e Inclusión
-  const [requiresSupport, setRequiresSupport] = React.useState(false);
-  const [supportDetails, setSupportDetails] = React.useState("");
+  const [receivesReasonableAdjustments, setReceivesReasonableAdjustments] = React.useState(false);
+  const [adjustmentDetails, setAdjustmentDetails] = React.useState("");
 
   // 4. Responsable / Tutor Legal
   const [responsibleFullName, setResponsibleFullName] = React.useState("");
   const [responsibleDocumentNumber, setResponsibleDocumentNumber] = React.useState("");
-  const [responsiblePhone, setResponsiblePhone] = React.useState("");
+  const [responsiblePhoneNumber, setResponsiblePhoneNumber] = React.useState("");
   const [responsibleEmail, setResponsibleEmail] = React.useState("");
   const [responsibleOccupation, setResponsibleOccupation] = React.useState("");
   const [responsibleEducationLevel, setResponsibleEducationLevel] = React.useState("");
 
   // 5. Preferencias
   const [preferredShift, setPreferredShift] = React.useState("");
-  const [imageAuthorization, setImageAuthorization] = React.useState(false);
-  const [isReentering, setIsReentering] = React.useState(false);
+  const [allowsImageUse, setAllowsImageUse] = React.useState(false);
+  const [isReenrolling, setIsReenrolling] = React.useState(false);
   const [previousTeacher, setPreviousTeacher] = React.useState("");
 
   // 6. Documentación Adjunta
@@ -141,11 +138,10 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
         const appData = data.data || {};
         const personal = appData.personalData || {};
-        const education = appData.educationBackground || {};
         const academic = appData.academicBackground || {};
         const health = appData.healthInclusion || {};
         const resp = appData.responsible || {};
-        const pref = appData.preferences || {};
+        const pref = appData.preference || {};
         const atts = appData.attachments || [];
 
         setFirstName(personal.firstName || "");
@@ -159,29 +155,27 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
           }
         }
 
-        setAddress(personal.address || "");
-        setCity(personal.city || "");
-        setPhone(personal.phone || "");
+        setPhoneNumber(personal.phoneNumber || "");
         setEmail(personal.email || "");
 
-        setSecondarySchool(education.secondarySchool || academic.secondarySchool || "");
-        setGraduationYear(education.graduationYear ? String(education.graduationYear) : "");
-        setIsSecondaryComplete(Boolean(education.isSecondaryComplete));
-        setSecondaryTitle(education.secondaryTitle || "");
+        setSecondarySchool(academic.secondarySchool || "");
+        setCurrentGradeYear(academic.currentGradeYear ? String(academic.currentGradeYear) : "");
+        setSecondaryCompleted(Boolean(academic.secondaryCompleted));
+        setSecondaryDegreeTitle(academic.secondaryDegreeTitle || "");
 
-        setRequiresSupport(Boolean(health.requiresSupport));
-        setSupportDetails(health.supportDetails || "");
+        setReceivesReasonableAdjustments(Boolean(health.receivesReasonableAdjustments));
+        setAdjustmentDetails(health.adjustmentDetails || "");
 
         setResponsibleFullName(resp.fullName || "");
         setResponsibleDocumentNumber(resp.documentNumber || "");
-        setResponsiblePhone(resp.phone || "");
+        setResponsiblePhoneNumber(resp.phoneNumber || "");
         setResponsibleEmail(resp.email || "");
         setResponsibleOccupation(resp.occupation || "");
         setResponsibleEducationLevel(resp.educationLevel || "");
 
         setPreferredShift(pref.preferredShift || "");
-        setImageAuthorization(Boolean(pref.imageAuthorization));
-        setIsReentering(Boolean(pref.isReentering));
+        setAllowsImageUse(Boolean(pref.allowsImageUse));
+        setIsReenrolling(Boolean(pref.isReenrolling));
         setPreviousTeacher(pref.previousTeacher || "");
 
         setAttachments(atts);
@@ -208,36 +202,31 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         lastName,
         documentNumber,
         birthDate: birthDate && isValid(birthDate) ? format(birthDate, "yyyy-MM-dd") : "",
-        address,
-        city,
-        phone,
+        phoneNumber,
         email,
-      },
-      educationBackground: {
-        secondarySchool,
-        graduationYear,
-        isSecondaryComplete,
-        secondaryTitle,
       },
       academicBackground: {
         secondarySchool,
+        currentGradeYear,
+        secondaryCompleted,
+        secondaryDegreeTitle,
       },
       healthInclusion: {
-        requiresSupport,
-        supportDetails,
+        receivesReasonableAdjustments,
+        adjustmentDetails,
       },
       responsible: {
         fullName: responsibleFullName,
         documentNumber: responsibleDocumentNumber,
-        phone: responsiblePhone,
+        phoneNumber: responsiblePhoneNumber,
         email: responsibleEmail,
         occupation: responsibleOccupation,
         educationLevel: responsibleEducationLevel,
       },
-      preferences: {
+      preference: {
         preferredShift,
-        imageAuthorization,
-        isReentering,
+        allowsImageUse,
+        isReenrolling,
         previousTeacher,
       },
       attachments,
@@ -247,25 +236,23 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     lastName,
     documentNumber,
     birthDate,
-    address,
-    city,
-    phone,
+    phoneNumber,
     email,
     secondarySchool,
-    graduationYear,
-    isSecondaryComplete,
-    secondaryTitle,
-    requiresSupport,
-    supportDetails,
+    currentGradeYear,
+    secondaryCompleted,
+    secondaryDegreeTitle,
+    receivesReasonableAdjustments,
+    adjustmentDetails,
     responsibleFullName,
     responsibleDocumentNumber,
-    responsiblePhone,
+    responsiblePhoneNumber,
     responsibleEmail,
     responsibleOccupation,
     responsibleEducationLevel,
     preferredShift,
-    imageAuthorization,
-    isReentering,
+    allowsImageUse,
+    isReenrolling,
     previousTeacher,
     attachments,
   ]);
@@ -329,10 +316,10 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       if (firstIssue && firstIssue.path.length > 0) {
         const section = firstIssue.path[0];
         if (section === "personalData") setActiveTab("personal");
-        else if (section === "educationBackground") setActiveTab("education");
+        else if (section === "academicBackground") setActiveTab("education");
         else if (section === "healthInclusion") setActiveTab("health");
         else if (section === "responsible") setActiveTab("responsible");
-        else if (section === "preferences") setActiveTab("preferences");
+        else if (section === "preference") setActiveTab("preferences");
         else if (section === "attachments") setActiveTab("documents");
       }
       return;
@@ -375,13 +362,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   // Document upload callbacks
   const handleUploadSuccess = (uploaded: EnrollmentAttachment) => {
     setAttachments((prev) => {
-      const filtered = prev.filter((att) => att.documentType !== uploaded.documentType);
+      const filtered = prev.filter((att) => att.attachmentType !== uploaded.attachmentType);
       return [...filtered, uploaded];
     });
   };
 
   const handleDeleteSuccess = (docType: EnrollmentDocumentType, attachmentId: string) => {
-    setAttachments((prev) => prev.filter((att) => att.id !== attachmentId && att.documentType !== docType));
+    setAttachments((prev) => prev.filter((att) => att.id !== attachmentId && att.attachmentType !== docType));
   };
 
   // Helpers to query validation errors by path
@@ -558,30 +545,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={!!getFieldError(["personalData", "address"])}>
-                  <FieldLabel htmlFor="address" required>
-                    Domicilio (Calle y número)
-                  </FieldLabel>
-                  <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Av. Libertador 1234" />
-                  <FieldError errors={[{ message: getFieldError(["personalData", "address"]) }]} />
-                </Field>
-
-                <Field data-invalid={!!getFieldError(["personalData", "city"])}>
-                  <FieldLabel htmlFor="city" required>
-                    Localidad
-                  </FieldLabel>
-                  <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Villa María" />
-                  <FieldError errors={[{ message: getFieldError(["personalData", "city"]) }]} />
-                </Field>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={!!getFieldError(["personalData", "phone"])}>
-                  <FieldLabel htmlFor="phone" required>
+                <Field data-invalid={!!getFieldError(["personalData", "phoneNumber"])}>
+                  <FieldLabel htmlFor="phoneNumber" required>
                     Teléfono de contacto
                   </FieldLabel>
-                  <PhoneInput id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="3534123456" />
-                  <FieldError errors={[{ message: getFieldError(["personalData", "phone"]) }]} />
+                  <PhoneInput id="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="3534123456" />
+                  <FieldError errors={[{ message: getFieldError(["personalData", "phoneNumber"]) }]} />
                 </Field>
 
                 <Field data-invalid={!!getFieldError(["personalData", "email"])}>
@@ -612,7 +581,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               <CardDescription>Antecedentes de escolaridad y nivel de egreso secundario.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Field data-invalid={!!getFieldError(["educationBackground", "secondarySchool"])}>
+              <Field data-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}>
                 <FieldLabel htmlFor="secondarySchool" required>
                   Colegio secundario de origen
                 </FieldLabel>
@@ -622,27 +591,27 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   onChange={(e) => setSecondarySchool(e.target.value)}
                   placeholder="Escuela Normal Superior Víctor Mercante"
                 />
-                <FieldError errors={[{ message: getFieldError(["educationBackground", "secondarySchool"]) }]} />
+                <FieldError errors={[{ message: getFieldError(["academicBackground", "secondarySchool"]) }]} />
               </Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field>
-                  <FieldLabel htmlFor="graduationYear">Año cursado o egreso</FieldLabel>
+                  <FieldLabel htmlFor="currentGradeYear">Año cursado o egreso</FieldLabel>
                   <NumericInput
-                    id="graduationYear"
+                    id="currentGradeYear"
                     maxLength={4}
-                    value={graduationYear}
-                    onChange={(e) => setGraduationYear(e.target.value)}
+                    value={currentGradeYear}
+                    onChange={(e) => setCurrentGradeYear(e.target.value)}
                     placeholder="2024"
                   />
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="secondaryTitle">Título o especialidad obtenida</FieldLabel>
+                  <FieldLabel htmlFor="secondaryDegreeTitle">Título o especialidad obtenida</FieldLabel>
                   <Input
-                    id="secondaryTitle"
-                    value={secondaryTitle}
-                    onChange={(e) => setSecondaryTitle(e.target.value)}
+                    id="secondaryDegreeTitle"
+                    value={secondaryDegreeTitle}
+                    onChange={(e) => setSecondaryDegreeTitle(e.target.value)}
                     placeholder="Bachiller en Arte y Música"
                   />
                 </Field>
@@ -650,12 +619,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FieldLabel htmlFor="isSecondaryComplete" className="text-sm font-medium">
+                  <FieldLabel htmlFor="secondaryCompleted" className="text-sm font-medium">
                     ¿Secundario completo?
                   </FieldLabel>
                   <FieldDescription>Indicá si ya finalizaste todos los estudios secundarios y tenés título o constancia de egreso.</FieldDescription>
                 </div>
-                <Switch id="isSecondaryComplete" checked={isSecondaryComplete} onCheckedChange={setIsSecondaryComplete} />
+                <Switch id="secondaryCompleted" checked={secondaryCompleted} onCheckedChange={setSecondaryCompleted} />
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
@@ -683,15 +652,19 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
             <CardContent className="space-y-5">
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FieldLabel htmlFor="requiresSupport" className="text-sm font-medium">
+                  <FieldLabel htmlFor="receivesReasonableAdjustments" className="text-sm font-medium">
                     ¿Requiere ajustes razonables o apoyos específicos?
                   </FieldLabel>
                   <FieldDescription>Ajustes pedagógicos, edilicios o de acompañamiento por razones de salud o discapacidad.</FieldDescription>
                 </div>
-                <Switch id="requiresSupport" checked={requiresSupport} onCheckedChange={setRequiresSupport} />
+                <Switch
+                  id="receivesReasonableAdjustments"
+                  checked={receivesReasonableAdjustments}
+                  onCheckedChange={setReceivesReasonableAdjustments}
+                />
               </div>
 
-              {requiresSupport && (
+              {receivesReasonableAdjustments && (
                 <div className="space-y-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
                   <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200">
                     <AlertTriangleIcon className="size-4 text-amber-600 dark:text-amber-400" />
@@ -702,18 +675,18 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     </AlertDescription>
                   </Alert>
 
-                  <Field data-invalid={!!getFieldError(["healthInclusion", "supportDetails"])}>
-                    <FieldLabel htmlFor="supportDetails" required>
+                  <Field data-invalid={!!getFieldError(["healthInclusion", "adjustmentDetails"])}>
+                    <FieldLabel htmlFor="adjustmentDetails" required>
                       Detalle de los apoyos requeridos
                     </FieldLabel>
                     <Textarea
-                      id="supportDetails"
-                      value={supportDetails}
-                      onChange={(e) => setSupportDetails(e.target.value)}
+                      id="adjustmentDetails"
+                      value={adjustmentDetails}
+                      onChange={(e) => setAdjustmentDetails(e.target.value)}
                       placeholder="Describí brevemente los apoyos que necesitás para tu cursada..."
                       rows={3}
                     />
-                    <FieldError errors={[{ message: getFieldError(["healthInclusion", "supportDetails"]) }]} />
+                    <FieldError errors={[{ message: getFieldError(["healthInclusion", "adjustmentDetails"]) }]} />
                   </Field>
                 </div>
               )}
@@ -778,17 +751,17 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   <FieldError errors={[{ message: getFieldError(["responsible", "documentNumber"]) }]} />
                 </Field>
 
-                <Field data-invalid={!!getFieldError(["responsible", "phone"])}>
-                  <FieldLabel htmlFor="responsiblePhone" required={isMinor}>
+                <Field data-invalid={!!getFieldError(["responsible", "phoneNumber"])}>
+                  <FieldLabel htmlFor="responsiblePhoneNumber" required={isMinor}>
                     Teléfono del Responsable
                   </FieldLabel>
                   <PhoneInput
-                    id="responsiblePhone"
-                    value={responsiblePhone}
-                    onChange={(e) => setResponsiblePhone(e.target.value)}
+                    id="responsiblePhoneNumber"
+                    value={responsiblePhoneNumber}
+                    onChange={(e) => setResponsiblePhoneNumber(e.target.value)}
                     placeholder="3534987654"
                   />
-                  <FieldError errors={[{ message: getFieldError(["responsible", "phone"]) }]} />
+                  <FieldError errors={[{ message: getFieldError(["responsible", "phoneNumber"]) }]} />
                 </Field>
               </div>
 
@@ -863,7 +836,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               <CardDescription>Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              <Field data-invalid={!!getFieldError(["preferences", "preferredShift"])}>
+              <Field data-invalid={!!getFieldError(["preference", "preferredShift"])}>
                 <FieldLabel htmlFor="preferredShift" required>
                   Turno de preferencia
                 </FieldLabel>
@@ -879,33 +852,33 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     ))}
                   </SelectContent>
                 </Select>
-                <FieldError errors={[{ message: getFieldError(["preferences", "preferredShift"]) }]} />
+                <FieldError errors={[{ message: getFieldError(["preference", "preferredShift"]) }]} />
               </Field>
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FieldLabel htmlFor="imageAuthorization" className="text-sm font-medium">
+                  <FieldLabel htmlFor="allowsImageUse" className="text-sm font-medium">
                     Autorización para uso de imagen
                   </FieldLabel>
                   <FieldDescription>
                     Autorizo a la institución a registrar y publicar fotografías y videos con fines pedagógicos y difusión cultural.
                   </FieldDescription>
                 </div>
-                <Switch id="imageAuthorization" checked={imageAuthorization} onCheckedChange={setImageAuthorization} />
+                <Switch id="allowsImageUse" checked={allowsImageUse} onCheckedChange={setAllowsImageUse} />
               </div>
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FieldLabel htmlFor="isReentering" className="text-sm font-medium">
+                  <FieldLabel htmlFor="isReenrolling" className="text-sm font-medium">
                     ¿Sos estudiante reingresante?
                   </FieldLabel>
                   <FieldDescription>Indicá si cursaste materias en este conservatorio o instituto en ciclos anteriores.</FieldDescription>
                 </div>
-                <Switch id="isReentering" checked={isReentering} onCheckedChange={setIsReentering} />
+                <Switch id="isReenrolling" checked={isReenrolling} onCheckedChange={setIsReenrolling} />
               </div>
 
-              {isReentering && (
-                <Field data-invalid={!!getFieldError(["preferences", "previousTeacher"])}>
+              {isReenrolling && (
+                <Field data-invalid={!!getFieldError(["preference", "previousTeacher"])}>
                   <FieldLabel htmlFor="previousTeacher" required>
                     Docente con quien cursaste previamente
                   </FieldLabel>
@@ -915,7 +888,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     onChange={(e) => setPreviousTeacher(e.target.value)}
                     placeholder="Profesor/a de instrumento o cátedra"
                   />
-                  <FieldError errors={[{ message: getFieldError(["preferences", "previousTeacher"]) }]} />
+                  <FieldError errors={[{ message: getFieldError(["preference", "previousTeacher"]) }]} />
                 </Field>
               )}
             </CardContent>
@@ -949,7 +922,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               title="DNI (Frente)"
               description="Foto legible de la parte frontal del DNI donde se vean tus datos."
               required
-              attachment={attachments.find((a) => a.documentType === "DNI_FRONT")}
+              attachment={attachments.find((a) => a.attachmentType === "DNI_FRONT")}
               onUploadSuccess={handleUploadSuccess}
               onDeleteSuccess={handleDeleteSuccess}
             />
@@ -961,7 +934,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               title="DNI (Dorso)"
               description="Foto legible del dorso del DNI con domicilio visible."
               required
-              attachment={attachments.find((a) => a.documentType === "DNI_BACK")}
+              attachment={attachments.find((a) => a.attachmentType === "DNI_BACK")}
               onUploadSuccess={handleUploadSuccess}
               onDeleteSuccess={handleDeleteSuccess}
             />
@@ -969,11 +942,11 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
             {/* 3. Foto 4x4 */}
             <DocumentUploaderCard
               applicationId={application.applicationId}
-              documentType="PHOTO_4X4"
+              documentType="PHOTO_ID"
               title="Foto Carnet 4x4"
               description="Foto carnet actualizada sobre fondo blanco o liso para el legajo."
               required
-              attachment={attachments.find((a) => a.documentType === "PHOTO_4X4")}
+              attachment={attachments.find((a) => a.attachmentType === "PHOTO_ID")}
               onUploadSuccess={handleUploadSuccess}
               onDeleteSuccess={handleDeleteSuccess}
             />
@@ -984,8 +957,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               documentType="SECONDARY_CERTIFICATE"
               title="Título Secundario o Constancia"
               description="Copia del analítico final o certificado de título en trámite."
-              required={isSecondaryComplete}
-              attachment={attachments.find((a) => a.documentType === "SECONDARY_CERTIFICATE")}
+              required={secondaryCompleted}
+              attachment={attachments.find((a) => a.attachmentType === "SECONDARY_CERTIFICATE")}
               onUploadSuccess={handleUploadSuccess}
               onDeleteSuccess={handleDeleteSuccess}
             />
@@ -996,8 +969,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               documentType="HEALTH_REPORT"
               title="Informe de Salud / Certificado CUD"
               description="Certificado médico o CUD para respaldar los apoyos solicitados."
-              required={requiresSupport}
-              attachment={attachments.find((a) => a.documentType === "HEALTH_REPORT")}
+              required={receivesReasonableAdjustments}
+              attachment={attachments.find((a) => a.attachmentType === "HEALTH_REPORT")}
               onUploadSuccess={handleUploadSuccess}
               onDeleteSuccess={handleDeleteSuccess}
             />

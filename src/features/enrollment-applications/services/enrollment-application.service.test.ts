@@ -46,14 +46,14 @@ describe("enrollment-application.service administrative queries", () => {
 
       const result = await fetchEnrollmentApplications({
         status: "SUBMITTED",
-        enrollmentPeriodId: "period-123",
+        periodId: "period-123",
         search: "Pérez",
         page: 1,
         size: 20,
       });
 
       expect(institutionalApiFetchMock).toHaveBeenCalledWith(
-        "/api/v1/enrollment-applications?enrollmentPeriodId=period-123&status=SUBMITTED&search=P%C3%A9rez&page=1&size=20",
+        "/api/v1/enrollment-applications?periodId=period-123&status=SUBMITTED&search=P%C3%A9rez&page=1&size=20",
         { method: "GET" },
       );
       expect(result).toEqual(MOCK_PAGE);
@@ -65,7 +65,7 @@ describe("enrollment-application.service administrative queries", () => {
 
       await fetchEnrollmentApplications({
         status: "all",
-        enrollmentPeriodId: "all",
+        periodId: "all",
       });
 
       expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications", { method: "GET" });

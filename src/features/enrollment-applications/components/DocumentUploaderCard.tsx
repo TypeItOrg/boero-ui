@@ -7,6 +7,7 @@ import { Button } from "@common/components/ui/button";
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
 import { uploadEnrollmentAttachmentAction, deleteEnrollmentAttachmentAction } from "../actions/enrollment-application.actions";
+import { getAttachmentDownloadUrl } from "../utils/enrollment-application.util";
 import type { EnrollmentAttachment, EnrollmentDocumentType } from "../types/enrollment-application.types";
 
 interface DocumentUploaderCardProps {
@@ -67,7 +68,7 @@ export function DocumentUploaderCard({
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("documentType", documentType);
+      formData.append("attachmentType", documentType);
 
       const uploaded = await uploadEnrollmentAttachmentAction(applicationId, formData);
       onUploadSuccess({
@@ -108,7 +109,7 @@ export function DocumentUploaderCard({
   };
 
   const handlePreview = () => {
-    const targetUrl = attachment?.url || previewBlobUrl;
+    const targetUrl = previewBlobUrl || (attachment ? getAttachmentDownloadUrl(applicationId, attachment.id) : undefined);
     if (targetUrl) {
       window.open(targetUrl, "_blank", "noopener,noreferrer");
     }
@@ -157,10 +158,10 @@ export function DocumentUploaderCard({
                 <FileTextIcon className="size-5" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium" title={attachment.fileName}>
-                  {attachment.fileName}
+                <p className="truncate text-sm font-medium" title={attachment.originalFileName}>
+                  {attachment.originalFileName}
                 </p>
-                {attachment.fileSize && <p className="text-muted-foreground text-xs">{formatFileSize(attachment.fileSize)}</p>}
+                {attachment.size && <p className="text-muted-foreground text-xs">{formatFileSize(attachment.size)}</p>}
               </div>
             </div>
 

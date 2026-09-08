@@ -24,53 +24,51 @@ export const personalDataSchema = z.object({
   lastName: z.string().trim().min(1, "El apellido es obligatorio"),
   documentNumber: z.string().trim().min(1, "El número de documento es obligatorio"),
   birthDate: z.string().trim().min(1, "La fecha de nacimiento es obligatoria"),
-  address: z.string().trim().min(1, "El domicilio es obligatorio"),
-  city: z.string().trim().min(1, "La localidad es obligatoria"),
-  phone: z.string().trim().min(1, "El teléfono de contacto es obligatorio"),
+  phoneNumber: z.string().trim().min(1, "El teléfono de contacto es obligatorio"),
   email: z.string().trim().min(1, "El correo electrónico es obligatorio").email("El correo electrónico no es válido"),
 });
 
 // Paso 2: Escolaridad de Base
-export const educationBackgroundSchema = z.object({
+export const academicBackgroundSchema = z.object({
   secondarySchool: z.string().trim().min(1, "El colegio de origen es obligatorio"),
-  graduationYear: z.string().trim().optional(),
-  isSecondaryComplete: z.boolean().default(false),
-  secondaryTitle: z.string().trim().optional(),
+  currentGradeYear: z.string().trim().optional(),
+  secondaryCompleted: z.boolean().default(false),
+  secondaryDegreeTitle: z.string().trim().optional(),
 });
 
 // Paso 3: Salud e Inclusión
 export const healthInclusionSchema = z.object({
-  requiresSupport: z.boolean().default(false),
-  supportDetails: z.string().trim().optional(),
+  receivesReasonableAdjustments: z.boolean().default(false),
+  adjustmentDetails: z.string().trim().optional(),
 });
 
 // Paso 4: Responsable / Tutor Legal
 export const responsibleSchema = z.object({
   fullName: z.string().trim().optional(),
   documentNumber: z.string().trim().optional(),
-  phone: z.string().trim().optional(),
+  phoneNumber: z.string().trim().optional(),
   email: z.string().trim().optional(),
   occupation: z.string().trim().optional(),
   educationLevel: z.string().trim().optional(),
 });
 
 // Paso 5: Preferencias
-export const preferencesSchema = z.object({
+export const preferenceSchema = z.object({
   preferredShift: z.string().trim().min(1, "Debe seleccionar un turno preferente"),
-  imageAuthorization: z.boolean().default(false),
-  isReentering: z.boolean().default(false),
+  allowsImageUse: z.boolean().default(false),
+  isReenrolling: z.boolean().default(false),
   previousTeacher: z.string().trim().optional(),
 });
 
 // Paso 6: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
-  documentType: z.enum(["DNI_FRONT", "DNI_BACK", "SECONDARY_CERTIFICATE", "HEALTH_REPORT", "PHOTO_4X4"]),
-  fileName: z.string(),
+  attachmentType: z.enum(["DNI_FRONT", "DNI_BACK", "SECONDARY_CERTIFICATE", "HEALTH_REPORT", "PHOTO_ID"]),
+  originalFileName: z.string(),
   contentType: z.string().optional(),
-  fileSize: z.number().optional(),
+  size: z.number().optional(),
   url: z.string().optional(),
-  uploadedAt: z.string().optional(),
+  createdAt: z.string().optional(),
 });
 
 // Schema para guardar borrador (permite campos incompletos durante el autoguardado)
@@ -82,10 +80,10 @@ export const updateEnrollmentDraftSchema = z.object({
 export const enrollmentApplicationSubmissionSchema = z
   .object({
     personalData: personalDataSchema,
-    educationBackground: educationBackgroundSchema,
+    academicBackground: academicBackgroundSchema,
     healthInclusion: healthInclusionSchema,
     responsible: responsibleSchema,
-    preferences: preferencesSchema,
+    preference: preferenceSchema,
     attachments: z.array(enrollmentAttachmentSchema).default([]),
   })
   .superRefine((data, ctx) => {
@@ -107,11 +105,11 @@ export const enrollmentApplicationSubmissionSchema = z
           path: ["responsible", "documentNumber"],
         });
       }
-      if (!resp?.phone || resp.phone.trim().length === 0) {
+      if (!resp?.phoneNumber || resp.phoneNumber.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "El teléfono del responsable es obligatorio para menores de 18 años",
-          path: ["responsible", "phone"],
+          path: ["responsible", "phoneNumber"],
         });
       }
       if (!resp?.email || resp.email.trim().length === 0) {
@@ -144,17 +142,17 @@ export const enrollmentApplicationSubmissionSchema = z
     }
 
     // 2. Condicional: Si recibe ajustes razonables, detalle e informe de salud obligatorios
-    if (data.healthInclusion.requiresSupport) {
-      if (!data.healthInclusion.supportDetails || data.healthInclusion.supportDetails.trim().length === 0) {
+    if (data.healthInclusion.receivesReasonableAdjustments) {
+      if (!data.healthInclusion.adjustmentDetails || data.healthInclusion.adjustmentDetails.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Debe describir los ajustes razonables que requiere",
-          path: ["healthInclusion", "supportDetails"],
+          path: ["healthInclusion", "adjustmentDetails"],
         });
       }
 
-      const hasHealthReport = data.attachments.some((att) => att.documentType === "HEALTH_REPORT");
-      if (!hasHealthReport) {
+      const hasHealthDoc = data.attachments.some((att) => att.attachmentType === "HEALTH_REPORT");
+      if (!hasHealthDoc) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Al requerir ajustes razonables, el Certificado o Informe de Salud es obligatorio",
@@ -164,18 +162,18 @@ export const enrollmentApplicationSubmissionSchema = z
     }
 
     // 3. Condicional: Si es reingresante, docente previo obligatorio
-    if (data.preferences.isReentering) {
-      if (!data.preferences.previousTeacher || data.preferences.previousTeacher.trim().length === 0) {
+    if (data.preference.isReenrolling) {
+      if (!data.preference.previousTeacher || data.preference.previousTeacher.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Debe indicar el docente previo al ser estudiante reingresante",
-          path: ["preferences", "previousTeacher"],
+          path: ["preference", "previousTeacher"],
         });
       }
     }
 
     // 4. Documentación obligatoria estándar
-    const hasDniFront = data.attachments.some((att) => att.documentType === "DNI_FRONT");
+    const hasDniFront = data.attachments.some((att) => att.attachmentType === "DNI_FRONT");
     if (!hasDniFront) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -184,7 +182,7 @@ export const enrollmentApplicationSubmissionSchema = z
       });
     }
 
-    const hasDniBack = data.attachments.some((att) => att.documentType === "DNI_BACK");
+    const hasDniBack = data.attachments.some((att) => att.attachmentType === "DNI_BACK");
     if (!hasDniBack) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -193,12 +191,12 @@ export const enrollmentApplicationSubmissionSchema = z
       });
     }
 
-    const hasPhoto = data.attachments.some((att) => att.documentType === "PHOTO_4X4");
+    const hasPhoto = data.attachments.some((att) => att.attachmentType === "PHOTO_ID");
     if (!hasPhoto) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Debe adjuntar la foto carnet 4x4",
-        path: ["attachments", "PHOTO_4X4"],
+        path: ["attachments", "PHOTO_ID"],
       });
     }
   });

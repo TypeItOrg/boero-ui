@@ -19,42 +19,39 @@ describe("EnrollmentDetailView", () => {
         lastName: "Martínez",
         documentNumber: "42123456",
         birthDate: "2004-08-12",
-        address: "Av. San Martín 1234",
-        city: "Villa María",
-        phone: "3534123456",
+        phoneNumber: "3534123456",
         email: "lucas@example.com",
       },
-      educationBackground: {
+      academicBackground: {
         secondarySchool: "Colegio Nacional",
-        graduationYear: "2022",
-        isSecondaryComplete: true,
-        secondaryTitle: "Bachiller en Ciencias Sociales",
+        currentGradeYear: "2022",
+        secondaryCompleted: true,
+        secondaryDegreeTitle: "Bachiller en Ciencias Sociales",
       },
       healthInclusion: {
-        requiresSupport: true,
-        supportDetails: "Requiere acceso por rampa para silla de ruedas",
+        receivesReasonableAdjustments: true,
+        adjustmentDetails: "Requiere acceso por rampa para silla de ruedas",
       },
       responsible: {
         fullName: "Carlos Martínez",
         documentNumber: "18123456",
-        phone: "3534987654",
+        phoneNumber: "3534987654",
         email: "carlos@example.com",
         occupation: "Comerciante",
         educationLevel: "Secundario Completo",
       },
-      preferences: {
+      preference: {
         preferredShift: "MORNING",
-        imageAuthorization: true,
-        isReentering: false,
+        allowsImageUse: true,
+        isReenrolling: false,
         previousTeacher: "Prof. Alberto Rossi",
       },
       attachments: [
         {
           id: "att-1",
-          documentType: "DNI_FRONT",
-          fileName: "dni_frente.pdf",
-          fileSize: 1048576,
-          url: "/api/v1/enrollment-applications/app-abc-123/attachments/att-1",
+          attachmentType: "DNI_FRONT",
+          originalFileName: "dni_frente.pdf",
+          size: 1048576,
         },
       ],
     },
@@ -82,7 +79,7 @@ describe("EnrollmentDetailView", () => {
 
     // 1. Datos Personales
     expect(screen.getByText("Datos Personales y de Contacto")).toBeInTheDocument();
-    expect(screen.getByText("Av. San Martín 1234, Villa María")).toBeInTheDocument();
+    expect(screen.getByText("3534123456")).toBeInTheDocument();
     expect(screen.getByText("lucas@example.com")).toBeInTheDocument();
 
     // 2. Trayectoria Educativa
@@ -109,7 +106,10 @@ describe("EnrollmentDetailView", () => {
     // 6. Documentación Adjunta
     expect(screen.getByText("Documentación Adjunta")).toBeInTheDocument();
     expect(screen.getByText(/dni_frente\.pdf/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /descargar/i })).toHaveAttribute("href", "/api/v1/enrollment-applications/app-abc-123/attachments/att-1");
+    expect(screen.getByRole("link", { name: /descargar/i })).toHaveAttribute(
+      "href",
+      "/api/enrollment-applications/app-abc-123/attachments/att-1/content",
+    );
   });
 
   it("handles empty / default states for optional sections", () => {
