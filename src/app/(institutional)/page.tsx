@@ -11,7 +11,11 @@ import { getAcademicAccess } from "@features/academic/utils/academic-access.util
 import { InstitutionalHomeSkeleton } from "@features/institutional-auth/components/institutional-home-skeleton";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { getInstitutionalHomeLinks, type InstitutionalHomeLink } from "@features/institutional-auth/utils/institutional-home-access.util";
+import {
+  getInstitutionalAcademicOfferLink,
+  getInstitutionalHomeLinks,
+  type InstitutionalHomeLink,
+} from "@features/institutional-auth/utils/institutional-home-access.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 type HomeAccessRowProps = {
@@ -51,9 +55,10 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const links = getInstitutionalHomeLinks(user);
   const managementLinks = links.filter((link) => link.href !== "/account");
   const personalLink = links.find((link) => link.href === "/account");
+  const academicOfferLink = getInstitutionalAcademicOfferLink(user);
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
   const hasInstitutionalAccess = managementLinks.length > 0;
-  const hasAcademicAccess = academicResources.length > 0;
+  const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
   const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess;
   const greeting = getGreeting(new Date());
   const primaryRole = user.roles[0] ?? "Usuario institucional";
@@ -97,6 +102,21 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
       </header>
 
       <div className="flex flex-col gap-4 px-3 pb-3 md:px-4 md:pb-4">
+        {academicOfferLink ? (
+          <HomeSubsection
+            id="academic-offer-title"
+            title="Oferta académica"
+            description="Conocé las propuestas vigentes de la institución."
+            icon={GraduationCapIcon}
+            imageSrc="/gestion-academica.webp"
+            imageSide="right"
+          >
+            <nav aria-label="Oferta académica" className="[&>a]:bg-background grid gap-4">
+              <HomeAccessRow link={academicOfferLink} />
+            </nav>
+          </HomeSubsection>
+        ) : null}
+
         {managementLinks.length > 0 ? (
           <HomeSubsection
             id="institutional-management-title"

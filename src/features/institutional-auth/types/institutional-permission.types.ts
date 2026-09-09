@@ -12,6 +12,7 @@ export const INSTITUTIONAL_PERMISSION = {
   ROLE_DELETE: "institution:roles:delete",
   GRADES_ENTER: "institution:grades:enter",
   GRADES_ENTER_FINAL: "institution:grades:enter-final",
+  ACADEMIC_OFFER_READ: "institution:academic-offer:read",
   INSTITUTION_READ: "institution:read",
   INSTITUTION_UPDATE: "institution:update",
   ACADEMIC_YEAR_READ: "institution:academic-year:read",
