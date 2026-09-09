@@ -40,11 +40,17 @@ import {
   updateEnrollmentDraftAction,
   submitEnrollmentApplicationAction,
   cancelEnrollmentApplicationAction,
+  fetchEnrollmentApplicationTrainingPathsAction,
+  fetchEnrollmentApplicationStudyPlanSpacesAction,
 } from "../actions/enrollment-application.actions";
 import { calculateAge, enrollmentApplicationSubmissionSchema } from "../schemas/enrollment-application.schema";
 import { SHIFT_OPTIONS, EDUCATION_LEVEL_OPTIONS } from "../constants/enrollment-application.constants";
 import { DocumentUploaderCard } from "./DocumentUploaderCard";
 import { EnrollmentStatusCard } from "./EnrollmentStatusCard";
+import { EnrollmentTrainingPathSelector } from "./EnrollmentTrainingPathSelector";
+import { EnrollmentStudyPlanSpacesSelector } from "./EnrollmentStudyPlanSpacesSelector";
+import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type {
   EnrollmentApplicationData,
   EnrollmentApplicationResponse,
@@ -63,8 +69,10 @@ const TABS = [
   { id: "education", label: "2. Escolaridad" },
   { id: "health", label: "3. Salud e Inclusión" },
   { id: "responsible", label: "4. Tutor Legal" },
-  { id: "preferences", label: "5. Preferencias" },
-  { id: "documents", label: "6. Adjuntos" },
+  { id: "training-path", label: "5. Trayecto Formativo" },
+  { id: "spaces", label: "6. Espacios e Instrumentos" },
+  { id: "preferences", label: "7. Preferencias" },
+  { id: "documents", label: "8. Adjuntos" },
 ] as const;
 
 export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWizardProps): React.ReactElement {
@@ -111,13 +119,23 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   const [responsibleOccupation, setResponsibleOccupation] = React.useState("");
   const [responsibleEducationLevel, setResponsibleEducationLevel] = React.useState("");
 
-  // 5. Preferencias
+  // 5. Trayecto Formativo
+  const [trainingPaths, setTrainingPaths] = React.useState<TrainingPath[]>([]);
+  const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState("");
+
+  // 6. Espacios e Instrumentos
+  const [studyPlanSpaces, setStudyPlanSpaces] = React.useState<StudyPlanSpace[]>([]);
+  const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>([]);
+  const [selectedInstrumentIdsByStudyPlanSpaceId, setSelectedInstrumentIdsByStudyPlanSpaceId] = React.useState<Record<string, string>>({});
+  const [loadingSpaces, setLoadingSpaces] = React.useState(false);
+
+  // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState("");
   const [allowsImageUse, setAllowsImageUse] = React.useState(false);
   const [isReenrolling, setIsReenrolling] = React.useState(false);
   const [previousTeacher, setPreviousTeacher] = React.useState("");
 
-  // 6. Documentación Adjunta
+  // 8. Documentación Adjunta
   const [attachments, setAttachments] = React.useState<EnrollmentAttachment[]>([]);
 
   // Reactive age computation
@@ -178,7 +196,36 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         setIsReenrolling(Boolean(pref.isReenrolling));
         setPreviousTeacher(pref.previousTeacher || "");
 
+        const career = appData.careerSelection || {};
+        const spaceSel = appData.academicSpaceSelection || {};
+        const instSel = appData.instrumentSelection || {};
+
+        setSelectedTrainingPathId(career.trainingPathId || "");
+        setSelectedStudyPlanSpaceIds(spaceSel.studyPlanSpaceIds || []);
+        setSelectedInstrumentIdsByStudyPlanSpaceId(instSel.studyPlanSpaceInstrumentIds || {});
+
         setAttachments(atts);
+
+        // Fetch available training paths and study plan spaces
+        fetchEnrollmentApplicationTrainingPathsAction(data.applicationId)
+          .then((paths) => {
+            if (!active) return;
+            setTrainingPaths(paths);
+          })
+          .catch(() => {
+            if (!active) return;
+            setTrainingPaths([]);
+          });
+
+        fetchEnrollmentApplicationStudyPlanSpacesAction(data.applicationId)
+          .then((spaces) => {
+            if (!active) return;
+            setStudyPlanSpaces(spaces);
+          })
+          .catch(() => {
+            if (!active) return;
+            setStudyPlanSpaces([]);
+          });
 
         isInitialDataLoaded.current = true;
         setLoading(false);
@@ -193,6 +240,29 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       active = false;
     };
   }, [studyPlanId, academicYearId]);
+
+  const handleToggleSpace = (studyPlanSpaceId: string) => {
+    setSelectedStudyPlanSpaceIds((prev) => {
+      if (prev.includes(studyPlanSpaceId)) {
+        const updated = prev.filter((id) => id !== studyPlanSpaceId);
+        setSelectedInstrumentIdsByStudyPlanSpaceId((prevInst) => {
+          const nextInst = { ...prevInst };
+          delete nextInst[studyPlanSpaceId];
+          return nextInst;
+        });
+        return updated;
+      } else {
+        return [...prev, studyPlanSpaceId];
+      }
+    });
+  };
+
+  const handleSelectInstrument = (studyPlanSpaceId: string, instrumentId: string) => {
+    setSelectedInstrumentIdsByStudyPlanSpaceId((prev) => ({
+      ...prev,
+      [studyPlanSpaceId]: instrumentId,
+    }));
+  };
 
   // Structured payload for auto-save and submission
   const structuredData: EnrollmentApplicationData = React.useMemo(() => {
@@ -223,6 +293,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         occupation: responsibleOccupation,
         educationLevel: responsibleEducationLevel,
       },
+      careerSelection: selectedTrainingPathId ? { trainingPathId: selectedTrainingPathId } : undefined,
+      academicSpaceSelection: selectedStudyPlanSpaceIds.length > 0 ? { studyPlanSpaceIds: selectedStudyPlanSpaceIds } : undefined,
+      instrumentSelection:
+        Object.keys(selectedInstrumentIdsByStudyPlanSpaceId).length > 0
+          ? { studyPlanSpaceInstrumentIds: selectedInstrumentIdsByStudyPlanSpaceId }
+          : undefined,
       preference: {
         preferredShift,
         allowsImageUse,
@@ -250,6 +326,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     responsibleEmail,
     responsibleOccupation,
     responsibleEducationLevel,
+    selectedTrainingPathId,
+    selectedStudyPlanSpaceIds,
+    selectedInstrumentIdsByStudyPlanSpaceId,
     preferredShift,
     allowsImageUse,
     isReenrolling,
@@ -261,19 +340,21 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
   // Auto-save logic
   React.useEffect(() => {
-    if (!application?.applicationId || loading || !isInitialDataLoaded.current) return;
-    if (application.status !== "DRAFT") return;
+    const appId = application?.applicationId;
+    const appStatus = application?.status;
+    if (!appId || loading || !isInitialDataLoaded.current) return;
+    if (appStatus !== "DRAFT") return;
 
     let active = true;
 
     async function autoSave() {
       await Promise.resolve();
-      if (!active) return;
+      if (!active || !appId) return;
       setSaving(true);
       setSaveError(null);
 
       try {
-        const updated = await updateEnrollmentDraftAction(application!.applicationId, { data: debouncedData });
+        const updated = await updateEnrollmentDraftAction(appId, { data: debouncedData });
         if (active) {
           setApplication((prev) => (prev ? { ...prev, updatedAt: updated.updatedAt } : updated));
         }
@@ -295,6 +376,27 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       active = false;
     };
   }, [debouncedData, application?.applicationId, application?.status, loading]);
+
+  // Refetch spaces when selected training path changes
+  React.useEffect(() => {
+    const appId = application?.applicationId;
+    if (!appId || !selectedTrainingPathId || !isInitialDataLoaded.current) return;
+    let active = true;
+    setLoadingSpaces(true);
+    fetchEnrollmentApplicationStudyPlanSpacesAction(appId)
+      .then((updatedSpaces) => {
+        if (!active) return;
+        setStudyPlanSpaces(updatedSpaces);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!active) return;
+        setLoadingSpaces(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedTrainingPathId, application?.applicationId]);
 
   // Submission handler with full Zod validation and conditional rules
   const handleSubmitApplication = async () => {
@@ -319,9 +421,35 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         else if (section === "academicBackground") setActiveTab("education");
         else if (section === "healthInclusion") setActiveTab("health");
         else if (section === "responsible") setActiveTab("responsible");
+        else if (section === "careerSelection") setActiveTab("training-path");
+        else if (section === "academicSpaceSelection" || section === "instrumentSelection") setActiveTab("spaces");
         else if (section === "preference") setActiveTab("preferences");
         else if (section === "attachments") setActiveTab("documents");
       }
+      return;
+    }
+
+    if (trainingPaths.length > 0 && !selectedTrainingPathId) {
+      setIsSubmitting(false);
+      setSubmissionError("Debés seleccionar un trayecto formativo antes de enviar.");
+      setActiveTab("training-path");
+      return;
+    }
+
+    if (studyPlanSpaces.length > 0 && selectedStudyPlanSpaceIds.length === 0) {
+      setIsSubmitting(false);
+      setSubmissionError("Debés seleccionar al menos un espacio curricular.");
+      setActiveTab("spaces");
+      return;
+    }
+
+    const missingInstrumentSpace = studyPlanSpaces.find(
+      (s) => selectedStudyPlanSpaceIds.includes(s.id) && s.requiresInstrument && !selectedInstrumentIdsByStudyPlanSpaceId[s.id],
+    );
+    if (missingInstrumentSpace) {
+      setIsSubmitting(false);
+      setSubmissionError(`Debés seleccionar un instrumento para "${missingInstrumentSpace.academicSpaceName}".`);
+      setActiveTab("spaces");
       return;
     }
 
@@ -472,7 +600,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
       {/* Tabs navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-3 lg:grid-cols-6">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4 lg:grid-cols-8">
           {TABS.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="py-2.5 text-xs font-medium data-[state=active]:font-semibold">
               {tab.label}
@@ -818,6 +946,72 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                 <ChevronLeftIcon className="size-4" />
                 Atrás
               </Button>
+              <Button type="button" onClick={() => setActiveTab("training-path")} className="gap-1.5">
+                Siguiente: Trayecto Formativo
+                <ChevronRightIcon className="size-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        {/* ========================================================================= */}
+        {/* PASO 5: TRAYECTO FORMATIVO */}
+        {/* ========================================================================= */}
+        <TabsContent value="training-path" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>5. Trayecto Formativo</CardTitle>
+              <CardDescription>Elegí la orientación o especialidad dentro del plan de estudio.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EnrollmentTrainingPathSelector
+                trainingPaths={trainingPaths}
+                selectedTrainingPathId={selectedTrainingPathId}
+                onSelectTrainingPath={setSelectedTrainingPathId}
+                disabled={!application.isEditable}
+                error={getFieldError(["careerSelection", "trainingPathId"])}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button type="button" variant="outline" onClick={() => setActiveTab("responsible")} className="gap-1.5">
+                <ChevronLeftIcon className="size-4" />
+                Atrás
+              </Button>
+              <Button type="button" onClick={() => setActiveTab("spaces")} className="gap-1.5">
+                Siguiente: Espacios e Instrumentos
+                <ChevronRightIcon className="size-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        {/* ========================================================================= */}
+        {/* PASO 6: ESPACIOS CURRICULARES E INSTRUMENTOS */}
+        {/* ========================================================================= */}
+        <TabsContent value="spaces" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>6. Espacios Académicos e Instrumentos</CardTitle>
+              <CardDescription>Seleccioná las materias que vas a cursar y el instrumento que corresponda.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EnrollmentStudyPlanSpacesSelector
+                studyPlanSpaces={studyPlanSpaces}
+                selectedStudyPlanSpaceIds={selectedStudyPlanSpaceIds}
+                selectedInstrumentIdsByStudyPlanSpaceId={selectedInstrumentIdsByStudyPlanSpaceId}
+                onToggleSpace={handleToggleSpace}
+                onSelectInstrument={handleSelectInstrument}
+                disabled={!application.isEditable}
+                isLoading={loadingSpaces}
+                spaceError={getFieldError(["academicSpaceSelection", "studyPlanSpaceIds"])}
+                instrumentError={getFieldError(["instrumentSelection", "studyPlanSpaceInstrumentIds"])}
+              />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button type="button" variant="outline" onClick={() => setActiveTab("training-path")} className="gap-1.5">
+                <ChevronLeftIcon className="size-4" />
+                Atrás
+              </Button>
               <Button type="button" onClick={() => setActiveTab("preferences")} className="gap-1.5">
                 Siguiente: Preferencias
                 <ChevronRightIcon className="size-4" />
@@ -827,12 +1021,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 5: PREFERENCIAS */}
+        {/* PASO 7: PREFERENCIAS */}
         {/* ========================================================================= */}
         <TabsContent value="preferences" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>5. Preferencias y Consentimientos</CardTitle>
+              <CardTitle>7. Preferencias y Consentimientos</CardTitle>
               <CardDescription>Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -893,7 +1087,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               )}
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("responsible")} className="gap-1.5">
+              <Button type="button" variant="outline" onClick={() => setActiveTab("spaces")} className="gap-1.5">
                 <ChevronLeftIcon className="size-4" />
                 Atrás
               </Button>
@@ -906,11 +1100,11 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 6: DOCUMENTACIÓN ADJUNTA */}
+        {/* PASO 8: DOCUMENTACIÓN ADJUNTA */}
         {/* ========================================================================= */}
         <TabsContent value="documents" className="mt-6 space-y-6">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold tracking-tight">6. Documentación Requerida</h2>
+            <h2 className="text-lg font-semibold tracking-tight">8. Documentación Requerida</h2>
             <p className="text-muted-foreground text-sm">Adjuntá las imágenes o archivos PDF solicitados para completar la postulación.</p>
           </div>
 

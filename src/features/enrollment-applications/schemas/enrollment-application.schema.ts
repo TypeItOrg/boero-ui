@@ -60,7 +60,28 @@ export const preferenceSchema = z.object({
   previousTeacher: z.string().trim().optional(),
 });
 
-// Paso 6: Adjunto
+// Paso: Trayecto Formativo
+export const careerSelectionSchema = z
+  .object({
+    trainingPathId: z.string().trim().optional(),
+  })
+  .optional();
+
+// Paso: Espacios Académicos
+export const academicSpaceSelectionSchema = z
+  .object({
+    studyPlanSpaceIds: z.array(z.string().trim()).optional(),
+  })
+  .optional();
+
+// Paso: Instrumentos
+export const instrumentSelectionSchema = z
+  .object({
+    studyPlanSpaceInstrumentIds: z.record(z.string(), z.string()).optional(),
+  })
+  .optional();
+
+// Paso: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
   attachmentType: z.enum(["DNI_FRONT", "DNI_BACK", "SECONDARY_CERTIFICATE", "HEALTH_REPORT", "PHOTO_ID"]),
@@ -76,13 +97,16 @@ export const updateEnrollmentDraftSchema = z.object({
   data: z.record(z.string(), z.unknown()),
 });
 
-// Schema completo y estricto para Enviar Inscripción (valida los 6 pasos y reglas condicionales)
+// Schema completo y estricto para Enviar Inscripción (valida los pasos y reglas condicionales)
 export const enrollmentApplicationSubmissionSchema = z
   .object({
     personalData: personalDataSchema,
     academicBackground: academicBackgroundSchema,
     healthInclusion: healthInclusionSchema,
     responsible: responsibleSchema,
+    careerSelection: careerSelectionSchema,
+    academicSpaceSelection: academicSpaceSelectionSchema,
+    instrumentSelection: instrumentSelectionSchema,
     preference: preferenceSchema,
     attachments: z.array(enrollmentAttachmentSchema).default([]),
   })

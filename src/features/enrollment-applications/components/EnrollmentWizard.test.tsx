@@ -15,6 +15,8 @@ jest.mock("../actions/enrollment-application.actions", () => ({
   updateEnrollmentDraftAction: jest.fn(),
   submitEnrollmentApplicationAction: jest.fn(),
   cancelEnrollmentApplicationAction: jest.fn(),
+  fetchEnrollmentApplicationTrainingPathsAction: jest.fn(),
+  fetchEnrollmentApplicationStudyPlanSpacesAction: jest.fn(),
 }));
 
 import {
@@ -22,12 +24,16 @@ import {
   updateEnrollmentDraftAction,
   submitEnrollmentApplicationAction,
   cancelEnrollmentApplicationAction,
+  fetchEnrollmentApplicationTrainingPathsAction,
+  fetchEnrollmentApplicationStudyPlanSpacesAction,
 } from "../actions/enrollment-application.actions";
 
 const startAction = jest.mocked(startOrGetEnrollmentApplicationAction);
 const updateAction = jest.mocked(updateEnrollmentDraftAction);
 const submitAction = jest.mocked(submitEnrollmentApplicationAction);
 const cancelAction = jest.mocked(cancelEnrollmentApplicationAction);
+const fetchTrainingPathsAction = jest.mocked(fetchEnrollmentApplicationTrainingPathsAction);
+const fetchStudyPlanSpacesAction = jest.mocked(fetchEnrollmentApplicationStudyPlanSpacesAction);
 
 const BASE: EnrollmentApplicationResponse = {
   applicationId: "app-1",
@@ -73,6 +79,8 @@ describe("EnrollmentWizard", () => {
     // (aunque el usuario no haya tocado nada todavía), así que sin esto la
     // promesa sin resolver revienta el efecto en cada test.
     updateAction.mockResolvedValue(BASE);
+    fetchTrainingPathsAction.mockResolvedValue([]);
+    fetchStudyPlanSpacesAction.mockResolvedValue([]);
   });
 
   it("loads the existing draft and populates the personal data step", async () => {
@@ -147,5 +155,38 @@ describe("EnrollmentWizard", () => {
 
     await waitFor(() => expect(cancelAction).toHaveBeenCalledWith("app-1"));
     expect(await screen.findByTestId("status-card")).toHaveTextContent("status:CANCELLED");
+  });
+
+  it("renders training-path and spaces tabs and loads their data", async () => {
+    fetchTrainingPathsAction.mockResolvedValue([
+      { id: "tp-1", name: "Formación Básica en Guitarra", description: "Trayecto inicial", active: true, institutionId: "inst-1" },
+    ]);
+    fetchStudyPlanSpacesAction.mockResolvedValue([
+      {
+        id: "s-1",
+        studyPlanId: "plan-1",
+        academicSpaceId: "as-1",
+        academicSpaceName: "Práctica de Conjunto",
+        academicLevelId: null,
+        academicLevelName: null,
+        requirementType: "REQUIRED",
+        displayOrder: 1,
+        approvalMode: "PROMOTION",
+        requiresInstrument: false,
+        allowedInstruments: [],
+      },
+    ]);
+    startAction.mockResolvedValue(BASE);
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    expect(await screen.findByRole("tab", { name: /5\. trayecto formativo/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("tab", { name: /5\. trayecto formativo/i }));
+    expect(await screen.findByText("Formación Básica en Guitarra")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i }));
+    expect(await screen.findByText("Práctica de Conjunto")).toBeInTheDocument();
   });
 });

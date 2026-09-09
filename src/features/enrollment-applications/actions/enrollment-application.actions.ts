@@ -10,7 +10,11 @@ import {
   deleteEnrollmentAttachment,
   fetchEnrollmentApplications,
   fetchEnrollmentApplicationById,
+  fetchEnrollmentApplicationTrainingPaths,
+  fetchEnrollmentApplicationStudyPlanSpaces,
 } from "../services/enrollment-application.service";
+import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type {
   EnrollmentApplicationResponse,
   EnrollmentAttachment,
@@ -62,4 +66,12 @@ export async function uploadEnrollmentAttachmentAction(applicationId: string, fo
 
 export async function deleteEnrollmentAttachmentAction(applicationId: string, attachmentId: string): Promise<void> {
   return deleteEnrollmentAttachment(applicationId, attachmentId);
+}
+
+export async function fetchEnrollmentApplicationTrainingPathsAction(applicationId: string): Promise<TrainingPath[]> {
+  return fetchEnrollmentApplicationTrainingPaths(applicationId);
+}
+
+export async function fetchEnrollmentApplicationStudyPlanSpacesAction(applicationId: string): Promise<StudyPlanSpace[]> {
+  return fetchEnrollmentApplicationStudyPlanSpaces(applicationId);
 }
