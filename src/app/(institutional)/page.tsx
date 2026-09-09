@@ -188,7 +188,7 @@ function HomeSubsection({ children, description, icon: Icon, id, imageSide = "le
             imageSide === "right" ? "lg:grid-cols-[minmax(0,2fr)_minmax(200px,0.7fr)]" : "lg:grid-cols-[minmax(200px,0.7fr)_minmax(0,2fr)]",
           )}
         >
-          <div className={cn("bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-92", imageSide === "right" && "lg:order-2")}>
+          <div className={cn("bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-auto", imageSide === "right" && "lg:order-2")}>
             <Image src={imageSrc} alt="" fill sizes="(max-width: 1023px) 100vw, 28vw" className="object-cover" />
           </div>
           <div className={cn("min-w-0", imageSide === "right" && "lg:order-1")}>{children}</div>

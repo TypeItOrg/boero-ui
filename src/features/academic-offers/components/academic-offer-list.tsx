@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { ArrowRightIcon, BookOpenCheckIcon, CalendarRangeIcon, RouteIcon } from "lucide-react";
+import { BookOpenCheckIcon, CalendarRangeIcon, RouteIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
@@ -32,8 +32,8 @@ export function AcademicOfferList({ items, page, size, totalItems, totalPages }:
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="flex h-full flex-1 flex-col justify-between gap-5">
+      <div className="flex flex-wrap items-stretch gap-4">
         {items.map((offer) => (
           <AcademicOfferCard key={offer.studyPlanId} offer={offer} />
         ))}
@@ -45,7 +45,7 @@ export function AcademicOfferList({ items, page, size, totalItems, totalPages }:
 
 function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): React.ReactElement {
   return (
-    <Card className="h-full transition-shadow hover:shadow-md">
+    <Card className="flex-[1_0_min(300px,100%)] transition-shadow hover:shadow-md">
       <CardHeader className="gap-3">
         <div className="flex items-start justify-between gap-3">
           <span className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
@@ -62,7 +62,6 @@ function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): React.Re
         <p className="flex items-center gap-2">
           <BookOpenCheckIcon aria-hidden="true" className="text-muted-foreground size-4" />
           <span>{offer.studyPlanName}</span>
-          <Badge variant="outline">Versión {offer.studyPlanVersion}</Badge>
         </p>
         <p className="text-muted-foreground flex items-center gap-2">
           <CalendarRangeIcon aria-hidden="true" className="size-4" />
@@ -70,13 +69,12 @@ function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): React.Re
         </p>
       </CardContent>
       <CardFooter className="justify-end">
-        <Link
+        <ReturnToLink
           href={`/academic-offers/${offer.studyPlanId}`}
           className="text-primary focus-visible:ring-ring inline-flex items-center gap-2 rounded-md font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
         >
           Ver espacios académicos
-          <ArrowRightIcon aria-hidden="true" className="size-4" />
-        </Link>
+        </ReturnToLink>
       </CardFooter>
     </Card>
   );

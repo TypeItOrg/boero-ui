@@ -1,7 +1,7 @@
-import { BookOpenCheckIcon, Layers3Icon } from "lucide-react";
+import { BookMarkedIcon, BookOpenCheckIcon, Layers3Icon, LibraryBigIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { formatDisplayDate } from "@common/utils/date-input.util";
 import type { AcademicOfferDetail as AcademicOfferDetailType } from "@features/academic-offers/types/academic-offer-detail.types";
@@ -18,17 +18,23 @@ export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailTyp
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="bg-muted/25 flex flex-col items-start gap-4 rounded-xl border p-5">
-        <div className="flex flex-col items-start gap-3">
-          <Badge variant="success">Inscripción habilitada</Badge>
-          {detail.offer.trainingPathDescription ? (
-            <p className="text-muted-foreground mt-3 max-w-3xl leading-relaxed">{detail.offer.trainingPathDescription}</p>
-          ) : null}
-        </div>
-        <div className="bg-background grid gap-1 rounded-lg border px-4 py-3 text-sm shadow-xs">
-          <span className="font-semibold">{detail.offer.studyPlanName}</span>
-          <span className="text-muted-foreground">Versión {detail.offer.studyPlanVersion}</span>
-          <span className="text-muted-foreground">{formatValidity(detail.offer.effectiveFrom, detail.offer.effectiveTo)}</span>
+      <section className="bg-muted/25 rounded-xl border p-5">
+        <div className="bg-background flex w-full min-w-0 flex-col gap-4 rounded-xl border p-4 shadow-xs sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 flex-1 items-stretch gap-3.5">
+            <span className="bg-primary/10 text-primary flex min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+              <BookMarkedIcon aria-hidden="true" className="size-5" />
+            </span>
+            <div className="flex min-w-0 flex-col justify-center">
+              <h2 className="font-semibold">{detail.offer.studyPlanName}</h2>
+              <p className="text-muted-foreground text-sm">{formatValidity(detail.offer.effectiveFrom, detail.offer.effectiveTo)}</p>
+              {detail.offer.trainingPathDescription ? (
+                <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{detail.offer.trainingPathDescription}</p>
+              ) : null}
+            </div>
+          </div>
+          <Badge variant="success" className="w-fit shrink-0">
+            Inscripción habilitada
+          </Badge>
         </div>
       </section>
 
@@ -98,10 +104,17 @@ export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailTyp
 
 function AcademicOfferSpaceCard({ space }: { space: AcademicOfferSpace }): React.ReactElement {
   return (
-    <Card size="sm" className="bg-background h-full">
-      <CardHeader>
-        <CardTitle className="text-base font-semibold">{space.name}</CardTitle>
-        {space.description ? <p className="text-muted-foreground line-clamp-3 text-sm">{space.description}</p> : null}
+    <Card size="sm" className="bg-muted/25 h-full">
+      <CardHeader className="border-b">
+        <div className="flex items-stretch gap-3">
+          <span className="bg-primary/10 text-primary flex min-h-10 min-w-10 shrink-0 items-center justify-center self-stretch rounded-lg">
+            <LibraryBigIcon aria-hidden="true" className="size-4" />
+          </span>
+          <div className="flex min-w-0 flex-col justify-center">
+            <CardTitle className="text-base font-semibold">{space.name}</CardTitle>
+            <CardDescription className="line-clamp-3">{space.description ?? "Sin descripción disponible."}</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="mt-auto flex flex-wrap gap-2">
         <Badge variant={space.requirementType === "REQUIRED" ? "default" : "outline"}>{requirementTypeLabels[space.requirementType]}</Badge>
