@@ -12,6 +12,8 @@ import {
   UserRoundIcon,
   UsersIcon,
   XCircleIcon,
+  BookMarkedIcon,
+  MusicIcon,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@common/components/ui/badge";
@@ -250,6 +252,45 @@ export function EnrollmentDetailView({ application, studyPlanName, academicYearN
             </div>
             <DetailValue label="Docente previo / Referencia" value={preference.previousTeacher || "Ninguno"} />
           </dl>
+        </section>
+
+        {/* Tarjeta: Espacios Curriculares e Instrumentos */}
+        <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+          <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+            <DetailSectionHeader
+              icon={BookMarkedIcon}
+              title="Espacios Curriculares e Instrumentos"
+              description="Materias y asignaciones instrumentales seleccionadas."
+            />
+          </header>
+          <div className="mt-4 space-y-3 sm:mt-5">
+            {application.spaces && application.spaces.length > 0 ? (
+              <div className="divide-border/60 bg-background/50 divide-y rounded-lg border">
+                {application.spaces.map((space) => (
+                  <div key={space.spaceId} className="flex items-center justify-between p-3 text-sm">
+                    <div className="space-y-0.5">
+                      <p className="text-foreground font-medium">{space.spaceName}</p>
+                      {space.subjectCode ? <p className="text-muted-foreground font-mono text-xs">{space.subjectCode}</p> : null}
+                    </div>
+                    {space.instrumentName ? (
+                      <Badge variant="secondary" className="gap-1 text-xs">
+                        <MusicIcon className="size-3" />
+                        {space.instrumentName}
+                      </Badge>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : data.academicSpaceSelection?.studyPlanSpaceIds && data.academicSpaceSelection.studyPlanSpaceIds.length > 0 ? (
+              <p className="text-muted-foreground text-sm">
+                {data.academicSpaceSelection.studyPlanSpaceIds.length} espacio(s) académico(s) en borrador.
+              </p>
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
+                <p className="text-muted-foreground text-sm">No se han registrado materias para esta solicitud.</p>
+              </div>
+            )}
+          </div>
         </section>
 
         {/* 6. Tarjeta: Documentación Adjunta */}

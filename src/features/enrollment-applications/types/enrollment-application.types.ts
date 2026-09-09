@@ -50,12 +50,37 @@ export interface EnrollmentPreference {
   previousTeacher?: string;
 }
 
+export interface EnrollmentCareerSelection {
+  trainingPathId?: string;
+}
+
+export interface EnrollmentAcademicSpaceSelection {
+  studyPlanSpaceIds?: string[];
+}
+
+export interface EnrollmentInstrumentSelection {
+  studyPlanSpaceInstrumentIds?: Record<string, string>;
+}
+
+export interface EnrollmentApplicationSpaceResponse {
+  spaceId: string;
+  studyPlanSpaceId: string;
+  spaceName: string;
+  instrumentId: string | null;
+  instrumentName: string | null;
+  subjectCode: string | null;
+  year: number | null;
+}
+
 export interface EnrollmentApplicationData {
   personalData?: Partial<EnrollmentPersonalData>;
   academicBackground?: Partial<EnrollmentAcademicBackground>;
   healthInclusion?: Partial<EnrollmentHealthInclusion>;
   responsible?: Partial<EnrollmentResponsible>;
   preference?: Partial<EnrollmentPreference>;
+  careerSelection?: EnrollmentCareerSelection;
+  academicSpaceSelection?: EnrollmentAcademicSpaceSelection;
+  instrumentSelection?: EnrollmentInstrumentSelection;
   attachments?: EnrollmentAttachment[];
   [key: string]: unknown;
 }
@@ -73,6 +98,7 @@ export interface EnrollmentApplicationResponse {
   status: EnrollmentApplicationStatus;
   isEditable: boolean;
   data: EnrollmentApplicationData;
+  spaces?: EnrollmentApplicationSpaceResponse[];
   applicantName?: string;
   applicantDocumentNumber?: string;
   createdAt: string;

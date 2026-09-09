@@ -3,6 +3,8 @@ import "server-only";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { ENROLLMENT_APPLICATIONS_API_PATH } from "../constants/enrollment-application.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type {
   EnrollmentApplicationResponse,
   EnrollmentAttachment,
@@ -153,6 +155,32 @@ export async function deleteEnrollmentAttachment(applicationId: string, attachme
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || "Error al eliminar el archivo adjunto");
   }
+}
+
+export async function fetchEnrollmentApplicationTrainingPaths(applicationId: string): Promise<TrainingPath[]> {
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/training-paths`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Error al obtener los trayectos formativos disponibles");
+  }
+
+  return response.json();
+}
+
+export async function fetchEnrollmentApplicationStudyPlanSpaces(applicationId: string): Promise<StudyPlanSpace[]> {
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/study-plan-spaces`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Error al obtener los espacios académicos disponibles");
+  }
+
+  return response.json();
 }
 
 export { getAttachmentDownloadUrl } from "../utils/enrollment-application.util";
