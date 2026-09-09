@@ -31,9 +31,6 @@ export default async function AcademicOffersPage({ searchParams }: { searchParam
 
   return (
     <PlatformPageShell title="Oferta académica" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={RouteIcon} />}>
-      <p className="text-muted-foreground max-w-3xl">
-        Explorá los trayectos con inscripción habilitada y consultá los espacios académicos que forman cada propuesta.
-      </p>
       <DataTableNavigationProvider>
         <AcademicOfferList {...offers} />
       </DataTableNavigationProvider>
