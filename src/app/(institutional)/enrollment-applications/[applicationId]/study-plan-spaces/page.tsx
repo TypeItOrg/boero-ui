@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BookMarkedIcon, RouteIcon } from "lucide-react";
+import { BookMarkedIcon, GraduationCapIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { isHttpResponseError } from "@common/utils/http-response-error.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { fetchAcademicYear, fetchStudyPlan } from "@features/academic/services/academic.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import { EnrollmentTrainingPathForm } from "@features/enrollment/components/enrollment-training-path-form";
+import { EnrollmentStudyPlanSpacesForm } from "@features/enrollment/components/enrollment-study-plan-spaces-form";
+import { fetchEnrollmentApplicationStudyPlanSpaces } from "@features/enrollment/services/fetch-enrollment-application-study-plan-spaces.service";
 import { fetchEnrollmentApplication } from "@features/enrollment/services/fetch-enrollment-application.service";
-import { fetchEnrollmentApplicationTrainingPaths } from "@features/enrollment/services/fetch-enrollment-application-training-paths.service";
 import { isApplicantInstitutionalUser } from "@features/enrollment/utils/is-applicant-institutional-user.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -18,10 +18,10 @@ import { getInstitutionalMetadata } from "@features/institutional-auth/utils/ins
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Seleccionar trayecto formativo");
+  return getInstitutionalMetadata("Seleccionar espacios academicos");
 }
 
-export default async function EnrollmentApplicationTrainingPathPage({
+export default async function EnrollmentApplicationStudyPlanSpacesPage({
   params,
   searchParams,
 }: {
@@ -34,33 +34,36 @@ export default async function EnrollmentApplicationTrainingPathPage({
   const user = await requireInstitutionalUser();
 
   if (!isApplicantInstitutionalUser(user)) {
-    return <InstitutionalAccessDenied description="Esta pantalla está disponible solo para postulantes con una solicitud en curso." />;
+    return <InstitutionalAccessDenied description="Esta pantalla esta disponible solo para postulantes con una solicitud en curso." />;
   }
 
   const application = await fetchEnrollmentApplication(applicationId);
   if (!application) notFound();
 
-  const [trainingPaths, studyPlan, academicYear] = await Promise.all([
-    fetchEnrollmentApplicationTrainingPaths(applicationId),
+  const [studyPlanSpaces, studyPlan, academicYear] = await Promise.all([
+    fetchEnrollmentApplicationStudyPlanSpaces(applicationId),
     safeFetchStudyPlan(user.institutionId, application.studyPlanId),
     safeFetchAcademicYear(user.institutionId, application.academicYearId),
   ]);
 
   return (
     <PlatformPageShell
-      title="Seleccionar trayecto formativo"
+      title="Seleccionar espacios academicos"
       minViewportHeight
       breadcrumb={
         <InstitutionalBreadcrumb
           hiddenSegments={[applicationId]}
-          segmentLabels={{ "enrollment-applications": "Solicitudes", "training-path": "Trayecto formativo" }}
+          segmentLabels={{ "enrollment-applications": "Solicitudes", "study-plan-spaces": "Espacios academicos" }}
         />
       }
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
       actions={
-        <div data-slot="platform-page-icon" className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <RouteIcon className="size-6 sm:size-7" />
+        <div
+          data-slot="platform-page-icon"
+          className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex"
+        >
+          <GraduationCapIcon className="size-6 sm:size-7" />
         </div>
       }
     >
@@ -77,7 +80,7 @@ export default async function EnrollmentApplicationTrainingPathPage({
           </div>
           <div className="flex items-start gap-3">
             <div className="bg-primary/10 text-primary rounded-xl p-2">
-              <RouteIcon className="size-5" />
+              <GraduationCapIcon className="size-5" />
             </div>
             <div>
               <p className="text-muted-foreground text-sm">Solicitud</p>
@@ -86,11 +89,11 @@ export default async function EnrollmentApplicationTrainingPathPage({
           </div>
         </div>
 
-        <EnrollmentTrainingPathForm
+        <EnrollmentStudyPlanSpacesForm
           applicationId={application.applicationId}
           applicationEditable={application.isEditable}
           currentData={application.data}
-          trainingPaths={trainingPaths}
+          studyPlanSpaces={studyPlanSpaces}
           returnTo={destination}
           studyPlanName={studyPlan?.name ?? application.studyPlanId}
           academicYearLabel={academicYear ? String(academicYear.year) : application.academicYearId}

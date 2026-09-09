@@ -83,8 +83,10 @@ export function AcademicLevelFields({ initialValues = {}, fieldErrors }: Academi
 export function StudyPlanSpaceFields({
   academicSpaces = [],
   institutionId,
+  instruments = [],
   levels = [],
   initialValues = {},
+  selectedInstrumentIds = [],
   fieldErrors,
   scope,
 }: AcademicFieldsProps): React.ReactElement {
@@ -142,6 +144,26 @@ export function StudyPlanSpaceFields({
           defaultValue={toFormControlValue(initialValues.approvalMode ?? APPROVAL_MODE[0])}
           options={APPROVAL_MODE.map((mode) => ({ value: mode, label: approvalModeLabels[mode] }))}
         />
+      </FormField>
+      <FormField label="Instrumentos habilitados" name="instrumentIds" error={fieldErrors?.instrumentIds} className="sm:col-span-2">
+        <div className="bg-background flex max-h-64 flex-col gap-2 overflow-y-auto rounded-xl border p-3">
+          {instruments.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No hay instrumentos activos para asociar en esta institución.</p>
+          ) : (
+            instruments.map((instrument) => {
+              const checked = selectedInstrumentIds.includes(instrument.id);
+              return (
+                <label key={instrument.id} className="hover:bg-muted/40 flex items-start gap-3 rounded-lg border p-3">
+                  <input type="checkbox" name="instrumentIds" value={instrument.id} defaultChecked={checked} className="mt-0.5" />
+                  <span className="min-w-0">
+                    <span className="block font-medium">{instrument.name}</span>
+                    {instrument.description ? <span className="text-muted-foreground block text-sm">{instrument.description}</span> : null}
+                  </span>
+                </label>
+              );
+            })
+          )}
+        </div>
       </FormField>
     </>
   );

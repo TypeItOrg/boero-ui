@@ -1,5 +1,6 @@
 import type { ApprovalMode } from "@features/academic/types/approval-mode.types";
 import type { RequirementType } from "@features/academic/types/requirement-type.types";
+import type { StudyPlanSpaceInstrumentOption } from "@features/academic/types/study-plan-space-instrument-option.types";
 
 export type StudyPlanSpace = {
   id: string;
@@ -11,4 +12,6 @@ export type StudyPlanSpace = {
   requirementType: RequirementType;
   displayOrder: number;
   approvalMode: ApprovalMode;
+  requiresInstrument: boolean;
+  allowedInstruments: readonly StudyPlanSpaceInstrumentOption[];
 };

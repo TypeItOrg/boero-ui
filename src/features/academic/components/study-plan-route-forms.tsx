@@ -9,6 +9,7 @@ import { AcademicPageIcon, AcademicShell } from "@features/academic/components/a
 import { fetchPrerequisite } from "@features/academic/services/academic.service";
 import type { AcademicFormOptions } from "@features/academic/types/academic-form-options.types";
 import type { AcademicLevel } from "@features/academic/types/academic-level.types";
+import type { Instrument } from "@features/academic/types/instrument.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -64,7 +65,7 @@ export function EditLevel(props: BaseFormProps & { level: AcademicLevel }): Reac
   );
 }
 
-export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[] }): React.ReactElement {
+export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; instruments: Instrument[] }): React.ReactElement {
   return (
     <AcademicShell
       title="Incorporar espacio"
@@ -80,13 +81,16 @@ export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[] })
         resource={AcademicResource.STUDY_PLAN_SPACE}
         parentId={props.id}
         returnTo={props.planPath}
+        instruments={props.instruments}
         levels={props.levels}
       />
     </AcademicShell>
   );
 }
 
-export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; space: StudyPlanSpace; spacePath: string }): React.ReactElement {
+export function EditPlanSpace(
+  props: BaseFormProps & { levels: AcademicLevel[]; instruments: Instrument[]; space: StudyPlanSpace; spacePath: string },
+): React.ReactElement {
   return (
     <AcademicShell
       title="Editar espacio"
@@ -102,8 +106,18 @@ export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; 
         id={props.space.id}
         parentId={props.id}
         returnTo={props.spacePath}
-        initialValues={{ ...props.space }}
+        initialValues={{
+          id: props.space.id,
+          studyPlanId: props.space.studyPlanId,
+          academicSpaceId: props.space.academicSpaceId,
+          academicLevelId: props.space.academicLevelId,
+          requirementType: props.space.requirementType,
+          displayOrder: props.space.displayOrder,
+          approvalMode: props.space.approvalMode,
+        }}
+        instruments={props.instruments}
         levels={props.levels}
+        selectedInstrumentIds={props.space.allowedInstruments.map((instrument) => instrument.instrumentId)}
       />
     </AcademicShell>
   );

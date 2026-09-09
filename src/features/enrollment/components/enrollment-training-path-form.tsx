@@ -37,16 +37,23 @@ export function EnrollmentTrainingPathForm({
 }: EnrollmentTrainingPathFormProps): React.ReactElement {
   const action = saveEnrollmentApplicationTrainingPathAction.bind(null, applicationId);
   const [state, formAction, isPending] = React.useActionState(action, INITIAL_STATE);
+  const initialTrainingPathId = currentData.careerSelection?.trainingPathId ?? "";
   const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState(currentData.careerSelection?.trainingPathId ?? "");
   const [dataSnapshot, setDataSnapshot] = React.useState(currentData);
+  const [savedTrainingPathId, setSavedTrainingPathId] = React.useState(initialTrainingPathId);
+
+  React.useEffect(() => {
+    setDataSnapshot(buildNextDraftData(currentData, selectedTrainingPathId));
+  }, [currentData, selectedTrainingPathId]);
 
   React.useEffect(() => {
     if (!state.success || !selectedTrainingPathId) return;
-    setDataSnapshot((previous) => buildNextDraftData(previous, selectedTrainingPathId));
+    setSavedTrainingPathId(selectedTrainingPathId);
   }, [selectedTrainingPathId, state.success]);
 
   const fieldErrors = state.fieldErrors?.trainingPathId ? [{ message: state.fieldErrors.trainingPathId }] : undefined;
   const canSubmit = applicationEditable && selectedTrainingPathId.length > 0 && !isPending;
+  const canOpenStudyPlanSpaces = savedTrainingPathId.length > 0 && selectedTrainingPathId === savedTrainingPathId;
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
@@ -91,19 +98,21 @@ export function EnrollmentTrainingPathForm({
               trainingPaths.map((trainingPath) => {
                 const checked = trainingPath.id === selectedTrainingPathId;
                 return (
-                    <button
-                      key={trainingPath.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={checked}
-                      disabled={!applicationEditable || isPending}
-                      onClick={() => setSelectedTrainingPathId(trainingPath.id)}
-                    className={cn(
-                      "text-left transition-transform disabled:cursor-not-allowed disabled:opacity-60",
-                      checked && "translate-y-px",
-                    )}
+                  <button
+                    key={trainingPath.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={checked}
+                    disabled={!applicationEditable || isPending}
+                    onClick={() => setSelectedTrainingPathId(trainingPath.id)}
+                    className={cn("text-left transition-transform disabled:cursor-not-allowed disabled:opacity-60", checked && "translate-y-px")}
                   >
-                    <Card className={cn("border-border hover:border-primary/40 hover:bg-primary/3 min-h-40 border", checked && "border-primary bg-primary/5 ring-primary/15 ring-3")}>
+                    <Card
+                      className={cn(
+                        "border-border hover:border-primary/40 hover:bg-primary/3 min-h-40 border",
+                        checked && "border-primary bg-primary/5 ring-primary/15 ring-3",
+                      )}
+                    >
                       <CardHeader>
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -150,11 +159,11 @@ export function EnrollmentTrainingPathForm({
           <Card>
             <CardHeader>
               <CardTitle>Antes de continuar</CardTitle>
-              <CardDescription>Elegí un único trayecto para definir la propuesta académica de esta inscripción.</CardDescription>
+              <CardDescription>Elegí y guardá un único trayecto antes de pasar a los espacios académicos.</CardDescription>
             </CardHeader>
             <CardContent className="text-muted-foreground space-y-2 text-sm">
               <p>La selección se guarda en el borrador actual.</p>
-              <p>Si cambiás de trayecto más adelante, esta pantalla reflejará la última opción guardada.</p>
+              <p>Si cambiás de trayecto, los espacios e instrumentos seleccionados previamente se reinician.</p>
             </CardContent>
           </Card>
         </aside>
@@ -164,19 +173,30 @@ export function EnrollmentTrainingPathForm({
         <Button asChild type="button" size="lg" variant="outline">
           <Link href={returnTo}>Volver</Link>
         </Button>
-        <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
-          {isPending ? (
-            <>
-              <Loader2Icon className="animate-spin" data-icon="inline-start" />
-              Guardando…
-            </>
-          ) : (
-            <>
-              <RouteIcon data-icon="inline-start" />
-              Guardar trayecto
-            </>
-          )}
-        </Button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          {canOpenStudyPlanSpaces ? (
+            <Button asChild type="button" size="lg" variant="secondary">
+              <Link
+                href={`/enrollment-applications/${applicationId}/study-plan-spaces?returnTo=${encodeURIComponent(`/enrollment-applications/${applicationId}/training-path`)}`}
+              >
+                Ver espacios academicos
+              </Link>
+            </Button>
+          ) : null}
+          <Button type="submit" size="lg" disabled={!canSubmit} aria-busy={isPending}>
+            {isPending ? (
+              <>
+                <Loader2Icon className="animate-spin" data-icon="inline-start" />
+                Guardando…
+              </>
+            ) : (
+              <>
+                <RouteIcon data-icon="inline-start" />
+                Guardar trayecto
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </form>
   );
@@ -185,18 +205,33 @@ export function EnrollmentTrainingPathForm({
 function ContextRow({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
     <div className="flex flex-col gap-1 rounded-lg border px-3 py-2">
-      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">{label}</span>
+      <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</span>
       <span className="text-sm font-medium">{value}</span>
     </div>
   );
 }
 
 function buildNextDraftData(currentData: EnrollmentApplicationDraftData, trainingPathId: string): EnrollmentApplicationDraftData {
+  const currentTrainingPathId = currentData.careerSelection?.trainingPathId;
+  const trainingPathChanged = currentTrainingPathId !== trainingPathId;
+
   return {
     ...currentData,
     careerSelection: {
       ...(currentData.careerSelection ?? {}),
       trainingPathId,
     },
+    academicSpaceSelection: trainingPathChanged
+      ? {
+          ...(currentData.academicSpaceSelection ?? {}),
+          studyPlanSpaceIds: [],
+        }
+      : currentData.academicSpaceSelection,
+    instrumentSelection: trainingPathChanged
+      ? {
+          ...(currentData.instrumentSelection ?? {}),
+          studyPlanSpaceInstrumentIds: {},
+        }
+      : currentData.instrumentSelection,
   };
 }

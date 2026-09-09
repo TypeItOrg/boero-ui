@@ -78,5 +78,35 @@ describe("saveEnrollmentApplicationTrainingPathAction", () => {
     expect(revalidatePathMock).toHaveBeenCalledWith(
       "/enrollment-applications/019183ab-45bc-7000-8000-000000000001/training-path",
     );
+    expect(revalidatePathMock).toHaveBeenCalledWith(
+      "/enrollment-applications/019183ab-45bc-7000-8000-000000000001/study-plan-spaces",
+    );
+  });
+
+  it("clears selected spaces and instruments when the training path changes", async () => {
+    apiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+
+    const formData = new FormData();
+    formData.set(
+      "currentData",
+      JSON.stringify({
+        careerSelection: { trainingPathId: "019183ab-45bc-7000-8000-000000000050" },
+        academicSpaceSelection: { studyPlanSpaceIds: ["019183ab-45bc-7000-8000-000000000101"] },
+        instrumentSelection: {
+          studyPlanSpaceInstrumentIds: { "019183ab-45bc-7000-8000-000000000101": "019183ab-45bc-7000-8000-000000000201" },
+        },
+      }),
+    );
+    formData.set("trainingPathId", "019183ab-45bc-7000-8000-000000000099");
+
+    await saveEnrollmentApplicationTrainingPathAction("019183ab-45bc-7000-8000-000000000001", {}, formData);
+
+    expect(JSON.parse(String(apiFetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      data: {
+        careerSelection: { trainingPathId: "019183ab-45bc-7000-8000-000000000099" },
+        academicSpaceSelection: { studyPlanSpaceIds: [] },
+        instrumentSelection: { studyPlanSpaceInstrumentIds: {} },
+      },
+    });
   });
 });

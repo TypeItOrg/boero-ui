@@ -82,4 +82,20 @@ describe("getInstitutionalNavigationSections", () => {
 
     expect(generalSection).toEqual({ label: "General", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
   });
+
+  it("shows applicant enrollment navigation without academic permissions", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Postulante"],
+    });
+
+    expect(sections).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Inscripción",
+          items: [expect.objectContaining({ title: "Solicitudes", url: "/enrollment-applications" })],
+        }),
+      ]),
+    );
+  });
 });

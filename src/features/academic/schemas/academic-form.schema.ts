@@ -102,6 +102,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     requirementType: z.enum(REQUIREMENT_TYPE),
     displayOrder: positiveOrder,
     approvalMode: z.enum(APPROVAL_MODE),
+    instrumentIds: z.array(z.string().uuid("Seleccioná instrumentos válidos.")).default([]),
   }),
   [AcademicResource.PREREQUISITE]: z.object({
     requiredStudyPlanSpaceId: z.string().uuid("Seleccioná un espacio requerido."),
@@ -111,7 +112,18 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
 };
 
 export function parseAcademicForm(resource: AcademicResource, formData: FormData) {
-  return academicFormSchemas[resource].safeParse(Object.fromEntries(formData.entries()));
+  return academicFormSchemas[resource].safeParse(getAcademicFormInput(resource, formData));
+}
+
+function getAcademicFormInput(resource: AcademicResource, formData: FormData): Record<string, FormDataEntryValue | FormDataEntryValue[]> {
+  if (resource === AcademicResource.STUDY_PLAN_SPACE) {
+    return {
+      ...Object.fromEntries(formData.entries()),
+      instrumentIds: formData.getAll("instrumentIds"),
+    };
+  }
+
+  return Object.fromEntries(formData.entries());
 }
 
 export const academicStatusSchema = z.discriminatedUnion("resource", [

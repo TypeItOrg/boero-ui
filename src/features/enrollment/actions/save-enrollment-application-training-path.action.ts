@@ -47,13 +47,7 @@ export async function saveEnrollmentApplicationTrainingPathAction(
     };
   }
 
-  const nextData: EnrollmentApplicationDraftData = {
-    ...currentData,
-    careerSelection: {
-      ...(currentData.careerSelection ?? {}),
-      trainingPathId: parsed.data.trainingPathId,
-    },
-  };
+  const nextData = buildNextDraftData(currentData, parsed.data.trainingPathId);
 
   const error = await getTrainingPathErrorState(
     institutionalApiFetch(`/api/v1/enrollment-applications/${context.data.applicationId}/draft`, {
@@ -66,7 +60,33 @@ export async function saveEnrollmentApplicationTrainingPathAction(
   if (error) return error;
 
   revalidatePath(`/enrollment-applications/${context.data.applicationId}/training-path`);
+  revalidatePath(`/enrollment-applications/${context.data.applicationId}/study-plan-spaces`);
   return { success: true };
+}
+
+function buildNextDraftData(currentData: EnrollmentApplicationDraftData, trainingPathId: string): EnrollmentApplicationDraftData {
+  const currentTrainingPathId = currentData.careerSelection?.trainingPathId;
+  const trainingPathChanged = currentTrainingPathId !== trainingPathId;
+
+  return {
+    ...currentData,
+    careerSelection: {
+      ...(currentData.careerSelection ?? {}),
+      trainingPathId,
+    },
+    academicSpaceSelection: trainingPathChanged
+      ? {
+          ...(currentData.academicSpaceSelection ?? {}),
+          studyPlanSpaceIds: [],
+        }
+      : currentData.academicSpaceSelection,
+    instrumentSelection: trainingPathChanged
+      ? {
+          ...(currentData.instrumentSelection ?? {}),
+          studyPlanSpaceInstrumentIds: {},
+        }
+      : currentData.instrumentSelection,
+  };
 }
 
 function parseDraftData(rawData: string): EnrollmentApplicationDraftData | null {
