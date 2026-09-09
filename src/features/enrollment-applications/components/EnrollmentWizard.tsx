@@ -122,12 +122,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   // 5. Trayecto Formativo
   const [trainingPaths, setTrainingPaths] = React.useState<TrainingPath[]>([]);
   const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState("");
+  const [trainingPathsLoadError, setTrainingPathsLoadError] = React.useState(false);
 
   // 6. Espacios e Instrumentos
   const [studyPlanSpaces, setStudyPlanSpaces] = React.useState<StudyPlanSpace[]>([]);
   const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>([]);
   const [selectedInstrumentIdsByStudyPlanSpaceId, setSelectedInstrumentIdsByStudyPlanSpaceId] = React.useState<Record<string, string>>({});
   const [loadingSpaces, setLoadingSpaces] = React.useState(false);
+  const [studyPlanSpacesLoadError, setStudyPlanSpacesLoadError] = React.useState(false);
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState("");
@@ -211,20 +213,24 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
           .then((paths) => {
             if (!active) return;
             setTrainingPaths(paths);
+            setTrainingPathsLoadError(false);
           })
           .catch(() => {
             if (!active) return;
             setTrainingPaths([]);
+            setTrainingPathsLoadError(true);
           });
 
         fetchEnrollmentApplicationStudyPlanSpacesAction(data.applicationId)
           .then((spaces) => {
             if (!active) return;
             setStudyPlanSpaces(spaces);
+            setStudyPlanSpacesLoadError(false);
           })
           .catch(() => {
             if (!active) return;
             setStudyPlanSpaces([]);
+            setStudyPlanSpacesLoadError(true);
           });
 
         isInitialDataLoaded.current = true;
@@ -401,8 +407,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       .then((updatedSpaces) => {
         if (!active) return;
         setStudyPlanSpaces(updatedSpaces);
+        setStudyPlanSpacesLoadError(false);
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!active) return;
+        setStudyPlanSpacesLoadError(true);
+      })
       .finally(() => {
         if (!active) return;
         setLoadingSpaces(false);
@@ -419,6 +429,24 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     setSubmissionError(null);
     setValidationIssues([]);
     setIsSubmitting(true);
+
+    // The catalog fetches failing is not the same as an empty catalog: an
+    // empty list means the step is genuinely optional, a failed fetch means
+    // we don't actually know, so we can't silently skip the required checks
+    // below.
+    if (trainingPathsLoadError) {
+      setIsSubmitting(false);
+      setSubmissionError("No se pudieron cargar los trayectos formativos disponibles. Reintentá antes de enviar la inscripción.");
+      setActiveTab("training-path");
+      return;
+    }
+
+    if (studyPlanSpacesLoadError) {
+      setIsSubmitting(false);
+      setSubmissionError("No se pudieron cargar los espacios académicos disponibles. Reintentá antes de enviar la inscripción.");
+      setActiveTab("spaces");
+      return;
+    }
 
     const parseResult = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
 
