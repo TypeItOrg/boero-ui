@@ -377,10 +377,24 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     };
   }, [debouncedData, application?.applicationId, application?.status, loading]);
 
-  // Refetch spaces when selected training path changes
+  // Refetch spaces when selected training path changes; a genuine career
+  // change (not the initial hydration from a persisted draft) invalidates
+  // whatever spaces/instruments were picked for the previous plan, mirroring
+  // the backend's reassign-and-clear rule for updateDraft.
+  const previousTrainingPathIdRef = React.useRef<string | null>(null);
+
   React.useEffect(() => {
     const appId = application?.applicationId;
     if (!appId || !selectedTrainingPathId || !isInitialDataLoaded.current) return;
+
+    const isCareerChange = previousTrainingPathIdRef.current !== null && previousTrainingPathIdRef.current !== selectedTrainingPathId;
+    previousTrainingPathIdRef.current = selectedTrainingPathId;
+
+    if (isCareerChange) {
+      setSelectedStudyPlanSpaceIds([]);
+      setSelectedInstrumentIdsByStudyPlanSpaceId({});
+    }
+
     let active = true;
     setLoadingSpaces(true);
     fetchEnrollmentApplicationStudyPlanSpacesAction(appId)

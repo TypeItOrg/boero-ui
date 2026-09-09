@@ -189,4 +189,58 @@ describe("EnrollmentWizard", () => {
     await userEvent.click(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i }));
     expect(await screen.findByText("Práctica de Conjunto")).toBeInTheDocument();
   });
+
+  it("clears previously selected spaces and instruments when the applicant changes training path", async () => {
+    jest.useFakeTimers({ advanceTimers: true });
+
+    const DRAFT_WITH_CAREER: EnrollmentApplicationResponse = {
+      ...BASE,
+      data: {
+        careerSelection: { trainingPathId: "tp-1" },
+        academicSpaceSelection: { studyPlanSpaceIds: ["s-1"] },
+        instrumentSelection: { studyPlanSpaceInstrumentIds: { "s-1": "inst-1" } },
+      },
+    };
+
+    startAction.mockResolvedValue(DRAFT_WITH_CAREER);
+    updateAction.mockResolvedValue(DRAFT_WITH_CAREER);
+    fetchTrainingPathsAction.mockResolvedValue([
+      { id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" },
+      { id: "tp-2", name: "Piano", description: "", active: true, institutionId: "inst-1" },
+    ]);
+    fetchStudyPlanSpacesAction.mockResolvedValue([
+      {
+        id: "s-1",
+        studyPlanId: "plan-1",
+        academicSpaceId: "as-1",
+        academicSpaceName: "Práctica de Conjunto",
+        academicLevelId: null,
+        academicLevelName: null,
+        requirementType: "REQUIRED",
+        displayOrder: 1,
+        approvalMode: "PROMOTION",
+        requiresInstrument: true,
+        allowedInstruments: [{ instrumentId: "inst-1", name: "Guitarra" }],
+      },
+    ]);
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    await userEvent.click(await screen.findByRole("tab", { name: /5\. trayecto formativo/i }));
+    await screen.findByText("Guitarra");
+    await userEvent.click(screen.getByText("Piano"));
+
+    await act(async () => {
+      jest.advanceTimersByTime(900);
+    });
+
+    await waitFor(() => {
+      const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
+      expect(payload.data.careerSelection).toEqual({ trainingPathId: "tp-2" });
+      expect(payload.data.academicSpaceSelection).toBeUndefined();
+      expect(payload.data.instrumentSelection).toBeUndefined();
+    });
+
+    jest.useRealTimers();
+  });
 });
