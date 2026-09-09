@@ -243,4 +243,36 @@ describe("EnrollmentWizard", () => {
 
     jest.useRealTimers();
   });
+
+  it("blocks submission when the training paths catalog failed to load, instead of treating it as optional", async () => {
+    startAction.mockResolvedValue(COMPLETE_DRAFT);
+    updateAction.mockResolvedValue(COMPLETE_DRAFT);
+    fetchTrainingPathsAction.mockRejectedValue(new Error("network error"));
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    await screen.findByDisplayValue("Lucas");
+    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
+
+    expect(await screen.findByText(/no se pudieron cargar los trayectos formativos/i)).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /5\. trayecto formativo/i })).toHaveAttribute("data-state", "active");
+    expect(submitAction).not.toHaveBeenCalled();
+  });
+
+  it("blocks submission when the study plan spaces catalog failed to load, instead of treating it as optional", async () => {
+    startAction.mockResolvedValue(COMPLETE_DRAFT);
+    updateAction.mockResolvedValue(COMPLETE_DRAFT);
+    fetchStudyPlanSpacesAction.mockRejectedValue(new Error("network error"));
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    await screen.findByDisplayValue("Lucas");
+    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
+
+    expect(await screen.findByText(/no se pudieron cargar los espacios académicos/i)).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i })).toHaveAttribute("data-state", "active");
+    expect(submitAction).not.toHaveBeenCalled();
+  });
 });
