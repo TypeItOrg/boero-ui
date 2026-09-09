@@ -114,7 +114,7 @@ describe("EnrollmentWizard", () => {
     jest.useRealTimers();
   });
 
-  it("blocks submission and jumps back to the personal data tab when required fields are missing", async () => {
+  it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
     startAction.mockResolvedValue(BASE);
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
@@ -126,6 +126,12 @@ describe("EnrollmentWizard", () => {
     expect(await screen.findByText(/campos obligatorios incompletos/i)).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /datos personales/i })).toHaveAttribute("data-state", "active");
     expect(submitAction).not.toHaveBeenCalled();
+
+    // The "personal" tab remounts its inputs when navigated back to, so the
+    // focused element must be re-queried rather than reusing the stale node.
+    const refocusedFirstNameInput = await screen.findByLabelText(/^nombre/i);
+    await waitFor(() => expect(refocusedFirstNameInput).toHaveFocus());
+    expect(refocusedFirstNameInput).toHaveAttribute("aria-invalid", "true");
   });
 
   it("submits the application when every required field and attachment is present", async () => {

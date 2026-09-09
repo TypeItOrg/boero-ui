@@ -38,7 +38,7 @@ export function EnrollmentStudyPlanSpacesSelector({
     return (
       <div className="text-muted-foreground flex flex-col items-center justify-center space-y-3 p-12 text-center">
         <div className="border-primary size-6 animate-spin rounded-full border-2 border-t-transparent" />
-        <p className="text-sm">Cargando espacios académicos disponibles...</p>
+        <p className="text-sm">Cargando espacios académicos disponibles…</p>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export function EnrollmentStudyPlanSpacesSelector({
                           className={cn("h-8 w-full text-xs", hasMissingInstrument && "border-destructive")}
                           aria-label={`Instrumento para ${space.academicSpaceName}`}
                         >
-                          <SelectValue placeholder="Elegir instrumento..." />
+                          <SelectValue placeholder="Elegir instrumento…" />
                         </SelectTrigger>
                         <SelectContent>
                           {space.allowedInstruments && space.allowedInstruments.length > 0 ? (
