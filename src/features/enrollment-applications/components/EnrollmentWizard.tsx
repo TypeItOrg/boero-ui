@@ -75,6 +75,28 @@ const TABS = [
   { id: "documents", label: "8. Adjuntos" },
 ] as const;
 
+// Maps a Zod issue path to the id of the input it corresponds to, so the
+// first invalid field can be focused after a failed submission jumps to
+// its tab.
+const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
+  "personalData.firstName": "firstName",
+  "personalData.lastName": "lastName",
+  "personalData.documentNumber": "documentNumber",
+  "personalData.birthDate": "birthDate",
+  "personalData.phoneNumber": "phoneNumber",
+  "personalData.email": "email",
+  "academicBackground.secondarySchool": "secondarySchool",
+  "healthInclusion.adjustmentDetails": "adjustmentDetails",
+  "responsible.fullName": "responsibleFullName",
+  "responsible.documentNumber": "responsibleDocumentNumber",
+  "responsible.phoneNumber": "responsiblePhoneNumber",
+  "responsible.email": "responsibleEmail",
+  "responsible.occupation": "responsibleOccupation",
+  "responsible.educationLevel": "responsibleEducationLevel",
+  "preference.preferredShift": "preferredShift",
+  "preference.previousTeacher": "previousTeacher",
+};
+
 export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWizardProps): React.ReactElement {
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -89,6 +111,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
   const [submissionError, setSubmissionError] = React.useState<string | null>(null);
   const [validationIssues, setValidationIssues] = React.useState<z.ZodIssue[]>([]);
+  const [pendingFocusFieldId, setPendingFocusFieldId] = React.useState<string | null>(null);
 
   // Flag to avoid auto-saving empty state before initial fetch
   const isInitialDataLoaded = React.useRef(false);
@@ -246,6 +269,21 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       active = false;
     };
   }, [studyPlanId, academicYearId]);
+
+  // Focus the first invalid field once its tab has mounted after a failed
+  // submission (the tab switch and this focus request commit together).
+  React.useEffect(() => {
+    if (!pendingFocusFieldId) return;
+    const fieldId = pendingFocusFieldId;
+    // The newly active TabsContent panel mounts through Radix's own Presence
+    // state machine, which settles a render pass after this effect runs, so
+    // the field isn't in the DOM yet here — defer the lookup a tick.
+    const timeoutId = window.setTimeout(() => {
+      document.getElementById(fieldId)?.focus();
+      setPendingFocusFieldId(null);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [pendingFocusFieldId, activeTab]);
 
   const handleToggleSpace = (studyPlanSpaceId: string) => {
     setSelectedStudyPlanSpaceIds((prev) => {
@@ -455,7 +493,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       const issues = parseResult.error.issues;
       setValidationIssues(issues);
 
-      // Auto-navigate to the first invalid step
+      // Auto-navigate to the first invalid step and focus its field
       const firstIssue = issues[0];
       if (firstIssue && firstIssue.path.length > 0) {
         const section = firstIssue.path[0];
@@ -467,6 +505,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         else if (section === "academicSpaceSelection" || section === "instrumentSelection") setActiveTab("spaces");
         else if (section === "preference") setActiveTab("preferences");
         else if (section === "attachments") setActiveTab("documents");
+
+        const fieldId = FIELD_ID_BY_ERROR_PATH[firstIssue.path.join(".")];
+        if (fieldId) setPendingFocusFieldId(fieldId);
       }
       return;
     }
@@ -585,11 +626,11 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm">
+          <div className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm" aria-live="polite" aria-atomic="true">
             {saving ? (
               <>
                 <Loader2Icon className="text-primary size-4 animate-spin" />
-                <span>Guardando cambios...</span>
+                <span>Guardando cambios…</span>
               </>
             ) : saveError ? (
               <span className="text-destructive flex items-center gap-1">
@@ -665,7 +706,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   <FieldLabel htmlFor="firstName" required>
                     Nombre
                   </FieldLabel>
-                  <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Juan" />
+                  <Input
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Juan"
+                    autoComplete="given-name"
+                    aria-invalid={!!getFieldError(["personalData", "firstName"])}
+                  />
                   <FieldError errors={[{ message: getFieldError(["personalData", "firstName"]) }]} />
                 </Field>
 
@@ -673,7 +721,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   <FieldLabel htmlFor="lastName" required>
                     Apellido
                   </FieldLabel>
-                  <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Pérez" />
+                  <Input
+                    id="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Pérez"
+                    autoComplete="family-name"
+                    aria-invalid={!!getFieldError(["personalData", "lastName"])}
+                  />
                   <FieldError errors={[{ message: getFieldError(["personalData", "lastName"]) }]} />
                 </Field>
               </div>
@@ -689,6 +744,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={documentNumber}
                     onChange={(e) => setDocumentNumber(e.target.value)}
                     placeholder="12345678"
+                    aria-invalid={!!getFieldError(["personalData", "documentNumber"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["personalData", "documentNumber"]) }]} />
                 </Field>
@@ -704,7 +760,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                       </Badge>
                     )}
                   </div>
-                  <DatePicker id="birthDate" value={birthDate} onChange={(d) => setBirthDate(d)} maxDate={new Date()} />
+                  <DatePicker
+                    id="birthDate"
+                    value={birthDate}
+                    onChange={(d) => setBirthDate(d)}
+                    maxDate={new Date()}
+                    aria-invalid={!!getFieldError(["personalData", "birthDate"])}
+                  />
                   {isMinor && (
                     <FieldDescription className="text-xs text-amber-600 dark:text-amber-400">
                       Al ser menor de 18 años, deberás completar los datos del tutor en el paso 4.
@@ -719,7 +781,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   <FieldLabel htmlFor="phoneNumber" required>
                     Teléfono de contacto
                   </FieldLabel>
-                  <PhoneInput id="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="3534123456" />
+                  <PhoneInput
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="3534123456"
+                    autoComplete="tel"
+                    aria-invalid={!!getFieldError(["personalData", "phoneNumber"])}
+                  />
                   <FieldError errors={[{ message: getFieldError(["personalData", "phoneNumber"]) }]} />
                 </Field>
 
@@ -727,7 +796,16 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   <FieldLabel htmlFor="email" required>
                     Correo electrónico
                   </FieldLabel>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="postulante@ejemplo.com" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="postulante@ejemplo.com"
+                    autoComplete="email"
+                    spellCheck={false}
+                    aria-invalid={!!getFieldError(["personalData", "email"])}
+                  />
                   <FieldError errors={[{ message: getFieldError(["personalData", "email"]) }]} />
                 </Field>
               </div>
@@ -760,6 +838,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   value={secondarySchool}
                   onChange={(e) => setSecondarySchool(e.target.value)}
                   placeholder="Escuela Normal Superior Víctor Mercante"
+                  aria-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}
                 />
                 <FieldError errors={[{ message: getFieldError(["academicBackground", "secondarySchool"]) }]} />
               </Field>
@@ -853,8 +932,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                       id="adjustmentDetails"
                       value={adjustmentDetails}
                       onChange={(e) => setAdjustmentDetails(e.target.value)}
-                      placeholder="Describí brevemente los apoyos que necesitás para tu cursada..."
+                      placeholder="Describí brevemente los apoyos que necesitás para tu cursada…"
                       rows={3}
+                      aria-invalid={!!getFieldError(["healthInclusion", "adjustmentDetails"])}
                     />
                     <FieldError errors={[{ message: getFieldError(["healthInclusion", "adjustmentDetails"]) }]} />
                   </Field>
@@ -902,6 +982,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   value={responsibleFullName}
                   onChange={(e) => setResponsibleFullName(e.target.value)}
                   placeholder="María Rodríguez"
+                  autoComplete="name"
+                  aria-invalid={!!getFieldError(["responsible", "fullName"])}
                 />
                 <FieldError errors={[{ message: getFieldError(["responsible", "fullName"]) }]} />
               </Field>
@@ -917,6 +999,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={responsibleDocumentNumber}
                     onChange={(e) => setResponsibleDocumentNumber(e.target.value)}
                     placeholder="20123456"
+                    aria-invalid={!!getFieldError(["responsible", "documentNumber"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["responsible", "documentNumber"]) }]} />
                 </Field>
@@ -930,6 +1013,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={responsiblePhoneNumber}
                     onChange={(e) => setResponsiblePhoneNumber(e.target.value)}
                     placeholder="3534987654"
+                    autoComplete="tel"
+                    aria-invalid={!!getFieldError(["responsible", "phoneNumber"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["responsible", "phoneNumber"]) }]} />
                 </Field>
@@ -946,6 +1031,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={responsibleEmail}
                     onChange={(e) => setResponsibleEmail(e.target.value)}
                     placeholder="tutor@ejemplo.com"
+                    autoComplete="email"
+                    spellCheck={false}
+                    aria-invalid={!!getFieldError(["responsible", "email"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["responsible", "email"]) }]} />
                 </Field>
@@ -959,6 +1047,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={responsibleOccupation}
                     onChange={(e) => setResponsibleOccupation(e.target.value)}
                     placeholder="Empleado / Docente / Comercio"
+                    aria-invalid={!!getFieldError(["responsible", "occupation"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["responsible", "occupation"]) }]} />
                 </Field>
@@ -969,7 +1058,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   Nivel de Instrucción
                 </FieldLabel>
                 <Select value={responsibleEducationLevel} onValueChange={setResponsibleEducationLevel}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["responsible", "educationLevel"])}>
                     <SelectValue placeholder="Seleccioná el máximo nivel alcanzado" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1077,7 +1166,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   Turno de preferencia
                 </FieldLabel>
                 <Select value={preferredShift} onValueChange={setPreferredShift}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["preference", "preferredShift"])}>
                     <SelectValue placeholder="Seleccioná un turno" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1123,6 +1212,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     value={previousTeacher}
                     onChange={(e) => setPreviousTeacher(e.target.value)}
                     placeholder="Profesor/a de instrumento o cátedra"
+                    aria-invalid={!!getFieldError(["preference", "previousTeacher"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["preference", "previousTeacher"]) }]} />
                 </Field>
@@ -1236,7 +1326,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                 {isSubmitting ? (
                   <>
                     <Loader2Icon className="size-4 animate-spin" />
-                    <span>Validando y enviando...</span>
+                    <span>Validando y enviando…</span>
                   </>
                 ) : (
                   <>
@@ -1263,7 +1353,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isCancelling}>Conservar borrador</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleCancelApplication} disabled={isCancelling}>
-              {isCancelling ? "Cancelando..." : "Sí, cancelar solicitud"}
+              {isCancelling ? "Cancelando…" : "Sí, cancelar solicitud"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
