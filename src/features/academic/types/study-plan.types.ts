@@ -10,5 +10,7 @@ export type StudyPlan = {
   effectiveFrom: string | null;
   effectiveTo: string | null;
   status: StudyPlanStatus;
+  previousVersionId?: string | null;
+  versionNumber?: number;
   deletedAt?: string | null;
 };

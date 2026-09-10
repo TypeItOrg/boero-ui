@@ -33,6 +33,7 @@ type AcademicDetailProps = {
   canEdit: boolean;
   academicSpaceUsage?: AcademicSpaceUsageData | null;
   statusAction?: ReactNode;
+  versionAction?: ReactNode;
   returnTo?: string;
 };
 
@@ -43,6 +44,7 @@ export function AcademicDetail({
   canEdit,
   academicSpaceUsage,
   statusAction,
+  versionAction,
   returnTo,
 }: AcademicDetailProps): React.ReactElement {
   const destination = returnTo ?? `${basePath}/${resource}`;
@@ -53,13 +55,14 @@ export function AcademicDetail({
       <Button asChild size="lg" variant="outline">
         <Link href={destination}>Volver</Link>
       </Button>
-      {canEdit || statusAction ? (
+      {canEdit || statusAction || versionAction ? (
         <div className="flex flex-wrap items-center gap-2">
           {canEdit ? (
             <Button asChild size="lg">
               <ReturnToLink href={`${detailPath}/edit`}>Editar</ReturnToLink>
             </Button>
           ) : null}
+          {versionAction}
           {statusAction}
         </div>
       ) : null}
@@ -141,7 +144,7 @@ function StudyPlanSummary({ plan }: { plan: StudyPlan }): React.ReactElement {
         </div>
       </header>
 
-      <dl className="grid gap-5 pt-5 sm:grid-cols-3">
+      <dl className="grid gap-5 pt-5 sm:grid-cols-4">
         <div>
           <dt className="text-muted-foreground text-sm">Trayecto formativo</dt>
           <dd className="mt-1 font-semibold">{plan.trainingPathName}</dd>
@@ -155,6 +158,10 @@ function StudyPlanSummary({ plan }: { plan: StudyPlan }): React.ReactElement {
         <div>
           <dt className="text-muted-foreground text-sm">Vigencia</dt>
           <dd className="mt-1 font-semibold tabular-nums">{formatStudyPlanValidity(plan)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground text-sm">Versión</dt>
+          <dd className="mt-1 font-semibold">{plan.versionNumber ?? 1}</dd>
         </div>
       </dl>
     </section>

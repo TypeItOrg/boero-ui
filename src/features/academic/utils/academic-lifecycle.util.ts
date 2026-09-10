@@ -28,6 +28,6 @@ export function getAcademicLifecycleCapabilities(
 
 function isDeletableState(resource: AcademicCollectionResource, item: LifecycleInput): boolean {
   if (resource === AcademicResource.ACADEMIC_YEAR) return item.statusValue === "PLANNED";
-  if (resource === AcademicResource.STUDY_PLAN) return item.statusValue === "DRAFT";
+  if (resource === AcademicResource.STUDY_PLAN) return item.statusValue === "DRAFT" || item.statusValue === "INACTIVE";
   return !item.active;
 }

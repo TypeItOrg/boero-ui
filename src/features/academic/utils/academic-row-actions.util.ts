@@ -14,6 +14,7 @@ export function getAcademicRowActions(
   canChangeStatus: boolean,
   canDelete: boolean,
   canRestore: boolean,
+  canCreateVersion = false,
 ): readonly AcademicRowAction[] {
   const detailHref = `${basePath}/${resource}/${row.id}`;
   const lifecycle = getAcademicLifecycleCapabilities(resource, row, {
@@ -80,6 +81,14 @@ export function getAcademicRowActions(
         label: "Desactivar",
         resource: AcademicResource.STUDY_PLAN,
         targetStatus: "INACTIVE",
+      });
+    }
+    if (canCreateVersion && (row.statusValue === "ACTIVE" || row.statusValue === "INACTIVE")) {
+      actions.push({
+        href: `${detailHref}/versions/new`,
+        kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE,
+        label: "Nueva versión",
+        preserveReturnTo: true,
       });
     }
     if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });

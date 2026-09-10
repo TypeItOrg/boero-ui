@@ -102,6 +102,7 @@ export async function AcademicRouteView({
         nestedAction,
         nestedId,
         renderBreadcrumb,
+        searchParams,
         scope,
       });
     }

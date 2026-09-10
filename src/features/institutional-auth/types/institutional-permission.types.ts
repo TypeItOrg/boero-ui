@@ -60,9 +60,3 @@ export const INSTITUTIONAL_PERMISSION = {
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];
-
-const institutionalPermissionSet = new Set<string>(Object.values(INSTITUTIONAL_PERMISSION));
-
-export function isInstitutionalPermission(value: string): value is InstitutionalPermission {
-  return institutionalPermissionSet.has(value);
-}

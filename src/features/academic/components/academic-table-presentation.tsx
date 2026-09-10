@@ -28,6 +28,7 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 type AcademicTablePresentationProps = PaginationParams & {
   basePath: string;
   canCreate: boolean;
+  canCreateVersion?: boolean;
   canDelete: boolean;
   canRestore: boolean;
   canChangeStatus: boolean;
@@ -49,6 +50,7 @@ type AcademicTablePresentationProps = PaginationParams & {
 export function AcademicTablePresentation({
   basePath,
   canCreate,
+  canCreateVersion = false,
   canDelete,
   canRestore,
   canChangeStatus,
@@ -157,6 +159,7 @@ export function AcademicTablePresentation({
                 basePath={global ? `/admin/institutions/${row.institutionId}/academic` : basePath}
                 canChangeStatus={canChangeStatus}
                 canDelete={canDelete}
+                canCreateVersion={canCreateVersion}
                 canRestore={canRestore}
                 canUpdate={canUpdate}
                 columns={columns}
