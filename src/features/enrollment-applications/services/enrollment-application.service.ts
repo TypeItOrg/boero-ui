@@ -10,13 +10,10 @@ import { ENROLLMENT_APPLICATION_ERROR_MESSAGES } from "../constants/enrollment-a
 import type {
   EnrollmentApplication,
   EnrollmentApplicationResponse,
-  EnrollmentAttachment,
-  EnrollmentDocumentType,
   StartEnrollmentApplicationInput,
   UpdateEnrollmentDraftInput,
 } from "../types/enrollment-application.types";
 import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
-import { enrollmentApplicationApiFetch } from "./enrollment-application-api-fetch.service";
 
 export type FetchEnrollmentApplicationsParams = {
   page: number;
@@ -28,9 +25,7 @@ export async function fetchEnrollmentApplications(
   institutionId: string,
   params: FetchEnrollmentApplicationsParams,
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
-  const response = await enrollmentApplicationApiFetch(
-    `/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`,
-  );
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`);
 
   return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
 }
@@ -39,9 +34,7 @@ export async function fetchMyEnrollmentApplications(
   institutionId: string,
   params: FetchEnrollmentApplicationsParams,
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
-  const response = await enrollmentApplicationApiFetch(
-    `/api/v1/institutions/${institutionId}/my-enrollment-applications?${buildListSearchParams(params)}`,
-  );
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/my-enrollment-applications?${buildListSearchParams(params)}`);
 
   return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH_MY);
 }
@@ -133,39 +126,6 @@ export async function cancelEnrollmentApplication(applicationId: string): Promis
   }
 
   return response.json();
-}
-
-export async function uploadEnrollmentAttachment(
-  applicationId: string,
-  documentType: EnrollmentDocumentType,
-  file: File,
-): Promise<EnrollmentAttachment> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("attachmentType", documentType);
-
-  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/attachments`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al subir el archivo adjunto");
-  }
-
-  return response.json();
-}
-
-export async function deleteEnrollmentAttachment(applicationId: string, attachmentId: string): Promise<void> {
-  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/attachments/${attachmentId}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al eliminar el archivo adjunto");
-  }
 }
 
 export async function fetchEnrollmentApplicationTrainingPaths(applicationId: string): Promise<TrainingPath[]> {

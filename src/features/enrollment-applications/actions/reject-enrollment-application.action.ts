@@ -5,8 +5,8 @@ import { z } from "zod";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { ENROLLMENT_APPLICATION_ERROR_MESSAGES } from "../constants/enrollment-application-error-messages.constants";
-import { enrollmentApplicationApiFetch } from "../services/enrollment-application-api-fetch.service";
 import type { EnrollmentApplicationRejectActionState } from "../types/enrollment-application-reject-action-state.types";
 import type { EnrollmentApplicationRejectField } from "../types/enrollment-application-reject-field.types";
 
@@ -37,7 +37,7 @@ export async function rejectEnrollmentApplicationAction(
   }
 
   const errorState = await getResponseErrorActionState(
-    enrollmentApplicationApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/reject`, {
+    institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/reject`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rejectionReason: parsed.data.rejectionReason }),

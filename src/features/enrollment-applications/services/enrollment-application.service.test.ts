@@ -107,71 +107,6 @@ describe("enrollment-application.service administrative queries", () => {
     });
   });
 
-  describe("uploadEnrollmentAttachment", () => {
-    const file = new File(["contenido"], "dni.pdf", { type: "application/pdf" });
-
-    it("returns the parsed attachment when the upload succeeds", async () => {
-      const mockAttachment = {
-        id: "att-1",
-        documentType: "DNI_FRONT" as const,
-        fileName: "dni.pdf",
-        contentType: "application/pdf",
-        fileSize: 9,
-        uploadedAt: "2026-03-01T10:00:00Z",
-      };
-      institutionalApiFetchMock.mockResolvedValue(Response.json(mockAttachment));
-      const { uploadEnrollmentAttachment } = await importService();
-
-      const result = await uploadEnrollmentAttachment("app-456", "DNI_FRONT", file);
-
-      expect(result).toEqual(mockAttachment);
-    });
-
-    it("propagates the error instead of fabricating an attachment on 404", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrada" }), { status: 404 }));
-      const { uploadEnrollmentAttachment } = await importService();
-
-      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("No encontrada");
-    });
-
-    it("propagates the error instead of fabricating an attachment on 405", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
-      const { uploadEnrollmentAttachment } = await importService();
-
-      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("Método no permitido");
-    });
-
-    it("propagates a network failure instead of fabricating an attachment", async () => {
-      institutionalApiFetchMock.mockRejectedValue(new Error("Network error"));
-      const { uploadEnrollmentAttachment } = await importService();
-
-      await expect(uploadEnrollmentAttachment("app-456", "DNI_FRONT", file)).rejects.toThrow("Network error");
-    });
-  });
-
-  describe("deleteEnrollmentAttachment", () => {
-    it("resolves without error when the backend confirms deletion", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 204 }));
-      const { deleteEnrollmentAttachment } = await importService();
-
-      await expect(deleteEnrollmentAttachment("app-456", "att-1")).resolves.toBeUndefined();
-    });
-
-    it("propagates the error instead of silently succeeding on 404", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrado" }), { status: 404 }));
-      const { deleteEnrollmentAttachment } = await importService();
-
-      await expect(deleteEnrollmentAttachment("app-456", "att-1")).rejects.toThrow("No encontrado");
-    });
-
-    it("propagates the error instead of silently succeeding on 405", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Método no permitido" }), { status: 405 }));
-      const { deleteEnrollmentAttachment } = await importService();
-
-      await expect(deleteEnrollmentAttachment("app-456", "att-1")).rejects.toThrow("Método no permitido");
-    });
-  });
-
   describe("fetchEnrollmentApplicationTrainingPaths", () => {
     it("fetches the eligible training paths for the application", async () => {
       const mockTrainingPaths = [{ id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" }];
@@ -231,8 +166,8 @@ describe("enrollment-application.service institutional queries", () => {
   const enrollmentApplicationApiFetchMock = jest.fn<Promise<Response>, [string, RequestInit?]>();
 
   async function importInstitutionalService(): Promise<typeof ServiceModule> {
-    jest.doMock("@features/enrollment-applications/services/enrollment-application-api-fetch.service", () => ({
-      enrollmentApplicationApiFetch: enrollmentApplicationApiFetchMock,
+    jest.doMock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
+      institutionalApiFetch: enrollmentApplicationApiFetchMock,
     }));
     return import("./enrollment-application.service");
   }

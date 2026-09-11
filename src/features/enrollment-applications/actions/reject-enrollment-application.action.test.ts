@@ -2,14 +2,14 @@ jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
 
-jest.mock("@features/enrollment-applications/services/enrollment-application-api-fetch.service", () => ({
-  enrollmentApplicationApiFetch: jest.fn(),
+jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
+  institutionalApiFetch: jest.fn(),
 }));
 
 import { revalidatePath } from "next/cache";
 
 import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";
-import { enrollmentApplicationApiFetch } from "@features/enrollment-applications/services/enrollment-application-api-fetch.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const APPLICATION_ID = "00000000-0000-4000-8000-000000000002";
@@ -21,16 +21,16 @@ function createFormData(rejectionReason: string): FormData {
 }
 
 describe("rejectEnrollmentApplicationAction", () => {
-  const enrollmentApplicationApiFetchMock = jest.mocked(enrollmentApplicationApiFetch);
+  const institutionalApiFetchMock = jest.mocked(institutionalApiFetch);
   const revalidatePathMock = jest.mocked(revalidatePath);
 
   beforeEach(() => {
-    enrollmentApplicationApiFetchMock.mockReset();
+    institutionalApiFetchMock.mockReset();
     revalidatePathMock.mockReset();
   });
 
   it("rejects the enrollment application with the given reason", async () => {
-    enrollmentApplicationApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
     const result = await rejectEnrollmentApplicationAction(
       INSTITUTION_ID,
@@ -40,7 +40,7 @@ describe("rejectEnrollmentApplicationAction", () => {
     );
 
     expect(result).toEqual({ success: true });
-    const [path, request] = enrollmentApplicationApiFetchMock.mock.calls[0];
+    const [path, request] = institutionalApiFetchMock.mock.calls[0];
     expect(path).toBe(`/api/v1/institutions/${INSTITUTION_ID}/enrollment-applications/${APPLICATION_ID}/reject`);
     expect(request?.method).toBe("POST");
     expect(JSON.parse(request?.body as string)).toEqual({ rejectionReason: "Documentación incompleta" });
@@ -48,7 +48,7 @@ describe("rejectEnrollmentApplicationAction", () => {
   });
 
   it("returns the error when the backend rejects the request", async () => {
-    enrollmentApplicationApiFetchMock.mockResolvedValue(
+    institutionalApiFetchMock.mockResolvedValue(
       new Response(JSON.stringify({ message: "La solicitud ya fue evaluada", status: 409 }), {
         status: 409,
         headers: { "Content-Type": "application/json" },
@@ -71,7 +71,7 @@ describe("rejectEnrollmentApplicationAction", () => {
     expect(result.fieldErrors).toEqual({
       rejectionReason: "Debés indicar el motivo del rechazo.",
     });
-    expect(enrollmentApplicationApiFetchMock).not.toHaveBeenCalled();
+    expect(institutionalApiFetchMock).not.toHaveBeenCalled();
   });
 
   it("returns a validation error when the rejection reason is too long", async () => {
@@ -80,7 +80,7 @@ describe("rejectEnrollmentApplicationAction", () => {
     expect(result.fieldErrors).toEqual({
       rejectionReason: "El motivo no puede superar los 1000 caracteres.",
     });
-    expect(enrollmentApplicationApiFetchMock).not.toHaveBeenCalled();
+    expect(institutionalApiFetchMock).not.toHaveBeenCalled();
   });
 
   it("returns an error when the action arguments are invalid", async () => {
@@ -92,6 +92,6 @@ describe("rejectEnrollmentApplicationAction", () => {
     );
 
     expect(result).toEqual({ error: "La solicitud no es válida." });
-    expect(enrollmentApplicationApiFetchMock).not.toHaveBeenCalled();
+    expect(institutionalApiFetchMock).not.toHaveBeenCalled();
   });
 });
