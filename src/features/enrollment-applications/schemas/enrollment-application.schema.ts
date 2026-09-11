@@ -174,15 +174,6 @@ export const enrollmentApplicationSubmissionSchema = z
           path: ["healthInclusion", "adjustmentDetails"],
         });
       }
-
-      const hasHealthDoc = data.attachments.some((att) => att.attachmentType === "HEALTH_REPORT");
-      if (!hasHealthDoc) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Al requerir ajustes razonables, el Certificado o Informe de Salud es obligatorio",
-          path: ["attachments", "HEALTH_REPORT"],
-        });
-      }
     }
 
     // 3. Condicional: Si es reingresante, docente previo obligatorio
@@ -194,34 +185,6 @@ export const enrollmentApplicationSubmissionSchema = z
           path: ["preference", "previousTeacher"],
         });
       }
-    }
-
-    // 4. Documentación obligatoria estándar
-    const hasDniFront = data.attachments.some((att) => att.attachmentType === "DNI_FRONT");
-    if (!hasDniFront) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Debe adjuntar la imagen del frente del DNI",
-        path: ["attachments", "DNI_FRONT"],
-      });
-    }
-
-    const hasDniBack = data.attachments.some((att) => att.attachmentType === "DNI_BACK");
-    if (!hasDniBack) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Debe adjuntar la imagen del dorso del DNI",
-        path: ["attachments", "DNI_BACK"],
-      });
-    }
-
-    const hasPhoto = data.attachments.some((att) => att.attachmentType === "PHOTO_ID");
-    if (!hasPhoto) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Debe adjuntar la foto carnet 4x4",
-        path: ["attachments", "PHOTO_ID"],
-      });
     }
   });
 

@@ -120,7 +120,7 @@ describe("EnrollmentWizard", () => {
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
     await screen.findByLabelText(/^nombre/i);
-    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
     fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
 
     expect(await screen.findByText(/campos obligatorios incompletos/i)).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe("EnrollmentWizard", () => {
     expect(refocusedFirstNameInput).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("submits the application when every required field and attachment is present", async () => {
+  it("submits the application when every required field is present", async () => {
     startAction.mockResolvedValue(COMPLETE_DRAFT);
     updateAction.mockResolvedValue(COMPLETE_DRAFT);
     submitAction.mockResolvedValue({ ...COMPLETE_DRAFT, status: "SUBMITTED" });
@@ -142,7 +142,7 @@ describe("EnrollmentWizard", () => {
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
     await screen.findByDisplayValue("Lucas");
-    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
     fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
 
     await waitFor(() => expect(submitAction).toHaveBeenCalledWith("app-1"));
@@ -161,6 +161,32 @@ describe("EnrollmentWizard", () => {
 
     await waitFor(() => expect(cancelAction).toHaveBeenCalledWith("app-1"));
     expect(await screen.findByTestId("status-card")).toHaveTextContent("status:CANCELLED");
+  });
+
+  it("does not render responsible tab for adult applicant", async () => {
+    startAction.mockResolvedValue(BASE);
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    await screen.findByLabelText(/^nombre/i);
+    expect(screen.queryByRole("tab", { name: /tutor legal/i })).not.toBeInTheDocument();
+  });
+
+  it("renders responsible tab when applicant is a minor (< 18)", async () => {
+    startAction.mockResolvedValue({
+      ...BASE,
+      data: {
+        personalData: {
+          ...BASE.data.personalData,
+          birthDate: "2015-05-12",
+        },
+      },
+    });
+
+    render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
+
+    await screen.findByLabelText(/^nombre/i);
+    expect(screen.getByRole("tab", { name: /tutor legal/i })).toBeInTheDocument();
   });
 
   it("renders training-path and spaces tabs and loads their data", async () => {
@@ -186,13 +212,13 @@ describe("EnrollmentWizard", () => {
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
-    expect(await screen.findByRole("tab", { name: /5\. trayecto formativo/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i })).toBeInTheDocument();
+    expect(await screen.findByRole("tab", { name: /trayecto formativo/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /espacios e instrumentos/i })).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("tab", { name: /5\. trayecto formativo/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /trayecto formativo/i }));
     expect(await screen.findByText("Formación Básica en Guitarra")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /espacios e instrumentos/i }));
     expect(await screen.findByText("Práctica de Conjunto")).toBeInTheDocument();
   });
 
@@ -232,7 +258,7 @@ describe("EnrollmentWizard", () => {
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
-    await userEvent.click(await screen.findByRole("tab", { name: /5\. trayecto formativo/i }));
+    await userEvent.click(await screen.findByRole("tab", { name: /trayecto formativo/i }));
     await screen.findByText("Guitarra");
     await userEvent.click(screen.getByText("Piano"));
 
@@ -258,11 +284,11 @@ describe("EnrollmentWizard", () => {
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
     await screen.findByDisplayValue("Lucas");
-    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
     fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
 
     expect(await screen.findByText(/no se pudieron cargar los trayectos formativos/i)).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /5\. trayecto formativo/i })).toHaveAttribute("data-state", "active");
+    expect(screen.getByRole("tab", { name: /trayecto formativo/i })).toHaveAttribute("data-state", "active");
     expect(submitAction).not.toHaveBeenCalled();
   });
 
@@ -274,11 +300,11 @@ describe("EnrollmentWizard", () => {
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
     await screen.findByDisplayValue("Lucas");
-    await userEvent.click(screen.getByRole("tab", { name: /adjuntos/i }));
+    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
     fireEvent.click(screen.getByRole("button", { name: /enviar inscripción/i }));
 
     expect(await screen.findByText(/no se pudieron cargar los espacios académicos/i)).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /6\. espacios e instrumentos/i })).toHaveAttribute("data-state", "active");
+    expect(screen.getByRole("tab", { name: /espacios e instrumentos/i })).toHaveAttribute("data-state", "active");
     expect(submitAction).not.toHaveBeenCalled();
   });
 });
