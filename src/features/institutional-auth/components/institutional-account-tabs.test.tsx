@@ -13,6 +13,7 @@ describe("InstitutionalAccountTabs", () => {
     ["/account/edit", "Perfil"],
     ["/account/password", "Contraseña"],
     ["/account/sessions", "Sesiones"],
+    ["/account/passkeys", "Passkeys"],
   ])("marks %s as the %s tab", (pathname, expectedTitle) => {
     jest.mocked(usePathname).mockReturnValue(pathname);
 
@@ -29,5 +30,6 @@ describe("InstitutionalAccountTabs", () => {
     expect(screen.getByRole("link", { name: "Perfil" })).toHaveAttribute("href", "/account");
     expect(screen.getByRole("link", { name: "Contraseña" })).toHaveAttribute("href", "/account/password");
     expect(screen.getByRole("link", { name: "Sesiones" })).toHaveAttribute("href", "/account/sessions");
+    expect(screen.getByRole("link", { name: "Passkeys" })).toHaveAttribute("href", "/account/passkeys");
   });
 });

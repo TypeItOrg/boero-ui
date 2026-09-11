@@ -21,4 +21,12 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   FETCH_INSTITUTIONS: "No se pudieron cargar las instituciones.",
   PASSWORD_RECOVERY_SENT: "Si los datos coinciden, recibirás un enlace por correo.",
   PASSWORD_RECOVERY_INVALID_TOKEN: "El enlace de recuperación es inválido o ha expirado.",
+  ACCOUNT_NOT_FOUND: "No encontramos una cuenta asociada a ese DNI en esta institución.",
+  PASSKEY_FAILED: "No pudimos usar una passkey. Podés reintentar o ingresar con tu contraseña.",
+  PASSKEY_UNSUPPORTED: "Las passkeys no están disponibles en este navegador.",
+  RECENT_AUTH_REQUIRED: "Necesitás una autenticación reciente para realizar esta acción.",
+  REAUTH_INVALID_PASSWORD: "La contraseña actual no es correcta.",
+  REAUTH_RATE_LIMITED: "Demasiados intentos. Intentá nuevamente más tarde.",
+  REAUTH_UNAVAILABLE: "No pudimos verificar tu contraseña ahora. Intentá nuevamente más tarde.",
+  REAUTH_CONNECTION: "No se pudo conectar con el servidor.",
 } as const;
