@@ -45,35 +45,18 @@ import {
 } from "../actions/enrollment-application.actions";
 import { calculateAge, enrollmentApplicationSubmissionSchema } from "../schemas/enrollment-application.schema";
 import { SHIFT_OPTIONS, EDUCATION_LEVEL_OPTIONS } from "../constants/enrollment-application.constants";
-import { DocumentUploaderCard } from "./DocumentUploaderCard";
 import { EnrollmentStatusCard } from "./EnrollmentStatusCard";
 import { EnrollmentTrainingPathSelector } from "./EnrollmentTrainingPathSelector";
 import { EnrollmentStudyPlanSpacesSelector } from "./EnrollmentStudyPlanSpacesSelector";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
-import type {
-  EnrollmentApplicationData,
-  EnrollmentApplicationResponse,
-  EnrollmentAttachment,
-  EnrollmentDocumentType,
-} from "../types/enrollment-application.types";
+import type { EnrollmentApplicationData, EnrollmentApplicationResponse, EnrollmentAttachment } from "../types/enrollment-application.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
   studyPlanId: string;
   academicYearId: string;
 }
-
-const TABS = [
-  { id: "personal", label: "1. Datos Personales" },
-  { id: "education", label: "2. Escolaridad" },
-  { id: "health", label: "3. Salud e Inclusión" },
-  { id: "responsible", label: "4. Tutor Legal" },
-  { id: "training-path", label: "5. Trayecto Formativo" },
-  { id: "spaces", label: "6. Espacios e Instrumentos" },
-  { id: "preferences", label: "7. Preferencias" },
-  { id: "documents", label: "8. Adjuntos" },
-] as const;
 
 // Maps a Zod issue path to the id of the input it corresponds to, so the
 // first invalid field can be focused after a failed submission jumps to
@@ -169,6 +152,24 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   }, [birthDate]);
 
   const isMinor = calculatedAge !== null && calculatedAge < 18;
+
+  const visibleTabs = React.useMemo(() => {
+    const rawTabs = [
+      { id: "personal", label: "Datos Personales" },
+      { id: "education", label: "Escolaridad" },
+      { id: "health", label: "Salud e Inclusión" },
+      ...(isMinor ? [{ id: "responsible", label: "Tutor Legal" }] : []),
+      { id: "training-path", label: "Trayecto Formativo" },
+      { id: "spaces", label: "Espacios e Instrumentos" },
+      { id: "preferences", label: "Preferencias" },
+    ];
+    return rawTabs.map((tab, index) => ({
+      ...tab,
+      label: `${index + 1}. ${tab.label}`,
+    }));
+  }, [isMinor]);
+
+  const effectiveActiveTab = !isMinor && activeTab === "responsible" ? "training-path" : activeTab;
 
   // Initial fetch / start application
   React.useEffect(() => {
@@ -283,7 +284,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       setPendingFocusFieldId(null);
     }, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [pendingFocusFieldId, activeTab]);
+  }, [pendingFocusFieldId, effectiveActiveTab]);
 
   const handleToggleSpace = (studyPlanSpaceId: string) => {
     setSelectedStudyPlanSpaceIds((prev) => {
@@ -500,11 +501,10 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         if (section === "personalData") setActiveTab("personal");
         else if (section === "academicBackground") setActiveTab("education");
         else if (section === "healthInclusion") setActiveTab("health");
-        else if (section === "responsible") setActiveTab("responsible");
+        else if (section === "responsible" && isMinor) setActiveTab("responsible");
         else if (section === "careerSelection") setActiveTab("training-path");
         else if (section === "academicSpaceSelection" || section === "instrumentSelection") setActiveTab("spaces");
         else if (section === "preference") setActiveTab("preferences");
-        else if (section === "attachments") setActiveTab("documents");
 
         const fieldId = FIELD_ID_BY_ERROR_PATH[firstIssue.path.join(".")];
         if (fieldId) setPendingFocusFieldId(fieldId);
@@ -568,18 +568,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     } finally {
       setIsCancelling(false);
     }
-  };
-
-  // Document upload callbacks
-  const handleUploadSuccess = (uploaded: EnrollmentAttachment) => {
-    setAttachments((prev) => {
-      const filtered = prev.filter((att) => att.attachmentType !== uploaded.attachmentType);
-      return [...filtered, uploaded];
-    });
-  };
-
-  const handleDeleteSuccess = (docType: EnrollmentDocumentType, attachmentId: string) => {
-    setAttachments((prev) => prev.filter((att) => att.id !== attachmentId && att.attachmentType !== docType));
   };
 
   // Helpers to query validation errors by path
@@ -682,9 +670,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
       )}
 
       {/* Tabs navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 p-1 sm:grid-cols-4 lg:grid-cols-8">
-          {TABS.map((tab) => (
+      <Tabs value={effectiveActiveTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList
+          className={`grid h-auto w-full gap-1 p-1 ${
+            isMinor ? "grid-cols-2 sm:grid-cols-4 lg:grid-cols-7" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
+          }`}
+        >
+          {visibleTabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="py-2.5 text-xs font-medium data-[state=active]:font-semibold">
               {tab.label}
             </TabsTrigger>
@@ -946,8 +938,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                 <ChevronLeftIcon className="size-4" />
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab("responsible")} className="gap-1.5">
-                Siguiente: Tutor Legal
+              <Button type="button" onClick={() => setActiveTab(isMinor ? "responsible" : "training-path")} className="gap-1.5">
+                {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Trayecto Formativo"}
                 <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
@@ -955,143 +947,145 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 4: RESPONSABLE / TUTOR LEGAL */}
+        {/* PASO 4: RESPONSABLE / TUTOR LEGAL (Sólo para menores de edad) */}
         {/* ========================================================================= */}
-        <TabsContent value="responsible" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>4. Responsable / Tutor Legal</CardTitle>
-                  <CardDescription>
-                    {isMinor
-                      ? "Obligatorio: Al ser menor de 18 años, debés consignar los datos de tu tutor o representante legal."
-                      : "Opcional: Al ser mayor de edad, podés omitir esta sección o ingresar un contacto alternativo."}
-                  </CardDescription>
+        {isMinor && (
+          <TabsContent value="responsible" className="mt-6 space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>4. Responsable / Tutor Legal</CardTitle>
+                    <CardDescription>
+                      {isMinor
+                        ? "Obligatorio: Al ser menor de 18 años, debés consignar los datos de tu tutor o representante legal."
+                        : "Opcional: Al ser mayor de edad, podés omitir esta sección o ingresar un contacto alternativo."}
+                    </CardDescription>
+                  </div>
+                  <Badge variant={isMinor ? "destructive" : "outline"}>{isMinor ? "Obligatorio (Menor)" : "Opcional (Mayor)"}</Badge>
                 </div>
-                <Badge variant={isMinor ? "destructive" : "outline"}>{isMinor ? "Obligatorio (Menor)" : "Opcional (Mayor)"}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field data-invalid={!!getFieldError(["responsible", "fullName"])}>
-                <FieldLabel htmlFor="responsibleFullName" required={isMinor}>
-                  Nombre y Apellido del Responsable
-                </FieldLabel>
-                <Input
-                  id="responsibleFullName"
-                  value={responsibleFullName}
-                  onChange={(e) => setResponsibleFullName(e.target.value)}
-                  placeholder="María Rodríguez"
-                  autoComplete="name"
-                  aria-invalid={!!getFieldError(["responsible", "fullName"])}
-                />
-                <FieldError errors={[{ message: getFieldError(["responsible", "fullName"]) }]} />
-              </Field>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={!!getFieldError(["responsible", "documentNumber"])}>
-                  <FieldLabel htmlFor="responsibleDocumentNumber" required={isMinor}>
-                    DNI del Responsable
-                  </FieldLabel>
-                  <NumericInput
-                    id="responsibleDocumentNumber"
-                    maxLength={8}
-                    value={responsibleDocumentNumber}
-                    onChange={(e) => setResponsibleDocumentNumber(e.target.value)}
-                    placeholder="20123456"
-                    aria-invalid={!!getFieldError(["responsible", "documentNumber"])}
-                  />
-                  <FieldError errors={[{ message: getFieldError(["responsible", "documentNumber"]) }]} />
-                </Field>
-
-                <Field data-invalid={!!getFieldError(["responsible", "phoneNumber"])}>
-                  <FieldLabel htmlFor="responsiblePhoneNumber" required={isMinor}>
-                    Teléfono del Responsable
-                  </FieldLabel>
-                  <PhoneInput
-                    id="responsiblePhoneNumber"
-                    value={responsiblePhoneNumber}
-                    onChange={(e) => setResponsiblePhoneNumber(e.target.value)}
-                    placeholder="3534987654"
-                    autoComplete="tel"
-                    aria-invalid={!!getFieldError(["responsible", "phoneNumber"])}
-                  />
-                  <FieldError errors={[{ message: getFieldError(["responsible", "phoneNumber"]) }]} />
-                </Field>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={!!getFieldError(["responsible", "email"])}>
-                  <FieldLabel htmlFor="responsibleEmail" required={isMinor}>
-                    Correo electrónico
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Field data-invalid={!!getFieldError(["responsible", "fullName"])}>
+                  <FieldLabel htmlFor="responsibleFullName" required={isMinor}>
+                    Nombre y Apellido del Responsable
                   </FieldLabel>
                   <Input
-                    id="responsibleEmail"
-                    type="email"
-                    value={responsibleEmail}
-                    onChange={(e) => setResponsibleEmail(e.target.value)}
-                    placeholder="tutor@ejemplo.com"
-                    autoComplete="email"
-                    spellCheck={false}
-                    aria-invalid={!!getFieldError(["responsible", "email"])}
+                    id="responsibleFullName"
+                    value={responsibleFullName}
+                    onChange={(e) => setResponsibleFullName(e.target.value)}
+                    placeholder="María Rodríguez"
+                    autoComplete="name"
+                    aria-invalid={!!getFieldError(["responsible", "fullName"])}
                   />
-                  <FieldError errors={[{ message: getFieldError(["responsible", "email"]) }]} />
+                  <FieldError errors={[{ message: getFieldError(["responsible", "fullName"]) }]} />
                 </Field>
 
-                <Field data-invalid={!!getFieldError(["responsible", "occupation"])}>
-                  <FieldLabel htmlFor="responsibleOccupation" required={isMinor}>
-                    Ocupación / Profesión
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field data-invalid={!!getFieldError(["responsible", "documentNumber"])}>
+                    <FieldLabel htmlFor="responsibleDocumentNumber" required={isMinor}>
+                      DNI del Responsable
+                    </FieldLabel>
+                    <NumericInput
+                      id="responsibleDocumentNumber"
+                      maxLength={8}
+                      value={responsibleDocumentNumber}
+                      onChange={(e) => setResponsibleDocumentNumber(e.target.value)}
+                      placeholder="20123456"
+                      aria-invalid={!!getFieldError(["responsible", "documentNumber"])}
+                    />
+                    <FieldError errors={[{ message: getFieldError(["responsible", "documentNumber"]) }]} />
+                  </Field>
+
+                  <Field data-invalid={!!getFieldError(["responsible", "phoneNumber"])}>
+                    <FieldLabel htmlFor="responsiblePhoneNumber" required={isMinor}>
+                      Teléfono del Responsable
+                    </FieldLabel>
+                    <PhoneInput
+                      id="responsiblePhoneNumber"
+                      value={responsiblePhoneNumber}
+                      onChange={(e) => setResponsiblePhoneNumber(e.target.value)}
+                      placeholder="3534987654"
+                      autoComplete="tel"
+                      aria-invalid={!!getFieldError(["responsible", "phoneNumber"])}
+                    />
+                    <FieldError errors={[{ message: getFieldError(["responsible", "phoneNumber"]) }]} />
+                  </Field>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field data-invalid={!!getFieldError(["responsible", "email"])}>
+                    <FieldLabel htmlFor="responsibleEmail" required={isMinor}>
+                      Correo electrónico
+                    </FieldLabel>
+                    <Input
+                      id="responsibleEmail"
+                      type="email"
+                      value={responsibleEmail}
+                      onChange={(e) => setResponsibleEmail(e.target.value)}
+                      placeholder="tutor@ejemplo.com"
+                      autoComplete="email"
+                      spellCheck={false}
+                      aria-invalid={!!getFieldError(["responsible", "email"])}
+                    />
+                    <FieldError errors={[{ message: getFieldError(["responsible", "email"]) }]} />
+                  </Field>
+
+                  <Field data-invalid={!!getFieldError(["responsible", "occupation"])}>
+                    <FieldLabel htmlFor="responsibleOccupation" required={isMinor}>
+                      Ocupación / Profesión
+                    </FieldLabel>
+                    <Input
+                      id="responsibleOccupation"
+                      value={responsibleOccupation}
+                      onChange={(e) => setResponsibleOccupation(e.target.value)}
+                      placeholder="Empleado / Docente / Comercio"
+                      aria-invalid={!!getFieldError(["responsible", "occupation"])}
+                    />
+                    <FieldError errors={[{ message: getFieldError(["responsible", "occupation"]) }]} />
+                  </Field>
+                </div>
+
+                <Field data-invalid={!!getFieldError(["responsible", "educationLevel"])}>
+                  <FieldLabel htmlFor="responsibleEducationLevel" required={isMinor}>
+                    Nivel de Instrucción
                   </FieldLabel>
-                  <Input
-                    id="responsibleOccupation"
-                    value={responsibleOccupation}
-                    onChange={(e) => setResponsibleOccupation(e.target.value)}
-                    placeholder="Empleado / Docente / Comercio"
-                    aria-invalid={!!getFieldError(["responsible", "occupation"])}
-                  />
-                  <FieldError errors={[{ message: getFieldError(["responsible", "occupation"]) }]} />
+                  <Select value={responsibleEducationLevel} onValueChange={setResponsibleEducationLevel}>
+                    <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["responsible", "educationLevel"])}>
+                      <SelectValue placeholder="Seleccioná el máximo nivel alcanzado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EDUCATION_LEVEL_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["responsible", "educationLevel"]) }]} />
                 </Field>
-              </div>
-
-              <Field data-invalid={!!getFieldError(["responsible", "educationLevel"])}>
-                <FieldLabel htmlFor="responsibleEducationLevel" required={isMinor}>
-                  Nivel de Instrucción
-                </FieldLabel>
-                <Select value={responsibleEducationLevel} onValueChange={setResponsibleEducationLevel}>
-                  <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["responsible", "educationLevel"])}>
-                    <SelectValue placeholder="Seleccioná el máximo nivel alcanzado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EDUCATION_LEVEL_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={[{ message: getFieldError(["responsible", "educationLevel"]) }]} />
-              </Field>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("health")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
-                Atrás
-              </Button>
-              <Button type="button" onClick={() => setActiveTab("training-path")} className="gap-1.5">
-                Siguiente: Trayecto Formativo
-                <ChevronRightIcon className="size-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button type="button" variant="outline" onClick={() => setActiveTab("health")} className="gap-1.5">
+                  <ChevronLeftIcon className="size-4" />
+                  Atrás
+                </Button>
+                <Button type="button" onClick={() => setActiveTab("training-path")} className="gap-1.5">
+                  Siguiente: Trayecto Formativo
+                  <ChevronRightIcon className="size-4" />
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+        )}
 
         {/* ========================================================================= */}
-        {/* PASO 5: TRAYECTO FORMATIVO */}
+        {/* PASO: TRAYECTO FORMATIVO */}
         {/* ========================================================================= */}
         <TabsContent value="training-path" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>5. Trayecto Formativo</CardTitle>
+              <CardTitle>{isMinor ? "5. Trayecto Formativo" : "4. Trayecto Formativo"}</CardTitle>
               <CardDescription>Elegí la orientación o especialidad dentro del plan de estudio.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -1104,7 +1098,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
               />
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("responsible")} className="gap-1.5">
+              <Button type="button" variant="outline" onClick={() => setActiveTab(isMinor ? "responsible" : "health")} className="gap-1.5">
                 <ChevronLeftIcon className="size-4" />
                 Atrás
               </Button>
@@ -1122,7 +1116,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         <TabsContent value="spaces" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>6. Espacios Académicos e Instrumentos</CardTitle>
+              <CardTitle>{isMinor ? "6. Espacios Académicos e Instrumentos" : "5. Espacios Académicos e Instrumentos"}</CardTitle>
               <CardDescription>Seleccioná las materias que vas a cursar y el instrumento que corresponda.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -1152,12 +1146,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 7: PREFERENCIAS */}
+        {/* PASO: PREFERENCIAS */}
         {/* ========================================================================= */}
         <TabsContent value="preferences" className="mt-6 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>7. Preferencias y Consentimientos</CardTitle>
+              <CardTitle>{isMinor ? "7. Preferencias y Consentimientos" : "6. Preferencias y Consentimientos"}</CardTitle>
               <CardDescription>Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -1223,84 +1217,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                 <ChevronLeftIcon className="size-4" />
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab("documents")} className="gap-1.5">
-                Siguiente: Documentación
-                <ChevronRightIcon className="size-4" />
-              </Button>
             </CardFooter>
           </Card>
-        </TabsContent>
-
-        {/* ========================================================================= */}
-        {/* PASO 8: DOCUMENTACIÓN ADJUNTA */}
-        {/* ========================================================================= */}
-        <TabsContent value="documents" className="mt-6 space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold tracking-tight">8. Documentación Requerida</h2>
-            <p className="text-muted-foreground text-sm">Adjuntá las imágenes o archivos PDF solicitados para completar la postulación.</p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* 1. DNI Frente */}
-            <DocumentUploaderCard
-              applicationId={application.applicationId}
-              documentType="DNI_FRONT"
-              title="DNI (Frente)"
-              description="Foto legible de la parte frontal del DNI donde se vean tus datos."
-              required
-              attachment={attachments.find((a) => a.attachmentType === "DNI_FRONT")}
-              onUploadSuccess={handleUploadSuccess}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-
-            {/* 2. DNI Dorso */}
-            <DocumentUploaderCard
-              applicationId={application.applicationId}
-              documentType="DNI_BACK"
-              title="DNI (Dorso)"
-              description="Foto legible del dorso del DNI con domicilio visible."
-              required
-              attachment={attachments.find((a) => a.attachmentType === "DNI_BACK")}
-              onUploadSuccess={handleUploadSuccess}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-
-            {/* 3. Foto 4x4 */}
-            <DocumentUploaderCard
-              applicationId={application.applicationId}
-              documentType="PHOTO_ID"
-              title="Foto Carnet 4x4"
-              description="Foto carnet actualizada sobre fondo blanco o liso para el legajo."
-              required
-              attachment={attachments.find((a) => a.attachmentType === "PHOTO_ID")}
-              onUploadSuccess={handleUploadSuccess}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-
-            {/* 4. Título Secundario */}
-            <DocumentUploaderCard
-              applicationId={application.applicationId}
-              documentType="SECONDARY_CERTIFICATE"
-              title="Título Secundario o Constancia"
-              description="Copia del analítico final o certificado de título en trámite."
-              required={secondaryCompleted}
-              attachment={attachments.find((a) => a.attachmentType === "SECONDARY_CERTIFICATE")}
-              onUploadSuccess={handleUploadSuccess}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-
-            {/* 5. Informe de Salud (Condicional si requiere apoyo) */}
-            <DocumentUploaderCard
-              applicationId={application.applicationId}
-              documentType="HEALTH_REPORT"
-              title="Informe de Salud / Certificado CUD"
-              description="Certificado médico o CUD para respaldar los apoyos solicitados."
-              required={receivesReasonableAdjustments}
-              attachment={attachments.find((a) => a.attachmentType === "HEALTH_REPORT")}
-              onUploadSuccess={handleUploadSuccess}
-              onDeleteSuccess={handleDeleteSuccess}
-            />
-          </div>
 
           <div className="bg-muted/30 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -1311,11 +1229,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
             </div>
 
             <div className="flex items-center gap-3 self-end sm:self-center">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("preferences")}>
-                <ChevronLeftIcon className="mr-1 size-4" />
-                Atrás
-              </Button>
-
               <Button
                 type="button"
                 size="lg"

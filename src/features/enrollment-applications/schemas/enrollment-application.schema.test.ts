@@ -176,18 +176,16 @@ describe("enrollment-application.schema", () => {
       if (!result.success) {
         const paths = result.error.issues.map((i) => i.path.join("."));
         expect(paths).toContain("healthInclusion.adjustmentDetails");
-        expect(paths).toContain("attachments.HEALTH_REPORT");
       }
     });
 
-    it("passes health inclusion check when details and health report are provided", () => {
+    it("passes health inclusion check when details are provided", () => {
       const healthSupportData = {
         ...baseValidAdult,
         healthInclusion: {
           receivesReasonableAdjustments: true,
           adjustmentDetails: "Adaptación de material en macrotipo",
         },
-        attachments: [...baseValidAdult.attachments, { id: "4", attachmentType: "HEALTH_REPORT", originalFileName: "informe-medico.pdf" }],
       };
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(healthSupportData);
@@ -212,20 +210,14 @@ describe("enrollment-application.schema", () => {
       }
     });
 
-    it("fails when standard mandatory attachments are missing", () => {
-      const missingDni = {
+    it("allows submission when attachments are empty (documentation relegated)", () => {
+      const withoutAttachments = {
         ...baseValidAdult,
         attachments: [],
       };
 
-      const result = enrollmentApplicationSubmissionSchema.safeParse(missingDni);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const paths = result.error.issues.map((i) => i.path.join("."));
-        expect(paths).toContain("attachments.DNI_FRONT");
-        expect(paths).toContain("attachments.DNI_BACK");
-        expect(paths).toContain("attachments.PHOTO_ID");
-      }
+      const result = enrollmentApplicationSubmissionSchema.safeParse(withoutAttachments);
+      expect(result.success).toBe(true);
     });
   });
 });
