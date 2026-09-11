@@ -1,4 +1,3 @@
-import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { EnrollmentApplication, EnrollmentApplicationResponse } from "../types/enrollment-application.types";
 import type * as ServiceModule from "./enrollment-application.service";
 
@@ -16,14 +15,6 @@ const MOCK_APPLICATION: EnrollmentApplicationResponse = {
   updatedAt: "2026-03-01T10:00:00Z",
 };
 
-const MOCK_PAGE: PaginatedResponse<EnrollmentApplicationResponse> = {
-  items: [MOCK_APPLICATION],
-  page: 0,
-  size: 10,
-  totalItems: 1,
-  totalPages: 1,
-};
-
 describe("enrollment-application.service administrative queries", () => {
   const institutionalApiFetchMock = jest.fn<Promise<Response>, [string, RequestInit?]>();
 
@@ -38,46 +29,6 @@ describe("enrollment-application.service administrative queries", () => {
   beforeEach(() => {
     jest.resetModules();
     institutionalApiFetchMock.mockReset();
-  });
-
-  describe("fetchEnrollmentApplications", () => {
-    it("requests applications with query params and returns parsed response", async () => {
-      institutionalApiFetchMock.mockResolvedValue(Response.json(MOCK_PAGE));
-      const { fetchEnrollmentApplications } = await importService();
-
-      const result = await fetchEnrollmentApplications({
-        status: "SUBMITTED",
-        periodId: "period-123",
-        search: "Pérez",
-        page: 1,
-        size: 20,
-      });
-
-      expect(institutionalApiFetchMock).toHaveBeenCalledWith(
-        "/api/v1/enrollment-applications?periodId=period-123&status=SUBMITTED&search=P%C3%A9rez&page=1&size=20",
-        { method: "GET" },
-      );
-      expect(result).toEqual(MOCK_PAGE);
-    });
-
-    it("omits 'all' filter values from query parameters", async () => {
-      institutionalApiFetchMock.mockResolvedValue(Response.json(MOCK_PAGE));
-      const { fetchEnrollmentApplications } = await importService();
-
-      await fetchEnrollmentApplications({
-        status: "all",
-        periodId: "all",
-      });
-
-      expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications", { method: "GET" });
-    });
-
-    it("throws error when response is not ok", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Error del servidor" }), { status: 500 }));
-      const { fetchEnrollmentApplications } = await importService();
-
-      await expect(fetchEnrollmentApplications()).rejects.toThrow("Error del servidor");
-    });
   });
 
   describe("fetchEnrollmentApplicationById", () => {

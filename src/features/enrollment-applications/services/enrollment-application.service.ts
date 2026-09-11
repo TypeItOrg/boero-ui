@@ -12,7 +12,6 @@ import type {
   EnrollmentApplicationResponse,
   EnrollmentAttachment,
   EnrollmentDocumentType,
-  FetchEnrollmentApplicationsParams as FetchDraftApplicationsParams,
   StartEnrollmentApplicationInput,
   UpdateEnrollmentDraftInput,
 } from "../types/enrollment-application.types";
@@ -28,53 +27,12 @@ export type FetchEnrollmentApplicationsParams = {
 export async function fetchEnrollmentApplications(
   institutionId: string,
   params: FetchEnrollmentApplicationsParams,
-): Promise<PaginatedResponse<EnrollmentApplication>>;
-export async function fetchEnrollmentApplications(params?: FetchDraftApplicationsParams): Promise<PaginatedResponse<EnrollmentApplicationResponse>>;
-export async function fetchEnrollmentApplications(
-  first?: string | FetchDraftApplicationsParams,
-  second?: FetchEnrollmentApplicationsParams,
-): Promise<PaginatedResponse<EnrollmentApplication> | PaginatedResponse<EnrollmentApplicationResponse>> {
-  if (typeof first === "string") {
-    const institutionId = first;
-    const params = second ?? { page: 0, size: 10 };
-    const response = await enrollmentApplicationApiFetch(
-      `/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`,
-    );
+): Promise<PaginatedResponse<EnrollmentApplication>> {
+  const response = await enrollmentApplicationApiFetch(
+    `/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`,
+  );
 
-    return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
-  }
-
-  const params = first;
-  const queryParams = new URLSearchParams();
-  if (params?.periodId && params.periodId !== "all") {
-    queryParams.set("periodId", params.periodId);
-  }
-  if (params?.status && params.status !== "all") {
-    queryParams.set("status", params.status);
-  }
-  if (params?.search?.trim()) {
-    queryParams.set("search", params.search.trim());
-  }
-  if (params?.page !== undefined) {
-    queryParams.set("page", String(params.page));
-  }
-  if (params?.size !== undefined) {
-    queryParams.set("size", String(params.size));
-  }
-
-  const queryString = queryParams.toString();
-  const url = `${ENROLLMENT_APPLICATIONS_API_PATH}${queryString ? `?${queryString}` : ""}`;
-
-  const response = await institutionalApiFetch(url, {
-    method: "GET",
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al obtener las inscripciones");
-  }
-
-  return response.json();
+  return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
 }
 
 export async function fetchMyEnrollmentApplications(

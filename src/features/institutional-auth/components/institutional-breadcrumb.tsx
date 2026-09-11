@@ -25,7 +25,6 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   instruments: "Instrumentos",
   "enrollment-periods": "Períodos de inscripción",
   enrollment: "Inscripción",
-  enrollments: "Inscripciones",
   courses: "Cursos",
   shifts: "Turnos",
   "enrollment-applications": "Solicitudes de inscripción",
