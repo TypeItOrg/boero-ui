@@ -83,6 +83,10 @@ describe("EnrollmentWizard", () => {
     fetchStudyPlanSpacesAction.mockResolvedValue([]);
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("loads the existing draft and populates the personal data step", async () => {
     startAction.mockResolvedValue(COMPLETE_DRAFT);
 
