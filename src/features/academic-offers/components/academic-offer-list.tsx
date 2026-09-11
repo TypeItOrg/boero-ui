@@ -19,7 +19,7 @@ type AcademicOfferListProps = {
 export function AcademicOfferList({ items, page, size, totalItems, totalPages }: AcademicOfferListProps): React.ReactElement {
   if (items.length === 0) {
     return (
-      <Empty className="bg-muted/20 min-h-80 border">
+      <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6">
         <EmptyHeader className="max-w-md">
           <EmptyMedia variant="icon" className="text-primary size-12 rounded-full">
             <RouteIcon className="size-6" />
