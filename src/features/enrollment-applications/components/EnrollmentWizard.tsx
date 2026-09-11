@@ -50,7 +50,7 @@ import { EnrollmentTrainingPathSelector } from "./EnrollmentTrainingPathSelector
 import { EnrollmentStudyPlanSpacesSelector } from "./EnrollmentStudyPlanSpacesSelector";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
-import type { EnrollmentApplicationData, EnrollmentApplicationResponse, EnrollmentAttachment } from "../types/enrollment-application.types";
+import type { EnrollmentApplicationData, EnrollmentApplicationResponse } from "../types/enrollment-application.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
@@ -143,9 +143,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
   const [isReenrolling, setIsReenrolling] = React.useState(false);
   const [previousTeacher, setPreviousTeacher] = React.useState("");
 
-  // 8. Documentación Adjunta
-  const [attachments, setAttachments] = React.useState<EnrollmentAttachment[]>([]);
-
   // Reactive age computation
   const calculatedAge = React.useMemo(() => {
     return calculateAge(birthDate);
@@ -186,7 +183,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         const health = appData.healthInclusion || {};
         const resp = appData.responsible || {};
         const pref = appData.preference || {};
-        const atts = appData.attachments || [];
 
         setFirstName(personal.firstName || "");
         setLastName(personal.lastName || "");
@@ -229,8 +225,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         setSelectedTrainingPathId(career.trainingPathId || "");
         setSelectedStudyPlanSpaceIds(spaceSel.studyPlanSpaceIds || []);
         setSelectedInstrumentIdsByStudyPlanSpaceId(instSel.studyPlanSpaceInstrumentIds || {});
-
-        setAttachments(atts);
 
         // Fetch available training paths and study plan spaces
         fetchEnrollmentApplicationTrainingPathsAction(data.applicationId)
@@ -350,7 +344,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
         isReenrolling,
         previousTeacher,
       },
-      attachments,
     };
   }, [
     firstName,
@@ -378,7 +371,6 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
     allowsImageUse,
     isReenrolling,
     previousTeacher,
-    attachments,
   ]);
 
   const debouncedData = useDebouncedValue(structuredData, 800);

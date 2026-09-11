@@ -2,14 +2,9 @@
 
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
-import { ENROLLMENT_APPLICATION_STATUS_LABEL } from "../utils/enrollment-application-status.util";
+import { ENROLLMENT_APPLICATION_STATUS_OPTIONS } from "../constants/enrollment-application.constants";
 
 const ALL_STATUSES = "all";
-
-const STATUS_FILTER_OPTIONS = (Object.keys(ENROLLMENT_APPLICATION_STATUS_LABEL) as EnrollmentApplicationStatus[]).map((status) => ({
-  value: status,
-  label: ENROLLMENT_APPLICATION_STATUS_LABEL[status],
-}));
 
 type EnrollmentApplicationFiltersProps = {
   size: number;
@@ -21,7 +16,7 @@ export function EnrollmentApplicationFilters({ size, status }: EnrollmentApplica
     defaultValue: ALL_STATUSES,
     label: "Estado",
     name: "status",
-    options: [{ value: ALL_STATUSES, label: "Todos los estados" }, ...STATUS_FILTER_OPTIONS],
+    options: [...ENROLLMENT_APPLICATION_STATUS_OPTIONS],
     value: status ?? ALL_STATUSES,
   };
 
