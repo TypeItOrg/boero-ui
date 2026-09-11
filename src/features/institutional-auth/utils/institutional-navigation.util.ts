@@ -44,7 +44,6 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [
-    { title: "Inscripciones", url: "/enrollment", icon: FilePenLineIcon },
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_READ)
       ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }]
       : []),
@@ -70,7 +69,12 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
 
   const enrollmentItems: NavigationItem[] = [
-    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
+    ...(canViewOwnEnrollmentApplications(user)
+      ? [
+          { title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon },
+          { title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon },
+        ]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
       ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
       : []),

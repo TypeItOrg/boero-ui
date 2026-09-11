@@ -23,21 +23,16 @@ describe("getInstitutionalNavigationSections", () => {
       expect.arrayContaining([
         expect.objectContaining({
           label: "Académico",
-          items: [
-            expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
-            expect.objectContaining({ title: "Planes de estudio", url: "/study-plans" }),
-          ],
+          items: [expect.objectContaining({ title: "Planes de estudio", url: "/study-plans" })],
         }),
       ]),
     );
   });
 
-  it("hides the academic hub without academic read permissions or enrollment", () => {
+  it("hides the academic hub without academic read permissions", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
-    expect(sections.find((section) => section.label === "Académico")?.items).toEqual([
-      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
-    ]);
+    expect(sections.find((section) => section.label === "Académico")).toBeUndefined();
   });
 
   it("shows catalog resources independently", () => {
@@ -55,15 +50,12 @@ describe("getInstitutionalNavigationSections", () => {
     });
 
     expect(spaceSections.find((section) => section.label === "Académico")?.items).toEqual([
-      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Espacios académicos", url: "/academic-spaces" }),
     ]);
     expect(instrumentSections.find((section) => section.label === "Académico")?.items).toEqual([
-      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Instrumentos", url: "/instruments" }),
     ]);
     expect(shiftSections.find((section) => section.label === "Académico")?.items).toEqual([
-      expect.objectContaining({ title: "Inscripciones", url: "/enrollment" }),
       expect.objectContaining({ title: "Turnos", url: "/shifts" }),
     ]);
   });
@@ -84,10 +76,11 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles"]);
   });
 
-  it("shows the applicant section for applicant roles", () => {
+  it("shows the applicant section with new enrollment and my applications for applicant roles", () => {
     const sections = getInstitutionalNavigationSections({ ...USER, roles: ["Postulante"] });
 
     expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
       expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
     ]);
   });
@@ -108,7 +101,7 @@ describe("getInstitutionalNavigationSections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
     expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
-    expect(sections.map((section) => section.label)).toEqual([undefined, "Académico", "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "General"]);
   });
 
   it("links the account area once for every authenticated user", () => {
