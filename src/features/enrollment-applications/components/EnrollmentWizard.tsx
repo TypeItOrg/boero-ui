@@ -911,8 +911,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                     <AlertTriangleIcon className="size-4 text-amber-600 dark:text-amber-400" />
                     <AlertTitle>Documentación médica requerida</AlertTitle>
                     <AlertDescription>
-                      Al solicitar ajustes razonables, deberás adjuntar el Certificado Único de Discapacidad (CUD) o informe médico pertinente en el
-                      paso 6 (Adjuntos).
+                      Al solicitar ajustes razonables, deberás presentar el Certificado Único de Discapacidad (CUD) o informe médico pertinente en la
+                      institución de forma física.
                     </AlertDescription>
                   </Alert>
 
