@@ -67,7 +67,7 @@ export function PlatformLoginForm({ next }: { next?: string }): React.ReactEleme
             <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>Iniciar sesión</span>
             {isPending ? (
               <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
-                <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+                <Loader2Icon aria-hidden="true" className="animate-spin" />
                 <span className="sr-only" role="status" aria-live="polite">
                   Ingresando...
                 </span>

@@ -10,6 +10,7 @@ const ACCOUNT_TABS = [
   { title: "Perfil", url: "/account" },
   { title: "Contraseña", url: "/account/password" },
   { title: "Sesiones", url: "/account/sessions" },
+  { title: "Passkeys", url: "/account/passkeys" },
 ] as const;
 
 export function InstitutionalAccountTabs(): React.ReactElement {
@@ -44,6 +45,7 @@ export function InstitutionalAccountTabs(): React.ReactElement {
 function getActiveTabUrl(pathname: string): string {
   if (pathname.startsWith("/account/password")) return "/account/password";
   if (pathname.startsWith("/account/sessions")) return "/account/sessions";
+  if (pathname.startsWith("/account/passkeys")) return "/account/passkeys";
 
   return "/account";
 }
