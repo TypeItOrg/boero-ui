@@ -1,9 +1,19 @@
 import type { LucideIcon } from "lucide-react";
-import { Building2Icon, GraduationCapIcon, KeyRoundIcon, UserRoundIcon, UserRoundPlusIcon, UsersIcon } from "lucide-react";
+import {
+  Building2Icon,
+  ClipboardListIcon,
+  FilePenLineIcon,
+  KeyRoundIcon,
+  UserRoundCheckIcon,
+  UserRoundIcon,
+  UserRoundPlusIcon,
+  UsersIcon,
+} from "lucide-react";
 
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import { canViewOwnEnrollmentApplications } from "@features/institutional-auth/utils/institutional-applicant-role.util";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 
 export type InstitutionalHomeLink = {
   href: string;
@@ -77,8 +87,36 @@ export function getInstitutionalHomeTasks(user: Pick<InstitutionalUser, "permiss
   return MANAGEMENT_TASKS.filter((link) => isHomeLinkVisible(user, link));
 }
 
-export function getInstitutionalAcademicOfferLink(user: Pick<InstitutionalUser, "permissions">): InstitutionalHomeLink | undefined {
-  return isHomeLinkVisible(user, ACADEMIC_OFFER_LINK) ? ACADEMIC_OFFER_LINK : undefined;
+export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
+  const links: InstitutionalHomeLink[] = [];
+
+  if (canViewOwnEnrollmentApplications(user)) {
+    links.push(
+      {
+        href: "/enrollment",
+        title: "Nueva inscripción",
+        description: "Completá y enviá una nueva solicitud de inscripción.",
+        icon: FilePenLineIcon,
+      },
+      {
+        href: "/my-enrollment-applications",
+        title: "Mis inscripciones",
+        description: "Consultá el estado y seguimiento de tus trámites de inscripción.",
+        icon: UserRoundCheckIcon,
+      },
+    );
+  }
+
+  if (hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)) {
+    links.push({
+      href: "/enrollment-applications",
+      title: "Solicitudes de inscripción",
+      description: "Revisá y gestioná las solicitudes de inscripción recibidas.",
+      icon: ClipboardListIcon,
+    });
+  }
+
+  return links;
 }
 
 function isHomeLinkVisible(user: Pick<InstitutionalUser, "permissions">, link: InstitutionalHomeLink): boolean {

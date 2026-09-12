@@ -178,6 +178,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
 
   // Sync activeTab with URL query params
   React.useEffect(() => {
+    if (searchParams.get("tab") === activeTab) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", activeTab);
     router.replace(`?${params.toString()}`, { scroll: false });
@@ -329,7 +330,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         firstName,
         lastName,
         documentNumber,
-        birthDate: birthDate && isValid(birthDate) ? format(birthDate, "yyyy-MM-dd") : "",
+        birthDate: birthDate && isValid(birthDate) ? format(birthDate, "yyyy-MM-dd") : null,
         phoneNumber,
         email,
       },

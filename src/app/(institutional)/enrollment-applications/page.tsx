@@ -7,6 +7,7 @@ import { EnrollmentApplicationFilters } from "@features/enrollment-applications/
 import { EnrollmentApplicationTableContainer } from "@features/enrollment-applications/components/enrollment-application-table";
 import { EnrollmentApplicationTableSkeleton } from "@features/enrollment-applications/components/enrollment-application-table-skeleton";
 import { fetchEnrollmentApplications } from "@features/enrollment-applications/services/enrollment-application.service";
+import { fetchTrainingPaths } from "@features/academic/services/academic.service";
 import {
   parseEnrollmentApplicationPaginationParams,
   type EnrollmentApplicationSearchParams,
@@ -36,8 +37,13 @@ export default async function EnrollmentApplicationsPage({
   }
 
   const resolvedSearchParams = await searchParams;
-  const { page, size, status } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
-  const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status });
+  const { page, size, status, trainingPathId, open } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
+  const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status, trainingPathId, open });
+  const { items: trainingPaths } = await fetchTrainingPaths("institutional", user.institutionId, {
+    active: true,
+    size: 100,
+    sort: "name,asc",
+  });
 
   return (
     <PlatformPageShell
@@ -46,7 +52,7 @@ export default async function EnrollmentApplicationsPage({
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <DataTableNavigationProvider>
-        <EnrollmentApplicationFilters status={status} size={size} />
+        <EnrollmentApplicationFilters status={status} trainingPathId={trainingPathId} open={open} trainingPaths={trainingPaths} size={size} />
         <Suspense fallback={<EnrollmentApplicationTableSkeleton />}>
           <EnrollmentApplicationTableContainer
             page={page}
