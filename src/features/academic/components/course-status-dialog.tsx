@@ -146,24 +146,6 @@ export function CourseStatusDialog({
   );
 }
 
-export function CourseStatusButton({
-  status,
-  ...props
-}: Omit<CourseStatusDialogProps, "targetStatus"> & { status: CourseStatus }): React.ReactElement | null {
-  const [open, setOpen] = React.useState(false);
-  if (status === "CLOSED") return null;
-  const targetStatus = status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-  const config = COURSE_STATUS_DIALOG_CONFIG[targetStatus];
-  return (
-    <>
-      <Button type="button" size="lg" variant={config.variant} onClick={() => setOpen(true)}>
-        {targetStatus === "ACTIVE" ? "Activar" : "Desactivar"}
-      </Button>
-      {open ? <CourseStatusDialog {...props} targetStatus={targetStatus} open={open} onOpenChange={setOpen} /> : null}
-    </>
-  );
-}
-
 export function CourseDetailStatusActions({
   courseStatus,
   id,

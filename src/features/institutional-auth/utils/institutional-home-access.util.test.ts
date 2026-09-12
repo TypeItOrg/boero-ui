@@ -1,6 +1,7 @@
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
+  getInstitutionalAcademicOfferLink,
   getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
   getInstitutionalHomeTasks,
@@ -49,5 +50,12 @@ describe("institutional home access", () => {
 
     const links = getInstitutionalEnrollmentHomeLinks(user);
     expect(links.map(({ href }) => href)).toEqual(["/enrollment-applications"]);
+  });
+
+  it("exposes the academic offer independently from management links", () => {
+    const user = { permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ] };
+
+    expect(getInstitutionalAcademicOfferLink(user)?.href).toBe("/academic-offers");
+    expect(getInstitutionalHomeLinks(user).map(({ href }) => href)).toEqual(["/account"]);
   });
 });

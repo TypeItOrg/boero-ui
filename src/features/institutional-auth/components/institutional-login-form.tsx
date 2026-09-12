@@ -1,161 +1,139 @@
 "use client";
 
-import { SyntheticEvent, useActionState, useEffect, useState, useTransition } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
-
+import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
-import { Checkbox } from "@common/components/ui/checkbox";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { PasswordInput } from "@common/components/ui/password-input";
-import { NumericInput } from "@common/components/ui/restricted-input";
-import { cn } from "@common/utils/cn.util";
 import { consumeInstitutionalPasswordChangedFlash } from "@features/institutional-auth/actions/consume-institutional-password-changed-flash.action";
-import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
-import { loginInstitutional } from "@features/institutional-auth/actions/institutional-login.action";
-import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import type { InstitutionalLoginActionState } from "@features/institutional-auth/types/institutional-login-state.types";
+import type { InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
+import { InstitutionalIdentifyStep } from "@features/institutional-auth/components/institutional-identify-step";
+import { InstitutionalPasswordStep } from "@features/institutional-auth/components/institutional-password-step";
+import { InstitutionalPasskeyStep } from "@features/institutional-auth/components/institutional-passkey-step";
+import type { InstitutionalIdentifyResult } from "@features/institutional-auth/types/institutional-identify-result.types";
+import type { InstitutionalLoginStep } from "@features/institutional-auth/types/institutional-login-step.types";
 
-const INITIAL_STATE: InstitutionalLoginActionState = {};
-
-type InstitutionalLoginFormProps = {
-  registered?: boolean;
-  passwordChanged?: boolean;
-};
+type LoginFlow = {
+  institution?: InstitutionalInstitution;
+  documentNumber: string;
+  revision: number;
+} & ({ step: "IDENTIFIER" } | { step: Exclude<InstitutionalLoginStep, "IDENTIFIER">; attempt: InstitutionalIdentifyResult });
+type InstitutionalLoginFormProps = { registered?: boolean; passwordChanged?: boolean };
 
 export function InstitutionalLoginForm({ registered = false, passwordChanged = false }: InstitutionalLoginFormProps): React.ReactElement {
-  const [state, formAction] = useActionState<InstitutionalLoginActionState, FormData>(loginInstitutional, INITIAL_STATE);
-  const [isPending, startTransition] = useTransition();
-  const [institution, setInstitution] = useState<InstitutionalInstitution>();
+  const [flow, setFlow] = useState<LoginFlow>({ step: "IDENTIFIER", documentNumber: "", revision: 0 });
+  const [loginStatus, setLoginStatus] = useState<{ pending: boolean; error: string | null }>({ pending: false, error: null });
+  const loginPending = loginStatus.pending;
+  // Keep the initial notice visible after consuming its one-time cookie.
   const [showPasswordChanged] = useState(passwordChanged);
-  const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
-  const canShowSuccessMessage = !isPending && !state.error && !hasFieldErrors;
+  const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
     if (!passwordChanged) return;
-
     void consumeInstitutionalPasswordChangedFlash();
   }, [passwordChanged]);
 
-  function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function setLoginPending(pending: boolean): void {
+    setLoginStatus((current) => ({ pending, error: pending ? null : current.error }));
+  }
 
-    startTransition(() => formAction(formData));
+  function setLoginError(error: string | null): void {
+    setLoginStatus((current) => ({ ...current, error }));
+  }
+
+  function changeMethod(step: Exclude<InstitutionalLoginStep, "IDENTIFIER">): void {
+    setLoginError(null);
+    setFlow((current) => (current.step === "IDENTIFIER" ? current : { ...current, step }));
+  }
+
+  function handleIdentified(attempt: InstitutionalIdentifyResult, revision: number): void {
+    setFlow((current) => (current.revision === revision ? { ...current, step: attempt.nextStep, attempt } : current));
+  }
+
+  function changeInstitution(institution: InstitutionalInstitution | undefined): void {
+    if (loginPending) return;
+    setLoginError(null);
+    setFlow((current) =>
+      current.institution?.id === institution?.id
+        ? { ...current, institution }
+        : {
+            step: "IDENTIFIER",
+            institution,
+            documentNumber: current.documentNumber,
+            revision: current.revision + 1,
+          },
+    );
+  }
+
+  function changeDocument(documentNumber: string): void {
+    if (loginPending) return;
+    setLoginError(null);
+    setFlow((current) =>
+      current.documentNumber === documentNumber
+        ? current
+        : {
+            step: "IDENTIFIER",
+            institution: current.institution,
+            documentNumber,
+            revision: current.revision + 1,
+          },
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 md:p-8">
-      <header className="flex flex-col items-center space-y-1 text-center">
-        <Image width={875} height={1202} src={"/boero-logo.webp"} alt={"Logo de la institución"} className="h-auto w-20 md:hidden" />
-        <h1 className="text-2xl font-bold">Bienvenido de nuevo</h1>
-        <p className="text-muted-foreground text-sm">
-          <span className="hidden md:block">Ingresá tus credenciales para acceder a tu institución.</span>
-          <span className="md:hidden">Ingresá tus credenciales para continuar.</span>
-        </p>
-      </header>
-
+    <div className="p-5 sm:p-8">
+      <InstitutionalAuthStepHeader title="Bienvenido de nuevo" description="Ingresá tus credenciales para acceder a tu institución." />
       <div className="mt-6 space-y-6">
-        {registered && canShowSuccessMessage ? (
-          <Alert variant="success">
-            <CheckCircle2Icon className="size-4" />
-            <AlertTitle>Cuenta creada</AlertTitle>
-            <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.REGISTERED}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        {showPasswordChanged && canShowSuccessMessage ? (
-          <Alert variant="success">
-            <CheckCircle2Icon className="size-4" />
-            <AlertTitle>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSWORD_CHANGED_TITLE}</AlertTitle>
-            <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSWORD_CHANGED_DESCRIPTION}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        {state.error ? (
+        {loginStatus.error ? (
           <Alert variant="destructive">
             <AlertCircleIcon className="size-4" />
             <AlertTitle>¡Ups! Algo salió mal</AlertTitle>
-            <AlertDescription>{state.error}</AlertDescription>
+            <AlertDescription>{loginStatus.error}</AlertDescription>
           </Alert>
         ) : null}
-
-        <FieldGroup>
-          <Field data-invalid={!!state.fieldErrors?.institutionId}>
-            <FieldLabel htmlFor="institution-id" required>
-              Institución
-            </FieldLabel>
-            <InstitutionPicker
-              ariaInvalid={!!state.fieldErrors?.institutionId}
-              id="institution-id"
-              onValueChange={(_, item) => setInstitution(item)}
-              selectedLabel={institution?.name}
-              value={institution?.id}
-            />
-            <FieldError errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined} />
-          </Field>
-        </FieldGroup>
-
-        <FieldGroup>
-          <Field data-invalid={!!state.fieldErrors?.documentNumber}>
-            <FieldLabel htmlFor="document-number" required>
-              Documento
-            </FieldLabel>
-            <NumericInput
-              aria-invalid={!!state.fieldErrors?.documentNumber}
-              autoComplete="username"
-              id="document-number"
-              maxLength={8}
-              name="documentNumber"
-            />
-            <FieldError errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined} />
-          </Field>
-        </FieldGroup>
-
-        <FieldGroup>
-          <Field data-invalid={!!state.fieldErrors?.password}>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor="password" required>
-                Contraseña
-              </FieldLabel>
-              <Link className="text-primary text-sm font-medium underline underline-offset-4" href="/auth/password-recovery">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-            <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="current-password" id="password" name="password" />
-            <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
-          </Field>
-        </FieldGroup>
-
-        <Field orientation="horizontal">
-          <Checkbox id="remember-me" name="rememberMe" className="mt-px" />
-          <FieldLabel htmlFor="remember-me" className="font-normal">
-            Recordarme
-          </FieldLabel>
-        </Field>
-
-        <footer className="mt-6 flex w-full flex-col gap-4">
-          <Button aria-busy={isPending} className="relative w-full" disabled={isPending} size="lg" type="submit">
-            <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPending && "opacity-0")}>Iniciar sesión</span>
-            {isPending ? (
-              <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[inherit]">
-                <Loader2Icon aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
-                <span className="sr-only" role="status" aria-live="polite">
-                  Ingresando...
-                </span>
-              </span>
-            ) : null}
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            ¿No tenés una cuenta?{" "}
-            <Link className="text-primary font-medium underline underline-offset-4" href="/auth/register">
-              Crear cuenta
-            </Link>
-          </p>
-        </footer>
+        <InstitutionalIdentifyStep
+          registered={registered}
+          showPasswordChanged={showPasswordChanged}
+          institution={flow.institution}
+          documentNumber={flow.documentNumber}
+          revision={flow.revision}
+          identified={flow.step !== "IDENTIFIER"}
+          disabled={loginPending}
+          onInstitutionChange={changeInstitution}
+          onDocumentChange={changeDocument}
+          onIdentified={handleIdentified}
+        />
+        {flow.step !== "IDENTIFIER" ? (
+          <div key={`${flow.attempt.loginAttemptId}-${flow.step}`} className="animate-fade-in-up">
+            {flow.step === "PASSWORD" ? (
+              <InstitutionalPasswordStep
+                loginAttemptId={flow.attempt.loginAttemptId}
+                hasPasskeys={flow.attempt.nextStep === "PASSKEY"}
+                rememberMe={rememberMe}
+                onRememberMeChange={setRememberMe}
+                onPendingChange={setLoginPending}
+                onError={setLoginError}
+                onUsePasskey={() => changeMethod("PASSKEY")}
+              />
+            ) : (
+              <InstitutionalPasskeyStep
+                loginAttemptId={flow.attempt.loginAttemptId}
+                rememberMe={rememberMe}
+                onRememberMeChange={setRememberMe}
+                onPendingChange={setLoginPending}
+                onError={setLoginError}
+                onUsePassword={() => changeMethod("PASSWORD")}
+              />
+            )}
+          </div>
+        ) : null}
+        <p className="text-muted-foreground text-center text-sm">
+          ¿No tenés una cuenta?{" "}
+          <Link className="text-primary font-medium underline underline-offset-4" href="/auth/register">
+            Crear cuenta
+          </Link>
+        </p>
       </div>
-    </form>
+    </div>
   );
 }

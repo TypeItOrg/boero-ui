@@ -35,6 +35,17 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections.find((section) => section.label === "Académico")).toBeUndefined();
   });
 
+  it("shows the applicant academic offer without management resources", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ],
+    });
+
+    expect(sections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Oferta académica", url: "/academic-offers" }),
+    ]);
+  });
+
   it("shows catalog resources independently", () => {
     const spaceSections = getInstitutionalNavigationSections({
       ...USER,

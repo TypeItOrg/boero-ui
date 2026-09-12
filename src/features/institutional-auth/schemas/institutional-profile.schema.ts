@@ -22,5 +22,3 @@ export const institutionalProfileSchema = z.object({
     })
     .optional(),
 });
-
-export type InstitutionalProfileInput = z.infer<typeof institutionalProfileSchema>;

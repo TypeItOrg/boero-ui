@@ -28,6 +28,7 @@ export async function PlatformAcademicCollectionPage({
         basePath="/admin"
         canChangeStatus={config.canChangeStatus(FULL_ACADEMIC_ACCESS)}
         canCreate={false}
+        canCreateVersion={config.canCreate(FULL_ACADEMIC_ACCESS)}
         canDelete={config.canDelete(FULL_ACADEMIC_ACCESS)}
         canRestore={config.canRestore(FULL_ACADEMIC_ACCESS)}
         canUpdate={config.canUpdate(FULL_ACADEMIC_ACCESS)}

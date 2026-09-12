@@ -12,6 +12,7 @@ import { InstitutionalHomeSkeleton } from "@features/institutional-auth/componen
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import {
+  getInstitutionalAcademicOfferLink,
   getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
   type InstitutionalHomeLink,
@@ -55,10 +56,11 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const links = getInstitutionalHomeLinks(user);
   const managementLinks = links.filter((link) => link.href !== "/account");
   const personalLink = links.find((link) => link.href === "/account");
+  const academicOfferLink = getInstitutionalAcademicOfferLink(user);
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
   const enrollmentLinks = getInstitutionalEnrollmentHomeLinks(user);
   const hasInstitutionalAccess = managementLinks.length > 0;
-  const hasAcademicAccess = academicResources.length > 0;
+  const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
   const hasEnrollmentAccess = enrollmentLinks.length > 0;
   const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess || hasEnrollmentAccess;
   const greeting = getGreeting(new Date());
@@ -103,6 +105,21 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
       </header>
 
       <div className="flex flex-col gap-4 px-3 pb-3 md:px-4 md:pb-4">
+        {academicOfferLink ? (
+          <HomeSubsection
+            id="academic-offer-title"
+            title="Oferta académica"
+            description="Conocé las propuestas vigentes de la institución."
+            icon={GraduationCapIcon}
+            imageSrc="/gestion-academica.webp"
+            imageSide="right"
+          >
+            <nav aria-label="Oferta académica" className="[&>a]:bg-background grid gap-4">
+              <HomeAccessRow link={academicOfferLink} />
+            </nav>
+          </HomeSubsection>
+        ) : null}
+
         {managementLinks.length > 0 ? (
           <HomeSubsection
             id="institutional-management-title"
@@ -189,7 +206,7 @@ function HomeSubsection({ children, description, icon: Icon, id, imageSide = "le
             imageSide === "right" ? "lg:grid-cols-[minmax(0,2fr)_minmax(200px,0.7fr)]" : "lg:grid-cols-[minmax(200px,0.7fr)_minmax(0,2fr)]",
           )}
         >
-          <div className={cn("bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-92", imageSide === "right" && "lg:order-2")}>
+          <div className={cn("bg-muted relative h-44 overflow-hidden rounded-lg border sm:h-52 lg:h-auto", imageSide === "right" && "lg:order-2")}>
             <Image src={imageSrc} alt="" fill sizes="(max-width: 1023px) 100vw, 28vw" className="object-cover" />
           </div>
           <div className={cn("min-w-0", imageSide === "right" && "lg:order-1")}>{children}</div>

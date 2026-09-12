@@ -16,6 +16,7 @@ import { PlatformCollectionActions } from "@features/platform-auth/components/pl
 type AcademicCollectionProps = {
   basePath: string;
   canCreate: boolean;
+  canCreateVersion?: boolean;
   canDelete: boolean;
   canChangeStatus: boolean;
   canUpdate: boolean;
@@ -34,6 +35,7 @@ type AcademicCollectionProps = {
 export async function AcademicCollectionView({
   basePath,
   canCreate,
+  canCreateVersion = canCreate,
   canDelete,
   canChangeStatus,
   canUpdate,
@@ -213,6 +215,7 @@ export async function AcademicCollectionView({
             global={global}
             institutionId={effectiveInstitutionId}
             canCreate={canCreate && !isTrainingPathFixed}
+            canCreateVersion={canCreateVersion}
             deleted={params.deleted}
             page={params.page}
             resource={resource}

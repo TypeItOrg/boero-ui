@@ -16,6 +16,7 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   roles: "Roles",
   institution: "Institución",
   "academic-years": "Ciclos lectivos",
+  "academic-offers": "Oferta académica",
   "training-paths": "Trayectos formativos",
   "study-plans": "Planes de estudio",
   "academic-levels": "Niveles",

@@ -3,6 +3,7 @@ import {
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
+  GraduationCapIcon,
   KeyRoundIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
@@ -28,6 +29,14 @@ const PERSONAL_LINK: InstitutionalHomeLink = {
   title: "Mi cuenta",
   description: "Administrá tus datos, contraseña y sesiones.",
   icon: UserRoundIcon,
+};
+
+const ACADEMIC_OFFER_LINK: InstitutionalHomeLink = {
+  href: "/academic-offers",
+  title: "Oferta académica",
+  description: "Explorá los trayectos disponibles y sus espacios académicos.",
+  icon: GraduationCapIcon,
+  permission: INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ,
 };
 
 const MANAGEMENT_LINKS: readonly InstitutionalHomeLink[] = [
@@ -109,6 +118,10 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
   }
 
   return links;
+}
+
+export function getInstitutionalAcademicOfferLink(user: Pick<InstitutionalUser, "permissions">): InstitutionalHomeLink | undefined {
+  return isHomeLinkVisible(user, ACADEMIC_OFFER_LINK) ? ACADEMIC_OFFER_LINK : undefined;
 }
 
 function isHomeLinkVisible(user: Pick<InstitutionalUser, "permissions">, link: InstitutionalHomeLink): boolean {

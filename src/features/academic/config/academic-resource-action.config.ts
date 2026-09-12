@@ -57,7 +57,7 @@ export const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConf
     createPath: (base, parentId, data) => `${base}/training-paths/${parentId ?? data.trainingPathId}/study-plans`,
     createPermission: INSTITUTIONAL_PERMISSION.STUDY_PLAN_CREATE,
     updatePermission: INSTITUTIONAL_PERMISSION.STUDY_PLAN_UPDATE,
-    prepareBody: (data) => Object.fromEntries(Object.entries(data).filter(([field]) => field !== "trainingPathId")),
+    prepareBody: (data) => Object.fromEntries(Object.entries(data).filter(([field]) => field !== "trainingPathId" && field !== "status")),
   },
   [AcademicResource.ACADEMIC_LEVEL]: {
     createPath: (base, parentId) => `${base}/study-plans/${parentId}/academic-levels`,

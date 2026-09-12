@@ -59,8 +59,3 @@ export const updatePersonFormSchema = basePersonSchema
       });
     }
   });
-
-export type CreatePersonFormInput = z.input<typeof createPersonFormSchema>;
-export type CreatePersonFormValues = z.output<typeof createPersonFormSchema>;
-export type UpdatePersonFormInput = z.input<typeof updatePersonFormSchema>;
-export type UpdatePersonFormValues = z.output<typeof updatePersonFormSchema>;

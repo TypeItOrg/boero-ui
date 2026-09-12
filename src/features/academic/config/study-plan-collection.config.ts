@@ -58,15 +58,17 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
   dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
   toRow: (item) => {
     const plan = item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>;
+    const versionNumber = plan.versionNumber ?? 1;
     return {
       id: plan.id,
       institutionId: plan.institutionId,
       institutionName: plan.institutionName,
-      primaryValue: plan.name,
+      primaryValue: versionNumber > 1 ? `${plan.name} · v${versionNumber}` : plan.name,
       detailValues: [plan.trainingPathName, formatDisplayDate(plan.effectiveFrom, "Sin definir"), formatDisplayDate(plan.effectiveTo, "Sin definir")],
       status: studyPlanStatusLabels[plan.status],
       active: plan.status === "ACTIVE",
       effectiveFrom: plan.effectiveFrom,
+      versionNumber: plan.versionNumber,
       statusValue: plan.status,
       deletedAt: plan.deletedAt ?? null,
     };

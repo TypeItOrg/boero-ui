@@ -8,6 +8,7 @@ import { APPROVAL_MODE } from "@features/academic/types/approval-mode.types";
 import { REQUIRED_CONDITION } from "@features/academic/types/required-condition.types";
 import { REQUIREMENT_STAGE } from "@features/academic/types/requirement-stage.types";
 import { REQUIREMENT_TYPE } from "@features/academic/types/requirement-type.types";
+import { STUDY_PLAN_STATUS } from "@features/academic/types/study-plan-status.types";
 import {
   academicSpaceFormatLabels,
   academicSpaceTypeLabels,
@@ -15,9 +16,16 @@ import {
   requiredConditionLabels,
   requirementStageLabels,
   requirementTypeLabels,
+  studyPlanStatusLabels,
 } from "@features/academic/utils/academic-labels.util";
 
+const STUDY_PLAN_STATUS_OPTIONS = STUDY_PLAN_STATUS.filter((status) => status !== "INACTIVE").map((status) => ({
+  value: status,
+  label: studyPlanStatusLabels[status],
+}));
+
 export function StudyPlanFields({
+  canChangeStatus = false,
   initialValues = {},
   fieldErrors,
   institutionId,
@@ -26,9 +34,15 @@ export function StudyPlanFields({
   trainingPaths = [],
 }: AcademicFieldsProps): React.ReactElement {
   const initialTrainingPathId = toOptionalFormString(initialValues.trainingPathId);
+  const initialStatus = toOptionalFormString(initialValues.status);
   return (
     <>
       <NameField initialValues={initialValues} error={fieldErrors?.name} />
+      {canChangeStatus && initialStatus ? (
+        <FormField label="Estado" name="status" error={fieldErrors?.status} className="sm:col-span-2" required>
+          <FormSelect name="status" defaultValue={initialStatus} options={STUDY_PLAN_STATUS_OPTIONS} />
+        </FormField>
+      ) : null}
       <FormField label="Trayecto formativo" name="trainingPathId" error={fieldErrors?.trainingPathId} className="sm:col-span-2" required>
         {institutionId && scope ? (
           <TrainingPathDropdown
