@@ -9,7 +9,7 @@ import { cn } from "@common/utils/cn.util";
 const ACCOUNT_TABS = [
   { title: "Perfil", url: "/account" },
   { title: "Contraseña", url: "/account/password" },
-  { title: "Claves de acceso", url: "/account/passkeys" },
+  { title: "Llaves de acceso", url: "/account/passkeys" },
   { title: "Sesiones", url: "/account/sessions" },
 ] as const;
 

@@ -58,6 +58,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
             <FieldLabel htmlFor="register-institution-id" required>
               Institución
             </FieldLabel>
+            <input name="institutionName" type="hidden" value={institution?.name ?? ""} />
             <InstitutionPicker
               ariaInvalid={!!state.fieldErrors?.institutionId}
               id="register-institution-id"

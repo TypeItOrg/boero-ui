@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
+import { emailVerificationContextSchema } from "@features/institutional-auth/schemas/email-verification.schema";
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
-import { setInstitutionalRegistrationSuccessCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
 import { INSTITUTIONAL_REGISTER_FIELD_NAMES } from "@features/institutional-auth/types/institutional-register-field-name.types";
 
@@ -48,6 +49,11 @@ export async function registerInstitutional(
     return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM };
   }
 
-  await setInstitutionalRegistrationSuccessCookie();
-  redirect("/auth/login");
+  const identity = { institutionId: input.institutionId, documentNumber: input.documentNumber };
+  const context = emailVerificationContextSchema.safeParse({
+    ...identity,
+    institutionName: formData.get("institutionName") || undefined,
+  });
+  await setEmailVerificationContext(context.success ? context.data : identity);
+  redirect("/auth/email-verification");
 }

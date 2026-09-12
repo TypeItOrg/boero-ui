@@ -1,3 +1,11 @@
+jest.mock("next/navigation", () => ({
+  redirect: jest.fn(() => {
+    throw new Error("NEXT_REDIRECT");
+  }),
+}));
+jest.mock("@features/institutional-auth/utils/email-verification-context.util", () => ({ setEmailVerificationContext: jest.fn() }));
+import { redirect } from "next/navigation";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 jest.mock("next/headers", () => ({
   headers: jest.fn(),
 }));
@@ -61,4 +69,12 @@ describe("identifyInstitutionalUser", () => {
     expect(state.loginAttemptId).toBe("attempt");
     expect(state.nextStep).toBe("PASSKEY");
   });
+});
+
+it("redirects pending accounts with identity stored outside the URL", async () => {
+  const identity = { institutionId: "22222222-2222-4222-8222-222222222222", documentNumber: "12345678" };
+  jest.mocked(identifyInstitutionalAccount).mockResolvedValue({ success: true, data: { nextStep: "EMAIL_VERIFICATION", loginAttemptId: null } });
+  await expect(identifyInstitutionalUser({}, identifyFormData(identity))).rejects.toThrow("NEXT_REDIRECT");
+  expect(setEmailVerificationContext).toHaveBeenCalledWith(identity);
+  expect(redirect).toHaveBeenCalledWith("/auth/email-verification");
 });

@@ -1,4 +1,5 @@
 import type { PasskeyCreationOptionsJson } from "@features/institutional-auth/types/passkey-creation-options-json.types";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { readBackendErrorCode } from "@features/institutional-auth/utils/backend-error-code.util";
 
@@ -20,7 +21,7 @@ export async function requestPasskeyRegistrationOptions(label: string): Promise<
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo iniciar el registro de la clave de acceso.");
+    throw new Error(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_START_FAILED);
   }
 
   return (await response.json()) as {

@@ -23,8 +23,8 @@ jest.mock("@features/institutional-auth/actions/finish-passkey-login.action", ()
   finishPasskeyLogin: jest.fn(),
 }));
 
-jest.mock("@features/institutional-auth/actions/consume-institutional-password-changed-flash.action", () => ({
-  consumeInstitutionalPasswordChangedFlash: jest.fn(),
+jest.mock("@features/institutional-auth/actions/consume-institutional-login-flashes.action", () => ({
+  consumeInstitutionalLoginFlashes: jest.fn(),
 }));
 
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
@@ -49,7 +49,7 @@ describe("InstitutionalLoginForm", () => {
     expect(screen.getByRole("button", { name: "Continuar" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Contraseña")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "¿Olvidaste tu contraseña?" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /clave de acceso/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /llave de acceso/i })).not.toBeInTheDocument();
   });
 
   it("shows an explicit error for unknown accounts", async () => {
@@ -77,7 +77,7 @@ describe("InstitutionalLoginForm", () => {
     expect(screen.getByLabelText(/Contraseña/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "¿Olvidaste tu contraseña?" })).toBeInTheDocument();
     expect(screen.getByLabelText(/Documento/)).toBeEnabled();
-    expect(screen.queryByRole("button", { name: "Usar una clave de acceso" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Usar una llave de acceso" })).not.toBeInTheDocument();
   });
 
   it("routes accounts with passkeys to the passkey step without auto-opening WebAuthn", async () => {
@@ -89,7 +89,7 @@ describe("InstitutionalLoginForm", () => {
     await user.type(screen.getByLabelText(/Documento/), "12345678");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
 
-    expect(await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Ingresá con tu llave de acceso" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Usar contraseña" })).toBeInTheDocument();
     expect(screen.getByLabelText(/Documento/)).toBeEnabled();
 
@@ -129,16 +129,16 @@ describe("InstitutionalLoginForm", () => {
 
     await user.type(screen.getByLabelText(/Documento/), "12345678");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
-    await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" });
+    await screen.findByRole("heading", { name: "Ingresá con tu llave de acceso" });
 
     await user.click(screen.getByRole("button", { name: "Usar contraseña" }));
 
     expect(await screen.findByLabelText(/Contraseña/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Usar una clave de acceso" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usar una llave de acceso" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Usar una clave de acceso" }));
+    await user.click(screen.getByRole("button", { name: "Usar una llave de acceso" }));
 
-    expect(await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Ingresá con tu llave de acceso" })).toBeInTheDocument();
     expect(identifyMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,4 +1,5 @@
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { readBackendErrorCode } from "@features/institutional-auth/utils/backend-error-code.util";
 
@@ -17,7 +18,7 @@ export async function verifyPasskeyRegistration(ceremonyId: string, credential: 
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo registrar la clave de acceso.");
+    throw new Error(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_FAILED);
   }
 
   return (await response.json()) as Passkey;

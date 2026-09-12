@@ -7,6 +7,7 @@ import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 
 import { Input } from "@common/components/ui/input";
 import { renamePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 import type { RenamePasskeyState } from "@features/institutional-auth/types/rename-passkey-state.types";
 
@@ -19,7 +20,7 @@ export function PasskeyRenameDialog({ passkey, onClose, onSuccess }: PasskeyRena
       if (result.success) onSuccess();
       return result;
     } catch {
-      return { error: "No se pudo renombrar la clave de acceso." };
+      return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_RENAME_FAILED };
     }
   }, {});
 
@@ -40,7 +41,7 @@ export function PasskeyRenameDialog({ passkey, onClose, onSuccess }: PasskeyRena
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Renombrar clave de acceso</DialogTitle>
+          <DialogTitle>Renombrar llave de acceso</DialogTitle>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Field data-invalid={!!error}>

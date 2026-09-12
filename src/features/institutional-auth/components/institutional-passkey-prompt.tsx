@@ -27,7 +27,7 @@ export function InstitutionalPasskeyPrompt({
         </div>
         <div className="min-w-0">
           <h2 id="passkey-prompt-title" className="text-sm leading-6 font-semibold @min-[15rem]:text-base">
-            Ingresá con tu clave de acceso
+            Ingresá con tu llave de acceso
           </h2>
           <p className="text-muted-foreground hidden text-sm leading-relaxed @min-[15rem]:block">Confirmá tu identidad con tu dispositivo.</p>
         </div>

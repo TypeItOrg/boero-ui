@@ -1,6 +1,7 @@
 import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import type { BackendError } from "@common/types/backend-error.types";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { InstitutionalLoginResult } from "@features/institutional-auth/types/institutional-login-result.types";
 
 export type PasskeyAuthVerifyInput = {
@@ -30,7 +31,7 @@ export async function verifyPasskeyAuth(input: PasskeyAuthVerifyInput, requestHe
   } catch {
     return {
       success: false,
-      error: { status: 500, message: "No se pudo conectar con el servidor." },
+      error: { status: 500, message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_CONNECTION_FAILED },
     };
   }
 }

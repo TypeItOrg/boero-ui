@@ -1,3 +1,5 @@
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
+
 describe("revokePasskey", () => {
   type RevokePasskeyModule = typeof import("@features/institutional-auth/services/revoke-passkey.service");
 
@@ -35,7 +37,7 @@ describe("revokePasskey", () => {
 
     const { revokePasskey } = await importService();
 
-    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la clave de acceso.");
+    await expect(revokePasskey("passkey-id")).rejects.toThrow(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REVOKE_FAILED);
   });
 
   it("keeps a generic error for server failures", async () => {
@@ -43,6 +45,6 @@ describe("revokePasskey", () => {
 
     const { revokePasskey } = await importService();
 
-    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la clave de acceso.");
+    await expect(revokePasskey("passkey-id")).rejects.toThrow(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REVOKE_FAILED);
   });
 });

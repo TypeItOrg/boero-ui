@@ -6,13 +6,14 @@ import { cookies } from "next/headers";
 
 import {
   clearInstitutionalAuthCookies,
-  clearInstitutionalPasswordChangedCookie,
+  clearInstitutionalLoginFlashCookies,
   hasInstitutionalPasswordChangedCookie,
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_ACCESS_TOKEN_MAX_AGE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE,
   INSTITUTIONAL_REMEMBER_ME_MAX_AGE,
+  INSTITUTIONAL_EMAIL_VERIFIED_COOKIE,
   INSTITUTIONAL_PASSWORD_CHANGED_COOKIE,
   INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE,
   setInstitutionalPasswordChangedCookie,
@@ -80,9 +81,10 @@ describe("institutional auth cookies", () => {
     await expect(hasInstitutionalPasswordChangedCookie()).resolves.toBe(true);
   });
 
-  it("clears the password changed flash cookie", async () => {
-    await clearInstitutionalPasswordChangedCookie();
+  it("clears the institutional login flash cookies", async () => {
+    await clearInstitutionalLoginFlashCookies();
 
-    expect(cookieStore.delete).toHaveBeenCalledWith(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE);
+    expect(cookieStore.delete).toHaveBeenNthCalledWith(1, INSTITUTIONAL_EMAIL_VERIFIED_COOKIE);
+    expect(cookieStore.delete).toHaveBeenNthCalledWith(2, INSTITUTIONAL_PASSWORD_CHANGED_COOKIE);
   });
 });

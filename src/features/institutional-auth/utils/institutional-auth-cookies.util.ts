@@ -12,12 +12,12 @@ type InstitutionalAuthCookieOptions = {
 
 export const INSTITUTIONAL_ACCESS_TOKEN_COOKIE = "institutional_access_token";
 export const INSTITUTIONAL_REFRESH_TOKEN_COOKIE = "institutional_refresh_token";
-export const INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE = "institutional_registration_success";
+export const INSTITUTIONAL_EMAIL_VERIFIED_COOKIE = "institutional_email_verified";
 export const INSTITUTIONAL_PASSWORD_CHANGED_COOKIE = "institutional_password_changed";
 export const INSTITUTIONAL_ACCESS_TOKEN_MAX_AGE = 60 * 15;
 export const INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 export const INSTITUTIONAL_REMEMBER_ME_MAX_AGE = 60 * 60 * 24 * 30;
-export const INSTITUTIONAL_REGISTRATION_SUCCESS_MAX_AGE = 15;
+export const INSTITUTIONAL_EMAIL_VERIFIED_MAX_AGE = 15;
 export const INSTITUTIONAL_PASSWORD_CHANGED_MAX_AGE = 5;
 
 export function getInstitutionalAuthCookieOptions(maxAge: number): InstitutionalAuthCookieOptions {
@@ -46,19 +46,14 @@ export async function clearInstitutionalAuthCookies(): Promise<void> {
   cookieStore.delete(INSTITUTIONAL_REFRESH_TOKEN_COOKIE);
 }
 
-export async function setInstitutionalRegistrationSuccessCookie(): Promise<void> {
+export async function setInstitutionalEmailVerifiedCookie(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set(INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE, "true", getInstitutionalAuthCookieOptions(INSTITUTIONAL_REGISTRATION_SUCCESS_MAX_AGE));
+  cookieStore.set(INSTITUTIONAL_EMAIL_VERIFIED_COOKIE, "true", getInstitutionalAuthCookieOptions(INSTITUTIONAL_EMAIL_VERIFIED_MAX_AGE));
 }
 
-export async function hasInstitutionalRegistrationSuccessCookie(): Promise<boolean> {
+export async function hasInstitutionalEmailVerifiedCookie(): Promise<boolean> {
   const cookieStore = await cookies();
-  return cookieStore.get(INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE)?.value === "true";
-}
-
-export async function clearInstitutionalRegistrationSuccessCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(INSTITUTIONAL_REGISTRATION_SUCCESS_COOKIE);
+  return cookieStore.get(INSTITUTIONAL_EMAIL_VERIFIED_COOKIE)?.value === "true";
 }
 
 export async function setInstitutionalPasswordChangedCookie(): Promise<void> {
@@ -71,7 +66,8 @@ export async function hasInstitutionalPasswordChangedCookie(): Promise<boolean> 
   return cookieStore.get(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE)?.value === "true";
 }
 
-export async function clearInstitutionalPasswordChangedCookie(): Promise<void> {
+export async function clearInstitutionalLoginFlashCookies(): Promise<void> {
   const cookieStore = await cookies();
+  cookieStore.delete(INSTITUTIONAL_EMAIL_VERIFIED_COOKIE);
   cookieStore.delete(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE);
 }

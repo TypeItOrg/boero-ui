@@ -1,3 +1,4 @@
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { readBackendErrorCode } from "@features/institutional-auth/utils/backend-error-code.util";
@@ -13,6 +14,6 @@ export async function revokePasskey(id: string): Promise<void> {
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo eliminar la clave de acceso.");
+    throw new Error(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REVOKE_FAILED);
   }
 }

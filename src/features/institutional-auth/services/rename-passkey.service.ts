@@ -1,4 +1,5 @@
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 export async function renamePasskey(id: string, label: string): Promise<Passkey> {
@@ -10,7 +11,7 @@ export async function renamePasskey(id: string, label: string): Promise<Passkey>
   });
 
   if (!response.ok) {
-    throw new Error("No se pudo renombrar la clave de acceso.");
+    throw new Error(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_RENAME_FAILED);
   }
 
   return (await response.json()) as Passkey;

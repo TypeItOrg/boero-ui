@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { FieldError } from "@common/components/ui/field";
 
 import { revokePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 import type { RevokePasskeyState } from "@features/institutional-auth/types/revoke-passkey-state.types";
@@ -23,7 +24,7 @@ export function PasskeyRevokeDialog({ passkey, onClose, onSuccess, onRequireReau
       }
       return result;
     } catch {
-      return { error: "No se pudo eliminar la clave de acceso." };
+      return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REVOKE_FAILED };
     }
   }, {});
 
@@ -42,8 +43,8 @@ export function PasskeyRevokeDialog({ passkey, onClose, onSuccess, onRequireReau
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Eliminar clave de acceso</DialogTitle>
-          <DialogDescription>Se eliminará «{passkey.label}». Podrás seguir ingresando con tu contraseña u otras claves de acceso.</DialogDescription>
+          <DialogTitle>Eliminar llave de acceso</DialogTitle>
+          <DialogDescription>Se eliminará «{passkey.label}». Podrás seguir ingresando con tu contraseña u otras llaves de acceso.</DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <FieldError>{state.error}</FieldError>

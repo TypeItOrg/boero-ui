@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getFieldErrors } from "@common/utils/form-field-errors.util";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
 import { requestPasskeyRegistrationOptions } from "@features/institutional-auth/services/passkey-registration-options.service";
 import { verifyPasskeyRegistration } from "@features/institutional-auth/services/passkey-registration-verify.service";
@@ -30,13 +31,13 @@ export async function requestPasskeyRegistration(
       return { error: RECENT_AUTH_REQUIRED };
     }
 
-    return { error: "No se pudo iniciar el registro de la clave de acceso." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_START_FAILED };
   }
 }
 
 export async function verifyPasskeyRegistrationAction(ceremonyId: string, credential: unknown): Promise<VerifyPasskeyRegistrationState> {
   if (!ceremonyId) {
-    return { error: "No se pudo registrar la clave de acceso." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_FAILED };
   }
 
   try {
@@ -46,7 +47,7 @@ export async function verifyPasskeyRegistrationAction(ceremonyId: string, creden
       return { error: RECENT_AUTH_REQUIRED };
     }
 
-    return { error: "No se pudo registrar la clave de acceso." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_FAILED };
   }
 
   revalidatePath("/account/passkeys");

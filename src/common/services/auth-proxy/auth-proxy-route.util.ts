@@ -2,7 +2,7 @@ import { INSTITUTIONAL_LOGIN_PATH } from "@features/institutional-auth/utils/ins
 import { PLATFORM_LOGIN_PATH } from "@features/platform-auth/utils/platform-auth-proxy-policy.util";
 
 const ADMIN_SESSION_ROOT_PATHS = ["/admin", "/api/admin"] as const;
-const INSTITUTIONAL_PUBLIC_ROOT_PATHS = ["/auth/register", "/auth/password-recovery"] as const;
+const INSTITUTIONAL_PUBLIC_ROOT_PATHS = ["/auth/register", "/auth/password-recovery", "/auth/email-verification"] as const;
 
 export enum RouteAccess {
   Public,

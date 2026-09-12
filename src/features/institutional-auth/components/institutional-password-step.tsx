@@ -104,7 +104,7 @@ export function InstitutionalPasswordStep({
           </Button>
           {hasPasskeys ? (
             <Button className="w-full" disabled={isPasswordPending} onClick={onUsePasskey} size="lg" type="button" variant="outline">
-              Usar una clave de acceso
+              Usar una llave de acceso
             </Button>
           ) : null}
         </footer>

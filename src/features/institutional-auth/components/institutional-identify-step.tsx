@@ -11,7 +11,7 @@ import { identifyInstitutionalUser } from "@features/institutional-auth/actions/
 import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { InstitutionalIdentifyActionState } from "@features/institutional-auth/types/institutional-identify-state.types";
-import type { InstitutionalIdentifyResult } from "@features/institutional-auth/types/institutional-identify-result.types";
+import type { InstitutionalLoginAttempt } from "@features/institutional-auth/types/institutional-login-attempt.types";
 
 type InstitutionalIdentifyStepProps = {
   documentNumber: string;
@@ -19,11 +19,11 @@ type InstitutionalIdentifyStepProps = {
   identified: boolean;
   disabled: boolean;
   onDocumentChange: (value: string) => void;
-  registered: boolean;
+  emailVerified: boolean;
   showPasswordChanged: boolean;
   institution: InstitutionalInstitution | undefined;
   onInstitutionChange: (institution: InstitutionalInstitution | undefined) => void;
-  onIdentified: (result: InstitutionalIdentifyResult, revision: number) => void;
+  onIdentified: (result: InstitutionalLoginAttempt, revision: number) => void;
 };
 
 export function InstitutionalIdentifyStep({
@@ -32,7 +32,7 @@ export function InstitutionalIdentifyStep({
   identified,
   disabled,
   onDocumentChange,
-  registered,
+  emailVerified,
   showPasswordChanged,
   institution,
   onInstitutionChange,
@@ -63,11 +63,11 @@ export function InstitutionalIdentifyStep({
   return (
     <form onSubmit={handleIdentifySubmit}>
       <div className="space-y-6">
-        {registered && canShowSuccessMessage ? (
+        {emailVerified && canShowSuccessMessage ? (
           <Alert variant="success">
             <CheckCircle2Icon className="size-4" />
-            <AlertTitle>Cuenta creada</AlertTitle>
-            <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.REGISTERED}</AlertDescription>
+            <AlertTitle>¡Listo! Correo electrónico confirmado</AlertTitle>
+            <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.EMAIL_VERIFIED}</AlertDescription>
           </Alert>
         ) : null}
 
@@ -92,6 +92,7 @@ export function InstitutionalIdentifyStep({
             <FieldLabel htmlFor="institution-id" required>
               Institución
             </FieldLabel>
+            <input name="institutionName" type="hidden" value={institution?.name ?? ""} />
             <InstitutionPicker
               ariaInvalid={!!identifyState.fieldErrors?.institutionId}
               disabled={disabled}

@@ -136,7 +136,7 @@ export function InstitutionalPasskeyStep({
         {webauthnSupported === false ? (
           <Alert>
             <FingerprintIcon className="size-4" />
-            <AlertTitle>Claves de acceso no disponibles</AlertTitle>
+            <AlertTitle>Llaves de acceso no disponibles</AlertTitle>
             <AlertDescription>{INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_UNSUPPORTED}</AlertDescription>
           </Alert>
         ) : null}

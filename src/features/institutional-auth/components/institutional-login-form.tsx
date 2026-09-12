@@ -4,34 +4,35 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { consumeInstitutionalPasswordChangedFlash } from "@features/institutional-auth/actions/consume-institutional-password-changed-flash.action";
+import { consumeInstitutionalLoginFlashes } from "@features/institutional-auth/actions/consume-institutional-login-flashes.action";
 import type { InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import { InstitutionalIdentifyStep } from "@features/institutional-auth/components/institutional-identify-step";
 import { InstitutionalPasswordStep } from "@features/institutional-auth/components/institutional-password-step";
 import { InstitutionalPasskeyStep } from "@features/institutional-auth/components/institutional-passkey-step";
-import type { InstitutionalIdentifyResult } from "@features/institutional-auth/types/institutional-identify-result.types";
+import type { InstitutionalLoginAttempt } from "@features/institutional-auth/types/institutional-login-attempt.types";
 import type { InstitutionalLoginStep } from "@features/institutional-auth/types/institutional-login-step.types";
 
 type LoginFlow = {
   institution?: InstitutionalInstitution;
   documentNumber: string;
   revision: number;
-} & ({ step: "IDENTIFIER" } | { step: Exclude<InstitutionalLoginStep, "IDENTIFIER">; attempt: InstitutionalIdentifyResult });
-type InstitutionalLoginFormProps = { registered?: boolean; passwordChanged?: boolean };
+} & ({ step: "IDENTIFIER" } | { step: Exclude<InstitutionalLoginStep, "IDENTIFIER">; attempt: InstitutionalLoginAttempt });
+type InstitutionalLoginFormProps = { emailVerified?: boolean; passwordChanged?: boolean };
 
-export function InstitutionalLoginForm({ registered = false, passwordChanged = false }: InstitutionalLoginFormProps): React.ReactElement {
+export function InstitutionalLoginForm({ emailVerified = false, passwordChanged = false }: InstitutionalLoginFormProps): React.ReactElement {
   const [flow, setFlow] = useState<LoginFlow>({ step: "IDENTIFIER", documentNumber: "", revision: 0 });
   const [loginStatus, setLoginStatus] = useState<{ pending: boolean; error: string | null }>({ pending: false, error: null });
   const loginPending = loginStatus.pending;
   // Keep the initial notice visible after consuming its one-time cookie.
+  const [showEmailVerified] = useState(emailVerified);
   const [showPasswordChanged] = useState(passwordChanged);
   const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
-    if (!passwordChanged) return;
-    void consumeInstitutionalPasswordChangedFlash();
-  }, [passwordChanged]);
+    if (!emailVerified && !passwordChanged) return;
+    void consumeInstitutionalLoginFlashes();
+  }, [emailVerified, passwordChanged]);
 
   function setLoginPending(pending: boolean): void {
     setLoginStatus((current) => ({ pending, error: pending ? null : current.error }));
@@ -46,7 +47,7 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
     setFlow((current) => (current.step === "IDENTIFIER" ? current : { ...current, step }));
   }
 
-  function handleIdentified(attempt: InstitutionalIdentifyResult, revision: number): void {
+  function handleIdentified(attempt: InstitutionalLoginAttempt, revision: number): void {
     setFlow((current) => (current.revision === revision ? { ...current, step: attempt.nextStep, attempt } : current));
   }
 
@@ -92,7 +93,7 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
           </Alert>
         ) : null}
         <InstitutionalIdentifyStep
-          registered={registered}
+          emailVerified={showEmailVerified}
           showPasswordChanged={showPasswordChanged}
           institution={flow.institution}
           documentNumber={flow.documentNumber}

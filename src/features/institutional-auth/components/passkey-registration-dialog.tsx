@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { requestPasskeyRegistration, verifyPasskeyRegistrationAction } from "@features/institutional-auth/actions/passkey-registration.actions";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
 import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webauthn-support.hook";
 import type { VerifyPasskeyRegistrationState } from "@features/institutional-auth/types/verify-passkey-registration-state.types";
@@ -36,7 +37,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
 
   async function register(_previous: VerifyPasskeyRegistrationState, formData: FormData): Promise<VerifyPasskeyRegistrationState> {
     const label = String(formData.get("label") ?? "").trim();
-    if (!webauthnSupported) return { error: "Las claves de acceso no están disponibles en este navegador." };
+    if (!webauthnSupported) return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_UNSUPPORTED };
     const controller = new AbortController();
     ceremonyRef.current = controller;
 
@@ -49,7 +50,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
         return {};
       }
       if (options.error || !options.ceremonyId || !options.options) {
-        return { error: options.error ?? "No se pudo iniciar el registro de la clave de acceso." };
+        return { error: options.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_START_FAILED };
       }
 
       const credential = await createPasskeyCredential(toPublicKeyCreationOptions(options.options), controller.signal);
@@ -67,7 +68,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
       return {};
     } catch (error) {
       if (controller.signal.aborted || isUserCancelled(error)) return {};
-      return { error: "No se pudo registrar la clave de acceso." };
+      return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_FAILED };
     } finally {
       if (ceremonyRef.current === controller) {
         ceremonyRef.current = null;
@@ -98,8 +99,8 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Añadir clave de acceso</DialogTitle>
-          <DialogDescription>Elegí un nombre para reconocer esta clave de acceso en tus dispositivos.</DialogDescription>
+          <DialogTitle>Añadir llave de acceso</DialogTitle>
+          <DialogDescription>Elegí un nombre para reconocer esta llave de acceso en tus dispositivos.</DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Field data-invalid={!!state.error}>

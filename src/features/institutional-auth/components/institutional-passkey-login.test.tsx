@@ -24,8 +24,8 @@ jest.mock("@features/institutional-auth/actions/finish-passkey-login.action", ()
   finishPasskeyLogin: jest.fn(),
 }));
 
-jest.mock("@features/institutional-auth/actions/consume-institutional-password-changed-flash.action", () => ({
-  consumeInstitutionalPasswordChangedFlash: jest.fn(),
+jest.mock("@features/institutional-auth/actions/consume-institutional-login-flashes.action", () => ({
+  consumeInstitutionalLoginFlashes: jest.fn(),
 }));
 
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
@@ -74,7 +74,7 @@ describe("InstitutionalLoginForm", () => {
 
       await user.type(screen.getByLabelText(/Documento/), "12345678");
       await user.click(screen.getByRole("button", { name: "Continuar" }));
-      await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" });
+      await screen.findByRole("heading", { name: "Ingresá con tu llave de acceso" });
 
       return view;
     }

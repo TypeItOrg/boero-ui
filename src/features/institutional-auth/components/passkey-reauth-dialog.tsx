@@ -7,6 +7,7 @@ import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 
 import { PasswordInput } from "@common/components/ui/password-input";
 import { reAuthenticateAction } from "@features/institutional-auth/actions/passkey-management.actions";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { ReAuthenticateState } from "@features/institutional-auth/types/re-authenticate-state.types";
 
 type PasskeyReauthDialogProps = { onClose: () => void; onVerified: () => Promise<ReAuthenticateState> };
@@ -18,7 +19,7 @@ export function PasskeyReauthDialog({ onClose, onVerified }: PasskeyReauthDialog
       if (!result.success) return result;
       return await onVerified();
     } catch {
-      return { error: "No se pudo completar la operación. Intentá nuevamente." };
+      return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_OPERATION_FAILED };
     }
   }, {});
 

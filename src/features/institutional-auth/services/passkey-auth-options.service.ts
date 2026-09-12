@@ -1,5 +1,6 @@
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import type { BackendError } from "@common/types/backend-error.types";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { PasskeyRequestOptionsJson } from "@features/institutional-auth/types/passkey-request-options-json.types";
 
 export type PasskeyAuthOptionsOutput =
@@ -26,7 +27,7 @@ export async function requestPasskeyAuthOptions(loginAttemptId: string): Promise
   } catch {
     return {
       success: false,
-      error: { status: 500, message: "No se pudo conectar con el servidor." },
+      error: { status: 500, message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_CONNECTION_FAILED },
     };
   }
 }

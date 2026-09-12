@@ -52,11 +52,11 @@ export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyMa
               <FingerprintIcon className="size-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-base font-semibold">Tus claves de acceso</h2>
+              <h2 className="text-base font-semibold">Tus llaves de acceso</h2>
               <p className="text-muted-foreground text-sm">
                 {initialPasskeys.length === 0
-                  ? "Todavía no registraste ninguna clave de acceso."
-                  : `${initialPasskeys.length} de ${maxActivePasskeys} claves de acceso en uso.`}
+                  ? "Todavía no registraste ninguna llave de acceso."
+                  : `${initialPasskeys.length} de ${maxActivePasskeys} llaves de acceso en uso.`}
               </p>
             </div>
           </div>
@@ -68,19 +68,19 @@ export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyMa
             type="button"
           >
             <PlusIcon aria-hidden="true" className="size-4" />
-            Añadir clave de acceso
+            Añadir llave de acceso
           </Button>
         </header>
 
         {webauthnSupported === false ? (
           <p className="text-muted-foreground mt-4 text-sm">
-            Tu navegador no puede crear claves de acceso. Podés ver, renombrar o eliminar las que ya tenés desde otro dispositivo.
+            Tu navegador no puede crear llaves de acceso. Podés ver, renombrar o eliminar las que ya tenés desde otro dispositivo.
           </p>
         ) : null}
 
         <div className="mt-4 sm:mt-5">
           {initialPasskeys.length === 0 ? (
-            <p className="text-muted-foreground text-sm">Registrá una clave de acceso para iniciar sesión sin contraseña usando tu dispositivo.</p>
+            <p className="text-muted-foreground text-sm">Registrá una llave de acceso para iniciar sesión sin contraseña usando tu dispositivo.</p>
           ) : (
             <ul className="flex flex-col gap-3">
               {initialPasskeys.map((passkey) => (

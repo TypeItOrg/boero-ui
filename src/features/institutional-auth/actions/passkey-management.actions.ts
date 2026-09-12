@@ -21,7 +21,7 @@ export async function renamePasskeyAction(id: string, _previousState: RenamePass
   const bound = idSchema.safeParse({ id });
 
   if (!bound.success) {
-    return { error: "La clave de acceso especificada no existe." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_NOT_FOUND };
   }
 
   const parsed = passkeyLabelSchema.safeParse({ label: formData.get("label") ?? "" });
@@ -33,7 +33,7 @@ export async function renamePasskeyAction(id: string, _previousState: RenamePass
   try {
     await renamePasskey(bound.data.id, parsed.data.label);
   } catch {
-    return { error: "No se pudo renombrar la clave de acceso." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_RENAME_FAILED };
   }
 
   revalidatePath("/account/passkeys");
@@ -44,7 +44,7 @@ export async function revokePasskeyAction(id: string): Promise<RevokePasskeyStat
   const bound = idSchema.safeParse({ id });
 
   if (!bound.success) {
-    return { error: "La clave de acceso especificada no existe." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_NOT_FOUND };
   }
 
   try {
@@ -54,7 +54,7 @@ export async function revokePasskeyAction(id: string): Promise<RevokePasskeyStat
       return { error: RECENT_AUTH_REQUIRED };
     }
 
-    return { error: "No se pudo eliminar la clave de acceso." };
+    return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REVOKE_FAILED };
   }
 
   revalidatePath("/account/passkeys");
@@ -65,7 +65,7 @@ export async function reAuthenticateAction(_previousState: ReAuthenticateState, 
   const password = formData.get("password") ?? "";
 
   if (typeof password !== "string" || password.length === 0) {
-    return { fieldErrors: { password: "La contraseña es requerida." } };
+    return { fieldErrors: { password: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_PASSWORD } };
   }
 
   try {
