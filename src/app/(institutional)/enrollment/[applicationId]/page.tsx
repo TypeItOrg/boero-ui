@@ -23,7 +23,7 @@ export default async function EnrollmentDetailPage({ params }: EnrollmentDetailP
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-6">
-      <EnrollmentWizard studyPlanId={studyPlanId} academicYearId={academicYearId} readOnly={!isEditable} />
+      <EnrollmentWizard studyPlanId={studyPlanId} academicYearId={academicYearId} applicationId={applicationId} readOnly={!isEditable} />
     </main>
   );
 }
