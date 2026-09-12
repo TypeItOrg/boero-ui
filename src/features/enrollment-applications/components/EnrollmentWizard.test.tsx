@@ -4,6 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { EnrollmentWizard } from "./EnrollmentWizard";
 import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(() => null),
+  }),
+}));
+
 jest.mock("./EnrollmentStatusCard", () => ({
   EnrollmentStatusCard: ({ application }: { application: EnrollmentApplicationResponse }) => (
     <div data-testid="status-card">status:{application.status}</div>
