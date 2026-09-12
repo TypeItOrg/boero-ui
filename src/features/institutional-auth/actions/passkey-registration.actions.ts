@@ -30,13 +30,13 @@ export async function requestPasskeyRegistration(
       return { error: RECENT_AUTH_REQUIRED };
     }
 
-    return { error: "No se pudo iniciar el registro de la passkey." };
+    return { error: "No se pudo iniciar el registro de la clave de acceso." };
   }
 }
 
 export async function verifyPasskeyRegistrationAction(ceremonyId: string, credential: unknown): Promise<VerifyPasskeyRegistrationState> {
   if (!ceremonyId) {
-    return { error: "No se pudo registrar la passkey." };
+    return { error: "No se pudo registrar la clave de acceso." };
   }
 
   try {
@@ -46,7 +46,7 @@ export async function verifyPasskeyRegistrationAction(ceremonyId: string, creden
       return { error: RECENT_AUTH_REQUIRED };
     }
 
-    return { error: "No se pudo registrar la passkey." };
+    return { error: "No se pudo registrar la clave de acceso." };
   }
 
   revalidatePath("/account/passkeys");

@@ -17,7 +17,7 @@ export async function verifyPasskeyRegistration(ceremonyId: string, credential: 
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo registrar la passkey.");
+    throw new Error("No se pudo registrar la clave de acceso.");
   }
 
   return (await response.json()) as Passkey;

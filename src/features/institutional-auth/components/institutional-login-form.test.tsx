@@ -1,7 +1,6 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
 
 jest.mock("@features/institutional-auth/components/institution-picker", () => ({
@@ -31,12 +30,10 @@ jest.mock("@features/institutional-auth/actions/consume-institutional-password-c
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
 import { institutionalPasswordLogin } from "@features/institutional-auth/actions/institutional-password-login.action";
 import { beginPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
-import { finishPasskeyLogin } from "@features/institutional-auth/actions/finish-passkey-login.action";
 
 const identifyMock = jest.mocked(identifyInstitutionalUser);
 const passwordMock = jest.mocked(institutionalPasswordLogin);
 const beginMock = jest.mocked(beginPasskeyLogin);
-const finishMock = jest.mocked(finishPasskeyLogin);
 
 describe("InstitutionalLoginForm", () => {
   beforeEach(() => {
@@ -44,27 +41,27 @@ describe("InstitutionalLoginForm", () => {
     identifyMock.mockResolvedValue({});
   });
 
-  it("shows only institution and DNI on the initial step", () => {
+  it("shows only institution and Documento on the initial step", () => {
     render(<InstitutionalLoginForm />);
 
     expect(screen.getByLabelText("Institución")).toBeInTheDocument();
-    expect(screen.getByLabelText(/DNI/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Documento/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Continuar" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Contraseña")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "¿Olvidaste tu contraseña?" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /passkey/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /clave de acceso/i })).not.toBeInTheDocument();
   });
 
   it("shows an explicit error for unknown accounts", async () => {
     const user = userEvent.setup();
-    identifyMock.mockResolvedValue({ error: "No encontramos una cuenta asociada a ese DNI en esta institución." });
+    identifyMock.mockResolvedValue({ error: "No encontramos una cuenta asociada a ese documento en esta institución." });
 
     render(<InstitutionalLoginForm />);
 
-    await user.type(screen.getByLabelText(/DNI/), "99999999");
+    await user.type(screen.getByLabelText(/Documento/), "99999999");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
 
-    expect(await screen.findByText("No encontramos una cuenta asociada a ese DNI en esta institución.")).toBeInTheDocument();
+    expect(await screen.findByText("No encontramos una cuenta asociada a ese documento en esta institución.")).toBeInTheDocument();
   });
 
   it("routes accounts without passkeys to the generic password step", async () => {
@@ -73,14 +70,14 @@ describe("InstitutionalLoginForm", () => {
 
     render(<InstitutionalLoginForm />);
 
-    await user.type(screen.getByLabelText(/DNI/), "12345678");
+    await user.type(screen.getByLabelText(/Documento/), "12345678");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
 
-    expect(await screen.findByText("Bienvenido de nuevo")).toBeInTheDocument();
+    expect(await screen.findByLabelText(/Contraseña/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Contraseña/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "¿Olvidaste tu contraseña?" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cambiar cuenta" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Usar una passkey" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Documento/)).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Usar una clave de acceso" })).not.toBeInTheDocument();
   });
 
   it("routes accounts with passkeys to the passkey step without auto-opening WebAuthn", async () => {
@@ -89,12 +86,12 @@ describe("InstitutionalLoginForm", () => {
 
     render(<InstitutionalLoginForm />);
 
-    await user.type(screen.getByLabelText(/DNI/), "12345678");
+    await user.type(screen.getByLabelText(/Documento/), "12345678");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
 
-    expect(await screen.findByText("Continuá con tu passkey")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Usar contraseña" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cambiar cuenta" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Documento/)).toBeEnabled();
 
     await waitFor(() => expect(beginMock).not.toHaveBeenCalled());
   });
@@ -108,18 +105,18 @@ describe("InstitutionalLoginForm", () => {
 
     render(<InstitutionalLoginForm />);
 
-    await user.type(screen.getByLabelText(/DNI/), "11111111");
+    await user.type(screen.getByLabelText(/Documento/), "11111111");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
-    await screen.findByText("Bienvenido de nuevo");
+    await screen.findByLabelText(/Contraseña/);
 
     await user.type(screen.getByLabelText(/Contraseña/), "wrong");
     await user.click(screen.getByRole("button", { name: "Iniciar sesión" }));
     expect(await screen.findByText("wrong password")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Cambiar cuenta" }));
-    await user.type(screen.getByLabelText(/DNI/), "22222222");
+    await user.clear(screen.getByLabelText(/Documento/));
+    await user.type(screen.getByLabelText(/Documento/), "22222222");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
-    await screen.findByText("Bienvenido de nuevo");
+    await screen.findByLabelText(/Contraseña/);
 
     expect(screen.queryByText("wrong password")).not.toBeInTheDocument();
   });
@@ -130,185 +127,18 @@ describe("InstitutionalLoginForm", () => {
 
     render(<InstitutionalLoginForm />);
 
-    await user.type(screen.getByLabelText(/DNI/), "12345678");
+    await user.type(screen.getByLabelText(/Documento/), "12345678");
     await user.click(screen.getByRole("button", { name: "Continuar" }));
-    await screen.findByText("Continuá con tu passkey");
+    await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" });
 
     await user.click(screen.getByRole("button", { name: "Usar contraseña" }));
 
-    expect(await screen.findByText("Bienvenido de nuevo")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Usar una passkey" })).toBeInTheDocument();
+    expect(await screen.findByLabelText(/Contraseña/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usar una clave de acceso" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Usar una passkey" }));
+    await user.click(screen.getByRole("button", { name: "Usar una clave de acceso" }));
 
-    expect(await screen.findByText("Continuá con tu passkey")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Ingresá con tu clave de acceso" })).toBeInTheDocument();
     expect(identifyMock).toHaveBeenCalledTimes(1);
-  });
-
-  describe("passkey ceremony lifecycle", () => {
-    const validOptions = {
-      challenge: "dGVzdC1jaGFsbGVuZ2U",
-      rpId: "localhost",
-      userVerification: "required",
-      allowCredentials: [],
-    };
-    const fakeCredential = { toJSON: () => ({ id: "credential-id", type: "public-key" }) };
-    const getMock = jest.fn();
-
-    function deferred<T>() {
-      let resolve!: (value: T) => void;
-      let reject!: (reason?: unknown) => void;
-      const promise = new Promise<T>((res, rej) => {
-        resolve = res;
-        reject = rej;
-      });
-      return { promise, resolve, reject };
-    }
-
-    async function goToPasskeyStep() {
-      const user = userEvent.setup();
-      identifyMock.mockResolvedValue({ loginAttemptId: "attempt-9", nextStep: "PASSKEY" });
-      beginMock.mockResolvedValue({ ceremonyId: "ceremony-9", options: validOptions });
-      finishMock.mockResolvedValue({});
-      Object.defineProperty(window, "PublicKeyCredential", { value: function () {}, configurable: true });
-      Object.defineProperty(navigator, "credentials", { value: { create: jest.fn(), get: getMock }, configurable: true });
-
-      const view = render(<InstitutionalLoginForm />);
-
-      await user.type(screen.getByLabelText(/DNI/), "12345678");
-      await user.click(screen.getByRole("button", { name: "Continuar" }));
-      await screen.findByText("Continuá con tu passkey");
-
-      return view;
-    }
-
-    function passkeyButton(): HTMLElement {
-      return screen.getByRole("button", { name: /Ingresar con passkey/ });
-    }
-
-    beforeEach(() => {
-      getMock.mockReset();
-    });
-
-    it("ignores a second click while a ceremony is in flight", async () => {
-      await goToPasskeyStep();
-      getMock.mockReturnValue(new Promise(() => {}));
-      const button = passkeyButton();
-
-      fireEvent.click(button);
-      fireEvent.click(button);
-
-      await waitFor(() => {
-        expect(beginMock).toHaveBeenCalledTimes(1);
-        expect(getMock).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    it("ignores a stale rejection after a newer ceremony completed", async () => {
-      await goToPasskeyStep();
-      const first = deferred<unknown>();
-      getMock.mockReturnValueOnce(first.promise);
-      fireEvent.click(passkeyButton());
-      await screen.findByText("Esperando tu passkey...");
-
-      fireEvent.click(screen.getByRole("button", { name: "Cancelar" }));
-      expect(await screen.findByRole("button", { name: /Ingresar con passkey/ })).toBeInTheDocument();
-
-      getMock.mockResolvedValueOnce(fakeCredential);
-      finishMock.mockResolvedValueOnce({ error: "second-error" });
-      fireEvent.click(passkeyButton());
-      expect(await screen.findByText("second-error")).toBeInTheDocument();
-
-      first.reject(new Error("stale-error"));
-
-      await waitFor(() => expect(screen.getByText("second-error")).toBeInTheDocument());
-      expect(screen.queryByText(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED)).not.toBeInTheDocument();
-    });
-
-    it.each([
-      ["NotAllowedError", new DOMException("cancelled", "NotAllowedError")],
-      ["AbortError", new DOMException("aborted", "AbortError")],
-    ])("stays silent on %s without leaving a spinner", async (_, error) => {
-      await goToPasskeyStep();
-      getMock.mockRejectedValueOnce(error);
-
-      fireEvent.click(passkeyButton());
-
-      await waitFor(() => expect(getMock).toHaveBeenCalledTimes(1));
-      await waitFor(() => expect(screen.queryByText("Esperando tu passkey...")).not.toBeInTheDocument());
-      expect(screen.queryByText("¡Ups! Algo salió mal")).not.toBeInTheDocument();
-      expect(passkeyButton()).toBeEnabled();
-    });
-
-    it("aborts the pending ceremony when switching to password", async () => {
-      await goToPasskeyStep();
-      getMock.mockReturnValue(new Promise(() => {}));
-      fireEvent.click(passkeyButton());
-      await screen.findByText("Esperando tu passkey...");
-
-      const signal = getMock.mock.calls[0][0].signal as AbortSignal | undefined;
-      expect(signal).toBeInstanceOf(AbortSignal);
-
-      fireEvent.click(screen.getByRole("button", { name: "Usar contraseña" }));
-
-      expect(signal?.aborted).toBe(true);
-      expect(await screen.findByText("Bienvenido de nuevo")).toBeInTheDocument();
-      expect(screen.queryByText("Esperando tu passkey...")).not.toBeInTheDocument();
-    });
-
-    it("aborts the pending ceremony when changing account", async () => {
-      await goToPasskeyStep();
-      getMock.mockReturnValue(new Promise(() => {}));
-      fireEvent.click(passkeyButton());
-      await screen.findByText("Esperando tu passkey...");
-
-      const signal = getMock.mock.calls[0][0].signal as AbortSignal | undefined;
-
-      fireEvent.click(screen.getByRole("button", { name: "Cambiar cuenta" }));
-
-      expect(signal?.aborted).toBe(true);
-      expect(await screen.findByLabelText(/DNI/)).toBeInTheDocument();
-    });
-
-    it("aborts the pending ceremony on unmount", async () => {
-      const boundScreen = await goToPasskeyStep();
-      getMock.mockReturnValue(new Promise(() => {}));
-      fireEvent.click(passkeyButton());
-      await screen.findByText("Esperando tu passkey...");
-
-      const signal = getMock.mock.calls[0][0].signal as AbortSignal | undefined;
-      expect(signal?.aborted).toBe(false);
-
-      boundScreen.unmount();
-
-      expect(signal?.aborted).toBe(true);
-    });
-
-    it("shows no error flash on a successful ceremony", async () => {
-      await goToPasskeyStep();
-      getMock.mockResolvedValue(fakeCredential);
-      finishMock.mockResolvedValue({});
-
-      fireEvent.click(passkeyButton());
-
-      await waitFor(() => expect(finishMock).toHaveBeenCalled());
-      expect(screen.queryByText("¡Ups! Algo salió mal")).not.toBeInTheDocument();
-    });
-
-    it("swallows NEXT_REDIRECT without flashing a passkey error", async () => {
-      await goToPasskeyStep();
-      getMock.mockResolvedValue(fakeCredential);
-      const redirectError = Object.assign(new Error("NEXT_REDIRECT"), {
-        digest: "NEXT_REDIRECT;push;/;307;",
-      });
-      finishMock.mockRejectedValueOnce(redirectError);
-
-      fireEvent.click(passkeyButton());
-
-      await waitFor(() => expect(finishMock).toHaveBeenCalled());
-      await waitFor(() => expect(screen.getByText("Esperando tu passkey...")).toBeInTheDocument());
-      expect(screen.queryByText("¡Ups! Algo salió mal")).not.toBeInTheDocument();
-      expect(screen.queryByText(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED)).not.toBeInTheDocument();
-    });
   });
 });

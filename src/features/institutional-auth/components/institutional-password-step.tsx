@@ -2,16 +2,15 @@
 
 import { useActionState, useTransition, type SyntheticEvent } from "react";
 import Link from "next/link";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { Loader2Icon } from "lucide-react";
 
-import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
 import { institutionalPasswordLogin } from "@features/institutional-auth/actions/institutional-password-login.action";
-import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import type { InstitutionalPasswordLoginActionState } from "@features/institutional-auth/types/institutional-password-login-state.types";
 
 const INITIAL_PASSWORD_STATE: InstitutionalPasswordLoginActionState = {};
@@ -21,8 +20,9 @@ type InstitutionalPasswordStepProps = {
   hasPasskeys: boolean;
   rememberMe: boolean;
   onRememberMeChange: (value: boolean) => void;
+  onPendingChange: (pending: boolean) => void;
+  onError: (message: string | null) => void;
   onUsePasskey: () => void;
-  onChangeAccount: () => void;
 };
 
 export function InstitutionalPasswordStep({
@@ -30,38 +30,41 @@ export function InstitutionalPasswordStep({
   hasPasskeys,
   rememberMe,
   onRememberMeChange,
+  onPendingChange,
+  onError,
   onUsePasskey,
-  onChangeAccount,
 }: InstitutionalPasswordStepProps): React.ReactElement {
-  const [passwordState, passwordAction] = useActionState<InstitutionalPasswordLoginActionState, FormData>(
-    institutionalPasswordLogin.bind(null, loginAttemptId),
+  const [passwordState, passwordAction, isPasswordPending] = useActionState<InstitutionalPasswordLoginActionState, FormData>(
+    async (previous, formData) => {
+      try {
+        const result = await institutionalPasswordLogin(loginAttemptId, previous, formData);
+        onError(result.error ?? null);
+        onPendingChange(false);
+        return result;
+      } catch (error) {
+        if (!isRedirectError(error)) onPendingChange(false);
+        throw error;
+      }
+    },
     INITIAL_PASSWORD_STATE,
   );
-  const [isPasswordPending, startPasswordTransition] = useTransition();
+  const [, startPasswordTransition] = useTransition();
 
   function handlePasswordSubmit(event: SyntheticEvent<HTMLFormElement>): void {
     event.preventDefault();
+    if (isPasswordPending) return;
     const formData = new FormData(event.currentTarget);
+    onPendingChange(true);
 
     startPasswordTransition(() => passwordAction(formData));
   }
 
   return (
     <form onSubmit={handlePasswordSubmit}>
-      <InstitutionalAuthStepHeader title="Bienvenido de nuevo" description="Ingresá tu contraseña para continuar." />
-
-      <div className="mt-6 space-y-6">
-        {passwordState.error ? (
-          <Alert variant="destructive">
-            <AlertCircleIcon className="size-4" />
-            <AlertTitle>¡Ups! Algo salió mal</AlertTitle>
-            <AlertDescription>{passwordState.error}</AlertDescription>
-          </Alert>
-        ) : null}
-
+      <div className="space-y-6">
         <FieldGroup>
           <Field data-invalid={!!passwordState.fieldErrors?.password}>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
               <FieldLabel htmlFor="password" required>
                 Contraseña
               </FieldLabel>
@@ -87,7 +90,7 @@ export function InstitutionalPasswordStep({
           </FieldLabel>
         </Field>
 
-        <footer className="mt-6 flex w-full flex-col gap-4">
+        <footer className="mt-6 flex w-full flex-col gap-2">
           <Button aria-busy={isPasswordPending} className="relative w-full" disabled={isPasswordPending} size="lg" type="submit">
             <span className={cn("inline-flex items-center gap-[inherit] transition-opacity", isPasswordPending && "opacity-0")}>Iniciar sesión</span>
             {isPasswordPending ? (
@@ -101,12 +104,9 @@ export function InstitutionalPasswordStep({
           </Button>
           {hasPasskeys ? (
             <Button className="w-full" disabled={isPasswordPending} onClick={onUsePasskey} size="lg" type="button" variant="outline">
-              Usar una passkey
+              Usar una clave de acceso
             </Button>
           ) : null}
-          <button className="text-primary text-center text-sm font-medium underline underline-offset-4" onClick={onChangeAccount} type="button">
-            Cambiar cuenta
-          </button>
         </footer>
       </div>
     </form>

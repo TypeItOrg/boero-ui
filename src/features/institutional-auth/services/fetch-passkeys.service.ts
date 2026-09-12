@@ -5,7 +5,7 @@ export async function fetchPasskeys(): Promise<PasskeyList> {
   const response = await institutionalApiFetch("/api/v1/auth/passkeys", { cache: "no-store" });
 
   if (!response.ok) {
-    throw new Error("No se pudieron cargar las passkeys.");
+    throw new Error("No se pudieron cargar las claves de acceso.");
   }
 
   return (await response.json()) as PasskeyList;
