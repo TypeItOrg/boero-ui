@@ -5,7 +5,7 @@ import * as React from "react";
 import { EllipsisVerticalIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@common/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { EnrollmentApplication } from "../types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "../utils/enrollment-application-date.util";
@@ -54,11 +54,11 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
         {(canViewDraft || canCancel) && (
           <div className="flex justify-end">
             <DropdownMenu>
-              <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                <button aria-label="Abrir acciones" disabled={isPending}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isPending}>
                   <EllipsisVerticalIcon className="size-4" />
-                </button>
-              </Button>
+                </Button>
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-44 p-1.5">
                 {canViewDraft && (
                   <DropdownMenuItem asChild>

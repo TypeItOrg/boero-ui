@@ -56,6 +56,7 @@ import type { z } from "zod";
 interface EnrollmentWizardProps {
   studyPlanId: string;
   academicYearId: string;
+  readOnly?: boolean;
 }
 
 // Maps a Zod issue path to the id of the input it corresponds to, so the
@@ -80,7 +81,7 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "preference.previousTeacher": "previousTeacher",
 };
 
-export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWizardProps): React.ReactElement {
+export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false }: EnrollmentWizardProps): React.ReactElement {
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -598,6 +599,16 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
 
   return (
     <div className="flex flex-col gap-6">
+      {readOnly && (
+        <Alert variant="default" className="border-amber-200 bg-amber-50">
+          <AlertTriangleIcon className="text-amber-600 size-4" />
+          <AlertTitle className="text-amber-900">Solicitud de inscripción - Visualización</AlertTitle>
+          <AlertDescription className="text-amber-800">
+            Esta solicitud ya ha sido enviada y no se puede modificar. Los datos que ves a continuación son solo de referencia.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Wizard Header */}
       <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -625,16 +636,18 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
             )}
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setIsCancelDialogOpen(true)}
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
-          >
-            <BanIcon className="mr-1 size-3.5" />
-            Cancelar borrador
-          </Button>
+          {!readOnly && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsCancelDialogOpen(true)}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
+            >
+              <BanIcon className="mr-1 size-3.5" />
+              Cancelar borrador
+            </Button>
+          )}
         </div>
       </div>
 
@@ -1212,22 +1225,23 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
             </CardFooter>
           </Card>
 
-          <div className="bg-muted/30 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold">¿Listo para finalizar tu inscripción?</p>
-              <p className="text-muted-foreground text-xs">
-                Al enviar la postulación, no podrás realizar más modificaciones mientras sea evaluada por el instituto.
-              </p>
-            </div>
+          {!readOnly && (
+            <div className="bg-muted/30 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">¿Listo para finalizar tu inscripción?</p>
+                <p className="text-muted-foreground text-xs">
+                  Al enviar la postulación, no podrás realizar más modificaciones mientras sea evaluada por el instituto.
+                </p>
+              </div>
 
-            <div className="flex items-center gap-3 self-end sm:self-center">
-              <Button
-                type="button"
-                size="lg"
-                onClick={handleSubmitApplication}
-                disabled={isSubmitting || saving}
-                className="bg-primary gap-2 font-medium"
-              >
+              <div className="flex items-center gap-3 self-end sm:self-center">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={handleSubmitApplication}
+                  disabled={isSubmitting || saving}
+                  className="bg-primary gap-2 font-medium"
+                >
                 {isSubmitting ? (
                   <>
                     <Loader2Icon className="size-4 animate-spin" />
@@ -1240,8 +1254,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId }: EnrollmentWiza
                   </>
                 )}
               </Button>
+              </div>
             </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
 

@@ -2,6 +2,7 @@
 
 import {
   startOrGetEnrollmentApplication,
+  fetchEnrollmentApplicationById,
   updateEnrollmentDraft,
   submitEnrollmentApplication,
   cancelEnrollmentApplication,
@@ -38,4 +39,8 @@ export async function fetchEnrollmentApplicationTrainingPathsAction(applicationI
 
 export async function fetchEnrollmentApplicationStudyPlanSpacesAction(applicationId: string): Promise<StudyPlanSpace[]> {
   return fetchEnrollmentApplicationStudyPlanSpaces(applicationId);
+}
+
+export async function getEnrollmentApplicationAction(applicationId: string): Promise<EnrollmentApplicationResponse> {
+  return fetchEnrollmentApplicationById(applicationId);
 }
