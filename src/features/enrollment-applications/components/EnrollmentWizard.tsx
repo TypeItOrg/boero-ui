@@ -38,6 +38,7 @@ import {
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
 import {
   startOrGetEnrollmentApplicationAction,
+  getEnrollmentApplicationAction,
   updateEnrollmentDraftAction,
   submitEnrollmentApplicationAction,
   cancelEnrollmentApplicationAction,
@@ -57,6 +58,7 @@ import type { z } from "zod";
 interface EnrollmentWizardProps {
   studyPlanId: string;
   academicYearId: string;
+  applicationId?: string;
   readOnly?: boolean;
 }
 
@@ -82,7 +84,7 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "preference.previousTeacher": "previousTeacher",
 };
 
-export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false }: EnrollmentWizardProps): React.ReactElement {
+export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, readOnly = false }: EnrollmentWizardProps): React.ReactElement {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse | null>(null);
@@ -185,7 +187,11 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false
   React.useEffect(() => {
     let active = true;
 
-    startOrGetEnrollmentApplicationAction({ studyPlanId, academicYearId })
+    const fetchApplication = applicationId
+      ? getEnrollmentApplicationAction(applicationId)
+      : startOrGetEnrollmentApplicationAction({ studyPlanId, academicYearId });
+
+    fetchApplication
       .then((data) => {
         if (!active) return;
         setApplication(data);
@@ -276,7 +282,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false
     return () => {
       active = false;
     };
-  }, [studyPlanId, academicYearId]);
+  }, [studyPlanId, academicYearId, applicationId]);
 
   // Focus the first invalid field once its tab has mounted after a failed
   // submission (the tab switch and this focus request commit together).
@@ -613,7 +619,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false
     <div className="flex flex-col gap-6">
       {readOnly && (
         <Alert variant="default" className="border-amber-200 bg-amber-50">
-          <AlertTriangleIcon className="text-amber-600 size-4" />
+          <AlertTriangleIcon className="size-4 text-amber-600" />
           <AlertTitle className="text-amber-900">Solicitud de inscripción - Visualización</AlertTitle>
           <AlertDescription className="text-amber-800">
             Esta solicitud ya ha sido enviada y no se puede modificar. Los datos que ves a continuación son solo de referencia.
@@ -1254,18 +1260,18 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false
                   disabled={isSubmitting || saving}
                   className="bg-primary gap-2 font-medium"
                 >
-                {isSubmitting ? (
-                  <>
-                    <Loader2Icon className="size-4 animate-spin" />
-                    <span>Validando y enviando…</span>
-                  </>
-                ) : (
-                  <>
-                    <SendIcon className="size-4" />
-                    <span>Enviar inscripción</span>
-                  </>
-                )}
-              </Button>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2Icon className="size-4 animate-spin" />
+                      <span>Validando y enviando…</span>
+                    </>
+                  ) : (
+                    <>
+                      <SendIcon className="size-4" />
+                      <span>Enviar inscripción</span>
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           )}
