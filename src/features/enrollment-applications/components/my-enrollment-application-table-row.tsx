@@ -32,8 +32,7 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
     }
   };
 
-  const canViewDraft = application.status === "DRAFT";
-  const canCancel = application.status === "DRAFT" || application.status === "SUBMITTED";
+  const canCancel = application.status === "DRAFT";
 
   return (
     <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
@@ -51,34 +50,30 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
         )}
       </TableCell>
       <TableCell>
-        {(canViewDraft || canCancel) && (
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isPending}>
-                  <EllipsisVerticalIcon className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44 p-1.5">
-                {canViewDraft && (
-                  <DropdownMenuItem asChild>
-                    <Link href={`/enrollment/${application.applicationId}`} className="cursor-pointer px-2.5 py-1.5">
-                      Ver
-                    </Link>
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isPending}>
+                <EllipsisVerticalIcon className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44 p-1.5">
+              <DropdownMenuItem asChild>
+                <Link href={`/enrollment/${application.applicationId}`} className="cursor-pointer px-2.5 py-1.5">
+                  Ver
+                </Link>
+              </DropdownMenuItem>
+              {canCancel && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onClick={handleCancel} disabled={isPending} className="px-2.5 py-1.5">
+                    {isPending ? "Cancelando…" : "Cancelar"}
                   </DropdownMenuItem>
-                )}
-                {canCancel && (
-                  <>
-                    {canViewDraft && <DropdownMenuSeparator />}
-                    <DropdownMenuItem variant="destructive" onClick={handleCancel} disabled={isPending} className="px-2.5 py-1.5">
-                      {isPending ? "Cancelando…" : "Cancelar"}
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </TableCell>
     </TableRow>
   );
