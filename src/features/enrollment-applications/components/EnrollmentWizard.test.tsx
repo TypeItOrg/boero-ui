@@ -118,16 +118,16 @@ describe("EnrollmentWizard", () => {
     try {
       fireEvent.change(firstNameInput, { target: { value: "Ana" } });
 
-      await act(async () => {
+      act(() => {
         jest.advanceTimersByTime(900);
       });
-
-      await waitFor(() => expect(updateAction).toHaveBeenCalled());
-      const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-      expect(payload.data.personalData?.firstName).toBe("Ana");
     } finally {
       jest.useRealTimers();
     }
+
+    await waitFor(() => expect(updateAction).toHaveBeenCalled());
+    const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
+    expect(payload.data.personalData?.firstName).toBe("Ana");
   });
 
   it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
@@ -280,19 +280,19 @@ describe("EnrollmentWizard", () => {
     try {
       fireEvent.click(screen.getByText("Piano"));
 
-      await act(async () => {
+      act(() => {
         jest.advanceTimersByTime(900);
-      });
-
-      await waitFor(() => {
-        const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-        expect(payload.data.careerSelection).toEqual({ trainingPathId: "tp-2" });
-        expect(payload.data.academicSpaceSelection).toBeUndefined();
-        expect(payload.data.instrumentSelection).toBeUndefined();
       });
     } finally {
       jest.useRealTimers();
     }
+
+    await waitFor(() => {
+      const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
+      expect(payload.data.careerSelection).toEqual({ trainingPathId: "tp-2" });
+      expect(payload.data.academicSpaceSelection).toBeUndefined();
+      expect(payload.data.instrumentSelection).toBeUndefined();
+    });
   });
 
   it("blocks submission when the training paths catalog failed to load, instead of treating it as optional", async () => {
