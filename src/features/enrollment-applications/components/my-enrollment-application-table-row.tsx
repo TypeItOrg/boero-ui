@@ -6,6 +6,7 @@ import { Button } from "@common/components/ui/button";
 import type { EnrollmentApplication } from "../types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "../utils/enrollment-application-date.util";
 import { EnrollmentApplicationStatusBadge } from "./enrollment-application-status-badge";
+import { EnrollmentApplicationCancelButton } from "./enrollment-application-cancel-button";
 
 type MyEnrollmentApplicationTableRowProps = {
   application: EnrollmentApplication;
@@ -36,9 +37,7 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
           </Link>
         )}
         {(application.status === "DRAFT" || application.status === "SUBMITTED") && (
-          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 px-2 text-xs">
-            Cancelar
-          </Button>
+          <EnrollmentApplicationCancelButton applicationId={application.applicationId} />
         )}
       </TableCell>
     </TableRow>
