@@ -23,8 +23,13 @@ describe("EnrollmentStartSelector", () => {
     expect(onStart).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1" });
   });
 
-  it("does not render when there are no study plans or no open periods", () => {
+  it("shows an informative message when there are no study plans available", () => {
     const { container } = render(<EnrollmentStartSelector studyPlans={[]} periods={periods} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no hay planes de estudio/i);
+    expect(container).toHaveTextContent(/no se encuentran planes de estudio disponibles/i);
+  });
+
+  it("shows an informative message when there are no open enrollment periods", () => {
+    const { container } = render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={jest.fn()} />);
+    expect(container).toHaveTextContent(/no hay períodos de inscripción abiertos/i);
   });
 });

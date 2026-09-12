@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { ArrowRightIcon } from "lucide-react";
+import Link from "next/link";
+import { ArrowRightIcon, CheckCircle2Icon, InfoIcon } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@common/components/ui/card";
 import { Field, FieldLabel } from "@common/components/ui/field";
@@ -26,18 +26,41 @@ interface EnrollmentStartSelectorProps {
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods: EnrollmentStartPeriodOption[];
   onStart: (selection: { studyPlanId: string; academicYearId: string }) => void;
+  allExcludedByActiveApplication?: boolean;
 }
 
-export function EnrollmentStartSelector({ studyPlans, periods, onStart }: EnrollmentStartSelectorProps): React.ReactElement {
+export function EnrollmentStartSelector({
+  studyPlans,
+  periods,
+  onStart,
+  allExcludedByActiveApplication = false,
+}: EnrollmentStartSelectorProps): React.ReactElement {
   const [studyPlanId, setStudyPlanId] = React.useState(studyPlans[0]?.id ?? "");
   const [academicYearId, setAcademicYearId] = React.useState(periods[0]?.academicYearId ?? "");
 
+  if (studyPlans.length === 0 && allExcludedByActiveApplication) {
+    return (
+      <Alert variant="success">
+        <CheckCircle2Icon className="size-4" />
+        <AlertTitle>Ya estás inscripto en todos los trayectos disponibles</AlertTitle>
+        <AlertDescription>
+          No hace falta que inicies una nueva solicitud. Podés ver el estado de tus inscripciones en{" "}
+          <Link href="/my-enrollment-applications">Mis inscripciones</Link>.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   if (studyPlans.length === 0 || periods.length === 0) {
     return (
-      <Alert variant="destructive">
-        <AlertCircleIcon className="size-4" />
-        <AlertTitle>Inscripción no disponible</AlertTitle>
-        <AlertDescription>No hay planes de estudio o períodos de inscripción habilitados en este momento para la institución.</AlertDescription>
+      <Alert>
+        <InfoIcon className="size-4" />
+        <AlertTitle>Inscripción no disponible por el momento</AlertTitle>
+        <AlertDescription>
+          {periods.length === 0
+            ? "No hay períodos de inscripción abiertos en este momento. Volvé a intentarlo cuando la institución habilite uno nuevo."
+            : "No se encuentran planes de estudio disponibles en este momento."}
+        </AlertDescription>
       </Alert>
     );
   }
