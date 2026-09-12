@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2Icon,
   CheckCircle2Icon,
@@ -82,10 +83,14 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
 };
 
 export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false }: EnrollmentWizardProps): React.ReactElement {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [activeTab, setActiveTab] = React.useState<string>("personal");
+  const [activeTab, setActiveTab] = React.useState<string>(() => {
+    return searchParams.get("tab") || "personal";
+  });
 
   // Status flags
   const [saving, setSaving] = React.useState(false);
@@ -168,6 +173,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, readOnly = false
   }, [isMinor]);
 
   const effectiveActiveTab = !isMinor && activeTab === "responsible" ? "training-path" : activeTab;
+
+  // Sync activeTab with URL query params
+  React.useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", activeTab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [activeTab, router, searchParams]);
 
   // Initial fetch / start application
   React.useEffect(() => {
