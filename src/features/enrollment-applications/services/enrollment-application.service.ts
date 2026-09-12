@@ -1,8 +1,9 @@
 import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { ENROLLMENT_APPLICATIONS_API_PATH } from "../constants/enrollment-application.constants";
@@ -19,6 +20,8 @@ export type FetchEnrollmentApplicationsParams = {
   page: number;
   size: number;
   status?: EnrollmentApplicationStatus;
+  trainingPathId?: string;
+  open?: boolean;
 };
 
 export async function fetchEnrollmentApplications(
@@ -28,6 +31,32 @@ export async function fetchEnrollmentApplications(
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`);
 
   return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
+}
+
+export type FetchPlatformEnrollmentApplicationsParams = FetchEnrollmentApplicationsParams & {
+  institutionId?: string;
+};
+
+export async function fetchPlatformEnrollmentApplications(
+  params: FetchPlatformEnrollmentApplicationsParams,
+): Promise<PaginatedResponse<EnrollmentApplication>> {
+  const searchParams = buildListSearchParams(params);
+  if (params.institutionId) {
+    searchParams.set("institutionId", params.institutionId);
+  }
+
+  const response = await platformApiFetch(`/api/v1/admin/enrollment-applications?${searchParams}`);
+
+  return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
+}
+
+export async function fetchPlatformEnrollmentApplicationById(
+  institutionId: string,
+  applicationId: string,
+): Promise<EnrollmentApplicationResponse | null> {
+  const response = await platformApiFetch(`/api/v1/admin/enrollment-applications/${institutionId}/${applicationId}`);
+
+  return parseNullableHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
 }
 
 export async function fetchMyEnrollmentApplications(
@@ -48,6 +77,14 @@ function buildListSearchParams(params: FetchEnrollmentApplicationsParams): URLSe
 
   if (params.status) {
     searchParams.set("status", params.status);
+  }
+
+  if (params.trainingPathId) {
+    searchParams.set("trainingPathId", params.trainingPathId);
+  }
+
+  if (params.open) {
+    searchParams.set("open", "true");
   }
 
   return searchParams;

@@ -9,6 +9,7 @@ type EnrollmentApplicationTableContainerProps = PaginationParams & {
   status?: EnrollmentApplicationStatus;
   canApprove: boolean;
   canReject: boolean;
+  scope?: "platform";
 };
 
 export async function EnrollmentApplicationTableContainer({
@@ -18,6 +19,7 @@ export async function EnrollmentApplicationTableContainer({
   size,
   canApprove,
   canReject,
+  scope,
 }: EnrollmentApplicationTableContainerProps): Promise<React.ReactElement> {
   const data = await dataPromise;
 
@@ -30,6 +32,7 @@ export async function EnrollmentApplicationTableContainer({
       status={status}
       canApprove={canApprove}
       canReject={canReject}
+      scope={scope}
     />
   );
 }

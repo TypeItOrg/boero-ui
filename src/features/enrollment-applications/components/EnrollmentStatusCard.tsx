@@ -14,6 +14,7 @@ import {
   SlidersIcon,
   ExternalLinkIcon,
   CalendarIcon,
+  MusicIcon,
 } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { es } from "date-fns/locale";
@@ -27,6 +28,7 @@ import type { EnrollmentApplicationResponse, EnrollmentApplicationStatus } from 
 
 interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
+  showApplicantAlert?: boolean;
 }
 
 function getStatusBadge(status: EnrollmentApplicationStatus): React.ReactElement {
@@ -124,7 +126,7 @@ function formatDateSafe(dateStr?: string): string {
   return isValid(d) ? format(d, "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: es }) : dateStr;
 }
 
-export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps): React.ReactElement {
+export function EnrollmentStatusCard({ application, showApplicantAlert = true }: EnrollmentStatusCardProps): React.ReactElement {
   const data = application.data || {};
   const personal = data.personalData || {};
   const academic = data.academicBackground || {};
@@ -150,7 +152,7 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
         </CardHeader>
 
         <CardContent className="space-y-6 pt-6">
-          {getStatusAlert(application.status)}
+          {showApplicantAlert ? getStatusAlert(application.status) : null}
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Datos Personales */}
@@ -273,11 +275,44 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
               )}
             </div>
 
+            {/* Trayecto Formativo y Espacios */}
+            <div className="bg-card space-y-3 rounded-lg border p-4 md:col-span-2">
+              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
+                <MusicIcon className="text-primary size-4" />
+                <span>5. Trayecto Formativo y Espacios Académicos</span>
+              </div>
+              <dl className="grid grid-cols-1 gap-x-3 gap-y-2 text-xs sm:grid-cols-2">
+                <div>
+                  <dt className="text-muted-foreground">Trayecto formativo:</dt>
+                  <dd className="text-foreground font-medium">{application.trainingPathName || "-"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Plan de estudio:</dt>
+                  <dd className="text-foreground font-medium">{application.studyPlanName || "-"}</dd>
+                </div>
+              </dl>
+              {application.spaces && application.spaces.length > 0 ? (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {application.spaces.map((space) => (
+                    <div key={space.studyPlanSpaceId} className="bg-muted/30 rounded-md border p-2.5 text-xs">
+                      <p className="font-medium">{space.spaceName}</p>
+                      <p className="text-muted-foreground text-[10px]">
+                        {space.academicLevelName ? `${space.academicLevelName} · ` : ""}
+                        {space.instrumentName ? `Instrumento: ${space.instrumentName}` : "Sin instrumento"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-xs italic">No hay espacios académicos seleccionados.</p>
+              )}
+            </div>
+
             {/* Preferencias */}
             <div className="bg-card space-y-3 rounded-lg border p-4 md:col-span-2">
               <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
                 <SlidersIcon className="text-primary size-4" />
-                <span>5. Preferencias</span>
+                <span>6. Preferencias</span>
               </div>
               <dl className="grid grid-cols-1 gap-4 text-xs sm:grid-cols-3">
                 <div>
@@ -310,7 +345,7 @@ export function EnrollmentStatusCard({ application }: EnrollmentStatusCardProps)
           <div className="bg-card space-y-3 rounded-lg border p-4">
             <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
               <FileTextIcon className="text-primary size-4" />
-              <span>6. Documentación Presentada ({attachments.length} archivos)</span>
+              <span>7. Documentación Presentada ({attachments.length} archivos)</span>
             </div>
 
             {attachments.length === 0 ? (

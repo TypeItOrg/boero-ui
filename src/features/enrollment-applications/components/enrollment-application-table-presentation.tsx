@@ -22,6 +22,7 @@ type EnrollmentApplicationTablePresentationProps = {
   status?: EnrollmentApplicationStatus;
   canApprove: boolean;
   canReject: boolean;
+  scope?: "platform";
 };
 
 export function EnrollmentApplicationTablePresentation({
@@ -31,6 +32,7 @@ export function EnrollmentApplicationTablePresentation({
   status,
   canApprove,
   canReject,
+  scope,
 }: EnrollmentApplicationTablePresentationProps): React.ReactElement {
   const router = useRouter();
   const { isPending: isNavigating } = useDataTableNavigation();
@@ -49,6 +51,10 @@ export function EnrollmentApplicationTablePresentation({
     setApplicationToApprove(undefined);
     setApplicationToReject(undefined);
     router.refresh();
+  }
+
+  function handleRowClick(application: EnrollmentApplication): void {
+    router.push(`/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`);
   }
 
   if (data.items.length === 0) {
@@ -82,6 +88,7 @@ export function EnrollmentApplicationTablePresentation({
                 canReject={canReject}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
+                onRowClick={scope === "platform" ? handleRowClick : undefined}
               />
             ))}
           </TableBody>
