@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { LibraryBigIcon } from "lucide-react";
+import { GitBranchPlusIcon, LibraryBigIcon } from "lucide-react";
 
-import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
-import { AcademicAccessDenied } from "@features/academic/components/academic-shell";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { AcademicAccessDenied, AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
+import { StudyPlanVersionForm } from "@features/academic/components/study-plan-version-form";
 import { StudyPlanSpaceDetail } from "@features/academic/components/study-plan-space-detail";
 import {
   EditLevel,
@@ -31,6 +32,7 @@ type StudyPlanRouteProps = {
   nestedAction?: string;
   nestedId?: string;
   renderBreadcrumb: (options?: AcademicBreadcrumbOptions) => React.ReactNode;
+  searchParams?: Record<string, string | string[] | undefined>;
   scope: AcademicScope;
 };
 
@@ -40,6 +42,33 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
   const canEditCurriculum = props.access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
   const levels = curriculum.levels.map(({ level }) => level);
+
+  if (props.action === ACADEMIC_ROUTE_SEGMENT.VERSIONS) {
+    if (props.nestedId !== ACADEMIC_ROUTE_SEGMENT.NEW) notFound();
+    if (!props.access.studyPlanCreate || curriculum.studyPlan.status === "DRAFT") {
+      return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
+    }
+    const breadcrumb = props.renderBreadcrumb({
+      hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.VERSIONS],
+      segmentLabels: {
+        [props.id]: curriculum.studyPlan.name,
+        [ACADEMIC_ROUTE_SEGMENT.NEW]: "Nueva versión",
+      },
+    });
+    const returnTo = getSafeReturnTo(props.searchParams?.returnTo, planPath);
+    return (
+      <AcademicShell
+        title="Nueva versión"
+        breadcrumb={breadcrumb}
+        minViewportHeight
+        headerClassName="flex-row items-center justify-between"
+        actionsClassName="self-stretch"
+        actions={<AcademicPageIcon icon={GitBranchPlusIcon} />}
+      >
+        <StudyPlanVersionForm institutionId={props.institutionId} returnTo={returnTo} scope={props.scope} source={curriculum.studyPlan} />
+      </AcademicShell>
+    );
+  }
 
   if (props.action === AcademicResource.ACADEMIC_LEVEL) {
     if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;

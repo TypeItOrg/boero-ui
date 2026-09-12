@@ -6,7 +6,7 @@ See [customization.md](../customization.md) for theming, CSS variables, and addi
 
 - Semantic colors
 - Built-in variants first
-- className for layout only
+- className and variants
 - No space-x-* / space-y-*
 - Prefer size-* over w-* h-* when equal
 - Prefer truncate shorthand
@@ -56,7 +56,7 @@ For positive, negative, or status indicators, use Badge variants, semantic token
 <span className="text-destructive">-3.2%</span>
 ```
 
-If you need a success/positive color that doesn't exist as a semantic token, use a Badge variant or ask the user about adding a custom CSS variable to the theme (see [customization.md](../customization.md)).
+If a requested design needs a missing semantic color, reuse a suitable variant or add a scoped token following [customization.md](../customization.md). Ask only when the choice materially changes an unresolved product requirement.
 
 ---
 
@@ -78,9 +78,9 @@ If you need a success/positive color that doesn't exist as a semantic token, use
 
 ---
 
-## className for layout only
+## className and variants
 
-Use `className` for layout (e.g. `max-w-md`, `mx-auto`, `mt-4`), **not** for overriding component colors or typography. To change colors, use semantic tokens, built-in variants, or CSS variables.
+Prefer existing variants and semantic tokens; use `className` for layout and intentional local appearance changes. Preserve a requested design rather than treating these examples as a prohibition on typography or color customization.
 
 **Incorrect:**
 
@@ -159,4 +159,4 @@ import { cn } from "@/lib/utils"
 
 ## No manual z-index on overlay components
 
-`Dialog`, `Sheet`, `Drawer`, `AlertDialog`, `DropdownMenu`, `Popover`, `Tooltip`, `HoverCard` handle their own stacking. Never add `z-50` or `z-[999]`.
+`Dialog`, `Sheet`, `Drawer`, `AlertDialog`, `DropdownMenu`, `Popover`, `Tooltip`, `HoverCard` handle their own stacking. Avoid arbitrary z-index overrides; if an actual stacking defect requires one, understand the existing stacking context and keep the fix scoped.

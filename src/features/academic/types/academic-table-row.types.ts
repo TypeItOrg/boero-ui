@@ -7,6 +7,7 @@ export type AcademicTableRow = {
   status: string;
   active: boolean;
   effectiveFrom?: string | null;
+  versionNumber?: number;
   statusValue?: string;
   deletedAt?: string | null;
 };

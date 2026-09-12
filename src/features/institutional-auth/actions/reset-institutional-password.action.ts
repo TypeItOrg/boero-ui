@@ -7,6 +7,7 @@ import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/
 import { resetInstitutionalPasswordSchema } from "@features/institutional-auth/schemas/reset-institutional-password.schema";
 import { resetInstitutionalPassword } from "@features/institutional-auth/services/reset-institutional-password.service";
 import type { ResetPasswordActionState } from "@features/institutional-auth/types/reset-password-action-state.types";
+import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const RESET_PASSWORD_FIELDS = ["password", "confirmPassword"] as const;
 
@@ -26,7 +27,10 @@ export async function resetPassword(_previousState: ResetPasswordActionState, fo
     password: parsed.data.password,
     confirmPassword: parsed.data.confirmPassword,
   });
-  if (output.success) redirect("/auth/login");
+  if (output.success) {
+    await setInstitutionalPasswordChangedCookie();
+    redirect("/auth/login");
+  }
 
   if (output.error.fieldErrors) {
     return { fieldErrors: pickFieldErrors(output.error.fieldErrors, RESET_PASSWORD_FIELDS) };

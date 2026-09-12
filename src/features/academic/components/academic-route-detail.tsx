@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
+import { GitBranchPlusIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { Button } from "@common/components/ui/button";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import type { FormValue } from "@common/types/form-value.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
@@ -18,6 +21,7 @@ import type { AcademicAccess } from "@features/academic/types/academic-access.ty
 import type { AcademicBreadcrumbOptions } from "@features/academic/types/academic-breadcrumb-options.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -66,9 +70,15 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   const detailPath = `${input.basePath}/${input.resource}/${input.id}`;
   const collectionPath = `${input.basePath}/${input.resource}`;
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);
+  const versionReturnTo = getSafeReturnTo(input.searchParams.returnTo, detailPath);
   const isNoDetailResource = input.resource === AcademicResource.ACADEMIC_YEAR;
   const canEdit = config.canUpdate(input.access) && canEditAcademicResource(input.resource, item);
   const canEditCurriculum = input.access.studyPlanCurriculumUpdate && curriculum !== null && curriculum.studyPlan.status === "DRAFT";
+  const canCreateVersion =
+    input.resource === AcademicResource.STUDY_PLAN &&
+    input.access.studyPlanCreate &&
+    (item as StudyPlan).status !== "DRAFT" &&
+    item.deletedAt == null;
   const currentResource = input.resource;
   const academicSpaceStatusBlocked =
     currentResource === AcademicResource.ACADEMIC_SPACE &&
@@ -121,6 +131,14 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
     segmentHrefs: isNoDetailResource ? { [input.id]: collectionPath } : undefined,
     segmentLabels: { [input.id]: config.getTitle(item) },
   });
+  const versionAction = canCreateVersion ? (
+    <Button asChild size="lg" variant="outline">
+      <ReturnToLink href={`${detailPath}/versions/new`} returnTo={versionReturnTo}>
+        <GitBranchPlusIcon data-icon="inline-start" />
+        Nueva versión
+      </ReturnToLink>
+    </Button>
+  ) : null;
   if (input.action === ACADEMIC_ROUTE_SEGMENT.EDIT) {
     if (!config.canUpdate(input.access)) return <AcademicAccessDenied breadcrumb={breadcrumb} />;
     if (!canEdit) notFound();
@@ -160,6 +178,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
         item={item}
         resource={input.resource}
         statusAction={statusAction}
+        versionAction={versionAction}
         returnTo={returnTo}
       />
       {curriculum ? (

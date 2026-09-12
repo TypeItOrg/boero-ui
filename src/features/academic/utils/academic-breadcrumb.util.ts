@@ -12,6 +12,7 @@ const NEW_LABELS: Readonly<Record<string, string>> = {
   [AcademicResource.INSTRUMENT]: "Nuevo instrumento",
   [AcademicResource.COURSE]: "Nuevo curso",
   [AcademicResource.SHIFT]: "Nuevo turno",
+  [ACADEMIC_ROUTE_SEGMENT.VERSIONS]: "Nueva versión",
 };
 
 export function getAcademicBreadcrumbLabels(segments: string[] | undefined): Readonly<Record<string, string>> {

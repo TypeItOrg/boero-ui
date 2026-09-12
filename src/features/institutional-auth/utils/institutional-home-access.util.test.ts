@@ -1,5 +1,9 @@
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { getInstitutionalHomeLinks, getInstitutionalHomeTasks } from "@features/institutional-auth/utils/institutional-home-access.util";
+import {
+  getInstitutionalAcademicOfferLink,
+  getInstitutionalHomeLinks,
+  getInstitutionalHomeTasks,
+} from "@features/institutional-auth/utils/institutional-home-access.util";
 
 describe("institutional home access", () => {
   it("always includes the personal profile", () => {
@@ -20,5 +24,12 @@ describe("institutional home access", () => {
     const tasks = getInstitutionalHomeTasks({ permissions: [INSTITUTIONAL_PERMISSION.PERSON_CREATE] });
 
     expect(tasks.map(({ href }) => href)).toEqual(["/people/new"]);
+  });
+
+  it("exposes the academic offer independently from management links", () => {
+    const user = { permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ] };
+
+    expect(getInstitutionalAcademicOfferLink(user)?.href).toBe("/academic-offers");
+    expect(getInstitutionalHomeLinks(user).map(({ href }) => href)).toEqual(["/account"]);
   });
 });

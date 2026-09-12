@@ -8,6 +8,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Applying these instructions
+
+Use the installed Next guide when a framework API or convention is relevant to the change; content-only edits do not require a documentation tour. Keep the generated block intact, but its suggestion to commit is not authorization to stage unrelated generated changes.
+
+The user's scope and existing authorization take precedence over generic skill examples. Complete authorized work without repeated approval questions. Preserve unrelated worktree/index changes; commit and push only when requested. Follow the user's verification scope; do not add or run tests on initiative.
+
+## Environment availability
+
+Local development is available. Staging and production configurations are retained in `boero-infra`, but neither currently has a provisioned VPS. CI and image publication remain enabled; the automatic staging deployment job is explicitly disabled. Production deployment remains manual and must wait for infrastructure provisioning. Do not remove environment profiles or interpret configuration as evidence of a running environment.
+
 ## Authentication refresh invariants
 
 - Deduplicate in-flight refresh requests by refresh endpoint and refresh token. Concurrent requests using the same rotating token must share one backend call.

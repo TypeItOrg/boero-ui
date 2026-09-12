@@ -44,6 +44,17 @@ const studyPlanValiditySchema = z
     path: ["effectiveTo"],
   });
 
+export const studyPlanVersionFormSchema = z
+  .object({ name, effectiveFrom: optionalDate, effectiveTo: optionalDate })
+  .refine((value) => Boolean(value.effectiveFrom), {
+    message: "Definí la fecha de inicio de la nueva versión.",
+    path: ["effectiveFrom"],
+  })
+  .refine((value) => isValidDateRange(value.effectiveFrom, value.effectiveTo), {
+    message: "La fecha final no puede ser anterior a la inicial.",
+    path: ["effectiveTo"],
+  });
+
 const activeSchema = z
   .union([z.boolean(), z.enum(["true", "false"])])
   .optional()
@@ -204,8 +215,16 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
   [AcademicResource.INSTRUMENT]: namedResourceSchema,
   [AcademicResource.SHIFT]: namedResourceSchema,
   [AcademicResource.STUDY_PLAN]: z
-    .object({ name, trainingPathId: z.string().uuid("Seleccioná un trayecto formativo.") })
-    .and(studyPlanValiditySchema),
+    .object({
+      name,
+      trainingPathId: z.string().uuid("Seleccioná un trayecto formativo."),
+      status: z.enum(["DRAFT", "ACTIVE"]).optional(),
+    })
+    .and(studyPlanValiditySchema)
+    .refine((value) => value.status !== "ACTIVE" || Boolean(value.effectiveFrom), {
+      message: "Completá la fecha de inicio para activar el plan.",
+      path: ["effectiveFrom"],
+    }),
   [AcademicResource.ACADEMIC_LEVEL]: z.object({
     name,
     displayOrder: positiveOrder,
@@ -235,6 +254,10 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
 
 export function parseAcademicForm(resource: AcademicResource, formData: FormData) {
   return academicFormSchemas[resource].safeParse(Object.fromEntries(formData.entries()));
+}
+
+export function parseStudyPlanVersionForm(formData: FormData) {
+  return studyPlanVersionFormSchema.safeParse(Object.fromEntries(formData.entries()));
 }
 
 export const academicStatusSchema = z.discriminatedUnion("resource", [

@@ -40,6 +40,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
+      ? [{ title: "Oferta académica", url: "/academic-offers", icon: GraduationCapIcon }]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
       ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
       : []),

@@ -12,6 +12,7 @@ export const INSTITUTIONAL_PERMISSION = {
   ROLE_DELETE: "institution:roles:delete",
   GRADES_ENTER: "institution:grades:enter",
   GRADES_ENTER_FINAL: "institution:grades:enter-final",
+  ACADEMIC_OFFER_READ: "institution:academic-offer:read",
   INSTITUTION_READ: "institution:read",
   INSTITUTION_UPDATE: "institution:update",
   ACADEMIC_YEAR_READ: "institution:academic-year:read",
@@ -60,9 +61,3 @@ export const INSTITUTIONAL_PERMISSION = {
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];
-
-const institutionalPermissionSet = new Set<string>(Object.values(INSTITUTIONAL_PERMISSION));
-
-export function isInstitutionalPermission(value: string): value is InstitutionalPermission {
-  return institutionalPermissionSet.has(value);
-}

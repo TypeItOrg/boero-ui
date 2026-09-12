@@ -148,6 +148,7 @@ export function StudyPlanStatusDialog({
                 onChange={setEffectiveTo}
                 onDraftChange={setEffectiveToDraft}
                 calendarMinDate={effectiveFromDate}
+                maxDate={config.needsEffectiveTo ? new Date() : undefined}
                 autoComplete="off"
                 required
                 aria-invalid={Boolean(effectiveToError)}
