@@ -294,5 +294,21 @@ describe("InstitutionalLoginForm", () => {
       await waitFor(() => expect(finishMock).toHaveBeenCalled());
       expect(screen.queryByText("¡Ups! Algo salió mal")).not.toBeInTheDocument();
     });
+
+    it("swallows NEXT_REDIRECT without flashing a passkey error", async () => {
+      await goToPasskeyStep();
+      getMock.mockResolvedValue(fakeCredential);
+      const redirectError = Object.assign(new Error("NEXT_REDIRECT"), {
+        digest: "NEXT_REDIRECT;push;/;307;",
+      });
+      finishMock.mockRejectedValueOnce(redirectError);
+
+      fireEvent.click(passkeyButton());
+
+      await waitFor(() => expect(finishMock).toHaveBeenCalled());
+      await waitFor(() => expect(screen.getByText("Esperando tu passkey...")).toBeInTheDocument());
+      expect(screen.queryByText("¡Ups! Algo salió mal")).not.toBeInTheDocument();
+      expect(screen.queryByText(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED)).not.toBeInTheDocument();
+    });
   });
 });

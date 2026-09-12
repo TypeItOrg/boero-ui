@@ -2,6 +2,7 @@
 
 import { SyntheticEvent, useActionState, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { AlertCircleIcon, CheckCircle2Icon, FingerprintIcon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -147,6 +148,20 @@ export function InstitutionalLoginForm({ registered = false, passwordChanged = f
         setPasskeyError(finish.error);
       }
     } catch (error) {
+      if (isRedirectError(error)) {
+        // `finishPasskeyLogin` redirige a "/" con `redirect()`, que Next
+        // implementa lanzando un error NEXT_REDIRECT. No es un fallo del
+        // login: se sale sin pintar error y sin resetear el spinner para
+        // que la navegación ocurra sin flash.
+        // Se limpia la ref para que `finally` no oculte el spinner antes
+        // de que la navegación desmonte el formulario. No se re-lanza:
+        // la Server Action ya respondió con redirect y el router navega
+        // igual (tragar el error no cancela la navegación), y así se evita
+        // un unhandled rejection en el handler del botón.
+        ceremonyRef.current = null;
+        return;
+      }
+
       if (process.env.NODE_ENV === "development") {
         console.debug("[passkey] login ceremony settled with error", error instanceof DOMException ? error.name : error?.constructor?.name);
       }
