@@ -9,9 +9,10 @@ import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enroll
 interface EnrollmentStartProps {
   studyPlans: StudyPlan[];
   periods: EnrollmentPeriod[];
+  allExcludedByActiveApplication?: boolean;
 }
 
-export function EnrollmentStart({ studyPlans, periods }: EnrollmentStartProps): React.ReactElement {
+export function EnrollmentStart({ studyPlans, periods, allExcludedByActiveApplication = false }: EnrollmentStartProps): React.ReactElement {
   const [selection, setSelection] = React.useState<{ studyPlanId: string; academicYearId: string } | null>(null);
 
   if (selection) {
@@ -28,6 +29,7 @@ export function EnrollmentStart({ studyPlans, periods }: EnrollmentStartProps): 
         name: period.name,
       }))}
       onStart={setSelection}
+      allExcludedByActiveApplication={allExcludedByActiveApplication}
     />
   );
 }
