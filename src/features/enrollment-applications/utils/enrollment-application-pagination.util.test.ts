@@ -4,7 +4,7 @@ describe("parseEnrollmentApplicationPaginationParams", () => {
   it("uses the default page, size and no status when no query params are present", () => {
     const result = parseEnrollmentApplicationPaginationParams({});
 
-    expect(result).toEqual({ page: 0, size: 10, status: undefined });
+    expect(result).toEqual({ page: 0, size: 10, status: undefined, trainingPathId: undefined, open: false });
   });
 
   it("returns a validated status when present in the query", () => {
@@ -22,6 +22,6 @@ describe("parseEnrollmentApplicationPaginationParams", () => {
   it("clamps the size to allowed page sizes", () => {
     const result = parseEnrollmentApplicationPaginationParams({ page: "3", size: "25" });
 
-    expect(result).toEqual({ page: 3, size: 10, status: undefined });
+    expect(result).toEqual({ page: 3, size: 10, status: undefined, trainingPathId: undefined, open: false });
   });
 });

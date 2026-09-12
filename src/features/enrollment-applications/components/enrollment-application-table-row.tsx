@@ -15,6 +15,7 @@ type EnrollmentApplicationTableRowProps = {
   canReject: boolean;
   onApprove: (application: EnrollmentApplication) => void;
   onReject: (application: EnrollmentApplication) => void;
+  onRowClick?: (application: EnrollmentApplication) => void;
 };
 
 export function EnrollmentApplicationTableRow({
@@ -23,12 +24,16 @@ export function EnrollmentApplicationTableRow({
   canReject,
   onApprove,
   onReject,
+  onRowClick,
 }: EnrollmentApplicationTableRowProps): React.ReactElement {
   const isPendingEvaluation = application.status === "SUBMITTED";
   const canResolve = isPendingEvaluation && (canApprove || canReject);
 
   return (
-    <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
+    <TableRow
+      className={`hover:bg-muted/50 h-11 border-b transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+      onClick={onRowClick ? () => onRowClick(application) : undefined}
+    >
       <TableCell className="font-medium">
         {application.applicantLastName}, {application.applicantFirstName}
       </TableCell>
@@ -46,7 +51,7 @@ export function EnrollmentApplicationTableRow({
           <span className="text-muted-foreground/60">—</span>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
         {canResolve ? (
           <div className="flex justify-end">
             <DropdownMenu>

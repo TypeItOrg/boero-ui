@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   BuildingIcon,
   CalendarRangeIcon,
+  ClipboardListIcon,
   FingerprintIcon,
   GraduationCapIcon,
   HouseIcon,
@@ -77,11 +78,27 @@ const ACADEMIC_NAVIGATION_ITEMS = [
   },
 ] as const satisfies readonly NavigationItem[];
 
+const ENROLLMENT_NAVIGATION_ITEMS = [
+  {
+    title: "Solicitudes de inscripción",
+    url: "/admin/enrollment-applications",
+    icon: ClipboardListIcon,
+  },
+] as const satisfies readonly NavigationItem[];
+
 const PLATFORM_NAVIGATION_ITEM = {
   title: "Administradores",
   url: "/admin/accounts",
   icon: FingerprintIcon,
 } as const satisfies NavigationItem;
+
+export const PLATFORM_NAVIGATION_ITEMS = [
+  PRIMARY_NAVIGATION_ITEM,
+  ...MANAGEMENT_NAVIGATION_ITEMS,
+  ...ACADEMIC_NAVIGATION_ITEMS,
+  ...ENROLLMENT_NAVIGATION_ITEMS,
+  PLATFORM_NAVIGATION_ITEM,
+] as const satisfies readonly NavigationItem[];
 
 export const PLATFORM_PRIMARY_NAVIGATION_ITEM = PRIMARY_NAVIGATION_ITEM;
 
@@ -98,6 +115,10 @@ export const PLATFORM_NAVIGATION_SECTIONS = [
   {
     label: "Académico",
     items: ACADEMIC_NAVIGATION_ITEMS,
+  },
+  {
+    label: "Inscripciones",
+    items: ENROLLMENT_NAVIGATION_ITEMS,
   },
   {
     label: "Plataforma",

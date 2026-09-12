@@ -38,7 +38,7 @@ export interface EnrollmentPersonalData {
   firstName: string;
   lastName: string;
   documentNumber: string;
-  birthDate: string;
+  birthDate: string | null;
   phoneNumber: string;
   email: string;
 }
@@ -85,13 +85,11 @@ export interface EnrollmentInstrumentSelection {
 }
 
 export interface EnrollmentApplicationSpaceResponse {
-  spaceId: string;
   studyPlanSpaceId: string;
   spaceName: string;
+  academicLevelName: string | null;
   instrumentId: string | null;
   instrumentName: string | null;
-  subjectCode: string | null;
-  year: number | null;
 }
 
 export interface EnrollmentApplicationData {
@@ -115,6 +113,7 @@ export interface EnrollmentApplicationResponse {
   academicYearId: string;
   enrollmentPeriodId: string;
   studyPlanName?: string;
+  trainingPathName?: string | null;
   academicYearName?: string;
   enrollmentPeriodName?: string;
   status: EnrollmentApplicationStatus;
@@ -139,6 +138,13 @@ export interface StartEnrollmentApplicationInput {
 export interface UpdateEnrollmentDraftInput {
   data: EnrollmentApplicationData;
 }
+
+export type PlatformEnrollmentApplicationSummary = {
+  institutionId: string;
+  applicationId: string;
+  applicantName: string;
+  studyPlanName: string;
+};
 
 export interface FetchEnrollmentApplicationsParams {
   periodId?: string;

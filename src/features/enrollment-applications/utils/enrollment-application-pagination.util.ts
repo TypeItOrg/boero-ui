@@ -9,10 +9,14 @@ export const ENROLLMENT_APPLICATION_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 
 export type EnrollmentApplicationSearchParams = PaginationSearchParams & {
   status?: string;
+  trainingPathId?: string;
+  open?: string;
 };
 
 export type EnrollmentApplicationPaginationParams = PaginationParams & {
   status?: EnrollmentApplicationStatus;
+  trainingPathId?: string;
+  open?: boolean;
 };
 
 export function parseEnrollmentApplicationPaginationParams(searchParams: EnrollmentApplicationSearchParams): EnrollmentApplicationPaginationParams {
@@ -25,5 +29,7 @@ export function parseEnrollmentApplicationPaginationParams(searchParams: Enrollm
     page,
     size,
     status: isEnrollmentApplicationStatus(searchParams.status) ? searchParams.status : undefined,
+    trainingPathId: searchParams.trainingPathId || undefined,
+    open: searchParams.open === "true",
   };
 }
