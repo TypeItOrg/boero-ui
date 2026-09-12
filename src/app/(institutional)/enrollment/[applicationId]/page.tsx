@@ -3,13 +3,14 @@ import { getEnrollmentApplicationAction } from "@features/enrollment-application
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 
 interface EnrollmentDetailPageProps {
-  params: {
+  params: Promise<{
     applicationId: string;
-  };
+  }>;
 }
 
 export default async function EnrollmentDetailPage({ params }: EnrollmentDetailPageProps) {
-  const application = await getEnrollmentApplicationAction(params.applicationId).catch(() => null);
+  const { applicationId } = await params;
+  const application = await getEnrollmentApplicationAction(applicationId).catch(() => null);
 
   if (!application) {
     notFound();
@@ -22,11 +23,7 @@ export default async function EnrollmentDetailPage({ params }: EnrollmentDetailP
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-6">
-      <EnrollmentWizard 
-        studyPlanId={studyPlanId} 
-        academicYearId={academicYearId}
-        readOnly={!isEditable}
-      />
+      <EnrollmentWizard studyPlanId={studyPlanId} academicYearId={academicYearId} readOnly={!isEditable} />
     </main>
   );
 }
