@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Building2Icon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from "lucide-react";
+import { Building2Icon, ClipboardListIcon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from "lucide-react";
 
 import { NavigationCard } from "@common/components/navigation/navigation-card";
 import { Separator } from "@common/components/ui/separator";
@@ -13,6 +13,7 @@ import { fetchInstitutionalPerson } from "@features/institutional-auth/services/
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import {
   getInstitutionalAcademicOfferLink,
+  getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
   type InstitutionalHomeLink,
 } from "@features/institutional-auth/utils/institutional-home-access.util";
@@ -57,9 +58,11 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const personalLink = links.find((link) => link.href === "/account");
   const academicOfferLink = getInstitutionalAcademicOfferLink(user);
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
+  const enrollmentLinks = getInstitutionalEnrollmentHomeLinks(user);
   const hasInstitutionalAccess = managementLinks.length > 0;
   const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
-  const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess;
+  const hasEnrollmentAccess = enrollmentLinks.length > 0;
+  const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess || hasEnrollmentAccess;
   const greeting = getGreeting(new Date());
   const primaryRole = user.roles[0] ?? "Usuario institucional";
 
@@ -143,6 +146,21 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             imageSide="right"
           >
             <AcademicResourceLinks basePath="" resources={academicResources} prominent className="[&>a]:bg-background" />
+          </HomeSubsection>
+        ) : null}
+
+        {enrollmentLinks.length > 0 ? (
+          <HomeSubsection
+            id="enrollment-management-title"
+            title="Inscripciones"
+            description="Gestioná y consultá tus trámites y solicitudes de inscripción."
+            icon={ClipboardListIcon}
+          >
+            <nav aria-label="Inscripciones" className={cn("[&>a]:bg-background grid gap-4", enrollmentLinks.length > 1 && "sm:grid-cols-2")}>
+              {enrollmentLinks.map((link) => (
+                <HomeAccessRow key={link.href} link={link} />
+              ))}
+            </nav>
           </HomeSubsection>
         ) : null}
 

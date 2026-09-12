@@ -5,6 +5,7 @@ describe("platform navigation", () => {
     expect(
       PLATFORM_NAVIGATION_SECTIONS.find((section) => "label" in section && section.label === "Académico")?.items.map((item) => item.url),
     ).toEqual([
+      "/admin/enrollment-periods",
       "/admin/academic-years",
       "/admin/training-paths",
       "/admin/study-plans",

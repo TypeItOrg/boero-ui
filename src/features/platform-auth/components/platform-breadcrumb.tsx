@@ -24,6 +24,7 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   instruments: "Instrumentos",
   courses: "Cursos",
   shifts: "Turnos",
+  "enrollment-applications": "Solicitudes de inscripción",
 };
 
 type BreadcrumbSegment = {

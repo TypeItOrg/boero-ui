@@ -1,6 +1,8 @@
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
   getInstitutionalAcademicOfferLink,
+  getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
   getInstitutionalHomeTasks,
 } from "@features/institutional-auth/utils/institutional-home-access.util";
@@ -24,6 +26,30 @@ describe("institutional home access", () => {
     const tasks = getInstitutionalHomeTasks({ permissions: [INSTITUTIONAL_PERMISSION.PERSON_CREATE] });
 
     expect(tasks.map(({ href }) => href)).toEqual(["/people/new"]);
+  });
+
+  it("returns enrollment links for applicant role", () => {
+    const user = {
+      institutionId: "inst-1",
+      personId: "p-1",
+      roles: ["Postulante"],
+      permissions: [],
+    } as unknown as InstitutionalUser;
+
+    const links = getInstitutionalEnrollmentHomeLinks(user);
+    expect(links.map(({ href }) => href)).toEqual(["/enrollment", "/my-enrollment-applications"]);
+  });
+
+  it("returns staff enrollment application link when user has enrollment read permission", () => {
+    const user = {
+      institutionId: "inst-1",
+      personId: "p-1",
+      roles: ["Administrativo"],
+      permissions: [INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ],
+    } as unknown as InstitutionalUser;
+
+    const links = getInstitutionalEnrollmentHomeLinks(user);
+    expect(links.map(({ href }) => href)).toEqual(["/enrollment-applications"]);
   });
 
   it("exposes the academic offer independently from management links", () => {

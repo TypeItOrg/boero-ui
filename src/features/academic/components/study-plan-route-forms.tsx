@@ -102,7 +102,15 @@ export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; 
         id={props.space.id}
         parentId={props.id}
         returnTo={props.spacePath}
-        initialValues={{ ...props.space }}
+        initialValues={{
+          id: props.space.id,
+          studyPlanId: props.space.studyPlanId,
+          academicSpaceId: props.space.academicSpaceId,
+          academicLevelId: props.space.academicLevelId,
+          requirementType: props.space.requirementType,
+          displayOrder: props.space.displayOrder,
+          approvalMode: props.space.approvalMode,
+        }}
         levels={props.levels}
       />
     </AcademicShell>

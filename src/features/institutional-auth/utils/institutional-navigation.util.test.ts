@@ -32,7 +32,7 @@ describe("getInstitutionalNavigationSections", () => {
   it("hides the academic hub without academic read permissions", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
-    expect(sections).not.toEqual(expect.arrayContaining([expect.objectContaining({ label: "Académico" })]));
+    expect(sections.find((section) => section.label === "Académico")).toBeUndefined();
   });
 
   it("shows the applicant academic offer without management resources", () => {
@@ -85,6 +85,27 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections.map((section) => section.label)).toEqual([undefined, "Plataforma", "Académico", "General"]);
     expect(sections[0]?.items.map((item) => item.title)).toEqual(["Inicio"]);
     expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles"]);
+  });
+
+  it("shows the applicant section with new enrollment and my applications for applicant roles", () => {
+    const sections = getInstitutionalNavigationSections({ ...USER, roles: ["Postulante"] });
+
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
+      expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+    ]);
+  });
+
+  it("hides the applicant section for staff roles even with the management permission", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Administrador Institucional"],
+      permissions: [INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ],
+    });
+
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Solicitudes de inscripción", url: "/enrollment-applications" }),
+    ]);
   });
 
   it("keeps Inicio outside labeled navigation sections", () => {
