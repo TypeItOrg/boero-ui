@@ -6,10 +6,10 @@ function subscribe(): () => void {
   return () => undefined;
 }
 
-function getServerSnapshot(): boolean {
-  return false;
+function getServerSnapshot(): null {
+  return null;
 }
 
-export function useWebAuthnSupport(): boolean {
-  return useSyncExternalStore(subscribe, isWebAuthnSupported, getServerSnapshot);
+export function useWebAuthnSupport(): boolean | null {
+  return useSyncExternalStore<boolean | null>(subscribe, isWebAuthnSupported, getServerSnapshot);
 }

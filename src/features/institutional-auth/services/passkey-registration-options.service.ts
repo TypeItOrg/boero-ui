@@ -20,7 +20,7 @@ export async function requestPasskeyRegistrationOptions(label: string): Promise<
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo iniciar el registro de la passkey.");
+    throw new Error("No se pudo iniciar el registro de la clave de acceso.");
   }
 
   return (await response.json()) as {

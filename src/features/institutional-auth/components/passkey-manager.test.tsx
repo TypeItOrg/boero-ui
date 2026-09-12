@@ -54,7 +54,7 @@ describe("PasskeyManager", () => {
     createMock.mockReturnValue(new Promise(() => {}));
     renderManager();
 
-    await user.click(screen.getByRole("button", { name: "Añadir passkey" }));
+    await user.click(screen.getByRole("button", { name: "Añadir clave de acceso" }));
     await user.type(screen.getByLabelText(/Nombre/), "Mi PC");
     fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
 
@@ -70,7 +70,7 @@ describe("PasskeyManager", () => {
     await waitFor(() => expect(screen.queryByText("Registrando...")).not.toBeInTheDocument());
     expect(requestMock).toHaveBeenCalledTimes(1);
     expect(verifyMock).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Añadir passkey" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Añadir clave de acceso" })).toBeInTheDocument();
   });
 
   it("ignores a stale creation rejection after cancelling and starting over", async () => {
@@ -83,7 +83,7 @@ describe("PasskeyManager", () => {
     );
     renderManager();
 
-    await user.click(screen.getByRole("button", { name: "Añadir passkey" }));
+    await user.click(screen.getByRole("button", { name: "Añadir clave de acceso" }));
     await user.type(screen.getByLabelText(/Nombre/), "Mi PC");
     fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
     await screen.findByText("Registrando...");
@@ -92,21 +92,21 @@ describe("PasskeyManager", () => {
     rejectFirst(new Error("stale-error"));
 
     await waitFor(() => expect(screen.queryByText("Registrando...")).not.toBeInTheDocument());
-    expect(screen.queryByText("No se pudo registrar la passkey.")).not.toBeInTheDocument();
+    expect(screen.queryByText("No se pudo registrar la clave de acceso.")).not.toBeInTheDocument();
   });
 
   it("disables adding and explains why when the browser cannot create passkeys", async () => {
     Object.defineProperty(window, "PublicKeyCredential", { value: undefined, configurable: true });
     renderManager();
 
-    expect(screen.getByRole("button", { name: "Añadir passkey" })).toBeDisabled();
-    expect(screen.getByText(/no puede crear passkeys/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Añadir clave de acceso" })).toBeDisabled();
+    expect(screen.getByText(/no puede crear claves de acceso/)).toBeInTheDocument();
   });
 
   it("shows the backend-provided passkey limit", () => {
     render(<PasskeyManager initialPasskeys={[{ id: "1", label: "Mi PC", createdAt: null, lastUsedAt: null }]} maxActivePasskeys={5} />);
 
-    expect(screen.getByText("1 de 5 passkeys en uso.")).toBeInTheDocument();
+    expect(screen.getByText("1 de 5 claves de acceso en uso.")).toBeInTheDocument();
   });
 
   it("ignores a second rename submit while one is in flight", async () => {

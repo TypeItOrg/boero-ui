@@ -6,7 +6,7 @@ import { fetchPasskeys } from "@features/institutional-auth/services/fetch-passk
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Passkeys");
+  return getInstitutionalMetadata("Claves de acceso");
 }
 
 export default async function PasskeysPage(): Promise<React.ReactElement> {

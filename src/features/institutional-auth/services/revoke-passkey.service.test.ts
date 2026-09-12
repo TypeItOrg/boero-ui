@@ -35,7 +35,7 @@ describe("revokePasskey", () => {
 
     const { revokePasskey } = await importService();
 
-    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la passkey.");
+    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la clave de acceso.");
   });
 
   it("keeps a generic error for server failures", async () => {
@@ -43,6 +43,6 @@ describe("revokePasskey", () => {
 
     const { revokePasskey } = await importService();
 
-    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la passkey.");
+    await expect(revokePasskey("passkey-id")).rejects.toThrow("No se pudo eliminar la clave de acceso.");
   });
 });

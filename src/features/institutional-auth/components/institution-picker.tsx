@@ -18,6 +18,7 @@ export type InstitutionalInstitution = {
 };
 
 type InstitutionPickerProps = {
+  disabled?: boolean;
   ariaInvalid?: boolean;
   id: string;
   onValueChange: (value: string | undefined, item: InstitutionalInstitution | undefined) => void;
@@ -28,9 +29,10 @@ type InstitutionPickerProps = {
 const INSTITUTION_QUERY_KEY = ["institutional-auth", "institutions"] as const;
 const INSTITUTION_OPTION_HEIGHT = 52;
 
-export function InstitutionPicker({ ariaInvalid, id, onValueChange, selectedLabel, value }: InstitutionPickerProps): React.ReactElement {
+export function InstitutionPicker({ disabled, ariaInvalid, id, onValueChange, selectedLabel, value }: InstitutionPickerProps): React.ReactElement {
   return (
     <AsyncDropdown<InstitutionalInstitution>
+      disabled={disabled}
       ariaInvalid={ariaInvalid}
       emptyDescription="No encontramos instituciones activas disponibles para iniciar sesión."
       emptyIcon={BuildingIcon}

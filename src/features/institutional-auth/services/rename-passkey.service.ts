@@ -10,7 +10,7 @@ export async function renamePasskey(id: string, label: string): Promise<Passkey>
   });
 
   if (!response.ok) {
-    throw new Error("No se pudo renombrar la passkey.");
+    throw new Error("No se pudo renombrar la clave de acceso.");
   }
 
   return (await response.json()) as Passkey;

@@ -13,6 +13,6 @@ export async function revokePasskey(id: string): Promise<void> {
   }
 
   if (!response.ok) {
-    throw new Error("No se pudo eliminar la passkey.");
+    throw new Error("No se pudo eliminar la clave de acceso.");
   }
 }
