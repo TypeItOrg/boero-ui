@@ -42,6 +42,7 @@ export function MyEnrollmentApplicationTablePresentation({
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Motivo de rechazo</TableHead>
+              <TableHead className="w-32">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
