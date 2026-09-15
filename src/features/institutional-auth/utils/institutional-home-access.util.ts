@@ -3,6 +3,7 @@ import {
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
+  GraduationCapIcon,
   KeyRoundIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
@@ -121,6 +122,10 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
   }
 
   return links;
+}
+
+export function getInstitutionalAcademicOfferLink(user: Pick<InstitutionalUser, "permissions">): InstitutionalHomeLink | undefined {
+  return isHomeLinkVisible(user, ACADEMIC_OFFER_LINK) ? ACADEMIC_OFFER_LINK : undefined;
 }
 
 function isHomeLinkVisible(user: Pick<InstitutionalUser, "permissions">, link: InstitutionalHomeLink): boolean {

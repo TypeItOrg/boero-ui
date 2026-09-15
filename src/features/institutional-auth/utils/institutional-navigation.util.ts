@@ -2,6 +2,7 @@ import {
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
+  ClockIcon,
   FilePenLineIcon,
   ClipboardListIcon,
   GraduationCapIcon,

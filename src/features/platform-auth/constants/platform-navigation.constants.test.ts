@@ -10,6 +10,7 @@ describe("platform navigation", () => {
       "/admin/study-plans",
       "/admin/academic-spaces",
       "/admin/instruments",
+      "/admin/courses",
     ]);
 
     expect(

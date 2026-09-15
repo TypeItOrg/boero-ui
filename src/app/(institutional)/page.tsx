@@ -12,6 +12,7 @@ import { InstitutionalHomeSkeleton } from "@features/institutional-auth/componen
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import {
+  getInstitutionalAcademicOfferLink,
   getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
   type InstitutionalHomeLink,
@@ -59,7 +60,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
   const enrollmentLinks = getInstitutionalEnrollmentHomeLinks(user);
   const hasInstitutionalAccess = managementLinks.length > 0;
-  const hasAcademicAccess = academicResources.length > 0;
+  const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
   const hasEnrollmentAccess = enrollmentLinks.length > 0;
   const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess || hasEnrollmentAccess;
   const greeting = getGreeting(new Date());
