@@ -3,6 +3,10 @@ import { render, screen } from "@testing-library/react";
 import { MyEnrollmentApplicationTableRow } from "@features/enrollment-applications/components/my-enrollment-application-table-row";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: jest.fn() }),
+}));
+
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const APPLICATION_ID = "00000000-0000-4000-8000-000000000002";
 

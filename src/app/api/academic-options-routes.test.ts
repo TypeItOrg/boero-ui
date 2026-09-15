@@ -58,10 +58,10 @@ describe("academic options routes", () => {
   });
 
   it("rejects an unsupported option resource", async () => {
-    const request = new Request(`http://localhost/api/institutional/academic/options/instruments?institutionId=${institutionId}`);
+    const request = new Request(`http://localhost/api/institutional/academic/options/courses?institutionId=${institutionId}`);
 
     const response = await getInstitutionalAcademicOptions(request, {
-      params: Promise.resolve({ resource: "instruments" }),
+      params: Promise.resolve({ resource: "courses" }),
     });
 
     expect(response.status).toBe(400);

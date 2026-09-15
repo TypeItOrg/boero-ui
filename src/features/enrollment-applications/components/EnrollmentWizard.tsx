@@ -426,6 +426,7 @@ export function EnrollmentWizard({
       return;
     }
 
+    const targetApplicationId = autosaveTarget;
     const dataSignature = JSON.stringify(debouncedData);
 
     if (!autosaveInitializedRef.current) {
@@ -454,7 +455,7 @@ export function EnrollmentWizard({
             return null;
           }
 
-          return updateEnrollmentDraftAction(autosaveTarget, { data: debouncedData }).then(unwrapEnrollmentResult);
+          return updateEnrollmentDraftAction(targetApplicationId, { data: debouncedData }).then(unwrapEnrollmentResult);
         });
         draftSaveQueue.current = request.then(
           () => undefined,

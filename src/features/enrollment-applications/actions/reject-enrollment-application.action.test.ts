@@ -6,6 +6,10 @@ jest.mock("@features/institutional-auth/services/institutional-api-fetch.service
   institutionalApiFetch: jest.fn(),
 }));
 
+jest.mock("@features/academic/utils/academic-action-auth.util", () => ({
+  authorizeAcademicAction: jest.fn().mockResolvedValue(undefined),
+}));
+
 import { revalidatePath } from "next/cache";
 
 import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";

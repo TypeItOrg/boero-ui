@@ -7,8 +7,8 @@ import { GET } from "@app/api/enrollment-applications/[applicationId]/attachment
 
 describe("GET /api/enrollment-applications/[applicationId]/attachments/[attachmentId]/content", () => {
   const institutionalApiFetchMock = jest.mocked(institutionalApiFetch);
-  const applicationId = "11111111-1111-1111-1111-111111111111";
-  const attachmentId = "22222222-2222-2222-2222-222222222222";
+  const applicationId = "11111111-1111-4111-8111-111111111111";
+  const attachmentId = "22222222-2222-4222-8222-222222222222";
 
   beforeEach(() => institutionalApiFetchMock.mockReset());
 

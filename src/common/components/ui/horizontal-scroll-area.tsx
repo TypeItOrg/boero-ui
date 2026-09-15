@@ -23,21 +23,23 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
       return;
     }
 
-    function updateScrollState(): void {
-      const maximumScrollLeft = viewport.scrollWidth - viewport.clientWidth;
+    const scrollViewport = viewport;
 
-      setCanScrollBackward(viewport.scrollLeft > 1);
-      setCanScrollForward(viewport.scrollLeft < maximumScrollLeft - 1);
+    function updateScrollState(): void {
+      const maximumScrollLeft = scrollViewport.scrollWidth - scrollViewport.clientWidth;
+
+      setCanScrollBackward(scrollViewport.scrollLeft > 1);
+      setCanScrollForward(scrollViewport.scrollLeft < maximumScrollLeft - 1);
     }
 
     function handleWheel(event: WheelEvent): void {
-      const maximumScrollLeft = viewport.scrollWidth - viewport.clientWidth;
+      const maximumScrollLeft = scrollViewport.scrollWidth - scrollViewport.clientWidth;
 
       if (maximumScrollLeft <= 1) {
         return;
       }
 
-      const verticalDelta = normalizeWheelDelta(event.deltaY, event.deltaMode, viewport.clientWidth);
+      const verticalDelta = normalizeWheelDelta(event.deltaY, event.deltaMode, scrollViewport.clientWidth);
       const scrollDelta = Math.abs(event.deltaX) >= Math.abs(verticalDelta) ? event.deltaX : verticalDelta;
 
       event.preventDefault();
@@ -47,24 +49,24 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
         return;
       }
 
-      viewport.scrollLeft = Math.max(0, Math.min(maximumScrollLeft, viewport.scrollLeft + scrollDelta));
+      scrollViewport.scrollLeft = Math.max(0, Math.min(maximumScrollLeft, scrollViewport.scrollLeft + scrollDelta));
     }
 
     const resizeObserver = new ResizeObserver(updateScrollState);
     const animationFrame = window.requestAnimationFrame(updateScrollState);
 
     root.addEventListener("wheel", handleWheel, { capture: true, passive: false });
-    viewport.addEventListener("scroll", updateScrollState, { passive: true });
-    resizeObserver.observe(viewport);
+    scrollViewport.addEventListener("scroll", updateScrollState, { passive: true });
+    resizeObserver.observe(scrollViewport);
 
-    if (viewport.firstElementChild) {
-      resizeObserver.observe(viewport.firstElementChild);
+    if (scrollViewport.firstElementChild) {
+      resizeObserver.observe(scrollViewport.firstElementChild);
     }
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
       root.removeEventListener("wheel", handleWheel, true);
-      viewport.removeEventListener("scroll", updateScrollState);
+      scrollViewport.removeEventListener("scroll", updateScrollState);
       resizeObserver.disconnect();
     };
   }, []);

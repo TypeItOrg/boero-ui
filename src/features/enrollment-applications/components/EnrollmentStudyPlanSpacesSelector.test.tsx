@@ -99,7 +99,7 @@ describe("EnrollmentStudyPlanSpacesSelector", () => {
       />,
     );
 
-    expect(screen.getByText(/seleccioná un instrumento:/i)).toBeInTheDocument();
-    expect(screen.getByText(/debés elegir un instrumento para cursar este espacio/i)).toBeInTheDocument();
+    expect(screen.getByText("Seleccioná un instrumento")).toBeInTheDocument();
+    expect(screen.getByText("Seleccioná un instrumento para este espacio.")).toBeInTheDocument();
   });
 });

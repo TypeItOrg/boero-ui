@@ -32,7 +32,7 @@ describe("institutional home access", () => {
       institutionId: "inst-1",
       personId: "p-1",
       roles: ["Postulante"],
-      permissions: [],
+      permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ],
     } as unknown as InstitutionalUser;
 
     const links = getInstitutionalEnrollmentHomeLinks(user);

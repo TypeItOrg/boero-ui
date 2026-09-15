@@ -128,7 +128,11 @@ describe("AcademicFormFields", () => {
   });
 
   it("marks every required study-plan-space field consistently", () => {
-    render(<AcademicFormFields resource={AcademicResource.STUDY_PLAN_SPACE} />);
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AcademicFormFields resource={AcademicResource.STUDY_PLAN_SPACE} />
+      </QueryClientProvider>,
+    );
 
     expect(screen.getByText("Espacio académico").parentElement).toHaveTextContent("Espacio académico*");
     expect(screen.getByText("Nivel").parentElement).not.toHaveTextContent("*");

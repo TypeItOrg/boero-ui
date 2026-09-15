@@ -52,7 +52,7 @@ describe("EnrollmentStatusCard", () => {
 
   it("renders status SUBMITTED with description and applicant name", () => {
     render(<EnrollmentStatusCard application={baseApp} />);
-    expect(screen.getByText("Estado de tu Solicitud de Inscripción")).toBeInTheDocument();
+    expect(screen.getByText("Solicitud en revisión")).toBeInTheDocument();
     expect(screen.getByText("Enviada")).toBeInTheDocument();
     expect(screen.getByText("Lucas Mendoza")).toBeInTheDocument();
     expect(screen.getByText("42111222")).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("EnrollmentStatusCard", () => {
   it("renders status APPROVED banner when approved", () => {
     const approvedApp = { ...baseApp, status: "APPROVED" as const };
     render(<EnrollmentStatusCard application={approvedApp} />);
-    expect(screen.getByText("¡Solicitud Aprobada!")).toBeInTheDocument();
+    expect(screen.getByText("Solicitud aprobada")).toBeInTheDocument();
   });
 
   it("renders status REJECTED banner when rejected", () => {
@@ -75,6 +75,6 @@ describe("EnrollmentStatusCard", () => {
   it("renders status CANCELLED banner when cancelled", () => {
     const cancelledApp = { ...baseApp, status: "CANCELLED" as const };
     render(<EnrollmentStatusCard application={cancelledApp} />);
-    expect(screen.getByText("Solicitud Cancelada")).toBeInTheDocument();
+    expect(screen.getByText("Solicitud cancelada")).toBeInTheDocument();
   });
 });

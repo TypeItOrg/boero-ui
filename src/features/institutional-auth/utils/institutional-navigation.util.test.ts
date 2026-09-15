@@ -88,7 +88,11 @@ describe("getInstitutionalNavigationSections", () => {
   });
 
   it("shows the applicant section with new enrollment and my applications for applicant roles", () => {
-    const sections = getInstitutionalNavigationSections({ ...USER, roles: ["Postulante"] });
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Postulante"],
+      permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ],
+    });
 
     expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
       expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
