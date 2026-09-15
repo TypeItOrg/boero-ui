@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "@common/components/ui/sidebar";
-import { useMobileSidebarNavigation } from "./use-mobile-sidebar-navigation";
+import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),

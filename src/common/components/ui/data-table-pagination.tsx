@@ -53,32 +53,34 @@ export function DataTablePagination({
   const canGoToNextPage = page < totalPages - 1;
 
   return (
-    <nav aria-label="Paginación de tabla" className="grid gap-3 px-1 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-      <p className="text-muted-foreground min-w-0 truncate text-sm">{summaryLabel}</p>
+    <nav aria-label="Paginación de tabla" className="@container/table-pagination px-1">
+      <div className="grid gap-4 @4xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @4xl/table-pagination:items-center">
+        <p className="text-muted-foreground min-w-0 truncate text-sm">{summaryLabel}</p>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 lg:flex lg:items-center lg:gap-6">
-        <PageSizeSelect
-          compactLabel={pageSizeCompactLabel}
-          disabled={isPending}
-          label={pageSizeLabel}
-          options={pageSizeOptions}
-          size={size}
-          onSizeChange={onPageSizeChange}
-        />
-
-        <div className="flex items-center justify-end gap-3">
-          <p className="text-foreground justify-self-end text-sm font-semibold whitespace-nowrap sm:justify-self-auto">
-            Página {currentPage} de {totalPages}
-          </p>
-
-          <PageNavigation
-            canGoToNextPage={canGoToNextPage}
-            canGoToPreviousPage={canGoToPreviousPage}
-            isPending={isPending}
-            page={page}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
+        <div className="grid gap-4 @2xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @2xl/table-pagination:items-center @4xl/table-pagination:flex @4xl/table-pagination:gap-6">
+          <PageSizeSelect
+            compactLabel={pageSizeCompactLabel}
+            disabled={isPending}
+            label={pageSizeLabel}
+            options={pageSizeOptions}
+            size={size}
+            onSizeChange={onPageSizeChange}
           />
+
+          <div className="flex items-center justify-between gap-3 @2xl/table-pagination:justify-end">
+            <p className="text-foreground text-sm font-semibold whitespace-nowrap">
+              Página {currentPage} de {totalPages}
+            </p>
+
+            <PageNavigation
+              canGoToNextPage={canGoToNextPage}
+              canGoToPreviousPage={canGoToPreviousPage}
+              isPending={isPending}
+              page={page}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </div>
         </div>
       </div>
     </nav>
@@ -89,8 +91,8 @@ function PageSizeSelect({ compactLabel, disabled, label, options, size, onSizeCh
   return (
     <div className="flex min-w-0 items-center gap-2">
       <p className="text-foreground text-sm font-medium whitespace-nowrap">
-        <span className="sm:hidden">{compactLabel}</span>
-        <span className="hidden sm:inline">{label}</span>
+        <span className="@2xl/table-pagination:hidden">{compactLabel}</span>
+        <span className="hidden @2xl/table-pagination:inline">{label}</span>
       </p>
       <Select value={String(size)} onValueChange={onSizeChange} disabled={disabled}>
         <SelectTrigger size="sm" className="w-20">
@@ -123,7 +125,7 @@ function PageNavigation({
       <Button
         variant="outline"
         size="icon-sm"
-        className="hidden sm:inline-flex"
+        className="hidden @2xl/table-pagination:inline-flex"
         aria-label="Ir a la primera página"
         onClick={() => onPageChange(0)}
         disabled={isPending || !canGoToPreviousPage}
@@ -151,7 +153,7 @@ function PageNavigation({
       <Button
         variant="outline"
         size="icon-sm"
-        className="hidden sm:inline-flex"
+        className="hidden @2xl/table-pagination:inline-flex"
         aria-label="Ir a la última página"
         onClick={() => onPageChange(totalPages - 1)}
         disabled={isPending || !canGoToNextPage}

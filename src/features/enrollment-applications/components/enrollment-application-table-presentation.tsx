@@ -1,5 +1,6 @@
 "use client";
 
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
@@ -7,13 +8,13 @@ import { Loader2Icon } from "lucide-react";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { EnrollmentApplicationApproveDialog } from "./enrollment-application-approve-dialog";
-import { EnrollmentApplicationEmptyState } from "./enrollment-application-empty-state";
-import { EnrollmentApplicationPagination } from "./enrollment-application-pagination";
-import { EnrollmentApplicationRejectDialog } from "./enrollment-application-reject-dialog";
-import { EnrollmentApplicationTableRow } from "./enrollment-application-table-row";
-import type { EnrollmentApplication } from "../types/enrollment-application.types";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
+import { EnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/enrollment-application-approve-dialog";
+import { EnrollmentApplicationEmptyState } from "@features/enrollment-applications/components/enrollment-application-empty-state";
+import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
+import { EnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/enrollment-application-reject-dialog";
+import { EnrollmentApplicationTableRow } from "@features/enrollment-applications/components/enrollment-application-table-row";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
 type EnrollmentApplicationTablePresentationProps = {
   data: PaginatedResponse<EnrollmentApplication>;
@@ -22,7 +23,7 @@ type EnrollmentApplicationTablePresentationProps = {
   status?: EnrollmentApplicationStatus;
   canApprove: boolean;
   canReject: boolean;
-  scope?: "platform";
+  scope?: AcademicScope;
 };
 
 export function EnrollmentApplicationTablePresentation({
@@ -40,11 +41,15 @@ export function EnrollmentApplicationTablePresentation({
   const [applicationToReject, setApplicationToReject] = React.useState<EnrollmentApplication>();
 
   function handleApproveDialogOpenChange(open: boolean): void {
-    if (!open) setApplicationToApprove(undefined);
+    if (!open) {
+      setApplicationToApprove(undefined);
+    }
   }
 
   function handleRejectDialogOpenChange(open: boolean): void {
-    if (!open) setApplicationToReject(undefined);
+    if (!open) {
+      setApplicationToReject(undefined);
+    }
   }
 
   function handleResolved(): void {
@@ -88,7 +93,7 @@ export function EnrollmentApplicationTablePresentation({
                 canReject={canReject}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
-                onRowClick={scope === "platform" ? handleRowClick : undefined}
+                onRowClick={scope === AcademicScope.ADMIN ? handleRowClick : undefined}
               />
             ))}
           </TableBody>

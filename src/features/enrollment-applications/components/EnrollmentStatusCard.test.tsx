@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
-import { EnrollmentStatusCard } from "./EnrollmentStatusCard";
-import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
+import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 
 describe("EnrollmentStatusCard", () => {
   const baseApp: EnrollmentApplicationResponse = {

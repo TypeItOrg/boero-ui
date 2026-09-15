@@ -14,6 +14,7 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { InstitutionRoleDeleteButton } from "@features/roles/components/institution-role-delete-button";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
 import { fetchInstitutionPermissionGroups, fetchInstitutionRole } from "@features/roles/services/institution-role.service";
@@ -54,13 +55,7 @@ export default async function RoleDetailPage({
       breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [roleId]: role.name }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="flex h-full items-center gap-3">
-          <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
-            <ShieldCheckIcon className="size-6 sm:size-7" aria-hidden="true" />
-          </div>
-        </div>
-      }
+      actions={<PlatformPageIcon icon={ShieldCheckIcon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">

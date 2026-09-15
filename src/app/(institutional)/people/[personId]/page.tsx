@@ -20,6 +20,7 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 import type { Metadata } from "next";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
@@ -74,11 +75,7 @@ export default async function PersonPage({
       }
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <UserRoundPenIcon className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={UserRoundPenIcon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">

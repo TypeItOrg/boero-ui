@@ -2,6 +2,7 @@ import * as React from "react";
 import { SearchIcon, ShieldCheckIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { EmptyMedia } from "@common/components/ui/empty";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PlatformRoleListItem } from "@features/roles/types/platform-role-list-item.types";
 
@@ -15,7 +16,9 @@ export function PlatformRolesEmptyState({ data, hasFilters, onFirstPage }: Platf
   if (data.totalItems > 0) {
     return (
       <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <ShieldCheckIcon className="mb-4 size-8" />
+        <EmptyMedia className="mb-4" variant="icon">
+          <ShieldCheckIcon className="size-5" />
+        </EmptyMedia>
         <h3 className="text-foreground text-base font-semibold">No hay roles en esta página</h3>
         <p className="mt-1.5 max-w-sm text-sm">Podés volver a la primera página para ver los resultados.</p>
         <Button type="button" variant="outline" size="sm" className="mt-6" onClick={onFirstPage}>
@@ -27,7 +30,9 @@ export function PlatformRolesEmptyState({ data, hasFilters, onFirstPage }: Platf
   const Icon = hasFilters ? SearchIcon : ShieldCheckIcon;
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-      <Icon className="mb-4 size-8" />
+      <EmptyMedia className="mb-4" variant="icon">
+        <Icon className="size-5" />
+      </EmptyMedia>
       <h3 className="text-foreground text-base font-semibold">{hasFilters ? "No se encontraron resultados" : "No hay roles registrados"}</h3>
       <p className="mt-1.5 max-w-sm text-sm">
         {hasFilters ? "No encontramos roles que coincidan con los filtros." : "Todavía no hay roles cargados en las instituciones."}

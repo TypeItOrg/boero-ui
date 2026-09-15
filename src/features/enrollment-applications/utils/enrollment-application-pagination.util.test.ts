@@ -1,4 +1,4 @@
-import { parseEnrollmentApplicationPaginationParams } from "./enrollment-application-pagination.util";
+import { parseEnrollmentApplicationPaginationParams } from "@features/enrollment-applications/utils/enrollment-application-pagination.util";
 
 describe("parseEnrollmentApplicationPaginationParams", () => {
   it("uses the default page, size and no status when no query params are present", () => {

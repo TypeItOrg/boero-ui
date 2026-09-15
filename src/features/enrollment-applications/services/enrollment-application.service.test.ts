@@ -1,5 +1,6 @@
-import type { EnrollmentApplication, EnrollmentApplicationResponse } from "../types/enrollment-application.types";
-import type * as ServiceModule from "./enrollment-application.service";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
+import type * as ServiceModule from "@features/enrollment-applications/services/enrollment-application.service";
 
 const MOCK_APPLICATION: EnrollmentApplicationResponse = {
   applicationId: "app-456",
@@ -23,7 +24,7 @@ describe("enrollment-application.service administrative queries", () => {
       institutionalApiFetch: institutionalApiFetchMock,
     }));
 
-    return import("./enrollment-application.service");
+    return import("@features/enrollment-applications/services/enrollment-application.service");
   }
 
   beforeEach(() => {
@@ -169,7 +170,7 @@ describe("enrollment-application.service institutional queries", () => {
     jest.doMock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
       institutionalApiFetch: enrollmentApplicationApiFetchMock,
     }));
-    return import("./enrollment-application.service");
+    return import("@features/enrollment-applications/services/enrollment-application.service");
   }
 
   const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";

@@ -71,7 +71,7 @@ describe("getInstitutionalNavigationSections", () => {
     ]);
   });
 
-  it("places academic links after the complete platform section", () => {
+  it("places academic links after the complete institution section", () => {
     const sections = getInstitutionalNavigationSections({
       ...USER,
       permissions: [
@@ -82,9 +82,9 @@ describe("getInstitutionalNavigationSections", () => {
       ],
     });
 
-    expect(sections.map((section) => section.label)).toEqual([undefined, "Plataforma", "Académico", "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "Institución", "Académico", "Personal"]);
     expect(sections[0]?.items.map((item) => item.title)).toEqual(["Inicio"]);
-    expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles"]);
+    expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles y permisos"]);
   });
 
   it("shows the applicant section with new enrollment and my applications for applicant roles", () => {
@@ -112,13 +112,13 @@ describe("getInstitutionalNavigationSections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
     expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
-    expect(sections.map((section) => section.label)).toEqual([undefined, "General"]);
+    expect(sections.map((section) => section.label)).toEqual([undefined, "Personal"]);
   });
 
   it("links the account area once for every authenticated user", () => {
     const sections = getInstitutionalNavigationSections(USER);
-    const generalSection = sections.find((section) => section.label === "General");
+    const personalSection = sections.find((section) => section.label === "Personal");
 
-    expect(generalSection).toEqual({ label: "General", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
+    expect(personalSection).toEqual({ label: "Personal", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
   });
 });

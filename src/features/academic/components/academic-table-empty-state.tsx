@@ -2,6 +2,7 @@ import * as React from "react";
 import { GraduationCapIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 
@@ -27,21 +28,21 @@ export function AcademicTableEmptyState({
   const description = supportingDescription ?? copy.description;
 
   return (
-    <div className="bg-muted/25 text-muted-foreground flex h-full min-h-80 flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-      <div className="bg-background text-primary mb-5 flex size-14 items-center justify-center rounded-full border shadow-xs">
-        <Icon className="size-7" aria-hidden="true" />
-      </div>
-      <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">{copy.title}</h3>
-      <p className="text-muted-foreground [&>a:hover]:text-primary mt-2 max-w-md text-sm/relaxed [&>a]:underline [&>a]:underline-offset-4">
-        {description}
-      </p>
+    <Empty className="bg-muted/25 h-full min-h-80 rounded-lg border border-solid px-4 py-12">
+      <EmptyHeader className="max-w-md">
+        <EmptyMedia variant="icon">
+          <Icon className="size-5" aria-hidden="true" />
+        </EmptyMedia>
+        <EmptyTitle className="mt-2 text-base">{copy.title}</EmptyTitle>
+        <EmptyDescription>{description}</EmptyDescription>
+      </EmptyHeader>
       {createAction}
       {hasItemsOnOtherPages ? (
         <Button type="button" variant="outline" size="sm" className="mt-6" onClick={onFirstPage}>
           Volver a la primera página
         </Button>
       ) : null}
-    </div>
+    </Empty>
   );
 }
 

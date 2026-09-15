@@ -1,8 +1,17 @@
+jest.mock("@features/enrollment-applications/services/enrollment-read-client.service", () => ({
+  fetchEnrollmentApplication: jest.fn(),
+  fetchEnrollmentTrainingPaths: jest.fn(),
+}));
+jest.mock("@features/enrollment-applications/services/enrollment-spaces-client.service", () => ({ fetchEnrollmentSpaces: jest.fn() }));
+jest.mock("@features/enrollment-applications/actions/change-enrollment-career.action", () => ({ changeEnrollmentCareerAction: jest.fn() }));
+import { fetchEnrollmentTrainingPaths } from "@features/enrollment-applications/services/enrollment-read-client.service";
+import { fetchEnrollmentSpaces } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
+import { changeEnrollmentCareerAction } from "@features/enrollment-applications/actions/change-enrollment-career.action";
 import * as React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EnrollmentWizard } from "./EnrollmentWizard";
-import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
+import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -13,13 +22,13 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-jest.mock("./EnrollmentStatusCard", () => ({
+jest.mock("@features/enrollment-applications/components/EnrollmentStatusCard", () => ({
   EnrollmentStatusCard: ({ application }: { application: EnrollmentApplicationResponse }) => (
     <div data-testid="status-card">status:{application.status}</div>
   ),
 }));
 
-jest.mock("../actions/enrollment-application.actions", () => ({
+jest.mock("@features/enrollment-applications/actions/enrollment-application.actions", () => ({
   startOrGetEnrollmentApplicationAction: jest.fn(),
   updateEnrollmentDraftAction: jest.fn(),
   submitEnrollmentApplicationAction: jest.fn(),
@@ -33,16 +42,14 @@ import {
   updateEnrollmentDraftAction,
   submitEnrollmentApplicationAction,
   cancelEnrollmentApplicationAction,
-  fetchEnrollmentApplicationTrainingPathsAction,
-  fetchEnrollmentApplicationStudyPlanSpacesAction,
-} from "../actions/enrollment-application.actions";
+} from "@features/enrollment-applications/actions/enrollment-application.actions";
 
 const startAction = jest.mocked(startOrGetEnrollmentApplicationAction);
 const updateAction = jest.mocked(updateEnrollmentDraftAction);
 const submitAction = jest.mocked(submitEnrollmentApplicationAction);
 const cancelAction = jest.mocked(cancelEnrollmentApplicationAction);
-const fetchTrainingPathsAction = jest.mocked(fetchEnrollmentApplicationTrainingPathsAction);
-const fetchStudyPlanSpacesAction = jest.mocked(fetchEnrollmentApplicationStudyPlanSpacesAction);
+const fetchTrainingPathsAction = jest.mocked(fetchEnrollmentTrainingPaths);
+const fetchStudyPlanSpacesAction = jest.mocked(fetchEnrollmentSpaces);
 
 const BASE: EnrollmentApplicationResponse = {
   applicationId: "app-1",
@@ -61,6 +68,7 @@ const BASE: EnrollmentApplicationResponse = {
 const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
   ...BASE,
   data: {
+    academicSpaceSelection: { studyPlanSpaceIds: ["s-1"] },
     personalData: {
       firstName: "Lucas",
       lastName: "Mendoza",
@@ -87,7 +95,7 @@ describe("EnrollmentWizard", () => {
     // El wizard dispara un autoguardado apenas termina de cargar el borrador
     // (aunque el usuario no haya tocado nada todavía), así que sin esto la
     // promesa sin resolver revienta el efecto en cada test.
-    updateAction.mockResolvedValue(BASE);
+    updateAction.mockResolvedValue({ application: BASE });
     fetchTrainingPathsAction.mockResolvedValue([]);
     fetchStudyPlanSpacesAction.mockResolvedValue([]);
   });
@@ -97,7 +105,7 @@ describe("EnrollmentWizard", () => {
   });
 
   it("loads the existing draft and populates the personal data step", async () => {
-    startAction.mockResolvedValue(COMPLETE_DRAFT);
+    startAction.mockResolvedValue({ application: COMPLETE_DRAFT });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -107,16 +115,18 @@ describe("EnrollmentWizard", () => {
   });
 
   it("autosaves the draft after the applicant edits a field", async () => {
-    startAction.mockResolvedValue(BASE);
-    updateAction.mockResolvedValue(BASE);
+    startAction.mockResolvedValue({ application: BASE });
+    updateAction.mockResolvedValue({ application: BASE });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
-    const firstNameInput = await screen.findByLabelText(/^nombre/i);
+    await screen.findByLabelText(/^nombre/i);
+    await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    const schoolInput = await screen.findByLabelText(/colegio secundario/i);
 
     jest.useFakeTimers();
     try {
-      fireEvent.change(firstNameInput, { target: { value: "Ana" } });
+      fireEvent.change(schoolInput, { target: { value: "Colegio Nacional" } });
 
       act(() => {
         jest.advanceTimersByTime(900);
@@ -127,11 +137,11 @@ describe("EnrollmentWizard", () => {
 
     await waitFor(() => expect(updateAction).toHaveBeenCalled());
     const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-    expect(payload.data.personalData?.firstName).toBe("Ana");
+    expect(payload.data.academicBackground?.secondarySchool).toBe("Colegio Nacional");
   });
 
   it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
-    startAction.mockResolvedValue(BASE);
+    startAction.mockResolvedValue({ application: BASE });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -151,9 +161,9 @@ describe("EnrollmentWizard", () => {
   });
 
   it("submits the application when every required field is present", async () => {
-    startAction.mockResolvedValue(COMPLETE_DRAFT);
-    updateAction.mockResolvedValue(COMPLETE_DRAFT);
-    submitAction.mockResolvedValue({ ...COMPLETE_DRAFT, status: "SUBMITTED" });
+    startAction.mockResolvedValue({ application: COMPLETE_DRAFT });
+    updateAction.mockResolvedValue({ application: COMPLETE_DRAFT });
+    submitAction.mockResolvedValue({ application: { ...COMPLETE_DRAFT, status: "SUBMITTED" } });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -166,8 +176,8 @@ describe("EnrollmentWizard", () => {
   });
 
   it("cancels the draft after the applicant confirms the dialog", async () => {
-    startAction.mockResolvedValue(BASE);
-    cancelAction.mockResolvedValue({ ...BASE, status: "CANCELLED" });
+    startAction.mockResolvedValue({ application: BASE });
+    cancelAction.mockResolvedValue({ application: { ...BASE, status: "CANCELLED" } });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -180,7 +190,7 @@ describe("EnrollmentWizard", () => {
   });
 
   it("does not render responsible tab for adult applicant", async () => {
-    startAction.mockResolvedValue(BASE);
+    startAction.mockResolvedValue({ application: BASE });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -190,11 +200,13 @@ describe("EnrollmentWizard", () => {
 
   it("renders responsible tab when applicant is a minor (< 18)", async () => {
     startAction.mockResolvedValue({
-      ...BASE,
-      data: {
-        personalData: {
-          ...BASE.data.personalData,
-          birthDate: "2015-05-12",
+      application: {
+        ...BASE,
+        data: {
+          personalData: {
+            ...BASE.data.personalData,
+            birthDate: "2015-05-12",
+          },
         },
       },
     });
@@ -224,7 +236,7 @@ describe("EnrollmentWizard", () => {
         allowedInstruments: [],
       },
     ]);
-    startAction.mockResolvedValue(BASE);
+    startAction.mockResolvedValue({ application: BASE });
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
 
@@ -248,8 +260,18 @@ describe("EnrollmentWizard", () => {
       },
     };
 
-    startAction.mockResolvedValue(DRAFT_WITH_CAREER);
-    updateAction.mockResolvedValue(DRAFT_WITH_CAREER);
+    jest.mocked(changeEnrollmentCareerAction).mockResolvedValue({
+      application: {
+        ...DRAFT_WITH_CAREER,
+        data: {
+          careerSelection: { trainingPathId: "tp-2" },
+          academicSpaceSelection: { studyPlanSpaceIds: [] },
+          instrumentSelection: { studyPlanSpaceInstrumentIds: {} },
+        },
+      },
+    });
+    startAction.mockResolvedValue({ application: DRAFT_WITH_CAREER });
+    updateAction.mockResolvedValue({ application: DRAFT_WITH_CAREER });
     fetchTrainingPathsAction.mockResolvedValue([
       { id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" },
       { id: "tp-2", name: "Piano", description: "", active: true, institutionId: "inst-1" },
@@ -290,14 +312,14 @@ describe("EnrollmentWizard", () => {
     await waitFor(() => {
       const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
       expect(payload.data.careerSelection).toEqual({ trainingPathId: "tp-2" });
-      expect(payload.data.academicSpaceSelection).toBeUndefined();
+      expect(payload.data.academicSpaceSelection).toEqual({ studyPlanSpaceIds: [] });
       expect(payload.data.instrumentSelection).toBeUndefined();
     });
   });
 
   it("blocks submission when the training paths catalog failed to load, instead of treating it as optional", async () => {
-    startAction.mockResolvedValue(COMPLETE_DRAFT);
-    updateAction.mockResolvedValue(COMPLETE_DRAFT);
+    startAction.mockResolvedValue({ application: COMPLETE_DRAFT });
+    updateAction.mockResolvedValue({ application: COMPLETE_DRAFT });
     fetchTrainingPathsAction.mockRejectedValue(new Error("network error"));
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);
@@ -312,8 +334,8 @@ describe("EnrollmentWizard", () => {
   });
 
   it("blocks submission when the study plan spaces catalog failed to load, instead of treating it as optional", async () => {
-    startAction.mockResolvedValue(COMPLETE_DRAFT);
-    updateAction.mockResolvedValue(COMPLETE_DRAFT);
+    startAction.mockResolvedValue({ application: COMPLETE_DRAFT });
+    updateAction.mockResolvedValue({ application: COMPLETE_DRAFT });
     fetchStudyPlanSpacesAction.mockRejectedValue(new Error("network error"));
 
     render(<EnrollmentWizard studyPlanId="plan-1" academicYearId="year-1" />);

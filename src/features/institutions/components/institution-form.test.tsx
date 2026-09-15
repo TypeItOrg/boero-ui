@@ -11,11 +11,11 @@ jest.mock("@features/locations/components/location-picker", () => ({
   LocationPicker: () => <div data-testid="location-picker" />,
 }));
 
-jest.mock("../actions/create-institution.action", () => ({
+jest.mock("@features/institutions/actions/create-institution.action", () => ({
   createInstitutionAction: jest.fn(),
 }));
 
-jest.mock("../actions/update-institution.action", () => ({
+jest.mock("@features/institutions/actions/update-institution.action", () => ({
   updateInstitutionAction: jest.fn(),
 }));
 

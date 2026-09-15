@@ -1,6 +1,7 @@
 import { CheckIcon, KeyRoundIcon } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
 import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
@@ -27,13 +28,15 @@ export function InstitutionRolePermissions({ permissionCodes, groups }: Institut
 
   if (assignedGroups.length === 0) {
     return (
-      <div className="bg-muted/25 text-muted-foreground flex min-h-80 flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background text-primary mb-5 flex size-14 items-center justify-center rounded-full border shadow-xs">
-          <KeyRoundIcon className="size-7" aria-hidden="true" />
-        </div>
-        <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">Sin permisos asignados</h3>
-        <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">Este rol todavía no concede acceso a ninguna operación.</p>
-      </div>
+      <Empty className="bg-muted/25 min-h-80 rounded-lg border border-solid px-4 py-12">
+        <EmptyHeader className="max-w-md">
+          <EmptyMedia variant="icon">
+            <KeyRoundIcon className="size-5" aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyTitle className="mt-2 text-base">Sin permisos asignados</EmptyTitle>
+          <EmptyDescription>Este rol todavía no concede acceso a ninguna operación.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 

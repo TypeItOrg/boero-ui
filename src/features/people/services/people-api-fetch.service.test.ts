@@ -20,7 +20,7 @@ describe("peopleApiFetch", () => {
   it("uses the institutional session for institutional people requests", async () => {
     const response = new Response(null, { status: 204 });
     institutionalApiFetchMock.mockResolvedValue(response);
-    const { peopleApiFetch } = await import("./people-api-fetch.service");
+    const { peopleApiFetch } = await import("@features/people/services/people-api-fetch.service");
     const init = { method: "PUT" };
 
     await expect(peopleApiFetch(PeopleScope.INSTITUTIONAL, "/api/v1/people/1", init)).resolves.toBe(response);
@@ -32,7 +32,7 @@ describe("peopleApiFetch", () => {
   it("uses the platform session for admin people requests", async () => {
     const response = new Response(null, { status: 204 });
     platformApiFetchMock.mockResolvedValue(response);
-    const { peopleApiFetch } = await import("./people-api-fetch.service");
+    const { peopleApiFetch } = await import("@features/people/services/people-api-fetch.service");
 
     await expect(peopleApiFetch(PeopleScope.ADMIN, "/api/v1/admin/people")).resolves.toBe(response);
 

@@ -3,7 +3,7 @@ jest.mock("@features/platform-auth/services/platform-api-fetch.service", () => (
 }));
 
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
-import { GET } from "./route";
+import { GET } from "@app/api/admin/search/route";
 
 describe("GET /api/admin/search", () => {
   const platformApiFetchMock = jest.mocked(platformApiFetch);

@@ -5,7 +5,7 @@ import {
   healthInclusionSchema,
   preferenceSchema,
   enrollmentApplicationSubmissionSchema,
-} from "./enrollment-application.schema";
+} from "@features/enrollment-applications/schemas/enrollment-application.schema";
 
 describe("enrollment-application.schema", () => {
   describe("calculateAge", () => {

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { BuildingIcon, HouseIcon, PlusIcon, UserLockIcon, UsersIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { MobileBottomNavigation } from "./mobile-bottom-navigation";
+import { MobileBottomNavigation } from "@common/components/navigation/mobile-bottom-navigation";
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),

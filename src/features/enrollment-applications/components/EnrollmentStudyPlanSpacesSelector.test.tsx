@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EnrollmentStudyPlanSpacesSelector } from "./EnrollmentStudyPlanSpacesSelector";
+import { EnrollmentStudyPlanSpacesSelector } from "@features/enrollment-applications/components/EnrollmentStudyPlanSpacesSelector";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 
 const MOCK_SPACES: StudyPlanSpace[] = [

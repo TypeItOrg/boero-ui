@@ -5,6 +5,7 @@ import type { AsyncDropdownRenderItemState } from "@common/types/async-dropdown-
 
 export type AsyncDropdownProps<TItem> = {
   ariaInvalid?: boolean;
+  "aria-required"?: React.AriaAttributes["aria-required"];
   className?: string;
   contentClassName?: string;
   clearLabel?: string;

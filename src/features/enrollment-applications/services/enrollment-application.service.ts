@@ -6,15 +6,13 @@ import { institutionalApiFetch } from "@features/institutional-auth/services/ins
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import { ENROLLMENT_APPLICATIONS_API_PATH } from "../constants/enrollment-application.constants";
-import { ENROLLMENT_APPLICATION_ERROR_MESSAGES } from "../constants/enrollment-application-error-messages.constants";
-import type {
-  EnrollmentApplication,
-  EnrollmentApplicationResponse,
-  StartEnrollmentApplicationInput,
-  UpdateEnrollmentDraftInput,
-} from "../types/enrollment-application.types";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
+import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
+import type { UpdateEnrollmentDraftInput } from "@features/enrollment-applications/types/update-enrollment-draft-input.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
 export type FetchEnrollmentApplicationsParams = {
   page: number;
@@ -30,7 +28,7 @@ export async function fetchEnrollmentApplications(
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications?${buildListSearchParams(params)}`);
 
-  return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
 }
 
 export type FetchPlatformEnrollmentApplicationsParams = FetchEnrollmentApplicationsParams & {
@@ -41,13 +39,14 @@ export async function fetchPlatformEnrollmentApplications(
   params: FetchPlatformEnrollmentApplicationsParams,
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
   const searchParams = buildListSearchParams(params);
+
   if (params.institutionId) {
     searchParams.set("institutionId", params.institutionId);
   }
 
   const response = await platformApiFetch(`/api/v1/admin/enrollment-applications?${searchParams}`);
 
-  return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
 }
 
 export async function fetchPlatformEnrollmentApplicationById(
@@ -56,7 +55,7 @@ export async function fetchPlatformEnrollmentApplicationById(
 ): Promise<EnrollmentApplicationResponse | null> {
   const response = await platformApiFetch(`/api/v1/admin/enrollment-applications/${institutionId}/${applicationId}`);
 
-  return parseNullableHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH);
+  return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
 }
 
 export async function fetchMyEnrollmentApplications(
@@ -65,7 +64,7 @@ export async function fetchMyEnrollmentApplications(
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/my-enrollment-applications?${buildListSearchParams(params)}`);
 
-  return parseHttpResponse(response, ENROLLMENT_APPLICATION_ERROR_MESSAGES.FETCH_MY);
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH_MY);
 }
 
 function buildListSearchParams(params: FetchEnrollmentApplicationsParams): URLSearchParams {
@@ -97,7 +96,8 @@ export async function fetchEnrollmentApplicationById(applicationId: string): Pro
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al obtener la solicitud de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.FETCH_APPLICATION_FAILED);
   }
 
   return response.json();
@@ -116,7 +116,8 @@ export async function startOrGetEnrollmentApplication(input: StartEnrollmentAppl
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al iniciar la solicitud de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.CREATE_APPLICATION_FAILED);
   }
 
   return response.json();
@@ -133,7 +134,8 @@ export async function updateEnrollmentDraft(applicationId: string, input: Update
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al actualizar el borrador de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.UPDATE_DRAFT_FAILED);
   }
 
   return response.json();
@@ -146,7 +148,8 @@ export async function submitEnrollmentApplication(applicationId: string): Promis
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al enviar la solicitud de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.SUBMIT_APPLICATION_FAILED);
   }
 
   return response.json();
@@ -159,7 +162,8 @@ export async function cancelEnrollmentApplication(applicationId: string): Promis
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al cancelar la solicitud de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.CANCEL_APPLICATION_FAILED);
   }
 
   return response.json();
@@ -172,7 +176,8 @@ export async function fetchEnrollmentApplicationTrainingPaths(applicationId: str
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al obtener los trayectos formativos disponibles");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.FETCH_TRAINING_PATHS_FAILED);
   }
 
   return response.json();
@@ -185,10 +190,11 @@ export async function fetchEnrollmentApplicationStudyPlanSpaces(applicationId: s
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al obtener los espacios académicos disponibles");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.FETCH_SPACES_FAILED);
   }
 
   return response.json();
 }
 
-export { getAttachmentDownloadUrl } from "../utils/enrollment-application.util";
+export { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";

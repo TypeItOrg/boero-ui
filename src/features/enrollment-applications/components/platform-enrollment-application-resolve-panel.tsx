@@ -6,11 +6,14 @@ import { BadgeCheckIcon, BanIcon, ShieldCheckIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
-import { EnrollmentApplicationStatusBadge } from "./enrollment-application-status-badge";
-import { PlatformEnrollmentApplicationApproveDialog } from "./platform-enrollment-application-approve-dialog";
-import { PlatformEnrollmentApplicationRejectDialog } from "./platform-enrollment-application-reject-dialog";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
-import type { PlatformEnrollmentApplicationSummary } from "../types/enrollment-application.types";
+import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
+import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
+import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
+import {
+  ENROLLMENT_APPLICATION_STATUS,
+  type EnrollmentApplicationStatus,
+} from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { PlatformEnrollmentApplicationSummary } from "@features/enrollment-applications/types/platform-enrollment-application-summary.types";
 
 type PlatformEnrollmentApplicationResolvePanelProps = {
   application: PlatformEnrollmentApplicationSummary;
@@ -48,7 +51,7 @@ export function PlatformEnrollmentApplicationResolvePanel({
             <EnrollmentApplicationStatusBadge status={status} />
           </div>
 
-          {status === "SUBMITTED" ? (
+          {status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED ? (
             <div className="flex flex-col gap-1.5">
               <Button type="button" size="sm" onClick={() => setShowApproveDialog(true)}>
                 <BadgeCheckIcon />

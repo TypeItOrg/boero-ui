@@ -1,3 +1,4 @@
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ClipboardListIcon } from "lucide-react";
@@ -39,11 +40,13 @@ export default async function EnrollmentApplicationsPage({
   const resolvedSearchParams = await searchParams;
   const { page, size, status, trainingPathId, open } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
   const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status, trainingPathId, open });
-  const { items: trainingPaths } = await fetchTrainingPaths("institutional", user.institutionId, {
-    active: true,
-    size: 100,
-    sort: "name,asc",
-  });
+  const { items: trainingPaths } = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.TRAINING_PATH_READ)
+    ? await fetchTrainingPaths(AcademicScope.INSTITUTIONAL, user.institutionId, {
+        active: true,
+        size: 100,
+        sort: "name,asc",
+      })
+    : { items: [] };
 
   return (
     <PlatformPageShell

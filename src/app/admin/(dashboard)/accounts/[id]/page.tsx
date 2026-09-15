@@ -10,6 +10,7 @@ import { PlatformAccountDetail } from "@features/platform-accounts/components/pl
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { Metadata } from "next";
 
 type PlatformAccountDetailPageProps = {
@@ -34,11 +35,7 @@ export default async function PlatformAccountDetailPage({ params, searchParams }
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <FingerprintIcon className="size-6 sm:size-7" aria-hidden="true" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={FingerprintIcon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">

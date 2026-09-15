@@ -42,7 +42,7 @@ export default async function InstitutionPeoplePage({ params, searchParams }: Pe
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={<PlatformPageIcon icon={UsersIcon} />}
     >
-      <PlatformCollectionActions>
+      <PlatformCollectionActions className="sm:justify-start">
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href={`/admin/institutions/${id}/people/new`}>
             <PlusIcon data-icon="inline-start" />

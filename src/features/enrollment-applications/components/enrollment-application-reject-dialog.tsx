@@ -10,9 +10,9 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
 import { cn } from "@common/utils/cn.util";
-import { rejectEnrollmentApplicationAction } from "../actions/reject-enrollment-application.action";
-import type { EnrollmentApplicationRejectActionState } from "../types/enrollment-application-reject-action-state.types";
-import type { EnrollmentApplication } from "../types/enrollment-application.types";
+import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";
+import type { EnrollmentApplicationRejectActionState } from "@features/enrollment-applications/types/enrollment-application-reject-action-state.types";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
 const INITIAL_STATE: EnrollmentApplicationRejectActionState = {};
 
@@ -43,7 +43,10 @@ export function EnrollmentApplicationRejectDialog({
   }, [state.success, onRejected]);
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isPending && !nextOpen) {
+      return;
+    }
+
     onOpenChange(nextOpen);
   }
 

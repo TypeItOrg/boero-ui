@@ -1,8 +1,8 @@
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationParams } from "@common/types/pagination-params.types";
-import type { EnrollmentApplication } from "../types/enrollment-application.types";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
-import { MyEnrollmentApplicationTablePresentation } from "./my-enrollment-application-table-presentation";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { MyEnrollmentApplicationTablePresentation } from "@features/enrollment-applications/components/my-enrollment-application-table-presentation";
 
 type MyEnrollmentApplicationTableContainerProps = PaginationParams & {
   dataPromise: Promise<PaginatedResponse<EnrollmentApplication>>;

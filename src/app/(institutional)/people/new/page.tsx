@@ -7,6 +7,7 @@ import { InstitutionalBreadcrumb } from "@features/institutional-auth/components
 import { PersonForm } from "@features/people/components/person-form";
 import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -37,11 +38,7 @@ export default async function NewPersonPage({
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <UserPlusIcon className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={UserPlusIcon} />}
     >
       <PersonForm mode="create" institutionId={user.institutionId} scope={PeopleScope.INSTITUTIONAL} returnTo={destination} />
     </PlatformPageShell>

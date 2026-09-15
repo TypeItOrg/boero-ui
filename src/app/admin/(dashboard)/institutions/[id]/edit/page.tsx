@@ -9,6 +9,7 @@ import { InstitutionForm } from "@features/institutions/components/institution-f
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 type EditInstitutionPageProps = {
   params: Promise<{ id: string }>;
@@ -42,11 +43,7 @@ export default async function EditInstitutionPage({ params, searchParams }: Edit
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={Building2Icon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">

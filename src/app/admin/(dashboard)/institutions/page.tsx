@@ -27,7 +27,7 @@ export default async function InstitutionsPage({ searchParams }: PageProps): Pro
 
   return (
     <PlatformPageShell title="Instituciones" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={BuildingIcon} />}>
-      <PlatformCollectionActions>
+      <PlatformCollectionActions className="sm:justify-start">
         <Button asChild size="lg" className="w-full">
           <ReturnToLink href="/admin/institutions/new">
             <PlusIcon data-icon="inline-start" />

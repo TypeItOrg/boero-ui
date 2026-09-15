@@ -176,8 +176,8 @@ function DashboardEmptyState({ icon: Icon, title, description }: DashboardEmptyS
   return (
     <Empty className="bg-muted/25 mt-4 min-h-56 rounded-xl border border-solid p-6">
       <EmptyHeader>
-        <EmptyMedia variant="icon" className="bg-background size-12 rounded-xl border shadow-xs">
-          <Icon aria-hidden="true" className="size-6" />
+        <EmptyMedia variant="icon">
+          <Icon aria-hidden="true" className="size-5" />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>
         <EmptyDescription>{description}</EmptyDescription>

@@ -18,8 +18,8 @@ export function NotFoundContent(): React.ReactElement {
       <Card className="bg-background w-full max-w-lg p-6 md:p-8">
         <Empty className="border-0 p-0">
           <EmptyHeader>
-            <EmptyMedia variant="icon" className="mb-4 size-16 rounded-full">
-              <SearchXIcon className="size-8" />
+            <EmptyMedia variant="icon">
+              <SearchXIcon className="size-5" />
             </EmptyMedia>
             <EmptyTitle className="text-lg">Página no encontrada</EmptyTitle>
             <EmptyDescription>La página que estás buscando no existe, fue movida o la dirección ingresada no es correcta.</EmptyDescription>

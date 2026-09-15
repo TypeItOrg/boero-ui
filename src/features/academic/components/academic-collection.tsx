@@ -130,7 +130,9 @@ export async function AcademicCollectionView({
     <div className="flex h-full flex-col gap-4">
       <DataTableNavigationProvider>
         <Sheet>
-          <PlatformCollectionActions className={useAdvancedFilters && createAction ? "sm:justify-between" : undefined}>
+          <PlatformCollectionActions
+            className={useAdvancedFilters && createAction ? "sm:justify-between" : createAction ? "sm:justify-start" : undefined}
+          >
             {useAdvancedFilters ? (
               <>
                 {createAction}

@@ -3,6 +3,7 @@ import { ArrowUpRightIcon, CalendarDaysIcon, CircleAlertIcon, Layers3Icon, Libra
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { formatDisplayDate } from "@common/utils/date-input.util";
 import { AcademicSpaceUsagePagination } from "@features/academic/components/academic-space-usage-pagination";
@@ -42,15 +43,15 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
       </div>
 
       {plans.items.length === 0 ? (
-        <div className="bg-background mt-5 flex min-h-64 flex-col items-center justify-center rounded-xl border px-4 py-10 text-center">
-          <div className="bg-background text-primary mb-5 flex size-14 items-center justify-center rounded-full border shadow-xs">
-            <Layers3Icon className="size-7" aria-hidden="true" />
-          </div>
-          <h3 className="text-foreground font-heading text-lg font-medium tracking-tight">Este espacio todavía no está incorporado a ningún plan</h3>
-          <p className="text-muted-foreground mt-2 max-w-md text-sm/relaxed">
-            Cuando forme parte de una estructura curricular, vas a poder consultar sus ubicaciones acá.
-          </p>
-        </div>
+        <Empty className="bg-background mt-5 min-h-64 rounded-xl border border-solid px-4 py-10">
+          <EmptyHeader className="max-w-md">
+            <EmptyMedia variant="icon">
+              <Layers3Icon className="size-5" aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyTitle className="mt-2 text-base">Este espacio todavía no está incorporado a ningún plan</EmptyTitle>
+            <EmptyDescription>Cuando forme parte de una estructura curricular, vas a poder consultar sus ubicaciones acá.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <>
           <div className="mt-5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] gap-4">

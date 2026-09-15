@@ -1,4 +1,4 @@
-export type EnrollmentPeriodStatus = "PLANNED" | "OPEN" | "CLOSED";
+import type { EnrollmentPeriodStatus } from "@features/enrollment-periods/types/enrollment-period-status.types";
 
 export type EnrollmentPeriod = {
   id: string;
@@ -10,21 +10,4 @@ export type EnrollmentPeriod = {
   endDate: string;
   status: EnrollmentPeriodStatus;
   deletedAt?: string | null;
-};
-
-export type CreateEnrollmentPeriodRequest = {
-  academicYearId: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-};
-
-export type UpdateEnrollmentPeriodRequest = {
-  name: string;
-  startDate: string;
-  endDate: string;
-};
-
-export type EnrollmentPeriodStatusRequest = {
-  status: EnrollmentPeriodStatus;
 };

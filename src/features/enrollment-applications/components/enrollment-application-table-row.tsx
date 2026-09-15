@@ -1,13 +1,14 @@
 "use client";
 
+import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { BadgeCheckIcon, BanIcon, EllipsisVerticalIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
-import type { EnrollmentApplication } from "../types/enrollment-application.types";
-import { formatEnrollmentApplicationDate } from "../utils/enrollment-application-date.util";
-import { EnrollmentApplicationStatusBadge } from "./enrollment-application-status-badge";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
 
 type EnrollmentApplicationTableRowProps = {
   application: EnrollmentApplication;
@@ -26,7 +27,7 @@ export function EnrollmentApplicationTableRow({
   onReject,
   onRowClick,
 }: EnrollmentApplicationTableRowProps): React.ReactElement {
-  const isPendingEvaluation = application.status === "SUBMITTED";
+  const isPendingEvaluation = application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED;
   const canResolve = isPendingEvaluation && (canApprove || canReject);
 
   return (
@@ -45,7 +46,7 @@ export function EnrollmentApplicationTableRow({
         <EnrollmentApplicationStatusBadge status={application.status} />
       </TableCell>
       <TableCell className="max-w-72">
-        {application.status === "REJECTED" && application.rejectionReason ? (
+        {application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED && application.rejectionReason ? (
           <span className="text-destructive">{application.rejectionReason}</span>
         ) : (
           <span className="text-muted-foreground/60">—</span>

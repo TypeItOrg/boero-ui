@@ -5,7 +5,7 @@ import { academicApiFetch } from "@features/academic/services/academic-api-fetch
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 const academicOptionsRequestSchema = z.object({
-  resource: z.enum(["training-paths", "academic-spaces", "study-plans", "academic-years"]),
+  resource: z.enum(["training-paths", "academic-spaces", "study-plans", "academic-years", "instruments"]),
   institutionId: z.uuid(),
   active: z.enum(["true", "false", "all"]).default("true"),
   page: z.coerce.number().int().min(0).default(0),
@@ -14,7 +14,8 @@ const academicOptionsRequestSchema = z.object({
   status: z.enum(["DRAFT", "ACTIVE", "INACTIVE"]).optional(),
 });
 
-const DEFAULT_SORT_BY_RESOURCE: Record<"training-paths" | "academic-spaces" | "study-plans" | "academic-years", string> = {
+const DEFAULT_SORT_BY_RESOURCE: Record<"training-paths" | "academic-spaces" | "study-plans" | "academic-years" | "instruments", string> = {
+  instruments: "name,asc",
   "academic-spaces": "name,asc",
   "academic-years": "year,desc",
   "study-plans": "name,asc",
@@ -27,6 +28,7 @@ export async function proxyAcademicOptionsGet(request: Request, resourceSegment:
     resource: resourceSegment,
     ...Object.fromEntries(searchParams),
   });
+
   if (!parsed.success) {
     return Response.json({ message: "Los parámetros de opciones académicas no son válidos." }, { status: 400 });
   }
@@ -37,13 +39,24 @@ export async function proxyAcademicOptionsGet(request: Request, resourceSegment:
     size: String(parsed.data.size),
     sort: DEFAULT_SORT_BY_RESOURCE[parsed.data.resource],
   });
-  if (parsed.data.active !== "all") backendParams.set("active", parsed.data.active);
-  if (parsed.data.search) backendParams.set("search", parsed.data.search);
-  if (parsed.data.status) backendParams.set("status", parsed.data.status);
+
+  if (parsed.data.active !== "all") {
+    backendParams.set("active", parsed.data.active);
+  }
+
+  if (parsed.data.search) {
+    backendParams.set("search", parsed.data.search);
+  }
+
+  if (parsed.data.status) {
+    backendParams.set("status", parsed.data.status);
+  }
 
   const backendPath = `${getAcademicApiBase(scope, parsed.data.institutionId)}/${parsed.data.resource}?${backendParams}`;
+
   try {
     const response = await academicApiFetch(scope, backendPath, { signal: request.signal });
+
     return createPassthroughResponse(response);
   } catch {
     return Response.json({ message: "El servicio de opciones académicas no está disponible." }, { status: 503 });

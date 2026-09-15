@@ -6,11 +6,11 @@ import { Loader2Icon } from "lucide-react";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { MyEnrollmentApplicationEmptyState } from "./my-enrollment-application-empty-state";
-import { MyEnrollmentApplicationTableRow } from "./my-enrollment-application-table-row";
-import { EnrollmentApplicationPagination } from "./enrollment-application-pagination";
-import type { EnrollmentApplication } from "../types/enrollment-application.types";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
+import { MyEnrollmentApplicationEmptyState } from "@features/enrollment-applications/components/my-enrollment-application-empty-state";
+import { MyEnrollmentApplicationTableRow } from "@features/enrollment-applications/components/my-enrollment-application-table-row";
+import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
 type MyEnrollmentApplicationTablePresentationProps = {
   data: PaginatedResponse<EnrollmentApplication>;
@@ -42,7 +42,9 @@ export function MyEnrollmentApplicationTablePresentation({
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Motivo de rechazo</TableHead>
-              <TableHead className="w-32">Acciones</TableHead>
+              <TableHead className="w-16 pr-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

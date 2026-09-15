@@ -11,6 +11,7 @@ import { getInstitutionalMetadata } from "@features/institutional-auth/utils/ins
 import { fetchInstitutionalInstitution } from "@features/institutions/services/fetch-institutional-institution.service";
 import { InstitutionalInstitutionForm } from "@features/institutions/components/institutional-institution-form";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Editar mi institución");
@@ -35,11 +36,7 @@ export default async function EditInstitutionalInstitutionPage(): Promise<React.
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <Building2Icon className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={Building2Icon} />}
     >
       <InstitutionalInstitutionForm institution={institution} returnTo="/institution" />
     </PlatformPageShell>

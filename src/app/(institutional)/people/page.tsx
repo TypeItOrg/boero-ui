@@ -46,7 +46,7 @@ export default async function PeoplePage({ searchParams }: { searchParams: Promi
 
   return (
     <PlatformPageShell title="Usuarios" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UsersIcon} />}>
-      <PlatformCollectionActions>
+      <PlatformCollectionActions className="sm:justify-start">
         {canCreate ? (
           <Button asChild size="lg" className="w-full">
             <ReturnToLink href="/people/new">

@@ -65,13 +65,13 @@ export function StudyPlanCurriculumView({
       </div>
 
       {isEmpty ? (
-        <Empty className="bg-background mt-5 min-h-72 border-0">
-          <EmptyHeader className="max-w-md">
-            <EmptyMedia className="bg-background text-primary mb-5 size-14 rounded-full border shadow-xs" variant="default">
-              <BookOpenCheckIcon />
+        <Empty className="bg-muted/25 mt-5 min-h-72 rounded-xl border border-solid p-6">
+          <EmptyHeader className="max-w-sm">
+            <EmptyMedia variant="icon">
+              <BookOpenCheckIcon className="size-5" />
             </EmptyMedia>
-            <EmptyTitle className="text-foreground font-heading text-lg font-medium tracking-tight">La currícula todavía está vacía</EmptyTitle>
-            <EmptyDescription className="text-sm/relaxed">Creá los niveles y luego incorporá espacios académicos al plan.</EmptyDescription>
+            <EmptyTitle className="text-base">La currícula todavía está vacía</EmptyTitle>
+            <EmptyDescription>Creá los niveles y luego incorporá espacios académicos al plan.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (

@@ -3,8 +3,10 @@ import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types"
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-type AcademicOptionResource = "training-paths" | "academic-spaces" | "study-plans" | "academic-years";
+type AcademicOptionResource = "training-paths" | "academic-spaces" | "study-plans" | "academic-years" | "instruments";
+
 type AcademicOption = { id: string };
+
 type AcademicOptionActiveFilter = boolean | "all";
 
 export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
@@ -20,8 +22,15 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     search,
     size: String(size),
   });
-  if (options.active !== undefined) searchParams.set("active", String(options.active));
-  if (options.status) searchParams.set("status", options.status);
+
+  if (options.active !== undefined) {
+    searchParams.set("active", String(options.active));
+  }
+
+  if (options.status) {
+    searchParams.set("status", options.status);
+  }
+
   const response = await fetch(`/api/${scope}/academic/options/${resource}?${searchParams}`, {
     cache: "no-store",
     signal,
@@ -30,6 +39,7 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     response,
     "No se pudieron cargar las opciones académicas.",
   );
+
   return {
     items: data.items,
     nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null,

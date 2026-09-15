@@ -26,11 +26,14 @@ const optionalText = (max: number) =>
     .trim()
     .max(max)
     .transform((value) => value || null);
+
 const optionalDate = z
   .string()
   .refine((value) => !value || parseDateInput(value) !== undefined, "Ingresá una fecha válida.")
   .transform((value) => value || null);
+
 const name = z.string().trim().min(1, "Ingresá un nombre.").max(150, "El nombre no puede superar los 150 caracteres.");
+
 const positiveOrder = z.coerce.number().int().min(1, "El orden debe ser positivo.");
 
 const studyPlanValiditySchema = z
@@ -61,11 +64,14 @@ const activeSchema = z
   .transform((val) => (val === undefined ? undefined : val === true || val === "true"));
 
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 const timeField = z.string().regex(timePattern, "Ingresá una hora válida (HH:mm).");
+
 const scheduleSchema = z.object({ startTime: timeField, endTime: timeField });
 
 function toMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
+
   return hours * 60 + minutes;
 }
 
@@ -81,6 +87,7 @@ const courseClassDaySchema = z
     day.schedules.forEach((schedule, index) => {
       const start = toMinutes(schedule.startTime);
       const end = toMinutes(schedule.endTime);
+
       if (start < 0 || end < 0 || start >= end) {
         context.addIssue({
           code: "custom",
@@ -90,16 +97,23 @@ const courseClassDaySchema = z
         hasInvalidSchedule = true;
       }
     });
-    if (hasInvalidSchedule) return;
+
+    if (hasInvalidSchedule) {
+      return;
+    }
+
     const totalMinutes = day.schedules.reduce((total, schedule) => total + (toMinutes(schedule.endTime) - toMinutes(schedule.startTime)), 0);
+
     if (totalMinutes <= 0) {
       context.addIssue({
         code: "custom",
         message: "Los horarios deben tener una duración mayor a 0.",
         path: ["schedules"],
       });
+
       return;
     }
+
     const slots = day.schedules
       .map((schedule, index) => ({
         index,
@@ -107,6 +121,7 @@ const courseClassDaySchema = z
         end: toMinutes(schedule.endTime),
       }))
       .sort((a, b) => a.start - b.start);
+
     for (let index = 1; index < slots.length; index += 1) {
       if (slots[index].start < slots[index - 1].end) {
         context.addIssue({
@@ -137,6 +152,7 @@ const parsedCourseClasses = z
       return JSON.parse(value) as unknown;
     } catch {
       context.addIssue({ code: "custom", message: "Las clases del curso no son válidas." });
+
       return z.NEVER;
     }
   })
@@ -151,7 +167,10 @@ const courseSchema = z
     classes: parsedCourseClasses,
   })
   .superRefine((value, context) => {
-    if (value.format !== "INDIVIDUAL") return;
+    if (value.format !== "INDIVIDUAL") {
+      return;
+    }
+
     value.classes.forEach((courseClass, classIndex) => {
       courseClass.days.forEach((day, dayIndex) => {
         if (!day.periodDurationMinutes) {
@@ -160,11 +179,17 @@ const courseSchema = z
             message: "Indicá la duración de cada período para los espacios individuales.",
             path: ["classes"],
           });
+
           return;
         }
+
         day.schedules.forEach((schedule, scheduleIndex) => {
-          if (day.periodDurationMinutes == null) return;
+          if (day.periodDurationMinutes == null) {
+            return;
+          }
+
           const duration = toMinutes(schedule.endTime) - toMinutes(schedule.startTime);
+
           if (duration % day.periodDurationMinutes !== 0) {
             context.addIssue({
               code: "custom",
@@ -178,6 +203,7 @@ const courseSchema = z
   });
 
 const namedResourceSchema = z.object({ name, description: optionalText(1000), active: activeSchema });
+
 const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
   [AcademicResource.ACADEMIC_YEAR]: z
     .object({
@@ -243,6 +269,9 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     requirementType: z.enum(REQUIREMENT_TYPE),
     displayOrder: positiveOrder,
     approvalMode: z.enum(APPROVAL_MODE),
+    instrumentIds: z
+      .array(z.uuid("Seleccioná instrumentos válidos."))
+      .refine((ids) => new Set(ids).size === ids.length, "No se pueden repetir instrumentos."),
   }),
   [AcademicResource.PREREQUISITE]: z.object({
     requiredStudyPlanSpaceId: z.string().uuid("Seleccioná un espacio requerido."),
@@ -253,7 +282,11 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
 };
 
 export function parseAcademicForm(resource: AcademicResource, formData: FormData) {
-  return academicFormSchemas[resource].safeParse(Object.fromEntries(formData.entries()));
+  const values = Object.fromEntries(formData.entries());
+
+  return academicFormSchemas[resource].safeParse(
+    resource === AcademicResource.STUDY_PLAN_SPACE ? { ...values, instrumentIds: formData.getAll("instrumentIds") } : values,
+  );
 }
 
 export function parseStudyPlanVersionForm(formData: FormData) {
@@ -276,10 +309,14 @@ export const academicStatusSchema = z.discriminatedUnion("resource", [
           message: "Ingresá la fecha de finalización.",
           path: ["effectiveTo"],
         });
+
         return;
       }
 
-      if (isValidDateRange(value.effectiveFrom, value.effectiveTo)) return;
+      if (isValidDateRange(value.effectiveFrom, value.effectiveTo)) {
+        return;
+      }
+
       context.addIssue({
         code: "custom",
         message: "La fecha final no puede ser anterior al inicio del plan.",

@@ -1,7 +1,10 @@
 import * as React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { EnrollmentStartSelector } from "./EnrollmentStartSelector";
-import type { EnrollmentStartStudyPlanOption, EnrollmentStartPeriodOption } from "./EnrollmentStartSelector";
+import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import type {
+  EnrollmentStartStudyPlanOption,
+  EnrollmentStartPeriodOption,
+} from "@features/enrollment-applications/components/EnrollmentStartSelector";
 
 describe("EnrollmentStartSelector", () => {
   const studyPlans: EnrollmentStartStudyPlanOption[] = [

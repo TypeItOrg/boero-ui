@@ -24,6 +24,7 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   instruments: "Instrumentos",
   courses: "Cursos",
   shifts: "Turnos",
+  "enrollment-periods": "Períodos de inscripción",
   "enrollment-applications": "Solicitudes de inscripción",
 };
 
@@ -40,6 +41,7 @@ type PlatformBreadcrumbProps = {
 };
 
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
+
 const EMPTY_SEGMENTS: readonly string[] = [];
 
 function getSegments(
@@ -62,9 +64,13 @@ function getSegments(
 
   let accumulatedPath = "/admin";
   let visiblePartIndex = 0;
+
   for (const part of parts) {
     accumulatedPath = `${accumulatedPath}/${part}`;
-    if (hiddenSegmentSet.has(part)) continue;
+
+    if (hiddenSegmentSet.has(part)) {
+      continue;
+    }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
     const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
@@ -73,7 +79,9 @@ function getSegments(
     visiblePartIndex += 1;
   }
 
-  if (trailingLabel) segments.push({ label: trailingLabel });
+  if (trailingLabel) {
+    segments.push({ label: trailingLabel });
+  }
 
   return segments;
 }

@@ -1,4 +1,4 @@
-import { isNavigationItemActive } from "./navigation.util";
+import { isNavigationItemActive } from "@common/utils/navigation.util";
 
 describe("isNavigationItemActive", () => {
   it("matches a destination and its nested routes", () => {

@@ -1,41 +1,50 @@
-import { EnrollmentApplicationStatus, EnrollmentDocumentType } from "../types/enrollment-application.types";
+import {
+  ENROLLMENT_APPLICATION_STATUS,
+  type EnrollmentApplicationStatus,
+} from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { ENROLLMENT_DOCUMENT_TYPE, type EnrollmentDocumentType } from "@features/enrollment-applications/types/enrollment-document-type.types";
 
 export const ENROLLMENT_APPLICATIONS_API_PATH = "/api/v1/enrollment-applications";
 
+export const ACTIVE_ENROLLMENT_APPLICATION_STATUSES = [
+  ENROLLMENT_APPLICATION_STATUS.DRAFT,
+  ENROLLMENT_APPLICATION_STATUS.SUBMITTED,
+  ENROLLMENT_APPLICATION_STATUS.APPROVED,
+] as const satisfies readonly EnrollmentApplicationStatus[];
+
 export const ENROLLMENT_APPLICATION_STATUS_LABELS: Record<EnrollmentApplicationStatus, string> = {
-  DRAFT: "Borrador",
-  SUBMITTED: "Enviada",
-  APPROVED: "Aprobada",
-  CANCELLED: "Cancelada",
-  REJECTED: "Rechazada",
+  [ENROLLMENT_APPLICATION_STATUS.DRAFT]: "Borrador",
+  [ENROLLMENT_APPLICATION_STATUS.SUBMITTED]: "Enviada",
+  [ENROLLMENT_APPLICATION_STATUS.APPROVED]: "Aprobada",
+  [ENROLLMENT_APPLICATION_STATUS.CANCELLED]: "Cancelada",
+  [ENROLLMENT_APPLICATION_STATUS.REJECTED]: "Rechazada",
 };
 
 export const ENROLLMENT_APPLICATION_STATUS_VARIANTS: Record<
   EnrollmentApplicationStatus,
   "secondary" | "default" | "outline" | "success" | "destructive"
 > = {
-  DRAFT: "secondary",
-  SUBMITTED: "default",
-  CANCELLED: "outline",
-  APPROVED: "success",
-  REJECTED: "destructive",
+  [ENROLLMENT_APPLICATION_STATUS.DRAFT]: "secondary",
+  [ENROLLMENT_APPLICATION_STATUS.SUBMITTED]: "default",
+  [ENROLLMENT_APPLICATION_STATUS.CANCELLED]: "outline",
+  [ENROLLMENT_APPLICATION_STATUS.APPROVED]: "success",
+  [ENROLLMENT_APPLICATION_STATUS.REJECTED]: "destructive",
 };
 
 export const ENROLLMENT_APPLICATION_STATUS_OPTIONS = [
   { value: "all", label: "Todos los estados" },
-  { value: "DRAFT", label: "Borrador" },
-  { value: "SUBMITTED", label: "Enviada" },
-  { value: "APPROVED", label: "Aprobada" },
-  { value: "REJECTED", label: "Rechazada" },
-  { value: "CANCELLED", label: "Cancelada" },
+  ...Object.values(ENROLLMENT_APPLICATION_STATUS).map((status) => ({
+    value: status,
+    label: ENROLLMENT_APPLICATION_STATUS_LABELS[status],
+  })),
 ] as const;
 
 export const ENROLLMENT_DOCUMENT_TYPE_LABELS: Record<EnrollmentDocumentType, string> = {
-  DNI_FRONT: "DNI Frente",
-  DNI_BACK: "DNI Dorso",
-  SECONDARY_CERTIFICATE: "Título Secundario",
-  HEALTH_REPORT: "Informe de Salud",
-  PHOTO_ID: "Foto 4x4",
+  [ENROLLMENT_DOCUMENT_TYPE.DNI_FRONT]: "DNI Frente",
+  [ENROLLMENT_DOCUMENT_TYPE.DNI_BACK]: "DNI Dorso",
+  [ENROLLMENT_DOCUMENT_TYPE.SECONDARY_CERTIFICATE]: "Título Secundario",
+  [ENROLLMENT_DOCUMENT_TYPE.HEALTH_REPORT]: "Informe de Salud",
+  [ENROLLMENT_DOCUMENT_TYPE.PHOTO_ID]: "Foto 4x4",
 };
 
 export const SHIFT_OPTIONS = [

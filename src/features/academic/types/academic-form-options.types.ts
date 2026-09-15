@@ -4,6 +4,7 @@ import type { AcademicSpace } from "@features/academic/types/academic-space.type
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import type { StudyPlanSpaceInstrumentOption } from "@features/academic/types/study-plan-space-instrument-option.types";
 
 export type AcademicFormOptions = {
   academicSpaces?: AcademicSpace[];
@@ -11,6 +12,7 @@ export type AcademicFormOptions = {
   excludedPlanSpaceId?: string;
   initialValues?: Record<string, FormValue>;
   levels?: AcademicLevel[];
+  initialInstruments?: readonly StudyPlanSpaceInstrumentOption[];
   planSpaces?: StudyPlanSpace[];
   trainingPaths?: TrainingPath[];
   institutionId?: string;

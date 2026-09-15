@@ -1,15 +1,16 @@
+import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import "server-only";
 
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import type {
-  CreateEnrollmentPeriodRequest,
-  EnrollmentPeriod,
-  EnrollmentPeriodStatusRequest,
-  UpdateEnrollmentPeriodRequest,
-} from "../types/enrollment-period.types";
+import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
+import type { CreateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/create-enrollment-period-request.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
+import type { EnrollmentPeriodStatusRequest } from "@features/enrollment-periods/types/enrollment-period-status-request.types";
+import type { UpdateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/update-enrollment-period-request.types";
 
 const getPeriodsPath = (institutionId: string) => `/api/v1/institutions/${institutionId}/enrollment-periods`;
 
@@ -29,20 +30,54 @@ export async function listEnrollmentPeriods(
   scope: AcademicScopeType = AcademicScope.INSTITUTIONAL,
 ): Promise<PaginatedResponse<EnrollmentPeriod>> {
   const queryParams = new URLSearchParams();
-  if (params?.academicYearId) queryParams.set("academicYearId", params.academicYearId);
-  if (params?.status) queryParams.set("status", params.status);
-  if (params?.search) queryParams.set("search", params.search);
-  if (params?.page !== undefined) queryParams.set("page", String(params.page));
-  if (params?.size !== undefined) queryParams.set("size", String(params.size));
+
+  if (params?.academicYearId) {
+    queryParams.set("academicYearId", params.academicYearId);
+  }
+
+  if (params?.status) {
+    queryParams.set("status", params.status);
+  }
+
+  if (params?.search) {
+    queryParams.set("search", params.search);
+  }
+
+  if (params?.page !== undefined) {
+    queryParams.set("page", String(params.page));
+  }
+
+  if (params?.size !== undefined) {
+    queryParams.set("size", String(params.size));
+  }
 
   const queryString = queryParams.toString();
   const url = `${getPeriodsPath(institutionId)}${queryString ? `?${queryString}` : ""}`;
 
   const response = await enrollmentApiFetch(scope, url, { method: "GET" });
+
   if (!response.ok) {
-    throw new Error("Error al obtener los períodos de inscripción");
+    throw new Error(ENROLLMENT_MESSAGES.PERIOD_FETCH_FAILED);
   }
+
   return response.json();
+}
+
+export async function fetchEnrollmentPeriod(
+  institutionId: string,
+  periodId: string,
+  scope: AcademicScopeType = AcademicScope.INSTITUTIONAL,
+): Promise<EnrollmentPeriod | null> {
+  const response = await enrollmentApiFetch(scope, `${getPeriodsPath(institutionId)}/${periodId}`, { method: "GET" });
+
+  return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.PERIOD_FETCH_FAILED);
+}
+
+export async function fetchAvailableEnrollmentPeriods(params: { page: number; size: number }): Promise<PaginatedResponse<EnrollmentPeriod>> {
+  const query = new URLSearchParams({ page: String(params.page), size: String(params.size) });
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/options/periods?${query}`);
+
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.PERIOD_FETCH_FAILED);
 }
 
 export async function createEnrollmentPeriod(
@@ -55,10 +90,13 @@ export async function createEnrollmentPeriod(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al crear el período de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.PERIOD_CREATE_FAILED);
   }
+
   return response.json();
 }
 
@@ -73,10 +111,13 @@ export async function updateEnrollmentPeriod(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al actualizar el período de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.PERIOD_UPDATE_FAILED);
   }
+
   return response.json();
 }
 
@@ -91,9 +132,11 @@ export async function updateEnrollmentPeriodStatus(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al actualizar el estado del período de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.PERIOD_STATUS_FAILED);
   }
 }
 
@@ -105,8 +148,10 @@ export async function deleteEnrollmentPeriod(
   const response = await enrollmentApiFetch(scope, `${getPeriodsPath(institutionId)}/${periodId}`, {
     method: "DELETE",
   });
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Error al eliminar el período de inscripción");
+
+    throw new Error(errorData.message || ENROLLMENT_MESSAGES.PERIOD_DELETE_FAILED);
   }
 }

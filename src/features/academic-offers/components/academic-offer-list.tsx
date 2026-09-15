@@ -21,8 +21,8 @@ export function AcademicOfferList({ items, page, size, totalItems, totalPages }:
     return (
       <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6">
         <EmptyHeader className="max-w-md">
-          <EmptyMedia variant="icon" className="text-primary size-12 rounded-full">
-            <RouteIcon className="size-6" />
+          <EmptyMedia variant="icon">
+            <RouteIcon className="size-5" />
           </EmptyMedia>
           <EmptyTitle className="text-base">No hay trayectos disponibles</EmptyTitle>
           <EmptyDescription>Cuando la institución habilite un plan de estudio vigente, vas a encontrarlo en esta sección.</EmptyDescription>

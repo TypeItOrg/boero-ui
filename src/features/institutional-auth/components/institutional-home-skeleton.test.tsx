@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 
-import { InstitutionalHomeSkeleton } from "./institutional-home-skeleton";
+import { InstitutionalHomeSkeleton } from "@features/institutional-auth/components/institutional-home-skeleton";
 
 describe("InstitutionalHomeSkeleton", () => {
   it("renders with accessible status role and label", () => {

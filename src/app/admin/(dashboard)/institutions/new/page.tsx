@@ -5,6 +5,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { InstitutionForm } from "@features/institutions/components/institution-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 export const metadata = {
   title: "Nueva institución",
@@ -25,11 +26,7 @@ export default async function NewInstitutionPage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ new: "Nueva" }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <Building2 className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={Building2} />}
     >
       <InstitutionForm mode="create" returnTo={destination} />
     </PlatformPageShell>

@@ -1,36 +1,58 @@
+import { ENROLLMENT_DOCUMENT_TYPE } from "@features/enrollment-applications/types/enrollment-document-type.types";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { z } from "zod";
+import { parseDateInput } from "@common/utils/date-input.util";
+
+const BUSINESS_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Argentina/Buenos_Aires",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 export function calculateAge(birthDate: string | Date | undefined): number | null {
-  if (!birthDate) return null;
-  const date = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
-  if (isNaN(date.getTime())) return null;
-  const today = new Date();
-  let age = today.getFullYear() - date.getFullYear();
-  const monthDiff = today.getMonth() - date.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) {
+  if (!birthDate) {
+    return null;
+  }
+
+  const date = typeof birthDate === "string" ? parseDateInput(birthDate) : birthDate;
+
+  if (!date || isNaN(date.getTime())) {
+    return null;
+  }
+
+  const parts = BUSINESS_DATE_FORMATTER.formatToParts(new Date());
+  const year = Number(parts.find((part) => part.type === "year")?.value);
+  const month = Number(parts.find((part) => part.type === "month")?.value);
+  const day = Number(parts.find((part) => part.type === "day")?.value);
+  let age = year - date.getFullYear();
+  const monthDiff = month - 1 - date.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && day < date.getDate())) {
     age--;
   }
+
   return age >= 0 ? age : null;
 }
 
 export const startEnrollmentApplicationSchema = z.object({
-  studyPlanId: z.string().uuid("El plan de estudio debe ser un UUID válido"),
-  academicYearId: z.string().uuid("El ciclo lectivo debe ser un UUID válido"),
+  studyPlanId: z.string().uuid(ENROLLMENT_MESSAGES.STUDY_PLAN_ID_INVALID),
+  academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID),
 });
 
 // Paso 1: Datos Personales y Contacto
 export const personalDataSchema = z.object({
-  firstName: z.string().trim().min(1, "El nombre es obligatorio"),
-  lastName: z.string().trim().min(1, "El apellido es obligatorio"),
-  documentNumber: z.string().trim().min(1, "El número de documento es obligatorio"),
-  birthDate: z.string().trim().min(1, "La fecha de nacimiento es obligatoria"),
-  phoneNumber: z.string().trim().min(1, "El teléfono de contacto es obligatorio"),
-  email: z.string().trim().min(1, "El correo electrónico es obligatorio").email("El correo electrónico no es válido"),
+  firstName: z.string().trim().min(1, ENROLLMENT_MESSAGES.NAME_REQUIRED),
+  lastName: z.string().trim().min(1, ENROLLMENT_MESSAGES.LAST_NAME_REQUIRED),
+  documentNumber: z.string().trim().min(1, ENROLLMENT_MESSAGES.DOCUMENT_REQUIRED),
+  birthDate: z.string().trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
+  phoneNumber: z.string().trim().nullish(),
+  email: z.string().trim().min(1, ENROLLMENT_MESSAGES.EMAIL_REQUIRED).email(ENROLLMENT_MESSAGES.EMAIL_INVALID),
 });
 
 // Paso 2: Escolaridad de Base
 export const academicBackgroundSchema = z.object({
-  secondarySchool: z.string().trim().min(1, "El colegio de origen es obligatorio"),
+  secondarySchool: z.string().trim().min(1, ENROLLMENT_MESSAGES.SCHOOL_REQUIRED),
   currentGradeYear: z.string().trim().optional(),
   secondaryCompleted: z.boolean().default(false),
   secondaryDegreeTitle: z.string().trim().optional(),
@@ -54,7 +76,7 @@ export const responsibleSchema = z.object({
 
 // Paso 5: Preferencias
 export const preferenceSchema = z.object({
-  preferredShift: z.string().trim().min(1, "Debe seleccionar un turno preferente"),
+  preferredShift: z.string().trim().min(1, ENROLLMENT_MESSAGES.SHIFT_REQUIRED),
   allowsImageUse: z.boolean().default(false),
   isReenrolling: z.boolean().default(false),
   previousTeacher: z.string().trim().optional(),
@@ -84,7 +106,7 @@ export const instrumentSelectionSchema = z
 // Paso: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
-  attachmentType: z.enum(["DNI_FRONT", "DNI_BACK", "SECONDARY_CERTIFICATE", "HEALTH_REPORT", "PHOTO_ID"]),
+  attachmentType: z.enum(ENROLLMENT_DOCUMENT_TYPE),
   originalFileName: z.string(),
   contentType: z.string().optional(),
   size: z.number().optional(),
@@ -94,7 +116,30 @@ export const enrollmentAttachmentSchema = z.object({
 
 // Schema para guardar borrador (permite campos incompletos durante el autoguardado)
 export const updateEnrollmentDraftSchema = z.object({
-  data: z.record(z.string(), z.unknown()),
+  data: z.object({
+    academicBackground: z
+      .object({
+        secondarySchool: z.string().max(255).optional(),
+        schoolOrigin: z.string().max(255).optional(),
+        currentGradeYear: z.string().max(50).optional(),
+        secondaryCompleted: z.boolean().optional(),
+        secondaryDegreeTitle: z.string().max(255).optional(),
+      })
+      .optional(),
+    healthInclusion: z.object({ receivesReasonableAdjustments: z.boolean().optional(), adjustmentDetails: z.string().optional() }).optional(),
+    responsible: responsibleSchema.partial().optional(),
+    preference: z
+      .object({
+        preferredShift: z.string().max(50).optional(),
+        allowsImageUse: z.boolean().optional(),
+        isReenrolling: z.boolean().optional(),
+        previousTeacher: z.string().max(255).optional(),
+      })
+      .optional(),
+    careerSelection: z.object({ trainingPathId: z.uuid().optional() }).optional(),
+    academicSpaceSelection: z.object({ studyPlanSpaceIds: z.array(z.uuid()).optional() }).optional(),
+    instrumentSelection: z.object({ studyPlanSpaceInstrumentIds: z.record(z.uuid(), z.uuid()).optional() }).optional(),
+  }),
 });
 
 // Schema completo y estricto para Enviar Inscripción (valida los pasos y reglas condicionales)
@@ -113,53 +158,60 @@ export const enrollmentApplicationSubmissionSchema = z
   .superRefine((data, ctx) => {
     // 1. Condicional: Si edad < 18, tutor legal obligatorio
     const age = calculateAge(data.personalData.birthDate);
+
     if (age !== null && age < 18) {
       const resp = data.responsible;
+
       if (!resp?.fullName || resp.fullName.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El nombre y apellido del responsable es obligatorio para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_NAME_REQUIRED,
           path: ["responsible", "fullName"],
         });
       }
+
       if (!resp?.documentNumber || resp.documentNumber.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El DNI del responsable es obligatorio para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_DOCUMENT_REQUIRED,
           path: ["responsible", "documentNumber"],
         });
       }
+
       if (!resp?.phoneNumber || resp.phoneNumber.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El teléfono del responsable es obligatorio para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_PHONE_REQUIRED,
           path: ["responsible", "phoneNumber"],
         });
       }
+
       if (!resp?.email || resp.email.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El correo electrónico del responsable es obligatorio para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_EMAIL_REQUIRED,
           path: ["responsible", "email"],
         });
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resp.email.trim())) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El correo electrónico del responsable no es válido",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_EMAIL_INVALID,
           path: ["responsible", "email"],
         });
       }
+
       if (!resp?.occupation || resp.occupation.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "La ocupación del responsable es obligatoria para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_OCCUPATION_REQUIRED,
           path: ["responsible", "occupation"],
         });
       }
+
       if (!resp?.educationLevel || resp.educationLevel.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El nivel de instrucción del responsable es obligatorio para menores de 18 años",
+          message: ENROLLMENT_MESSAGES.RESPONSIBLE_EDUCATION_REQUIRED,
           path: ["responsible", "educationLevel"],
         });
       }
@@ -170,7 +222,7 @@ export const enrollmentApplicationSubmissionSchema = z
       if (!data.healthInclusion.adjustmentDetails || data.healthInclusion.adjustmentDetails.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Debe describir los ajustes razonables que requiere",
+          message: ENROLLMENT_MESSAGES.ADJUSTMENT_DETAILS_REQUIRED,
           path: ["healthInclusion", "adjustmentDetails"],
         });
       }
@@ -181,7 +233,7 @@ export const enrollmentApplicationSubmissionSchema = z
       if (!data.preference.previousTeacher || data.preference.previousTeacher.trim().length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Debe indicar el docente previo al ser estudiante reingresante",
+          message: ENROLLMENT_MESSAGES.PREVIOUS_TEACHER_REQUIRED,
           path: ["preference", "previousTeacher"],
         });
       }

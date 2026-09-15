@@ -4,6 +4,7 @@ import { Loader2Icon, PlusIcon, SearchIcon, UserIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
+import { EmptyMedia } from "@common/components/ui/empty";
 import type { PaginationQuery } from "@common/types/pagination-query.types";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
@@ -29,9 +30,9 @@ export function PeopleTableEmptyState({
   if (totalItems > 0) {
     content = (
       <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+        <EmptyMedia className="mb-4" variant="icon">
           <UserIcon className="size-5" />
-        </div>
+        </EmptyMedia>
         <h3 className="text-foreground text-base font-semibold">No hay usuarios en esta página</h3>
         <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
           La página seleccionada no contiene elementos. Podés volver a la primera página para ver los resultados.
@@ -46,9 +47,9 @@ export function PeopleTableEmptyState({
   } else if (search.trim() !== "") {
     content = (
       <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+        <EmptyMedia className="mb-4" variant="icon">
           <SearchIcon className="size-5" />
-        </div>
+        </EmptyMedia>
         <h3 className="text-foreground text-base font-semibold">No se encontraron resultados</h3>
         <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">
           No encontramos ningún usuario que coincida con los criterios de búsqueda seleccionados.
@@ -58,9 +59,9 @@ export function PeopleTableEmptyState({
   } else {
     content = (
       <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-        <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+        <EmptyMedia className="mb-4" variant="icon">
           <UserIcon className="size-5" />
-        </div>
+        </EmptyMedia>
         <h3 className="text-foreground text-base font-semibold">No hay usuarios registrados</h3>
         <p className={`text-muted-foreground mt-1.5 max-w-sm text-sm ${canCreate ? "mb-6" : ""}`}>
           {canCreate ? "Comenzá creando un nuevo usuario para esta institución." : "Todavía no hay usuarios registrados en esta institución."}

@@ -42,11 +42,6 @@ const MANAGEMENT_NAVIGATION_ITEMS = [
 
 const ACADEMIC_NAVIGATION_ITEMS = [
   {
-    title: "Períodos de inscripción",
-    url: "/admin/enrollment-periods",
-    icon: CalendarRangeIcon,
-  },
-  {
     title: "Ciclos lectivos",
     url: "/admin/academic-years",
     icon: CalendarRangeIcon,
@@ -79,6 +74,11 @@ const ACADEMIC_NAVIGATION_ITEMS = [
 ] as const satisfies readonly NavigationItem[];
 
 const ENROLLMENT_NAVIGATION_ITEMS = [
+  {
+    title: "Períodos de inscripción",
+    url: "/admin/enrollment-periods",
+    icon: CalendarRangeIcon,
+  },
   {
     title: "Solicitudes de inscripción",
     url: "/admin/enrollment-applications",

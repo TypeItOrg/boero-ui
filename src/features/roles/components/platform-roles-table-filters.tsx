@@ -5,7 +5,7 @@ import { BuildingIcon, XIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
-import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+import { DataTableFilters, type DataTableSelectFilter, type DataTableTriggerPosition } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
@@ -21,6 +21,7 @@ type PlatformRolesTableFiltersProps = {
   roleType: PlatformRoleType | undefined;
   search: string;
   size: number;
+  triggerPosition?: DataTableTriggerPosition;
 };
 
 export function PlatformRolesTableFilters({
@@ -29,6 +30,7 @@ export function PlatformRolesTableFilters({
   roleType,
   search,
   size,
+  triggerPosition,
 }: PlatformRolesTableFiltersProps): React.ReactElement {
   const { navigate } = useDataTableNavigation();
   const roleTypeFilter: DataTableSelectFilter = {
@@ -91,6 +93,7 @@ export function PlatformRolesTableFilters({
       searchPlaceholder="Buscar por rol o institución..."
       selectFilters={[roleTypeFilter]}
       size={size}
+      triggerPosition={triggerPosition}
     />
   );
 }

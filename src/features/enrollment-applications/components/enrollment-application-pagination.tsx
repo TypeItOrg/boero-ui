@@ -3,7 +3,7 @@
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
-import { ENROLLMENT_APPLICATION_PAGE_SIZE_OPTIONS } from "../utils/enrollment-application-pagination.util";
+import { ENROLLMENT_APPLICATION_PAGE_SIZE_OPTIONS } from "@features/enrollment-applications/utils/enrollment-application-pagination.util";
 
 type EnrollmentApplicationPaginationProps = PaginationParams & {
   totalItems: number;

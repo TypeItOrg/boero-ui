@@ -120,8 +120,8 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
       <CardContent className="mt-4 p-0">
         <Empty className="border-0 p-0">
           <EmptyHeader>
-            <EmptyMedia variant="icon" className="bg-muted text-muted-foreground mb-4 size-16 rounded-full">
-              <UsersIcon className="size-8" />
+            <EmptyMedia variant="icon">
+              <UsersIcon className="size-5" />
             </EmptyMedia>
             <EmptyTitle className="text-base font-semibold">Todavía no hay usuarios</EmptyTitle>
             <EmptyDescription className="text-sm">Creá el primero para esta institución.</EmptyDescription>

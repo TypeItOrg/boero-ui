@@ -45,6 +45,7 @@ type InstitutionalBreadcrumbProps = {
 };
 
 const EMPTY_SEGMENT_LABELS: Readonly<Record<string, string>> = {};
+
 const EMPTY_SEGMENTS: readonly string[] = [];
 
 export function InstitutionalBreadcrumb({
@@ -98,7 +99,10 @@ function getSegments(
 
   for (const part of parts) {
     accumulatedPath = `${accumulatedPath}/${part}`;
-    if (hiddenSegmentSet.has(part)) continue;
+
+    if (hiddenSegmentSet.has(part)) {
+      continue;
+    }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
     const label = customSegmentLabels[part] ?? SEGMENT_LABELS[part] ?? "Editar";
@@ -110,7 +114,9 @@ function getSegments(
     visiblePartIndex += 1;
   }
 
-  if (trailingLabel) segments.push({ label: trailingLabel });
+  if (trailingLabel) {
+    segments.push({ label: trailingLabel });
+  }
 
   return segments;
 }

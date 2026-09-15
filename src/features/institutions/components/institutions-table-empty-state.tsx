@@ -4,6 +4,7 @@ import { BuildingIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
+import { EmptyMedia } from "@common/components/ui/empty";
 
 type InstitutionsTableEmptyStateProps = {
   active: boolean | undefined;
@@ -73,9 +74,9 @@ export function InstitutionsTableEmptyState({
 function EmptyState({ children, icon, title }: React.PropsWithChildren<{ icon: React.ReactNode; title: string }>): React.ReactElement {
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-      <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+      <EmptyMedia className="mb-4" variant="icon">
         {icon}
-      </div>
+      </EmptyMedia>
       <h3 className="text-foreground text-base font-semibold">{title}</h3>
       {children}
     </div>

@@ -1,4 +1,5 @@
-import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 
 export function getApplicantFullName(application: EnrollmentApplicationResponse): string {
   if (application.applicantName?.trim()) {
@@ -6,9 +7,13 @@ export function getApplicantFullName(application: EnrollmentApplicationResponse)
   }
 
   const personal = application.data?.personalData;
+
   if (personal?.firstName || personal?.lastName) {
     const full = `${personal.firstName ?? ""} ${personal.lastName ?? ""}`.trim();
-    if (full.length > 0) return full;
+
+    if (full.length > 0) {
+      return full;
+    }
   }
 
   return "Sin nombre registrado";
@@ -20,6 +25,7 @@ export function getApplicantDni(application: EnrollmentApplicationResponse): str
   }
 
   const personal = application.data?.personalData;
+
   if (personal?.documentNumber?.trim()) {
     return personal.documentNumber.trim();
   }
@@ -28,11 +34,16 @@ export function getApplicantDni(application: EnrollmentApplicationResponse): str
 }
 
 export function formatApplicationDate(dateStr?: string | null): string {
-  if (!dateStr) return "—";
+  if (!dateStr) {
+    return "—";
+  }
 
   try {
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr;
+
+    if (isNaN(date.getTime())) {
+      return dateStr;
+    }
 
     const day = String(date.getUTCDate()).padStart(2, "0");
     const month = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -45,11 +56,16 @@ export function formatApplicationDate(dateStr?: string | null): string {
 }
 
 export function formatApplicationDateTime(dateStr?: string | null): string {
-  if (!dateStr) return "—";
+  if (!dateStr) {
+    return "—";
+  }
 
   try {
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr;
+
+    if (isNaN(date.getTime())) {
+      return dateStr;
+    }
 
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -64,12 +80,16 @@ export function formatApplicationDateTime(dateStr?: string | null): string {
 }
 
 export function formatBirthDate(dateStr?: string | null): string {
-  if (!dateStr) return "—";
+  if (!dateStr) {
+    return "—";
+  }
 
   // Handle YYYY-MM-DD
   const parts = dateStr.split("-");
+
   if (parts.length === 3) {
     const [year, month, day] = parts;
+
     if (year && month && day) {
       return `${day.slice(0, 2)}/${month}/${year}`;
     }
@@ -79,12 +99,21 @@ export function formatBirthDate(dateStr?: string | null): string {
 }
 
 export function formatFileSize(bytes?: number): string {
-  if (bytes === undefined || bytes === null || isNaN(bytes)) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes === undefined || bytes === null || isNaN(bytes)) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function getAttachmentDownloadUrl(applicationId: string, attachmentId: string): string {
-  return `/api/enrollment-applications/${applicationId}/attachments/${attachmentId}/content`;
+export function getAttachmentDownloadUrl(applicationId: string, attachmentId: string, scope: AcademicScope = AcademicScope.INSTITUTIONAL): string {
+  return `/api/enrollment-applications/${applicationId}/attachments/${attachmentId}/content${AcademicScope.isAdmin(scope) ? `?scope=${AcademicScope.ADMIN}` : ""}`;
 }

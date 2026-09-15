@@ -8,6 +8,7 @@ import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { EmptyMedia } from "@common/components/ui/empty";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { InstitutionRolesPagination } from "@features/roles/components/institution-roles-pagination";
 import type { InstitutionRole } from "@features/roles/types/institution-role.types";
@@ -72,9 +73,9 @@ export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: 
           </div>
         ) : (
           <div className="bg-muted/25 text-muted-foreground flex h-full flex-1 flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-            <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+            <EmptyMedia className="mb-4" variant="icon">
               <SearchIcon className="size-5" />
-            </div>
+            </EmptyMedia>
             <h3 className="text-foreground text-base font-semibold">
               {search.trim() !== "" ? "No se encontraron resultados" : "No hay roles registrados"}
             </h3>

@@ -1,65 +1,82 @@
 "use client";
 
+import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { changeEnrollmentCareerAction } from "@features/enrollment-applications/actions/change-enrollment-career.action";
+import { fetchEnrollmentSpaces } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
+import type { ChangeEnrollmentCareerResult } from "@features/enrollment-applications/types/change-enrollment-career-result.types";
+import { useSearchParams } from "next/navigation";
 import {
   Loader2Icon,
   CheckCircle2Icon,
   AlertCircleIcon,
   AlertTriangleIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  SendIcon,
   BanIcon,
+  GraduationCapIcon,
+  HeartHandshakeIcon,
+  FileClockIcon,
+  LibraryBigIcon,
+  RouteIcon,
+  SlidersHorizontalIcon,
+  UserRoundIcon,
+  UsersRoundIcon,
 } from "lucide-react";
 import { format, isValid } from "date-fns";
 import { Button } from "@common/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@common/components/ui/card";
+import { Card, CardContent, CardFooter } from "@common/components/ui/card";
 import { Field, FieldLabel, FieldDescription, FieldError } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import { HorizontalScrollArea } from "@common/components/ui/horizontal-scroll-area";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
-import { DatePicker } from "@common/components/ui/date-picker";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { Switch } from "@common/components/ui/switch";
 import { Textarea } from "@common/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@common/components/ui/tabs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@common/components/ui/alert-dialog";
+import { EnrollmentCancelDialog } from "@features/enrollment-applications/components/enrollment-cancel-dialog";
+import { EnrollmentSubmitDialog } from "@features/enrollment-applications/components/enrollment-submit-dialog";
+import { unwrapEnrollmentResult } from "@features/enrollment-applications/utils/unwrap-enrollment-result.util";
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
 import {
-  startOrGetEnrollmentApplicationAction,
-  getEnrollmentApplicationAction,
   updateEnrollmentDraftAction,
   submitEnrollmentApplicationAction,
-  cancelEnrollmentApplicationAction,
-  fetchEnrollmentApplicationTrainingPathsAction,
-  fetchEnrollmentApplicationStudyPlanSpacesAction,
-} from "../actions/enrollment-application.actions";
-import { calculateAge, enrollmentApplicationSubmissionSchema } from "../schemas/enrollment-application.schema";
-import { SHIFT_OPTIONS, EDUCATION_LEVEL_OPTIONS } from "../constants/enrollment-application.constants";
-import { EnrollmentStatusCard } from "./EnrollmentStatusCard";
-import { EnrollmentTrainingPathSelector } from "./EnrollmentTrainingPathSelector";
-import { EnrollmentStudyPlanSpacesSelector } from "./EnrollmentStudyPlanSpacesSelector";
+} from "@features/enrollment-applications/actions/enrollment-application.actions";
+import { calculateAge, enrollmentApplicationSubmissionSchema } from "@features/enrollment-applications/schemas/enrollment-application.schema";
+import { SHIFT_OPTIONS, EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
+import { EnrollmentTrainingPathSelector } from "@features/enrollment-applications/components/EnrollmentTrainingPathSelector";
+import { EnrollmentStudyPlanSpacesSelector } from "@features/enrollment-applications/components/EnrollmentStudyPlanSpacesSelector";
+import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
-import type { EnrollmentApplicationData, EnrollmentApplicationResponse } from "../types/enrollment-application.types";
+import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
-  studyPlanId: string;
-  academicYearId: string;
-  applicationId?: string;
+  initialApplication: EnrollmentApplicationResponse;
+  initialStudyPlanSpaces: readonly StudyPlanSpace[];
+  initialTrainingPaths: readonly TrainingPath[];
   readOnly?: boolean;
+  returnTo?: string;
+}
+
+const READ_ONLY_INPUT_CLASS_NAME = "bg-muted/50 text-muted-foreground";
+
+function subscribeToHydration(): () => void {
+  return () => undefined;
+}
+
+function getHydratedSnapshot(): boolean {
+  return true;
+}
+
+function getServerHydrationSnapshot(): boolean {
+  return false;
 }
 
 // Maps a Zod issue path to the id of the input it corresponds to, so the
@@ -84,72 +101,139 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "preference.previousTeacher": "previousTeacher",
 };
 
-export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, readOnly = false }: EnrollmentWizardProps): React.ReactElement {
-  const router = useRouter();
+function parseInitialBirthDate(value: string | null | undefined): Date | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  return isValid(date) ? date : undefined;
+}
+
+export function EnrollmentWizard({
+  initialApplication,
+  initialStudyPlanSpaces,
+  initialTrainingPaths,
+  readOnly = false,
+  returnTo = "/my-enrollment-applications",
+}: EnrollmentWizardProps): React.ReactElement {
   const searchParams = useSearchParams();
-  const [application, setApplication] = React.useState<EnrollmentApplicationResponse | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const initialData = initialApplication.data;
+  const [application, setApplication] = React.useState<EnrollmentApplicationResponse>(initialApplication);
   const [activeTab, setActiveTab] = React.useState<string>(() => {
     return searchParams.get("tab") || "personal";
   });
+  const hydrated = React.useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerHydrationSnapshot);
 
   // Status flags
-  const [saving, setSaving] = React.useState(false);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [isCancelling, setIsCancelling] = React.useState(false);
+  const [autosaveState, saveDraft, saving] = React.useActionState(
+    async (_previous: { error?: string }, save: () => Promise<{ error?: string }>) => save(),
+    {},
+  );
+  const careerChangingRef = React.useRef(false);
+  const draftSaveQueue = React.useRef<Promise<void>>(Promise.resolve());
+  const autosaveInitializedRef = React.useRef(false);
+  const lastSavedDataRef = React.useRef<string | null>(null);
+  const tabTriggerRefs = React.useRef(new Map<string, HTMLButtonElement>());
+  const hasCenteredInitialTabRef = React.useRef(false);
+  const saveError = autosaveState.error;
   const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
-  const [submissionError, setSubmissionError] = React.useState<string | null>(null);
-  const [validationIssues, setValidationIssues] = React.useState<z.ZodIssue[]>([]);
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false);
   const [pendingFocusFieldId, setPendingFocusFieldId] = React.useState<string | null>(null);
 
-  // Flag to avoid auto-saving empty state before initial fetch
-  const isInitialDataLoaded = React.useRef(false);
-
   // 1. Datos Personales
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [documentNumber, setDocumentNumber] = React.useState("");
-  const [birthDate, setBirthDate] = React.useState<Date | undefined>(undefined);
-  const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [email, setEmail] = React.useState("");
+  const firstName = initialData?.personalData?.firstName ?? "";
+  const lastName = initialData?.personalData?.lastName ?? "";
+  const documentNumber = initialData?.personalData?.documentNumber ?? "";
+  const birthDate = parseInitialBirthDate(initialData?.personalData?.birthDate);
+  const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
+  const email = initialData?.personalData?.email ?? "";
 
   // 2. Escolaridad de Base
-  const [secondarySchool, setSecondarySchool] = React.useState("");
-  const [currentGradeYear, setCurrentGradeYear] = React.useState("");
-  const [secondaryCompleted, setSecondaryCompleted] = React.useState(false);
-  const [secondaryDegreeTitle, setSecondaryDegreeTitle] = React.useState("");
+  const [secondarySchool, setSecondarySchool] = React.useState(initialData?.academicBackground?.secondarySchool ?? "");
+  const [currentGradeYear, setCurrentGradeYear] = React.useState(
+    initialData?.academicBackground?.currentGradeYear ? String(initialData.academicBackground.currentGradeYear) : "",
+  );
+  const [secondaryCompleted, setSecondaryCompleted] = React.useState(Boolean(initialData?.academicBackground?.secondaryCompleted));
+  const [secondaryDegreeTitle, setSecondaryDegreeTitle] = React.useState(initialData?.academicBackground?.secondaryDegreeTitle ?? "");
 
   // 3. Salud e Inclusión
-  const [receivesReasonableAdjustments, setReceivesReasonableAdjustments] = React.useState(false);
-  const [adjustmentDetails, setAdjustmentDetails] = React.useState("");
+  const [receivesReasonableAdjustments, setReceivesReasonableAdjustments] = React.useState(
+    Boolean(initialData?.healthInclusion?.receivesReasonableAdjustments),
+  );
+  const [adjustmentDetails, setAdjustmentDetails] = React.useState(initialData?.healthInclusion?.adjustmentDetails ?? "");
 
   // 4. Responsable / Tutor Legal
-  const [responsibleFullName, setResponsibleFullName] = React.useState("");
-  const [responsibleDocumentNumber, setResponsibleDocumentNumber] = React.useState("");
-  const [responsiblePhoneNumber, setResponsiblePhoneNumber] = React.useState("");
-  const [responsibleEmail, setResponsibleEmail] = React.useState("");
-  const [responsibleOccupation, setResponsibleOccupation] = React.useState("");
-  const [responsibleEducationLevel, setResponsibleEducationLevel] = React.useState("");
+  const [responsibleFullName, setResponsibleFullName] = React.useState(initialData?.responsible?.fullName ?? "");
+  const [responsibleDocumentNumber, setResponsibleDocumentNumber] = React.useState(initialData?.responsible?.documentNumber ?? "");
+  const [responsiblePhoneNumber, setResponsiblePhoneNumber] = React.useState(initialData?.responsible?.phoneNumber ?? "");
+  const [responsibleEmail, setResponsibleEmail] = React.useState(initialData?.responsible?.email ?? "");
+  const [responsibleOccupation, setResponsibleOccupation] = React.useState(initialData?.responsible?.occupation ?? "");
+  const [responsibleEducationLevel, setResponsibleEducationLevel] = React.useState(initialData?.responsible?.educationLevel ?? "");
 
   // 5. Trayecto Formativo
-  const [trainingPaths, setTrainingPaths] = React.useState<TrainingPath[]>([]);
-  const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState("");
-  const [trainingPathsLoadError, setTrainingPathsLoadError] = React.useState(false);
+  const trainingPaths = initialTrainingPaths;
+  const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState(initialData?.careerSelection?.trainingPathId ?? "");
 
   // 6. Espacios e Instrumentos
-  const [studyPlanSpaces, setStudyPlanSpaces] = React.useState<StudyPlanSpace[]>([]);
-  const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>([]);
-  const [selectedInstrumentIdsByStudyPlanSpaceId, setSelectedInstrumentIdsByStudyPlanSpaceId] = React.useState<Record<string, string>>({});
+  const [studyPlanSpaces, setStudyPlanSpaces] = React.useState<StudyPlanSpace[]>(() => [...initialStudyPlanSpaces]);
+  const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>(
+    initialData?.academicSpaceSelection?.studyPlanSpaceIds ?? [],
+  );
+  const [selectedInstrumentIdsByStudyPlanSpaceId, setSelectedInstrumentIdsByStudyPlanSpaceId] = React.useState<Record<string, string>>(
+    initialData?.instrumentSelection?.studyPlanSpaceInstrumentIds ?? {},
+  );
   const [loadingSpaces, setLoadingSpaces] = React.useState(false);
   const [studyPlanSpacesLoadError, setStudyPlanSpacesLoadError] = React.useState(false);
 
   // 7. Preferencias
-  const [preferredShift, setPreferredShift] = React.useState("");
-  const [allowsImageUse, setAllowsImageUse] = React.useState(false);
-  const [isReenrolling, setIsReenrolling] = React.useState(false);
-  const [previousTeacher, setPreviousTeacher] = React.useState("");
+  const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
+  const [allowsImageUse, setAllowsImageUse] = React.useState(Boolean(initialData?.preference?.allowsImageUse));
+  const [isReenrolling, setIsReenrolling] = React.useState(Boolean(initialData?.preference?.isReenrolling));
+  const [previousTeacher, setPreviousTeacher] = React.useState(initialData?.preference?.previousTeacher ?? "");
+
+  const reloadSpaces = async (id: string) => {
+    setLoadingSpaces(true);
+
+    try {
+      setStudyPlanSpaces(await fetchEnrollmentSpaces(id));
+      setStudyPlanSpacesLoadError(false);
+    } catch {
+      setStudyPlanSpacesLoadError(true);
+    } finally {
+      setLoadingSpaces(false);
+    }
+  };
+
+  const [careerResult, changeCareer, isChangingCareer] = React.useActionState(
+    async (_previous: ChangeEnrollmentCareerResult | null, input: { id: string; trainingPathId: string }): Promise<ChangeEnrollmentCareerResult> => {
+      try {
+        // An older save must finish before changing the plan, so it cannot restore it later.
+        await draftSaveQueue.current;
+        const result = await changeEnrollmentCareerAction(input.id, input.trainingPathId);
+
+        if (result.error !== undefined) {
+          return result;
+        }
+
+        const updated = result.application;
+        setApplication(updated);
+        setSelectedTrainingPathId(updated.data.careerSelection?.trainingPathId || input.trainingPathId);
+        setSelectedStudyPlanSpaceIds(updated.data.academicSpaceSelection?.studyPlanSpaceIds || []);
+        setSelectedInstrumentIdsByStudyPlanSpaceId(updated.data.instrumentSelection?.studyPlanSpaceInstrumentIds || {});
+        setStudyPlanSpaces([]);
+        await reloadSpaces(updated.applicationId);
+
+        return result;
+      } catch {
+        return { error: ENROLLMENT_MESSAGES.CAREER_CHANGE_FAILED };
+      } finally {
+        careerChangingRef.current = false;
+      }
+    },
+    null,
+  );
 
   // Reactive age computation
   const calculatedAge = React.useMemo(() => {
@@ -168,6 +252,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
       { id: "spaces", label: "Espacios e Instrumentos" },
       { id: "preferences", label: "Preferencias" },
     ];
+
     return rawTabs.map((tab, index) => ({
       ...tab,
       label: `${index + 1}. ${tab.label}`,
@@ -176,119 +261,43 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
 
   const effectiveActiveTab = !isMinor && activeTab === "responsible" ? "training-path" : activeTab;
 
-  // Sync activeTab with URL query params
-  React.useEffect(() => {
-    if (searchParams.get("tab") === activeTab) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", activeTab);
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [activeTab, router, searchParams]);
+  React.useLayoutEffect(() => {
+    if (!hydrated) {
+      return;
+    }
 
-  // Initial fetch / start application
-  React.useEffect(() => {
-    let active = true;
+    const activeTrigger = tabTriggerRefs.current.get(effectiveActiveTab);
 
-    const fetchApplication = applicationId
-      ? getEnrollmentApplicationAction(applicationId)
-      : startOrGetEnrollmentApplicationAction({ studyPlanId, academicYearId });
+    if (!activeTrigger) {
+      return;
+    }
 
-    fetchApplication
-      .then((data) => {
-        if (!active) return;
-        setApplication(data);
+    activeTrigger.scrollIntoView({
+      behavior: hasCenteredInitialTabRef.current ? "smooth" : "auto",
+      block: "nearest",
+      inline: "center",
+    });
+    hasCenteredInitialTabRef.current = true;
+  }, [effectiveActiveTab, hydrated]);
 
-        const appData = data.data || {};
-        const personal = appData.personalData || {};
-        const academic = appData.academicBackground || {};
-        const health = appData.healthInclusion || {};
-        const resp = appData.responsible || {};
-        const pref = appData.preference || {};
+  function handleActiveTabChange(nextTab: string): void {
+    setActiveTab(nextTab);
 
-        setFirstName(personal.firstName || "");
-        setLastName(personal.lastName || "");
-        setDocumentNumber(personal.documentNumber || "");
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", nextTab);
+    const queryString = params.toString();
+    const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}${window.location.hash}`;
 
-        if (personal.birthDate) {
-          const parsedDate = new Date(personal.birthDate + "T00:00:00");
-          if (isValid(parsedDate)) {
-            setBirthDate(parsedDate);
-          }
-        }
-
-        setPhoneNumber(personal.phoneNumber || "");
-        setEmail(personal.email || "");
-
-        setSecondarySchool(academic.secondarySchool || "");
-        setCurrentGradeYear(academic.currentGradeYear ? String(academic.currentGradeYear) : "");
-        setSecondaryCompleted(Boolean(academic.secondaryCompleted));
-        setSecondaryDegreeTitle(academic.secondaryDegreeTitle || "");
-
-        setReceivesReasonableAdjustments(Boolean(health.receivesReasonableAdjustments));
-        setAdjustmentDetails(health.adjustmentDetails || "");
-
-        setResponsibleFullName(resp.fullName || "");
-        setResponsibleDocumentNumber(resp.documentNumber || "");
-        setResponsiblePhoneNumber(resp.phoneNumber || "");
-        setResponsibleEmail(resp.email || "");
-        setResponsibleOccupation(resp.occupation || "");
-        setResponsibleEducationLevel(resp.educationLevel || "");
-
-        setPreferredShift(pref.preferredShift || "");
-        setAllowsImageUse(Boolean(pref.allowsImageUse));
-        setIsReenrolling(Boolean(pref.isReenrolling));
-        setPreviousTeacher(pref.previousTeacher || "");
-
-        const career = appData.careerSelection || {};
-        const spaceSel = appData.academicSpaceSelection || {};
-        const instSel = appData.instrumentSelection || {};
-
-        setSelectedTrainingPathId(career.trainingPathId || "");
-        setSelectedStudyPlanSpaceIds(spaceSel.studyPlanSpaceIds || []);
-        setSelectedInstrumentIdsByStudyPlanSpaceId(instSel.studyPlanSpaceInstrumentIds || {});
-
-        // Fetch available training paths and study plan spaces
-        fetchEnrollmentApplicationTrainingPathsAction(data.applicationId)
-          .then((paths) => {
-            if (!active) return;
-            setTrainingPaths(paths);
-            setTrainingPathsLoadError(false);
-          })
-          .catch(() => {
-            if (!active) return;
-            setTrainingPaths([]);
-            setTrainingPathsLoadError(true);
-          });
-
-        fetchEnrollmentApplicationStudyPlanSpacesAction(data.applicationId)
-          .then((spaces) => {
-            if (!active) return;
-            setStudyPlanSpaces(spaces);
-            setStudyPlanSpacesLoadError(false);
-          })
-          .catch(() => {
-            if (!active) return;
-            setStudyPlanSpaces([]);
-            setStudyPlanSpacesLoadError(true);
-          });
-
-        isInitialDataLoaded.current = true;
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (!active) return;
-        setError(err.message || "No se pudo iniciar la solicitud de inscripción.");
-        setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [studyPlanId, academicYearId, applicationId]);
+    window.history.replaceState(null, "", nextUrl);
+  }
 
   // Focus the first invalid field once its tab has mounted after a failed
   // submission (the tab switch and this focus request commit together).
   React.useEffect(() => {
-    if (!pendingFocusFieldId) return;
+    if (!pendingFocusFieldId) {
+      return;
+    }
+
     const fieldId = pendingFocusFieldId;
     // The newly active TabsContent panel mounts through Radix's own Presence
     // state machine, which settles a render pass after this effect runs, so
@@ -297,6 +306,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
       document.getElementById(fieldId)?.focus();
       setPendingFocusFieldId(null);
     }, 0);
+
     return () => window.clearTimeout(timeoutId);
   }, [pendingFocusFieldId, effectiveActiveTab]);
 
@@ -307,8 +317,10 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         setSelectedInstrumentIdsByStudyPlanSpaceId((prevInst) => {
           const nextInst = { ...prevInst };
           delete nextInst[studyPlanSpaceId];
+
           return nextInst;
         });
+
         return updated;
       } else {
         return [...prev, studyPlanSpaceId];
@@ -353,7 +365,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         educationLevel: responsibleEducationLevel,
       },
       careerSelection: selectedTrainingPathId ? { trainingPathId: selectedTrainingPathId } : undefined,
-      academicSpaceSelection: selectedStudyPlanSpaceIds.length > 0 ? { studyPlanSpaceIds: selectedStudyPlanSpaceIds } : undefined,
+      academicSpaceSelection: { studyPlanSpaceIds: selectedStudyPlanSpaceIds },
       instrumentSelection:
         Object.keys(selectedInstrumentIdsByStudyPlanSpaceId).length > 0
           ? { studyPlanSpaceInstrumentIds: selectedInstrumentIdsByStudyPlanSpaceId }
@@ -393,231 +405,214 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
     previousTeacher,
   ]);
 
+  const [validationIssues, setValidationIssues] = React.useState<z.ZodIssue[]>([]);
+
   const debouncedData = useDebouncedValue(structuredData, 800);
+  const debouncedDataIsCurrent = JSON.stringify(debouncedData) === JSON.stringify(structuredData);
+  const autosaveTarget =
+    application?.status === ENROLLMENT_APPLICATION_STATUS.DRAFT &&
+    !readOnly &&
+    !isChangingCareer &&
+    !isSubmitDialogOpen &&
+    !isCancelDialogOpen &&
+    debouncedDataIsCurrent &&
+    debouncedData.careerSelection?.trainingPathId === (selectedTrainingPathId || undefined)
+      ? application.applicationId
+      : null;
 
   // Auto-save logic
   React.useEffect(() => {
-    const appId = application?.applicationId;
-    const appStatus = application?.status;
-    if (!appId || loading || !isInitialDataLoaded.current) return;
-    if (appStatus !== "DRAFT") return;
+    if (!autosaveTarget) {
+      return;
+    }
+
+    const dataSignature = JSON.stringify(debouncedData);
+
+    if (!autosaveInitializedRef.current) {
+      autosaveInitializedRef.current = true;
+      lastSavedDataRef.current = dataSignature;
+
+      return;
+    }
+
+    if (lastSavedDataRef.current === dataSignature) {
+      return;
+    }
 
     let active = true;
 
-    async function autoSave() {
+    async function autoSave(): Promise<{ error?: string }> {
       await Promise.resolve();
-      if (!active || !appId) return;
-      setSaving(true);
-      setSaveError(null);
+
+      if (!active) {
+        return {};
+      }
 
       try {
-        const updated = await updateEnrollmentDraftAction(appId, { data: debouncedData });
-        if (active) {
+        const request = draftSaveQueue.current.then(() => {
+          if (!active || careerChangingRef.current) {
+            return null;
+          }
+
+          return updateEnrollmentDraftAction(autosaveTarget, { data: debouncedData }).then(unwrapEnrollmentResult);
+        });
+        draftSaveQueue.current = request.then(
+          () => undefined,
+          () => undefined,
+        );
+        const updated = await request;
+
+        if (active && updated && !careerChangingRef.current) {
+          lastSavedDataRef.current = dataSignature;
           setApplication((prev) => (prev ? { ...prev, updatedAt: updated.updatedAt } : updated));
         }
       } catch (err: unknown) {
         if (active) {
-          const msg = err instanceof Error ? err.message : "Error al guardar el borrador";
-          setSaveError(msg);
-        }
-      } finally {
-        if (active) {
-          setSaving(false);
+          return { error: err instanceof Error ? err.message : ENROLLMENT_MESSAGES.DRAFT_SAVE_FAILED };
         }
       }
+
+      return {};
     }
 
-    autoSave();
+    React.startTransition(() => saveDraft(autoSave));
 
     return () => {
       active = false;
     };
-  }, [debouncedData, application?.applicationId, application?.status, loading]);
+  }, [autosaveTarget, debouncedData, saveDraft]);
 
-  // Refetch spaces when selected training path changes; a genuine career
-  // change (not the initial hydration from a persisted draft) invalidates
-  // whatever spaces/instruments were picked for the previous plan, mirroring
-  // the backend's reassign-and-clear rule for updateDraft.
-  const previousTrainingPathIdRef = React.useRef<string | null>(null);
-
-  React.useEffect(() => {
-    const appId = application?.applicationId;
-    if (!appId || !selectedTrainingPathId || !isInitialDataLoaded.current) return;
-
-    const isCareerChange = previousTrainingPathIdRef.current !== null && previousTrainingPathIdRef.current !== selectedTrainingPathId;
-    previousTrainingPathIdRef.current = selectedTrainingPathId;
-
-    if (isCareerChange) {
-      setSelectedStudyPlanSpaceIds([]);
-      setSelectedInstrumentIdsByStudyPlanSpaceId({});
-    }
-
-    let active = true;
-    setLoadingSpaces(true);
-    fetchEnrollmentApplicationStudyPlanSpacesAction(appId)
-      .then((updatedSpaces) => {
-        if (!active) return;
-        setStudyPlanSpaces(updatedSpaces);
-        setStudyPlanSpacesLoadError(false);
-      })
-      .catch(() => {
-        if (!active) return;
-        setStudyPlanSpacesLoadError(true);
-      })
-      .finally(() => {
-        if (!active) return;
-        setLoadingSpaces(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [selectedTrainingPathId, application?.applicationId]);
-
-  // Submission handler with full Zod validation and conditional rules
-  const handleSubmitApplication = async () => {
-    if (!application?.applicationId || isSubmitting) return;
-
-    setSubmissionError(null);
-    setValidationIssues([]);
-    setIsSubmitting(true);
-
-    // The catalog fetches failing is not the same as an empty catalog: an
-    // empty list means the step is genuinely optional, a failed fetch means
-    // we don't actually know, so we can't silently skip the required checks
-    // below.
-    if (trainingPathsLoadError) {
-      setIsSubmitting(false);
-      setSubmissionError("No se pudieron cargar los trayectos formativos disponibles. Reintentá antes de enviar la inscripción.");
-      setActiveTab("training-path");
+  const handleChangeCareer = (trainingPathId: string) => {
+    if (
+      !application?.isEditable ||
+      readOnly ||
+      careerChangingRef.current ||
+      isSubmitDialogOpen ||
+      isCancelDialogOpen ||
+      loadingSpaces ||
+      trainingPathId === selectedTrainingPathId
+    ) {
       return;
     }
+
+    careerChangingRef.current = true;
+    React.startTransition(() => changeCareer({ id: application.applicationId, trainingPathId }));
+  };
+
+  async function submitApplication(): Promise<{ error?: string; issues?: z.ZodIssue[] }> {
+    if (!application?.applicationId || careerChangingRef.current || loadingSpaces || isCancelDialogOpen) {
+      return {};
+    }
+
+    setValidationIssues([]);
 
     if (studyPlanSpacesLoadError) {
-      setIsSubmitting(false);
-      setSubmissionError("No se pudieron cargar los espacios académicos disponibles. Reintentá antes de enviar la inscripción.");
-      setActiveTab("spaces");
-      return;
+      handleActiveTabChange("spaces");
+
+      return { error: ENROLLMENT_MESSAGES.SPACES_RETRY };
     }
 
-    const parseResult = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
-
-    if (!parseResult.success) {
-      setIsSubmitting(false);
-      const issues = parseResult.error.issues;
-      setValidationIssues(issues);
-
-      // Auto-navigate to the first invalid step and focus its field
-      const firstIssue = issues[0];
-      if (firstIssue && firstIssue.path.length > 0) {
-        const section = firstIssue.path[0];
-        if (section === "personalData") setActiveTab("personal");
-        else if (section === "academicBackground") setActiveTab("education");
-        else if (section === "healthInclusion") setActiveTab("health");
-        else if (section === "responsible" && isMinor) setActiveTab("responsible");
-        else if (section === "careerSelection") setActiveTab("training-path");
-        else if (section === "academicSpaceSelection" || section === "instrumentSelection") setActiveTab("spaces");
-        else if (section === "preference") setActiveTab("preferences");
-
-        const fieldId = FIELD_ID_BY_ERROR_PATH[firstIssue.path.join(".")];
-        if (fieldId) setPendingFocusFieldId(fieldId);
-      }
-      return;
-    }
+    const parsed = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
+    const issues: z.ZodIssue[] = parsed.success ? [] : [...parsed.error.issues];
 
     if (trainingPaths.length > 0 && !selectedTrainingPathId) {
-      setIsSubmitting(false);
-      setSubmissionError("Debés seleccionar un trayecto formativo antes de enviar.");
-      setActiveTab("training-path");
-      return;
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.TRAINING_PATH_REQUIRED, path: ["careerSelection", "trainingPathId"] });
     }
 
-    if (studyPlanSpaces.length > 0 && selectedStudyPlanSpaceIds.length === 0) {
-      setIsSubmitting(false);
-      setSubmissionError("Debés seleccionar al menos un espacio curricular.");
-      setActiveTab("spaces");
-      return;
+    if (selectedStudyPlanSpaceIds.length === 0) {
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.SPACE_REQUIRED, path: ["academicSpaceSelection", "studyPlanSpaceIds"] });
     }
 
-    const missingInstrumentSpace = studyPlanSpaces.find(
-      (s) => selectedStudyPlanSpaceIds.includes(s.id) && s.requiresInstrument && !selectedInstrumentIdsByStudyPlanSpaceId[s.id],
+    const spacesWithMissingInstrument = studyPlanSpaces.filter(
+      (space) => selectedStudyPlanSpaceIds.includes(space.id) && space.requiresInstrument && !selectedInstrumentIdsByStudyPlanSpaceId[space.id],
     );
-    if (missingInstrumentSpace) {
-      setIsSubmitting(false);
-      setSubmissionError(`Debés seleccionar un instrumento para "${missingInstrumentSpace.academicSpaceName}".`);
-      setActiveTab("spaces");
-      return;
+
+    for (const space of spacesWithMissingInstrument) {
+      issues.push({
+        code: "custom",
+        message: ENROLLMENT_MESSAGES.INSTRUMENT_REQUIRED(space.academicSpaceName),
+        path: ["instrumentSelection", "studyPlanSpaceInstrumentIds"],
+      });
+    }
+
+    if (issues.length > 0) {
+      setValidationIssues(issues);
+      // Auto-navigate to the first invalid step and focus its field
+      const firstIssue = issues[0];
+
+      if (firstIssue && firstIssue.path.length > 0) {
+        const section = firstIssue.path[0];
+
+        if (section === "personalData") {
+          handleActiveTabChange("personal");
+        } else if (section === "academicBackground") {
+          handleActiveTabChange("education");
+        } else if (section === "healthInclusion") {
+          handleActiveTabChange("health");
+        } else if (section === "responsible" && isMinor) {
+          handleActiveTabChange("responsible");
+        } else if (section === "careerSelection") {
+          handleActiveTabChange("training-path");
+        } else if (section === "academicSpaceSelection" || section === "instrumentSelection") {
+          handleActiveTabChange("spaces");
+        } else if (section === "preference") {
+          handleActiveTabChange("preferences");
+        }
+
+        const fieldId = FIELD_ID_BY_ERROR_PATH[firstIssue.path.join(".")];
+
+        if (fieldId) {
+          setPendingFocusFieldId(fieldId);
+        }
+      }
+
+      return { issues };
     }
 
     try {
-      // 1. Guardar último estado del borrador
-      await updateEnrollmentDraftAction(application.applicationId, { data: structuredData });
-      // 2. Enviar solicitud formal
-      const submitted = await submitEnrollmentApplicationAction(application.applicationId);
-      setApplication(submitted);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error al enviar la postulación";
-      setSubmissionError(msg);
-    } finally {
-      setIsSubmitting(false);
+      await draftSaveQueue.current;
+      await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
+      setApplication(await submitEnrollmentApplicationAction(application.applicationId).then(unwrapEnrollmentResult));
+
+      return {};
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : ENROLLMENT_MESSAGES.SUBMISSION_FAILED };
     }
-  };
-
-  // Cancellation handler
-  const handleCancelApplication = async () => {
-    if (!application?.applicationId || isCancelling) return;
-
-    setIsCancelling(true);
-    setSubmissionError(null);
-
-    try {
-      const cancelled = await cancelEnrollmentApplicationAction(application.applicationId);
-      setApplication(cancelled);
-      setIsCancelDialogOpen(false);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error al cancelar la postulación";
-      setSubmissionError(msg);
-      setIsCancelDialogOpen(false);
-    } finally {
-      setIsCancelling(false);
-    }
-  };
+  }
 
   // Helpers to query validation errors by path
   const getFieldError = (path: (string | number)[]): string | undefined => {
     const issue = validationIssues.find((iss) => {
-      if (iss.path.length !== path.length) return false;
+      if (iss.path.length !== path.length) {
+        return false;
+      }
+
       return iss.path.every((val, idx) => val === path[idx]);
     });
+
     return issue?.message;
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2Icon className="text-primary size-8 animate-spin" />
-      </div>
-    );
-  }
-
-  // Error state on initialization
-  if (error || !application) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircleIcon className="size-4" />
-        <AlertTitle>Inscripción no disponible</AlertTitle>
-        <AlertDescription>{error || "No se pudo cargar la solicitud de inscripción."}</AlertDescription>
-      </Alert>
-    );
-  }
-
   // If application is no longer in draft (SUBMITTED, APPROVED, REJECTED, CANCELLED), render read-only status view
-  if (application.status !== "DRAFT") {
+  if (application.status !== ENROLLMENT_APPLICATION_STATUS.DRAFT) {
     return <EnrollmentStatusCard application={application} />;
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href={returnTo}>Volver</Link>
+        </Button>
+
+        {!readOnly && (
+          <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)}>
+            <BanIcon className="size-4" />
+            Cancelar
+          </Button>
+        )}
+      </div>
+
       {readOnly && (
         <Alert variant="default" className="border-amber-200 bg-amber-50">
           <AlertTriangleIcon className="size-4 text-amber-600" />
@@ -628,65 +623,43 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         </Alert>
       )}
 
-      {/* Wizard Header */}
-      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Formulario de Inscripción</h1>
-          <p className="text-muted-foreground text-sm">Completá cada uno de los pasos para solicitar tu admisión en el instituto.</p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm" aria-live="polite" aria-atomic="true">
-            {saving ? (
-              <>
-                <Loader2Icon className="text-primary size-4 animate-spin" />
-                <span>Guardando cambios…</span>
-              </>
-            ) : saveError ? (
-              <span className="text-destructive flex items-center gap-1">
-                <AlertCircleIcon className="size-4" />
-                Error al guardar
-              </span>
-            ) : (
-              <>
-                <CheckCircle2Icon className="size-4 text-emerald-500" />
-                <span>Borrador guardado</span>
-              </>
-            )}
+      <div className="bg-muted/25 rounded-xl border p-4 sm:p-6">
+        <div className="flex items-stretch gap-3.5">
+          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+            <FileClockIcon className="size-5" aria-hidden="true" />
           </div>
-
-          {!readOnly && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsCancelDialogOpen(true)}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 text-xs"
-            >
-              <BanIcon className="mr-1 size-3.5" />
-              Cancelar borrador
-            </Button>
-          )}
+          <div className="flex flex-col justify-center gap-1">
+            <p className="font-heading text-sm font-medium">Solicitud en borrador</p>
+            <div className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm" aria-live="polite" aria-atomic="true">
+              {saving ? (
+                <>
+                  <Loader2Icon className="text-primary size-4 animate-spin" />
+                  <span>Guardando cambios…</span>
+                </>
+              ) : saveError ? (
+                <span className="text-destructive flex items-center gap-1">
+                  <AlertCircleIcon className="size-4" />
+                  Error al guardar
+                </span>
+              ) : (
+                <>
+                  <CheckCircle2Icon className="size-4 text-emerald-500" />
+                  <span>Borrador guardado</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* General Submission / Validation Errors Banner */}
-      {submissionError && (
-        <Alert variant="destructive">
-          <AlertCircleIcon className="size-4" />
-          <AlertTitle>No se pudo enviar la inscripción</AlertTitle>
-          <AlertDescription>{submissionError}</AlertDescription>
-        </Alert>
-      )}
-
       {validationIssues.length > 0 && (
-        <Alert variant="destructive" className="border-destructive/40 bg-destructive/5">
-          <AlertTriangleIcon className="size-4" />
-          <AlertTitle>Campos obligatorios incompletos ({validationIssues.length})</AlertTitle>
+        <Alert variant="destructive">
+          <AlertCircleIcon />
+          <AlertTitle>{ENROLLMENT_MESSAGES.INCOMPLETE_FIELDS_TITLE(validationIssues.length)}</AlertTitle>
           <AlertDescription>
-            <ul className="mt-2 list-disc space-y-1 pl-4 text-xs">
-              {validationIssues.map((issue, idx) => (
-                <li key={idx}>{issue.message}</li>
+            <ul className="mt-1 list-disc space-y-0.5 pl-4">
+              {validationIssues.map((issue, index) => (
+                <li key={index}>{issue.message}</li>
               ))}
             </ul>
           </AlertDescription>
@@ -694,30 +667,64 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
       )}
 
       {/* Tabs navigation */}
-      <Tabs value={effectiveActiveTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList
-          className={`grid h-auto w-full gap-1 p-1 ${
-            isMinor ? "grid-cols-2 sm:grid-cols-4 lg:grid-cols-7" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
-          }`}
-        >
-          {visibleTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id} className="py-2.5 text-xs font-medium data-[state=active]:font-semibold">
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs
+        value={effectiveActiveTab}
+        onValueChange={handleActiveTabChange}
+        className="w-full gap-3 [&_[data-slot=card-footer]_[data-slot=button]]:h-auto [&_[data-slot=card-footer]_[data-slot=button]]:min-h-9 [&_[data-slot=card-footer]_[data-slot=button]]:w-full [&_[data-slot=card-footer]_[data-slot=button]]:max-w-full [&_[data-slot=card-footer]_[data-slot=button]]:py-2 [&_[data-slot=card-footer]_[data-slot=button]]:text-center [&_[data-slot=card-footer]_[data-slot=button]]:whitespace-normal sm:[&_[data-slot=card-footer]_[data-slot=button]]:h-9 sm:[&_[data-slot=card-footer]_[data-slot=button]]:w-auto sm:[&_[data-slot=card-footer]_[data-slot=button]]:whitespace-nowrap"
+      >
+        {hydrated ? (
+          <HorizontalScrollArea>
+            <TabsList className="flex h-[52px]! w-max min-w-full gap-1 p-1">
+              {visibleTabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  ref={(element) => {
+                    if (element) {
+                      tabTriggerRefs.current.set(tab.id, element);
+                    } else {
+                      tabTriggerRefs.current.delete(tab.id);
+                    }
+                  }}
+                  value={tab.id}
+                  className="h-10! min-w-44 flex-[1_0_auto] px-5 py-2 text-center text-sm group-data-[overflow=true]/horizontal-scroll-area:h-11!"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </HorizontalScrollArea>
+        ) : (
+          <div
+            className="bg-muted flex h-[52px] w-full animate-pulse items-center gap-1 rounded-lg p-1"
+            role="status"
+            aria-label="Preparando pasos de la inscripción"
+          >
+            {Array.from({ length: 3 }, (_, index) => (
+              <span key={index} className="bg-background/70 h-10 flex-1 rounded-md" />
+            ))}
+          </div>
+        )}
 
         {/* ========================================================================= */}
         {/* PASO 1: DATOS PERSONALES Y CONTACTO */}
         {/* ========================================================================= */}
-        <TabsContent value="personal" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>1. Datos Personales y Contacto</CardTitle>
-              <CardDescription>Información identificatoria y canales de contacto del postulante.</CardDescription>
-            </CardHeader>
+        <TabsContent value="personal" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={UserRoundIcon}
+              title="1. Datos Personales y Contacto"
+              description={
+                <>
+                  Actualizá tus datos desde{" "}
+                  <ReturnToLink href="/account/edit" className="underline underline-offset-4">
+                    Cuenta
+                  </ReturnToLink>
+                  ; para cambiar el documento, contactá a la institución.
+                </>
+              }
+            />
             <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                 <Field data-invalid={!!getFieldError(["personalData", "firstName"])}>
                   <FieldLabel htmlFor="firstName" required>
                     Nombre
@@ -725,7 +732,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                   <Input
                     id="firstName"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="Juan"
                     autoComplete="given-name"
                     aria-invalid={!!getFieldError(["personalData", "firstName"])}
@@ -740,7 +748,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                   <Input
                     id="lastName"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="Pérez"
                     autoComplete="family-name"
                     aria-invalid={!!getFieldError(["personalData", "lastName"])}
@@ -749,16 +758,17 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                 <Field data-invalid={!!getFieldError(["personalData", "documentNumber"])}>
                   <FieldLabel htmlFor="documentNumber" required>
-                    Documento Nacional de Identidad (DNI)
+                    Documento Nacional de Identidad
                   </FieldLabel>
                   <NumericInput
                     id="documentNumber"
                     maxLength={8}
                     value={documentNumber}
-                    onChange={(e) => setDocumentNumber(e.target.value)}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="12345678"
                     aria-invalid={!!getFieldError(["personalData", "documentNumber"])}
                   />
@@ -766,21 +776,22 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
 
                 <Field data-invalid={!!getFieldError(["personalData", "birthDate"])}>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <FieldLabel htmlFor="birthDate" required>
                       Fecha de nacimiento
                     </FieldLabel>
                     {calculatedAge !== null && (
-                      <Badge variant={isMinor ? "destructive" : "outline"} className="text-xs">
+                      <Badge variant={isMinor ? "destructive" : "outline"} size="lg" className="w-full justify-center sm:w-auto">
                         {calculatedAge} años {isMinor ? "(Menor de 18)" : "(Mayor de edad)"}
                       </Badge>
                     )}
                   </div>
-                  <DatePicker
+                  <Input
                     id="birthDate"
-                    value={birthDate}
-                    onChange={(d) => setBirthDate(d)}
-                    maxDate={new Date()}
+                    value={birthDate && isValid(birthDate) ? format(birthDate, "dd/MM/yyyy") : ""}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
+                    placeholder="dd/mm/aaaa"
                     aria-invalid={!!getFieldError(["personalData", "birthDate"])}
                   />
                   {isMinor && (
@@ -792,15 +803,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                 <Field data-invalid={!!getFieldError(["personalData", "phoneNumber"])}>
-                  <FieldLabel htmlFor="phoneNumber" required>
-                    Teléfono de contacto
-                  </FieldLabel>
+                  <FieldLabel htmlFor="phoneNumber">Teléfono de contacto</FieldLabel>
                   <PhoneInput
                     id="phoneNumber"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="3534123456"
                     autoComplete="tel"
                     aria-invalid={!!getFieldError(["personalData", "phoneNumber"])}
@@ -816,7 +826,8 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="postulante@ejemplo.com"
                     autoComplete="email"
                     spellCheck={false}
@@ -826,10 +837,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button type="button" onClick={() => setActiveTab("education")} className="gap-1.5">
+            <CardFooter className="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-end">
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange("education")} className="w-full gap-1.5 sm:w-auto">
                 Siguiente: Escolaridad
-                <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -838,12 +848,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* ========================================================================= */}
         {/* PASO 2: ESCOLARIDAD DE BASE */}
         {/* ========================================================================= */}
-        <TabsContent value="education" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>2. Escolaridad de Base</CardTitle>
-              <CardDescription>Antecedentes de escolaridad y nivel de egreso secundario.</CardDescription>
-            </CardHeader>
+        <TabsContent value="education" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={GraduationCapIcon}
+              title="2. Escolaridad de Base"
+              description="Antecedentes de escolaridad y nivel de egreso secundario."
+            />
             <CardContent className="space-y-4">
               <Field data-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}>
                 <FieldLabel htmlFor="secondarySchool" required>
@@ -859,9 +870,9 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 <FieldError errors={[{ message: getFieldError(["academicBackground", "secondarySchool"]) }]} />
               </Field>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                 <Field>
-                  <FieldLabel htmlFor="currentGradeYear">Año cursado o egreso</FieldLabel>
+                  <FieldLabel htmlFor="currentGradeYear">Año de cursado o egreso (opcional)</FieldLabel>
                   <NumericInput
                     id="currentGradeYear"
                     maxLength={4}
@@ -872,7 +883,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="secondaryDegreeTitle">Título o especialidad obtenida</FieldLabel>
+                  <FieldLabel htmlFor="secondaryDegreeTitle">Título o especialidad obtenida (opcional)</FieldLabel>
                   <Input
                     id="secondaryDegreeTitle"
                     value={secondaryDegreeTitle}
@@ -882,24 +893,22 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div className="min-w-0 flex-1 space-y-0.5">
                   <FieldLabel htmlFor="secondaryCompleted" className="text-sm font-medium">
                     ¿Secundario completo?
                   </FieldLabel>
                   <FieldDescription>Indicá si ya finalizaste todos los estudios secundarios y tenés título o constancia de egreso.</FieldDescription>
                 </div>
-                <Switch id="secondaryCompleted" checked={secondaryCompleted} onCheckedChange={setSecondaryCompleted} />
+                <Switch id="secondaryCompleted" size="lg" checked={secondaryCompleted} onCheckedChange={setSecondaryCompleted} />
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("personal")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
+            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("personal")} className="gap-1.5">
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab("health")} className="gap-1.5">
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange("health")} className="gap-1.5">
                 Siguiente: Salud e Inclusión
-                <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -908,15 +917,16 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* ========================================================================= */}
         {/* PASO 3: SALUD E INCLUSIÓN */}
         {/* ========================================================================= */}
-        <TabsContent value="health" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>3. Salud e Inclusión</CardTitle>
-              <CardDescription>Información para garantizar la equidad, accesibilidad y ajustes razonables en tu formación.</CardDescription>
-            </CardHeader>
+        <TabsContent value="health" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={HeartHandshakeIcon}
+              title="3. Salud e Inclusión"
+              description="Información para garantizar la equidad, accesibilidad y ajustes razonables en tu formación."
+            />
             <CardContent className="space-y-5">
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div className="min-w-0 flex-1 space-y-0.5">
                   <FieldLabel htmlFor="receivesReasonableAdjustments" className="text-sm font-medium">
                     ¿Requiere ajustes razonables o apoyos específicos?
                   </FieldLabel>
@@ -924,6 +934,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </div>
                 <Switch
                   id="receivesReasonableAdjustments"
+                  size="lg"
                   checked={receivesReasonableAdjustments}
                   onCheckedChange={setReceivesReasonableAdjustments}
                 />
@@ -957,14 +968,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </div>
               )}
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("education")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
+            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("education")} className="gap-1.5">
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab(isMinor ? "responsible" : "training-path")} className="gap-1.5">
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange(isMinor ? "responsible" : "training-path")} className="gap-1.5">
                 {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Trayecto Formativo"}
-                <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -974,21 +983,14 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* PASO 4: RESPONSABLE / TUTOR LEGAL (Sólo para menores de edad) */}
         {/* ========================================================================= */}
         {isMinor && (
-          <TabsContent value="responsible" className="mt-6 space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>4. Responsable / Tutor Legal</CardTitle>
-                    <CardDescription>
-                      {isMinor
-                        ? "Obligatorio: Al ser menor de 18 años, debés consignar los datos de tu tutor o representante legal."
-                        : "Opcional: Al ser mayor de edad, podés omitir esta sección o ingresar un contacto alternativo."}
-                    </CardDescription>
-                  </div>
-                  <Badge variant={isMinor ? "destructive" : "outline"}>{isMinor ? "Obligatorio (Menor)" : "Opcional (Mayor)"}</Badge>
-                </div>
-              </CardHeader>
+          <TabsContent value="responsible" className="space-y-6">
+            <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+              <EnrollmentStepCardHeader
+                icon={UsersRoundIcon}
+                title="4. Responsable / Tutor Legal"
+                description="Obligatorio: Al ser menor de 18 años, debés consignar los datos de tu tutor o representante legal."
+                action={<Badge variant="destructive">Obligatorio (Menor)</Badge>}
+              />
               <CardContent className="space-y-4">
                 <Field data-invalid={!!getFieldError(["responsible", "fullName"])}>
                   <FieldLabel htmlFor="responsibleFullName" required={isMinor}>
@@ -1005,7 +1007,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                   <FieldError errors={[{ message: getFieldError(["responsible", "fullName"]) }]} />
                 </Field>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                   <Field data-invalid={!!getFieldError(["responsible", "documentNumber"])}>
                     <FieldLabel htmlFor="responsibleDocumentNumber" required={isMinor}>
                       DNI del Responsable
@@ -1037,7 +1039,7 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                   </Field>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                   <Field data-invalid={!!getFieldError(["responsible", "email"])}>
                     <FieldLabel htmlFor="responsibleEmail" required={isMinor}>
                       Correo electrónico
@@ -1089,14 +1091,12 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                   <FieldError errors={[{ message: getFieldError(["responsible", "educationLevel"]) }]} />
                 </Field>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button type="button" variant="outline" onClick={() => setActiveTab("health")} className="gap-1.5">
-                  <ChevronLeftIcon className="size-4" />
+              <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("health")} className="gap-1.5">
                   Atrás
                 </Button>
-                <Button type="button" onClick={() => setActiveTab("training-path")} className="gap-1.5">
+                <Button type="button" size="lg" onClick={() => handleActiveTabChange("training-path")} className="gap-1.5">
                   Siguiente: Trayecto Formativo
-                  <ChevronRightIcon className="size-4" />
                 </Button>
               </CardFooter>
             </Card>
@@ -1106,29 +1106,39 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* ========================================================================= */}
         {/* PASO: TRAYECTO FORMATIVO */}
         {/* ========================================================================= */}
-        <TabsContent value="training-path" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{isMinor ? "5. Trayecto Formativo" : "4. Trayecto Formativo"}</CardTitle>
-              <CardDescription>Elegí la orientación o especialidad dentro del plan de estudio.</CardDescription>
-            </CardHeader>
+        <TabsContent value="training-path" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={RouteIcon}
+              title={isMinor ? "5. Trayecto Formativo" : "4. Trayecto Formativo"}
+              description="Elegí la orientación o especialidad dentro del plan de estudio."
+            />
             <CardContent>
               <EnrollmentTrainingPathSelector
                 trainingPaths={trainingPaths}
                 selectedTrainingPathId={selectedTrainingPathId}
-                onSelectTrainingPath={setSelectedTrainingPathId}
-                disabled={!application.isEditable}
-                error={getFieldError(["careerSelection", "trainingPathId"])}
+                onSelectTrainingPath={handleChangeCareer}
+                disabled={!application.isEditable || readOnly || isChangingCareer || isSubmitDialogOpen || isCancelDialogOpen || loadingSpaces}
+                error={(!isChangingCareer && careerResult?.error) || getFieldError(["careerSelection", "trainingPathId"])}
               />
+              {isChangingCareer && (
+                <p role="status" className="text-muted-foreground mt-3 text-sm">
+                  Guardando el trayecto y cargando sus espacios…
+                </p>
+              )}
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab(isMinor ? "responsible" : "health")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
+            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={() => handleActiveTabChange(isMinor ? "responsible" : "health")}
+                className="gap-1.5"
+              >
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab("spaces")} className="gap-1.5">
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
                 Siguiente: Espacios e Instrumentos
-                <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -1137,12 +1147,13 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* ========================================================================= */}
         {/* PASO 6: ESPACIOS CURRICULARES E INSTRUMENTOS */}
         {/* ========================================================================= */}
-        <TabsContent value="spaces" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{isMinor ? "6. Espacios Académicos e Instrumentos" : "5. Espacios Académicos e Instrumentos"}</CardTitle>
-              <CardDescription>Seleccioná las materias que vas a cursar y el instrumento que corresponda.</CardDescription>
-            </CardHeader>
+        <TabsContent value="spaces" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={LibraryBigIcon}
+              title={isMinor ? "6. Espacios Académicos e Instrumentos" : "5. Espacios Académicos e Instrumentos"}
+              description="Seleccioná las materias que vas a cursar y el instrumento que corresponda."
+            />
             <CardContent>
               <EnrollmentStudyPlanSpacesSelector
                 studyPlanSpaces={studyPlanSpaces}
@@ -1150,20 +1161,35 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 selectedInstrumentIdsByStudyPlanSpaceId={selectedInstrumentIdsByStudyPlanSpaceId}
                 onToggleSpace={handleToggleSpace}
                 onSelectInstrument={handleSelectInstrument}
-                disabled={!application.isEditable}
+                disabled={
+                  !application.isEditable || readOnly || isChangingCareer || isSubmitDialogOpen || isCancelDialogOpen || studyPlanSpacesLoadError
+                }
                 isLoading={loadingSpaces}
                 spaceError={getFieldError(["academicSpaceSelection", "studyPlanSpaceIds"])}
                 instrumentError={getFieldError(["instrumentSelection", "studyPlanSpaceInstrumentIds"])}
               />
+              {studyPlanSpacesLoadError && (
+                <Alert variant="destructive" className="mt-4">
+                  <AlertTitle>No se pudieron cargar los espacios</AlertTitle>
+                  <AlertDescription>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={loadingSpaces || isChangingCareer}
+                      onClick={() => reloadSpaces(application.applicationId)}
+                    >
+                      Reintentar
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("training-path")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
+            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("training-path")} className="gap-1.5">
                 Atrás
               </Button>
-              <Button type="button" onClick={() => setActiveTab("preferences")} className="gap-1.5">
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
                 Siguiente: Preferencias
-                <ChevronRightIcon className="size-4" />
               </Button>
             </CardFooter>
           </Card>
@@ -1172,34 +1198,37 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
         {/* ========================================================================= */}
         {/* PASO: PREFERENCIAS */}
         {/* ========================================================================= */}
-        <TabsContent value="preferences" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{isMinor ? "7. Preferencias y Consentimientos" : "6. Preferencias y Consentimientos"}</CardTitle>
-              <CardDescription>Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales.</CardDescription>
-            </CardHeader>
+        <TabsContent value="preferences" className="space-y-6">
+          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
+            <EnrollmentStepCardHeader
+              icon={SlidersHorizontalIcon}
+              title={isMinor ? "7. Preferencias y Consentimientos" : "6. Preferencias y Consentimientos"}
+              description="Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales."
+            />
             <CardContent className="space-y-5">
               <Field data-invalid={!!getFieldError(["preference", "preferredShift"])}>
                 <FieldLabel htmlFor="preferredShift" required>
                   Turno de preferencia
                 </FieldLabel>
                 <Select value={preferredShift} onValueChange={setPreferredShift}>
-                  <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["preference", "preferredShift"])}>
+                  <SelectTrigger id="preferredShift" className="h-9! w-full" aria-invalid={!!getFieldError(["preference", "preferredShift"])}>
                     <SelectValue placeholder="Seleccioná un turno" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SHIFT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      {SHIFT_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
                 <FieldError errors={[{ message: getFieldError(["preference", "preferredShift"]) }]} />
               </Field>
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div className="min-w-0 flex-1 space-y-0.5">
                   <FieldLabel htmlFor="allowsImageUse" className="text-sm font-medium">
                     Autorización para uso de imagen
                   </FieldLabel>
@@ -1207,17 +1236,17 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                     Autorizo a la institución a registrar y publicar fotografías y videos con fines pedagógicos y difusión cultural.
                   </FieldDescription>
                 </div>
-                <Switch id="allowsImageUse" checked={allowsImageUse} onCheckedChange={setAllowsImageUse} />
+                <Switch id="allowsImageUse" size="lg" checked={allowsImageUse} onCheckedChange={setAllowsImageUse} />
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                <div className="min-w-0 flex-1 space-y-0.5">
                   <FieldLabel htmlFor="isReenrolling" className="text-sm font-medium">
                     ¿Sos estudiante reingresante?
                   </FieldLabel>
                   <FieldDescription>Indicá si cursaste materias en este conservatorio o instituto en ciclos anteriores.</FieldDescription>
                 </div>
-                <Switch id="isReenrolling" checked={isReenrolling} onCheckedChange={setIsReenrolling} />
+                <Switch id="isReenrolling" size="lg" checked={isReenrolling} onCheckedChange={setIsReenrolling} />
               </div>
 
               {isReenrolling && (
@@ -1236,67 +1265,35 @@ export function EnrollmentWizard({ studyPlanId, academicYearId, applicationId, r
                 </Field>
               )}
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setActiveTab("spaces")} className="gap-1.5">
-                <ChevronLeftIcon className="size-4" />
+            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
                 Atrás
               </Button>
-            </CardFooter>
-          </Card>
-
-          {!readOnly && (
-            <div className="bg-muted/30 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold">¿Listo para finalizar tu inscripción?</p>
-                <p className="text-muted-foreground text-xs">
-                  Al enviar la postulación, no podrás realizar más modificaciones mientras sea evaluada por el instituto.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3 self-end sm:self-center">
+              {!readOnly ? (
                 <Button
                   type="button"
                   size="lg"
-                  onClick={handleSubmitApplication}
-                  disabled={isSubmitting || saving}
-                  className="bg-primary gap-2 font-medium"
+                  onClick={() => setIsSubmitDialogOpen(true)}
+                  disabled={saving || isChangingCareer || loadingSpaces || isCancelDialogOpen}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2Icon className="size-4 animate-spin" />
-                      <span>Validando y enviando…</span>
-                    </>
-                  ) : (
-                    <>
-                      <SendIcon className="size-4" />
-                      <span>Enviar inscripción</span>
-                    </>
-                  )}
+                  Enviar inscripción
                 </Button>
-              </div>
-            </div>
-          )}
+              ) : null}
+            </CardFooter>
+          </Card>
         </TabsContent>
       </Tabs>
 
       {/* Confirmation Dialog for Cancel Application */}
-      <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Deseás cancelar tu borrador de inscripción?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción dará de baja tu postulación actual y ya no podrás seguir editándola. Si deseás postularte más adelante, deberás iniciar una
-              nueva solicitud.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isCancelling}>Conservar borrador</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleCancelApplication} disabled={isCancelling}>
-              {isCancelling ? "Cancelando…" : "Sí, cancelar solicitud"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isCancelDialogOpen && (
+        <EnrollmentCancelDialog
+          applicationId={application.applicationId}
+          beforeCancel={() => draftSaveQueue.current}
+          onClose={() => setIsCancelDialogOpen(false)}
+          onCancelled={setApplication}
+        />
+      )}
+      {isSubmitDialogOpen ? <EnrollmentSubmitDialog onClose={() => setIsSubmitDialogOpen(false)} onSubmit={submitApplication} /> : null}
     </div>
   );
 }

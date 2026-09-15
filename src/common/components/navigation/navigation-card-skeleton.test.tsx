@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 
-import { NavigationCardSkeleton } from "./navigation-card-skeleton";
+import { NavigationCardSkeleton } from "@common/components/navigation/navigation-card-skeleton";
 
 describe("NavigationCardSkeleton", () => {
   it("renders with default compact styles and aria-hidden", () => {

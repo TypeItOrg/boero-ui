@@ -11,6 +11,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
 import { PlatformRoleDeleteButton } from "@features/roles/components/platform-role-delete-button";
 import { fetchPlatformPermissionGroups, fetchPlatformRole } from "@features/roles/services/platform-role.service";
@@ -35,13 +36,7 @@ export default async function PlatformRoleDetailPage({
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ roles: "Roles", [roleId]: role.name }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="flex h-full items-center gap-3">
-          <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
-            <ShieldCheckIcon className="size-6 sm:size-7" aria-hidden="true" />
-          </div>
-        </div>
-      }
+      actions={<PlatformPageIcon icon={ShieldCheckIcon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="lg">

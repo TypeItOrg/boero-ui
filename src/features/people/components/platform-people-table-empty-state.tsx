@@ -2,6 +2,7 @@ import * as React from "react";
 import { SearchIcon, UsersIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { EmptyMedia } from "@common/components/ui/empty";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 
@@ -59,9 +60,9 @@ function EmptyState({
 }): React.ReactElement {
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
-      <div className="bg-background border-border/50 text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full border shadow-sm">
+      <EmptyMedia className="mb-4" variant="icon">
         {icon}
-      </div>
+      </EmptyMedia>
       <h3 className="text-foreground text-base font-semibold">{title}</h3>
       <p className={`text-muted-foreground mt-1.5 max-w-sm text-sm${action ? "mb-6" : ""}`}>{description}</p>
       {action}

@@ -5,8 +5,8 @@ import {
   formatFileSize,
   getApplicantDni,
   getApplicantFullName,
-} from "./enrollment-application.util";
-import type { EnrollmentApplicationResponse } from "../types/enrollment-application.types";
+} from "@features/enrollment-applications/utils/enrollment-application.util";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 
 describe("enrollment-application.util", () => {
   const baseApplication: EnrollmentApplicationResponse = {

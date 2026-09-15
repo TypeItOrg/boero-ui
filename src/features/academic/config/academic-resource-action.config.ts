@@ -32,6 +32,7 @@ export const ACADEMIC_ACTION_FIELDS = [
   "academicLevelId",
   "requirementType",
   "approvalMode",
+  "instrumentIds",
   "requiredStudyPlanSpaceId",
   "requirementStage",
   "requiredCondition",
@@ -107,7 +108,9 @@ export const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConf
 };
 
 export const academicScopeSchema = z.enum([AcademicScope.ADMIN, AcademicScope.INSTITUTIONAL]);
+
 export const academicResourceSchema = z.enum(AcademicResource);
+
 export const statusResourceSchema = z.enum([
   AcademicResource.ACADEMIC_YEAR,
   AcademicResource.TRAINING_PATH,
@@ -223,8 +226,14 @@ export function isFormStatusResource(resource: AcademicResource): resource is Ac
 }
 
 export function getStatusRequestBody(data: z.infer<typeof academicStatusSchema>): Record<string, unknown> {
-  if ("active" in data) return { active: data.active };
-  if ("effectiveTo" in data) return { status: data.status, effectiveTo: data.effectiveTo };
+  if ("active" in data) {
+    return { active: data.active };
+  }
+
+  if ("effectiveTo" in data) {
+    return { status: data.status, effectiveTo: data.effectiveTo };
+  }
+
   return { status: data.status };
 }
 

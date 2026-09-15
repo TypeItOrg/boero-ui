@@ -10,6 +10,8 @@ type TimeInputWithIconProps = {
   id: string;
   "aria-label": string;
   "aria-invalid"?: boolean;
+  disabled?: boolean;
+  required?: boolean;
   value: string;
   onValueChange: (value: string) => void;
 };
@@ -18,6 +20,8 @@ export function TimeInputWithIcon({
   id,
   "aria-label": label,
   "aria-invalid": invalid,
+  disabled = false,
+  required = false,
   value,
   onValueChange,
 }: TimeInputWithIconProps): React.ReactElement {
@@ -27,14 +31,17 @@ export function TimeInputWithIcon({
     <TimeField
       id={id}
       aria-label={label}
+      className="group/time-field"
+      isDisabled={disabled}
       isInvalid={invalid}
+      isRequired={required}
       hourCycle={24}
       granularity="minute"
       shouldForceLeadingZeros
       value={time}
       onChange={(nextTime) => onValueChange(nextTime ? `${String(nextTime.hour).padStart(2, "0")}:${String(nextTime.minute).padStart(2, "0")}` : "")}
     >
-      <div className="border-input bg-background focus-within:border-ring focus-within:ring-ring/50 has-[[data-invalid]]:border-destructive flex h-9 items-center gap-2 rounded-md border px-3 shadow-xs transition-[color,box-shadow] focus-within:ring-3">
+      <div className="border-input bg-background focus-within:border-ring focus-within:ring-ring/50 has-[[data-invalid]]:border-destructive flex h-9 items-center gap-2 rounded-md border px-3 shadow-xs transition-[color,box-shadow] group-data-[disabled]/time-field:cursor-not-allowed group-data-[disabled]/time-field:opacity-50 focus-within:ring-3">
         <Clock8Icon aria-hidden="true" className="text-muted-foreground size-4 shrink-0" />
         <DateInput className="min-w-0 flex-1 font-[inherit] text-base leading-normal font-normal tracking-normal whitespace-nowrap normal-nums md:text-sm">
           {(segment) => (

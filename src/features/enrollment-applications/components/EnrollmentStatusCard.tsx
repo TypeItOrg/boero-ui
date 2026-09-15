@@ -1,132 +1,161 @@
 "use client";
 
 import * as React from "react";
-import {
-  CheckCircle2Icon,
-  ClockIcon,
-  XCircleIcon,
-  BanIcon,
-  FileTextIcon,
-  UserIcon,
-  GraduationCapIcon,
-  HeartHandshakeIcon,
-  UsersIcon,
-  SlidersIcon,
-  ExternalLinkIcon,
-  CalendarIcon,
-  MusicIcon,
-} from "lucide-react";
 import { format, isValid } from "date-fns";
 import { es } from "date-fns/locale";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@common/components/ui/card";
+import {
+  BanIcon,
+  CalendarDaysIcon,
+  CheckCircle2Icon,
+  ClipboardCheckIcon,
+  ClockIcon,
+  ExternalLinkIcon,
+  FileTextIcon,
+  GraduationCapIcon,
+  HeartHandshakeIcon,
+  Music2Icon,
+  SlidersHorizontalIcon,
+  UserRoundIcon,
+  UsersRoundIcon,
+  XCircleIcon,
+  type LucideIcon,
+} from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
-import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { ENROLLMENT_APPLICATION_STATUS_LABELS, ENROLLMENT_DOCUMENT_TYPE_LABELS } from "../constants/enrollment-application.constants";
-import { getAttachmentDownloadUrl } from "../utils/enrollment-application.util";
-import type { EnrollmentApplicationResponse, EnrollmentApplicationStatus } from "../types/enrollment-application.types";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
+import { cn } from "@common/utils/cn.util";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
+import {
+  ENROLLMENT_APPLICATION_STATUS_LABELS,
+  ENROLLMENT_DOCUMENT_TYPE_LABELS,
+  SHIFT_OPTIONS,
+} from "@features/enrollment-applications/constants/enrollment-application.constants";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
+import {
+  ENROLLMENT_APPLICATION_STATUS,
+  type EnrollmentApplicationStatus,
+} from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
 
 interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
   showApplicantAlert?: boolean;
+  scope?: AcademicScope;
 }
+
+type DetailItemProps = {
+  className?: string;
+  label: string;
+  value: React.ReactNode;
+};
+
+type DetailCardProps = {
+  children: React.ReactNode;
+  className?: string;
+  description: string;
+  icon: LucideIcon;
+  title: string;
+};
+
+const SECTION_CARD_CLASS_NAME = "bg-muted/25 sm:[--card-spacing:--spacing(6)]";
 
 function getStatusBadge(status: EnrollmentApplicationStatus): React.ReactElement {
-  switch (status) {
-    case "SUBMITTED":
-      return (
-        <Badge variant="secondary" className="gap-1.5 border-amber-500/30 bg-amber-500/15 px-3 py-1 text-sm text-amber-800 dark:text-amber-300">
-          <ClockIcon className="size-4" />
-          {ENROLLMENT_APPLICATION_STATUS_LABELS.SUBMITTED}
-        </Badge>
-      );
-    case "APPROVED":
-      return (
-        <Badge variant="success" className="gap-1.5 px-3 py-1 text-sm">
-          <CheckCircle2Icon className="size-4" />
-          {ENROLLMENT_APPLICATION_STATUS_LABELS.APPROVED}
-        </Badge>
-      );
-    case "REJECTED":
-      return (
-        <Badge variant="destructive" className="gap-1.5 px-3 py-1 text-sm">
-          <XCircleIcon className="size-4" />
-          {ENROLLMENT_APPLICATION_STATUS_LABELS.REJECTED}
-        </Badge>
-      );
-    case "CANCELLED":
-      return (
-        <Badge variant="outline" className="text-muted-foreground gap-1.5 px-3 py-1 text-sm">
-          <BanIcon className="size-4" />
-          {ENROLLMENT_APPLICATION_STATUS_LABELS.CANCELLED}
-        </Badge>
-      );
-    default:
-      return (
-        <Badge variant="outline" className="gap-1.5 px-3 py-1 text-sm">
-          {ENROLLMENT_APPLICATION_STATUS_LABELS.DRAFT}
-        </Badge>
-      );
+  if (status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
+    return (
+      <Badge size="lg" variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300">
+        <ClockIcon />
+        {ENROLLMENT_APPLICATION_STATUS_LABELS.SUBMITTED}
+      </Badge>
+    );
   }
-}
 
-function getStatusAlert(status: EnrollmentApplicationStatus): React.ReactElement | null {
-  switch (status) {
-    case "SUBMITTED":
-      return (
-        <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200">
-          <ClockIcon className="size-4 text-amber-600 dark:text-amber-400" />
-          <AlertTitle className="font-semibold">Solicitud en revisión</AlertTitle>
-          <AlertDescription>
-            Tu solicitud de inscripción ha sido enviada exitosamente. La administración institucional está evaluando los datos y la documentación
-            presentada. Te contactaremos ante cualquier novedad o solicitud de subsanación.
-          </AlertDescription>
-        </Alert>
-      );
-    case "APPROVED":
-      return (
-        <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200">
-          <CheckCircle2Icon className="size-4 text-emerald-600 dark:text-emerald-400" />
-          <AlertTitle className="font-semibold">¡Solicitud Aprobada!</AlertTitle>
-          <AlertDescription>
-            Tu postulación ha sido aprobada. Cumplís con todos los requisitos para el ingreso. La institución te indicará los próximos pasos
-            administrativos para la confirmación de matrícula.
-          </AlertDescription>
-        </Alert>
-      );
-    case "REJECTED":
-      return (
-        <Alert variant="destructive">
-          <XCircleIcon className="size-4" />
-          <AlertTitle className="font-semibold">Solicitud no admitida</AlertTitle>
-          <AlertDescription>
-            Tu solicitud de inscripción ha sido desestimada o rechazada. Para más información o consultas sobre los motivos, por favor comunicate con
-            la secretaría académica de la institución.
-          </AlertDescription>
-        </Alert>
-      );
-    case "CANCELLED":
-      return (
-        <Alert variant="default" className="border-muted bg-muted/30">
-          <BanIcon className="text-muted-foreground size-4" />
-          <AlertTitle className="text-muted-foreground font-semibold">Solicitud Cancelada</AlertTitle>
-          <AlertDescription className="text-muted-foreground">
-            Esta postulación fue cancelada voluntariamente. Ya no podrá ser editada ni evaluada.
-          </AlertDescription>
-        </Alert>
-      );
-    default:
-      return null;
+  if (status === ENROLLMENT_APPLICATION_STATUS.APPROVED) {
+    return (
+      <Badge size="lg" variant="success">
+        <CheckCircle2Icon />
+        {ENROLLMENT_APPLICATION_STATUS_LABELS.APPROVED}
+      </Badge>
+    );
   }
+
+  if (status === ENROLLMENT_APPLICATION_STATUS.REJECTED) {
+    return (
+      <Badge size="lg" variant="destructive">
+        <XCircleIcon />
+        {ENROLLMENT_APPLICATION_STATUS_LABELS.REJECTED}
+      </Badge>
+    );
+  }
+
+  if (status === ENROLLMENT_APPLICATION_STATUS.CANCELLED) {
+    return (
+      <Badge size="lg" variant="outline" className="text-muted-foreground">
+        <BanIcon />
+        {ENROLLMENT_APPLICATION_STATUS_LABELS.CANCELLED}
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge size="lg" variant="outline">
+      {ENROLLMENT_APPLICATION_STATUS_LABELS.DRAFT}
+    </Badge>
+  );
 }
 
-function formatDateSafe(dateStr?: string): string {
-  if (!dateStr) return "-";
-  const d = new Date(dateStr);
-  return isValid(d) ? format(d, "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: es }) : dateStr;
-}
+function getStatusAlert(application: EnrollmentApplicationResponse): React.ReactElement | null {
+  if (application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
+    return (
+      <Alert className="bg-card border-amber-500/30 text-amber-800 dark:text-amber-300">
+        <ClockIcon />
+        <AlertTitle>Solicitud en revisión</AlertTitle>
+        <AlertDescription>
+          La institución está revisando los datos y la documentación presentada. Te contactará si necesita algo más.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
-export function EnrollmentStatusCard({ application, showApplicantAlert = true }: EnrollmentStatusCardProps): React.ReactElement {
+  if (application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED) {
+    return (
+      <Alert variant="success">
+        <CheckCircle2Icon />
+        <AlertTitle>Solicitud aprobada</AlertTitle>
+        <AlertDescription>La institución te indicará los próximos pasos para confirmar la matrícula.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED) {
+    return (
+      <Alert variant="destructive">
+        <XCircleIcon />
+        <AlertTitle>Solicitud no admitida</AlertTitle>
+        <AlertDescription>{application.rejectionReason || "Contactá a la institución para obtener más información."}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (application.status === ENROLLMENT_APPLICATION_STATUS.CANCELLED) {
+    return (
+      <Alert>
+        <BanIcon />
+        <AlertTitle>Solicitud cancelada</AlertTitle>
+        <AlertDescription>Esta solicitud ya no puede editarse ni ser evaluada.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  return null;
+}
+export function EnrollmentStatusCard({
+  application,
+  showApplicantAlert = true,
+  scope = AcademicScope.INSTITUTIONAL,
+}: EnrollmentStatusCardProps): React.ReactElement {
   const data = application.data || {};
   const personal = data.personalData || {};
   const academic = data.academicBackground || {};
@@ -134,252 +163,189 @@ export function EnrollmentStatusCard({ application, showApplicantAlert = true }:
   const responsible = data.responsible || {};
   const preference = data.preference || {};
   const attachments = data.attachments || [];
+  const spaces = application.spaces || [];
+  const preferredShift = SHIFT_OPTIONS.find((option) => option.value === preference.preferredShift)?.label || preference.preferredShift || "—";
 
   return (
-    <div className="flex flex-col gap-6">
-      <Card className="border-2 shadow-sm">
-        <CardHeader className="border-b pb-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-xl font-bold">Estado de tu Solicitud de Inscripción</CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                <CalendarIcon className="size-3.5" />
-                <span>Última actualización: {formatDateSafe(application.updatedAt)}</span>
-              </CardDescription>
+    <div className="flex flex-col gap-4">
+      <Card className={SECTION_CARD_CLASS_NAME}>
+        <CardHeader>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-stretch gap-3.5">
+              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+                <ClipboardCheckIcon className="size-5" aria-hidden="true" />
+              </div>
+              <div className="flex min-w-0 flex-col justify-center gap-1">
+                <h2 className="font-heading text-lg font-semibold">Estado de la solicitud</h2>
+                <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <CalendarDaysIcon className="size-4 shrink-0" aria-hidden="true" />
+                  Última actualización: {formatDateTime(application.updatedAt)}
+                </p>
+              </div>
             </div>
-            <div>{getStatusBadge(application.status)}</div>
+            {getStatusBadge(application.status)}
           </div>
         </CardHeader>
-
-        <CardContent className="space-y-6 pt-6">
-          {showApplicantAlert ? getStatusAlert(application.status) : null}
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Datos Personales */}
-            <div className="bg-card space-y-3 rounded-lg border p-4">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <UserIcon className="text-primary size-4" />
-                <span>1. Datos Personales y Contacto</span>
-              </div>
-              <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                <div>
-                  <dt className="text-muted-foreground">Nombre completo:</dt>
-                  <dd className="text-foreground font-medium">
-                    {personal.firstName} {personal.lastName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">DNI:</dt>
-                  <dd className="text-foreground font-medium">{personal.documentNumber || "-"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Fecha de Nacimiento:</dt>
-                  <dd className="text-foreground font-medium">{personal.birthDate || "-"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Teléfono:</dt>
-                  <dd className="text-foreground font-medium">{personal.phoneNumber || "-"}</dd>
-                </div>
-                <div className="col-span-2">
-                  <dt className="text-muted-foreground">Email:</dt>
-                  <dd className="text-foreground font-medium">{personal.email || "-"}</dd>
-                </div>
-              </dl>
-            </div>
-
-            {/* Escolaridad de Base */}
-            <div className="bg-card space-y-3 rounded-lg border p-4">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <GraduationCapIcon className="text-primary size-4" />
-                <span>2. Escolaridad de Base</span>
-              </div>
-              <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                <div className="col-span-2">
-                  <dt className="text-muted-foreground">Colegio de origen:</dt>
-                  <dd className="text-foreground font-medium">{academic.secondarySchool || "-"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Secundario completo:</dt>
-                  <dd className="text-foreground font-medium">{academic.secondaryCompleted ? "Sí" : "No"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Año de egreso:</dt>
-                  <dd className="text-foreground font-medium">{academic.currentGradeYear || "-"}</dd>
-                </div>
-                {academic.secondaryDegreeTitle && (
-                  <div className="col-span-2">
-                    <dt className="text-muted-foreground">Título secundario:</dt>
-                    <dd className="text-foreground font-medium">{academic.secondaryDegreeTitle}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Salud e Inclusión */}
-            <div className="bg-card space-y-3 rounded-lg border p-4">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <HeartHandshakeIcon className="text-primary size-4" />
-                <span>3. Salud e Inclusión</span>
-              </div>
-              <dl className="space-y-2 text-xs">
-                <div>
-                  <dt className="text-muted-foreground">¿Requiere ajustes razonables?</dt>
-                  <dd className="text-foreground font-medium">
-                    {health.receivesReasonableAdjustments ? "Sí, requiere ajustes" : "No requiere ajustes"}
-                  </dd>
-                </div>
-                {health.receivesReasonableAdjustments && health.adjustmentDetails && (
-                  <div>
-                    <dt className="text-muted-foreground">Detalle de los ajustes:</dt>
-                    <dd className="text-foreground bg-muted/40 mt-0.5 rounded-md p-2 font-medium">{health.adjustmentDetails}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Responsable / Tutor */}
-            <div className="bg-card space-y-3 rounded-lg border p-4">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <UsersIcon className="text-primary size-4" />
-                <span>4. Responsable / Tutor Legal</span>
-              </div>
-              {responsible.fullName ? (
-                <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
-                  <div className="col-span-2">
-                    <dt className="text-muted-foreground">Nombre completo:</dt>
-                    <dd className="text-foreground font-medium">{responsible.fullName}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">DNI:</dt>
-                    <dd className="text-foreground font-medium">{responsible.documentNumber || "-"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Teléfono:</dt>
-                    <dd className="text-foreground font-medium">{responsible.phoneNumber || "-"}</dd>
-                  </div>
-                  <div className="col-span-2">
-                    <dt className="text-muted-foreground">Email:</dt>
-                    <dd className="text-foreground font-medium">{responsible.email || "-"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Ocupación:</dt>
-                    <dd className="text-foreground font-medium">{responsible.occupation || "-"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Nivel de instrucción:</dt>
-                    <dd className="text-foreground font-medium">{responsible.educationLevel || "-"}</dd>
-                  </div>
-                </dl>
-              ) : (
-                <p className="text-muted-foreground text-xs italic">No se requirió tutor legal (postulante mayor de edad).</p>
-              )}
-            </div>
-
-            {/* Trayecto Formativo y Espacios */}
-            <div className="bg-card space-y-3 rounded-lg border p-4 md:col-span-2">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <MusicIcon className="text-primary size-4" />
-                <span>5. Trayecto Formativo y Espacios Académicos</span>
-              </div>
-              <dl className="grid grid-cols-1 gap-x-3 gap-y-2 text-xs sm:grid-cols-2">
-                <div>
-                  <dt className="text-muted-foreground">Trayecto formativo:</dt>
-                  <dd className="text-foreground font-medium">{application.trainingPathName || "-"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Plan de estudio:</dt>
-                  <dd className="text-foreground font-medium">{application.studyPlanName || "-"}</dd>
-                </div>
-              </dl>
-              {application.spaces && application.spaces.length > 0 ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {application.spaces.map((space) => (
-                    <div key={space.studyPlanSpaceId} className="bg-muted/30 rounded-md border p-2.5 text-xs">
-                      <p className="font-medium">{space.spaceName}</p>
-                      <p className="text-muted-foreground text-[10px]">
-                        {space.academicLevelName ? `${space.academicLevelName} · ` : ""}
-                        {space.instrumentName ? `Instrumento: ${space.instrumentName}` : "Sin instrumento"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-xs italic">No hay espacios académicos seleccionados.</p>
-              )}
-            </div>
-
-            {/* Preferencias */}
-            <div className="bg-card space-y-3 rounded-lg border p-4 md:col-span-2">
-              <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-                <SlidersIcon className="text-primary size-4" />
-                <span>6. Preferencias</span>
-              </div>
-              <dl className="grid grid-cols-1 gap-4 text-xs sm:grid-cols-3">
-                <div>
-                  <dt className="text-muted-foreground">Turno preferente:</dt>
-                  <dd className="text-foreground font-medium">
-                    {preference.preferredShift === "MORNING"
-                      ? "Mañana"
-                      : preference.preferredShift === "AFTERNOON"
-                        ? "Tarde"
-                        : preference.preferredShift === "EVENING"
-                          ? "Noche"
-                          : preference.preferredShift || "-"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Autorización de uso de imagen:</dt>
-                  <dd className="text-foreground font-medium">{preference.allowsImageUse ? "Autorizada" : "No autorizada"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">¿Estudiante reingresante?</dt>
-                  <dd className="text-foreground font-medium">
-                    {preference.isReenrolling ? `Sí (Docente previo: ${preference.previousTeacher || "No indicado"})` : "No"}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Documentación Adjunta */}
-          <div className="bg-card space-y-3 rounded-lg border p-4">
-            <div className="text-foreground flex items-center gap-2 border-b pb-2 text-sm font-semibold">
-              <FileTextIcon className="text-primary size-4" />
-              <span>7. Documentación Presentada ({attachments.length} archivos)</span>
-            </div>
-
-            {attachments.length === 0 ? (
-              <p className="text-muted-foreground text-xs italic">No hay archivos adjuntos registrados.</p>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
-                {attachments.map((att) => (
-                  <div key={att.id} className="bg-muted/30 flex items-center justify-between rounded-md border p-2.5 text-xs">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <FileTextIcon className="text-primary size-4 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="truncate font-medium">{att.originalFileName}</p>
-                        <p className="text-muted-foreground text-[10px]">
-                          {ENROLLMENT_DOCUMENT_TYPE_LABELS[att.attachmentType] || att.attachmentType}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 shrink-0 px-2 text-xs"
-                      onClick={() => window.open(getAttachmentDownloadUrl(application.applicationId, att.id), "_blank")}
-                    >
-                      <ExternalLinkIcon className="mr-1 size-3" />
-                      Ver
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </CardContent>
       </Card>
+
+      {showApplicantAlert ? getStatusAlert(application) : null}
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <DetailCard icon={UserRoundIcon} title="Datos personales y contacto" description="Información registrada al enviar la solicitud.">
+          <dl className="grid gap-4 sm:grid-cols-2">
+            <DetailItem label="Nombre completo" value={`${personal.firstName || ""} ${personal.lastName || ""}`.trim() || "—"} />
+            <DetailItem label="Documento" value={personal.documentNumber || "—"} />
+            <DetailItem label="Fecha de nacimiento" value={formatBusinessDate(personal.birthDate)} />
+            <DetailItem label="Teléfono" value={personal.phoneNumber || "—"} />
+            <DetailItem className="sm:col-span-2" label="Correo electrónico" value={personal.email || "—"} />
+          </dl>
+        </DetailCard>
+
+        <DetailCard icon={GraduationCapIcon} title="Escolaridad de base" description="Antecedentes educativos informados.">
+          <dl className="grid gap-4 sm:grid-cols-2">
+            <DetailItem className="sm:col-span-2" label="Colegio de origen" value={academic.secondarySchool || "—"} />
+            <DetailItem label="Secundario completo" value={academic.secondaryCompleted ? "Sí" : "No"} />
+            <DetailItem label="Año de cursado o egreso" value={academic.currentGradeYear || "—"} />
+            <DetailItem className="sm:col-span-2" label="Título o especialidad" value={academic.secondaryDegreeTitle || "—"} />
+          </dl>
+        </DetailCard>
+
+        <DetailCard icon={HeartHandshakeIcon} title="Salud e inclusión" description="Necesidades de acompañamiento declaradas.">
+          <dl className="grid gap-4">
+            <DetailItem label="Ajustes razonables" value={health.receivesReasonableAdjustments ? "Sí, requiere ajustes" : "No requiere ajustes"} />
+            {health.receivesReasonableAdjustments ? <DetailItem label="Detalle" value={health.adjustmentDetails || "—"} /> : null}
+          </dl>
+        </DetailCard>
+        <DetailCard icon={UsersRoundIcon} title="Responsable o tutor legal" description="Información del responsable, cuando corresponde.">
+          {responsible.fullName ? (
+            <dl className="grid gap-4 sm:grid-cols-2">
+              <DetailItem className="sm:col-span-2" label="Nombre completo" value={responsible.fullName} />
+              <DetailItem label="Documento" value={responsible.documentNumber || "—"} />
+              <DetailItem label="Teléfono" value={responsible.phoneNumber || "—"} />
+              <DetailItem className="sm:col-span-2" label="Correo electrónico" value={responsible.email || "—"} />
+              <DetailItem label="Ocupación" value={responsible.occupation || "—"} />
+              <DetailItem label="Nivel de instrucción" value={responsible.educationLevel || "—"} />
+            </dl>
+          ) : (
+            <p className="text-muted-foreground text-sm">No se requirió tutor legal porque la persona postulante es mayor de edad.</p>
+          )}
+        </DetailCard>
+
+        <DetailCard
+          className="xl:col-span-2"
+          icon={Music2Icon}
+          title="Trayecto formativo y espacios académicos"
+          description="Trayecto y materias seleccionadas para la inscripción."
+        >
+          <dl className="mb-5 grid gap-4 sm:grid-cols-2">
+            <DetailItem label="Trayecto formativo" value={application.trainingPathName || "—"} />
+            <DetailItem label="Plan de estudio" value={application.studyPlanName || "—"} />
+          </dl>
+          {spaces.length > 0 ? (
+            <div className="bg-background divide-y overflow-hidden rounded-xl border">
+              {spaces.map((space) => (
+                <div key={space.studyPlanSpaceId} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{space.spaceName}</p>
+                    {space.academicLevelName ? <p className="text-muted-foreground text-sm">{space.academicLevelName}</p> : null}
+                  </div>
+                  {space.instrumentName ? <p className="text-muted-foreground text-sm">Instrumento: {space.instrumentName}</p> : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">No se seleccionaron espacios académicos.</p>
+          )}
+        </DetailCard>
+
+        <DetailCard
+          className="xl:col-span-2"
+          icon={SlidersHorizontalIcon}
+          title="Preferencias y consentimientos"
+          description="Preferencias declaradas para la cursada."
+        >
+          <dl className="grid gap-4 sm:grid-cols-3">
+            <DetailItem label="Turno preferente" value={preferredShift} />
+            <DetailItem label="Uso de imagen" value={preference.allowsImageUse ? "Autorizado" : "No autorizado"} />
+            <DetailItem label="Estudiante reingresante" value={preference.isReenrolling ? "Sí" : "No"} />
+            {preference.isReenrolling ? (
+              <DetailItem className="sm:col-span-3" label="Docente anterior" value={preference.previousTeacher || "—"} />
+            ) : null}
+          </dl>
+        </DetailCard>
+
+        <DetailCard
+          className="xl:col-span-2"
+          icon={FileTextIcon}
+          title="Documentación presentada"
+          description={`${attachments.length} ${attachments.length === 1 ? "archivo adjunto" : "archivos adjuntos"}.`}
+        >
+          {attachments.length > 0 ? (
+            <div className="bg-background divide-y overflow-hidden rounded-xl border">
+              {attachments.map((attachment) => (
+                <div key={attachment.id} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{attachment.originalFileName}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {ENROLLMENT_DOCUMENT_TYPE_LABELS[attachment.attachmentType] || attachment.attachmentType}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    className="shrink-0"
+                    onClick={() => window.open(getAttachmentDownloadUrl(application.applicationId, attachment.id, scope), "_blank")}
+                  >
+                    <ExternalLinkIcon />
+                    Abrir
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">No se adjuntaron documentos.</p>
+          )}
+        </DetailCard>
+      </div>
     </div>
   );
+}
+
+function DetailCard({ children, className, description, icon, title }: DetailCardProps): React.ReactElement {
+  return (
+    <Card className={cn(SECTION_CARD_CLASS_NAME, className)}>
+      <EnrollmentStepCardHeader icon={icon} title={title} description={description} />
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+}
+
+function DetailItem({ className, label, value }: DetailItemProps): React.ReactElement {
+  return (
+    <div className={cn("min-w-0 space-y-1", className)}>
+      <dt className="text-muted-foreground text-sm">{label}</dt>
+      <dd className="text-foreground text-sm font-medium break-words">{value}</dd>
+    </div>
+  );
+}
+
+function formatDateTime(value?: string): string {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+
+  return isValid(date) ? format(date, "d 'de' MMMM 'de' yyyy, HH:mm", { locale: es }) : value;
+}
+
+function formatBusinessDate(value?: string | null): string {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  return isValid(date) ? format(date, "dd/MM/yyyy") : value;
 }

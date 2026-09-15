@@ -2,12 +2,15 @@
 
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import type { EnrollmentApplicationStatus } from "../types/enrollment-application-status.types";
-import { ENROLLMENT_APPLICATION_STATUS_OPTIONS } from "../constants/enrollment-application.constants";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { ENROLLMENT_APPLICATION_STATUS_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
 
 const ALL_STATUSES = "all";
+
 const ALL_TRAINING_PATHS = "all";
+
 const OPEN_ONLY = "true";
+
 const ALL_PERIODS = "all";
 
 type EnrollmentApplicationFiltersProps = {

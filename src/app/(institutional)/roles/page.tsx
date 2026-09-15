@@ -38,7 +38,7 @@ export default async function RolesPage({
 
   return (
     <PlatformPageShell title="Roles" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UserLockIcon} />}>
-      <PlatformCollectionActions>
+      <PlatformCollectionActions className="sm:justify-start">
         {canCreate ? (
           <Button asChild size="lg" className="w-full">
             <ReturnToLink href="/roles/new">

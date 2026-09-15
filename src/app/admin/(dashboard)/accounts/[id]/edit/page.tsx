@@ -9,6 +9,7 @@ import { PlatformAccountForm } from "@features/platform-accounts/components/plat
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 type EditPlatformAccountPageProps = {
   params: Promise<{ id: string }>;
@@ -30,11 +31,7 @@ export default async function EditPlatformAccountPage({ params, searchParams }: 
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: fullName }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <FingerprintIcon className="size-6 sm:size-7" aria-hidden="true" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={FingerprintIcon} />}
     >
       <div>
         <Button asChild variant="outline" size="lg">

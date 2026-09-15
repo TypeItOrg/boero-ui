@@ -35,6 +35,7 @@ type SelectedTextInput<TItem> = {
 
 export function AsyncDropdown<TItem>({
   ariaInvalid,
+  "aria-required": ariaRequired,
   className,
   contentClassName,
   clearLabel = "Limpiar selección",
@@ -190,6 +191,7 @@ export function AsyncDropdown<TItem>({
               aria-expanded={isOpen}
               aria-haspopup="listbox"
               aria-invalid={ariaInvalid}
+              aria-required={ariaRequired}
               className={cn(
                 "w-full justify-between text-base focus-visible:ring-1 aria-invalid:ring-0 aria-invalid:focus-visible:ring-1 md:text-sm",
                 canClear && "pr-16",

@@ -41,6 +41,7 @@ Local development is available. Staging and production configurations are retain
 
 ## New feature boundaries
 
+- Always use braces for control-flow bodies, including single-statement guards. Separate validation, data preparation, network calls and returned results into readable blocks with blank lines; keep related statements together.
 - Validate Server Action bound arguments and form data at runtime; values bound by a client component are untrusted input.
 - Validate raw form values before coercion. A missing or unknown boolean value is invalid input, never an implicit `false`.
 - Use the shared authenticated API transport for server-side backend calls so authorization, no-store behavior, timeouts, and request headers remain consistent.

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EnrollmentTrainingPathSelector } from "./EnrollmentTrainingPathSelector";
+import { EnrollmentTrainingPathSelector } from "@features/enrollment-applications/components/EnrollmentTrainingPathSelector";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 
 const MOCK_PATHS: TrainingPath[] = [

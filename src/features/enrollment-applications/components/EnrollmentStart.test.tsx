@@ -1,10 +1,10 @@
 import * as React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { EnrollmentStart } from "./EnrollmentStart";
+import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
-jest.mock("./EnrollmentWizard", () => ({
+jest.mock("@features/enrollment-applications/components/EnrollmentWizard", () => ({
   EnrollmentWizard: ({ studyPlanId, academicYearId }: { studyPlanId: string; academicYearId: string }) => (
     <div data-testid="wizard">
       wizard:{studyPlanId}:{academicYearId}

@@ -100,6 +100,7 @@ export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; 
         institutionId={props.institutionId}
         resource={AcademicResource.STUDY_PLAN_SPACE}
         id={props.space.id}
+        initialInstruments={props.space.allowedInstruments}
         parentId={props.id}
         returnTo={props.spacePath}
         initialValues={{
@@ -155,7 +156,11 @@ export async function EditPrerequisite(
   },
 ): Promise<React.ReactElement> {
   const prerequisite = await fetchPrerequisite(props.scope, props.institutionId, props.prerequisiteId);
-  if (!prerequisite || prerequisite.targetStudyPlanSpaceId !== props.spaceId) notFound();
+
+  if (!prerequisite || prerequisite.targetStudyPlanSpaceId !== props.spaceId) {
+    notFound();
+  }
+
   return (
     <AcademicShell
       title="Editar correlatividad"

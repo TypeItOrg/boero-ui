@@ -9,6 +9,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 type AcademicResourceLinksProps = {
   basePath: string;
   className?: string;
+  leadingContent?: React.ReactNode;
   prominent?: boolean;
   resources: readonly AcademicCollectionResource[];
 };
@@ -27,13 +28,22 @@ export function getReadableAcademicResources(access: AcademicAccess): AcademicCo
   return ACADEMIC_COLLECTION_RESOURCES.filter((resource) => ACADEMIC_COLLECTION_CONFIG[resource].canRead(access));
 }
 
-export function AcademicResourceLinks({ basePath, className, prominent = false, resources }: AcademicResourceLinksProps): React.ReactElement {
+export function AcademicResourceLinks({
+  basePath,
+  className,
+  leadingContent,
+  prominent = false,
+  resources,
+}: AcademicResourceLinksProps): React.ReactElement {
+  const itemCount = resources.length + (leadingContent ? 1 : 0);
+
   return (
-    <nav aria-label="Secciones académicas" className={cn(prominent ? "grid gap-4 sm:grid-cols-2" : "grid gap-3", className)}>
+    <nav aria-label="Secciones académicas" className={cn(prominent ? "grid gap-4 @2xl/home-content:grid-cols-2" : "grid gap-3", className)}>
+      {leadingContent}
       {resources.map((resource, index) => {
         const config = ACADEMIC_COLLECTION_CONFIG[resource];
         const icon = ACADEMIC_RESOURCE_ICONS[resource];
-        const isLastOddResource = resources.length % 2 === 1 && index === resources.length - 1;
+        const isLastOddResource = itemCount % 2 === 1 && index === resources.length - 1;
 
         return (
           <NavigationCard
@@ -43,7 +53,7 @@ export function AcademicResourceLinks({ basePath, className, prominent = false, 
             title={config.title}
             description={prominent ? ACADEMIC_RESOURCE_DESCRIPTIONS[resource] : undefined}
             prominent={prominent}
-            className={prominent && isLastOddResource ? "sm:col-span-2" : undefined}
+            className={prominent && isLastOddResource ? "@2xl/home-content:col-span-2" : undefined}
           />
         );
       })}

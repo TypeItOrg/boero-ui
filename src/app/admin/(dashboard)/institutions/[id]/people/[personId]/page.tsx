@@ -14,6 +14,7 @@ import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.s
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 type EditPersonPageProps = {
   params: Promise<{ id: string; personId: string }>;
@@ -50,11 +51,7 @@ export default async function EditPersonPage({ params, searchParams }: EditPerso
       }
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <UserRoundPenIcon className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={UserRoundPenIcon} />}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline">

@@ -1,22 +1,49 @@
 "use client";
 
 import * as React from "react";
-import { EnrollmentStartSelector } from "./EnrollmentStartSelector";
-import { EnrollmentWizard } from "./EnrollmentWizard";
-import type { StudyPlan } from "@features/academic/types/study-plan.types";
+import { useRouter } from "next/navigation";
+import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
+import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface EnrollmentStartProps {
-  studyPlans: StudyPlan[];
+  studyPlans: EnrollmentStartStudyPlanOption[];
   periods: EnrollmentPeriod[];
   allExcludedByActiveApplication?: boolean;
+  studyPlanPagination?: React.ReactNode;
+  periodPagination?: React.ReactNode;
 }
 
-export function EnrollmentStart({ studyPlans, periods, allExcludedByActiveApplication = false }: EnrollmentStartProps): React.ReactElement {
-  const [selection, setSelection] = React.useState<{ studyPlanId: string; academicYearId: string } | null>(null);
+type EnrollmentStartState = {
+  error?: string;
+};
 
-  if (selection) {
-    return <EnrollmentWizard studyPlanId={selection.studyPlanId} academicYearId={selection.academicYearId} />;
+export function EnrollmentStart({
+  studyPlans,
+  periods,
+  allExcludedByActiveApplication = false,
+  studyPlanPagination,
+  periodPagination,
+}: EnrollmentStartProps): React.ReactElement {
+  const router = useRouter();
+  const [state, startApplication, isStarting] = React.useActionState(
+    async (_previous: EnrollmentStartState, input: { studyPlanId: string; academicYearId: string }): Promise<EnrollmentStartState> => {
+      const result = await startOrGetEnrollmentApplicationAction(input);
+
+      if ("error" in result) {
+        return { error: result.error };
+      }
+
+      router.push(`/my-enrollment-applications/${result.application.applicationId}`);
+
+      return {};
+    },
+    {},
+  );
+
+  function handleStart(input: { studyPlanId: string; academicYearId: string }): void {
+    React.startTransition(() => startApplication(input));
   }
 
   return (
@@ -28,7 +55,11 @@ export function EnrollmentStart({ studyPlans, periods, allExcludedByActiveApplic
         academicYearNumber: period.academicYearNumber,
         name: period.name,
       }))}
-      onStart={setSelection}
+      studyPlanPagination={studyPlanPagination}
+      periodPagination={periodPagination}
+      error={state.error}
+      isStarting={isStarting}
+      onStart={handleStart}
       allExcludedByActiveApplication={allExcludedByActiveApplication}
     />
   );

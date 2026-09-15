@@ -298,7 +298,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
         {classes.length === 0 ? (
           <Empty className="mt-5 min-h-56 border-0 bg-transparent">
             <EmptyHeader>
-              <EmptyMedia className="bg-primary/10 text-primary size-12 rounded-xl" variant="icon">
+              <EmptyMedia variant="icon">
                 <GraduationCapIcon className="size-5" />
               </EmptyMedia>
               <EmptyTitle className="mt-2 text-base">Creá la primera clase del curso</EmptyTitle>

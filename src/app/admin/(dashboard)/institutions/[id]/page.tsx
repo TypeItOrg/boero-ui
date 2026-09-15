@@ -14,6 +14,7 @@ import { InstitutionPeoplePreview, InstitutionPeoplePreviewSkeleton } from "@fea
 import { InstitutionReactivateButton } from "@features/institutions/components/institution-reactivate-button";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { Metadata } from "next";
 
 type InstitutionDetailPageProps = {
@@ -33,15 +34,15 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
   const userCount = Number.isFinite(institution.userCount) ? institution.userCount : 0;
 
   return (
-    <section className="flex max-w-full min-w-0 flex-1 flex-col gap-4 p-3 md:p-4">
-      <header className="bg-background flex min-w-0 flex-row items-center justify-between gap-4 rounded-xl p-4 shadow-xs sm:p-6">
+    <section className="@container/page-shell flex max-w-full min-w-0 flex-1 flex-col gap-4 p-3 md:p-4">
+      <header className="bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs @md/page-shell:p-6 @2xl/page-shell:flex-row @2xl/page-shell:items-center @2xl/page-shell:justify-between">
         <div className="min-w-0">
           <PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />
-          <h1 className="text-foreground max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl">{institution.name}</h1>
+          <h1 className="text-foreground max-w-4xl text-2xl font-bold tracking-tight @2xl/page-shell:text-3xl @4xl/page-shell:text-4xl">
+            {institution.name}
+          </h1>
         </div>
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br shadow-xs sm:flex">
-          <Building2Icon className="size-6 sm:size-7" aria-hidden="true" />
-        </div>
+        <PlatformPageIcon icon={Building2Icon} />
       </header>
 
       <div className="bg-background flex min-w-0 flex-1 flex-col gap-4 rounded-xl p-4 shadow-xs sm:p-6">

@@ -7,6 +7,7 @@ import { fetchInstitution } from "@features/institutions/services/fetch-institut
 import { PersonForm } from "@features/people/components/person-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
 export const metadata = {
   title: "Nuevo usuario",
@@ -31,11 +32,7 @@ export default async function NewPersonPage({ params, searchParams }: NewPersonP
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"
-      actions={
-        <div className="from-primary to-primary/80 text-primary-foreground hidden h-full items-center justify-center rounded-2xl bg-linear-to-br px-4 shadow-xs sm:flex">
-          <UserRoundIcon className="size-6 sm:size-7" />
-        </div>
-      }
+      actions={<PlatformPageIcon icon={UserRoundIcon} />}
     >
       <PersonForm mode="create" institutionId={id} returnTo={destination} />
     </PlatformPageShell>

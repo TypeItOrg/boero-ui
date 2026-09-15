@@ -3,7 +3,9 @@ import { PlusIcon, UserLockIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
+import { DataTableAdvancedFiltersTrigger } from "@common/components/ui/data-table-advanced-filters-trigger";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+import { Sheet } from "@common/components/ui/sheet";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
@@ -28,25 +30,29 @@ export default async function PlatformRolesPage({ searchParams }: { searchParams
 
   return (
     <PlatformPageShell title="Roles" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={UserLockIcon} />}>
-      <PlatformCollectionActions>
-        <Button asChild size="lg" className="w-full">
-          <ReturnToLink href="/admin/roles/new">
-            <PlusIcon data-icon="inline-start" />
-            Nuevo rol
-          </ReturnToLink>
-        </Button>
-      </PlatformCollectionActions>
       <DataTableNavigationProvider>
-        <PlatformRolesTableFilters
-          institutionId={params.institutionId}
-          institutionName={institutionName}
-          roleType={params.roleType}
-          search={params.search}
-          size={params.size}
-        />
-        <Suspense fallback={<PlatformRolesTableSkeleton />}>
-          <PlatformRolesTableContainer {...params} dataPromise={rolesPromise} />
-        </Suspense>
+        <Sheet>
+          <PlatformCollectionActions className="sm:justify-between">
+            <Button asChild size="lg" className="w-full">
+              <ReturnToLink href="/admin/roles/new">
+                <PlusIcon data-icon="inline-start" />
+                Nuevo rol
+              </ReturnToLink>
+            </Button>
+            <DataTableAdvancedFiltersTrigger count={params.institutionId !== undefined ? 1 : 0} label="Filtros avanzados" />
+          </PlatformCollectionActions>
+          <PlatformRolesTableFilters
+            institutionId={params.institutionId}
+            institutionName={institutionName}
+            roleType={params.roleType}
+            search={params.search}
+            size={params.size}
+            triggerPosition="external"
+          />
+          <Suspense fallback={<PlatformRolesTableSkeleton />}>
+            <PlatformRolesTableContainer {...params} dataPromise={rolesPromise} />
+          </Suspense>
+        </Sheet>
       </DataTableNavigationProvider>
     </PlatformPageShell>
   );

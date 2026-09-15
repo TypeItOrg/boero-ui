@@ -5,25 +5,38 @@ import Link from "next/link";
 import { AlertCircleIcon, CheckCircle2Icon, ClipboardPlusIcon } from "lucide-react";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { fetchStudyPlans } from "@features/academic/services/academic.service";
-import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { fetchAcademicOffers } from "@features/academic-offers/services/academic-offer.service";
+import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
-import { fetchMyEnrollmentApplications } from "@features/enrollment-applications/services/enrollment-application.service";
+import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
+import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
+import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { canStartEnrollmentApplication } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
 
-const INACTIVE_STATUSES = new Set(["CANCELLED", "REJECTED"]);
-
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Nueva inscripción");
 }
 
-export default async function EnrollmentPage(): Promise<React.ReactElement> {
-  const person = await fetchInstitutionalPerson();
+export default async function EnrollmentPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}): Promise<React.ReactElement> {
+  const query = await searchParams;
+  const plansPage = parsePaginationQuery({ page: query.plansPage }, { defaultSize: 20 });
+  const periodsPage = parsePaginationQuery({ page: query.periodsPage }, { defaultSize: 20 });
+  const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
+
+  if (!canStartEnrollmentApplication(user)) {
+    return <InstitutionalAccessDenied description="No tenés permisos para iniciar una inscripción en esta institución." />;
+  }
 
   if (!person || !person.institutionId) {
     return (
@@ -37,38 +50,16 @@ export default async function EnrollmentPage(): Promise<React.ReactElement> {
     );
   }
 
-  // El aspirante elige plan de estudio y ciclo lectivo entre las opciones
-  // realmente disponibles: sólo los ciclos con un período de inscripción
-  // abierto admiten crear una solicitud (EnrollmentPeriodClosedException).
-  let studyPlans: Awaited<ReturnType<typeof fetchStudyPlans>>["items"] = [];
-  let openPeriods: Awaited<ReturnType<typeof listEnrollmentPeriods>>["items"] = [];
-  let myApplications: Awaited<ReturnType<typeof fetchMyEnrollmentApplications>>["items"] = [];
+  const [plansResponse, periodsResponse, activePaths] = await Promise.all([
+    fetchAcademicOffers(person.institutionId, plansPage),
+    fetchAvailableEnrollmentPeriods(periodsPage),
+    fetchActiveEnrollmentPaths(person.institutionId),
+  ]);
 
-  try {
-    const [plansResponse, openPeriodsResponse, myApplicationsResponse] = await Promise.all([
-      fetchStudyPlans(AcademicScope.INSTITUTIONAL, person.institutionId, { size: 100 }),
-      listEnrollmentPeriods(person.institutionId, { status: "OPEN", size: 100 }),
-      fetchMyEnrollmentApplications(person.institutionId, { page: 0, size: 100 }),
-    ]);
-    studyPlans = plansResponse.items;
-    openPeriods = openPeriodsResponse.items;
-    myApplications = myApplicationsResponse.items;
-  } catch {
-    // Si ocurre algún fallo de permisos en la consulta, se mantiene sin opciones
-  }
-
-  // Una única inscripción viva por trayecto: se excluyen los planes de los
-  // trayectos donde ya existe una solicitud no cancelada/rechazada.
-  const trainingPathIdByStudyPlanId = new Map(studyPlans.map((plan) => [plan.id, plan.trainingPathId]));
-  const activeTrainingPathIds = new Set(
-    myApplications
-      .filter((application) => !INACTIVE_STATUSES.has(application.status))
-      .map((application) => trainingPathIdByStudyPlanId.get(application.studyPlanId))
-      .filter((trainingPathId): trainingPathId is string => Boolean(trainingPathId)),
-  );
-  const availableStudyPlans = studyPlans.filter((plan) => !activeTrainingPathIds.has(plan.trainingPathId));
-  const hasActiveApplication = activeTrainingPathIds.size > 0;
-  const allExcludedByActiveApplication = hasActiveApplication && availableStudyPlans.length === 0;
+  const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.trainingPathId));
+  const hasActiveApplication = activePaths.studyPlanIds.size > 0;
+  const allExcludedByActiveApplication =
+    hasActiveApplication && plansResponse.totalPages <= 1 && plansResponse.items.length > 0 && availableStudyPlans.length === 0;
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
@@ -82,7 +73,37 @@ export default async function EnrollmentPage(): Promise<React.ReactElement> {
           </AlertDescription>
         </Alert>
       )}
-      <EnrollmentStart studyPlans={availableStudyPlans} periods={openPeriods} allExcludedByActiveApplication={allExcludedByActiveApplication} />
+      <EnrollmentStart
+        studyPlans={availableStudyPlans.map((plan) => ({
+          id: plan.studyPlanId,
+          name: plan.studyPlanName,
+          trainingPathName: plan.trainingPathName,
+        }))}
+        periods={periodsResponse.items}
+        studyPlanPagination={
+          plansResponse.totalPages > 1 ? (
+            <EnrollmentCatalogPagination
+              page={plansResponse.page}
+              totalPages={plansResponse.totalPages}
+              parameter="plansPage"
+              query={query}
+              label="Páginas de planes de estudio"
+            />
+          ) : undefined
+        }
+        periodPagination={
+          periodsResponse.totalPages > 1 ? (
+            <EnrollmentCatalogPagination
+              page={periodsResponse.page}
+              totalPages={periodsResponse.totalPages}
+              parameter="periodsPage"
+              query={query}
+              label="Páginas de ciclos con inscripción abierta"
+            />
+          ) : undefined
+        }
+        allExcludedByActiveApplication={allExcludedByActiveApplication}
+      />
     </PlatformPageShell>
   );
 }
