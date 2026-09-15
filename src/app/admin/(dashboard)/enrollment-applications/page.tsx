@@ -39,8 +39,8 @@ export default async function PlatformEnrollmentApplicationsPage({
             size={size}
             status={status}
             dataPromise={dataPromise}
-            canApprove={false}
-            canReject={false}
+            canApprove
+            canReject
             scope={AcademicScope.ADMIN}
           />
         </Suspense>

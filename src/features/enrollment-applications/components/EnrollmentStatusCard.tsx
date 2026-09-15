@@ -2,10 +2,8 @@
 
 import * as React from "react";
 import { format, isValid } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   BanIcon,
-  CalendarDaysIcon,
   CheckCircle2Icon,
   ClipboardCheckIcon,
   ClockIcon,
@@ -39,6 +37,7 @@ import {
   type EnrollmentApplicationStatus,
 } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
+import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
 
 interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
@@ -170,20 +169,17 @@ export function EnrollmentStatusCard({
     <div className="flex flex-col gap-4">
       <Card className={SECTION_CARD_CLASS_NAME}>
         <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-stretch gap-3.5">
-              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                <ClipboardCheckIcon className="size-5" aria-hidden="true" />
-              </div>
-              <div className="flex min-w-0 flex-col justify-center gap-1">
-                <h2 className="font-heading text-lg font-semibold">Estado de la solicitud</h2>
-                <p className="text-muted-foreground flex items-center gap-2 text-sm">
-                  <CalendarDaysIcon className="size-4 shrink-0" aria-hidden="true" />
-                  Última actualización: {formatDateTime(application.updatedAt)}
-                </p>
-              </div>
+          <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
+              <ClipboardCheckIcon className="size-5" aria-hidden="true" />
             </div>
-            {getStatusBadge(application.status)}
+            <div className="flex min-w-0 flex-col justify-center">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                <h2 className="font-heading text-base leading-snug font-medium text-balance">Estado de la solicitud</h2>
+                <div className="@2xl/page-shell:ml-auto">{getStatusBadge(application.status)}</div>
+              </div>
+              <p className="text-muted-foreground text-sm text-pretty">Actualizada el {formatEnrollmentApplicationDateTime(application.updatedAt)}</p>
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -328,16 +324,6 @@ function DetailItem({ className, label, value }: DetailItemProps): React.ReactEl
       <dd className="text-foreground text-sm font-medium break-words">{value}</dd>
     </div>
   );
-}
-
-function formatDateTime(value?: string): string {
-  if (!value) {
-    return "—";
-  }
-
-  const date = new Date(value);
-
-  return isValid(date) ? format(date, "d 'de' MMMM 'de' yyyy, HH:mm", { locale: es }) : value;
 }
 
 function formatBusinessDate(value?: string | null): string {

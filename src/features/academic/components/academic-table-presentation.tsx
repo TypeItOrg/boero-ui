@@ -129,6 +129,9 @@ export function AcademicTablePresentation({
         <Table containerClassName="table-scrollbar" className={columns.detailLabels.length > 1 ? "min-w-220" : "min-w-180"}>
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow>
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               {global ? <TableHead>Institución</TableHead> : null}
               {[columns.primaryLabel, ...columns.detailLabels].map((label, index) => {
                 const field = columns.sortableFields?.[index];
@@ -147,9 +150,6 @@ export function AcademicTablePresentation({
                 return <TableHead key={`${label}-${index}`}>{label}</TableHead>;
               })}
               <TableHead>Estado</TableHead>
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

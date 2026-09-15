@@ -64,8 +64,8 @@ export function PlatformEnrollmentApplicationApproveDialog({
             </div>
             <AlertDialogTitle>Aprobar inscripción</AlertDialogTitle>
             <AlertDialogDescription>
-              Vas a aprobar la inscripción de <span className="text-foreground font-semibold">{application.applicantName}</span> al{" "}
-              <span className="text-foreground font-semibold">{application.studyPlanName}</span>. Se creará el registro del estudiante en la
+              Vas a aprobar la inscripción de «<span className="text-foreground font-semibold">{application.applicantName}</span>» al «
+              <span className="text-foreground font-semibold">{application.studyPlanName}</span>». Se creará el registro del estudiante en la
               institución.
             </AlertDialogDescription>
           </AlertDialogHeader>

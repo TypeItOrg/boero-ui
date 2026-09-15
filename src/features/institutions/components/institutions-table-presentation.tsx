@@ -51,6 +51,9 @@ export function InstitutionsTablePresentation({ data, page, size, sort, search, 
         <Table containerClassName="table-scrollbar" className="min-w-240">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 border-b transition-colors">
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <DataTableSortableHead<InstitutionSortField> field="name" label="Nombre" sort={sort} onSortChange={updateSort} />
               <TableHead>País</TableHead>
               <TableHead>Provincia</TableHead>
@@ -63,9 +66,6 @@ export function InstitutionsTablePresentation({ data, page, size, sort, search, 
                 defaultDirection="desc"
                 onSortChange={updateSort}
               />
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -217,14 +217,14 @@ function EnrollmentPeriodsTableContent({
             <Table containerClassName="table-scrollbar h-full" className="min-w-225">
               <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
                 <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
+                  <TableHead className="w-16 pl-4">
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Ciclo lectivo</TableHead>
                   <TableHead>Fecha de inicio</TableHead>
                   <TableHead>Fecha de fin</TableHead>
                   <TableHead>Estado</TableHead>
-                  <TableHead className="w-16 pr-4">
-                    <span className="sr-only">Acciones</span>
-                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -238,22 +238,15 @@ function EnrollmentPeriodsTableContent({
                     <ContextMenu key={period.id}>
                       <ContextMenuTrigger asChild>
                         <TableRow>
-                          <TableCell className="font-medium">{period.name}</TableCell>
-                          <TableCell>Ciclo {period.academicYearNumber}</TableCell>
-                          <TableCell>{formatEnrollmentPeriodDateTime(period.startDate)}</TableCell>
-                          <TableCell>{formatEnrollmentPeriodDateTime(period.endDate)}</TableCell>
-                          <TableCell>
-                            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-                          </TableCell>
-                          <TableCell className="pr-4">
-                            <div className="flex justify-end">
+                          <TableCell className="w-16 pl-4">
+                            <div className="flex justify-start">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${period.name}`} disabled={isChangingStatus}>
                                     <EllipsisVerticalIcon />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-44 p-1.5">
+                                <DropdownMenuContent align="start" className="w-44 p-1.5">
                                   {canUpdate ? (
                                     <DropdownMenuItem asChild>
                                       <ReturnToLink href={editHref} className="px-2.5 py-1.5">
@@ -289,6 +282,13 @@ function EnrollmentPeriodsTableContent({
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{period.name}</TableCell>
+                          <TableCell>Ciclo {period.academicYearNumber}</TableCell>
+                          <TableCell>{formatEnrollmentPeriodDateTime(period.startDate)}</TableCell>
+                          <TableCell>{formatEnrollmentPeriodDateTime(period.endDate)}</TableCell>
+                          <TableCell>
+                            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                           </TableCell>
                         </TableRow>
                       </ContextMenuTrigger>

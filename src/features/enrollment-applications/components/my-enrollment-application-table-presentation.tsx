@@ -37,14 +37,14 @@ export function MyEnrollmentApplicationTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-150">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <TableHead>Plan de estudio</TableHead>
               <TableHead>Ciclo lectivo</TableHead>
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Motivo de rechazo</TableHead>
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

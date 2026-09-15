@@ -47,6 +47,22 @@ export function PeopleTableRow({
 
   const tableRow = (
     <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
+      <TableCell className="w-16 pl-4">
+        {hasActions ? (
+          <PersonActionsMenu
+            person={person}
+            institutionId={institutionId}
+            scope={scope}
+            isSelf={isSelf}
+            canEdit={canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf)}
+            editLabel={canEditPerson ? "Editar" : "Administrar"}
+            canDelete={canDeletePerson}
+            canUpdateStatus={canUpdatePersonStatus}
+            onDelete={() => onDelete(person)}
+            onUpdateStatus={() => onUpdateStatus(person)}
+          />
+        ) : null}
+      </TableCell>
       <TableCell className="font-medium">
         {canOpenPerson ? (
           <PersonNavigationLink className="hover:underline" href={personDetailHref}>
@@ -78,22 +94,6 @@ export function PeopleTableRow({
         ) : (
           <span className="text-muted-foreground/60">Sin rol</span>
         )}
-      </TableCell>
-      <TableCell>
-        {hasActions ? (
-          <PersonActionsMenu
-            person={person}
-            institutionId={institutionId}
-            scope={scope}
-            isSelf={isSelf}
-            canEdit={canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf)}
-            editLabel={canEditPerson ? "Editar" : "Administrar"}
-            canDelete={canDeletePerson}
-            canUpdateStatus={canUpdatePersonStatus}
-            onDelete={() => onDelete(person)}
-            onUpdateStatus={() => onUpdateStatus(person)}
-          />
-        ) : null}
       </TableCell>
     </TableRow>
   );
@@ -171,14 +171,14 @@ function PersonActionsMenu({
   const personDetailHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined, true);
 
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${person.firstName} ${person.lastName}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 p-1.5">
+        <DropdownMenuContent align="start" className="w-44 p-1.5">
           <DropdownMenuItem asChild>
             <PersonNavigationLink href={personDetailHref} className="px-2.5 py-1.5">
               Ver detalle

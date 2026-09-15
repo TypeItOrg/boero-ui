@@ -13,6 +13,8 @@ import { EnrollmentApplicationEmptyState } from "@features/enrollment-applicatio
 import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
 import { EnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/enrollment-application-reject-dialog";
 import { EnrollmentApplicationTableRow } from "@features/enrollment-applications/components/enrollment-application-table-row";
+import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
+import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
@@ -58,10 +60,6 @@ export function EnrollmentApplicationTablePresentation({
     router.refresh();
   }
 
-  function handleRowClick(application: EnrollmentApplication): void {
-    router.push(`/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`);
-  }
-
   if (data.items.length === 0) {
     return <EnrollmentApplicationEmptyState hasFilter={Boolean(status)} isNavigating={isNavigating} size={size} totalItems={data.totalItems} />;
   }
@@ -72,6 +70,9 @@ export function EnrollmentApplicationTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-240">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <TableHead>Estudiante</TableHead>
               <TableHead>Documento</TableHead>
               <TableHead>Plan de estudio</TableHead>
@@ -79,9 +80,6 @@ export function EnrollmentApplicationTablePresentation({
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Motivo de rechazo</TableHead>
-              <TableHead className="w-16">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -93,7 +91,11 @@ export function EnrollmentApplicationTablePresentation({
                 canReject={canReject}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
-                onRowClick={scope === AcademicScope.ADMIN ? handleRowClick : undefined}
+                detailHref={
+                  scope === AcademicScope.ADMIN
+                    ? `/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`
+                    : undefined
+                }
               />
             ))}
           </TableBody>
@@ -108,7 +110,19 @@ export function EnrollmentApplicationTablePresentation({
 
       <EnrollmentApplicationPagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} />
 
-      {applicationToApprove ? (
+      {applicationToApprove && scope === AcademicScope.ADMIN ? (
+        <PlatformEnrollmentApplicationApproveDialog
+          application={{
+            institutionId: applicationToApprove.institutionId,
+            applicationId: applicationToApprove.applicationId,
+            applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
+            studyPlanName: applicationToApprove.studyPlanName,
+          }}
+          open
+          onOpenChange={handleApproveDialogOpenChange}
+          onApproved={handleResolved}
+        />
+      ) : applicationToApprove ? (
         <EnrollmentApplicationApproveDialog
           application={applicationToApprove}
           open
@@ -117,7 +131,19 @@ export function EnrollmentApplicationTablePresentation({
         />
       ) : null}
 
-      {applicationToReject ? (
+      {applicationToReject && scope === AcademicScope.ADMIN ? (
+        <PlatformEnrollmentApplicationRejectDialog
+          application={{
+            institutionId: applicationToReject.institutionId,
+            applicationId: applicationToReject.applicationId,
+            applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
+            studyPlanName: applicationToReject.studyPlanName,
+          }}
+          open
+          onOpenChange={handleRejectDialogOpenChange}
+          onRejected={handleResolved}
+        />
+      ) : applicationToReject ? (
         <EnrollmentApplicationRejectDialog
           application={applicationToReject}
           open

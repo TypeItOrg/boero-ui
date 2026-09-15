@@ -2,11 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheckIcon, BanIcon, ShieldCheckIcon } from "lucide-react";
+import { BadgeCheckIcon, BanIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
-import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
 import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
 import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
 import {
@@ -23,7 +21,7 @@ type PlatformEnrollmentApplicationResolvePanelProps = {
 export function PlatformEnrollmentApplicationResolvePanel({
   application,
   status,
-}: PlatformEnrollmentApplicationResolvePanelProps): React.ReactElement {
+}: PlatformEnrollmentApplicationResolvePanelProps): React.ReactElement | null {
   const router = useRouter();
   const [showApproveDialog, setShowApproveDialog] = React.useState(false);
   const [showRejectDialog, setShowRejectDialog] = React.useState(false);
@@ -34,41 +32,22 @@ export function PlatformEnrollmentApplicationResolvePanel({
     router.refresh();
   }
 
+  if (status !== ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
+    return null;
+  }
+
   return (
     <>
-      <Card className="bg-muted/25 gap-3 p-4">
-        <CardHeader className="p-0">
-          <div className="flex items-center gap-2.5">
-            <div className="bg-primary/10 text-primary flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg">
-              <ShieldCheckIcon className="size-4" aria-hidden="true" />
-            </div>
-            <CardTitle className="text-base">Resolución</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3 p-0">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Estado</span>
-            <EnrollmentApplicationStatusBadge status={status} />
-          </div>
-
-          {status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED ? (
-            <div className="flex flex-col gap-1.5">
-              <Button type="button" size="sm" onClick={() => setShowApproveDialog(true)}>
-                <BadgeCheckIcon />
-                Aprobar inscripción
-              </Button>
-              <Button type="button" size="sm" variant="destructive" onClick={() => setShowRejectDialog(true)}>
-                <BanIcon />
-                Rechazar inscripción
-              </Button>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-xs italic">
-              Esta solicitud ya fue resuelta y no admite nuevas acciones de aprobación o rechazo.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex w-full flex-col gap-2 @2xl/page-shell:w-auto @2xl/page-shell:flex-row">
+        <Button type="button" size="lg" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowApproveDialog(true)}>
+          <BadgeCheckIcon aria-hidden="true" />
+          Aprobar inscripción
+        </Button>
+        <Button type="button" size="lg" variant="destructive" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowRejectDialog(true)}>
+          <BanIcon aria-hidden="true" />
+          Rechazar inscripción
+        </Button>
+      </div>
 
       {showApproveDialog ? (
         <PlatformEnrollmentApplicationApproveDialog application={application} open onOpenChange={setShowApproveDialog} onApproved={handleResolved} />

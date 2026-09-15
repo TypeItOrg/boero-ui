@@ -99,6 +99,14 @@ export function AcademicTableRow({
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <TableRow>
+          <TableCell className="w-16 pl-4">
+            <AcademicRowActions
+              actions={actions}
+              label={row.primaryValue}
+              onLifecycleAction={handleLifecycleAction}
+              onStatusAction={handleStatusAction}
+            />
+          </TableCell>
           {global ? (
             <TableCell>
               <Link href={`/admin/institutions/${institutionId}`} className="font-medium hover:underline">
@@ -122,14 +130,6 @@ export function AcademicTableRow({
           ))}
           <TableCell>
             <Badge variant={row.deletedAt ? "destructive" : row.active ? "success" : "secondary"}>{row.deletedAt ? "Eliminado" : row.status}</Badge>
-          </TableCell>
-          <TableCell className="pr-4">
-            <AcademicRowActions
-              actions={actions}
-              label={row.primaryValue}
-              onLifecycleAction={handleLifecycleAction}
-              onStatusAction={handleStatusAction}
-            />
           </TableCell>
         </TableRow>
       </ContextMenuTrigger>

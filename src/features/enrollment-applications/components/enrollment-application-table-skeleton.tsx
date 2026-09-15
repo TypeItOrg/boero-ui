@@ -8,6 +8,9 @@ export function EnrollmentApplicationTableSkeleton(): React.ReactElement {
         <Table containerClassName="table-scrollbar" className="min-w-190">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors">
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <TableHead>
                 <Skeleton className="h-4 w-32" />
               </TableHead>
@@ -26,14 +29,14 @@ export function EnrollmentApplicationTableSkeleton(): React.ReactElement {
               <TableHead>
                 <Skeleton className="h-6 w-24 rounded-full" />
               </TableHead>
-              <TableHead className="w-16">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
+                <TableCell className="w-16 pl-4">
+                  <Skeleton className="size-8" />
+                </TableCell>
                 <TableCell>
                   <Skeleton className="h-5 w-36" />
                 </TableCell>
@@ -51,9 +54,6 @@ export function EnrollmentApplicationTableSkeleton(): React.ReactElement {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-5 w-28 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="size-8" />
                 </TableCell>
               </TableRow>
             ))}

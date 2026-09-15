@@ -63,14 +63,14 @@ export function AcademicRowActions({
   if (actions.length === 0) return <div className="h-9" />;
 
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${label}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 p-1.5">
+        <DropdownMenuContent align="start" className="w-44 p-1.5">
           <AcademicDropdownActions actions={actions} onLifecycleAction={onLifecycleAction} onStatusAction={onStatusAction} />
         </DropdownMenuContent>
       </DropdownMenu>

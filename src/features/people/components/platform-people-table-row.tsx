@@ -15,6 +15,9 @@ export function PlatformPeopleTableRow({ canUpdate, person }: { canUpdate: boole
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <TableRow className="h-11">
+          <TableCell className="w-16 pl-4">
+            <PlatformPersonActions person={person} canUpdate={canUpdate} />
+          </TableCell>
           <TableCell className="font-medium">
             {canUpdate ? (
               <ReturnToLink className="hover:underline" href={getPersonPath(person)}>
@@ -47,9 +50,6 @@ export function PlatformPeopleTableRow({ canUpdate, person }: { canUpdate: boole
               <span className="text-muted-foreground/60">Sin rol</span>
             )}
           </TableCell>
-          <TableCell className="pr-4">
-            <PlatformPersonActions person={person} canUpdate={canUpdate} />
-          </TableCell>
         </TableRow>
       </ContextMenuTrigger>
       <ContextMenuContent className="w-44 p-1.5">
@@ -74,14 +74,14 @@ export function PlatformPeopleTableRow({ canUpdate, person }: { canUpdate: boole
 
 function PlatformPersonActions({ person, canUpdate }: { person: PlatformPersonSummary; canUpdate: boolean }): React.ReactElement {
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${person.firstName} ${person.lastName}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 p-1.5">
+        <DropdownMenuContent align="start" className="w-44 p-1.5">
           <DropdownMenuGroup>
             {canUpdate ? (
               <DropdownMenuItem asChild>

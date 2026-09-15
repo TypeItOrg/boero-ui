@@ -62,15 +62,15 @@ export function PlatformPeopleTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-260">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="h-11">
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <DataTableSortableHead<PlatformPeopleSortField> field="lastName" label="Nombre" sort={sort} onSortChange={updateSort} />
               <DataTableSortableHead<PlatformPeopleSortField> field="documentNumber" label="Documento" sort={sort} onSortChange={updateSort} />
               <DataTableSortableHead<PlatformPeopleSortField> field="institutionName" label="Institución" sort={sort} onSortChange={updateSort} />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Roles</TableHead>
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

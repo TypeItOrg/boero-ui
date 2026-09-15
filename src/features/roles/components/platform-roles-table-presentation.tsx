@@ -57,14 +57,14 @@ export function PlatformRolesTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-220">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow>
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <DataTableSortableHead<PlatformRoleSortField> field="name" label="Rol" sort={sort} onSortChange={updateSort} />
               <DataTableSortableHead<PlatformRoleSortField> field="institutionName" label="Institución" sort={sort} onSortChange={updateSort} />
               <TableHead>Tipo</TableHead>
               <TableHead>Usuarios</TableHead>
               <TableHead>Permisos</TableHead>
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -72,6 +72,9 @@ export function PlatformRolesTablePresentation({
               <ContextMenu key={role.id}>
                 <ContextMenuTrigger asChild>
                   <TableRow>
+                    <TableCell className="w-16 pl-4">
+                      <PlatformRoleActions role={role} />
+                    </TableCell>
                     <TableCell className="font-medium">
                       <Link href={`/admin/roles/${role.id}`} className="hover:underline">
                         {role.name}
@@ -96,9 +99,6 @@ export function PlatformRolesTablePresentation({
                         <KeyRoundIcon className="text-muted-foreground size-4" />
                         {role.permissionCount}
                       </span>
-                    </TableCell>
-                    <TableCell className="pr-4">
-                      <PlatformRoleActions role={role} />
                     </TableCell>
                   </TableRow>
                 </ContextMenuTrigger>
@@ -143,14 +143,14 @@ export function PlatformRolesTablePresentation({
 
 function PlatformRoleActions({ role }: { role: PlatformRoleListItem }): React.ReactElement {
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${role.name}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 p-1.5">
+        <DropdownMenuContent align="start" className="w-48 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <Link href={`/admin/roles/${role.id}`} className="px-2.5 py-1.5">

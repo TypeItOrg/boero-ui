@@ -36,6 +36,9 @@ export function InstitutionsTableRow({ institution, onStatusChange }: Institutio
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <TableRow>
+          <TableCell className="w-16 pl-4">
+            <InstitutionActionsMenu institution={institution} onStatusChange={() => onStatusChange(institution)} />
+          </TableCell>
           <TableCell className="font-medium">
             <Link className="hover:underline" href={`/admin/institutions/${institution.id}`}>
               {institution.name}
@@ -49,9 +52,6 @@ export function InstitutionsTableRow({ institution, onStatusChange }: Institutio
           </TableCell>
           <TableCell>
             <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
-          </TableCell>
-          <TableCell className="pr-4">
-            <InstitutionActionsMenu institution={institution} onStatusChange={() => onStatusChange(institution)} />
           </TableCell>
         </TableRow>
       </ContextMenuTrigger>
@@ -124,14 +124,14 @@ function InstitutionActionsMenu({
   onStatusChange: () => void;
 }): React.ReactElement {
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${institution.name}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 p-1.5">
+        <DropdownMenuContent align="start" className="w-44 p-1.5">
           <DropdownMenuGroup>
             {getInstitutionActions(institution).map((action) => (
               <DropdownMenuItem key={action.href} asChild>

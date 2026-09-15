@@ -63,6 +63,9 @@ export function PlatformAccountsTablePresentation({
         <Table containerClassName="table-scrollbar" className="min-w-220">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow>
+              <TableHead className="w-16 pl-4">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
               <DataTableSortableHead<PlatformAccountSortField> field="name" label="Nombre" sort={sort} onSortChange={updateSort} />
               <DataTableSortableHead<PlatformAccountSortField> field="email" label="Correo electrónico" sort={sort} onSortChange={updateSort} />
               <TableHead>Rol</TableHead>
@@ -80,9 +83,6 @@ export function PlatformAccountsTablePresentation({
                 defaultDirection="desc"
                 onSortChange={updateSort}
               />
-              <TableHead className="w-16 pr-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -90,6 +90,9 @@ export function PlatformAccountsTablePresentation({
               <ContextMenu key={account.platformAccountId}>
                 <ContextMenuTrigger asChild>
                   <TableRow>
+                    <TableCell className="w-16 pl-4">
+                      <PlatformAccountActions account={account} />
+                    </TableCell>
                     <TableCell className="font-medium">
                       <ReturnToLink className="hover:underline" href={`/admin/accounts/${account.platformAccountId}`}>
                         {account.name} {account.lastName}
@@ -103,9 +106,6 @@ export function PlatformAccountsTablePresentation({
                       <Badge variant={account.enabled ? "success" : "destructive"}>{account.enabled ? "Habilitada" : "Deshabilitada"}</Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground tabular-nums">{dateFormatter.format(new Date(account.createdAt))}</TableCell>
-                    <TableCell className="pr-4">
-                      <PlatformAccountActions account={account} />
-                    </TableCell>
                   </TableRow>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-40 p-1.5">
@@ -151,14 +151,14 @@ function PlatformAccountActions({ account }: { account: PlatformAccountAdmin }):
   const accountName = `${account.name} ${account.lastName}`;
 
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-start">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${accountName}`}>
             <EllipsisVerticalIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 p-1.5">
+        <DropdownMenuContent align="start" className="w-40 p-1.5">
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <ReturnToLink href={`/admin/accounts/${account.platformAccountId}`} className="px-2.5 py-1.5">

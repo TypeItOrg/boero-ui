@@ -32,28 +32,15 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
-            <TableCell className="font-medium">{application.studyPlanName}</TableCell>
-            <TableCell>{application.academicYear}</TableCell>
-            <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
-            <TableCell>
-              <EnrollmentApplicationStatusBadge status={application.status} />
-            </TableCell>
-            <TableCell>
-              {application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED && application.rejectionReason ? (
-                <span className="text-destructive">{application.rejectionReason}</span>
-              ) : (
-                <span className="text-muted-foreground/60">—</span>
-              )}
-            </TableCell>
-            <TableCell className="pr-4">
-              <div className="flex justify-end">
+            <TableCell className="w-16 pl-4">
+              <div className="flex justify-start">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${application.studyPlanName}`} disabled={isCancelOpen}>
                       <EllipsisVerticalIcon />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44 p-1.5">
+                  <DropdownMenuContent align="start" className="w-44 p-1.5">
                     <DropdownMenuItem asChild>
                       <ReturnToLink href={detailHref} className="px-2.5 py-1.5">
                         {detailLabel}
@@ -72,6 +59,19 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+            </TableCell>
+            <TableCell className="font-medium">{application.studyPlanName}</TableCell>
+            <TableCell>{application.academicYear}</TableCell>
+            <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
+            <TableCell>
+              <EnrollmentApplicationStatusBadge status={application.status} />
+            </TableCell>
+            <TableCell>
+              {application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED && application.rejectionReason ? (
+                <span className="text-destructive">{application.rejectionReason}</span>
+              ) : (
+                <span className="text-muted-foreground/60">—</span>
+              )}
             </TableCell>
           </TableRow>
         </ContextMenuTrigger>
