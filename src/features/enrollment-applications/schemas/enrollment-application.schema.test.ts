@@ -9,23 +9,26 @@ import {
 
 describe("enrollment-application.schema", () => {
   describe("calculateAge", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date("2026-09-14T15:00:00.000Z"));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it("returns null for undefined or invalid date", () => {
       expect(calculateAge(undefined)).toBeNull();
       expect(calculateAge("invalid-date")).toBeNull();
     });
 
     it("calculates age correctly for adult", () => {
-      const birthDate = new Date();
-      birthDate.setFullYear(birthDate.getFullYear() - 25);
-      const age = calculateAge(birthDate);
-      expect(age).toBe(25);
+      expect(calculateAge("2001-09-14")).toBe(25);
     });
 
     it("calculates age correctly for minor", () => {
-      const birthDate = new Date();
-      birthDate.setFullYear(birthDate.getFullYear() - 16);
-      const age = calculateAge(birthDate);
-      expect(age).toBe(16);
+      expect(calculateAge("2010-09-14")).toBe(16);
     });
   });
 
