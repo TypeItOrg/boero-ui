@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
@@ -39,6 +40,7 @@ export function PersonEditForm({
 }: PersonEditFormProps): React.ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() => assignedRoles.map((role) => role.roleId));
+  const [isPending, setIsPending] = React.useState(false);
   const destination = returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
 
   return (
@@ -50,6 +52,7 @@ export function PersonEditForm({
           person={person}
           formId={formId}
           hideActions
+          onPendingChange={setIsPending}
           canEdit={canEdit}
           roleIds={canManageRoles ? selectedRoleCodes : undefined}
           scope={scope}
@@ -69,11 +72,23 @@ export function PersonEditForm({
       </div>
 
       <div className="mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
-        <Button asChild variant="outline" size="lg" className="flex-1 sm:flex-none">
-          <Link href={destination}>Cancelar</Link>
+        <Button asChild variant="outline" size="lg" className={cn("flex-1 sm:flex-none", isPending && "pointer-events-none opacity-50")}>
+          <Link
+            href={destination}
+            aria-disabled={isPending}
+            tabIndex={isPending ? -1 : undefined}
+            onClick={(event) => {
+              if (isPending) {
+                event.preventDefault();
+              }
+            }}
+          >
+            Cancelar
+          </Link>
         </Button>
-        <Button type="submit" form={formId} size="lg" className="flex-1 sm:flex-none">
-          {canEdit ? "Guardar cambios" : "Guardar roles"}
+        <Button type="submit" form={formId} size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
+          {isPending ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : null}
+          {isPending ? "Guardando..." : canEdit ? "Guardar cambios" : "Guardar roles"}
         </Button>
       </div>
     </div>

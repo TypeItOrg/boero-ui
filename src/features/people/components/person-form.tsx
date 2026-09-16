@@ -28,6 +28,7 @@ type PersonFormCommonProps = {
   institutionId: string;
   formId?: string;
   hideActions?: boolean;
+  onPendingChange?: (isPending: boolean) => void;
   scope?: PeopleScopeType;
   returnTo?: string;
 };
@@ -55,6 +56,7 @@ export function PersonForm({
   roleIds,
   formId,
   hideActions = false,
+  onPendingChange,
   canEdit = true,
   scope = PeopleScope.ADMIN,
   returnTo,
@@ -77,6 +79,10 @@ export function PersonForm({
     resolver,
     defaultValues: getDefaultValues(person),
   });
+
+  React.useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
 
   function onSubmit(values: PersonFormInput): void {
     setFormError(undefined);
