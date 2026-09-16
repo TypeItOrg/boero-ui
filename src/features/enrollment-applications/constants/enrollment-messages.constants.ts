@@ -47,6 +47,7 @@ export const ENROLLMENT_MESSAGES = {
   SUBMIT_APPLICATION_FAILED: "Error al enviar la solicitud de inscripción",
   CANCEL_APPLICATION_FAILED: "Error al cancelar la solicitud de inscripción",
   FETCH_TRAINING_PATHS_FAILED: "Error al obtener los trayectos formativos disponibles",
+  FETCH_SHIFTS_FAILED: "Error al obtener los turnos disponibles",
   FETCH_SPACES_FAILED: "Error al obtener los espacios académicos disponibles",
   APPLICATION_UNAVAILABLE: "No se pudo consultar la inscripción.",
   TRAINING_PATHS_UNAVAILABLE: "No se pudieron consultar los trayectos.",

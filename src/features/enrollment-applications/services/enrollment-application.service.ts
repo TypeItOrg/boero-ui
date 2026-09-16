@@ -5,6 +5,7 @@ import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
@@ -181,6 +182,14 @@ export async function fetchEnrollmentApplicationTrainingPaths(applicationId: str
   }
 
   return response.json();
+}
+
+export async function fetchEnrollmentApplicationShifts(applicationId: string): Promise<Shift[]> {
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/shifts`, {
+    method: "GET",
+  });
+
+  return parseHttpResponse<Shift[]>(response, ENROLLMENT_MESSAGES.FETCH_SHIFTS_FAILED);
 }
 
 export async function fetchEnrollmentApplicationStudyPlanSpaces(applicationId: string): Promise<StudyPlanSpace[]> {

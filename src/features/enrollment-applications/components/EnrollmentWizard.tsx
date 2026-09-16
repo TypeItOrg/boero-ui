@@ -46,12 +46,13 @@ import {
   submitEnrollmentApplicationAction,
 } from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { calculateAge, enrollmentApplicationSubmissionSchema } from "@features/enrollment-applications/schemas/enrollment-application.schema";
-import { SHIFT_OPTIONS, EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { EnrollmentTrainingPathSelector } from "@features/enrollment-applications/components/EnrollmentTrainingPathSelector";
 import { EnrollmentStudyPlanSpacesSelector } from "@features/enrollment-applications/components/EnrollmentStudyPlanSpacesSelector";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
@@ -61,6 +62,7 @@ interface EnrollmentWizardProps {
   initialApplication: EnrollmentApplicationResponse;
   initialStudyPlanSpaces: readonly StudyPlanSpace[];
   initialTrainingPaths: readonly TrainingPath[];
+  initialShifts?: readonly Shift[];
   readOnly?: boolean;
   returnTo?: string;
 }
@@ -115,6 +117,7 @@ export function EnrollmentWizard({
   initialApplication,
   initialStudyPlanSpaces,
   initialTrainingPaths,
+  initialShifts = [],
   readOnly = false,
   returnTo = "/my-enrollment-applications",
 }: EnrollmentWizardProps): React.ReactElement {
@@ -189,6 +192,15 @@ export function EnrollmentWizard({
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
+  const shiftOptions = React.useMemo(() => {
+    const options = initialShifts.map((shift) => ({ value: shift.name, label: shift.name }));
+
+    if (preferredShift && !options.some((option) => option.value === preferredShift)) {
+      return [{ value: preferredShift, label: preferredShift }, ...options];
+    }
+
+    return options;
+  }, [initialShifts, preferredShift]);
   const [allowsImageUse, setAllowsImageUse] = React.useState(Boolean(initialData?.preference?.allowsImageUse));
   const [isReenrolling, setIsReenrolling] = React.useState(Boolean(initialData?.preference?.isReenrolling));
   const [previousTeacher, setPreviousTeacher] = React.useState(initialData?.preference?.previousTeacher ?? "");
@@ -1217,11 +1229,17 @@ export function EnrollmentWizard({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {SHIFT_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
-                          {option.label}
+                      {shiftOptions.length > 0 ? (
+                        shiftOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+                            {option.label}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="__no-shifts" disabled>
+                          No hay turnos disponibles
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectGroup>
                   </SelectContent>
                 </Select>

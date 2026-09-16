@@ -29,7 +29,6 @@ import { EnrollmentStepCardHeader } from "@features/enrollment-applications/comp
 import {
   ENROLLMENT_APPLICATION_STATUS_LABELS,
   ENROLLMENT_DOCUMENT_TYPE_LABELS,
-  SHIFT_OPTIONS,
 } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import {
@@ -163,7 +162,7 @@ export function EnrollmentStatusCard({
   const preference = data.preference || {};
   const attachments = data.attachments || [];
   const spaces = application.spaces || [];
-  const preferredShift = SHIFT_OPTIONS.find((option) => option.value === preference.preferredShift)?.label || preference.preferredShift || "—";
+  const preferredShift = preference.preferredShift || "—";
 
   return (
     <div className="flex flex-col gap-4">

@@ -10,6 +10,7 @@ import { EnrollmentWizard } from "@features/enrollment-applications/components/E
 import {
   fetchEnrollmentApplicationById,
   fetchEnrollmentApplicationStudyPlanSpaces,
+  fetchEnrollmentApplicationShifts,
   fetchEnrollmentApplicationTrainingPaths,
 } from "@features/enrollment-applications/services/enrollment-application.service";
 import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
@@ -46,9 +47,11 @@ export default async function MyEnrollmentApplicationDetailPage({
   const isEditable = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
   const detailLabel = isEditable ? "Continuar inscripción" : "Detalle de inscripción";
   const PageIcon = isEditable ? FilePenLineIcon : ClipboardListIcon;
-  const [trainingPaths, studyPlanSpaces] = isEditable
-    ? await Promise.all([fetchEnrollmentApplicationTrainingPaths(applicationId), fetchEnrollmentApplicationStudyPlanSpaces(applicationId)])
-    : [[], []];
+  const [trainingPaths, studyPlanSpaces, shifts] = await Promise.all([
+    isEditable ? fetchEnrollmentApplicationTrainingPaths(applicationId) : Promise.resolve([]),
+    isEditable ? fetchEnrollmentApplicationStudyPlanSpaces(applicationId) : Promise.resolve([]),
+    isEditable ? fetchEnrollmentApplicationShifts(applicationId) : Promise.resolve([]),
+  ]);
 
   return (
     <PlatformPageShell
@@ -68,6 +71,7 @@ export default async function MyEnrollmentApplicationDetailPage({
         initialApplication={application}
         initialStudyPlanSpaces={studyPlanSpaces}
         initialTrainingPaths={trainingPaths}
+        initialShifts={shifts}
         readOnly={!isEditable}
         returnTo={destination}
       />

@@ -130,7 +130,7 @@ export const updateEnrollmentDraftSchema = z.object({
     responsible: responsibleSchema.partial().optional(),
     preference: z
       .object({
-        preferredShift: z.string().max(50).optional(),
+        preferredShift: z.string().max(150).optional(),
         allowsImageUse: z.boolean().optional(),
         isReenrolling: z.boolean().optional(),
         previousTeacher: z.string().max(255).optional(),

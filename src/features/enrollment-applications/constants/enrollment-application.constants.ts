@@ -47,12 +47,6 @@ export const ENROLLMENT_DOCUMENT_TYPE_LABELS: Record<EnrollmentDocumentType, str
   [ENROLLMENT_DOCUMENT_TYPE.PHOTO_ID]: "Foto 4x4",
 };
 
-export const SHIFT_OPTIONS = [
-  { value: "MORNING", label: "Mañana" },
-  { value: "AFTERNOON", label: "Tarde" },
-  { value: "EVENING", label: "Noche" },
-] as const;
-
 export const EDUCATION_LEVEL_OPTIONS = [
   { value: "PRIMARY_INCOMPLETE", label: "Primario Incompleto" },
   { value: "PRIMARY_COMPLETE", label: "Primario Completo" },
