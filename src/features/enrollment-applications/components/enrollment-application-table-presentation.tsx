@@ -94,7 +94,9 @@ export function EnrollmentApplicationTablePresentation({
                 detailHref={
                   scope === AcademicScope.ADMIN
                     ? `/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`
-                    : undefined
+                    : scope === AcademicScope.INSTITUTIONAL
+                      ? `/enrollment-applications/${application.applicationId}`
+                      : undefined
                 }
               />
             ))}
@@ -124,7 +126,12 @@ export function EnrollmentApplicationTablePresentation({
         />
       ) : applicationToApprove ? (
         <EnrollmentApplicationApproveDialog
-          application={applicationToApprove}
+          application={{
+            institutionId: applicationToApprove.institutionId,
+            applicationId: applicationToApprove.applicationId,
+            applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
+            studyPlanName: applicationToApprove.studyPlanName,
+          }}
           open
           onOpenChange={handleApproveDialogOpenChange}
           onApproved={handleResolved}
@@ -145,7 +152,12 @@ export function EnrollmentApplicationTablePresentation({
         />
       ) : applicationToReject ? (
         <EnrollmentApplicationRejectDialog
-          application={applicationToReject}
+          application={{
+            institutionId: applicationToReject.institutionId,
+            applicationId: applicationToReject.applicationId,
+            applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
+            studyPlanName: applicationToReject.studyPlanName,
+          }}
           open
           onOpenChange={handleRejectDialogOpenChange}
           onRejected={handleResolved}

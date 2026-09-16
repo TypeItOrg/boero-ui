@@ -64,6 +64,7 @@ export default async function EnrollmentApplicationsPage({
             dataPromise={dataPromise}
             canApprove={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE)}
             canReject={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT)}
+            scope={AcademicScope.INSTITUTIONAL}
           />
         </Suspense>
       </DataTableNavigationProvider>

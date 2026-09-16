@@ -18,10 +18,10 @@ import { cn } from "@common/utils/cn.util";
 import { safelyRunAction } from "@common/utils/safe-action.util";
 import { approveEnrollmentApplicationAction } from "@features/enrollment-applications/actions/approve-enrollment-application.action";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationReviewSummary } from "@features/enrollment-applications/types/enrollment-application-review-summary.types";
 
 type EnrollmentApplicationApproveDialogProps = {
-  application: EnrollmentApplication;
+  application: EnrollmentApplicationReviewSummary;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onApproved: () => void;
@@ -33,7 +33,6 @@ export function EnrollmentApplicationApproveDialog({
   onOpenChange,
   onApproved,
 }: EnrollmentApplicationApproveDialogProps): React.ReactElement {
-  const applicantName = `${application.applicantFirstName} ${application.applicantLastName}`;
   const [state, formAction, isPending] = React.useActionState(async (): Promise<EnrollmentApplicationActionState> => {
     const result = await safelyRunAction(
       approveEnrollmentApplicationAction(application.institutionId, application.applicationId),
@@ -65,7 +64,7 @@ export function EnrollmentApplicationApproveDialog({
             </div>
             <AlertDialogTitle>Aprobar inscripción</AlertDialogTitle>
             <AlertDialogDescription>
-              Vas a aprobar la inscripción de <span className="text-foreground font-semibold">{applicantName}</span> al{" "}
+              Vas a aprobar la inscripción de <span className="text-foreground font-semibold">{application.applicantName}</span> al{" "}
               <span className="text-foreground font-semibold">{application.studyPlanName}</span>. Se creará el registro del estudiante en la
               institución.
             </AlertDialogDescription>

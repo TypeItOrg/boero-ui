@@ -20,12 +20,12 @@ import { Textarea } from "@common/components/ui/textarea";
 import { cn } from "@common/utils/cn.util";
 import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";
 import type { EnrollmentApplicationRejectActionState } from "@features/enrollment-applications/types/enrollment-application-reject-action-state.types";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationReviewSummary } from "@features/enrollment-applications/types/enrollment-application-review-summary.types";
 
 const INITIAL_STATE: EnrollmentApplicationRejectActionState = {};
 
 type EnrollmentApplicationRejectDialogProps = {
-  application: EnrollmentApplication;
+  application: EnrollmentApplicationReviewSummary;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRejected: () => void;
@@ -37,7 +37,6 @@ export function EnrollmentApplicationRejectDialog({
   onOpenChange,
   onRejected,
 }: EnrollmentApplicationRejectDialogProps): React.ReactElement {
-  const applicantName = `${application.applicantFirstName} ${application.applicantLastName}`;
   const [state, formAction, isPending] = useActionState(
     rejectEnrollmentApplicationAction.bind(null, application.institutionId, application.applicationId),
     INITIAL_STATE,
@@ -68,7 +67,7 @@ export function EnrollmentApplicationRejectDialog({
             </div>
             <AlertDialogTitle>Rechazar inscripción</AlertDialogTitle>
             <AlertDialogDescription>
-              Vas a rechazar la inscripción de «<span className="text-foreground font-semibold">{applicantName}</span>» al «
+              Vas a rechazar la inscripción de «<span className="text-foreground font-semibold">{application.applicantName}</span>» al «
               <span className="text-foreground font-semibold">{application.studyPlanName}</span>». El motivo quedará visible para el postulante.
             </AlertDialogDescription>
           </AlertDialogHeader>

@@ -59,6 +59,15 @@ export async function fetchPlatformEnrollmentApplicationById(
   return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
 }
 
+export async function fetchInstitutionalEnrollmentApplicationById(
+  institutionId: string,
+  applicationId: string,
+): Promise<EnrollmentApplicationResponse | null> {
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}`);
+
+  return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
+}
+
 export async function fetchMyEnrollmentApplications(
   institutionId: string,
   params: FetchEnrollmentApplicationsParams,
