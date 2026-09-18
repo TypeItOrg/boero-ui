@@ -1,0 +1,72 @@
+import "server-only";
+
+import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
+import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
+import type { StudentSummary } from "@features/course-enrollments/types/student-summary.types";
+import type { Course } from "@features/academic/types/course.types";
+
+export async function fetchMyCourseEnrollments(
+  institutionId: string,
+  params: { page: number; size: number } = { page: 0, size: 20 },
+): Promise<PaginatedResponse<CourseEnrollment>> {
+  const searchParams = new URLSearchParams({ page: String(params.page), size: String(params.size), sort: "enrolledAt,desc" });
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments/mine?${searchParams}`);
+
+  return parseHttpResponse(response, "No se pudieron obtener tus cursadas.");
+}
+
+export async function fetchInstitutionalCourseEnrollments(
+  institutionId: string,
+  params: { page: number; size: number } = { page: 0, size: 20 },
+): Promise<PaginatedResponse<CourseEnrollment>> {
+  const searchParams = new URLSearchParams({ page: String(params.page), size: String(params.size), sort: "enrolledAt,desc" });
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments?${searchParams}`);
+
+  return parseHttpResponse(response, "No se pudieron obtener las cursadas.");
+}
+
+export async function fetchCourseWaitlist(institutionId: string, courseId: string): Promise<CourseWaitlistEntry[] | null> {
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/courses/${courseId}/waitlist`);
+
+  return parseNullableHttpResponse(response, "No se pudo obtener la lista de espera.");
+}
+
+export async function fetchStudents(
+  institutionId: string,
+  params: { page?: number; size?: number; search?: string } = {},
+): Promise<PaginatedResponse<StudentSummary>> {
+  const searchParams = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 100) });
+
+  if (params.search) {
+    searchParams.set("search", params.search);
+  }
+
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/students?${searchParams}`);
+
+  return parseHttpResponse(response, "No se pudieron obtener los estudiantes.");
+}
+
+export async function fetchActiveCourses(institutionId: string): Promise<Course[]> {
+  const response = await institutionalApiFetch(
+    `/api/v1/institutions/${institutionId}/course-enrollment-options?page=0&size=100&sort=academicSpace.name,asc`,
+  );
+  const data = await parseHttpResponse<PaginatedResponse<Course>>(response, "No se pudieron obtener los cursos activos.");
+
+  return data.items;
+}
+
+export async function fetchCourseEnrollment(institutionId: string, enrollmentId: string): Promise<CourseEnrollment | null> {
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments/${enrollmentId}`);
+
+  return parseNullableHttpResponse(response, "No se pudo obtener la cursada.");
+}
+
+export async function fetchCourseEnrollmentHistory(institutionId: string, enrollmentId: string): Promise<CourseEnrollmentHistory[]> {
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments/${enrollmentId}/history`);
+
+  return parseHttpResponse(response, "No se pudo obtener el historial de la cursada.");
+}
