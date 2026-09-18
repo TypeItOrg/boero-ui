@@ -8,8 +8,10 @@ export type EnrollmentApplication = {
   applicantFirstName: string;
   applicantLastName: string;
   applicantDocumentNumber: string;
-  studyPlanId: string;
-  studyPlanName: string;
+  studyPlanId?: string | null;
+  studyPlanName?: string | null;
+  trainingPathId?: string | null;
+  trainingPathName?: string | null;
   data?: Pick<EnrollmentApplicationData, "careerSelection">;
   academicYearId: string;
   academicYear: number;

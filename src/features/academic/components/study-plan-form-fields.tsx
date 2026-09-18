@@ -1,11 +1,4 @@
 import { NumericInput } from "@common/components/ui/restricted-input";
-import { useCallback, useState } from "react";
-import { XIcon } from "lucide-react";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
-import { Button } from "@common/components/ui/button";
-import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
-import type { Instrument } from "@features/academic/types/instrument.types";
 import { toFormControlValue, toOptionalFormString } from "@common/utils/form-value.util";
 import { DateRangeFields } from "@features/academic/components/academic-date-range-fields";
 import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
@@ -105,7 +98,6 @@ export function AcademicLevelFields({ initialValues = {}, fieldErrors }: Academi
 
 export function StudyPlanSpaceFields({
   academicSpaces = [],
-  initialInstruments = [],
   institutionId,
   levels = [],
   initialValues = {},
@@ -113,12 +105,6 @@ export function StudyPlanSpaceFields({
   scope,
 }: AcademicFieldsProps): React.ReactElement {
   const initialAcademicSpaceId = toOptionalFormString(initialValues.academicSpaceId);
-  const [instruments, setInstruments] = useState(initialInstruments);
-  const fetchInstruments = useCallback(
-    (input: AsyncDropdownFetchPageInput) => fetchAcademicOptionPage<Instrument>("instruments", scope!, institutionId!, input),
-    [scope, institutionId],
-  );
-
   return (
     <>
       <FormField label="Espacio académico" name="academicSpaceId" error={fieldErrors?.academicSpaceId} className="sm:col-span-2" required>
@@ -172,51 +158,6 @@ export function StudyPlanSpaceFields({
           defaultValue={toFormControlValue(initialValues.approvalMode ?? APPROVAL_MODE[0])}
           options={APPROVAL_MODE.map((mode) => ({ value: mode, label: approvalModeLabels[mode] }))}
         />
-      </FormField>
-      <FormField label="Instrumentos permitidos" name="instrumentIds" error={fieldErrors?.instrumentIds} className="sm:col-span-2">
-        <AsyncDropdown<Instrument>
-          id="instrumentIds"
-          disabled={!institutionId || !scope}
-          ariaInvalid={Boolean(fieldErrors?.instrumentIds)}
-          fetchPage={fetchInstruments}
-          queryKey={["academic-options", "instruments", scope, institutionId]}
-          getItemLabel={(item) => item.name}
-          getItemValue={(item) => item.id}
-          selectedValues={instruments.map((item) => item.instrumentId)}
-          placeholder="Agregar instrumento"
-          searchPlaceholder="Buscar instrumento..."
-          emptyMessage="No se encontraron instrumentos activos."
-          errorMessage="No se pudieron cargar los instrumentos."
-          onValueChange={(_value, item) => {
-            if (!item) {
-              return;
-            }
-
-            setInstruments((previous) =>
-              previous.some((selected) => selected.instrumentId === item.id)
-                ? previous.filter((selected) => selected.instrumentId !== item.id)
-                : [...previous, { instrumentId: item.id, name: item.name }],
-            );
-          }}
-        />
-        <div className="flex flex-wrap gap-2">
-          {instruments.map((instrument) => (
-            <span key={instrument.instrumentId} className="bg-muted inline-flex items-center gap-1 rounded-md pl-2 text-sm">
-              <input type="hidden" name="instrumentIds" value={instrument.instrumentId} />
-              {instrument.name}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                aria-label={`Quitar ${instrument.name}`}
-                onClick={() => setInstruments((previous) => previous.filter((item) => item.instrumentId !== instrument.instrumentId))}
-              >
-                <XIcon className="size-3.5" />
-              </Button>
-            </span>
-          ))}
-        </div>
-        <p className="text-muted-foreground text-sm">Si agregás opciones, el aspirante deberá elegir uno de estos instrumentos al inscribirse.</p>
       </FormField>
     </>
   );

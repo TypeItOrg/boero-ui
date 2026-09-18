@@ -175,6 +175,7 @@ describe("academic form schemas", () => {
         description: null,
         type: "SUBJECT",
         format: "GRUPAL",
+        instrumental: false,
       });
     }
   });

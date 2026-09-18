@@ -1,12 +1,14 @@
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import type { EnrollmentApplicationSpaceResponse } from "@features/enrollment-applications/types/enrollment-application-space-response.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
+import type { EnrollmentApplicationCourse } from "@features/enrollment-applications/types/enrollment-application-course.types";
 
 export interface EnrollmentApplicationResponse {
   applicationId: string;
   institutionId: string;
   personId: string;
-  studyPlanId: string;
+  trainingPathId?: string | null;
+  studyPlanId?: string | null;
   academicYearId: string;
   enrollmentPeriodId: string;
   studyPlanName?: string;
@@ -17,6 +19,7 @@ export interface EnrollmentApplicationResponse {
   isEditable: boolean;
   data: EnrollmentApplicationData;
   spaces?: EnrollmentApplicationSpaceResponse[];
+  courses?: EnrollmentApplicationCourse[];
   applicantName?: string;
   applicantDocumentNumber?: string;
   secondarySchool?: string | null;

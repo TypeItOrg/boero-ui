@@ -11,10 +11,16 @@ export type Course = {
   studyPlanName: string;
   trainingPathId: string;
   trainingPathName: string;
+  studyPlanSpaceId?: string;
   academicSpaceId: string;
   academicSpaceName: string;
   academicSpaceType: AcademicSpaceType;
   academicSpaceFormat: AcademicSpaceFormat;
+  academicSpaceInstrumental?: boolean;
+  academicLevelId?: string | null;
+  academicLevelName?: string | null;
+  instrumentId?: string | null;
+  instrumentName?: string | null;
   academicYearId: string;
   year: number;
   status: CourseStatus;

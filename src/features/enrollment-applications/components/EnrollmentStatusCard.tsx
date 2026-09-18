@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { cn } from "@common/utils/cn.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
+import { EnrollmentApplicationCoursesManagement } from "@features/enrollment-applications/components/enrollment-application-courses-management";
 import {
   ENROLLMENT_APPLICATION_STATUS_LABELS,
   ENROLLMENT_DOCUMENT_TYPE_LABELS,
@@ -42,6 +43,10 @@ interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
   showApplicantAlert?: boolean;
   scope?: AcademicScope;
+  canManageCourses?: boolean;
+  canEnrollCourses?: boolean;
+  canRejectCourses?: boolean;
+  canReadCourseWaitlist?: boolean;
 }
 
 type DetailItemProps = {
@@ -153,6 +158,10 @@ export function EnrollmentStatusCard({
   application,
   showApplicantAlert = true,
   scope = AcademicScope.INSTITUTIONAL,
+  canManageCourses = false,
+  canEnrollCourses = false,
+  canRejectCourses = false,
+  canReadCourseWaitlist = false,
 }: EnrollmentStatusCardProps): React.ReactElement {
   const data = application.data || {};
   const personal = data.personalData || {};
@@ -184,6 +193,27 @@ export function EnrollmentStatusCard({
       </Card>
 
       {showApplicantAlert ? getStatusAlert(application) : null}
+
+      {canManageCourses && application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED ? (
+        <EnrollmentApplicationCoursesManagement
+          applicationId={application.applicationId}
+          courses={application.courses ?? []}
+          canEnroll={canEnrollCourses}
+          canReject={canRejectCourses}
+          canReadWaitlist={canReadCourseWaitlist}
+        />
+      ) : null}
+
+      {!canManageCourses && application.courses && application.courses.length > 0 ? (
+        <EnrollmentApplicationCoursesManagement
+          applicationId={application.applicationId}
+          courses={application.courses}
+          canEnroll={false}
+          canReject={false}
+          canReadWaitlist={false}
+          readOnly
+        />
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-2">
         <DetailCard icon={UserRoundIcon} title="Datos personales y contacto" description="Información registrada al enviar la solicitud.">

@@ -74,7 +74,19 @@ export default async function EnrollmentApplicationDetailPage({
         />
       </div>
 
-      <EnrollmentStatusCard application={application} showApplicantAlert={false} scope={AcademicScope.INSTITUTIONAL} />
+      <EnrollmentStatusCard
+        application={application}
+        showApplicantAlert={false}
+        scope={AcademicScope.INSTITUTIONAL}
+        canManageCourses={
+          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_READ) ||
+          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL) ||
+          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT)
+        }
+        canEnrollCourses={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL)}
+        canRejectCourses={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT)}
+        canReadCourseWaitlist={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ)}
+      />
     </PlatformPageShell>
   );
 }

@@ -108,6 +108,7 @@ describe("enrollment-application.schema", () => {
         receivesReasonableAdjustments: false,
       },
       responsible: {},
+      courses: [{ courseId: "00000000-0000-4000-8000-000000000001", preferredTeacherId: null }],
       preference: {
         preferredShift: "AFTERNOON",
         allowsImageUse: true,

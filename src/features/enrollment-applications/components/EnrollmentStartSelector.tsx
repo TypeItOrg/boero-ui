@@ -2,6 +2,7 @@
 
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import * as React from "react";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import Link from "next/link";
 import { CalendarX2Icon, CheckCircle2Icon, FilePenLineIcon, GraduationCapIcon, Loader2Icon } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
@@ -27,7 +28,7 @@ export interface EnrollmentStartPeriodOption {
 interface EnrollmentStartSelectorProps {
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods: EnrollmentStartPeriodOption[];
-  onStart: (selection: { studyPlanId: string; academicYearId: string }) => void;
+  onStart: (selection: StartEnrollmentApplicationInput) => void;
   allExcludedByActiveApplication?: boolean;
   error?: string;
   isStarting?: boolean;
@@ -48,7 +49,7 @@ export function EnrollmentStartSelector({
   const academicYears = [...new Map(periods.map((period) => [period.academicYearId, period])).values()];
   const [selectedStudyPlan, setSelectedStudyPlan] = React.useState<EnrollmentStartStudyPlanOption | undefined>(studyPlans[0]);
   const [selectedPeriod, setSelectedPeriod] = React.useState<EnrollmentStartPeriodOption | undefined>(academicYears[0]);
-  const studyPlanId = selectedStudyPlan?.id ?? "";
+  const trainingPathId = selectedStudyPlan?.id ?? "";
   const academicYearId = selectedPeriod?.academicYearId ?? "";
 
   if (studyPlans.length === 0 && allExcludedByActiveApplication) {
@@ -79,7 +80,7 @@ export function EnrollmentStartSelector({
             <Icon className="size-5" aria-hidden="true" />
           </EmptyMedia>
           <EmptyTitle className="text-base">
-            {hasNoPeriods ? "No hay períodos de inscripción abiertos" : "No hay planes de estudio disponibles"}
+            {hasNoPeriods ? "No hay períodos de inscripción abiertos" : "No hay trayectos formativos disponibles"}
           </EmptyTitle>
           <EmptyDescription>{hasNoPeriods ? ENROLLMENT_MESSAGES.ENROLLMENT_CLOSED : ENROLLMENT_MESSAGES.NO_ELIGIBLE_PLANS}</EmptyDescription>
         </EmptyHeader>
@@ -96,7 +97,7 @@ export function EnrollmentStartSelector({
           </div>
           <div>
             <CardTitle>Iniciar solicitud de inscripción</CardTitle>
-            <CardDescription>Elegí el plan de estudio y el ciclo lectivo al que querés postularte.</CardDescription>
+            <CardDescription>Elegí el trayecto formativo al que querés postularte.</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -110,11 +111,11 @@ export function EnrollmentStartSelector({
         <FieldGroup className="grid gap-4 md:grid-cols-2">
           <Field className="min-w-0">
             <FieldLabel htmlFor="startStudyPlan" required>
-              Plan de estudio
+              Trayecto formativo
             </FieldLabel>
-            <Select value={studyPlanId} onValueChange={(value) => setSelectedStudyPlan(studyPlans.find((plan) => plan.id === value))}>
+            <Select value={trainingPathId} onValueChange={(value) => setSelectedStudyPlan(studyPlans.find((plan) => plan.id === value))}>
               <SelectTrigger id="startStudyPlan" className="h-9! w-full">
-                <SelectValue placeholder="Seleccioná un plan de estudio">
+                <SelectValue placeholder="Seleccioná un trayecto formativo">
                   {selectedStudyPlan ? `${selectedStudyPlan.name} — ${selectedStudyPlan.trainingPathName}` : undefined}
                 </SelectValue>
               </SelectTrigger>
@@ -129,7 +130,7 @@ export function EnrollmentStartSelector({
               </SelectContent>
             </Select>
             {studyPlans.length === 0 && (
-              <p className="text-muted-foreground text-sm">No hay planes disponibles en esta página. Podés consultar las demás páginas.</p>
+              <p className="text-muted-foreground text-sm">No hay trayectos disponibles en esta página. Podés consultar las demás páginas.</p>
             )}
             {studyPlanPagination}
           </Field>
@@ -160,12 +161,7 @@ export function EnrollmentStartSelector({
         </FieldGroup>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button
-          type="button"
-          size="lg"
-          onClick={() => onStart({ studyPlanId, academicYearId })}
-          disabled={isStarting || !studyPlanId || !academicYearId}
-        >
+        <Button type="button" size="lg" onClick={() => onStart({ trainingPathId, academicYearId })} disabled={isStarting || !trainingPathId}>
           {isStarting ? (
             <>
               <Loader2Icon data-icon="inline-start" className="animate-spin" />

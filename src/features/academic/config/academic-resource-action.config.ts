@@ -93,6 +93,8 @@ export const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConf
     updatePermission: INSTITUTIONAL_PERMISSION.COURSE_UPDATE,
     updatePath: (base, id) => `${base}/courses/${id}/classes`,
     prepareBody: (data) => ({
+      studyPlanSpaceId: data.studyPlanSpaceId,
+      instrumentId: data.instrumentId,
       studyPlanId: data.studyPlanId,
       academicSpaceId: data.academicSpaceId,
       academicYearId: data.academicYearId,

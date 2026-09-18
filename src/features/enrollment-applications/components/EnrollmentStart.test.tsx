@@ -55,7 +55,7 @@ describe("EnrollmentStart", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1" }));
+    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ trainingPathId: "plan-1", academicYearId: "year-1" }));
     expect(mockPush).toHaveBeenCalledWith("/my-enrollment-applications/app-1");
   });
 

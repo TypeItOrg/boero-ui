@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AlertCircleIcon, CheckCircle2Icon, ClipboardPlusIcon } from "lucide-react";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { fetchAcademicOffers } from "@features/academic-offers/services/academic-offer.service";
 import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
@@ -19,6 +18,7 @@ import { getInstitutionalMetadata } from "@features/institutional-auth/utils/ins
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
+import { fetchAvailableEnrollmentTrainingPaths } from "@features/enrollment-applications/services/enrollment-application.service";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Nueva inscripción");
@@ -51,13 +51,13 @@ export default async function EnrollmentPage({
   }
 
   const [plansResponse, periodsResponse, activePaths] = await Promise.all([
-    fetchAcademicOffers(person.institutionId, plansPage),
+    fetchAvailableEnrollmentTrainingPaths(plansPage),
     fetchAvailableEnrollmentPeriods(periodsPage),
     fetchActiveEnrollmentPaths(person.institutionId),
   ]);
 
-  const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.trainingPathId));
-  const hasActiveApplication = activePaths.studyPlanIds.size > 0;
+  const availableStudyPlans = plansResponse.items.filter((path) => !activePaths.trainingPathIds.has(path.id));
+  const hasActiveApplication = activePaths.trainingPathIds.size > 0;
   const allExcludedByActiveApplication =
     hasActiveApplication && plansResponse.totalPages <= 1 && plansResponse.items.length > 0 && availableStudyPlans.length === 0;
 
@@ -75,9 +75,9 @@ export default async function EnrollmentPage({
       )}
       <EnrollmentStart
         studyPlans={availableStudyPlans.map((plan) => ({
-          id: plan.studyPlanId,
-          name: plan.studyPlanName,
-          trainingPathName: plan.trainingPathName,
+          id: plan.id,
+          name: plan.name,
+          trainingPathName: plan.name,
         }))}
         periods={periodsResponse.items}
         studyPlanPagination={

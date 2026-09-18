@@ -9,6 +9,7 @@ export type AcademicSpace = {
   description: string | null;
   type: AcademicSpaceType;
   format: AcademicSpaceFormat;
+  instrumental?: boolean;
   active: boolean;
   deletedAt?: string | null;
 };

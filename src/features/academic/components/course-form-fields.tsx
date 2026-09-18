@@ -16,7 +16,12 @@ import { ToggleGroup, ToggleGroupItem } from "@common/components/ui/toggle-group
 import { cn } from "@common/utils/cn.util";
 import { toOptionalFormString } from "@common/utils/form-value.util";
 import { FormField } from "@features/academic/components/academic-form-controls";
-import { fetchCourseSpaceOptions, fetchCourseTeacherOptions, type CourseTeacherOption } from "@features/academic/services/course-options.service";
+import {
+  fetchCourseSpaceOptions,
+  fetchCourseTeacherOptions,
+  type CourseSpaceOption,
+  type CourseTeacherOption,
+} from "@features/academic/services/course-options.service";
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
@@ -45,6 +50,10 @@ type ClassDraft = {
   teachers: { personId: string; fullName: string }[];
   days: DayDraft[];
 };
+
+function getCourseSpaceLabel(item: CourseSpaceOption): string {
+  return `${item.name}${item.academicLevelName ? ` · ${item.academicLevelName}` : ""} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`;
+}
 
 function emptySchedule(): ScheduleDraft {
   return { startTime: "", endTime: "" };
@@ -79,6 +88,9 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
 
   const [studyPlanId, setStudyPlanId] = React.useState(toOptionalFormString(initialValues.studyPlanId));
   const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
+  const [studyPlanSpaceId, setStudyPlanSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [instrumentId, setInstrumentId] = React.useState(toOptionalFormString(initialValues.instrumentId));
+  const [instrumental, setInstrumental] = React.useState(Boolean(initialValues.academicSpaceInstrumental));
   const [spaceLabel, setSpaceLabel] = React.useState<string | undefined>(undefined);
   const [academicYearId, setAcademicYearId] = React.useState(toOptionalFormString(initialValues.academicYearId));
   const [format, setFormat] = React.useState<string | undefined>(
@@ -131,7 +143,9 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
   return (
     <>
       <input type="hidden" name="studyPlanId" value={studyPlanId ?? ""} />
+      <input type="hidden" name="studyPlanSpaceId" value={studyPlanSpaceId ?? ""} />
       <input type="hidden" name="academicSpaceId" value={spaceId ?? ""} />
+      <input type="hidden" name="instrumentId" value={instrumentId ?? ""} />
       <input type="hidden" name="academicYearId" value={academicYearId ?? ""} />
       <input type="hidden" name="format" value={format ?? ""} />
       <input type="hidden" name="classes" value={serializedClasses} />
@@ -175,6 +189,9 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 onValueChange={(value) => {
                   setStudyPlanId(value);
                   setSpaceId(undefined);
+                  setStudyPlanSpaceId(undefined);
+                  setInstrumentId(undefined);
+                  setInstrumental(false);
                   setSpaceLabel(undefined);
                   setFormat(undefined);
                 }}
@@ -198,7 +215,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
           >
             {institutionId && scope ? (
               studyPlanId ? (
-                <AsyncDropdown
+                <AsyncDropdown<CourseSpaceOption>
                   ariaInvalid={Boolean(fieldErrors?.academicSpaceId)}
                   disabled={editing || classesLocked}
                   emptyDescription="Incorporá espacios al plan para poder instanciarlos."
@@ -207,19 +224,18 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   emptyTitle="No hay espacios"
                   errorMessage="No se pudieron cargar los espacios del plan."
                   fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
-                  getItemLabel={(item) =>
-                    `${item.name} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`
-                  }
+                  getItemLabel={getCourseSpaceLabel}
                   getItemValue={(item) => item.id}
                   id="academicSpaceId"
                   key={`space-${institutionId}-${studyPlanId}`}
                   name="academicSpaceDisplay"
                   onValueChange={(value, item) => {
                     setSpaceId(value);
+                    setStudyPlanSpaceId(item?.studyPlanSpaceId ?? value);
+                    setInstrumentId(undefined);
+                    setInstrumental(Boolean(item?.instrumental));
                     if (item) {
-                      setSpaceLabel(
-                        `${item.name} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`,
-                      );
+                      setSpaceLabel(getCourseSpaceLabel(item));
                       setFormat(item.format);
                     }
                   }}
@@ -236,6 +252,37 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
               <Input disabled placeholder="Seleccioná una institución primero" type="text" />
             )}
           </FormField>
+
+          {instrumental ? (
+            <FormField label="Instrumento" name="instrumentId" error={fieldErrors?.instrumentId} className="flex-[1_0_min(300px,100%)]" required>
+              {institutionId && scope ? (
+                <AsyncDropdown<{ id: string; name: string }>
+                  ariaInvalid={Boolean(fieldErrors?.instrumentId)}
+                  disabled={editing || classesLocked}
+                  emptyMessage="No hay instrumentos activos."
+                  errorMessage="No se pudieron cargar los instrumentos."
+                  fetchPage={(input) =>
+                    fetchAcademicOptionPage<{ id: string; name: string }>("instruments", scope, institutionId, input, {
+                      active: true,
+                    })
+                  }
+                  getItemLabel={(item) => item.name}
+                  getItemValue={(item) => item.id}
+                  id="instrumentId"
+                  key={`instrument-${institutionId}-${studyPlanSpaceId ?? "none"}`}
+                  name="instrumentDisplay"
+                  onValueChange={(value) => setInstrumentId(value)}
+                  placeholder={classesLocked ? "Definido por el curso" : "Seleccionar instrumento"}
+                  queryKey={["courses", "instruments", scope, institutionId]}
+                  searchPlaceholder="Buscar instrumento…"
+                  selectedLabel={toOptionalFormString(initialValues.instrumentName)}
+                  value={instrumentId}
+                />
+              ) : (
+                <Input disabled placeholder="Seleccioná una institución primero" type="text" />
+              )}
+            </FormField>
+          ) : null}
 
           <FormField label="Ciclo lectivo" name="academicYearId" error={fieldErrors?.academicYearId} className="w-full flex-[1_0_100%]" required>
             {institutionId && scope ? (

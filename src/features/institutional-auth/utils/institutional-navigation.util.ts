@@ -69,6 +69,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
       ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
       : []),
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
+      ? [{ title: "Cursadas", url: "/course-enrollments", icon: GraduationCapIcon }]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
   ];
 
@@ -76,6 +79,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadEnrollmentPeriods ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }] : []),
     ...(canStartEnrollmentApplication(user) ? [{ title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon }] : []),
     ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
+    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis cursadas", url: "/my-course-enrollments", icon: GraduationCapIcon }] : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
       ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
       : []),

@@ -63,6 +63,17 @@ const activeSchema = z
   .optional()
   .transform((val) => (val === undefined ? undefined : val === true || val === "true"));
 
+const optionalUuid = z
+  .string()
+  .trim()
+  .refine((value) => value === "" || z.uuid().safeParse(value).success, "Seleccioná un valor válido.")
+  .transform((value) => value || null);
+
+const checkboxSchema = z
+  .enum(["on", "true", "false"])
+  .optional()
+  .transform((value) => value === "on" || value === "true");
+
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const timeField = z.string().regex(timePattern, "Ingresá una hora válida (HH:mm).");
@@ -160,13 +171,19 @@ const parsedCourseClasses = z
 
 const courseSchema = z
   .object({
-    studyPlanId: z.string().uuid("Seleccioná un plan de estudio."),
-    academicSpaceId: z.string().uuid("Seleccioná un espacio académico."),
+    studyPlanSpaceId: optionalUuid,
+    studyPlanId: optionalUuid,
+    academicSpaceId: optionalUuid,
+    instrumentId: optionalUuid,
     academicYearId: z.string().uuid("Seleccioná un ciclo lectivo."),
     format: z.enum(ACADEMIC_SPACE_FORMAT),
     classes: parsedCourseClasses,
   })
   .superRefine((value, context) => {
+    if (!value.studyPlanSpaceId && (!value.studyPlanId || !value.academicSpaceId)) {
+      context.addIssue({ code: "custom", message: "Seleccioná un espacio del plan de estudio.", path: ["studyPlanSpaceId"] });
+    }
+
     if (value.format !== "INDIVIDUAL") {
       return;
     }
@@ -261,6 +278,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     description: optionalText(1000),
     type: z.enum(ACADEMIC_SPACE_TYPE),
     format: z.enum(ACADEMIC_SPACE_FORMAT),
+    instrumental: checkboxSchema,
     active: activeSchema,
   }),
   [AcademicResource.STUDY_PLAN_SPACE]: z.object({
@@ -269,9 +287,6 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
     requirementType: z.enum(REQUIREMENT_TYPE),
     displayOrder: positiveOrder,
     approvalMode: z.enum(APPROVAL_MODE),
-    instrumentIds: z
-      .array(z.uuid("Seleccioná instrumentos válidos."))
-      .refine((ids) => new Set(ids).size === ids.length, "No se pueden repetir instrumentos."),
   }),
   [AcademicResource.PREREQUISITE]: z.object({
     requiredStudyPlanSpaceId: z.string().uuid("Seleccioná un espacio requerido."),
@@ -284,9 +299,7 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
 export function parseAcademicForm(resource: AcademicResource, formData: FormData) {
   const values = Object.fromEntries(formData.entries());
 
-  return academicFormSchemas[resource].safeParse(
-    resource === AcademicResource.STUDY_PLAN_SPACE ? { ...values, instrumentIds: formData.getAll("instrumentIds") } : values,
-  );
+  return academicFormSchemas[resource].safeParse(values);
 }
 
 export function parseStudyPlanVersionForm(formData: FormData) {

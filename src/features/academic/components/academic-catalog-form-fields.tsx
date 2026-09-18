@@ -75,6 +75,18 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
           options={ACADEMIC_SPACE_FORMAT.map((format) => ({ value: format, label: academicSpaceFormatLabels[format] }))}
         />
       </FormField>
+      <label className="border-input bg-background flex items-center gap-3 rounded-md border px-3 py-2 text-sm">
+        <input
+          type="checkbox"
+          name="instrumental"
+          defaultChecked={initialValues.instrumental === true}
+          disabled={Boolean(initialValues.id && initialValues.instrumentalLocked)}
+        />
+        <span>
+          <span className="block font-medium">Materia instrumental</span>
+          <span className="text-muted-foreground block text-xs">Independiente del formato individual o grupal.</span>
+        </span>
+      </label>
       {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>

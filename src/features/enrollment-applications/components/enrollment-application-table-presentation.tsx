@@ -118,7 +118,7 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName,
+            studyPlanName: applicationToApprove.studyPlanName ?? applicationToApprove.trainingPathName ?? "—",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -130,7 +130,7 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName,
+            studyPlanName: applicationToApprove.studyPlanName ?? applicationToApprove.trainingPathName ?? "—",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -144,7 +144,7 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName,
+            studyPlanName: applicationToReject.studyPlanName ?? applicationToReject.trainingPathName ?? "—",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}
@@ -156,7 +156,7 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName,
+            studyPlanName: applicationToReject.studyPlanName ?? applicationToReject.trainingPathName ?? "—",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}

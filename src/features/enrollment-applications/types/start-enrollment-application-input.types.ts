@@ -1,4 +1,4 @@
 export interface StartEnrollmentApplicationInput {
-  studyPlanId: string;
-  academicYearId: string;
+  trainingPathId: string;
+  academicYearId?: string;
 }

@@ -4,9 +4,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
-import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { Shift } from "@features/academic/types/shift.types";
-import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
@@ -14,6 +12,8 @@ import type { EnrollmentApplicationResponse } from "@features/enrollment-applica
 import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import type { UpdateEnrollmentDraftInput } from "@features/enrollment-applications/types/update-enrollment-draft-input.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+import type { TrainingPath } from "@features/academic/types/training-path.types";
 
 export type FetchEnrollmentApplicationsParams = {
   page: number;
@@ -179,20 +179,6 @@ export async function cancelEnrollmentApplication(applicationId: string): Promis
   return response.json();
 }
 
-export async function fetchEnrollmentApplicationTrainingPaths(applicationId: string): Promise<TrainingPath[]> {
-  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/training-paths`, {
-    method: "GET",
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-
-    throw new Error(errorData.message || ENROLLMENT_MESSAGES.FETCH_TRAINING_PATHS_FAILED);
-  }
-
-  return response.json();
-}
-
 export async function fetchEnrollmentApplicationShifts(applicationId: string): Promise<Shift[]> {
   const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/shifts`, {
     method: "GET",
@@ -201,18 +187,30 @@ export async function fetchEnrollmentApplicationShifts(applicationId: string): P
   return parseHttpResponse<Shift[]>(response, ENROLLMENT_MESSAGES.FETCH_SHIFTS_FAILED);
 }
 
-export async function fetchEnrollmentApplicationStudyPlanSpaces(applicationId: string): Promise<StudyPlanSpace[]> {
-  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/study-plan-spaces`, {
+export async function fetchEnrollmentApplicationCourses(
+  applicationId: string,
+  params: { page?: number; size?: number; search?: string } = {},
+): Promise<PaginatedResponse<EnrollmentCourseOption>> {
+  const searchParams = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 50) });
+
+  if (params.search) {
+    searchParams.set("search", params.search);
+  }
+
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/courses?${searchParams.toString()}`, {
     method: "GET",
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH_COURSES_FAILED);
+}
 
-    throw new Error(errorData.message || ENROLLMENT_MESSAGES.FETCH_SPACES_FAILED);
-  }
+export async function fetchAvailableEnrollmentTrainingPaths(params: { page?: number; size?: number } = {}): Promise<PaginatedResponse<TrainingPath>> {
+  const searchParams = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 20) });
+  const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/options/training-paths?${searchParams.toString()}`, {
+    method: "GET",
+  });
 
-  return response.json();
+  return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH_AVAILABLE_TRAINING_PATHS_FAILED);
 }
 
 export { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";

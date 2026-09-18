@@ -97,6 +97,7 @@ describe("getInstitutionalNavigationSections", () => {
     expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
       expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
       expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+      expect.objectContaining({ title: "Mis cursadas", url: "/my-course-enrollments" }),
     ]);
   });
 

@@ -66,6 +66,14 @@ export const INSTITUTIONAL_PERMISSION = {
   ENROLLMENT_APPLICATION_READ: "institution:enrollment-application:read",
   ENROLLMENT_APPLICATION_APPROVE: "institution:enrollment-application:approve",
   ENROLLMENT_APPLICATION_REJECT: "institution:enrollment-application:reject",
+  COURSE_ENROLLMENT_READ: "institution:course-enrollment:read",
+  COURSE_ENROLLMENT_CREATE: "institution:course-enrollment:create",
+  COURSE_ENROLLMENT_WITHDRAW: "institution:course-enrollment:withdraw",
+  COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE: "institution:course-enrollment:academic-status-update",
+  ENROLLMENT_APPLICATION_COURSE_READ: "institution:enrollment-application-course:read",
+  ENROLLMENT_APPLICATION_COURSE_ENROLL: "institution:enrollment-application-course:enroll",
+  ENROLLMENT_APPLICATION_COURSE_REJECT: "institution:enrollment-application-course:reject",
+  COURSE_WAITLIST_READ: "institution:course-waitlist:read",
 } as const;
 
 export type InstitutionalPermission = (typeof INSTITUTIONAL_PERMISSION)[keyof typeof INSTITUTIONAL_PERMISSION];

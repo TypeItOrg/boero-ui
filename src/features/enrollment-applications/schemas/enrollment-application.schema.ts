@@ -36,8 +36,8 @@ export function calculateAge(birthDate: string | Date | undefined): number | nul
 }
 
 export const startEnrollmentApplicationSchema = z.object({
-  studyPlanId: z.string().uuid(ENROLLMENT_MESSAGES.STUDY_PLAN_ID_INVALID),
-  academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID),
+  trainingPathId: z.string().uuid(ENROLLMENT_MESSAGES.TRAINING_PATH_ID_INVALID),
+  academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID).optional(),
 });
 
 // Paso 1: Datos Personales y Contacto
@@ -89,20 +89,6 @@ export const careerSelectionSchema = z
   })
   .optional();
 
-// Paso: Espacios Académicos
-export const academicSpaceSelectionSchema = z
-  .object({
-    studyPlanSpaceIds: z.array(z.string().trim()).optional(),
-  })
-  .optional();
-
-// Paso: Instrumentos
-export const instrumentSelectionSchema = z
-  .object({
-    studyPlanSpaceInstrumentIds: z.record(z.string(), z.string()).optional(),
-  })
-  .optional();
-
 // Paso: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
@@ -113,6 +99,8 @@ export const enrollmentAttachmentSchema = z.object({
   url: z.string().optional(),
   createdAt: z.string().optional(),
 });
+
+const enrollmentCoursesSchema = z.array(z.object({ courseId: z.uuid(), preferredTeacherId: z.uuid().nullable().optional() }));
 
 // Schema para guardar borrador (permite campos incompletos durante el autoguardado)
 export const updateEnrollmentDraftSchema = z.object({
@@ -137,8 +125,7 @@ export const updateEnrollmentDraftSchema = z.object({
       })
       .optional(),
     careerSelection: z.object({ trainingPathId: z.uuid().optional() }).optional(),
-    academicSpaceSelection: z.object({ studyPlanSpaceIds: z.array(z.uuid()).optional() }).optional(),
-    instrumentSelection: z.object({ studyPlanSpaceInstrumentIds: z.record(z.uuid(), z.uuid()).optional() }).optional(),
+    courses: enrollmentCoursesSchema.optional(),
   }),
 });
 
@@ -150,8 +137,7 @@ export const enrollmentApplicationSubmissionSchema = z
     healthInclusion: healthInclusionSchema,
     responsible: responsibleSchema,
     careerSelection: careerSelectionSchema,
-    academicSpaceSelection: academicSpaceSelectionSchema,
-    instrumentSelection: instrumentSelectionSchema,
+    courses: enrollmentCoursesSchema.min(1, ENROLLMENT_MESSAGES.SPACE_REQUIRED),
     preference: preferenceSchema,
     attachments: z.array(enrollmentAttachmentSchema).default([]),
   })

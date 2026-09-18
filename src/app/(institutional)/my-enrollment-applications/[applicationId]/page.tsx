@@ -9,9 +9,8 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import {
   fetchEnrollmentApplicationById,
-  fetchEnrollmentApplicationStudyPlanSpaces,
+  fetchEnrollmentApplicationCourses,
   fetchEnrollmentApplicationShifts,
-  fetchEnrollmentApplicationTrainingPaths,
 } from "@features/enrollment-applications/services/enrollment-application.service";
 import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -47,10 +46,9 @@ export default async function MyEnrollmentApplicationDetailPage({
   const isEditable = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
   const detailLabel = isEditable ? "Continuar inscripción" : "Detalle de inscripción";
   const PageIcon = isEditable ? FilePenLineIcon : ClipboardListIcon;
-  const [trainingPaths, studyPlanSpaces, shifts] = await Promise.all([
-    isEditable ? fetchEnrollmentApplicationTrainingPaths(applicationId) : Promise.resolve([]),
-    isEditable ? fetchEnrollmentApplicationStudyPlanSpaces(applicationId) : Promise.resolve([]),
+  const [shifts, courses] = await Promise.all([
     isEditable ? fetchEnrollmentApplicationShifts(applicationId) : Promise.resolve([]),
+    isEditable ? fetchEnrollmentApplicationCourses(applicationId) : Promise.resolve({ items: [], page: 0, size: 0, totalItems: 0, totalPages: 0 }),
   ]);
 
   return (
@@ -69,9 +67,10 @@ export default async function MyEnrollmentApplicationDetailPage({
       ) : null}
       <EnrollmentWizard
         initialApplication={application}
-        initialStudyPlanSpaces={studyPlanSpaces}
-        initialTrainingPaths={trainingPaths}
         initialShifts={shifts}
+        initialCourseOptions={courses.items}
+        initialCourseOptionsPage={courses.page}
+        initialCourseOptionsTotalPages={courses.totalPages}
         readOnly={!isEditable}
         returnTo={destination}
       />

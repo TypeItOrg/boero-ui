@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import { useRouter } from "next/navigation";
 import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
@@ -28,7 +29,7 @@ export function EnrollmentStart({
 }: EnrollmentStartProps): React.ReactElement {
   const router = useRouter();
   const [state, startApplication, isStarting] = React.useActionState(
-    async (_previous: EnrollmentStartState, input: { studyPlanId: string; academicYearId: string }): Promise<EnrollmentStartState> => {
+    async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
       const result = await startOrGetEnrollmentApplicationAction(input);
 
       if ("error" in result) {
@@ -42,7 +43,7 @@ export function EnrollmentStart({
     {},
   );
 
-  function handleStart(input: { studyPlanId: string; academicYearId: string }): void {
+  function handleStart(input: StartEnrollmentApplicationInput): void {
     React.startTransition(() => startApplication(input));
   }
 

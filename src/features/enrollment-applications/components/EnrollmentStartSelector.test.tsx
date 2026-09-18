@@ -23,7 +23,7 @@ describe("EnrollmentStartSelector", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    expect(onStart).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1" });
+    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-1", academicYearId: "year-1" });
   });
 
   it("shows an informative message when there are no study plans available", () => {
