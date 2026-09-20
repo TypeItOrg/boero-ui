@@ -175,7 +175,7 @@ type EnrollmentApplicationCourseDialogProps = {
   onResolved: () => void;
 };
 
-function EnrollmentApplicationCourseDialog({
+export function EnrollmentApplicationCourseDialog({
   applicationId,
   institutionId,
   scope = AcademicScope.INSTITUTIONAL,
@@ -186,6 +186,7 @@ function EnrollmentApplicationCourseDialog({
 }: EnrollmentApplicationCourseDialogProps): React.ReactElement {
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions>();
   const [loadError, setLoadError] = React.useState<string>();
+  const [optionsRevision, setOptionsRevision] = React.useState(0);
   const [state, formAction, isPending] = React.useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
     if (options) {
       const validation = validateEnrollmentAssignment(formData, options);
@@ -229,7 +230,7 @@ function EnrollmentApplicationCourseDialog({
     return () => {
       active = false;
     };
-  }, [course.courseId, institutionId, scope]);
+  }, [course.courseId, institutionId, scope, optionsRevision]);
 
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
@@ -254,10 +255,28 @@ function EnrollmentApplicationCourseDialog({
             </p>
           ) : null}
           {options ? (
-            <CourseEnrollmentAssignmentFields key={course.courseId} options={options} disabled={isPending} invalidDayIds={state.invalidDayIds} />
+            <CourseEnrollmentAssignmentFields
+              key={`${course.courseId}-${optionsRevision}`}
+              options={options}
+              disabled={isPending}
+              invalidDayIds={state.invalidDayIds}
+            />
           ) : null}
 
           <AlertDialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={isPending}
+              onClick={() => {
+                setOptions(undefined);
+                setLoadError(undefined);
+                setOptionsRevision((value) => value + 1);
+              }}
+            >
+              Actualizar horarios
+            </Button>
             <Button type="button" variant="outline" size="lg" disabled={isPending} onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>

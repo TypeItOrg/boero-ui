@@ -224,6 +224,15 @@ describe("EnrollmentWizard", () => {
     });
 
     expect(screen.queryByRole("tab", { name: /trayecto formativo/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /espacios e instrumentos/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /cursos/i })).toBeInTheDocument();
+  });
+  it("preserves saved courses and teacher preferences outside the loaded catalog page", async () => {
+    const courses = [{ courseId: "00000000-0000-4000-8000-000000000099", preferredTeacherId: "00000000-0000-4000-8000-000000000098" }];
+    renderWizard({ initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } } });
+    await screen.findByLabelText(/^nombre/i);
+    await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/colegio secundario/i), { target: { value: "Otro colegio" } });
+    await waitFor(() => expect(updateAction).toHaveBeenCalled(), { timeout: 3000 });
+    expect(updateAction.mock.calls.at(-1)?.[1].data.courses).toEqual(courses);
   });
 });

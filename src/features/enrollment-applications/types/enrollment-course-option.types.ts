@@ -16,8 +16,3 @@ export interface EnrollmentCourseOption {
   instrumental?: boolean;
   hasCapacity: boolean;
 }
-
-export interface EnrollmentCourseGroupSelection {
-  studyPlanSpaceId: string;
-  courseId: string | null;
-}

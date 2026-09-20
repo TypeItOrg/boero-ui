@@ -50,7 +50,7 @@ import { fetchEnrollmentCourses } from "@features/enrollment-applications/servic
 import type { Shift } from "@features/academic/types/shift.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
-import type { EnrollmentCourseGroupSelection, EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
@@ -176,23 +176,13 @@ export function EnrollmentWizard({
   // 5. Trayecto Formativo (resolved when the application starts)
   const selectedTrainingPathId = initialData?.careerSelection?.trainingPathId ?? "";
 
-  // 6. Espacios e Instrumentos
+  // 6. Cursos
   const [courseOptions, setCourseOptions] = React.useState<EnrollmentCourseOption[]>(() => [...initialCourseOptions]);
   const [courseOptionsPage, setCourseOptionsPage] = React.useState(initialCourseOptionsPage);
   const [courseOptionsTotalPages, setCourseOptionsTotalPages] = React.useState(initialCourseOptionsTotalPages);
   const [loadingMoreCourses, setLoadingMoreCourses] = React.useState(false);
   const [courseOptionsError, setCourseOptionsError] = React.useState<string>();
-  const [groupSelection, setGroupSelection] = React.useState<EnrollmentCourseGroupSelection[]>(() =>
-    (initialData?.courses ?? []).flatMap((course) => {
-      const option = initialCourseOptions.find((candidate) => candidate.courseId === course.courseId);
-      return option ? [{ studyPlanSpaceId: option.studyPlanSpaceId, courseId: course.courseId }] : [];
-    }),
-  );
-  const selectedCourseIds = React.useMemo(
-    () => groupSelection.map((entry) => entry.courseId).filter((courseId): courseId is string => courseId !== null),
-    [groupSelection],
-  );
-  const hasUnresolvedGroups = groupSelection.some((entry) => entry.courseId === null);
+  const [selectedCourseIds, setSelectedCourseIds] = React.useState<string[]>(() => (initialData?.courses ?? []).map((course) => course.courseId));
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
@@ -247,7 +237,7 @@ export function EnrollmentWizard({
       { id: "education", label: "Escolaridad" },
       { id: "health", label: "Salud e Inclusión" },
       ...(isMinor ? [{ id: "responsible", label: "Tutor Legal" }] : []),
-      { id: "spaces", label: "Espacios e Instrumentos" },
+      { id: "spaces", label: "Cursos" },
       { id: "preferences", label: "Preferencias" },
     ];
 
@@ -308,28 +298,10 @@ export function EnrollmentWizard({
     return () => window.clearTimeout(timeoutId);
   }, [pendingFocusFieldId, effectiveActiveTab]);
 
-  const handleToggleGroup = (studyPlanSpaceId: string, checked: boolean) => {
-    setGroupSelection((previous) => {
-      const remaining = previous.filter((entry) => entry.studyPlanSpaceId !== studyPlanSpaceId);
-      if (!checked) {
-        return remaining;
-      }
-      const options = courseOptions.filter((course) => course.studyPlanSpaceId === studyPlanSpaceId);
-      const singlePlainOption =
-        options.filter((option) => option.instrumentId == null).length === 1 ? options.find((option) => option.instrumentId == null) : undefined;
-      return [...remaining, { studyPlanSpaceId, courseId: singlePlainOption?.courseId ?? null }];
-    });
+  const handleToggleCourse = (courseId: string, checked: boolean) => {
+    setSelectedCourseIds((previous) => (checked ? Array.from(new Set([...previous, courseId])) : previous.filter((id) => id !== courseId)));
   };
 
-  const handleSelectInstrument = (studyPlanSpaceId: string, courseId: string) => {
-    setGroupSelection((previous) => previous.map((entry) => (entry.studyPlanSpaceId === studyPlanSpaceId ? { ...entry, courseId } : entry)));
-  };
-
-  const handleSelectCourse = (studyPlanSpaceId: string, courseId: string) => {
-    setGroupSelection((previous) => previous.map((entry) => (entry.studyPlanSpaceId === studyPlanSpaceId ? { ...entry, courseId } : entry)));
-  };
-
-  // Structured payload for auto-save and submission
   const structuredData: EnrollmentApplicationData = React.useMemo(() => {
     return {
       personalData: {
@@ -359,7 +331,10 @@ export function EnrollmentWizard({
         educationLevel: responsibleEducationLevel,
       },
       careerSelection: selectedTrainingPathId ? { trainingPathId: selectedTrainingPathId } : undefined,
-      courses: courseOptions.length > 0 ? selectedCourseIds.map((courseId) => ({ courseId, preferredTeacherId: null })) : undefined,
+      courses: selectedCourseIds.map((courseId) => ({
+        courseId,
+        preferredTeacherId: initialData?.courses?.find((course) => course.courseId === courseId)?.preferredTeacherId ?? null,
+      })),
       preference: {
         preferredShift,
         allowsImageUse,
@@ -387,7 +362,7 @@ export function EnrollmentWizard({
     responsibleOccupation,
     responsibleEducationLevel,
     selectedTrainingPathId,
-    courseOptions,
+    initialData?.courses,
     selectedCourseIds,
     preferredShift,
     allowsImageUse,
@@ -486,7 +461,7 @@ export function EnrollmentWizard({
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.TRAINING_PATH_REQUIRED, path: ["careerSelection", "trainingPathId"] });
     }
 
-    if (courseOptions.length === 0 || selectedCourseIds.length === 0 || hasUnresolvedGroups) {
+    if (selectedCourseIds.length === 0) {
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.SPACE_REQUIRED, path: ["courses"] });
     }
 
@@ -926,7 +901,7 @@ export function EnrollmentWizard({
                 Atrás
               </Button>
               <Button type="button" size="lg" onClick={() => handleActiveTabChange(isMinor ? "responsible" : "spaces")} className="gap-1.5">
-                {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Espacios e Instrumentos"}
+                {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Cursos"}
               </Button>
             </CardFooter>
           </Card>
@@ -1049,7 +1024,7 @@ export function EnrollmentWizard({
                   Atrás
                 </Button>
                 <Button type="button" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
-                  Siguiente: Espacios e Instrumentos
+                  Siguiente: Cursos
                 </Button>
               </CardFooter>
             </Card>
@@ -1063,17 +1038,38 @@ export function EnrollmentWizard({
           <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
             <EnrollmentStepCardHeader
               icon={LibraryBigIcon}
-              title={isMinor ? "5. Espacios Académicos e Instrumentos" : "4. Espacios Académicos e Instrumentos"}
-              description="Seleccioná las materias que vas a cursar y el instrumento que corresponda."
+              title={isMinor ? "5. Cursos" : "4. Cursos"}
+              description="Seleccioná los cursos que querés solicitar. En los instrumentales, elegí el curso del instrumento que vas a estudiar."
             />
             <CardContent>
+              {selectedCourseIds
+                .filter((id) => !courseOptions.some((option) => option.courseId === id))
+                .map((id) => {
+                  const selected = initialApplication.courses?.find((course) => course.courseId === id);
+                  const name = selected
+                    ? `${selected.academicSpaceName}${selected.instrumentName ? ` · ${selected.instrumentName}` : ""}`
+                    : "Curso seleccionado";
+                  return (
+                    <div key={id} className="mb-3 flex items-center justify-between gap-3 rounded-lg border p-3">
+                      <span>{name}</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={!application.isEditable || readOnly || isSubmitDialogOpen || isCancelDialogOpen}
+                        aria-label={`Quitar ${name}`}
+                        onClick={() => handleToggleCourse(id, false)}
+                      >
+                        Quitar
+                      </Button>
+                    </div>
+                  );
+                })}
               {courseOptions.length > 0 ? (
                 <EnrollmentCoursesSelector
                   courses={courseOptions}
-                  selection={groupSelection}
-                  onToggleGroup={handleToggleGroup}
-                  onSelectInstrument={handleSelectInstrument}
-                  onSelectCourse={handleSelectCourse}
+                  selectedCourseIds={selectedCourseIds}
+                  onToggleCourse={handleToggleCourse}
                   disabled={!application.isEditable || readOnly || isSubmitDialogOpen || isCancelDialogOpen}
                   error={getFieldError(["courses"])}
                   hasMore={hasMoreCourseOptions}
