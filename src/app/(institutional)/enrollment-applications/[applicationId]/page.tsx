@@ -10,6 +10,7 @@ import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentApplicationResolvePanel } from "@features/enrollment-applications/components/enrollment-application-resolve-panel";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { fetchInstitutionalEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
+import { formatEnrollmentApplicationBreadcrumbLabel } from "@features/enrollment-applications/utils/enrollment-application-breadcrumb.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -58,7 +59,9 @@ export default async function EnrollmentApplicationDetailPage({
   return (
     <PlatformPageShell
       title={applicantName}
-      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [applicationId]: applicantName }} />}
+      breadcrumb={
+        <InstitutionalBreadcrumb segmentLabels={{ [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName) }} />
+      }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <div className="flex flex-col gap-3 @2xl/page-shell:flex-row @2xl/page-shell:items-center @2xl/page-shell:justify-between">

@@ -45,6 +45,8 @@ export default async function MyEnrollmentApplicationDetailPage({
 
   const isEditable = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
   const detailLabel = isEditable ? "Continuar inscripción" : "Detalle de inscripción";
+  const detailContext = [application.trainingPathName, application.academicYearName].filter(Boolean).join(" ");
+  const breadcrumbLabel = detailContext ? `${detailLabel} · ${detailContext}` : detailLabel;
   const PageIcon = isEditable ? FilePenLineIcon : ClipboardListIcon;
   const [shifts, courses] = await Promise.all([
     isEditable ? fetchEnrollmentApplicationShifts(applicationId) : Promise.resolve([]),
@@ -55,7 +57,7 @@ export default async function MyEnrollmentApplicationDetailPage({
     <PlatformPageShell
       title={detailLabel}
       minViewportHeight
-      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [applicationId]: detailLabel }} />}
+      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [applicationId]: breadcrumbLabel }} />}
       actions={<PlatformPageIcon icon={PageIcon} />}
     >
       {!isEditable ? (

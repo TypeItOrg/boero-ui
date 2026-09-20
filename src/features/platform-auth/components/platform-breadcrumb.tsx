@@ -26,6 +26,8 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   shifts: "Turnos",
   "enrollment-periods": "Períodos de inscripción",
   "enrollment-applications": "Solicitudes de inscripción",
+  "course-enrollments": "Cursadas",
+  waitlist: "Lista de espera",
 };
 
 type BreadcrumbSegment = {
