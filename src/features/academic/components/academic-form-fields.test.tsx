@@ -246,6 +246,32 @@ describe("AcademicFormFields", () => {
     expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Inactivo");
   });
 
+  it("submits explicit instrumental values when unchecked, checked and locked", async () => {
+    const user = userEvent.setup();
+    const { container, unmount } = render(
+      <form>
+        <AcademicFormFields resource={AcademicResource.ACADEMIC_SPACE} />
+      </form>,
+    );
+    const form = container.querySelector("form")!;
+    expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
+    await user.click(screen.getByRole("checkbox", { name: "Espacio instrumental" }));
+    expect(new FormData(form).getAll("instrumental")).toEqual(["true"]);
+    await user.click(screen.getByRole("checkbox", { name: "Espacio instrumental" }));
+    expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
+    unmount();
+    const locked = render(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.ACADEMIC_SPACE}
+          initialValues={{ id: "space", instrumental: true, instrumentalLocked: true }}
+        />
+      </form>,
+    );
+    expect(screen.getByRole("checkbox", { name: "Espacio instrumental" })).toBeDisabled();
+    expect(new FormData(locked.container.querySelector("form")!).getAll("instrumental")).toEqual(["true"]);
+  });
+
   it("renders the academic-space status selector while editing", () => {
     const { container } = render(
       <form>

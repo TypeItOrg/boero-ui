@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 import { toFormControlValue } from "@common/utils/form-value.util";
@@ -60,6 +63,7 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
   const instrumentalLocked = Boolean(initialValues.id && initialValues.instrumentalLocked);
+  const [instrumental, setInstrumental] = useState(initialValues.instrumental === true);
 
   return (
     <>
@@ -84,12 +88,11 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
         data-invalid={Boolean(fieldErrors?.instrumental)}
         className="flex-[1_0_min(350px,100%)] flex-wrap self-end pb-2"
       >
-        {instrumentalLocked ? <input type="hidden" name="instrumental" value={initialValues.instrumental === true ? "true" : "false"} /> : null}
+        <input type="hidden" name="instrumental" value={String(instrumental)} />
         <Checkbox
           id="instrumental"
-          name={instrumentalLocked ? undefined : "instrumental"}
-          value="true"
-          defaultChecked={initialValues.instrumental === true}
+          checked={instrumental}
+          onCheckedChange={(checked) => setInstrumental(checked === true)}
           disabled={instrumentalLocked}
         />
         <FieldLabel htmlFor="instrumental" className="font-normal">

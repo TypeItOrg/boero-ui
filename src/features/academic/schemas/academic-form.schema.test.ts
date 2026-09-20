@@ -180,6 +180,29 @@ describe("academic form schemas", () => {
     }
   });
 
+  it.each([undefined, "", "on", "yes"])("rejects missing or unknown instrumental value %s", (value) => {
+    const formData = academicSpaceFormData("Armonía", "SUBJECT", "GRUPAL");
+    formData.delete("instrumental");
+    if (value !== undefined) {
+      formData.set("instrumental", value);
+    }
+    const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["instrumental"] })]));
+    }
+  });
+
+  it.each(["true", "false"])("accepts explicit instrumental value %s", (value) => {
+    const formData = academicSpaceFormData("Armonía", "SUBJECT", "GRUPAL");
+    formData.set("instrumental", value);
+    const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toMatchObject({ instrumental: value === "true" });
+    }
+  });
+
   it("rejects an unknown academic-space format", () => {
     const formData = academicSpaceFormData("Armonía", "SUBJECT", "HYBRID");
 
@@ -274,5 +297,6 @@ function academicSpaceFormData(name: string, type: string, format: string): Form
   formData.set("description", "");
   formData.set("type", type);
   formData.set("format", format);
+  formData.set("instrumental", "false");
   return formData;
 }

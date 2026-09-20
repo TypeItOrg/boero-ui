@@ -69,10 +69,7 @@ const optionalUuid = z
   .refine((value) => value === "" || z.uuid().safeParse(value).success, "Seleccioná un valor válido.")
   .transform((value) => value || null);
 
-const checkboxSchema = z
-  .enum(["on", "true", "false"])
-  .optional()
-  .transform((value) => value === "on" || value === "true");
+const checkboxSchema = z.enum(["true", "false"]).transform((value) => value === "true");
 
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
 
