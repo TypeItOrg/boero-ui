@@ -36,6 +36,7 @@ export function getAcademicAccess(user: InstitutionalUser): AcademicAccess {
     instrumentStatusUpdate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_STATUS_UPDATE),
     instrumentDelete: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_DELETE),
     instrumentRestore: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_RESTORE),
+    courseWaitlistRead: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ),
     courseRead: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ),
     courseCreate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_CREATE),
     courseUpdate: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_UPDATE),

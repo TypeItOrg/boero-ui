@@ -29,6 +29,7 @@ type AcademicTablePresentationProps = PaginationParams & {
   basePath: string;
   canCreate: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canDelete: boolean;
   canRestore: boolean;
   canChangeStatus: boolean;
@@ -50,6 +51,7 @@ type AcademicTablePresentationProps = PaginationParams & {
 export function AcademicTablePresentation({
   basePath,
   canCreate,
+  canReadWaitlist = false,
   canCreateVersion = false,
   canDelete,
   canRestore,
@@ -160,6 +162,7 @@ export function AcademicTablePresentation({
                 canChangeStatus={canChangeStatus}
                 canDelete={canDelete}
                 canCreateVersion={canCreateVersion}
+                canReadWaitlist={canReadWaitlist}
                 canRestore={canRestore}
                 canUpdate={canUpdate}
                 columns={columns}

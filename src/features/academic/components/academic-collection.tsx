@@ -17,6 +17,7 @@ type AcademicCollectionProps = {
   basePath: string;
   canCreate: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canDelete: boolean;
   canChangeStatus: boolean;
   canUpdate: boolean;
@@ -35,6 +36,7 @@ type AcademicCollectionProps = {
 export async function AcademicCollectionView({
   basePath,
   canCreate,
+  canReadWaitlist = false,
   canCreateVersion = canCreate,
   canDelete,
   canChangeStatus,
@@ -218,6 +220,7 @@ export async function AcademicCollectionView({
             institutionId={effectiveInstitutionId}
             canCreate={canCreate && !isTrainingPathFixed}
             canCreateVersion={canCreateVersion}
+            canReadWaitlist={canReadWaitlist}
             deleted={params.deleted}
             page={params.page}
             resource={resource}

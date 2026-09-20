@@ -23,6 +23,7 @@ type AcademicTableRowProps = {
   canChangeStatus: boolean;
   canDelete: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canRestore: boolean;
   canUpdate: boolean;
   columns: AcademicTableColumns;
@@ -37,6 +38,7 @@ export function AcademicTableRow({
   basePath,
   canChangeStatus,
   canDelete,
+  canReadWaitlist = false,
   canCreateVersion = false,
   canRestore,
   canUpdate,
@@ -49,7 +51,17 @@ export function AcademicTableRow({
 }: AcademicTableRowProps): React.ReactElement {
   const institutionId = row.institutionId ?? "";
   const detailHref = `${basePath}/${resource}/${row.id}`;
-  const actions = getAcademicRowActions(basePath, resource, row, canUpdate, canChangeStatus, canDelete, canRestore, canCreateVersion);
+  const actions = getAcademicRowActions(
+    basePath,
+    resource,
+    row,
+    canUpdate,
+    canChangeStatus,
+    canDelete,
+    canRestore,
+    canCreateVersion,
+    canReadWaitlist,
+  );
 
   function handleStatusAction(action: AcademicStatusAction): void {
     if (action.resource === AcademicResource.ACADEMIC_YEAR) {

@@ -31,6 +31,7 @@ export type AcademicAccess = {
   instrumentDelete: boolean;
   instrumentRestore: boolean;
   courseRead: boolean;
+  courseWaitlistRead?: boolean;
   courseCreate: boolean;
   courseUpdate: boolean;
   courseStatusUpdate: boolean;
@@ -89,6 +90,7 @@ export const FULL_ACADEMIC_ACCESS: AcademicAccess = {
   instrumentDelete: true,
   instrumentRestore: true,
   courseRead: true,
+  courseWaitlistRead: true,
   courseCreate: true,
   courseUpdate: true,
   courseStatusUpdate: true,
