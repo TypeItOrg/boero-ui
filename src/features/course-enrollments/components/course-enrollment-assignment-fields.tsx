@@ -77,7 +77,7 @@ export function CourseEnrollmentAssignmentFields({
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="grid min-w-0 gap-5">
       <input type="hidden" name="courseClassId" value={courseClassId} />
       <input type="hidden" name="assignments" value={JSON.stringify(assignments)} />
 
@@ -87,12 +87,15 @@ export function CourseEnrollmentAssignmentFields({
         </Alert>
       ) : (
         <>
-          <Field>
+          <Field className="min-w-0">
             <FieldLabel htmlFor="courseClassId" required>
               Clase
             </FieldLabel>
             <Select value={courseClassId} onValueChange={handleClassChange} disabled={disabled}>
-              <SelectTrigger id="courseClassId" className="h-9! w-full">
+              <SelectTrigger
+                id="courseClassId"
+                className="h-9! w-full min-w-0 [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate"
+              >
                 <SelectValue placeholder="Seleccioná una clase" />
               </SelectTrigger>
               <SelectContent>
@@ -114,7 +117,7 @@ export function CourseEnrollmentAssignmentFields({
             <FieldDescription>Elegí una clase y después los días que se asignarán a la cursada.</FieldDescription>
           </Field>
 
-          <div className="grid gap-4">
+          <div className="grid min-w-0 gap-4">
             <div>
               <p className="text-sm font-medium">Días y horarios</p>
               <p className="text-muted-foreground text-sm">
@@ -129,7 +132,10 @@ export function CourseEnrollmentAssignmentFields({
               const invalid = invalidDaySet.has(day.id);
 
               return (
-                <div key={day.id} className={cn("bg-muted/25 grid gap-3 rounded-lg border p-4 sm:grid-cols-2", invalid && "border-destructive")}>
+                <div
+                  key={day.id}
+                  className={cn("bg-muted/25 grid min-w-0 gap-3 rounded-lg border p-4 sm:grid-cols-2", invalid && "border-destructive")}
+                >
                   <Field orientation="horizontal" className="sm:col-span-2" data-invalid={invalid}>
                     <Checkbox
                       id={`day-${day.id}`}
@@ -148,7 +154,7 @@ export function CourseEnrollmentAssignmentFields({
                   </Field>
                   {checked ? (
                     <>
-                      <Field data-invalid={invalid}>
+                      <Field className="min-w-0" data-invalid={invalid}>
                         <FieldLabel htmlFor={`schedule-${day.id}`} required>
                           Horario
                         </FieldLabel>
@@ -157,7 +163,11 @@ export function CourseEnrollmentAssignmentFields({
                           onValueChange={(value) => handleScheduleChange(day.id, value)}
                           disabled={disabled}
                         >
-                          <SelectTrigger id={`schedule-${day.id}`} aria-invalid={invalid} className="h-9! w-full">
+                          <SelectTrigger
+                            id={`schedule-${day.id}`}
+                            aria-invalid={invalid}
+                            className="h-9! w-full min-w-0 [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate"
+                          >
                             <SelectValue placeholder="Seleccioná un horario" />
                           </SelectTrigger>
                           <SelectContent>
@@ -174,7 +184,7 @@ export function CourseEnrollmentAssignmentFields({
                       </Field>
 
                       {options.format === "INDIVIDUAL" && selectedSchedule ? (
-                        <Field data-invalid={invalid}>
+                        <Field className="min-w-0" data-invalid={invalid}>
                           <FieldLabel htmlFor={`slot-${day.id}`} required>
                             Período individual
                           </FieldLabel>
@@ -183,7 +193,11 @@ export function CourseEnrollmentAssignmentFields({
                             onValueChange={(value) => handleSlotChange(day.id, value)}
                             disabled={disabled}
                           >
-                            <SelectTrigger id={`slot-${day.id}`} aria-invalid={invalid} className="h-9! w-full">
+                            <SelectTrigger
+                              id={`slot-${day.id}`}
+                              aria-invalid={invalid}
+                              className="h-9! w-full min-w-0 [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate"
+                            >
                               <SelectValue placeholder="Seleccionar período" />
                             </SelectTrigger>
                             <SelectContent>

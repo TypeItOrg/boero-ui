@@ -5,7 +5,7 @@ import { ActionForm } from "@common/components/action-form";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CircleAlertIcon, Loader2Icon } from "lucide-react";
+import { CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
@@ -20,6 +20,8 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Field, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
+import { Skeleton } from "@common/components/ui/skeleton";
+import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
 import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
@@ -189,13 +191,16 @@ export function EnrollmentApplicationCourseDialog({
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions>();
   const [loadError, setLoadError] = React.useState<string>();
   const [optionsRevision, setOptionsRevision] = React.useState(0);
+  const isLoadingOptions = !options && !loadError;
   const [state, formAction, isPending] = React.useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
-    if (options) {
-      const validation = validateEnrollmentAssignment(formData, options);
+    if (!options) {
+      return { error: loadError ?? COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS };
+    }
 
-      if (!validation.ok) {
-        return { error: validation.message, invalidDayIds: validation.invalidDayIds };
-      }
+    const validation = validateEnrollmentAssignment(formData, options);
+
+    if (!validation.ok) {
+      return { error: validation.message, invalidDayIds: validation.invalidDayIds };
     }
 
     const result =
@@ -236,41 +241,44 @@ export function EnrollmentApplicationCourseDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
-      <AlertDialogContent className="max-w-4xl">
-        <ActionForm action={formAction} className="space-y-4">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Inscribir solicitud de cursada</AlertDialogTitle>
-            <AlertDialogDescription>
+      <AlertDialogContent className="flex h-[min(42rem,calc(100dvh-2rem))] w-[calc(100%-2rem)] min-w-0 flex-col overflow-hidden p-0 sm:max-w-3xl">
+        <ActionForm action={formAction} className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <AlertDialogHeader className="shrink-0 items-start border-b p-5 text-left">
+            <AlertDialogTitle className="text-left">Inscribir solicitud de cursada</AlertDialogTitle>
+            <AlertDialogDescription className="text-left">
               {course.academicSpaceName} · {course.studyPlanName} · {course.academicLevelName ?? "Sin nivel"}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          {state.error || loadError ? (
-            <Alert variant="destructive">
-              <CircleAlertIcon />
-              <AlertDescription>{state.error ?? loadError}</AlertDescription>
-            </Alert>
-          ) : null}
-          {!options && !loadError ? (
-            <p className="text-muted-foreground flex items-center gap-2 text-sm" role="status">
-              <Loader2Icon className="size-4 animate-spin" /> Cargando asignaciones disponibles…
-            </p>
-          ) : null}
-          {options ? (
-            <CourseEnrollmentAssignmentFields
-              key={`${course.courseId}-${optionsRevision}`}
-              options={options}
-              disabled={isPending}
-              invalidDayIds={state.invalidDayIds}
-            />
-          ) : null}
-
-          <AlertDialogFooter>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-5" aria-busy={isLoadingOptions}>
+            {state.error || loadError ? (
+              <Alert variant="destructive">
+                <CircleAlertIcon />
+                <AlertDescription>{state.error ?? loadError}</AlertDescription>
+              </Alert>
+            ) : null}
+            {isLoadingOptions ? (
+              <Skeleton
+                className="w-full flex-1 rounded-lg motion-reduce:animate-none"
+                role="status"
+                aria-label={COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS}
+              />
+            ) : null}
+            {options ? (
+              <CourseEnrollmentAssignmentFields
+                key={`${course.courseId}-${optionsRevision}`}
+                options={options}
+                disabled={isPending}
+                invalidDayIds={state.invalidDayIds}
+              />
+            ) : null}
+          </div>
+          <AlertDialogFooter className="mx-0 mb-0 shrink-0 sm:flex-wrap">
             <Button
               type="button"
               variant="outline"
               size="lg"
-              disabled={isPending}
+              disabled={isPending || isLoadingOptions}
               onClick={() => {
                 setOptions(undefined);
                 setLoadError(undefined);
