@@ -9,8 +9,6 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
 import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
-import type { StudentSummary } from "@features/course-enrollments/types/student-summary.types";
-import type { Course } from "@features/academic/types/course.types";
 
 export type CourseEnrollmentListParams = {
   page?: number;
@@ -67,30 +65,6 @@ export async function fetchPlatformCourseWaitlist(institutionId: string, courseI
   const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/courses/${courseId}/waitlist`);
 
   return parseNullableHttpResponse(response, "No se pudo obtener la lista de espera.");
-}
-
-export async function fetchStudents(
-  institutionId: string,
-  params: { page?: number; size?: number; search?: string } = {},
-): Promise<PaginatedResponse<StudentSummary>> {
-  const searchParams = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 100) });
-
-  if (params.search) {
-    searchParams.set("search", params.search);
-  }
-
-  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/students?${searchParams}`);
-
-  return parseHttpResponse(response, "No se pudieron obtener los estudiantes.");
-}
-
-export async function fetchActiveCourses(institutionId: string): Promise<Course[]> {
-  const response = await institutionalApiFetch(
-    `/api/v1/institutions/${institutionId}/course-enrollment-options?page=0&size=100&sort=academicSpace.name,asc`,
-  );
-  const data = await parseHttpResponse<PaginatedResponse<Course>>(response, "No se pudieron obtener los cursos activos.");
-
-  return data.items;
 }
 
 export async function fetchCourseEnrollment(institutionId: string, enrollmentId: string): Promise<CourseEnrollment | null> {

@@ -16,6 +16,7 @@ export interface CourseEnrollment {
   instrumentId?: string | null;
   instrumentName?: string | null;
   courseClassId: string;
+  courseClassLabel: string;
   source: CourseEnrollmentSource;
   status: CourseEnrollmentStatus;
   academicStatus: AcademicEnrollmentStatus;

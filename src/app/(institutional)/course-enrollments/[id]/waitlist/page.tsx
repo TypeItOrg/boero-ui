@@ -1,3 +1,5 @@
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -26,7 +28,10 @@ export default async function CourseWaitlistPage({ params }: { params: Promise<{
       breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[id]} trailingLabel="Lista de espera" />}
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
-      <CourseWaitlistTable entries={entries} />
+      <CourseWaitlistTable
+        entries={entries}
+        canEnroll={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL)}
+      />
     </PlatformPageShell>
   );
 }

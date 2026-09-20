@@ -126,4 +126,15 @@ describe("getInstitutionalNavigationSections", () => {
 
     expect(personalSection).toEqual({ label: "Personal", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
   });
+  it("shows teaching without granting administration and preserves student access for teachers", () => {
+    const items = getInstitutionalNavigationSections({ ...USER, roles: ["Profesor", "Estudiante"] }).flatMap((section) => section.items);
+    expect(items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "/my-teaching" }),
+        expect.objectContaining({ url: "/my-course-enrollments" }),
+        expect.objectContaining({ url: "/enrollment" }),
+      ]),
+    );
+    expect(items).not.toEqual(expect.arrayContaining([expect.objectContaining({ url: "/course-enrollments" })]));
+  });
 });

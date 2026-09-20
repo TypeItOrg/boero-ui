@@ -78,6 +78,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
 
   const enrollmentItems: NavigationItem[] = [
+    ...(user.roles.includes("Profesor") ? [{ title: "Mis clases y cursos", url: "/my-teaching", icon: GraduationCapIcon }] : []),
     ...(canReadEnrollmentPeriods ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }] : []),
     ...(canStartEnrollmentApplication(user) ? [{ title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon }] : []),
     ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),

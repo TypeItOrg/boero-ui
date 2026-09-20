@@ -7,10 +7,11 @@ import { COURSE_ENROLLMENT_PAGE_SIZE_OPTIONS } from "@features/course-enrollment
 
 type CourseEnrollmentPaginationProps = PaginationParams & {
   totalItems: number;
+  itemLabel?: string;
   totalPages: number;
 };
 
-export function CourseEnrollmentPagination({ page, size, totalItems, totalPages }: CourseEnrollmentPaginationProps): React.ReactElement {
+export function CourseEnrollmentPagination({ page, size, totalItems, totalPages, itemLabel }: CourseEnrollmentPaginationProps): React.ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function navigateToPage(newPage: number): void {
@@ -22,7 +23,7 @@ export function CourseEnrollmentPagination({ page, size, totalItems, totalPages 
   }
 
   const totalLabel = totalItems === 1 ? "cursada." : "cursadas.";
-  const summaryLabel = `${totalItems} ${totalLabel}`;
+  const summaryLabel = `${totalItems} ${itemLabel ?? totalLabel}`;
 
   return (
     <DataTablePagination

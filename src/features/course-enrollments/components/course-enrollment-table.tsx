@@ -18,6 +18,7 @@ import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/com
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
 import {
   ACADEMIC_ENROLLMENT_STATUS_LABELS,
+  COURSE_DAY_LABELS,
   COURSE_ENROLLMENT_STATUS_LABELS,
 } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { ScrollTextIcon } from "lucide-react";
@@ -89,7 +90,8 @@ export function CourseEnrollmentTable({
         <Table containerClassName="table-scrollbar" className="min-w-192">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
-              <TableHead>Curso</TableHead>
+              <TableHead>Estudiante</TableHead>
+              <TableHead>Curso / clase</TableHead>
               <TableHead>Plan / nivel</TableHead>
               <TableHead>Instrumento</TableHead>
               <TableHead>Horarios</TableHead>
@@ -101,7 +103,11 @@ export function CourseEnrollmentTable({
           <TableBody>
             {data.items.map((enrollment) => (
               <TableRow key={enrollment.id} className="hover:bg-muted/50 h-11 border-b transition-colors">
-                <TableCell className="font-medium">{enrollment.academicSpaceName}</TableCell>
+                <TableCell>{enrollment.studentName}</TableCell>
+                <TableCell className="font-medium">
+                  {enrollment.academicSpaceName}
+                  <div className="text-muted-foreground text-sm">{enrollment.courseClassLabel}</div>
+                </TableCell>
                 <TableCell>
                   <div>{enrollment.studyPlanName}</div>
                   <div className="text-muted-foreground">{enrollment.academicLevelName ?? "Sin nivel"}</div>
@@ -111,7 +117,10 @@ export function CourseEnrollmentTable({
                   {enrollment.schedules.length === 0
                     ? "—"
                     : enrollment.schedules
-                        .map((schedule) => `${schedule.dayOfWeek} ${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}`)
+                        .map(
+                          (schedule) =>
+                            `${COURSE_DAY_LABELS[schedule.dayOfWeek] ?? schedule.dayOfWeek} ${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}${schedule.releasedAt ? " (liberado)" : ""}`,
+                        )
                         .join(", ")}
                 </TableCell>
                 <TableCell>
