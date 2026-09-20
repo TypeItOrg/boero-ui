@@ -18,14 +18,23 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Field, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
+import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 import { enrollApplicationCourseAction, rejectApplicationCourseAction } from "@features/course-enrollments/actions/course-enrollment.actions";
+import {
+  enrollPlatformApplicationCourseAction,
+  rejectPlatformApplicationCourseAction,
+} from "@features/course-enrollments/actions/platform-course-enrollment.actions";
 import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/services/course-enrollment-client.service";
+import { fetchPlatformCourseEnrollmentOptions } from "@features/course-enrollments/services/platform-course-enrollment-client.service";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 import type { EnrollmentApplicationCourse } from "@features/enrollment-applications/types/enrollment-application-course.types";
 
 type EnrollmentApplicationCoursesManagementProps = {
   applicationId: string;
+  institutionId?: string;
+  scope?: AcademicScope;
   courses: readonly EnrollmentApplicationCourse[];
   canEnroll: boolean;
   canReject: boolean;
@@ -43,6 +52,8 @@ const STATUS_LABELS: Record<EnrollmentApplicationCourse["status"], string> = {
 
 export function EnrollmentApplicationCoursesManagement({
   applicationId,
+  institutionId,
+  scope = AcademicScope.INSTITUTIONAL,
   courses,
   canEnroll,
   canReject,
@@ -56,6 +67,11 @@ export function EnrollmentApplicationCoursesManagement({
   if (courses.length === 0) {
     return null;
   }
+
+  const waitlistHref = (courseId: string) =>
+    scope === AcademicScope.ADMIN && institutionId
+      ? `/admin/course-enrollments/${courseId}/waitlist?institutionId=${institutionId}`
+      : `/course-enrollments/${courseId}/waitlist`;
 
   return (
     <section className="bg-muted/25 rounded-xl border p-5 md:p-6" aria-labelledby="application-courses-title">
@@ -96,7 +112,7 @@ export function EnrollmentApplicationCoursesManagement({
               <div className="flex flex-wrap gap-2">
                 {canReadWaitlist ? (
                   <Button asChild variant="outline" size="sm">
-                    <Link href={`/course-enrollments/${course.courseId}/waitlist`}>Ver espera</Link>
+                    <Link href={waitlistHref(course.courseId)}>Ver espera</Link>
                   </Button>
                 ) : null}
                 {!readOnly && canEnroll && (course.status === "PENDING" || course.status === "WAITLISTED") ? (
@@ -118,6 +134,8 @@ export function EnrollmentApplicationCoursesManagement({
       {!readOnly && courseToEnroll ? (
         <EnrollmentApplicationCourseDialog
           applicationId={applicationId}
+          institutionId={institutionId}
+          scope={scope}
           course={courseToEnroll}
           open
           onOpenChange={(open) => {
@@ -131,6 +149,8 @@ export function EnrollmentApplicationCoursesManagement({
       {!readOnly && courseToReject ? (
         <RejectEnrollmentApplicationCourseDialog
           applicationId={applicationId}
+          institutionId={institutionId}
+          scope={scope}
           course={courseToReject}
           open
           onOpenChange={(open) => {
@@ -147,6 +167,8 @@ export function EnrollmentApplicationCoursesManagement({
 
 type EnrollmentApplicationCourseDialogProps = {
   applicationId: string;
+  institutionId?: string;
+  scope?: AcademicScope;
   course: EnrollmentApplicationCourse;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -155,6 +177,8 @@ type EnrollmentApplicationCourseDialogProps = {
 
 function EnrollmentApplicationCourseDialog({
   applicationId,
+  institutionId,
+  scope = AcademicScope.INSTITUTIONAL,
   course,
   open,
   onOpenChange,
@@ -162,8 +186,19 @@ function EnrollmentApplicationCourseDialog({
 }: EnrollmentApplicationCourseDialogProps): React.ReactElement {
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions>();
   const [loadError, setLoadError] = React.useState<string>();
-  const [state, formAction, isPending] = React.useActionState(async (_previous: { error?: string }, formData: FormData) => {
-    const result = await enrollApplicationCourseAction(applicationId, course.applicationCourseId, course.version, formData);
+  const [state, formAction, isPending] = React.useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
+    if (options) {
+      const validation = validateEnrollmentAssignment(formData, options);
+
+      if (!validation.ok) {
+        return { error: validation.message, invalidDayIds: validation.invalidDayIds };
+      }
+    }
+
+    const result =
+      scope === AcademicScope.ADMIN && institutionId
+        ? await enrollPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, formData)
+        : await enrollApplicationCourseAction(applicationId, course.applicationCourseId, course.version, formData);
 
     if (!result.error) {
       onOpenChange(false);
@@ -175,7 +210,11 @@ function EnrollmentApplicationCourseDialog({
 
   React.useEffect(() => {
     let active = true;
-    fetchCourseEnrollmentOptions(course.courseId)
+    const pending =
+      scope === AcademicScope.ADMIN && institutionId
+        ? fetchPlatformCourseEnrollmentOptions(institutionId, course.courseId)
+        : fetchCourseEnrollmentOptions(course.courseId);
+    pending
       .then((value) => {
         if (active) {
           setOptions(value);
@@ -190,11 +229,11 @@ function EnrollmentApplicationCourseDialog({
     return () => {
       active = false;
     };
-  }, [course.courseId]);
+  }, [course.courseId, institutionId, scope]);
 
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
-      <AlertDialogContent className="max-w-2xl">
+      <AlertDialogContent className="max-w-4xl">
         <form action={formAction} className="space-y-4">
           <AlertDialogHeader>
             <AlertDialogTitle>Inscribir solicitud de cursada</AlertDialogTitle>
@@ -214,7 +253,9 @@ function EnrollmentApplicationCourseDialog({
               <Loader2Icon className="size-4 animate-spin" /> Cargando asignaciones disponibles…
             </p>
           ) : null}
-          {options ? <CourseEnrollmentAssignmentFields key={course.courseId} options={options} disabled={isPending} /> : null}
+          {options ? (
+            <CourseEnrollmentAssignmentFields key={course.courseId} options={options} disabled={isPending} invalidDayIds={state.invalidDayIds} />
+          ) : null}
 
           <AlertDialogFooter>
             <Button type="button" variant="outline" size="lg" disabled={isPending} onClick={() => onOpenChange(false)}>
@@ -232,6 +273,8 @@ function EnrollmentApplicationCourseDialog({
 
 function RejectEnrollmentApplicationCourseDialog({
   applicationId,
+  institutionId,
+  scope = AcademicScope.INSTITUTIONAL,
   course,
   open,
   onOpenChange,
@@ -239,12 +282,11 @@ function RejectEnrollmentApplicationCourseDialog({
 }: EnrollmentApplicationCourseDialogProps): React.ReactElement {
   const [state, formAction, isPending] = React.useActionState(async (_previous: { error?: string }, formData: FormData) => {
     const reason = formData.get("reason");
-    const result = await rejectApplicationCourseAction(
-      applicationId,
-      course.applicationCourseId,
-      course.version,
-      typeof reason === "string" ? reason : "",
-    );
+    const normalizedReason = typeof reason === "string" ? reason : "";
+    const result =
+      scope === AcademicScope.ADMIN && institutionId
+        ? await rejectPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, normalizedReason)
+        : await rejectApplicationCourseAction(applicationId, course.applicationCourseId, course.version, normalizedReason);
 
     if (!result.error) {
       onOpenChange(false);

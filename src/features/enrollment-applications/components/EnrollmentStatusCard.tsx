@@ -43,6 +43,7 @@ interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
   showApplicantAlert?: boolean;
   scope?: AcademicScope;
+  institutionId?: string;
   canManageCourses?: boolean;
   canEnrollCourses?: boolean;
   canRejectCourses?: boolean;
@@ -158,6 +159,7 @@ export function EnrollmentStatusCard({
   application,
   showApplicantAlert = true,
   scope = AcademicScope.INSTITUTIONAL,
+  institutionId,
   canManageCourses = false,
   canEnrollCourses = false,
   canRejectCourses = false,
@@ -197,6 +199,8 @@ export function EnrollmentStatusCard({
       {canManageCourses && application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED ? (
         <EnrollmentApplicationCoursesManagement
           applicationId={application.applicationId}
+          institutionId={institutionId ?? application.institutionId}
+          scope={scope}
           courses={application.courses ?? []}
           canEnroll={canEnrollCourses}
           canReject={canRejectCourses}
@@ -204,13 +208,17 @@ export function EnrollmentStatusCard({
         />
       ) : null}
 
-      {!canManageCourses && application.courses && application.courses.length > 0 ? (
+      {application.courses &&
+      application.courses.length > 0 &&
+      !(canManageCourses && application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED) ? (
         <EnrollmentApplicationCoursesManagement
           applicationId={application.applicationId}
+          institutionId={institutionId ?? application.institutionId}
+          scope={scope}
           courses={application.courses}
           canEnroll={false}
           canReject={false}
-          canReadWaitlist={false}
+          canReadWaitlist={canReadCourseWaitlist}
           readOnly
         />
       ) : null}
@@ -256,17 +264,17 @@ export function EnrollmentStatusCard({
           )}
         </DetailCard>
 
-        <DetailCard
-          className="xl:col-span-2"
-          icon={Music2Icon}
-          title="Trayecto formativo y espacios académicos"
-          description="Trayecto y materias seleccionadas para la inscripción."
-        >
-          <dl className="mb-5 grid gap-4 sm:grid-cols-2">
-            <DetailItem label="Trayecto formativo" value={application.trainingPathName || "—"} />
-            <DetailItem label="Plan de estudio" value={application.studyPlanName || "—"} />
-          </dl>
-          {spaces.length > 0 ? (
+        {spaces.length > 0 ? (
+          <DetailCard
+            className="xl:col-span-2"
+            icon={Music2Icon}
+            title="Trayecto formativo y espacios académicos"
+            description="Trayecto y materias seleccionadas para la inscripción."
+          >
+            <dl className="mb-5 grid gap-4 sm:grid-cols-2">
+              <DetailItem label="Trayecto formativo" value={application.trainingPathName || "—"} />
+              <DetailItem label="Plan de estudio" value={application.studyPlanName || "—"} />
+            </dl>
             <div className="bg-background divide-y overflow-hidden rounded-xl border">
               {spaces.map((space) => (
                 <div key={space.studyPlanSpaceId} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -278,10 +286,8 @@ export function EnrollmentStatusCard({
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">No se seleccionaron espacios académicos.</p>
-          )}
-        </DetailCard>
+          </DetailCard>
+        ) : null}
 
         <DetailCard
           className="xl:col-span-2"
