@@ -269,7 +269,6 @@ const academicFormSchemas: Record<AcademicResource, z.ZodType> = {
       path: ["effectiveFrom"],
     }),
   [AcademicResource.ACADEMIC_LEVEL]: z.object({
-    name,
     displayOrder: positiveOrder,
     description: optionalText(1000),
   }),

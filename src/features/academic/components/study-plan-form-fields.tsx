@@ -81,7 +81,6 @@ export function StudyPlanFields({
 export function AcademicLevelFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   return (
     <>
-      <NameField initialValues={initialValues} error={fieldErrors?.name} fullWidth={false} />
       <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} className="w-full flex-none sm:max-w-48" required>
         <NumericInput
           aria-invalid={Boolean(fieldErrors?.displayOrder)}
@@ -91,6 +90,9 @@ export function AcademicLevelFields({ initialValues = {}, fieldErrors }: Academi
           required
         />
       </FormField>
+      <p className="text-muted-foreground w-full flex-[1_0_100%] text-sm">
+        El nombre se genera automáticamente a partir del orden (Nivel 1, Nivel 2, …).
+      </p>
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>
   );

@@ -337,13 +337,13 @@ describe("AcademicFormFields", () => {
     expect(order).toHaveAttribute("inputmode", "numeric");
   });
 
-  it("places the academic level name and order in the same responsive row", () => {
+  it("asks only for the order when creating an academic level and notes the derived name", () => {
     render(<AcademicFormFields resource={AcademicResource.ACADEMIC_LEVEL} />);
 
-    const nameField = screen.getByLabelText(/Nombre/).closest('[data-slot="field"]');
-    const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
+    expect(screen.queryByLabelText(/Nombre/)).not.toBeInTheDocument();
+    expect(screen.getByText("El nombre se genera automáticamente a partir del orden (Nivel 1, Nivel 2, …).")).toBeInTheDocument();
 
-    expect(nameField).not.toHaveClass("flex-[1_0_100%]");
+    const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
     expect(orderField).toHaveClass("sm:max-w-48", "flex-none");
   });
 
