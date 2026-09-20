@@ -50,7 +50,7 @@ import { fetchEnrollmentCourses } from "@features/enrollment-applications/servic
 import type { Shift } from "@features/academic/types/shift.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
-import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+import type { EnrollmentCourseGroupSelection, EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
@@ -182,7 +182,17 @@ export function EnrollmentWizard({
   const [courseOptionsTotalPages, setCourseOptionsTotalPages] = React.useState(initialCourseOptionsTotalPages);
   const [loadingMoreCourses, setLoadingMoreCourses] = React.useState(false);
   const [courseOptionsError, setCourseOptionsError] = React.useState<string>();
-  const [selectedCourseIds, setSelectedCourseIds] = React.useState<string[]>(initialData?.courses?.map((course) => course.courseId) ?? []);
+  const [groupSelection, setGroupSelection] = React.useState<EnrollmentCourseGroupSelection[]>(() =>
+    (initialData?.courses ?? []).flatMap((course) => {
+      const option = initialCourseOptions.find((candidate) => candidate.courseId === course.courseId);
+      return option ? [{ studyPlanSpaceId: option.studyPlanSpaceId, courseId: course.courseId }] : [];
+    }),
+  );
+  const selectedCourseIds = React.useMemo(
+    () => groupSelection.map((entry) => entry.courseId).filter((courseId): courseId is string => courseId !== null),
+    [groupSelection],
+  );
+  const hasUnresolvedGroups = groupSelection.some((entry) => entry.courseId === null);
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
@@ -298,19 +308,25 @@ export function EnrollmentWizard({
     return () => window.clearTimeout(timeoutId);
   }, [pendingFocusFieldId, effectiveActiveTab]);
 
-  const handleSelectCourse = (courseId: string) => {
-    const option = courseOptions.find((course) => course.courseId === courseId);
-    if (!option) {
-      return;
-    }
+  const handleToggleGroup = (studyPlanSpaceId: string, checked: boolean) => {
+    setGroupSelection((previous) => {
+      const remaining = previous.filter((entry) => entry.studyPlanSpaceId !== studyPlanSpaceId);
+      if (!checked) {
+        return remaining;
+      }
+      const options = courseOptions.filter((course) => course.studyPlanSpaceId === studyPlanSpaceId);
+      const singlePlainOption =
+        options.filter((option) => option.instrumentId == null).length === 1 ? options.find((option) => option.instrumentId == null) : undefined;
+      return [...remaining, { studyPlanSpaceId, courseId: singlePlainOption?.courseId ?? null }];
+    });
+  };
 
-    setSelectedCourseIds((previous) => [
-      ...previous.filter((selectedId) => {
-        const selected = courseOptions.find((course) => course.courseId === selectedId);
-        return selected?.studyPlanSpaceId !== option.studyPlanSpaceId;
-      }),
-      courseId,
-    ]);
+  const handleSelectInstrument = (studyPlanSpaceId: string, courseId: string) => {
+    setGroupSelection((previous) => previous.map((entry) => (entry.studyPlanSpaceId === studyPlanSpaceId ? { ...entry, courseId } : entry)));
+  };
+
+  const handleSelectCourse = (studyPlanSpaceId: string, courseId: string) => {
+    setGroupSelection((previous) => previous.map((entry) => (entry.studyPlanSpaceId === studyPlanSpaceId ? { ...entry, courseId } : entry)));
   };
 
   // Structured payload for auto-save and submission
@@ -470,7 +486,7 @@ export function EnrollmentWizard({
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.TRAINING_PATH_REQUIRED, path: ["careerSelection", "trainingPathId"] });
     }
 
-    if (courseOptions.length === 0 || selectedCourseIds.length === 0) {
+    if (courseOptions.length === 0 || selectedCourseIds.length === 0 || hasUnresolvedGroups) {
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.SPACE_REQUIRED, path: ["courses"] });
     }
 
@@ -1054,7 +1070,9 @@ export function EnrollmentWizard({
               {courseOptions.length > 0 ? (
                 <EnrollmentCoursesSelector
                   courses={courseOptions}
-                  selectedCourseIds={selectedCourseIds}
+                  selection={groupSelection}
+                  onToggleGroup={handleToggleGroup}
+                  onSelectInstrument={handleSelectInstrument}
                   onSelectCourse={handleSelectCourse}
                   disabled={!application.isEditable || readOnly || isSubmitDialogOpen || isCancelDialogOpen}
                   error={getFieldError(["courses"])}
