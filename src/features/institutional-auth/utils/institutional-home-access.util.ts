@@ -1,9 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  BookCopyIcon,
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
-  GraduationCapIcon,
   KeyRoundIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
@@ -38,7 +38,7 @@ const ACADEMIC_OFFER_LINK: InstitutionalHomeLink = {
   href: "/academic-offers",
   title: "Oferta académica",
   description: "Explorá los trayectos disponibles y sus espacios académicos.",
-  icon: GraduationCapIcon,
+  icon: BookCopyIcon,
   permission: INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ,
 };
 

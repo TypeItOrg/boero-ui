@@ -3,6 +3,7 @@ import {
   BuildingIcon,
   CalendarRangeIcon,
   ClipboardListIcon,
+  ClockIcon,
   FingerprintIcon,
   GraduationCapIcon,
   HouseIcon,
@@ -70,6 +71,11 @@ const ACADEMIC_NAVIGATION_ITEMS = [
     title: "Cursos",
     url: "/admin/courses",
     icon: GraduationCapIcon,
+  },
+  {
+    title: "Turnos",
+    url: "/admin/shifts",
+    icon: ClockIcon,
   },
 ] as const satisfies readonly NavigationItem[];
 

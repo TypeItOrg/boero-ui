@@ -1,4 +1,5 @@
 import {
+  BookCopyIcon,
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
@@ -10,6 +11,7 @@ import {
   LibraryBigIcon,
   Music2Icon,
   RouteIcon,
+  ScrollTextIcon,
   UserLockIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
@@ -49,7 +51,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
   const academicItems: NavigationItem[] = [
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
-      ? [{ title: "Oferta académica", url: "/academic-offers", icon: GraduationCapIcon }]
+      ? [{ title: "Oferta académica", url: "/academic-offers", icon: BookCopyIcon }]
       : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
       ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
@@ -70,7 +72,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
       ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
       : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
-      ? [{ title: "Cursadas", url: "/course-enrollments", icon: GraduationCapIcon }]
+      ? [{ title: "Cursadas", url: "/course-enrollments", icon: ScrollTextIcon }]
       : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
   ];
@@ -79,7 +81,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadEnrollmentPeriods ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }] : []),
     ...(canStartEnrollmentApplication(user) ? [{ title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon }] : []),
     ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
-    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis cursadas", url: "/my-course-enrollments", icon: GraduationCapIcon }] : []),
+    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis cursadas", url: "/my-course-enrollments", icon: ScrollTextIcon }] : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
       ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
       : []),
