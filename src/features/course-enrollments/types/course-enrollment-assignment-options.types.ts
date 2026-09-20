@@ -4,6 +4,10 @@ export interface CourseEnrollmentAssignmentOptions {
   classes: {
     id: string;
     teacherIds: string[];
+    teachers: {
+      personId: string;
+      fullName: string;
+    }[];
     days: {
       id: string;
       dayOfWeek: string;

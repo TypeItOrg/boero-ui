@@ -3,12 +3,16 @@
 import * as React from "react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Field, FieldDescription, FieldLabel } from "@common/components/ui/field";
+import { Checkbox } from "@common/components/ui/checkbox";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@common/components/ui/field";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { cn } from "@common/utils/cn.util";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 
 type CourseEnrollmentAssignmentFieldsProps = {
   options: CourseEnrollmentAssignmentOptions;
   disabled?: boolean;
+  invalidDayIds?: readonly string[];
 };
 
 type DaySelection = {
@@ -26,18 +30,42 @@ const DAY_LABELS: Record<string, string> = {
   SUNDAY: "Domingo",
 };
 
-export function CourseEnrollmentAssignmentFields({ options, disabled = false }: CourseEnrollmentAssignmentFieldsProps): React.ReactElement {
+export function CourseEnrollmentAssignmentFields({
+  options,
+  disabled = false,
+  invalidDayIds = [],
+}: CourseEnrollmentAssignmentFieldsProps): React.ReactElement {
   const [courseClassId, setCourseClassId] = React.useState(options.classes[0]?.id ?? "");
+  const [checkedDays, setCheckedDays] = React.useState<string[]>([]);
   const [daySelections, setDaySelections] = React.useState<Record<string, DaySelection>>({});
   const selectedClass = options.classes.find((courseClass) => courseClass.id === courseClassId);
-  const assignments = Object.values(daySelections);
+  const invalidDaySet = React.useMemo(() => new Set(invalidDayIds), [invalidDayIds]);
+  const assignments = checkedDays.map((dayId) => ({
+    dayId,
+    ...(daySelections[dayId] ?? { classScheduleId: "", individualSlotId: null }),
+  }));
 
   function handleClassChange(nextClassId: string): void {
     setCourseClassId(nextClassId);
+    setCheckedDays([]);
     setDaySelections({});
   }
 
+  function handleDayToggle(dayId: string, checked: boolean): void {
+    setCheckedDays((previous) => (checked ? [...previous, dayId] : previous.filter((id) => id !== dayId)));
+    setDaySelections((previous) => {
+      if (checked) {
+        return previous;
+      }
+
+      const next = { ...previous };
+      delete next[dayId];
+      return next;
+    });
+  }
+
   function handleScheduleChange(dayId: string, scheduleId: string): void {
+    setCheckedDays((previous) => (previous.includes(dayId) ? previous : [...previous, dayId]));
     setDaySelections((previous) => ({
       ...previous,
       [dayId]: {
@@ -72,20 +100,26 @@ export function CourseEnrollmentAssignmentFields({ options, disabled = false }: 
             <FieldLabel htmlFor="courseClassId" required>
               Clase
             </FieldLabel>
-            <select
-              id="courseClassId"
-              value={courseClassId}
-              onChange={(event) => handleClassChange(event.target.value)}
-              disabled={disabled}
-              required
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-            >
-              {options.classes.map((courseClass, index) => (
-                <option key={courseClass.id} value={courseClass.id}>
-                  Clase {index + 1}
-                </option>
-              ))}
-            </select>
+            <Select value={courseClassId} onValueChange={handleClassChange} disabled={disabled}>
+              <SelectTrigger id="courseClassId" className="h-9! w-full">
+                <SelectValue placeholder="Seleccioná una clase" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {options.classes.map((courseClass, index) => (
+                    <SelectItem key={courseClass.id} value={courseClass.id} className="px-2.5 py-1.5">
+                      Clase {index + 1}
+                      {courseClass.teachers.length > 0 ? ` — ${courseClass.teachers.map((teacher) => teacher.fullName).join(", ")}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {selectedClass && selectedClass.teachers.length > 0 ? (
+              <p className="text-muted-foreground text-sm">
+                Dictan esta clase: {selectedClass.teachers.map((teacher) => teacher.fullName).join(", ")}.
+              </p>
+            ) : null}
             <FieldDescription>Elegí una clase y después los días que se asignarán a la cursada.</FieldDescription>
           </Field>
 
@@ -98,54 +132,81 @@ export function CourseEnrollmentAssignmentFields({ options, disabled = false }: 
             </div>
 
             {selectedClass?.days.map((day) => {
+              const checked = checkedDays.includes(day.id);
               const selection = daySelections[day.id];
               const selectedSchedule = day.schedules.find((schedule) => schedule.id === selection?.classScheduleId);
+              const invalid = invalidDaySet.has(day.id);
 
               return (
-                <div key={day.id} className="bg-muted/25 grid gap-3 rounded-lg border p-4 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <p className="font-medium">{DAY_LABELS[day.dayOfWeek] ?? day.dayOfWeek}</p>
-                    {day.capacity !== null ? <p className="text-muted-foreground text-xs">Capacidad configurada: {day.capacity}</p> : null}
-                  </div>
-                  <Field>
-                    <FieldLabel htmlFor={`schedule-${day.id}`}>Horario</FieldLabel>
-                    <select
-                      id={`schedule-${day.id}`}
-                      value={selection?.classScheduleId ?? ""}
-                      onChange={(event) => handleScheduleChange(day.id, event.target.value)}
+                <div key={day.id} className={cn("bg-muted/25 grid gap-3 rounded-lg border p-4 sm:grid-cols-2", invalid && "border-destructive")}>
+                  <Field orientation="horizontal" className="sm:col-span-2" data-invalid={invalid}>
+                    <Checkbox
+                      id={`day-${day.id}`}
+                      checked={checked}
                       disabled={disabled}
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-                    >
-                      <option value="">No asignar este día</option>
-                      {day.schedules.map((schedule) => (
-                        <option key={schedule.id} value={schedule.id}>
-                          {formatTime(schedule.startTime)}–{formatTime(schedule.endTime)}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-
-                  {options.format === "INDIVIDUAL" && selectedSchedule ? (
-                    <Field>
-                      <FieldLabel htmlFor={`slot-${day.id}`} required>
-                        Período individual
+                      onCheckedChange={(value) => handleDayToggle(day.id, value === true)}
+                    />
+                    <div>
+                      <FieldLabel htmlFor={`day-${day.id}`} className="font-medium">
+                        {DAY_LABELS[day.dayOfWeek] ?? day.dayOfWeek}
                       </FieldLabel>
-                      <select
-                        id={`slot-${day.id}`}
-                        value={selection?.individualSlotId ?? ""}
-                        onChange={(event) => handleSlotChange(day.id, event.target.value)}
-                        disabled={disabled}
-                        required
-                        className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-                      >
-                        <option value="">Seleccionar período</option>
-                        {selectedSchedule.individualSlots.map((slot) => (
-                          <option key={slot.id} value={slot.id}>
-                            {formatTime(slot.startTime)}–{formatTime(slot.endTime)}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
+                      {day.capacity !== null ? <p className="text-muted-foreground text-xs">Capacidad configurada: {day.capacity}</p> : null}
+                    </div>
+                  </Field>
+                  {checked ? (
+                    <>
+                      <Field data-invalid={invalid}>
+                        <FieldLabel htmlFor={`schedule-${day.id}`} required>
+                          Horario
+                        </FieldLabel>
+                        <Select
+                          value={selection?.classScheduleId ?? ""}
+                          onValueChange={(value) => handleScheduleChange(day.id, value)}
+                          disabled={disabled}
+                        >
+                          <SelectTrigger id={`schedule-${day.id}`} aria-invalid={invalid} className="h-9! w-full">
+                            <SelectValue placeholder="Seleccioná un horario" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {day.schedules.map((schedule) => (
+                                <SelectItem key={schedule.id} value={schedule.id} className="px-2.5 py-1.5">
+                                  {formatTime(schedule.startTime)}–{formatTime(schedule.endTime)}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        {invalid && !selection?.classScheduleId ? <FieldError errors={[{ message: "Completá el horario de este día." }]} /> : null}
+                      </Field>
+
+                      {options.format === "INDIVIDUAL" && selectedSchedule ? (
+                        <Field data-invalid={invalid}>
+                          <FieldLabel htmlFor={`slot-${day.id}`} required>
+                            Período individual
+                          </FieldLabel>
+                          <Select
+                            value={selection?.individualSlotId ?? ""}
+                            onValueChange={(value) => handleSlotChange(day.id, value)}
+                            disabled={disabled}
+                          >
+                            <SelectTrigger id={`slot-${day.id}`} aria-invalid={invalid} className="h-9! w-full">
+                              <SelectValue placeholder="Seleccionar período" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                {selectedSchedule.individualSlots.map((slot) => (
+                                  <SelectItem key={slot.id} value={slot.id} className="px-2.5 py-1.5">
+                                    {formatTime(slot.startTime)}–{formatTime(slot.endTime)}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          {invalid && !selection?.individualSlotId ? <FieldError errors={[{ message: "Completá el período de este día." }]} /> : null}
+                        </Field>
+                      ) : null}
+                    </>
                   ) : null}
                 </div>
               );

@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { Button } from "@common/components/ui/button";
 import { Field, FieldLabel } from "@common/components/ui/field";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
+import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 import { createManualCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/services/course-enrollment-client.service";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
@@ -27,7 +28,15 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions | null>(null);
   const [optionsError, setOptionsError] = React.useState<string | null>(null);
   const [loadingOptions, setLoadingOptions] = React.useState(false);
-  const [state, formAction, isPending] = React.useActionState(async (_previous: { error?: string }, formData: FormData) => {
+  const [state, formAction, isPending] = React.useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
+    if (options) {
+      const validation = validateEnrollmentAssignment(formData, options);
+
+      if (!validation.ok) {
+        return { error: validation.message, invalidDayIds: validation.invalidDayIds };
+      }
+    }
+
     const result = await createManualCourseEnrollmentAction(formData);
 
     if (!result.error) {
@@ -141,7 +150,9 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
           <AlertDescription>{optionsError}</AlertDescription>
         </Alert>
       ) : null}
-      {options ? <CourseEnrollmentAssignmentFields key={courseId} options={options} disabled={isPending} /> : null}
+      {options ? (
+        <CourseEnrollmentAssignmentFields key={courseId} options={options} disabled={isPending} invalidDayIds={state.invalidDayIds} />
+      ) : null}
 
       <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
         <Button asChild type="button" variant="outline" size="lg">
