@@ -87,7 +87,8 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
   const initialFormat = toOptionalFormString(initialValues.academicSpaceFormat);
 
   const [studyPlanId, setStudyPlanId] = React.useState(toOptionalFormString(initialValues.studyPlanId));
-  const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
+  const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [academicSpaceId, setAcademicSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
   const [studyPlanSpaceId, setStudyPlanSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
   const [instrumentId, setInstrumentId] = React.useState(toOptionalFormString(initialValues.instrumentId));
   const [instrumental, setInstrumental] = React.useState(Boolean(initialValues.academicSpaceInstrumental));
@@ -144,7 +145,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
     <>
       <input type="hidden" name="studyPlanId" value={studyPlanId ?? ""} />
       <input type="hidden" name="studyPlanSpaceId" value={studyPlanSpaceId ?? ""} />
-      <input type="hidden" name="academicSpaceId" value={spaceId ?? ""} />
+      <input type="hidden" name="academicSpaceId" value={academicSpaceId ?? ""} />
       <input type="hidden" name="instrumentId" value={instrumentId ?? ""} />
       <input type="hidden" name="academicYearId" value={academicYearId ?? ""} />
       <input type="hidden" name="format" value={format ?? ""} />
@@ -189,6 +190,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 onValueChange={(value) => {
                   setStudyPlanId(value);
                   setSpaceId(undefined);
+                  setAcademicSpaceId(undefined);
                   setStudyPlanSpaceId(undefined);
                   setInstrumentId(undefined);
                   setInstrumental(false);
@@ -225,13 +227,14 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   errorMessage="No se pudieron cargar los espacios del plan."
                   fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
                   getItemLabel={getCourseSpaceLabel}
-                  getItemValue={(item) => item.id}
+                  getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
                   id="academicSpaceId"
                   key={`space-${institutionId}-${studyPlanId}`}
                   name="academicSpaceDisplay"
                   onValueChange={(value, item) => {
                     setSpaceId(value);
                     setStudyPlanSpaceId(item?.studyPlanSpaceId ?? value);
+                    setAcademicSpaceId(item?.id);
                     setInstrumentId(undefined);
                     setInstrumental(Boolean(item?.instrumental));
                     if (item) {
