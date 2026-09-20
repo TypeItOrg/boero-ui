@@ -22,5 +22,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*", "/api/institutional/:path*", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: [
+    "/api/courses/:courseId/enrollment-options",
+    "/api/admin/:path*",
+    "/api/institutional/:path*",
+    "/((?!api|_next/static|_next/image|.*\\..*).*)",
+  ],
 };

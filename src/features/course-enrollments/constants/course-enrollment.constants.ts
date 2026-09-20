@@ -27,7 +27,12 @@ export const ACADEMIC_ENROLLMENT_STATUS_OPTIONS = (Object.keys(ACADEMIC_ENROLLME
   label: ACADEMIC_ENROLLMENT_STATUS_LABELS[status],
 }));
 
+export const COURSE_ENROLLMENT_OPTIONS_TIMEOUT_MS = 15_000;
+
 export const COURSE_ENROLLMENT_MESSAGES = {
+  ASSIGNMENTS_FAILED: "No se pudieron obtener los horarios disponibles. Intentá nuevamente.",
+  ASSIGNMENTS_TIMEOUT: "La consulta de horarios tardó demasiado. Intentá nuevamente.",
+  LOADING_ASSIGNMENTS: "Cargando clases y horarios…",
   INVALID_ASSIGNMENT: "La solicitud no es válida.",
   DAY_REQUIRED: "Seleccioná al menos un día de la clase para la cursada.",
   INVALID_SCHEDULE: "El horario o período no pertenece a la clase y día seleccionados.",

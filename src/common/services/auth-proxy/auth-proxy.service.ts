@@ -1,3 +1,4 @@
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -44,12 +45,12 @@ export async function handleProtectedRoute(request: NextRequest, policy: AuthPro
   if (request.cookies.has(policy.accessTokenCookie)) return NextResponse.next();
 
   const refreshToken = request.cookies.get(policy.refreshTokenCookie)?.value;
-  if (!refreshToken) return createLoginRedirectResponse(request, policy);
+  if (!refreshToken) return createUnauthenticatedResponse(request, policy);
 
   const refreshAttempt = await refreshSession(policy.refreshPath, refreshToken);
   if (refreshAttempt.tokens) return createRefreshedSessionResponse(request, policy, refreshAttempt.tokens);
 
-  return createLoginRedirectResponse(request, policy, refreshAttempt.status);
+  return createUnauthenticatedResponse(request, policy, refreshAttempt.status);
 }
 
 async function getSessionStatus(currentUserPath: string, accessToken: string): Promise<SessionStatus> {
@@ -116,9 +117,19 @@ function removeInFlightRefresh(requestKey: string, refreshRequest: Promise<Refre
   }
 }
 
-function createLoginRedirectResponse(request: NextRequest, policy: AuthProxyPolicy, refreshStatus?: number): NextResponse {
-  const response = NextResponse.redirect(policy.getLoginRedirect(request));
-  if (refreshStatus === 401) policy.clearCookies(response);
+function createUnauthenticatedResponse(request: NextRequest, policy: AuthProxyPolicy, refreshStatus?: number): NextResponse {
+  const refreshUnavailable = request.cookies.has(policy.refreshTokenCookie) && refreshStatus !== 401;
+  const response = request.nextUrl.pathname.startsWith("/api/")
+    ? NextResponse.json(
+        { message: refreshUnavailable ? COMMON_ERROR_MESSAGES.SESSION_UNAVAILABLE : COMMON_ERROR_MESSAGES.SESSION_REQUIRED },
+        { status: refreshUnavailable ? 503 : 401, headers: { "cache-control": "private, no-store" } },
+      )
+    : NextResponse.redirect(policy.getLoginRedirect(request));
+
+  if (refreshStatus === 401) {
+    policy.clearCookies(response);
+  }
+
   return response;
 }
 
