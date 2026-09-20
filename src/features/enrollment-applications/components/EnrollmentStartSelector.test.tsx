@@ -17,18 +17,29 @@ describe("EnrollmentStartSelector", () => {
     { id: "period-2", academicYearId: "year-2", academicYearNumber: 2027, name: "Inscripción 2027" },
   ];
 
-  it("pre-selects the first study plan and period but lets the applicant change them", () => {
+  it("pre-selects the first study plan and starts without an academic year", () => {
     const onStart = jest.fn();
     render(<EnrollmentStartSelector studyPlans={studyPlans} periods={periods} onStart={onStart} />);
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-1", academicYearId: "year-1" });
+    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-1" });
   });
 
-  it("shows an informative message when there are no study plans available", () => {
+  it("shows an informative message when there are no courses available", () => {
     const { container } = render(<EnrollmentStartSelector studyPlans={[]} periods={periods} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no se encuentran planes de estudio disponibles/i);
+    expect(container).toHaveTextContent(/no hay cursos a los que te puedas inscribir/i);
+  });
+
+  it("shows the plain training path name when it matches the option name", () => {
+    render(
+      <EnrollmentStartSelector
+        studyPlans={[{ id: "path-1", name: "CAV Básico", trainingPathName: "CAV Básico" }]}
+        periods={periods}
+        onStart={jest.fn()}
+      />,
+    );
+    expect(screen.getByRole("combobox", { name: /trayecto formativo/i })).toHaveTextContent("CAV Básico");
   });
 
   it("shows an informative message when there are no open enrollment periods", () => {

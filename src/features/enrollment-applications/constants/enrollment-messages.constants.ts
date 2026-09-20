@@ -3,6 +3,7 @@ export const ENROLLMENT_MESSAGES = {
   INCOMPLETE_FIELDS_SUMMARY: (count: number) =>
     count === 1 ? "Hay 1 campo obligatorio incompleto." : `Hay ${count} campos obligatorios incompletos.`,
   INSTRUMENT_REQUIRED: (name: string) => `Debés seleccionar un instrumento para "${name}".`,
+  INSTRUMENT_PER_SPACE_REQUIRED: "Seleccioná un instrumento para este espacio.",
   FETCH: "No se pudieron cargar las solicitudes de inscripción.",
   FETCH_MY: "No se pudieron cargar tus solicitudes de inscripción.",
   APPROVE: "No se pudo aprobar la solicitud de inscripción.",
@@ -12,7 +13,7 @@ export const ENROLLMENT_MESSAGES = {
   APPLICATION_SAVE_FAILED: "No se pudo guardar la inscripción.",
   REJECTION_TOO_LONG: "El motivo no puede superar los 1000 caracteres.",
   ENROLLMENT_CLOSED: "No hay períodos de inscripción abiertos en este momento. Volvé a intentarlo cuando la institución habilite uno nuevo.",
-  NO_ELIGIBLE_PLANS: "No se encuentran planes de estudio disponibles en este momento.",
+  NO_ELIGIBLE_PLANS: "No hay cursos a los que te puedas inscribir ahora mismo.",
   START_FAILED: "No se pudo iniciar la solicitud de inscripción.",
   DRAFT_SAVE_FAILED: "Error al guardar el borrador",
   TRAINING_PATHS_RETRY: "No se pudieron cargar los trayectos formativos. Reintentá antes de enviar.",

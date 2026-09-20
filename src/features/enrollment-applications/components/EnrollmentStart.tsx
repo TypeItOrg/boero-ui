@@ -11,22 +11,14 @@ import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enroll
 interface EnrollmentStartProps {
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods: EnrollmentPeriod[];
-  allExcludedByActiveApplication?: boolean;
   studyPlanPagination?: React.ReactNode;
-  periodPagination?: React.ReactNode;
 }
 
 type EnrollmentStartState = {
   error?: string;
 };
 
-export function EnrollmentStart({
-  studyPlans,
-  periods,
-  allExcludedByActiveApplication = false,
-  studyPlanPagination,
-  periodPagination,
-}: EnrollmentStartProps): React.ReactElement {
+export function EnrollmentStart({ studyPlans, periods, studyPlanPagination }: EnrollmentStartProps): React.ReactElement {
   const router = useRouter();
   const [state, startApplication, isStarting] = React.useActionState(
     async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
@@ -57,11 +49,9 @@ export function EnrollmentStart({
         name: period.name,
       }))}
       studyPlanPagination={studyPlanPagination}
-      periodPagination={periodPagination}
       error={state.error}
       isStarting={isStarting}
       onStart={handleStart}
-      allExcludedByActiveApplication={allExcludedByActiveApplication}
     />
   );
 }

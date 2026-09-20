@@ -1,13 +1,11 @@
 import "server-only";
 
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AlertCircleIcon, CheckCircle2Icon, ClipboardPlusIcon } from "lucide-react";
+import { AlertCircleIcon, ClipboardPlusIcon } from "lucide-react";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
-import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
 import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -31,7 +29,6 @@ export default async function EnrollmentPage({
 }): Promise<React.ReactElement> {
   const query = await searchParams;
   const plansPage = parsePaginationQuery({ page: query.plansPage }, { defaultSize: 20 });
-  const periodsPage = parsePaginationQuery({ page: query.periodsPage }, { defaultSize: 20 });
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
 
   if (!canStartEnrollmentApplication(user)) {
@@ -50,31 +47,15 @@ export default async function EnrollmentPage({
     );
   }
 
-  const [plansResponse, periodsResponse, activePaths] = await Promise.all([
+  const [plansResponse, periodsResponse] = await Promise.all([
     fetchAvailableEnrollmentTrainingPaths(plansPage),
-    fetchAvailableEnrollmentPeriods(periodsPage),
-    fetchActiveEnrollmentPaths(person.institutionId),
+    fetchAvailableEnrollmentPeriods({ page: 0, size: 20 }),
   ]);
-
-  const availableStudyPlans = plansResponse.items.filter((path) => !activePaths.trainingPathIds.has(path.id));
-  const hasActiveApplication = activePaths.trainingPathIds.size > 0;
-  const allExcludedByActiveApplication =
-    hasActiveApplication && plansResponse.totalPages <= 1 && plansResponse.items.length > 0 && availableStudyPlans.length === 0;
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
-      {hasActiveApplication && !allExcludedByActiveApplication && (
-        <Alert variant="success">
-          <CheckCircle2Icon className="size-4" />
-          <AlertTitle>¡Ya estás en carrera!</AlertTitle>
-          <AlertDescription>
-            Tenés una solicitud de inscripción en curso, así que esos trayectos no aparecen acá para que no la dupliques. Podés seguirla en{" "}
-            <Link href="/my-enrollment-applications">Mis inscripciones</Link>.
-          </AlertDescription>
-        </Alert>
-      )}
       <EnrollmentStart
-        studyPlans={availableStudyPlans.map((plan) => ({
+        studyPlans={plansResponse.items.map((plan) => ({
           id: plan.id,
           name: plan.name,
           trainingPathName: plan.name,
@@ -91,18 +72,6 @@ export default async function EnrollmentPage({
             />
           ) : undefined
         }
-        periodPagination={
-          periodsResponse.totalPages > 1 ? (
-            <EnrollmentCatalogPagination
-              page={periodsResponse.page}
-              totalPages={periodsResponse.totalPages}
-              parameter="periodsPage"
-              query={query}
-              label="Páginas de ciclos con inscripción abierta"
-            />
-          ) : undefined
-        }
-        allExcludedByActiveApplication={allExcludedByActiveApplication}
       />
     </PlatformPageShell>
   );
