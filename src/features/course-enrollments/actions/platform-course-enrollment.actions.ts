@@ -111,6 +111,7 @@ export async function rejectPlatformApplicationCourseAction(
     !isValidUuid(applicationCourseId) ||
     !Number.isInteger(expectedVersion) ||
     expectedVersion < 0 ||
+    typeof reason !== "string" ||
     !reason.trim()
   ) {
     return { error: INVALID_ACTION_ARGUMENTS };

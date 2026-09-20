@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
+import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { CircleAlertIcon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -17,13 +23,11 @@ import type { StudentSummary } from "@features/course-enrollments/types/student-
 import type { Course } from "@features/academic/types/course.types";
 
 type CourseManualEnrollmentFormProps = {
-  students: readonly StudentSummary[];
-  courses: readonly Course[];
   returnTo: string;
 };
 
-export function CourseManualEnrollmentForm({ students, courses, returnTo }: CourseManualEnrollmentFormProps): React.ReactElement {
-  const router = useRouter();
+export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): React.ReactElement {
+  const [studentId, setStudentId] = React.useState<string>();
   const [courseId, setCourseId] = React.useState("");
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions | null>(null);
   const [optionsError, setOptionsError] = React.useState<string | null>(null);
@@ -37,13 +41,7 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
       }
     }
 
-    const result = await createManualCourseEnrollmentAction(formData);
-
-    if (!result.error) {
-      router.push(returnTo);
-    }
-
-    return result;
+    return createManualCourseEnrollmentAction(formData);
   }, {});
 
   function handleCourseChange(nextCourseId: string): void {
@@ -85,6 +83,7 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
+      <input type="hidden" name="returnTo" value={returnTo} />
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />
@@ -98,44 +97,36 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
           <FieldLabel htmlFor="studentId" required>
             Estudiante
           </FieldLabel>
-          <select
+          <AsyncDropdown<StudentSummary>
             id="studentId"
             name="studentId"
-            defaultValue=""
-            required
+            value={studentId}
+            onValueChange={setStudentId}
             disabled={isPending}
-            className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-          >
-            <option value="">Seleccionar estudiante</option>
-            {students.map((student) => (
-              <option key={student.studentId} value={student.studentId}>
-                {student.lastName}, {student.firstName} · DNI {student.documentNumber}
-              </option>
-            ))}
-          </select>
+            queryKey={["manual-enrollment-students"]}
+            fetchPage={(input) => fetchCatalog<StudentSummary>("students", input)}
+            getItemValue={(student) => student.studentId}
+            getItemLabel={(student) => `${student.lastName}, ${student.firstName} · DNI ${student.documentNumber}`}
+            placeholder="Seleccionar estudiante"
+          />
         </Field>
 
         <Field>
           <FieldLabel htmlFor="courseId" required>
             Curso
           </FieldLabel>
-          <select
+          <AsyncDropdown<Course>
             id="courseId"
             name="courseId"
             value={courseId}
-            onChange={(event) => handleCourseChange(event.target.value)}
-            required
+            onValueChange={(value) => handleCourseChange(value ?? "")}
             disabled={isPending}
-            className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-          >
-            <option value="">Seleccionar curso</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.academicSpaceName} · {course.academicLevelName ?? "Sin nivel"} · {course.studyPlanName} · {course.year}
-                {course.instrumentName ? ` · ${course.instrumentName}` : ""}
-              </option>
-            ))}
-          </select>
+            queryKey={["manual-enrollment-courses"]}
+            fetchPage={(input) => fetchCatalog<Course>("course-enrollment-options", input)}
+            getItemValue={(course) => course.id}
+            getItemLabel={(course) => `${course.academicSpaceName}${course.instrumentName ? ` · ${course.instrumentName}` : ""} · ${course.year}`}
+            placeholder="Seleccionar curso"
+          />
         </Field>
       </div>
 
@@ -164,4 +155,10 @@ export function CourseManualEnrollmentForm({ students, courses, returnTo }: Cour
       </div>
     </form>
   );
+}
+
+async function fetchCatalog<T>(resource: string, input: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<T>> {
+  const params = new URLSearchParams({ page: String(input.page), size: String(input.size), search: input.search ?? "" });
+  const response = await fetch(`/api/${resource}?${params}`, { cache: "no-store", signal: input.signal });
+  return toAsyncDropdownPage(await parseHttpResponse<PaginatedResponse<T>>(response, COURSE_ENROLLMENT_MESSAGES.CATALOG_FAILED));
 }

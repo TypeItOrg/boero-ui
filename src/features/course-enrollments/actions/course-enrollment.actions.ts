@@ -5,6 +5,8 @@ import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
 
 const allowedAcademicStatuses = new Set<string>(Object.values(ACADEMIC_ENROLLMENT_STATUS));
@@ -62,6 +64,11 @@ function buildAssignmentBody(
 }
 
 export async function createManualCourseEnrollmentAction(formData: FormData): Promise<CourseEnrollmentActionResult> {
+  const rawReturnTo = formData.get("returnTo");
+  if (rawReturnTo !== null && typeof rawReturnTo !== "string") {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
+  const returnTo = getSafeReturnTo(rawReturnTo ?? undefined, "/course-enrollments");
   const studentId = formData.get("studentId");
   const courseId = formData.get("courseId");
   const assignmentBody = buildAssignmentBody(formData);
@@ -83,7 +90,7 @@ export async function createManualCourseEnrollmentAction(formData: FormData): Pr
   }
 
   revalidatePath("/course-enrollments");
-  return {};
+  redirect(returnTo);
 }
 
 export async function enrollApplicationCourseAction(
@@ -135,6 +142,7 @@ export async function rejectApplicationCourseAction(
     !isValidUuid(applicationCourseId) ||
     !Number.isInteger(expectedVersion) ||
     expectedVersion < 0 ||
+    typeof reason !== "string" ||
     !reason.trim()
   ) {
     return { error: INVALID_ACTION_ARGUMENTS };
@@ -168,6 +176,7 @@ export async function withdrawCourseEnrollmentAction(
   if (
     !isValidUuid(enrollmentId) ||
     (type !== "VOLUNTARY" && type !== "ADMINISTRATIVE") ||
+    typeof reason !== "string" ||
     !reason.trim() ||
     (expectedVersion !== undefined && (!Number.isInteger(expectedVersion) || expectedVersion < 0))
   ) {
@@ -199,6 +208,7 @@ export async function updateCourseAcademicStatusAction(
 ): Promise<CourseEnrollmentActionResult> {
   if (
     !isValidUuid(enrollmentId) ||
+    typeof reason !== "string" ||
     !reason.trim() ||
     !allowedAcademicStatuses.has(status) ||
     (expectedVersion !== undefined && (!Number.isInteger(expectedVersion) || expectedVersion < 0))

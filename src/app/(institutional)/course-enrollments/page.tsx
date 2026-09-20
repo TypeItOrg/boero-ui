@@ -1,3 +1,4 @@
+import { appendReturnTo } from "@common/utils/return-to.util";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -35,6 +36,15 @@ export default async function CourseEnrollmentsPage({
   }
 
   const resolvedSearchParams = await searchParams;
+  const originParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(resolvedSearchParams)) {
+    for (const entry of Array.isArray(value) ? value : [value]) {
+      if (entry !== undefined) {
+        originParams.append(key, entry);
+      }
+    }
+  }
+  const returnTo = `/course-enrollments${originParams.size ? `?${originParams}` : ""}`;
   const { page, size, status, academicStatus } = parseCourseEnrollmentPaginationParams(resolvedSearchParams);
   const data = await fetchInstitutionalCourseEnrollments(user.institutionId, { page, size, status, academicStatus });
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_CREATE);
@@ -50,7 +60,7 @@ export default async function CourseEnrollmentsPage({
         <div className="flex flex-wrap items-center gap-2">
           {canCreate ? (
             <Button asChild size="lg">
-              <Link href="/course-enrollments/new">Alta manual</Link>
+              <Link href={appendReturnTo("/course-enrollments/new", returnTo)}>Alta manual</Link>
             </Button>
           ) : null}
           <PlatformPageIcon icon={GraduationCapIcon} />

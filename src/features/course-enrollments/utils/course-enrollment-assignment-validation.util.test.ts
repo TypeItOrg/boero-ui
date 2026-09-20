@@ -12,6 +12,7 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
   classes: [
     {
       id: CLASS_ID,
+      label: "Clase 1",
       teacherIds: ["00000000-0000-4000-8000-000000000006"],
       teachers: [{ personId: "00000000-0000-4000-8000-000000000006", fullName: "Ana Garcia" }],
       days: [
@@ -19,13 +20,14 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
           id: DAY_ID,
           dayOfWeek: "MONDAY",
           capacity: 6,
+          availableCapacity: 6,
           periodDurationMinutes: 60,
           schedules: [
             {
               id: SCHEDULE_ID,
               startTime: "10:00:00",
               endTime: "11:00:00",
-              individualSlots: [{ id: SLOT_ID, startTime: "10:00:00", endTime: "11:00:00" }],
+              individualSlots: [{ id: SLOT_ID, startTime: "10:00:00", endTime: "11:00:00", available: true }],
             },
           ],
         },
@@ -76,5 +78,29 @@ describe("validateEnrollmentAssignment", () => {
     const result = validateEnrollmentAssignment(formData([{ dayId: DAY_ID, classScheduleId: SCHEDULE_ID, individualSlotId: null }]), grupal);
 
     expect(result).toEqual({ ok: true });
+  });
+  it("rejects malformed items and a class outside the available options", () => {
+    expect(validateEnrollmentAssignment(formData([null]), OPTIONS).ok).toBe(false);
+    expect(validateEnrollmentAssignment(formData([{ classScheduleId: SCHEDULE_ID, individualSlotId: SLOT_ID }], DAY_ID), OPTIONS).ok).toBe(false);
+  });
+
+  it("rejects a period outside its schedule or a group assignment with an individual period", () => {
+    expect(validateEnrollmentAssignment(formData([{ dayId: DAY_ID, classScheduleId: SCHEDULE_ID, individualSlotId: CLASS_ID }]), OPTIONS).ok).toBe(
+      false,
+    );
+    expect(
+      validateEnrollmentAssignment(formData([{ dayId: DAY_ID, classScheduleId: SCHEDULE_ID, individualSlotId: SLOT_ID }]), {
+        ...OPTIONS,
+        format: "GRUPAL",
+      }).ok,
+    ).toBe(false);
+  });
+
+  it("rejects duplicate days and occupied periods", () => {
+    const assignment = { dayId: DAY_ID, classScheduleId: SCHEDULE_ID, individualSlotId: SLOT_ID };
+    expect(validateEnrollmentAssignment(formData([assignment, assignment]), OPTIONS).ok).toBe(false);
+    const occupied = JSON.parse(JSON.stringify(OPTIONS)) as CourseEnrollmentAssignmentOptions;
+    occupied.classes[0].days[0].schedules[0].individualSlots[0].available = false;
+    expect(validateEnrollmentAssignment(formData([assignment]), occupied).ok).toBe(false);
   });
 });

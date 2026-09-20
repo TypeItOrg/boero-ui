@@ -3,6 +3,7 @@ export interface CourseEnrollmentAssignmentOptions {
   format: "INDIVIDUAL" | "GRUPAL";
   classes: {
     id: string;
+    label: string;
     teacherIds: string[];
     teachers: {
       personId: string;
@@ -12,6 +13,7 @@ export interface CourseEnrollmentAssignmentOptions {
       id: string;
       dayOfWeek: string;
       capacity: number | null;
+      availableCapacity: number | null;
       periodDurationMinutes: number | null;
       schedules: {
         id: string;
@@ -21,6 +23,7 @@ export interface CourseEnrollmentAssignmentOptions {
           id: string;
           startTime: string;
           endTime: string;
+          available: boolean;
         }[];
       }[];
     }[];

@@ -9,6 +9,7 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
   classes: [
     {
       id: "00000000-0000-4000-8000-000000000001",
+      label: "Clase 1",
       teacherIds: ["00000000-0000-4000-8000-000000000006", "00000000-0000-4000-8000-000000000007"],
       teachers: [
         { personId: "00000000-0000-4000-8000-000000000006", fullName: "Ana Garcia" },
@@ -19,13 +20,14 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
           id: "00000000-0000-4000-8000-000000000002",
           dayOfWeek: "MONDAY",
           capacity: 6,
+          availableCapacity: 6,
           periodDurationMinutes: 60,
           schedules: [
             {
               id: "00000000-0000-4000-8000-000000000003",
               startTime: "10:00:00",
               endTime: "11:00:00",
-              individualSlots: [{ id: "00000000-0000-4000-8000-000000000004", startTime: "10:00:00", endTime: "11:00:00" }],
+              individualSlots: [{ id: "00000000-0000-4000-8000-000000000004", startTime: "10:00:00", endTime: "11:00:00", available: true }],
             },
           ],
         },
@@ -33,6 +35,7 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
     },
     {
       id: "00000000-0000-4000-8000-000000000008",
+      label: "Clase 2",
       teacherIds: ["00000000-0000-4000-8000-000000000009"],
       teachers: [{ personId: "00000000-0000-4000-8000-000000000009", fullName: "Maria Lopez" }],
       days: [],

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Checkbox } from "@common/components/ui/checkbox";
@@ -18,16 +19,6 @@ type CourseEnrollmentAssignmentFieldsProps = {
 type DaySelection = {
   classScheduleId: string;
   individualSlotId: string | null;
-};
-
-const DAY_LABELS: Record<string, string> = {
-  MONDAY: "Lunes",
-  TUESDAY: "Martes",
-  WEDNESDAY: "Miércoles",
-  THURSDAY: "Jueves",
-  FRIDAY: "Viernes",
-  SATURDAY: "Sábado",
-  SUNDAY: "Domingo",
 };
 
 export function CourseEnrollmentAssignmentFields({
@@ -108,7 +99,7 @@ export function CourseEnrollmentAssignmentFields({
                 <SelectGroup>
                   {options.classes.map((courseClass, index) => (
                     <SelectItem key={courseClass.id} value={courseClass.id} className="px-2.5 py-1.5">
-                      Clase {index + 1}
+                      {courseClass.label ?? `Clase ${index + 1}`}
                       {courseClass.teachers.length > 0 ? ` — ${courseClass.teachers.map((teacher) => teacher.fullName).join(", ")}` : ""}
                     </SelectItem>
                   ))}
@@ -143,14 +134,16 @@ export function CourseEnrollmentAssignmentFields({
                     <Checkbox
                       id={`day-${day.id}`}
                       checked={checked}
-                      disabled={disabled}
+                      disabled={disabled || day.availableCapacity === 0}
                       onCheckedChange={(value) => handleDayToggle(day.id, value === true)}
                     />
                     <div>
                       <FieldLabel htmlFor={`day-${day.id}`} className="font-medium">
-                        {DAY_LABELS[day.dayOfWeek] ?? day.dayOfWeek}
+                        {COURSE_DAY_LABELS[day.dayOfWeek] ?? day.dayOfWeek}
                       </FieldLabel>
-                      {day.capacity !== null ? <p className="text-muted-foreground text-xs">Capacidad configurada: {day.capacity}</p> : null}
+                      {day.capacity !== null ? (
+                        <p className="text-muted-foreground text-xs">Cupos disponibles: {day.availableCapacity ?? day.capacity}</p>
+                      ) : null}
                     </div>
                   </Field>
                   {checked ? (
@@ -196,8 +189,9 @@ export function CourseEnrollmentAssignmentFields({
                             <SelectContent>
                               <SelectGroup>
                                 {selectedSchedule.individualSlots.map((slot) => (
-                                  <SelectItem key={slot.id} value={slot.id} className="px-2.5 py-1.5">
+                                  <SelectItem key={slot.id} value={slot.id} disabled={slot.available === false} className="px-2.5 py-1.5">
                                     {formatTime(slot.startTime)}–{formatTime(slot.endTime)}
+                                    {slot.available === false ? " · Ocupado" : ""}
                                   </SelectItem>
                                 ))}
                               </SelectGroup>

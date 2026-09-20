@@ -17,6 +17,7 @@ import { Field, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
 import { updateCourseAcademicStatusAction, withdrawCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import { ACADEMIC_ENROLLMENT_STATUS_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 
@@ -119,7 +120,9 @@ export function CourseEnrollmentMutationDialog({
                 disabled={isPending}
                 className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
               >
-                {ACADEMIC_STATUS_OPTIONS.map((option) => (
+                {ACADEMIC_STATUS_OPTIONS.filter(
+                  (option) => enrollment.status !== COURSE_ENROLLMENT_STATUS.COMPLETED || option.value !== ACADEMIC_ENROLLMENT_STATUS.IN_PROGRESS,
+                ).map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
