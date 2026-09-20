@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import * as React from "react";
 import { CircleAlertIcon } from "lucide-react";
 
@@ -77,7 +79,7 @@ export function CourseEnrollmentMutationDialog({
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
-        <form action={formAction} className="space-y-4">
+        <ActionForm action={formAction} className="space-y-4">
           <AlertDialogHeader>
             <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Actualizar resultado académico"}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -146,7 +148,7 @@ export function CourseEnrollmentMutationDialog({
               {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Guardar resultado"}
             </Button>
           </AlertDialogFooter>
-        </form>
+        </ActionForm>
       </AlertDialogContent>
     </AlertDialog>
   );

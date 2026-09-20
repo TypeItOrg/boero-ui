@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import * as React from "react";
 import { useActionState } from "react";
 import { CircleAlertIcon, CircleXIcon } from "lucide-react";
@@ -60,7 +62,7 @@ export function EnrollmentApplicationRejectDialog({
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
-        <form action={formAction} className="space-y-4" noValidate>
+        <ActionForm action={formAction} className="space-y-4" noValidate>
           <AlertDialogHeader>
             <div className="bg-destructive/10 text-destructive mb-1 flex size-12 items-center justify-center rounded-2xl">
               <CircleXIcon className="size-6" />
@@ -107,7 +109,7 @@ export function EnrollmentApplicationRejectDialog({
               {isPending ? "Rechazando…" : "Rechazar inscripción"}
             </Button>
           </AlertDialogFooter>
-        </form>
+        </ActionForm>
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -32,7 +34,7 @@ export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }:
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (
-    <form action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">
@@ -68,6 +70,6 @@ export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }:
           {pending ? "Creando…" : "Crear versión"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

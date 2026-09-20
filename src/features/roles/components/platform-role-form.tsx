@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import * as React from "react";
 import Link from "next/link";
 import { useActionState } from "react";
@@ -35,7 +37,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
   const isEdit = Boolean(role);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <ActionForm action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />
@@ -120,7 +122,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
           {pending ? "Guardando…" : "Guardar cambios"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 

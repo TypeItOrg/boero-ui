@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -235,7 +237,7 @@ export function EnrollmentApplicationCourseDialog({
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
       <AlertDialogContent className="max-w-4xl">
-        <form action={formAction} className="space-y-4">
+        <ActionForm action={formAction} className="space-y-4">
           <AlertDialogHeader>
             <AlertDialogTitle>Inscribir solicitud de cursada</AlertDialogTitle>
             <AlertDialogDescription>
@@ -284,7 +286,7 @@ export function EnrollmentApplicationCourseDialog({
               {isPending ? "Inscribiendo…" : "Confirmar inscripción"}
             </Button>
           </AlertDialogFooter>
-        </form>
+        </ActionForm>
       </AlertDialogContent>
     </AlertDialog>
   );
@@ -318,7 +320,7 @@ function RejectEnrollmentApplicationCourseDialog({
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
       <AlertDialogContent>
-        <form action={formAction} className="space-y-4">
+        <ActionForm action={formAction} className="space-y-4">
           <AlertDialogHeader>
             <AlertDialogTitle>Rechazar solicitud de cursada</AlertDialogTitle>
             <AlertDialogDescription>
@@ -345,7 +347,7 @@ function RejectEnrollmentApplicationCourseDialog({
               {isPending ? "Rechazando…" : "Rechazar solicitud"}
             </Button>
           </AlertDialogFooter>
-        </form>
+        </ActionForm>
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { useActionState, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -73,7 +75,7 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
       }}
     >
       <DialogContent className="sm:max-w-[425px]">
-        <form action={formAction}>
+        <ActionForm action={formAction}>
           <DialogHeader>
             <DialogTitle>{period ? "Editar Período de Inscripción" : "Nuevo Período de Inscripción"}</DialogTitle>
             <DialogDescription>Configurá las fechas de inicio y fin para habilitar las pre-inscripciones.</DialogDescription>
@@ -139,7 +141,7 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
               {loading ? "Guardando..." : period ? "Guardar Cambios" : "Crear Período"}
             </Button>
           </DialogFooter>
-        </form>
+        </ActionForm>
       </DialogContent>
     </Dialog>
   );

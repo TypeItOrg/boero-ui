@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { useActionState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,7 +21,7 @@ export function ResetInstitutionalPasswordForm({ token }: { token: string }): Re
   const [state, formAction, isPending] = useActionState(resetPassword, INITIAL_STATE);
 
   return (
-    <form action={formAction} className="p-6 md:p-8">
+    <ActionForm action={formAction} className="p-6 md:p-8">
       <input name="token" type="hidden" value={token} />
       <header className="flex flex-col items-center space-y-1 text-center">
         <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-16 max-w-full sm:w-20 md:hidden" />
@@ -78,6 +80,6 @@ export function ResetInstitutionalPasswordForm({ token }: { token: string }): Re
           </p>
         </footer>
       </div>
-    </form>
+    </ActionForm>
   );
 }

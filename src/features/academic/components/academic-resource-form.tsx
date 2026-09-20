@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
@@ -103,7 +105,7 @@ export function AcademicResourceForm({
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (
-    <form action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">
@@ -164,6 +166,6 @@ export function AcademicResourceForm({
           {pending ? "Guardando…" : submitLabel}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

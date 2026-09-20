@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import Link from "next/link";
 import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -82,7 +84,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
   }, [courseId]);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <ActionForm action={formAction} className="flex flex-col gap-5">
       <input type="hidden" name="returnTo" value={returnTo} />
       {state.error ? (
         <Alert variant="destructive">
@@ -153,7 +155,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
           {isPending ? "Registrando…" : "Registrar cursada"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 

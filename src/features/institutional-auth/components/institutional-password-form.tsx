@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { useActionState } from "react";
 import { CircleAlertIcon, KeyRoundIcon } from "lucide-react";
 
@@ -16,7 +18,7 @@ export function InstitutionalPasswordForm(): React.ReactElement {
   const [state, formAction, isPending] = useActionState(changeInstitutionalPasswordAction, INITIAL_STATE);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon className="size-4" />
@@ -87,6 +89,6 @@ export function InstitutionalPasswordForm(): React.ReactElement {
           {isPending ? "Cambiando..." : "Cambiar contraseña"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

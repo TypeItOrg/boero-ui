@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { useActionState } from "react";
 import Link from "next/link";
 import { CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon } from "lucide-react";
@@ -30,7 +32,7 @@ export function InstitutionRoleForm({ institutionId, role, permissionGroups, ret
   const [state, formAction, pending] = useActionState(action, initialState);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <ActionForm action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />
@@ -103,6 +105,6 @@ export function InstitutionRoleForm({ institutionId, role, permissionGroups, ret
           {pending ? "Guardando…" : "Guardar cambios"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

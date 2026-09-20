@@ -21,6 +21,14 @@ Una Server Action con `revalidatePath` y `redirect` actualiza el árbol RSC de d
 
 Las Server Actions que devuelven `{ error }` no son un reemplazo directo de una `mutationFn`: para React Query son resoluciones exitosas salvo que se agregue un adaptador que lance el error. No introducir ese adaptador si la navegación y la actualización siguen perteneciendo al árbol RSC.
 
+## Conservar los datos cuando falla el envío
+
+React reinicia un `<form action={formAction}>` cuando la Action termina, incluso si devuelve errores de validación o de negocio. Esto borra campos no controlados y también puede vaciar controles de hora que escuchan el evento nativo `reset`.
+
+Usar `ActionForm` de `@common/components/action-form` en formularios con datos editables susceptibles de reinicio. Conserva `action`, `useActionState` y su estado pendiente, pero cancela `reset` y detiene su propagación en captura, antes de los listeners de los controles. Algunos selectores controlados también escuchan `reset` sin consultar `defaultPrevented`: controlar `value` no basta para protegerlos. Los valores permanecen en el formulario; no se guardan contraseñas ni otros datos en almacenamiento del navegador o en el estado devuelto por el servidor.
+
+El éxito sigue cerrando el diálogo o navegando según el flujo existente. Si el formulario permanece abierto y debe limpiar sus campos después del éxito, pasar `resetOnSuccess={Boolean(state.success)}`. No habilitarlo por la mera finalización de una petición. Las confirmaciones sin campos editables y los formularios con controles completamente controlados que no reaccionan a `reset` no necesitan este componente.
+
 ## Contrato de una Server Action
 
 1. Validar todos los argumentos vinculados y cada entrada de `FormData`; la UI no es una frontera de seguridad.

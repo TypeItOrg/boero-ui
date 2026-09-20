@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { useActionState, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +24,7 @@ export function InstitutionalPasswordRecoveryForm(): React.ReactElement {
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
 
   return (
-    <form action={formAction} className="p-6 md:p-8">
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={formAction} className="p-6 md:p-8">
       <header className="flex flex-col items-center space-y-1 text-center">
         <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-16 max-w-full sm:w-20 md:hidden" />
         <h1 className="text-2xl font-bold">Recuperar contraseña</h1>
@@ -94,6 +96,6 @@ export function InstitutionalPasswordRecoveryForm(): React.ReactElement {
           </p>
         </footer>
       </div>
-    </form>
+    </ActionForm>
   );
 }

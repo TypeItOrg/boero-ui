@@ -1,4 +1,6 @@
 "use client";
+
+import { ActionForm } from "@common/components/action-form";
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Loader2Icon } from "lucide-react";
@@ -60,7 +62,7 @@ function VerificationRequestForm({
   const [email, setEmail] = useState("");
 
   return (
-    <form action={action} className="mt-6 space-y-5">
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={action} className="mt-6 space-y-5">
       <EmailVerificationFeedback
         state={state}
         successMessage={
@@ -156,6 +158,6 @@ function VerificationRequestForm({
           </Button>
         </p>
       </div>
-    </form>
+    </ActionForm>
   );
 }

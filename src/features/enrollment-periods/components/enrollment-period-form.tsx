@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import { useActionState, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -85,7 +87,7 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
   );
 
   return (
-    <form action={formAction} className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm action={formAction} className="flex h-full min-h-0 w-full flex-1 flex-col">
       <input type="hidden" name="institutionId" value={institution?.id ?? ""} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto pb-4">
         {state.error ? (
@@ -215,7 +217,7 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
           {isPending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear período"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 
