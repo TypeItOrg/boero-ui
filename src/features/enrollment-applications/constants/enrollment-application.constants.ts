@@ -6,6 +6,22 @@ import { ENROLLMENT_DOCUMENT_TYPE, type EnrollmentDocumentType } from "@features
 
 export const ENROLLMENT_APPLICATIONS_API_PATH = "/api/v1/enrollment-applications";
 
+export const ENROLLMENT_SUBMISSION_ERROR_FIELDS = [
+  "applicant",
+  "personalData.firstName",
+  "personalData.lastName",
+  "personalData.documentNumber",
+  "personalData.email",
+  "responsible",
+  "responsible.fullName",
+  "responsible.documentNumber",
+  "responsible.phoneNumber",
+  "academicBackground",
+  "courses",
+  "preference.preferredShift",
+  "preference.previousTeacher",
+] as const;
+
 export const ACTIVE_ENROLLMENT_APPLICATION_STATUSES = [
   ENROLLMENT_APPLICATION_STATUS.DRAFT,
   ENROLLMENT_APPLICATION_STATUS.SUBMITTED,
