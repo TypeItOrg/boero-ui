@@ -181,7 +181,10 @@ describe("AcademicDetail", () => {
     render(<AcademicDetail item={COURSE} resource={AcademicResource.COURSE} basePath="" canEdit />);
 
     const info = screen.getByRole("region", { name: "Información del curso" });
-    expect(within(info).getByText("Lenguaje Musical I · Asignatura · Individual")).toBeInTheDocument();
+    expect(within(info).getByText("Lenguaje Musical I")).toBeInTheDocument();
+    expect(within(info).getByText("Asignatura")).toBeInTheDocument();
+    expect(within(info).getByText("Individual")).toBeInTheDocument();
+    expect(within(info).getByText("Sin nivel")).toBeInTheDocument();
     expect(within(info).getByText("CAVI")).toBeInTheDocument();
 
     const classesRegion = screen.getByRole("region", { name: "Clases" });
@@ -192,6 +195,27 @@ describe("AcademicDetail", () => {
     expect(within(classesRegion).getByText("60 min")).toBeInTheDocument();
     expect(within(classesRegion).getByText("4")).toBeInTheDocument();
     expect(within(classesRegion).getByText("08:00 — 12:00")).toBeInTheDocument();
+  });
+
+  it("shows the associated instrument for an instrumental course and a placeholder otherwise", () => {
+    const { rerender } = render(
+      <AcademicDetail
+        item={{ ...COURSE, academicSpaceInstrumental: true, instrumentId: "instrument-1", instrumentName: "Piano" }}
+        resource={AcademicResource.COURSE}
+        basePath=""
+        canEdit
+      />,
+    );
+
+    const info = screen.getByRole("region", { name: "Información del curso" });
+    expect(within(info).getByText("Instrumento")).toBeInTheDocument();
+    expect(within(info).getByText("Piano")).toBeInTheDocument();
+
+    rerender(<AcademicDetail item={COURSE} resource={AcademicResource.COURSE} basePath="" canEdit />);
+
+    const plainInfo = screen.getByRole("region", { name: "Información del curso" });
+    const instrumentLabel = within(plainInfo).getByText("Instrumento");
+    expect(instrumentLabel.nextElementSibling).toHaveTextContent("—");
   });
 
   it("renders empty states for a course without classes", () => {

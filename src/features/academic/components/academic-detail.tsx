@@ -199,12 +199,25 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
             <dt className="text-muted-foreground text-sm">Ciclo lectivo</dt>
             <dd className="mt-1 font-semibold tabular-nums">{course.year}</dd>
           </div>
-          <div className="sm:col-span-2">
+          <div>
             <dt className="text-muted-foreground text-sm">Espacio académico</dt>
-            <dd className="mt-1 font-semibold">
-              {course.academicSpaceName} · {academicSpaceTypeLabels[course.academicSpaceType]} ·{" "}
-              {academicSpaceFormatLabels[course.academicSpaceFormat]}
-            </dd>
+            <dd className="mt-1 font-semibold">{course.academicSpaceName}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-sm">Nivel</dt>
+            <dd className="mt-1 font-semibold">{course.academicLevelName ?? "Sin nivel"}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-sm">Tipo</dt>
+            <dd className="mt-1 font-semibold">{academicSpaceTypeLabels[course.academicSpaceType]}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-sm">Formato</dt>
+            <dd className="mt-1 font-semibold">{academicSpaceFormatLabels[course.academicSpaceFormat]}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-sm">Instrumento</dt>
+            <dd className="mt-1 font-semibold">{course.instrumentName ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground text-sm">Estado</dt>
