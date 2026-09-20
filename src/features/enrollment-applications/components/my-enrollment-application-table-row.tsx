@@ -36,7 +36,12 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
               <div className="flex justify-start">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${application.studyPlanName}`} disabled={isCancelOpen}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Abrir acciones de ${application.trainingPathName ?? "la solicitud"}`}
+                      disabled={isCancelOpen}
+                    >
                       <EllipsisVerticalIcon />
                     </Button>
                   </DropdownMenuTrigger>
@@ -60,7 +65,7 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
                 </DropdownMenu>
               </div>
             </TableCell>
-            <TableCell className="font-medium">{application.studyPlanName}</TableCell>
+            <TableCell className="font-medium">{application.trainingPathName ?? "—"}</TableCell>
             <TableCell>{application.academicYear}</TableCell>
             <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
             <TableCell>

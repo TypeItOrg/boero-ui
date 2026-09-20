@@ -74,7 +74,7 @@ export function EnrollmentApplicationTableRow({
         {application.applicantLastName}, {application.applicantFirstName}
       </TableCell>
       <TableCell>{application.applicantDocumentNumber}</TableCell>
-      <TableCell>{application.studyPlanName}</TableCell>
+      <TableCell>{application.trainingPathName ?? "—"}</TableCell>
       <TableCell>{application.academicYear}</TableCell>
       <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
       <TableCell>

@@ -20,6 +20,8 @@ function application(status: EnrollmentApplication["status"], rejectionReason?: 
     applicantDocumentNumber: "12345678",
     studyPlanId: "00000000-0000-4000-8000-000000000004",
     studyPlanName: "Plan Básico",
+    trainingPathId: "00000000-0000-4000-8000-000000000007",
+    trainingPathName: "CAV Básico",
     academicYearId: "00000000-0000-4000-8000-000000000005",
     academicYear: 2027,
     enrollmentPeriodId: "00000000-0000-4000-8000-000000000006",
@@ -55,6 +57,19 @@ describe("MyEnrollmentApplicationTableRow", () => {
     );
 
     expect(screen.queryByText("Documentación incompleta")).not.toBeInTheDocument();
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+  });
+
+  it("shows the training path instead of the study plan", () => {
+    render(
+      <table>
+        <tbody>
+          <MyEnrollmentApplicationTableRow application={application("SUBMITTED")} />
+        </tbody>
+      </table>,
+    );
+
+    expect(screen.getByText("CAV Básico")).toBeInTheDocument();
+    expect(screen.queryByText("Plan Básico")).not.toBeInTheDocument();
   });
 });
