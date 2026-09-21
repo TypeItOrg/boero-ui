@@ -6,8 +6,8 @@ import { EllipsisVerticalIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
@@ -52,14 +52,17 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
                       </ReturnToLink>
                     </DropdownMenuItem>
                     {canCancel ? (
-                      <DropdownMenuItem
-                        variant="destructive"
-                        className="px-2.5 py-1.5"
-                        onSelect={() => setIsCancelOpen(true)}
-                        disabled={isCancelOpen}
-                      >
-                        Cancelar
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          className="px-2.5 py-1.5"
+                          onSelect={() => setIsCancelOpen(true)}
+                          disabled={isCancelOpen}
+                        >
+                          Cancelar
+                        </DropdownMenuItem>
+                      </>
                     ) : null}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -87,9 +90,12 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
             </ReturnToLink>
           </ContextMenuItem>
           {canCancel ? (
-            <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => setIsCancelOpen(true)} disabled={isCancelOpen}>
-              Cancelar
-            </ContextMenuItem>
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => setIsCancelOpen(true)} disabled={isCancelOpen}>
+                Cancelar
+              </ContextMenuItem>
+            </>
           ) : null}
         </ContextMenuContent>
       </ContextMenu>

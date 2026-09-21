@@ -74,6 +74,9 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): React.R
                 {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
                 Cambiar tema
               </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
               <DropdownMenuItem disabled={logout.isPending} onClick={() => logout.mutate()}>
                 <LogOutIcon />
                 {logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}

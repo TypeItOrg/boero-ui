@@ -5,8 +5,8 @@ import { EllipsisVerticalIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
@@ -61,9 +61,12 @@ export function EnrollmentApplicationTableRow({
                   </DropdownMenuItem>
                 ) : null}
                 {canResolve && canReject ? (
-                  <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>
-                    Rechazar inscripción
-                  </DropdownMenuItem>
+                  <>
+                    {detailHref || canApprove ? <DropdownMenuSeparator /> : null}
+                    <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>
+                      Rechazar inscripción
+                    </DropdownMenuItem>
+                  </>
                 ) : null}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -111,9 +114,12 @@ export function EnrollmentApplicationTableRow({
           </ContextMenuItem>
         ) : null}
         {canResolve && canReject ? (
-          <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>
-            Rechazar inscripción
-          </ContextMenuItem>
+          <>
+            {detailHref || canApprove ? <ContextMenuSeparator /> : null}
+            <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>
+              Rechazar inscripción
+            </ContextMenuItem>
+          </>
         ) : null}
       </ContextMenuContent>
     </ContextMenu>

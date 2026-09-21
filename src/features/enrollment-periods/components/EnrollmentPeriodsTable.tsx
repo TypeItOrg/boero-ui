@@ -19,10 +19,10 @@ import { fetchAcademicOptionPage } from "@features/academic/services/academic-op
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import { Badge } from "@common/components/ui/badge";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
 import { Sheet } from "@common/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
@@ -233,6 +233,11 @@ function EnrollmentPeriodsTableContent({
                   const editHref = AcademicScope.isAdmin(scope)
                     ? `/admin/enrollment-periods/${period.id}/edit?institutionId=${encodeURIComponent(institutionId)}`
                     : `/enrollment-periods/${period.id}/edit`;
+                  const canClosePeriod = canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.CLOSED;
+                  const canDeletePeriod = canDelete && period.canDelete;
+                  const hasSensitiveActions = canClosePeriod || canDeletePeriod;
+                  const hasRegularActions =
+                    (canUpdate && period.canUpdate) || (canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.OPEN);
 
                   return (
                     <ContextMenu key={period.id}>
@@ -262,7 +267,8 @@ function EnrollmentPeriodsTableContent({
                                       Abrir inscripciones
                                     </DropdownMenuItem>
                                   ) : null}
-                                  {canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.CLOSED ? (
+                                  {hasSensitiveActions && hasRegularActions ? <DropdownMenuSeparator /> : null}
+                                  {canClosePeriod ? (
                                     <DropdownMenuItem
                                       variant="destructive"
                                       className="px-2.5 py-1.5"
@@ -271,7 +277,7 @@ function EnrollmentPeriodsTableContent({
                                       Cerrar inscripciones
                                     </DropdownMenuItem>
                                   ) : null}
-                                  {canDelete && period.canDelete ? (
+                                  {canDeletePeriod ? (
                                     <DropdownMenuItem
                                       className="text-destructive focus:text-destructive px-2.5 py-1.5"
                                       onSelect={() => setDeletingPeriodId(period.id)}
@@ -322,7 +328,8 @@ function EnrollmentPeriodsTableContent({
                             Abrir inscripciones
                           </ContextMenuItem>
                         ) : null}
-                        {canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.CLOSED ? (
+                        {hasSensitiveActions && hasRegularActions ? <ContextMenuSeparator /> : null}
+                        {canClosePeriod ? (
                           <ContextMenuItem
                             variant="destructive"
                             className="px-2.5 py-1.5"
@@ -332,7 +339,7 @@ function EnrollmentPeriodsTableContent({
                             Cerrar inscripciones
                           </ContextMenuItem>
                         ) : null}
-                        {canDelete && period.canDelete ? (
+                        {canDeletePeriod ? (
                           <ContextMenuItem
                             className="text-destructive focus:text-destructive px-2.5 py-1.5"
                             disabled={isChangingStatus}

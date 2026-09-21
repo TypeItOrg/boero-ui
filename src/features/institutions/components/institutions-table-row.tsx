@@ -69,7 +69,7 @@ export function InstitutionsTableRow({ institution, onStatusChange }: Institutio
             )}
           </ContextMenuItem>
         ))}
-        <ContextMenuSeparator />
+        {institution.active ? <ContextMenuSeparator /> : null}
         <ContextMenuItem
           variant={institution.active ? "destructive" : "default"}
           className="px-2.5 py-1.5"
@@ -147,7 +147,7 @@ function InstitutionActionsMenu({
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
+          {institution.active ? <DropdownMenuSeparator /> : null}
           <DropdownMenuItem variant={institution.active ? "destructive" : "default"} className="px-2.5 py-1.5" onSelect={onStatusChange}>
             {institution.active ? "Desactivar" : "Activar"}
           </DropdownMenuItem>

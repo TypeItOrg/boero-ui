@@ -4,8 +4,8 @@ import { EllipsisVerticalIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
-import { ContextMenuItem } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { ContextMenuItem, ContextMenuSeparator } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { ACADEMIC_LIFECYCLE_ACTION_KIND, type AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicRowAction } from "@features/academic/types/academic-row-action.types";
@@ -20,36 +20,50 @@ type AcademicActionProps = {
 };
 
 export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): React.ReactNode {
-  return actions.map((action) => {
+  const orderedActions = orderAcademicActions(actions);
+  const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
+
+  return orderedActions.map((action, index) => {
+    const separator = index === sensitiveActionIndex && index > 0 ? <ContextMenuSeparator /> : null;
+
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.NAVIGATE) {
       return (
-        <ContextMenuItem key={action.href} asChild>
-          <AcademicActionLink action={action} className="px-2.5 py-1.5" />
-        </ContextMenuItem>
+        <React.Fragment key={action.href}>
+          {separator}
+          <ContextMenuItem asChild>
+            <AcademicActionLink action={action} className="px-2.5 py-1.5" />
+          </ContextMenuItem>
+        </React.Fragment>
       );
     }
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.STATUS) {
       return (
-        <ContextMenuItem
-          key={action.label}
-          variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
-          className="px-2.5 py-1.5"
-          onSelect={() => onStatusAction(action)}
-        >
-          {action.label}
-        </ContextMenuItem>
+        <React.Fragment key={action.label}>
+          {separator}
+          <ContextMenuItem
+            variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
+            className="px-2.5 py-1.5"
+            onSelect={() => onStatusAction(action)}
+          >
+            {action.label}
+          </ContextMenuItem>
+        </React.Fragment>
       );
     }
 
     return (
-      <ContextMenuItem
-        key={action.label}
-        className={action.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE ? "text-destructive focus:text-destructive px-2.5 py-1.5" : "px-2.5 py-1.5"}
-        onSelect={() => onLifecycleAction(action.kind)}
-      >
-        {action.label}
-      </ContextMenuItem>
+      <React.Fragment key={action.label}>
+        {separator}
+        <ContextMenuItem
+          className={
+            action.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE ? "text-destructive focus:text-destructive px-2.5 py-1.5" : "px-2.5 py-1.5"
+          }
+          onSelect={() => onLifecycleAction(action.kind)}
+        >
+          {action.label}
+        </ContextMenuItem>
+      </React.Fragment>
     );
   });
 }
@@ -79,38 +93,62 @@ export function AcademicRowActions({
 }
 
 export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): React.ReactNode {
-  return actions.map((action) => {
+  const orderedActions = orderAcademicActions(actions);
+  const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
+
+  return orderedActions.map((action, index) => {
+    const separator = index === sensitiveActionIndex && index > 0 ? <DropdownMenuSeparator /> : null;
+
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.NAVIGATE) {
       return (
-        <DropdownMenuItem key={action.href} asChild>
-          <AcademicActionLink action={action} className="px-2.5 py-1.5" />
-        </DropdownMenuItem>
+        <React.Fragment key={action.href}>
+          {separator}
+          <DropdownMenuItem asChild>
+            <AcademicActionLink action={action} className="px-2.5 py-1.5" />
+          </DropdownMenuItem>
+        </React.Fragment>
       );
     }
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.STATUS) {
       return (
-        <DropdownMenuItem
-          key={action.label}
-          variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
-          className="px-2.5 py-1.5"
-          onSelect={() => onStatusAction(action)}
-        >
-          {action.label}
-        </DropdownMenuItem>
+        <React.Fragment key={action.label}>
+          {separator}
+          <DropdownMenuItem
+            variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
+            className="px-2.5 py-1.5"
+            onSelect={() => onStatusAction(action)}
+          >
+            {action.label}
+          </DropdownMenuItem>
+        </React.Fragment>
       );
     }
 
     return (
-      <DropdownMenuItem
-        key={action.label}
-        className={action.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE ? "text-destructive focus:text-destructive px-2.5 py-1.5" : "px-2.5 py-1.5"}
-        onSelect={() => onLifecycleAction(action.kind)}
-      >
-        {action.label}
-      </DropdownMenuItem>
+      <React.Fragment key={action.label}>
+        {separator}
+        <DropdownMenuItem
+          className={
+            action.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE ? "text-destructive focus:text-destructive px-2.5 py-1.5" : "px-2.5 py-1.5"
+          }
+          onSelect={() => onLifecycleAction(action.kind)}
+        >
+          {action.label}
+        </DropdownMenuItem>
+      </React.Fragment>
     );
   });
+}
+
+function orderAcademicActions(actions: readonly AcademicRowAction[]): AcademicRowAction[] {
+  return [...actions.filter((action) => !isSensitiveAcademicAction(action)), ...actions.filter(isSensitiveAcademicAction)];
+}
+
+function isSensitiveAcademicAction(action: AcademicRowAction): boolean {
+  return (
+    action.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE || (action.kind === ACADEMIC_ROW_ACTION_KIND.STATUS && isDestructiveStatusAction(action))
+  );
 }
 
 type AcademicActionLinkProps = Omit<React.ComponentProps<typeof Link>, "href"> & {
