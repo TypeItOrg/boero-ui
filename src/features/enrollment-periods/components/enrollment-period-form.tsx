@@ -189,25 +189,25 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
               <Input id="name" name="name" defaultValue={period?.name} placeholder="Ej. Inscripción 2027 · Primer llamado" required />
             </div>
 
-            <div className="@container/date-time-field grid min-w-0 gap-2">
+            <div className="grid min-w-0 gap-2">
               <FieldLabel htmlFor="startDate" required>
                 Fecha y hora de inicio
               </FieldLabel>
               <input type="hidden" name="startDate" value={formatDateInput(startDate)} />
               <input type="hidden" name="startTime" value={startTime} />
-              <div className="grid min-w-0 gap-2 *:min-w-0 @lg/date-time-field:grid-cols-[minmax(0,1fr)_7rem]">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 *:min-w-0">
                 <DatePicker id="startDate" value={startDate} onChange={setStartDate} required autoComplete="off" />
                 <TimeInputWithIcon id="startTime" aria-label="Hora de inicio" value={startTime} onValueChange={setStartTime} required />
               </div>
             </div>
 
-            <div className="@container/date-time-field grid min-w-0 gap-2">
+            <div className="grid min-w-0 gap-2">
               <FieldLabel htmlFor="endDate" required>
                 Fecha y hora de fin
               </FieldLabel>
               <input type="hidden" name="endDate" value={formatDateInput(endDate)} />
               <input type="hidden" name="endTime" value={endTime} />
-              <div className="grid min-w-0 gap-2 *:min-w-0 @lg/date-time-field:grid-cols-[minmax(0,1fr)_7rem]">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 *:min-w-0">
                 <DatePicker
                   id="endDate"
                   value={endDate}
