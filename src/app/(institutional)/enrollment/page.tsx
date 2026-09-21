@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { AlertCircleIcon, ClipboardPlusIcon } from "lucide-react";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
@@ -47,10 +46,7 @@ export default async function EnrollmentPage({
     );
   }
 
-  const [plansResponse, periodsResponse] = await Promise.all([
-    fetchAvailableEnrollmentTrainingPaths(plansPage),
-    fetchAvailableEnrollmentPeriods({ page: 0, size: 20 }),
-  ]);
+  const plansResponse = await fetchAvailableEnrollmentTrainingPaths(plansPage);
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
@@ -60,7 +56,6 @@ export default async function EnrollmentPage({
           name: plan.name,
           trainingPathName: plan.name,
         }))}
-        periods={periodsResponse.items}
         studyPlanPagination={
           plansResponse.totalPages > 1 ? (
             <EnrollmentCatalogPagination

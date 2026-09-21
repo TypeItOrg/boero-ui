@@ -22,6 +22,17 @@ const contextSchema = z.object({
 
 const detailsSchema = z
   .object({
+    offerings: z
+      .array(
+        z
+          .object({
+            studyPlanId: z.uuid(),
+            academicLevelIds: z.array(z.uuid()),
+            includeUnassigned: z.boolean(),
+          })
+          .refine((offering) => offering.academicLevelIds.length > 0 || offering.includeUnassigned, ENROLLMENT_MESSAGES.PERIOD_SCOPE_REQUIRED),
+      )
+      .min(1, ENROLLMENT_MESSAGES.PERIOD_SCOPE_REQUIRED),
     name: z.string().trim().min(1, ENROLLMENT_MESSAGES.PERIOD_NAME_REQUIRED).max(150),
     startDate: z.iso.datetime({ offset: true }),
     endDate: z.iso.datetime({ offset: true }),
@@ -64,6 +75,9 @@ async function mutate(
 
   revalidatePath("/enrollment-periods");
   revalidatePath("/admin/enrollment-periods");
+  revalidatePath("/my-enrollment-applications", "layout");
+  revalidatePath("/enrollment-applications", "layout");
+  revalidatePath("/admin/enrollment-applications", "layout");
 
   return { success: true };
 }

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Building2Icon, ClipboardListIcon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from "lucide-react";
+import { BookOpenIcon, Building2Icon, ClipboardListIcon, GraduationCapIcon, type LucideIcon, UserRoundIcon } from "lucide-react";
 
 import { NavigationCard } from "@common/components/navigation/navigation-card";
 import { Separator } from "@common/components/ui/separator";
@@ -15,6 +15,7 @@ import {
   getInstitutionalAcademicOfferLink,
   getInstitutionalEnrollmentHomeLinks,
   getInstitutionalHomeLinks,
+  getInstitutionalFormationHomeLinks,
   type InstitutionalHomeLink,
 } from "@features/institutional-auth/utils/institutional-home-access.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
@@ -59,6 +60,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   const academicOfferLink = getInstitutionalAcademicOfferLink(user);
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
   const enrollmentLinks = getInstitutionalEnrollmentHomeLinks(user);
+  const formationLinks = getInstitutionalFormationHomeLinks(user);
   const hasInstitutionalAccess = managementLinks.length > 0;
   const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
   const hasEnrollmentAccess = enrollmentLinks.length > 0;
@@ -189,7 +191,24 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
           </HomeSubsection>
         ) : null}
 
-        {!hasManagementTools && personalLink ? (
+        {formationLinks.length > 0 ? (
+          <HomeSubsection
+            id="formation-title"
+            title="Formación"
+            description="Seguí tu recorrido académico en la institución."
+            icon={BookOpenIcon}
+            imageSrc="/gestion-academica.webp"
+            imageSide="right"
+          >
+            <nav aria-label="Formación" className="[&>a]:bg-background grid gap-4">
+              {formationLinks.map((link) => (
+                <HomeAccessRow key={link.href} link={link} />
+              ))}
+            </nav>
+          </HomeSubsection>
+        ) : null}
+
+        {!hasManagementTools && formationLinks.length === 0 && personalLink ? (
           <HomeSubsection
             id="personal-space-title"
             title="Mi espacio"

@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
+import { INSTITUTIONAL_PERMISSION as P } from "@features/institutional-auth/types/institutional-permission.types";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon } from "lucide-react";
+import { EllipsisVerticalIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { Badge } from "@common/components/ui/badge";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
@@ -15,15 +20,16 @@ import type { CourseEnrollment } from "@features/course-enrollments/types/course
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
+import { CourseEnrollmentSchedules } from "@features/course-enrollments/components/course-enrollment-schedules";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
 import {
   ACADEMIC_ENROLLMENT_STATUS_LABELS,
-  COURSE_DAY_LABELS,
   COURSE_ENROLLMENT_STATUS_LABELS,
 } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { ScrollTextIcon } from "lucide-react";
 
 type CourseEnrollmentTableProps = {
+  permissionScopes?: import("@features/institutional-auth/types/institutional-user.types").InstitutionalUser["permissionScopes"];
   data: PaginatedResponse<CourseEnrollment>;
   page: number;
   size: number;
@@ -38,6 +44,7 @@ type CourseEnrollmentTableProps = {
 
 export function CourseEnrollmentTable({
   data,
+  permissionScopes,
   page,
   size,
   status,
@@ -52,6 +59,7 @@ export function CourseEnrollmentTable({
   const { isPending: isNavigating } = useDataTableNavigation();
   const [mutation, setMutation] = React.useState<{ enrollment: CourseEnrollment; mode: "withdraw" | "academic" }>();
   const hasFilters = status !== undefined || academicStatus !== undefined;
+  const showActionsColumn = Boolean(detailBasePath) || canReadWaitlist || canWithdraw || canUpdateAcademicStatus;
 
   if (data.items.length === 0) {
     return (
@@ -66,7 +74,7 @@ export function CourseEnrollmentTable({
               <EmptyDescription>
                 {hasFilters
                   ? "No encontramos ninguna cursada que coincida con los filtros seleccionados."
-                  : "Cuando te inscribas en un curso, tu cursada va a aparecer acá junto con su estado y resultado."}
+                  : "Las cursadas registradas van a aparecer acá junto con sus horarios, estado y resultado académico."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -90,75 +98,121 @@ export function CourseEnrollmentTable({
         <Table containerClassName="table-scrollbar" className="min-w-192">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
-              <TableHead>Estudiante</TableHead>
-              <TableHead>Curso / clase</TableHead>
-              <TableHead>Plan / nivel</TableHead>
+              {showActionsColumn ? (
+                <TableHead className="w-16 pl-4">
+                  <span className="sr-only">Acciones</span>
+                </TableHead>
+              ) : null}
+              <TableHead className={showActionsColumn ? undefined : "pl-4"}>Estudiante</TableHead>
+              <TableHead>Curso</TableHead>
+              <TableHead>Plan</TableHead>
               <TableHead>Instrumento</TableHead>
               <TableHead>Horarios</TableHead>
               <TableHead>Cursada</TableHead>
               <TableHead>Resultado</TableHead>
-              <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.items.map((enrollment) => (
-              <TableRow key={enrollment.id} className="hover:bg-muted/50 h-11 border-b transition-colors">
-                <TableCell>{enrollment.studentName}</TableCell>
-                <TableCell className="font-medium">
-                  {enrollment.academicSpaceName}
-                  <div className="text-muted-foreground text-sm">{enrollment.courseClassLabel}</div>
-                </TableCell>
-                <TableCell>
-                  <div>{enrollment.studyPlanName}</div>
-                  <div className="text-muted-foreground">{enrollment.academicLevelName ?? "Sin nivel"}</div>
-                </TableCell>
-                <TableCell>{enrollment.instrumentName ?? "—"}</TableCell>
-                <TableCell>
-                  {enrollment.schedules.length === 0
-                    ? "—"
-                    : enrollment.schedules
-                        .map(
-                          (schedule) =>
-                            `${COURSE_DAY_LABELS[schedule.dayOfWeek] ?? schedule.dayOfWeek} ${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}${schedule.releasedAt ? " (liberado)" : ""}`,
-                        )
-                        .join(", ")}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={enrollment.status === "ENROLLED" ? "success" : "secondary"}>
-                    {COURSE_ENROLLMENT_STATUS_LABELS[enrollment.status]}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={enrollment.academicStatus === "IN_PROGRESS" ? "outline" : "secondary"}>
-                    {ACADEMIC_ENROLLMENT_STATUS_LABELS[enrollment.academicStatus]}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex min-w-44 flex-wrap gap-2">
+            {data.items.map((enrollment) => {
+              const canWithdrawEnrollment =
+                canWithdraw &&
+                scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_WITHDRAW, enrollment.trainingPathId) &&
+                enrollment.status === "ENROLLED";
+              const canUpdateResult =
+                canUpdateAcademicStatus &&
+                scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE, enrollment.trainingPathId) &&
+                enrollment.status !== "WITHDRAWN" &&
+                enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN";
+              const canViewWaitlist =
+                canReadWaitlist && scopeIncludesTrainingPath(permissionScopes, P.COURSE_WAITLIST_READ, enrollment.trainingPathId);
+              const hasActions = Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult;
+
+              function renderActions(Item: typeof DropdownMenuItem | typeof ContextMenuItem): React.ReactElement {
+                return (
+                  <>
                     {detailBasePath ? (
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`${detailBasePath}/${enrollment.id}`}>Ver detalle</Link>
-                      </Button>
+                      <Item asChild>
+                        <ReturnToLink href={`${detailBasePath}/${enrollment.id}`} className="px-2.5 py-1.5">
+                          Ver detalle
+                        </ReturnToLink>
+                      </Item>
                     ) : null}
-                    {canReadWaitlist ? (
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/course-enrollments/${enrollment.courseId}/waitlist`}>Ver lista de espera</Link>
-                      </Button>
+                    {canViewWaitlist ? (
+                      <Item asChild>
+                        <Link href={`/course-enrollments/${enrollment.courseId}/waitlist`} className="px-2.5 py-1.5">
+                          Ver lista de espera
+                        </Link>
+                      </Item>
                     ) : null}
-                    {canWithdraw && enrollment.status === "ENROLLED" ? (
-                      <Button variant="outline" size="sm" onClick={() => setMutation({ enrollment, mode: "withdraw" })}>
+                    {canWithdrawEnrollment ? (
+                      <Item variant="destructive" className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "withdraw" })}>
                         Registrar baja
-                      </Button>
+                      </Item>
                     ) : null}
-                    {canUpdateAcademicStatus && enrollment.status !== "WITHDRAWN" && enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN" ? (
-                      <Button variant="outline" size="sm" onClick={() => setMutation({ enrollment, mode: "academic" })}>
+                    {canUpdateResult ? (
+                      <Item className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "academic" })}>
                         Resultado
-                      </Button>
+                      </Item>
                     ) : null}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </>
+                );
+              }
+
+              const row = (
+                <TableRow key={enrollment.id} className="hover:bg-muted/50 h-12 border-b transition-colors">
+                  {showActionsColumn ? (
+                    <TableCell className="w-16 pl-4">
+                      {hasActions ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${enrollment.studentName}`}>
+                              <EllipsisVerticalIcon />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-48 p-1.5">
+                            {renderActions(DropdownMenuItem)}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : null}
+                    </TableCell>
+                  ) : null}
+                  <TableCell className={showActionsColumn ? undefined : "pl-4"}>{enrollment.studentName}</TableCell>
+                  <TableCell className="font-medium">
+                    {enrollment.academicSpaceName}
+                    <div className="text-muted-foreground text-sm">{enrollment.courseClassLabel}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div>{enrollment.studyPlanName}</div>
+                    <div className="text-muted-foreground">{enrollment.academicLevelName ?? "Sin nivel"}</div>
+                  </TableCell>
+                  <TableCell>{enrollment.instrumentName ?? "—"}</TableCell>
+                  <TableCell>
+                    <CourseEnrollmentSchedules schedules={enrollment.schedules} />
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={enrollment.status === "ENROLLED" ? "success" : "secondary"}>
+                      {COURSE_ENROLLMENT_STATUS_LABELS[enrollment.status]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={enrollment.academicStatus === "IN_PROGRESS" ? "outline" : "secondary"}>
+                      {ACADEMIC_ENROLLMENT_STATUS_LABELS[enrollment.academicStatus]}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              );
+
+              if (!hasActions) {
+                return row;
+              }
+
+              return (
+                <ContextMenu key={enrollment.id}>
+                  <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
+                  <ContextMenuContent className="w-48 p-1.5">{renderActions(ContextMenuItem)}</ContextMenuContent>
+                </ContextMenu>
+              );
+            })}
           </TableBody>
         </Table>
 

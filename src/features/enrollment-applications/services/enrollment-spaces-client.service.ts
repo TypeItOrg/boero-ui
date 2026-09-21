@@ -5,7 +5,7 @@ import type { EnrollmentCourseOption } from "@features/enrollment-applications/t
 
 export async function fetchEnrollmentCourses(
   applicationId: string,
-  params: { page?: number; size?: number; search?: string } = {},
+  params: { page?: number; size?: number; search?: string; studyPlanSpaceId?: string; academicYear?: number; signal?: AbortSignal } = {},
 ): Promise<PaginatedResponse<EnrollmentCourseOption>> {
   const searchParams = new URLSearchParams({ page: String(params.page ?? 0), size: String(params.size ?? 50) });
 
@@ -13,7 +13,14 @@ export async function fetchEnrollmentCourses(
     searchParams.set("search", params.search);
   }
 
-  const response = await fetch(`/api/enrollment-applications/${applicationId}/courses?${searchParams}`, { cache: "no-store" });
+  if (params.studyPlanSpaceId) {
+    searchParams.set("studyPlanSpaceId", params.studyPlanSpaceId);
+  }
+  if (params.academicYear !== undefined) {
+    searchParams.set("academicYear", String(params.academicYear));
+  }
+
+  const response = await fetch(`/api/enrollment-applications/${applicationId}/courses?${searchParams}`, { cache: "no-store", signal: params.signal });
 
   return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH_COURSES_FAILED);
 }

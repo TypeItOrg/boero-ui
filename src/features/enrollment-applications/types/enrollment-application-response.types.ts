@@ -1,3 +1,4 @@
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import type { EnrollmentApplicationSpaceResponse } from "@features/enrollment-applications/types/enrollment-application-space-response.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
@@ -11,6 +12,8 @@ export interface EnrollmentApplicationResponse {
   studyPlanId?: string | null;
   academicYearId: string;
   enrollmentPeriodId: string;
+  enrollmentPeriod?: EnrollmentPeriod;
+  periodOpen?: boolean;
   studyPlanName?: string;
   trainingPathName?: string | null;
   academicYearName?: string;

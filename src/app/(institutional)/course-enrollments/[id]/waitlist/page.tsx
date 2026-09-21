@@ -1,5 +1,5 @@
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import { hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -25,12 +25,12 @@ export default async function CourseWaitlistPage({ params }: { params: Promise<{
   return (
     <PlatformPageShell
       title="Lista de espera"
-      breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[id]} trailingLabel="Lista de espera" />}
+      breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[id]} />}
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <CourseWaitlistTable
         entries={entries}
-        canEnroll={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL)}
+        canEnroll={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL, entries[0]?.trainingPathId ?? "")}
       />
     </PlatformPageShell>
   );

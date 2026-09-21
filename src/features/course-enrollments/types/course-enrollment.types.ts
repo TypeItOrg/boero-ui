@@ -13,10 +13,12 @@ export interface CourseEnrollment {
   academicLevelName?: string | null;
   studyPlanName: string;
   trainingPathName: string;
+  trainingPathId: string;
   instrumentId?: string | null;
   instrumentName?: string | null;
   courseClassId: string;
   courseClassLabel: string;
+  teachers?: { personId: string; fullName: string }[];
   source: CourseEnrollmentSource;
   status: CourseEnrollmentStatus;
   academicStatus: AcademicEnrollmentStatus;

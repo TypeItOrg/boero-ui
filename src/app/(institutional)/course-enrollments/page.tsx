@@ -53,24 +53,19 @@ export default async function CourseEnrollmentsPage({
   const canReadWaitlist = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ);
 
   return (
-    <PlatformPageShell
-      title="Cursadas"
-      breadcrumb={<InstitutionalBreadcrumb />}
-      actions={
+    <PlatformPageShell title="Cursadas" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={GraduationCapIcon} />}>
+      {canCreate ? (
         <div className="flex flex-wrap items-center gap-2">
-          {canCreate ? (
-            <Button asChild size="lg">
-              <Link href={appendReturnTo("/course-enrollments/new", returnTo)}>Alta manual</Link>
-            </Button>
-          ) : null}
-          <PlatformPageIcon icon={GraduationCapIcon} />
+          <Button asChild size="lg">
+            <Link href={appendReturnTo("/course-enrollments/new", returnTo)}>Alta manual</Link>
+          </Button>
         </div>
-      }
-    >
+      ) : null}
       <DataTableNavigationProvider>
         <CourseEnrollmentFilters size={size} status={status} academicStatus={academicStatus} />
         <Suspense fallback={<CourseEnrollmentTableSkeleton />}>
           <CourseEnrollmentTable
+            permissionScopes={user.permissionScopes}
             data={data}
             page={page}
             size={size}

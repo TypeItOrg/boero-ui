@@ -6,6 +6,7 @@ export interface CourseWaitlistEntry {
   hasCapacity: boolean;
   applicationCourseId: string;
   courseId: string;
+  trainingPathId: string;
   waitlistNumber: number;
   applicantName: string;
   applicantDocumentNumber: string;

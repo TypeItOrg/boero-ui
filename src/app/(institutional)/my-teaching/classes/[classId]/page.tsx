@@ -32,7 +32,10 @@ export default async function TeacherClassPage({
   const { page, size } = parseCourseEnrollmentPaginationParams(await searchParams);
   const data = await fetchTeacherClassEnrollments(user.institutionId, classId, page, size);
   return (
-    <PlatformPageShell title="Cursadas de mi clase" breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[classId]} />}>
+    <PlatformPageShell
+      title="Cursadas de mi clase"
+      breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[classId]} segmentLabels={{ classes: "Cursadas de mi clase" }} />}
+    >
       <DataTableNavigationProvider>
         <CourseEnrollmentTable data={data} page={page} size={size} emptyMessage="Esta clase todavía no tiene cursadas." />
       </DataTableNavigationProvider>

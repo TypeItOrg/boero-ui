@@ -87,8 +87,8 @@ export function EnrollmentApplicationTablePresentation({
               <EnrollmentApplicationTableRow
                 key={application.applicationId}
                 application={application}
-                canApprove={canApprove}
-                canReject={canReject}
+                canApprove={canApprove && application.canApprove === true}
+                canReject={canReject && application.canReject === true}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
                 detailHref={

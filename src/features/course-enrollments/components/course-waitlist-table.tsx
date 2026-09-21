@@ -52,27 +52,18 @@ export function CourseWaitlistTable({
         <Table containerClassName="table-scrollbar" className="min-w-192">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
+              <TableHead>Acciones</TableHead>
               <TableHead>Número</TableHead>
               <TableHead>Postulante</TableHead>
               <TableHead>Solicitud</TableHead>
               <TableHead>Motivo original</TableHead>
               <TableHead>Situación actual</TableHead>
               <TableHead>Turno preferido</TableHead>
-              <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {entries.map((entry) => (
               <TableRow key={entry.applicationCourseId} className="hover:bg-muted/50 h-11 border-b transition-colors">
-                <TableCell className="font-semibold">{entry.waitlistNumber}</TableCell>
-                <TableCell>
-                  <div className="font-medium">{entry.applicantName}</div>
-                  <div className="text-muted-foreground">{entry.applicantDocumentNumber}</div>
-                </TableCell>
-                <TableCell>{new Date(entry.waitlistedAt).toLocaleDateString("es-AR")}</TableCell>
-                <TableCell>{entry.originalReason ? (WAITLIST_REASON_LABELS[entry.originalReason] ?? entry.originalReason) : "—"}</TableCell>
-                <TableCell>{entry.hasCapacity ? "Cupo disponible" : "Sin cupos"}</TableCell>
-                <TableCell>{entry.preferredShift ?? "—"}</TableCell>
                 <TableCell>
                   {canEnroll ? (
                     <Button size="sm" disabled={!entry.hasCapacity} onClick={() => setSelected(entry)}>
@@ -82,6 +73,15 @@ export function CourseWaitlistTable({
                     "—"
                   )}
                 </TableCell>
+                <TableCell className="font-semibold">{entry.waitlistNumber}</TableCell>
+                <TableCell>
+                  <div className="font-medium">{entry.applicantName}</div>
+                  <div className="text-muted-foreground">{entry.applicantDocumentNumber}</div>
+                </TableCell>
+                <TableCell>{new Date(entry.waitlistedAt).toLocaleDateString("es-AR")}</TableCell>
+                <TableCell>{entry.originalReason ? (WAITLIST_REASON_LABELS[entry.originalReason] ?? entry.originalReason) : "—"}</TableCell>
+                <TableCell>{entry.hasCapacity ? "Cupo disponible" : "Sin cupos"}</TableCell>
+                <TableCell>{entry.preferredShift ?? "—"}</TableCell>
               </TableRow>
             ))}
           </TableBody>

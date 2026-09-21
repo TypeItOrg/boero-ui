@@ -1,8 +1,10 @@
 "use client";
 
+import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
+import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
 import { ActionForm } from "@common/components/action-form";
 
-import { useActionState, useCallback, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CalendarRangeIcon, CircleAlertIcon } from "lucide-react";
@@ -37,6 +39,8 @@ type EnrollmentPeriodFormProps = {
 
 export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, scope }: EnrollmentPeriodFormProps): React.ReactElement {
   const router = useRouter();
+  const errorRef = useRef<HTMLDivElement>(null);
+  const [offerings, setOfferings] = useState<EnrollmentPeriodOffering[]>(period?.offerings ?? []);
   const isEdit = period !== undefined;
   const initialStart = period ? getEnrollmentPeriodDateTimeInput(period.startDate) : undefined;
   const initialEnd = period ? getEnrollmentPeriodDateTimeInput(period.endDate) : undefined;
@@ -54,9 +58,12 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
         return Promise.resolve({ items: [], nextPage: null });
       }
 
-      return fetchAcademicOptionPage<AcademicYear>("academic-years", scope, institution.id, input, { active: "all" });
+      return fetchAcademicOptionPage<AcademicYear>("academic-years", scope, institution.id, input, {
+        active: "all",
+        operation: isEdit ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE",
+      });
     },
-    [institution, scope],
+    [institution, scope, isEdit],
   );
   const [state, formAction, isPending] = useActionState(
     async (_previous: EnrollmentPeriodActionState, formData: FormData): Promise<EnrollmentPeriodActionState> => {
@@ -69,6 +76,11 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
 
       const institutionId = String(formData.get("institutionId") ?? "");
       const values = {
+        offerings: offerings.map((offering) => ({
+          studyPlanId: offering.studyPlanId,
+          academicLevelIds: offering.academicLevels.map((level) => level.id),
+          includeUnassigned: offering.includeUnassigned,
+        })),
         name: String(formData.get("name") ?? ""),
         startDate: startDateTime.toISOString(),
         endDate: endDateTime.toISOString(),
@@ -86,12 +98,19 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
     {},
   );
 
+  useEffect(() => {
+    if (state.error && !isPending) {
+      errorRef.current?.scrollIntoView({ block: "center" });
+      errorRef.current?.focus({ preventScroll: true });
+    }
+  }, [state, isPending]);
+
   return (
     <ActionForm action={formAction} className="flex h-full min-h-0 w-full flex-1 flex-col">
       <input type="hidden" name="institutionId" value={institution?.id ?? ""} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto pb-4">
         {state.error ? (
-          <Alert variant="destructive">
+          <Alert ref={errorRef} tabIndex={-1} variant="destructive">
             <CircleAlertIcon />
             <AlertTitle>{isEdit ? "No se pudo actualizar el período" : "No se pudo crear el período"}</AlertTitle>
             <AlertDescription>{state.error}</AlertDescription>
@@ -133,6 +152,7 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
                   onValueChange={(_value, item) => {
                     setInstitution(item ? { id: item.id, name: item.name } : undefined);
                     setAcademicYear(undefined);
+                    setOfferings([]);
                   }}
                   placeholder="Seleccionar institución"
                   searchPlaceholder="Buscar institución…"
@@ -202,6 +222,17 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
             </div>
           </div>
         </section>
+        {institution ? (
+          <EnrollmentPeriodOfferings
+            operation={isEdit ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE"}
+            key={institution.id}
+            institutionId={institution.id}
+            scope={scope}
+            value={offerings}
+            onChange={setOfferings}
+            disabled={isPending}
+          />
+        ) : null}
       </div>
 
       <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">

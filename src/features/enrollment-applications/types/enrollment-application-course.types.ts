@@ -3,6 +3,11 @@ import type { EnrollmentApplicationCourseStatus } from "@features/enrollment-app
 export interface EnrollmentApplicationCourse {
   applicationCourseId: string;
   courseId: string;
+  periodOpen?: boolean;
+  enrollmentPeriodId?: string;
+  enrollmentDeadline?: string;
+  academicYear?: number;
+  withinPeriodScope?: boolean;
   studyPlanSpaceId: string;
   academicSpaceName: string;
   academicLevelName: string | null;

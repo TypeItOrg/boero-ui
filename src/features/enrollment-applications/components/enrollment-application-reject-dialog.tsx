@@ -69,8 +69,8 @@ export function EnrollmentApplicationRejectDialog({
             </div>
             <AlertDialogTitle>Rechazar inscripción</AlertDialogTitle>
             <AlertDialogDescription>
-              Vas a rechazar la inscripción de «<span className="text-foreground font-semibold">{application.applicantName}</span>» al «
-              <span className="text-foreground font-semibold">{application.studyPlanName}</span>». El motivo quedará visible para el postulante.
+              Vas a rechazar la inscripción de <span className="text-foreground font-semibold">{application.applicantName}</span>. El motivo quedará
+              visible para el postulante.
             </AlertDialogDescription>
           </AlertDialogHeader>
 

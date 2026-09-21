@@ -36,6 +36,7 @@ export function calculateAge(birthDate: string | Date | undefined): number | nul
 }
 
 export const startEnrollmentApplicationSchema = z.object({
+  enrollmentPeriodId: z.uuid().optional(),
   trainingPathId: z.string().uuid(ENROLLMENT_MESSAGES.TRAINING_PATH_ID_INVALID),
   academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID).optional(),
 });

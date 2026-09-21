@@ -9,6 +9,7 @@ jest.mock("@features/enrollment-applications/components/enrollment-application-c
 }));
 
 const ENTRY: CourseWaitlistEntry = {
+  trainingPathId: "training-path-id",
   applicationId: "parent-1",
   applicationCourseId: "child-1",
   courseId: "course-1",

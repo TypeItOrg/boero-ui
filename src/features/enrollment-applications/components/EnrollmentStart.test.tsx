@@ -41,6 +41,12 @@ describe("EnrollmentStart", () => {
       startDate: "2026-01-01",
       endDate: "2026-12-31",
       status: "OPEN",
+      scopeConfigured: true,
+      limitedView: false,
+      canUpdate: false,
+      canChangeStatus: false,
+      canDelete: false,
+      offerings: [],
     },
   ];
 

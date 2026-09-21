@@ -1,4 +1,15 @@
 export const ENROLLMENT_MESSAGES = {
+  COURSE_INSTRUMENT_REQUIRED: "Elegí un instrumento para continuar con este espacio.",
+  COURSE_INSTRUMENT_HINT: "Al elegirlo, este espacio se guarda en tu borrador. Podés cambiarlo antes de enviar la inscripción.",
+  COURSE_INSTRUMENT_DRAFT_PENDING: "Falta elegir instrumento para guardar los espacios marcados.",
+  PERIOD_SCOPE_REQUIRED: "Seleccioná al menos un plan y sus niveles o espacios sin nivel.",
+  PERIOD_SCOPE_LOAD_FAILED: "No se pudo cargar la estructura del plan. Volvé a intentarlo.",
+  PERIOD_COURSE_CLOSED: "La inscripción de este curso cerró. Quitalo de la selección para poder enviar la solicitud.",
+  PERIOD_CLOSED_DRAFT: "No hay cursos con inscripción abierta para este trayecto. Podés consultar o cancelar tu solicitud.",
+  PERIOD_COURSE_EXCLUDED: "Este curso quedó fuera de la oferta del período. Quitalo de la selección para continuar.",
+  ACADEMIC_SELECTION_INVALID: "Quitá los espacios cuyas correlatividades no cumplís para poder enviar la inscripción.",
+  ACADEMIC_REQUIREMENTS_PENDING: "Para inscribirte en este espacio debés cumplir las siguientes correlatividades:",
+
   INCOMPLETE_FIELDS_TITLE: (count: number) => (count === 1 ? "Campo obligatorio incompleto" : "Campos obligatorios incompletos"),
   INCOMPLETE_FIELDS_SUMMARY: (count: number) =>
     count === 1 ? "Hay 1 campo obligatorio incompleto." : `Hay ${count} campos obligatorios incompletos.`,

@@ -29,6 +29,7 @@ type CourseManualEnrollmentFormProps = {
 };
 
 export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): React.ReactElement {
+  const errorRef = React.useRef<HTMLDivElement>(null);
   const [studentId, setStudentId] = React.useState<string>();
   const [courseId, setCourseId] = React.useState("");
   const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions | null>(null);
@@ -83,11 +84,18 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
     };
   }, [courseId]);
 
+  React.useEffect(() => {
+    if (state.error && !isPending) {
+      errorRef.current?.scrollIntoView({ block: "center" });
+      errorRef.current?.focus({ preventScroll: true });
+    }
+  }, [state, isPending]);
+
   return (
     <ActionForm action={formAction} className="flex flex-col gap-5">
       <input type="hidden" name="returnTo" value={returnTo} />
       {state.error ? (
-        <Alert variant="destructive">
+        <Alert ref={errorRef} tabIndex={-1} variant="destructive">
           <CircleAlertIcon />
           <AlertTitle>No se pudo registrar la cursada</AlertTitle>
           <AlertDescription>{state.error}</AlertDescription>
@@ -103,7 +111,9 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
             id="studentId"
             name="studentId"
             value={studentId}
-            onValueChange={setStudentId}
+            onValueChange={(id) => {
+              setStudentId(id);
+            }}
             disabled={isPending}
             queryKey={["manual-enrollment-students"]}
             fetchPage={(input) => fetchCatalog<StudentSummary>("students", input)}
@@ -126,7 +136,30 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
             queryKey={["manual-enrollment-courses"]}
             fetchPage={(input) => fetchCatalog<Course>("course-enrollment-options", input)}
             getItemValue={(course) => course.id}
-            getItemLabel={(course) => `${course.academicSpaceName}${course.instrumentName ? ` · ${course.instrumentName}` : ""} · ${course.year}`}
+            getItemLabel={(course) =>
+              [
+                course.academicSpaceName,
+                course.instrumentName,
+                course.trainingPathName,
+                course.studyPlanName,
+                course.academicLevelName ?? "Sin nivel",
+                course.year,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            }
+            estimateSize={96}
+            renderItem={(course) => (
+              <div className="grid min-w-0 gap-1 text-left">
+                <span className="line-clamp-2 font-medium">{course.academicSpaceName}</span>
+                <span className="text-primary text-xs">
+                  {[course.academicLevelName ?? "Sin nivel", course.instrumentName, course.year].filter(Boolean).join(" · ")}
+                </span>
+                <span className="text-muted-foreground truncate text-xs" title={`${course.trainingPathName} · ${course.studyPlanName}`}>
+                  {course.trainingPathName} · {course.studyPlanName}
+                </span>
+              </div>
+            )}
             placeholder="Seleccionar curso"
           />
         </Field>

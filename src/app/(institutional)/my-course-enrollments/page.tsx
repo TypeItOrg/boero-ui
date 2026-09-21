@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { CourseEnrollmentFilters } from "@features/course-enrollments/components/course-enrollment-filters";
-import { CourseEnrollmentTable } from "@features/course-enrollments/components/course-enrollment-table";
-import { CourseEnrollmentTableSkeleton } from "@features/course-enrollments/components/course-enrollment-table-skeleton";
+import { MySubjects } from "@features/course-enrollments/components/my-subjects";
+import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { fetchMyCourseEnrollments } from "@features/course-enrollments/services/course-enrollment.service";
 import {
   parseCourseEnrollmentPaginationParams,
@@ -18,7 +16,7 @@ import { PlatformPageIcon } from "@features/platform-auth/components/platform-pa
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { GraduationCapIcon } from "lucide-react";
 
-export const metadata: Metadata = { title: "Mis cursadas" };
+export const metadata: Metadata = { title: "Mis materias" };
 
 export default async function MyCourseEnrollmentsPage({
   searchParams,
@@ -27,27 +25,26 @@ export default async function MyCourseEnrollmentsPage({
 }): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
   const resolvedSearchParams = await searchParams;
-  const { page, size, status, academicStatus } = parseCourseEnrollmentPaginationParams(resolvedSearchParams);
+  const parsed = parseCourseEnrollmentPaginationParams(resolvedSearchParams);
+  const { page, size } = parsed;
+  const status = parsed.status ?? COURSE_ENROLLMENT_STATUS.ENROLLED;
+  const academicStatus = status === COURSE_ENROLLMENT_STATUS.ENROLLED ? undefined : parsed.academicStatus;
   const data = await fetchMyCourseEnrollments(user.institutionId, { page, size, status, academicStatus });
   const canWithdraw = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_WITHDRAW);
   const canUpdateAcademicStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE);
 
   return (
-    <PlatformPageShell title="Mis cursadas" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={GraduationCapIcon} />}>
+    <PlatformPageShell title="Mis materias" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={GraduationCapIcon} />}>
       <DataTableNavigationProvider>
-        <CourseEnrollmentFilters size={size} status={status} academicStatus={academicStatus} />
-        <Suspense fallback={<CourseEnrollmentTableSkeleton />}>
-          <CourseEnrollmentTable
-            data={data}
-            page={page}
-            size={size}
-            status={status}
-            academicStatus={academicStatus}
-            emptyMessage="Todavía no tenés cursadas registradas."
-            canWithdraw={canWithdraw}
-            canUpdateAcademicStatus={canUpdateAcademicStatus}
-          />
-        </Suspense>
+        <MySubjects
+          data={data}
+          page={page}
+          size={size}
+          status={status}
+          academicStatus={academicStatus}
+          canWithdraw={canWithdraw}
+          canUpdateAcademicStatus={canUpdateAcademicStatus}
+        />
       </DataTableNavigationProvider>
     </PlatformPageShell>
   );

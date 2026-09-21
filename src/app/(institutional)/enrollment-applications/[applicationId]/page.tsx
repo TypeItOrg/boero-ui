@@ -16,7 +16,7 @@ import { InstitutionalBreadcrumb } from "@features/institutional-auth/components
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import { hasInstitutionalPermission, hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -72,8 +72,8 @@ export default async function EnrollmentApplicationDetailPage({
         <EnrollmentApplicationResolvePanel
           application={reviewSummary}
           status={application.status}
-          canApprove={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE)}
-          canReject={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT)}
+          canApprove={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE, application.trainingPathId ?? "")}
+          canReject={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT, application.trainingPathId ?? "")}
         />
       </div>
 
@@ -82,13 +82,21 @@ export default async function EnrollmentApplicationDetailPage({
         showApplicantAlert={false}
         scope={AcademicScope.INSTITUTIONAL}
         canManageCourses={
-          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_READ) ||
-          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL) ||
-          hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT)
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_READ, application.trainingPathId ?? "") ||
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL, application.trainingPathId ?? "") ||
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT, application.trainingPathId ?? "")
         }
-        canEnrollCourses={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL)}
-        canRejectCourses={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT)}
-        canReadCourseWaitlist={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ)}
+        canEnrollCourses={hasTrainingPathPermission(
+          user,
+          INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL,
+          application.trainingPathId ?? "",
+        )}
+        canRejectCourses={hasTrainingPathPermission(
+          user,
+          INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT,
+          application.trainingPathId ?? "",
+        )}
+        canReadCourseWaitlist={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ, application.trainingPathId ?? "")}
       />
     </PlatformPageShell>
   );

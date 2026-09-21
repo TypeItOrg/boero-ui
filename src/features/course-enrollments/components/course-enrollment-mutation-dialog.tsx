@@ -1,6 +1,7 @@
 "use client";
 
 import { ActionForm } from "@common/components/action-form";
+import { safelyRunAction } from "@common/utils/safe-action.util";
 
 import * as React from "react";
 import { CircleAlertIcon } from "lucide-react";
@@ -21,7 +22,7 @@ import { updateCourseAcademicStatusAction, withdrawCourseEnrollmentAction } from
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
-import { ACADEMIC_ENROLLMENT_STATUS_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
+import { ACADEMIC_ENROLLMENT_STATUS_LABELS, COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 
 type CourseEnrollmentMutationDialogProps = {
   enrollment: CourseEnrollment;
@@ -50,15 +51,17 @@ export function CourseEnrollmentMutationDialog({
       return { error: "Debés indicar el motivo de la operación." };
     }
 
-    const result =
+    const result = await safelyRunAction(
       mode === "withdraw"
-        ? await withdrawCourseEnrollmentAction(
+        ? withdrawCourseEnrollmentAction(
             enrollment.id,
             formData.get("type") === "VOLUNTARY" ? "VOLUNTARY" : "ADMINISTRATIVE",
             reason,
             enrollment.version,
           )
-        : await updateCourseAcademicStatusAction(enrollment.id, String(formData.get("status") ?? ""), reason, enrollment.version);
+        : updateCourseAcademicStatusAction(enrollment.id, String(formData.get("status") ?? ""), reason, enrollment.version),
+      COURSE_ENROLLMENT_MESSAGES.MUTATION_UNAVAILABLE,
+    );
 
     if (!result.error) {
       onOpenChange(false);

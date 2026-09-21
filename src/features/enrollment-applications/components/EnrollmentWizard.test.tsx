@@ -47,6 +47,8 @@ const COURSE_OPTION: EnrollmentCourseOption = {
   format: "GRUPAL",
   instrumentId: null,
   instrumentName: null,
+  academicYear: 2026,
+  eligibility: { eligible: true, requirements: [] },
   hasCapacity: true,
 };
 

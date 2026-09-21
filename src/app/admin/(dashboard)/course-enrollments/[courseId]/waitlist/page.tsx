@@ -34,7 +34,13 @@ export default async function PlatformCourseWaitlistPage({
   return (
     <PlatformPageShell
       title="Lista de espera"
-      breadcrumb={<PlatformBreadcrumb hiddenSegments={[courseId]} trailingLabel="Lista de espera" />}
+      breadcrumb={
+        <PlatformBreadcrumb
+          hiddenSegments={[courseId]}
+          segmentLabels={{ "course-enrollments": "Cursos" }}
+          segmentHrefs={{ "course-enrollments": "/admin/courses" }}
+        />
+      }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <CourseWaitlistTable entries={entries} institutionId={institutionId} scope="admin" canEnroll />

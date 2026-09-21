@@ -1,11 +1,12 @@
 "use client";
 
 import { ActionForm } from "@common/components/action-form";
+import { safelyRunAction } from "@common/utils/safe-action.util";
 
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
@@ -20,7 +21,6 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Field, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
-import { Skeleton } from "@common/components/ui/skeleton";
 import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
@@ -102,7 +102,8 @@ export function EnrollmentApplicationCoursesManagement({
                   </Badge>
                 </div>
                 <p className="text-muted-foreground mt-1 text-sm">
-                  {course.studyPlanName} · {course.academicLevelName ?? "Sin nivel"}
+                  {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {course.studyPlanName} ·{" "}
+                  {course.academicLevelName ?? "Sin nivel"}
                   {course.instrumentName ? ` · ${course.instrumentName}` : ""}
                 </p>
                 {course.waitlistNumber ? (
@@ -203,10 +204,12 @@ export function EnrollmentApplicationCourseDialog({
       return { error: validation.message, invalidDayIds: validation.invalidDayIds };
     }
 
-    const result =
+    const result = await safelyRunAction(
       scope === AcademicScope.ADMIN && institutionId
-        ? await enrollPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, formData)
-        : await enrollApplicationCourseAction(applicationId, course.applicationCourseId, course.version, formData);
+        ? enrollPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, formData)
+        : enrollApplicationCourseAction(applicationId, course.applicationCourseId, course.version, formData),
+      COURSE_ENROLLMENT_MESSAGES.MUTATION_UNAVAILABLE,
+    );
 
     if (!result.error) {
       onOpenChange(false);
@@ -225,7 +228,19 @@ export function EnrollmentApplicationCourseDialog({
     pending
       .then((value) => {
         if (active) {
-          setOptions(value);
+          const hasCapacity = value.classes.some((courseClass) =>
+            courseClass.days.some(
+              (day) =>
+                day.availableCapacity !== 0 &&
+                day.schedules.some((schedule) => value.format === "GRUPAL" || schedule.individualSlots.some((slot) => slot.available)),
+            ),
+          );
+
+          if (hasCapacity) {
+            setOptions(value);
+          } else {
+            setLoadError(COURSE_ENROLLMENT_MESSAGES.COURSE_WITHOUT_CAPACITY);
+          }
         }
       })
       .catch((error: unknown) => {
@@ -239,6 +254,29 @@ export function EnrollmentApplicationCourseDialog({
     };
   }, [course.courseId, institutionId, scope, optionsRevision]);
 
+  if (!options) {
+    return (
+      <AlertDialog open={open} onOpenChange={onOpenChange}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            {loadError ? (
+              <CircleAlertIcon className="text-destructive size-6" aria-hidden="true" />
+            ) : (
+              <LoaderCircleIcon className="text-primary size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+            )}
+            <AlertDialogTitle>{loadError ? "No se puede iniciar la inscripción" : "Comprobando disponibilidad"}</AlertDialogTitle>
+            <AlertDialogDescription aria-live="polite">{loadError ?? COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button type="button" size="lg" onClick={() => onOpenChange(false)}>
+              {loadError ? "Entendido" : "Cancelar"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={(nextOpen) => (!isPending ? onOpenChange(nextOpen) : undefined)}>
       <AlertDialogContent className="flex h-[min(42rem,calc(100dvh-2rem))] w-[calc(100%-2rem)] min-w-0 flex-col overflow-hidden p-0 sm:max-w-3xl">
@@ -246,23 +284,17 @@ export function EnrollmentApplicationCourseDialog({
           <AlertDialogHeader className="shrink-0 items-start border-b p-5 text-left">
             <AlertDialogTitle className="text-left">Inscribir solicitud de cursada</AlertDialogTitle>
             <AlertDialogDescription className="text-left">
-              {course.academicSpaceName} · {course.studyPlanName} · {course.academicLevelName ?? "Sin nivel"}
+              {course.academicSpaceName} · {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}
+              {course.academicLevelName ?? "Sin nivel"}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-5" aria-busy={isLoadingOptions}>
-            {state.error || loadError ? (
+            {state.error ? (
               <Alert variant="destructive">
                 <CircleAlertIcon />
-                <AlertDescription>{state.error ?? loadError}</AlertDescription>
+                <AlertDescription>{state.error}</AlertDescription>
               </Alert>
-            ) : null}
-            {isLoadingOptions ? (
-              <Skeleton
-                className="w-full flex-1 rounded-lg motion-reduce:animate-none"
-                role="status"
-                aria-label={COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS}
-              />
             ) : null}
             {options ? (
               <CourseEnrollmentAssignmentFields
@@ -312,10 +344,12 @@ function RejectEnrollmentApplicationCourseDialog({
   const [state, formAction, isPending] = React.useActionState(async (_previous: { error?: string }, formData: FormData) => {
     const reason = formData.get("reason");
     const normalizedReason = typeof reason === "string" ? reason : "";
-    const result =
+    const result = await safelyRunAction(
       scope === AcademicScope.ADMIN && institutionId
-        ? await rejectPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, normalizedReason)
-        : await rejectApplicationCourseAction(applicationId, course.applicationCourseId, course.version, normalizedReason);
+        ? rejectPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, normalizedReason)
+        : rejectApplicationCourseAction(applicationId, course.applicationCourseId, course.version, normalizedReason),
+      COURSE_ENROLLMENT_MESSAGES.MUTATION_UNAVAILABLE,
+    );
 
     if (!result.error) {
       onOpenChange(false);
@@ -332,7 +366,7 @@ function RejectEnrollmentApplicationCourseDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Rechazar solicitud de cursada</AlertDialogTitle>
             <AlertDialogDescription>
-              {course.academicSpaceName} · {course.studyPlanName}
+              {course.academicSpaceName} · {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {course.studyPlanName}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {state.error ? (

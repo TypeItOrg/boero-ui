@@ -4,7 +4,7 @@ import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import * as React from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2Icon,
   CheckCircle2Icon,
@@ -46,6 +46,7 @@ import { EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/const
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
+import { enrollmentCourseGroupKey } from "@features/enrollment-applications/utils/enrollment-course-group.util";
 import { fetchEnrollmentCourses } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
 import type { Shift } from "@features/academic/types/shift.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
@@ -115,11 +116,13 @@ export function EnrollmentWizard({
   initialCourseOptions = [],
   initialCourseOptionsPage = 0,
   initialCourseOptionsTotalPages = 1,
-  readOnly = false,
+  readOnly: requestedReadOnly = false,
   returnTo = "/my-enrollment-applications",
 }: EnrollmentWizardProps): React.ReactElement {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialData = initialApplication.data;
+  const readOnly = requestedReadOnly || initialApplication.periodOpen === false;
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse>(initialApplication);
   const [activeTab, setActiveTab] = React.useState<string>(() => {
     const requestedTab = searchParams.get("tab");
@@ -183,6 +186,8 @@ export function EnrollmentWizard({
   const [loadingMoreCourses, setLoadingMoreCourses] = React.useState(false);
   const [courseOptionsError, setCourseOptionsError] = React.useState<string>();
   const [selectedCourseIds, setSelectedCourseIds] = React.useState<string[]>(() => (initialData?.courses ?? []).map((course) => course.courseId));
+  const [pendingInstrumentGroups, setPendingInstrumentGroups] = React.useState<string[]>([]);
+  const [invalidInstrumentGroups, setInvalidInstrumentGroups] = React.useState<string[]>([]);
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
@@ -214,7 +219,7 @@ export function EnrollmentWizard({
         page: courseOptionsPage + 1,
         size: 50,
       });
-      setCourseOptions((previous) => [...previous, ...nextPage.items]);
+      setCourseOptions((previous) => [...new Map([...previous, ...nextPage.items].map((course) => [course.courseId, course])).values()]);
       setCourseOptionsPage(nextPage.page);
       setCourseOptionsTotalPages(nextPage.totalPages);
     } catch (error: unknown) {
@@ -247,7 +252,7 @@ export function EnrollmentWizard({
     }));
   }, [isMinor]);
 
-  const effectiveActiveTab = !isMinor && activeTab === "responsible" ? "spaces" : activeTab;
+  const effectiveActiveTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : activeTab === "responsible" ? "spaces" : "personal";
 
   React.useLayoutEffect(() => {
     if (!hydrated) {
@@ -266,6 +271,23 @@ export function EnrollmentWizard({
       inline: "center",
     });
     hasCenteredInitialTabRef.current = true;
+
+    const centerActiveTabOnResize = (): void => {
+      const bounds = activeTrigger.getBoundingClientRect();
+
+      if (bounds.bottom > 0 && bounds.top < window.innerHeight) {
+        activeTrigger.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+      }
+    };
+
+    const scrollViewport = activeTrigger.closest("[data-radix-scroll-area-viewport]");
+    const resizeObserver = new ResizeObserver(centerActiveTabOnResize);
+
+    if (scrollViewport) {
+      resizeObserver.observe(scrollViewport);
+    }
+
+    return () => resizeObserver.disconnect();
   }, [effectiveActiveTab, hydrated]);
 
   function handleActiveTabChange(nextTab: string): void {
@@ -282,7 +304,7 @@ export function EnrollmentWizard({
   // Focus the first invalid field once its tab has mounted after a failed
   // submission (the tab switch and this focus request commit together).
   React.useEffect(() => {
-    if (!pendingFocusFieldId) {
+    if (!pendingFocusFieldId || isSubmitDialogOpen) {
       return;
     }
 
@@ -296,10 +318,42 @@ export function EnrollmentWizard({
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [pendingFocusFieldId, effectiveActiveTab]);
+  }, [pendingFocusFieldId, effectiveActiveTab, isSubmitDialogOpen]);
 
   const handleToggleCourse = (courseId: string, checked: boolean) => {
     setSelectedCourseIds((previous) => (checked ? Array.from(new Set([...previous, courseId])) : previous.filter((id) => id !== courseId)));
+  };
+
+  const handleToggleInstrumentGroup = (course: EnrollmentCourseOption, checked: boolean): void => {
+    const key = enrollmentCourseGroupKey(course);
+    setInvalidInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    if (checked) {
+      setPendingInstrumentGroups((previous) => [...new Set([...previous, key])]);
+      return;
+    }
+
+    const groupIds = new Set(
+      [...courseOptions, ...(initialApplication.courses ?? [])].filter((item) => enrollmentCourseGroupKey(item) === key).map((item) => item.courseId),
+    );
+    setPendingInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setSelectedCourseIds((previous) => previous.filter((id) => !groupIds.has(id)));
+    setValidationIssues((previous) => previous.filter((issue) => issue.path[0] !== "courses"));
+  };
+
+  const handleSelectInstrument = (course: EnrollmentCourseOption): void => {
+    const key = enrollmentCourseGroupKey(course);
+    setInvalidInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setPendingInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setValidationIssues((previous) => previous.filter((issue) => issue.path[0] !== "courses"));
+    const groupIds = new Set(
+      [...courseOptions, ...(initialApplication.courses ?? [])].filter((item) => enrollmentCourseGroupKey(item) === key).map((item) => item.courseId),
+    );
+    setCourseOptions((previous) =>
+      previous.some((item) => item.courseId === course.courseId)
+        ? previous.map((item) => (item.courseId === course.courseId ? course : item))
+        : [...previous, course],
+    );
+    setSelectedCourseIds((previous) => [...previous.filter((id) => !groupIds.has(id)), course.courseId]);
   };
 
   const structuredData: EnrollmentApplicationData = React.useMemo(() => {
@@ -453,6 +507,7 @@ export function EnrollmentWizard({
     }
 
     setValidationIssues([]);
+    setInvalidInstrumentGroups([...pendingInstrumentGroups]);
 
     const parsed = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
     const issues: z.ZodIssue[] = parsed.success ? [] : [...parsed.error.issues];
@@ -461,8 +516,12 @@ export function EnrollmentWizard({
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.TRAINING_PATH_REQUIRED, path: ["careerSelection", "trainingPathId"] });
     }
 
-    if (selectedCourseIds.length === 0) {
-      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.SPACE_REQUIRED, path: ["courses"] });
+    if (pendingInstrumentGroups.length > 0) {
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_REQUIRED, path: ["courses"] });
+    }
+
+    if (courseOptions.some((course) => selectedCourseIds.includes(course.courseId) && course.eligibility?.eligible === false)) {
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.ACADEMIC_SELECTION_INVALID, path: ["courses"] });
     }
 
     if (issues.length > 0) {
@@ -501,6 +560,7 @@ export function EnrollmentWizard({
       await draftSaveQueue.current;
       await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
       setApplication(await submitEnrollmentApplicationAction(application.applicationId).then(unwrapEnrollmentResult));
+      router.refresh();
 
       return {};
     } catch (error) {
@@ -533,7 +593,7 @@ export function EnrollmentWizard({
           <Link href={returnTo}>Volver</Link>
         </Button>
 
-        {!readOnly && (
+        {!requestedReadOnly && (
           <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)}>
             <BanIcon className="size-4" />
             Cancelar
@@ -546,14 +606,16 @@ export function EnrollmentWizard({
           <AlertTriangleIcon className="size-4 text-amber-600" />
           <AlertTitle className="text-amber-900">Solicitud de inscripción - Visualización</AlertTitle>
           <AlertDescription className="text-amber-800">
-            Esta solicitud ya ha sido enviada y no se puede modificar. Los datos que ves a continuación son solo de referencia.
+            {application.periodOpen === false
+              ? ENROLLMENT_MESSAGES.PERIOD_CLOSED_DRAFT
+              : "Los datos de esta solicitud se muestran solo para consulta."}
           </AlertDescription>
         </Alert>
       )}
 
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-6">
-        <div className="flex items-stretch gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+        <div className="flex items-start gap-3.5">
+          <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
             <FileClockIcon className="size-5" aria-hidden="true" />
           </div>
           <div className="flex flex-col justify-center gap-1">
@@ -569,6 +631,8 @@ export function EnrollmentWizard({
                   <AlertCircleIcon className="size-4" />
                   Error al guardar
                 </span>
+              ) : pendingInstrumentGroups.length > 0 ? (
+                <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>
               ) : (
                 <>
                   <CheckCircle2Icon className="size-4 text-emerald-500" />
@@ -1039,11 +1103,18 @@ export function EnrollmentWizard({
             <EnrollmentStepCardHeader
               icon={LibraryBigIcon}
               title={isMinor ? "5. Cursos" : "4. Cursos"}
-              description="Seleccioná los cursos que querés solicitar. En los instrumentales, elegí el curso del instrumento que vas a estudiar."
+              description="Marcá los espacios que querés cursar y elegí el instrumento donde corresponda. Solo podés inscribirte si cumplís sus correlatividades."
             />
             <CardContent>
               {selectedCourseIds
-                .filter((id) => !courseOptions.some((option) => option.courseId === id))
+                .filter((id) => {
+                  const saved = initialApplication.courses?.find((course) => course.courseId === id);
+                  return !courseOptions.some(
+                    (option) =>
+                      option.courseId === id ||
+                      (option.instrumental && saved && enrollmentCourseGroupKey(option) === enrollmentCourseGroupKey(saved)),
+                  );
+                })
                 .map((id) => {
                   const selected = initialApplication.courses?.find((course) => course.courseId === id);
                   const name = selected
@@ -1051,7 +1122,14 @@ export function EnrollmentWizard({
                     : "Curso seleccionado";
                   return (
                     <div key={id} className="mb-3 flex items-center justify-between gap-3 rounded-lg border p-3">
-                      <span>{name}</span>
+                      <span>
+                        {name}
+                        {selected?.periodOpen === false ? (
+                          <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_CLOSED}</span>
+                        ) : selected?.withinPeriodScope === false ? (
+                          <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_EXCLUDED}</span>
+                        ) : null}
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
@@ -1067,6 +1145,12 @@ export function EnrollmentWizard({
                 })}
               {courseOptions.length > 0 ? (
                 <EnrollmentCoursesSelector
+                  applicationId={application.applicationId}
+                  savedCourses={initialApplication.courses ?? []}
+                  onSelectInstrument={handleSelectInstrument}
+                  pendingInstrumentGroups={pendingInstrumentGroups}
+                  invalidInstrumentGroups={invalidInstrumentGroups}
+                  onToggleInstrumentGroup={handleToggleInstrumentGroup}
                   courses={courseOptions}
                   selectedCourseIds={selectedCourseIds}
                   onToggleCourse={handleToggleCourse}
@@ -1094,7 +1178,19 @@ export function EnrollmentWizard({
               >
                 Atrás
               </Button>
-              <Button type="button" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => {
+                  if (pendingInstrumentGroups.length > 0) {
+                    setInvalidInstrumentGroups([...pendingInstrumentGroups]);
+                    document.getElementById(`instrument-${pendingInstrumentGroups[0]}`)?.focus();
+                    return;
+                  }
+                  handleActiveTabChange("preferences");
+                }}
+                className="gap-1.5"
+              >
                 Siguiente: Preferencias
               </Button>
             </CardFooter>
@@ -1197,7 +1293,10 @@ export function EnrollmentWizard({
           applicationId={application.applicationId}
           beforeCancel={() => draftSaveQueue.current}
           onClose={() => setIsCancelDialogOpen(false)}
-          onCancelled={setApplication}
+          onCancelled={(cancelledApplication) => {
+            setApplication(cancelledApplication);
+            router.refresh();
+          }}
         />
       )}
       {isSubmitDialogOpen ? <EnrollmentSubmitDialog onClose={() => setIsSubmitDialogOpen(false)} onSubmit={submitApplication} /> : null}

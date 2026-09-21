@@ -1,5 +1,7 @@
 "use client";
 
+import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
+import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
 import { ActionForm } from "@common/components/action-form";
 
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
@@ -30,9 +32,14 @@ interface Props {
 
 export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChange, scope = AcademicScope.INSTITUTIONAL }: Props) {
   const router = useRouter();
+  const [offerings, setOfferings] = useState<EnrollmentPeriodOffering[]>(period?.offerings ?? []);
   const fetchAcademicYears = useCallback(
-    (input: AsyncDropdownFetchPageInput) => fetchAcademicOptionPage<AcademicYear>("academic-years", scope, institutionId, input, { active: "all" }),
-    [scope, institutionId],
+    (input: AsyncDropdownFetchPageInput) =>
+      fetchAcademicOptionPage<AcademicYear>("academic-years", scope, institutionId, input, {
+        active: "all",
+        operation: period ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE",
+      }),
+    [scope, institutionId, period],
   );
 
   const [name, setName] = useState(period?.name ?? "");
@@ -49,7 +56,16 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
         return { error: ENROLLMENT_MESSAGES.DATE_INPUT_INVALID };
       }
 
-      const values = { name: String(formData.get("name") ?? ""), startDate: start.toISOString(), endDate: end.toISOString() };
+      const values = {
+        offerings: offerings.map((offering) => ({
+          studyPlanId: offering.studyPlanId,
+          academicLevelIds: offering.academicLevels.map((level) => level.id),
+          includeUnassigned: offering.includeUnassigned,
+        })),
+        name: String(formData.get("name") ?? ""),
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+      };
       const result = period
         ? await updateEnrollmentPeriodAction(institutionId, period.id, values, scope)
         : await createEnrollmentPeriodAction(institutionId, { ...values, academicYearId: String(formData.get("academicYearId") ?? "") }, scope);
@@ -74,7 +90,7 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
         }
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
         <ActionForm action={formAction}>
           <DialogHeader>
             <DialogTitle>{period ? "Editar Período de Inscripción" : "Nuevo Período de Inscripción"}</DialogTitle>
@@ -133,6 +149,14 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
             </div>
           </div>
 
+          <EnrollmentPeriodOfferings
+            operation={period ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE"}
+            institutionId={institutionId}
+            scope={scope}
+            value={offerings}
+            onChange={setOfferings}
+            disabled={loading}
+          />
           <DialogFooter>
             <Button type="button" variant="outline" disabled={loading} onClick={() => onOpenChange(false)}>
               Cancelar

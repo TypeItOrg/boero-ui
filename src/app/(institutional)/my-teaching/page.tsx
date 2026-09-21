@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { GraduationCapIcon } from "lucide-react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@common/components/ui/table";
@@ -27,42 +29,54 @@ export default async function MyTeachingPage({ searchParams }: { searchParams: P
     <PlatformPageShell title="Mis clases y cursos" breadcrumb={<InstitutionalBreadcrumb />}>
       <DataTableNavigationProvider>
         {data.items.length === 0 ? (
-          <p className="text-muted-foreground">Todavía no tenés clases asignadas.</p>
+          <Empty className="min-h-56 flex-1 rounded-lg border border-solid">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <GraduationCapIcon aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle>Todavía no tenés clases asignadas</EmptyTitle>
+              <EmptyDescription>Cuando la institución te asigne una clase, podrás consultar sus horarios y estudiantes acá.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Curso</TableHead>
-                <TableHead>Clase</TableHead>
-                <TableHead>Horarios</TableHead>
-                <TableHead>Estudiantes</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.items.map((item) => (
-                <TableRow key={item.courseClass.id}>
-                  <TableCell>
-                    {item.academicSpaceName}
-                    {item.instrumentName ? ` · ${item.instrumentName}` : ""}
-                  </TableCell>
-                  <TableCell>{item.classLabel}</TableCell>
-                  <TableCell>
-                    {item.courseClass.days
-                      .map(
-                        (day) =>
-                          `${courseWeekDayLabels[day.dayOfWeek]} ${day.schedules.map((schedule) => `${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}`).join(", ")}`,
-                      )
-                      .join("; ")}
-                  </TableCell>
-                  <TableCell>
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/my-teaching/classes/${item.courseClass.id}`}>Ver cursadas</Link>
-                    </Button>
-                  </TableCell>
+          <div className="min-h-0 flex-1 overflow-hidden rounded-lg border">
+            <Table containerClassName="table-scrollbar">
+              <TableHeader className="bg-muted">
+                <TableRow className="h-11">
+                  <TableHead className="w-16 pl-4">
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
+                  <TableHead>Curso</TableHead>
+                  <TableHead>Clase</TableHead>
+                  <TableHead>Horarios</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {data.items.map((item) => (
+                  <TableRow key={item.courseClass.id} className="h-12">
+                    <TableCell className="pl-4">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/my-teaching/classes/${item.courseClass.id}`}>Ver cursadas</Link>
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      {item.academicSpaceName}
+                      {item.instrumentName ? ` · ${item.instrumentName}` : ""}
+                    </TableCell>
+                    <TableCell>{item.classLabel}</TableCell>
+                    <TableCell>
+                      {item.courseClass.days
+                        .map(
+                          (day) =>
+                            `${courseWeekDayLabels[day.dayOfWeek]} ${day.schedules.map((schedule) => `${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}`).join(", ")}`,
+                        )
+                        .join("; ")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
         <CourseEnrollmentPagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} itemLabel="clases" />
       </DataTableNavigationProvider>
