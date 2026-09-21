@@ -36,7 +36,13 @@ export function Providers({ children }: { children: React.ReactNode }): React.Re
   });
 
   return (
-    <NextThemesProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem
+      disableTransitionOnChange
+      scriptProps={{ type: typeof window === "undefined" ? "text/javascript" : "text/plain" }}
+    >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </NextThemesProvider>
   );
