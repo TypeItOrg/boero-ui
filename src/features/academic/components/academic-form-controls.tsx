@@ -30,7 +30,7 @@ type FormSelectProps = {
   disabled?: boolean;
   name: string;
   onValueChange?: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   placeholder?: string;
   value?: string;
 };
@@ -96,7 +96,7 @@ export function FormSelect({
         <SelectContent>
           <SelectGroup>
             {options.map((option) => (
-              <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+              <SelectItem key={option.value} value={option.value} disabled={option.disabled} className="px-2.5 py-1.5">
                 {option.label}
               </SelectItem>
             ))}

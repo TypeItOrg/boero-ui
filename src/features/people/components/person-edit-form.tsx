@@ -52,7 +52,7 @@ export function PersonEditForm({
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
-      <div className={cn("grid items-start gap-4", canManageRoles && "xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]")}>
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4">
         <PersonForm
           mode="edit"
           institutionId={institutionId}

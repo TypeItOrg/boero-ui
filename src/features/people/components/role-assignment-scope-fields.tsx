@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+import { XIcon } from "lucide-react";
+import { Badge } from "@common/components/ui/badge";
+import { FormSelect } from "@features/academic/components/academic-form-controls";
 import { Button } from "@common/components/ui/button";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
@@ -31,6 +34,8 @@ export function RoleAssignmentScopeFields({
   supportsTrainingPathScope,
   inactivePermissions,
 }: Props) {
+  const scopeId = useId();
+  const pathsId = useId();
   const [selectedNames, setSelectedNames] = useState(names);
   const fetchPaths = useCallback(
     async ({ page, search, size, signal }: AsyncDropdownFetchPageInput) => {
@@ -43,20 +48,25 @@ export function RoleAssignmentScopeFields({
   );
   return (
     <fieldset className="grid gap-3 border-t pt-3" disabled={disabled}>
-      <label className="grid gap-1.5 text-sm">
-        <span className="font-medium">{M.LABEL}</span>
-        <select
-          className="bg-background h-10 rounded-md border px-3"
+      <div className="grid gap-1.5 text-sm">
+        <label htmlFor={scopeId} className="font-medium">
+          {M.LABEL}
+        </label>
+        <FormSelect
+          name={scopeId}
+          options={[
+            { value: "INSTITUTION", label: M.INSTITUTION },
+            { value: "TRAINING_PATHS", label: M.PATHS, disabled: !supportsTrainingPathScope },
+          ]}
+          disabled={disabled}
           value={value.accessScope}
-          onChange={(event) => onChange({ ...value, accessScope: event.target.value as RoleAssignment["accessScope"], trainingPathIds: [] })}
-        >
-          <option value="INSTITUTION">{M.INSTITUTION}</option>
-          <option value="TRAINING_PATHS" disabled={!supportsTrainingPathScope}>
-            {M.PATHS}
-          </option>
-        </select>
-      </label>
-      <p className="text-muted-foreground text-xs">{value.accessScope === "INSTITUTION" ? M.GLOBAL : M.LIMITED}</p>
+          onValueChange={(accessScope) => {
+            if (accessScope === "INSTITUTION" || accessScope === "TRAINING_PATHS") {
+              onChange({ ...value, accessScope, trainingPathIds: [] });
+            }
+          }}
+        />
+      </div>
       {value.accessScope === "TRAINING_PATHS" ? (
         <>
           {inactivePermissions.length > 0 ? (
@@ -64,37 +74,59 @@ export function RoleAssignmentScopeFields({
               {M.INACTIVE}: {inactivePermissions.join(", ")}
             </p>
           ) : null}
-          <AsyncDropdown<TrainingPathScopeOption>
-            fetchPage={fetchPaths}
-            queryKey={["role-scope-paths", institutionId, scope]}
-            getItemValue={(path) => path.id}
-            getItemLabel={(path) => path.name}
-            placeholder={M.SEARCH}
-            disabled={disabled}
-            onValueChange={(_id, path) => {
-              if (path && !value.trainingPathIds.includes(path.id)) {
+          <div className="grid min-w-0 gap-3">
+            <label htmlFor={pathsId} className="text-sm font-medium">
+              {M.PATHS}
+            </label>
+            <div className="bg-muted/20 flex min-h-12 min-w-0 flex-wrap items-center gap-2 rounded-xl border px-3 py-2.5">
+              {value.trainingPathIds.length === 0 ? <p className="text-muted-foreground text-sm">{M.EMPTY_SELECTION}</p> : null}
+              {value.trainingPathIds.map((id) => {
+                const name = selectedNames[id] ?? names[id] ?? id;
+                return (
+                  <Badge key={id} className="h-auto min-h-7 max-w-full gap-2 px-3" size="lg" variant="secondary">
+                    <span className="min-w-0 wrap-anywhere whitespace-normal">{name}</span>
+                    <Button
+                      aria-label={`${M.REMOVE} ${name}`}
+                      className="text-muted-foreground hover:text-foreground -mr-1 shrink-0"
+                      type="button"
+                      size="icon-xs"
+                      variant="ghost"
+                      disabled={disabled}
+                      onClick={() => onChange({ ...value, trainingPathIds: value.trainingPathIds.filter((path) => path !== id) })}
+                    >
+                      <XIcon />
+                    </Button>
+                  </Badge>
+                );
+              })}
+            </div>
+            <AsyncDropdown<TrainingPathScopeOption>
+              id={pathsId}
+              fetchPage={fetchPaths}
+              queryKey={["role-scope-paths", institutionId, scope]}
+              getItemValue={(path) => path.id}
+              getItemLabel={(path) => path.name}
+              placeholder={M.SEARCH}
+              searchPlaceholder={M.SEARCH_PLACEHOLDER}
+              emptyMessage={M.NO_RESULTS}
+              errorMessage={M.LOAD_ERROR}
+              disabled={disabled}
+              closeOnSelect={false}
+              selectedValues={value.trainingPathIds}
+              onValueChange={(_id, path) => {
+                if (!path) {
+                  return;
+                }
+
                 setSelectedNames((current) => ({ ...current, [path.id]: path.name }));
-                onChange({ ...value, trainingPathIds: [...value.trainingPathIds, path.id] });
-              }
-            }}
-          />
-          <ul className="grid gap-1">
-            {value.trainingPathIds.map((id) => (
-              <li key={id} className="flex items-center justify-between gap-2 text-sm">
-                <span>{selectedNames[id] ?? names[id] ?? id}</span>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  disabled={disabled}
-                  onClick={() => onChange({ ...value, trainingPathIds: value.trainingPathIds.filter((path) => path !== id) })}
-                >
-                  {M.REMOVE}
-                </Button>
-              </li>
-            ))}
-          </ul>
-          {value.trainingPathIds.length === 0 ? <p className="text-destructive text-xs">{M.REQUIRED}</p> : null}
+                const isSelected = value.trainingPathIds.includes(path.id);
+                onChange({
+                  ...value,
+                  trainingPathIds: isSelected ? value.trainingPathIds.filter((id) => id !== path.id) : [...value.trainingPathIds, path.id],
+                });
+              }}
+            />
+          </div>
         </>
       ) : null}
     </fieldset>
