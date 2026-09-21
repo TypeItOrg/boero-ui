@@ -116,9 +116,9 @@ export function CourseEnrollmentAssignmentFields({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {options.classes.map((courseClass, index) => (
+                    {options.classes.map((courseClass) => (
                       <SelectItem key={courseClass.id} value={courseClass.id} className="px-2.5 py-1.5">
-                        Clase {index + 1}
+                        {courseClass.label}
                         {courseClass.teachers.length > 0 ? ` — ${courseClass.teachers.map((teacher) => teacher.fullName).join(", ")}` : ""}
                       </SelectItem>
                     ))}

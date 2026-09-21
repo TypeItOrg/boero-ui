@@ -48,6 +48,7 @@ const COURSE: Course = {
   classes: [
     {
       id: "class-1",
+      classNumber: 1,
       teachers: [{ personId: "teacher-1", fullName: "Ana Garcia" }],
       days: [
         {
@@ -233,6 +234,7 @@ describe("AcademicDetail", () => {
       classes: [
         {
           id: "class-1",
+          classNumber: 1,
           teachers: [],
           days: [
             {

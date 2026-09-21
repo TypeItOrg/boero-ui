@@ -261,15 +261,15 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
           {course.classes.length === 0 ? (
             <p className="text-muted-foreground text-sm">Sin clases para mostrar.</p>
           ) : (
-            course.classes.map((courseClass, classIndex) => (
+            course.classes.map((courseClass) => (
               <article key={courseClass.id} className="bg-background overflow-hidden rounded-xl border shadow-2xs">
                 <div className="flex flex-col gap-3 border-b px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2.5">
                     <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg text-sm font-bold">
-                      {classIndex + 1}
+                      {courseClass.classNumber}
                     </span>
                     <div>
-                      <h3 className="text-base leading-none font-semibold">Clase {classIndex + 1}</h3>
+                      <h3 className="text-base leading-none font-semibold">Clase {courseClass.classNumber}</h3>
                       <p className="text-muted-foreground mt-1 text-xs">
                         {courseClass.days.length === 0
                           ? "Sin días configurados"
