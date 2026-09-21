@@ -1,6 +1,7 @@
 "use client";
 
 import { ActionForm } from "@common/components/action-form";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
 
 import * as React from "react";
 import Link from "next/link";
@@ -34,10 +35,11 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
   const destination = returnTo ?? (role ? `/admin/roles/${role.id}` : "/admin/roles");
   const action = savePlatformRoleAction.bind(null, role?.id, role?.institution.id, destination);
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
+  const formRef = useActionFormErrorFocus(state, pending);
   const isEdit = Boolean(role);
 
   return (
-    <ActionForm action={formAction} className="flex flex-col gap-4">
+    <ActionForm ref={formRef} action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />

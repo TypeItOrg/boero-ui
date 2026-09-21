@@ -3,6 +3,8 @@
 import * as React from "react";
 import { PlusIcon, ShieldCheckIcon, XIcon } from "lucide-react";
 
+import { RoleAssignmentScopeFields } from "@features/people/components/role-assignment-scope-fields";
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
 import { Button } from "@common/components/ui/button";
 import type { AssignableRole } from "@features/people/types/assignable-role.types";
 import type { PersonRole } from "@features/people/types/person-role.types";
@@ -12,6 +14,10 @@ import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonRolesManagerProps = {
+  institutionId?: string;
+  assignments?: readonly RoleAssignment[];
+  onAssignmentChange?: (assignment: RoleAssignment) => void;
+  disabled?: boolean;
   roles: AssignableRole[];
   assignedRoles: PersonRole[];
   selectedRoleCodes: readonly string[];
@@ -29,6 +35,10 @@ type SelectedRole = {
 };
 
 export function PersonRolesManager({
+  institutionId,
+  assignments,
+  onAssignmentChange,
+  disabled = false,
   roles,
   assignedRoles,
   selectedRoleCodes,
@@ -60,7 +70,7 @@ export function PersonRolesManager({
     if (selectedRoleCodeSet.has(roleId)) return;
 
     const roleSelection = getRoleSelection(roleId);
-    if (!canApplyRoleCodes(roleSelection.roleIds, roleSelection.implicitRevocationIds)) return;
+    if (!canApplyRoleCodes(roleSelection.roleIds)) return;
 
     onSelectedRoleCodesChange(roleSelection.roleIds);
   }
@@ -74,13 +84,12 @@ export function PersonRolesManager({
     onSelectedRoleCodesChange(nextRoleCodes);
   }
 
-  function canApplyRoleCodes(nextRoleCodes: readonly string[], implicitRevocationIds: readonly string[] = []): boolean {
+  function canApplyRoleCodes(nextRoleCodes: readonly string[]): boolean {
     const preservesProtectedRoles = Array.from(protectedRoleIds).every((roleId) => nextRoleCodes.includes(roleId));
     if (!preservesProtectedRoles) return false;
 
     const roleChanges = getRoleChanges(initialRoleCodes, nextRoleCodes);
-    const implicitRevocationIdSet = new Set(implicitRevocationIds);
-    const requiresExplicitRevocation = roleChanges.revocations.some((roleId) => !implicitRevocationIdSet.has(roleId));
+    const requiresExplicitRevocation = roleChanges.revocations.length > 0;
     const canAssign = roleChanges.assignments.length === 0 || canAssignRoles;
     const canRevoke = !requiresExplicitRevocation || canRevokeRoles;
 
@@ -89,22 +98,13 @@ export function PersonRolesManager({
 
   function getRoleSelection(roleId: string): {
     roleIds: string[];
-    implicitRevocationIds: string[];
   } {
     const candidate = rolesByCode.get(roleId);
     const replacesSelectedRoles =
       candidate?.technicalCode === SystemRoleCode.APPLICANT || (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
     const roleIds = replacesSelectedRoles ? [roleId] : [...selectedRoleCodes, roleId];
 
-    if (candidate?.technicalCode === SystemRoleCode.APPLICANT) {
-      return { roleIds, implicitRevocationIds: initialRoleCodes };
-    }
-
-    const replacesInitialApplicant = applicantRoleId !== undefined && initialRoleCodeSet.has(applicantRoleId);
-    return {
-      roleIds,
-      implicitRevocationIds: replacesInitialApplicant ? [applicantRoleId] : [],
-    };
+    return { roleIds };
   }
 
   return (
@@ -132,23 +132,52 @@ export function PersonRolesManager({
                 const isRevokable = !isInstitutionalAuthority || PeopleScope.isAdmin(scope);
 
                 return (
-                  <div key={role.roleId} className="flex items-center justify-between gap-3 rounded-lg border p-3">
-                    <div className="flex min-w-0 flex-col gap-1">
-                      <span className="font-medium">{role.displayName}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {isPendingAssignment ? "Se asignará al guardar." : `Asignado: ${formatAssignedAt(role.assignedAt)}`}
-                      </span>
+                  <div key={role.roleId} className="grid gap-3 rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 flex-col gap-1">
+                        <span className="font-medium">{role.displayName}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {isPendingAssignment ? "Se asignará al guardar." : `Asignado: ${formatAssignedAt(role.assignedAt)}`}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant={isPendingAssignment ? "outline" : "destructive"}
+                        size="sm"
+                        onClick={() => removeRole(role.roleId)}
+                        disabled={disabled || selectedRoleCodes.length <= 1 || !canApplyRoleCodes(nextRoleCodes) || !isRevokable}
+                      >
+                        <XIcon data-icon="inline-start" />
+                        {isPendingAssignment ? "Quitar" : "Revocar"}
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant={isPendingAssignment ? "outline" : "destructive"}
-                      size="sm"
-                      onClick={() => removeRole(role.roleId)}
-                      disabled={selectedRoleCodes.length <= 1 || !canApplyRoleCodes(nextRoleCodes) || !isRevokable}
-                    >
-                      <XIcon data-icon="inline-start" />
-                      {isPendingAssignment ? "Quitar" : "Revocar"}
-                    </Button>
+                    {institutionId && onAssignmentChange && assignments ? (
+                      <RoleAssignmentScopeFields
+                        supportsTrainingPathScope={rolesByCode.get(role.roleId)?.supportsTrainingPathScope === true}
+                        inactivePermissions={rolesByCode.get(role.roleId)?.inactivePermissionDescriptionsWhenScoped ?? []}
+                        institutionId={institutionId}
+                        scope={scope}
+                        value={assignments.find((a) => a.roleId === role.roleId)!}
+                        names={assignedRolesByCode.get(role.roleId)?.trainingPathNames ?? {}}
+                        onChange={(next) => {
+                          const original = assignedRolesByCode.get(role.roleId);
+                          const previous: Pick<RoleAssignment, "accessScope" | "trainingPathIds"> = original ?? {
+                            accessScope: "TRAINING_PATHS",
+                            trainingPathIds: [],
+                          };
+                          const expands =
+                            previous.accessScope !== "INSTITUTION" &&
+                            (next.accessScope === "INSTITUTION" || next.trainingPathIds.some((id) => !previous.trainingPathIds.includes(id)));
+                          const reduces =
+                            next.accessScope !== "INSTITUTION" &&
+                            (previous.accessScope === "INSTITUTION" || previous.trainingPathIds.some((id) => !next.trainingPathIds.includes(id)));
+                          if ((!expands || canAssignRoles) && (!reduces || canRevokeRoles)) {
+                            onAssignmentChange(next);
+                          }
+                        }}
+                        disabled={disabled || isInstitutionalAuthority || (!canAssignRoles && !canRevokeRoles)}
+                      />
+                    ) : null}
                   </div>
                 );
               })}
@@ -177,7 +206,7 @@ export function PersonRolesManager({
                       variant="outline"
                       size="sm"
                       onClick={() => selectRole(role.id)}
-                      disabled={!canApplyRoleCodes(roleSelection.roleIds, roleSelection.implicitRevocationIds)}
+                      disabled={disabled || !canApplyRoleCodes(roleSelection.roleIds)}
                     >
                       <PlusIcon data-icon="inline-start" />
                       Asignar

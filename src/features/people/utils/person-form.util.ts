@@ -1,3 +1,4 @@
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
 import type { Resolver, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -40,7 +41,7 @@ export function getDefaultValues(person: Person | undefined): PersonFormInput {
   };
 }
 
-export function getFormData(values: PersonFormInput, isEdit: boolean, canEdit: boolean, roleIds?: readonly string[]): FormData {
+export function getFormData(values: PersonFormInput, isEdit: boolean, canEdit: boolean, assignments?: readonly RoleAssignment[]): FormData {
   const formData = new FormData();
 
   if (!isEdit || canEdit) {
@@ -53,8 +54,8 @@ export function getFormData(values: PersonFormInput, isEdit: boolean, canEdit: b
     }
   }
 
-  if (isEdit && roleIds) {
-    formData.append("roleIds", JSON.stringify(roleIds));
+  if (isEdit && assignments) {
+    formData.append("assignments", JSON.stringify(assignments));
   }
 
   return formData;

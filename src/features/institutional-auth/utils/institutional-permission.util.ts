@@ -14,3 +14,21 @@ export function hasAnyInstitutionalPermission(user: InstitutionalPermissionSourc
 export function hasAllInstitutionalPermissions(user: InstitutionalPermissionSource, permissions: readonly InstitutionalPermission[]): boolean {
   return permissions.every((permission) => hasInstitutionalPermission(user, permission));
 }
+
+export function hasTrainingPathPermission(
+  user: InstitutionalUser | null | undefined,
+  permission: InstitutionalPermission,
+  trainingPathId: string,
+): boolean {
+  const access = user?.permissionScopes?.[permission];
+  return access?.accessScope === "INSTITUTION" || (access?.trainingPathIds.includes(trainingPathId) ?? false);
+}
+
+export function scopeIncludesTrainingPath(
+  scopes: InstitutionalUser["permissionScopes"],
+  permission: InstitutionalPermission,
+  trainingPathId: string | null | undefined,
+): boolean {
+  const access = scopes?.[permission];
+  return access?.accessScope === "INSTITUTION" || (trainingPathId != null && (access?.trainingPathIds.includes(trainingPathId) ?? false));
+}

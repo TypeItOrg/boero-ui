@@ -1,6 +1,7 @@
 "use client";
 
 import { ActionForm } from "@common/components/action-form";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
 
 import { useActionState } from "react";
 import Link from "next/link";
@@ -30,9 +31,10 @@ export function InstitutionRoleForm({ institutionId, role, permissionGroups, ret
   const destination = returnTo ?? (role ? `/roles/${role.id}` : "/roles");
   const action = saveInstitutionRoleAction.bind(null, institutionId, role?.id, destination);
   const [state, formAction, pending] = useActionState(action, initialState);
+  const formRef = useActionFormErrorFocus(state, pending);
 
   return (
-    <ActionForm action={formAction} className="flex flex-col gap-4">
+    <ActionForm ref={formRef} action={formAction} className="flex flex-col gap-4">
       {state.error ? (
         <Alert variant="destructive">
           <CircleAlertIcon />

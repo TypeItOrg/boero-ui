@@ -62,7 +62,7 @@ function VerificationRequestForm({
   const [email, setEmail] = useState("");
 
   return (
-    <ActionForm resetOnSuccess={Boolean(state.success)} action={action} className="mt-6 space-y-5">
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={action} noValidate className="mt-6 space-y-5">
       <EmailVerificationFeedback
         state={state}
         successMessage={
@@ -141,7 +141,7 @@ function VerificationRequestForm({
         ) : null}
       </FieldGroup>
       <div className="flex flex-col gap-4">
-        <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+        <Button type="submit" size="lg" className="h-auto min-h-9 py-2 whitespace-normal" disabled={pending} aria-busy={pending}>
           {pending ? <Loader2Icon className="animate-spin" /> : null}
           {pending ? "Enviando…" : mode === "resend" ? "Reenviar enlace" : "Cambiar correo electrónico y enviar enlace"}
         </Button>

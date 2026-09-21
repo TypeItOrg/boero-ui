@@ -5,4 +5,7 @@ export type PersonRole = {
   technicalCode: SystemRoleCode | null;
   displayName: string;
   assignedAt: string;
+  accessScope: "INSTITUTION" | "TRAINING_PATHS";
+  trainingPathIds: string[];
+  trainingPathNames: Record<string, string>;
 };

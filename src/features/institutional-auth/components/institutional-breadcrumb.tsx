@@ -8,7 +8,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 
 const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   people: "Usuarios",
-  new: "Nuevo usuario",
+  new: "Nuevo",
   account: "Cuenta",
   edit: "Editar",
   password: "Contraseña",
@@ -31,7 +31,8 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   "enrollment-applications": "Solicitudes de inscripción",
   "my-enrollment-applications": "Mis inscripciones",
   "course-enrollments": "Cursadas",
-  "my-course-enrollments": "Mis cursadas",
+  "my-course-enrollments": "Mis materias",
+  "my-schedules": "Mis horarios",
   "my-teaching": "Mis clases y cursos",
   waitlist: "Lista de espera",
 };

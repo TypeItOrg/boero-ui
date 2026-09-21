@@ -1,6 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BookCopyIcon,
+  BookOpenIcon,
+  CalendarRangeIcon,
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
@@ -122,6 +124,22 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
   }
 
   return links;
+}
+
+export function getInstitutionalFormationHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
+  if (!canViewOwnEnrollmentApplications(user)) {
+    return [];
+  }
+
+  return [
+    { href: "/my-course-enrollments", title: "Mis materias", description: "Consultá tus materias y resultados académicos.", icon: BookOpenIcon },
+    {
+      href: "/my-schedules",
+      title: "Mis horarios",
+      description: "Organizá tu semana con los días y horarios de tus clases.",
+      icon: CalendarRangeIcon,
+    },
+  ];
 }
 
 export function getInstitutionalAcademicOfferLink(user: Pick<InstitutionalUser, "permissions">): InstitutionalHomeLink | undefined {

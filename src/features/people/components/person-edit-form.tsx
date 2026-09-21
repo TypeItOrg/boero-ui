@@ -9,6 +9,7 @@ import { cn } from "@common/utils/cn.util";
 import { PersonForm } from "@features/people/components/person-form";
 import { PersonRolesManager } from "@features/people/components/person-roles-manager";
 import type { AssignableRole } from "@features/people/types/assignable-role.types";
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
 import type { PersonRole } from "@features/people/types/person-role.types";
 import type { Person } from "@features/people/types/person.types";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
@@ -40,6 +41,12 @@ export function PersonEditForm({
 }: PersonEditFormProps): React.ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const [selectedRoleCodes, setSelectedRoleCodes] = React.useState<string[]>(() => assignedRoles.map((role) => role.roleId));
+  const [roleScopes, setRoleScopes] = React.useState<Record<string, RoleAssignment>>(() =>
+    Object.fromEntries(
+      assignedRoles.map((role) => [role.roleId, { roleId: role.roleId, accessScope: role.accessScope, trainingPathIds: role.trainingPathIds }]),
+    ),
+  );
+  const assignments = selectedRoleCodes.map((roleId) => roleScopes[roleId] ?? { roleId, accessScope: "INSTITUTION" as const, trainingPathIds: [] });
   const [isPending, setIsPending] = React.useState(false);
   const destination = returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
 
@@ -54,12 +61,16 @@ export function PersonEditForm({
           hideActions
           onPendingChange={setIsPending}
           canEdit={canEdit}
-          roleIds={canManageRoles ? selectedRoleCodes : undefined}
+          assignments={canManageRoles ? assignments : undefined}
           scope={scope}
           returnTo={returnTo}
         />
         {canManageRoles ? (
           <PersonRolesManager
+            institutionId={institutionId}
+            assignments={assignments}
+            onAssignmentChange={(assignment) => setRoleScopes((current) => ({ ...current, [assignment.roleId]: assignment }))}
+            disabled={isPending}
             roles={roles}
             assignedRoles={assignedRoles}
             selectedRoleCodes={selectedRoleCodes}

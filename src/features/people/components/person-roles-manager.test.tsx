@@ -26,6 +26,9 @@ function assignedRole(roleCode: SystemRoleCodeType): PersonRole {
     technicalCode: role.technicalCode,
     displayName: role.name,
     assignedAt: "2026-07-17T21:03:00Z",
+    accessScope: "INSTITUTION",
+    trainingPathIds: [],
+    trainingPathNames: {},
   };
 }
 
@@ -46,7 +49,7 @@ function renderManager(
 }
 
 describe("PersonRolesManager", () => {
-  it("replaces applicant when assigning another role with only assign permission", async () => {
+  it("requires revocation permission when replacing an assigned applicant role", async () => {
     const user = userEvent.setup();
     const onSelectedRoleCodesChange = jest.fn();
 
@@ -57,7 +60,7 @@ describe("PersonRolesManager", () => {
 
     await user.click(screen.getByRole("button", { name: "Asignar" }));
 
-    expect(onSelectedRoleCodesChange).toHaveBeenCalledWith([administrativeRole.id]);
+    expect(onSelectedRoleCodesChange).not.toHaveBeenCalled();
   });
 
   it("allows restoring applicant when it cancels a pending replacement", async () => {
@@ -99,6 +102,9 @@ describe("PersonRolesManager", () => {
             technicalCode: SystemRoleCode.INSTITUTIONAL_AUTHORITY,
             displayName: authorityRole.name,
             assignedAt: "2026-07-17T21:03:00Z",
+            accessScope: "INSTITUTION",
+            trainingPathIds: [],
+            trainingPathNames: {},
           },
         ]}
         selectedRoleCodes={[authorityRole.id]}
@@ -130,6 +136,9 @@ describe("PersonRolesManager", () => {
             technicalCode: SystemRoleCode.INSTITUTIONAL_AUTHORITY,
             displayName: authorityRole.name,
             assignedAt: "2026-07-17T21:03:00Z",
+            accessScope: "INSTITUTION",
+            trainingPathIds: [],
+            trainingPathNames: {},
           },
         ]}
         selectedRoleCodes={[authorityRole.id]}
@@ -161,12 +170,18 @@ describe("PersonRolesManager", () => {
             technicalCode: SystemRoleCode.INSTITUTIONAL_AUTHORITY,
             displayName: authorityRole.name,
             assignedAt: "2026-07-17T21:03:00Z",
+            accessScope: "INSTITUTION",
+            trainingPathIds: [],
+            trainingPathNames: {},
           },
           {
             roleId: administrativeRole.id,
             technicalCode: null,
             displayName: administrativeRole.name,
             assignedAt: "2026-07-17T21:03:00Z",
+            accessScope: "INSTITUTION",
+            trainingPathIds: [],
+            trainingPathNames: {},
           },
         ]}
         selectedRoleCodes={[authorityRole.id, administrativeRole.id]}
