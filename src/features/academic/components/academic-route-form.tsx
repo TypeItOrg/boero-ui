@@ -5,7 +5,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
-import { fetchTrainingPath } from "@features/academic/services/academic.service";
+import { fetchTrainingPathForStudyPlanCreation } from "@features/academic/services/academic.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -52,7 +52,7 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
   );
 }
 
-async function getContextualTrainingPath(input: RouteFormInput): Promise<TrainingPath | undefined> {
+async function getContextualTrainingPath(input: RouteFormInput): Promise<Pick<TrainingPath, "id" | "name"> | undefined> {
   if (input.resource !== AcademicResource.STUDY_PLAN) return undefined;
 
   const rawTrainingPathId = getQueryParamValue(input.searchParams.trainingPathId);
@@ -61,7 +61,7 @@ async function getContextualTrainingPath(input: RouteFormInput): Promise<Trainin
   const trainingPathId = parseUuidQueryParam(rawTrainingPathId);
   if (!trainingPathId) notFound();
 
-  const trainingPath = await fetchTrainingPath(input.scope, input.institutionId, trainingPathId);
+  const trainingPath = await fetchTrainingPathForStudyPlanCreation(input.scope, input.institutionId, trainingPathId);
   if (!trainingPath) notFound();
 
   return trainingPath;

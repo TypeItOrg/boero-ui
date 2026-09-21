@@ -1,3 +1,5 @@
+import { unstable_rethrow } from "next/navigation";
+
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -10,14 +12,23 @@ export async function authorizeAcademicAction(
   institutionId: string,
   permission: InstitutionalPermission,
 ): Promise<AcademicActionState | undefined> {
-  if (AcademicScope.isAdmin(scope)) {
-    await requirePlatformAccount();
-    return undefined;
-  }
+  try {
+    if (AcademicScope.isAdmin(scope)) {
+      await requirePlatformAccount();
+      return undefined;
+    }
 
-  const user = await requireInstitutionalUser();
-  const belongsToInstitution = user.institutionId === institutionId;
-  const hasPermission = hasInstitutionalPermission(user, permission);
-  if (belongsToInstitution && hasPermission) return undefined;
-  return { error: "No tenés permisos para modificar esta configuración académica." };
+    const user = await requireInstitutionalUser();
+    const belongsToInstitution = user.institutionId === institutionId;
+    const hasPermission = hasInstitutionalPermission(user, permission);
+    if (belongsToInstitution && hasPermission) {
+      return undefined;
+    }
+
+    return { error: "No tenés permisos para modificar esta configuración académica." };
+  } catch (error) {
+    unstable_rethrow(error);
+
+    return { error: "No se pudo verificar tu sesión. Tus datos siguen en el formulario. Intentá nuevamente cuando se restablezca la conexión." };
+  }
 }

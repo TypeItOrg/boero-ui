@@ -173,7 +173,7 @@ const courseSchema = z
     academicSpaceId: optionalUuid,
     instrumentId: optionalUuid,
     academicYearId: z.string().uuid("Seleccioná un ciclo lectivo."),
-    format: z.enum(ACADEMIC_SPACE_FORMAT),
+    format: z.enum(ACADEMIC_SPACE_FORMAT, { error: "Seleccioná un espacio académico para definir el formato del curso." }),
     classes: parsedCourseClasses,
   })
   .superRefine((value, context) => {

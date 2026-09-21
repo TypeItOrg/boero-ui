@@ -45,7 +45,7 @@ describe("academic options routes", () => {
     const receivedUrl = new URL(receivedPath, "http://localhost");
 
     expect(receivedScope).toBe(scope);
-    expect(receivedUrl.pathname).toBe(`${backendBasePath}/training-paths`);
+    expect(receivedUrl.pathname).toBe(`${backendBasePath}/academic-options/training-paths`);
     expect(Object.fromEntries(receivedUrl.searchParams)).toEqual({
       active: "true",
       deleted: "false",

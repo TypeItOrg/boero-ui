@@ -25,7 +25,8 @@ export function TrainingPathDropdown(props: AcademicOptionDropdownProps): React.
   const [value, setValue] = React.useState(props.initialValue);
   const [selectedLabel, setSelectedLabel] = React.useState(props.selectedLabel);
   const fetchPage = React.useCallback(
-    (input: AsyncDropdownFetchPageInput) => fetchAcademicOptionPage<TrainingPath>("training-paths", props.scope, props.institutionId, input),
+    (input: AsyncDropdownFetchPageInput) =>
+      fetchAcademicOptionPage<TrainingPath>("training-paths", props.scope, props.institutionId, input, { operation: "STUDY_PLAN_CREATE" }),
     [props.institutionId, props.scope],
   );
 
@@ -60,7 +61,10 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
   const [value, setValue] = React.useState(props.initialValue);
   const [selectedLabel, setSelectedLabel] = React.useState(props.selectedLabel);
   const fetchPage = React.useCallback(
-    (input: AsyncDropdownFetchPageInput) => fetchAcademicOptionPage<AcademicSpace>("academic-spaces", props.scope, props.institutionId, input),
+    (input: AsyncDropdownFetchPageInput) =>
+      fetchAcademicOptionPage<AcademicSpace>("academic-spaces", props.scope, props.institutionId, input, {
+        operation: "STUDY_PLAN_CURRICULUM_UPDATE",
+      }),
     [props.institutionId, props.scope],
   );
 

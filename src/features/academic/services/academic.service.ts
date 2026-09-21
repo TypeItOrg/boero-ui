@@ -188,3 +188,16 @@ async function fetchDetailWithParams<T>(
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
   return parseNullableHttpResponse(response, FETCH_ERROR);
 }
+
+export async function fetchTrainingPathForStudyPlanCreation(
+  scope: AcademicScope,
+  institutionId: string,
+  trainingPathId: string,
+): Promise<Pick<TrainingPath, "id" | "name"> | null> {
+  const page = await fetchPage<Pick<TrainingPath, "id" | "name">>(scope, institutionId, "academic-options/training-paths", {
+    trainingPathId,
+    operation: "STUDY_PLAN_CREATE",
+    size: 1,
+  });
+  return page.items[0] ?? null;
+}

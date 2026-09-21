@@ -1,3 +1,5 @@
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { notFound } from "next/navigation";
 import { GitBranchPlusIcon } from "lucide-react";
 
@@ -67,6 +69,12 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   const [curriculum, fetchedItem, academicSpaceUsage] = await Promise.all([curriculumPromise, itemPromise, academicSpaceUsagePromise]);
   const item = curriculum?.studyPlan ?? fetchedItem;
   if (!item) notFound();
+  if (input.scope === "institutional") {
+    const pathId = input.resource === AcademicResource.TRAINING_PATH ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : undefined;
+    if (pathId) {
+      input = { ...input, access: getAcademicAccess(await requireInstitutionalUser(), pathId) };
+    }
+  }
   const detailPath = `${input.basePath}/${input.resource}/${input.id}`;
   const collectionPath = `${input.basePath}/${input.resource}`;
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);

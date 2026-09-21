@@ -1,5 +1,7 @@
 "use client";
 
+import type { StudyPlan } from "@features/academic/types/study-plan.types";
+
 import * as React from "react";
 import { CalendarDaysIcon, GraduationCapIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 
@@ -9,7 +11,7 @@ import { Badge } from "@common/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Input } from "@common/components/ui/input";
-import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { TimeInputWithIcon } from "@common/components/ui/time-input-with-icon";
 import { ToggleGroup, ToggleGroupItem } from "@common/components/ui/toggle-group";
@@ -171,18 +173,19 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
           {institutionField}
           <FormField label="Plan de estudio" name="studyPlanId" error={fieldErrors?.studyPlanId} className="flex-[1_0_min(300px,100%)]" required>
             {institutionId && scope ? (
-              <AsyncDropdown<{ id: string; name: string }>
+              <AsyncDropdown<StudyPlan>
                 ariaInvalid={Boolean(fieldErrors?.studyPlanId)}
                 disabled={editing || classesLocked}
                 emptyMessage="No se encontraron planes activos."
                 errorMessage="No se pudieron cargar los planes de estudio."
                 fetchPage={(input) =>
-                  fetchAcademicOptionPage<{ id: string; name: string }>("study-plans", scope, institutionId, input, {
+                  fetchAcademicOptionPage<StudyPlan>("study-plans", scope, institutionId, input, {
+                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
                     active: "all",
                     status: "ACTIVE",
                   })
                 }
-                getItemLabel={(item) => item.name}
+                getItemLabel={(item) => `${item.trainingPathName} · ${item.name} · v${item.versionNumber ?? 1}`}
                 getItemValue={(item) => item.id}
                 id="studyPlanId"
                 key={`plan-${institutionId}`}
@@ -198,7 +201,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   setFormat(undefined);
                 }}
                 placeholder={classesLocked ? "Definido por el curso" : "Seleccionar plan"}
-                queryKey={["courses", "study-plans", scope, institutionId]}
+                queryKey={["courses", "active-study-plans", scope, institutionId]}
                 searchPlaceholder="Buscar plan…"
                 selectedLabel={toOptionalFormString(initialValues.studyPlanName)}
                 value={studyPlanId}
@@ -211,14 +214,14 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
           <FormField
             label="Espacio académico"
             name="academicSpaceId"
-            error={fieldErrors?.academicSpaceId}
+            error={fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format}
             className="flex-[1_0_min(300px,100%)]"
             required
           >
             {institutionId && scope ? (
               studyPlanId ? (
                 <AsyncDropdown<CourseSpaceOption>
-                  ariaInvalid={Boolean(fieldErrors?.academicSpaceId)}
+                  ariaInvalid={Boolean(fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format)}
                   disabled={editing || classesLocked}
                   emptyDescription="Incorporá espacios al plan para poder instanciarlos."
                   emptyIcon={GraduationCapIcon}
@@ -261,11 +264,12 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
               {institutionId && scope ? (
                 <AsyncDropdown<{ id: string; name: string }>
                   ariaInvalid={Boolean(fieldErrors?.instrumentId)}
-                  disabled={editing || classesLocked}
+                  disabled={editing}
                   emptyMessage="No hay instrumentos activos."
                   errorMessage="No se pudieron cargar los instrumentos."
                   fetchPage={(input) =>
                     fetchAcademicOptionPage<{ id: string; name: string }>("instruments", scope, institutionId, input, {
+                      operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
                       active: true,
                     })
                   }
@@ -275,7 +279,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   key={`instrument-${institutionId}-${studyPlanSpaceId ?? "none"}`}
                   name="instrumentDisplay"
                   onValueChange={(value) => setInstrumentId(value)}
-                  placeholder={classesLocked ? "Definido por el curso" : "Seleccionar instrumento"}
+                  placeholder="Seleccionar instrumento"
                   queryKey={["courses", "instruments", scope, institutionId]}
                   searchPlaceholder="Buscar instrumento…"
                   selectedLabel={toOptionalFormString(initialValues.instrumentName)}
@@ -296,6 +300,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 errorMessage="No se pudieron cargar los ciclos lectivos."
                 fetchPage={(input) =>
                   fetchAcademicOptionPage<{ id: string; year: number }>("academic-years", scope, institutionId, input, {
+                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
                     active: "all",
                     status: "ACTIVE",
                   })
@@ -344,6 +349,8 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
             </Button>
           ) : null}
         </header>
+
+        {fieldErrors?.classes ? <FieldError className="mt-4" errors={[{ message: fieldErrors.classes }]} /> : null}
 
         {classes.length === 0 ? (
           <Empty className="mt-5 min-h-56 border-0 bg-transparent">
@@ -808,7 +815,9 @@ function ScheduleRangeEditor({
           {!isEmpty && !isValid ? <Badge variant="destructive">{isIncomplete ? "Incompleta" : "Inválida"}</Badge> : null}
           {isValid ? <Badge variant="outline">{duration} min</Badge> : null}
           {individual && isValid && period ? (
-            <Badge variant={isDivisible ? "success" : "destructive"}>{isDivisible ? `${duration / period} cupos` : "No divisible"}</Badge>
+            <Badge variant={isDivisible ? "success" : "destructive"}>
+              {isDivisible ? `${duration / period} ${duration === period ? "cupo" : "cupos"}` : "No divisible"}
+            </Badge>
           ) : null}
         </div>
         {canRemove ? (

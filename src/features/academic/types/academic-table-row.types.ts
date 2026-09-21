@@ -1,4 +1,5 @@
 export type AcademicTableRow = {
+  scopedActions?: { update: boolean; delete: boolean; restore: boolean; status: boolean; createVersion: boolean; waitlist: boolean };
   id: string;
   institutionId?: string;
   institutionName?: string;

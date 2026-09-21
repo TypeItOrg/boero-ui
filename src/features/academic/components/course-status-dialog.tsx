@@ -76,7 +76,8 @@ const COURSE_STATUS_DIALOG_CONFIG: Record<CourseStatus, CourseStatusDialogConfig
     description: (resourceLabel) => (
       <>
         El curso <span className="text-foreground font-semibold">{resourceLabel}</span> se cerrará de forma definitiva y no podrá volver a editarse ni
-        cambiar de estado.
+        cambiar de estado. Se finalizarán sus cursadas y se liberarán los horarios. Los resultados ya registrados se conservarán; los demás quedarán
+        pendientes de resultado. Las solicitudes de este curso pendientes o en lista de espera serán rechazadas y se quitará de los borradores.
       </>
     ),
     icon: GraduationCapIcon,

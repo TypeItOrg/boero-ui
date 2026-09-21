@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { ActionForm } from "@common/components/action-form";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
@@ -104,8 +105,10 @@ export function AcademicResourceForm({
   const submitLabel = id ? "Guardar cambios" : CREATE_ACTION_LABELS[resource];
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
+  const formRef = useActionFormErrorFocus(state, pending);
+
   return (
-    <ActionForm action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm ref={formRef} action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">

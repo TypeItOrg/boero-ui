@@ -159,12 +159,12 @@ export function AcademicTablePresentation({
               <AcademicTableRow
                 key={row.id}
                 basePath={global ? `/admin/institutions/${row.institutionId}/academic` : basePath}
-                canChangeStatus={canChangeStatus}
-                canDelete={canDelete}
-                canCreateVersion={canCreateVersion}
-                canReadWaitlist={canReadWaitlist}
-                canRestore={canRestore}
-                canUpdate={canUpdate}
+                canChangeStatus={canChangeStatus && (row.scopedActions?.status ?? true)}
+                canDelete={canDelete && (row.scopedActions?.delete ?? true)}
+                canCreateVersion={canCreateVersion && (row.scopedActions?.createVersion ?? true)}
+                canReadWaitlist={canReadWaitlist && (row.scopedActions?.waitlist ?? true)}
+                canRestore={canRestore && (row.scopedActions?.restore ?? true)}
+                canUpdate={canUpdate && (row.scopedActions?.update ?? true)}
                 columns={columns}
                 global={global}
                 onLifecycleAction={(id, label, kind) => {

@@ -1,3 +1,5 @@
+import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { notFound } from "next/navigation";
 import { GitBranchPlusIcon, LibraryBigIcon } from "lucide-react";
 
@@ -38,14 +40,18 @@ type StudyPlanRouteProps = {
 
 export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.ReactElement> {
   const curriculum = await fetchStudyPlanCurriculum(props.scope, props.institutionId, props.id);
-  if (!curriculum) notFound();
+  if (!curriculum) {
+    notFound();
+  }
+  const access =
+    props.scope === "institutional" ? getAcademicAccess(await requireInstitutionalUser(), curriculum.studyPlan.trainingPathId) : props.access;
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
-  const canEditCurriculum = props.access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
+  const canEditCurriculum = access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
   const levels = curriculum.levels.map(({ level }) => level);
 
   if (props.action === ACADEMIC_ROUTE_SEGMENT.VERSIONS) {
     if (props.nestedId !== ACADEMIC_ROUTE_SEGMENT.NEW) notFound();
-    if (!props.access.studyPlanCreate || curriculum.studyPlan.status === "DRAFT") {
+    if (!access.studyPlanCreate || curriculum.studyPlan.status === "DRAFT") {
       return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
     }
     const breadcrumb = props.renderBreadcrumb({
