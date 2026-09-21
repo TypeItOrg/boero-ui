@@ -72,3 +72,9 @@ export const EDUCATION_LEVEL_OPTIONS = [
   { value: "TERTIARY_COMPLETE", label: "Terciario / Universitario Completo" },
   { value: "POSTGRADUATE", label: "Posgrado" },
 ] as const;
+
+export const ENROLLMENT_APPLICATION_FILTER_MESSAGES = {
+  UNAVAILABLE_TRAINING_PATH: "Trayecto no disponible",
+  NO_RESULTS_TITLE: "No se encontraron solicitudes",
+  NO_RESULTS_DESCRIPTION: "No encontramos solicitudes de inscripción que coincidan con los filtros seleccionados.",
+} as const;

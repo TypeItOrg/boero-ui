@@ -11,6 +11,7 @@ import { EnrollmentApplicationTablePresentation } from "@features/enrollment-app
 type EnrollmentApplicationTableContainerProps = PaginationParams & {
   dataPromise: Promise<PaginatedResponse<EnrollmentApplication>>;
   status?: EnrollmentApplicationStatus;
+  hasFilters?: boolean;
   canApprove: boolean;
   canReject: boolean;
   scope?: AcademicScope;
@@ -19,6 +20,7 @@ type EnrollmentApplicationTableContainerProps = PaginationParams & {
 export async function EnrollmentApplicationTableContainer({
   dataPromise,
   status,
+  hasFilters = Boolean(status),
   page,
   size,
   canApprove,
@@ -47,6 +49,7 @@ export async function EnrollmentApplicationTableContainer({
       page={page}
       size={size}
       status={status}
+      hasFilters={hasFilters}
       canApprove={canApprove}
       canReject={canReject}
       scope={scope}

@@ -61,6 +61,7 @@ export default async function EnrollmentApplicationsPage({
             page={page}
             size={size}
             status={status}
+            hasFilters={Boolean(status || trainingPathId || open)}
             dataPromise={dataPromise}
             canApprove={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE)}
             canReject={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT)}

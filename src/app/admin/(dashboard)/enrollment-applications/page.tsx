@@ -38,6 +38,7 @@ export default async function PlatformEnrollmentApplicationsPage({
             page={page}
             size={size}
             status={status}
+            hasFilters={Boolean(status || trainingPathId || open)}
             dataPromise={dataPromise}
             canApprove
             canReject

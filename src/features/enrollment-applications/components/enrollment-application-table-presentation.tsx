@@ -23,6 +23,7 @@ type EnrollmentApplicationTablePresentationProps = {
   page: number;
   size: number;
   status?: EnrollmentApplicationStatus;
+  hasFilters?: boolean;
   canApprove: boolean;
   canReject: boolean;
   scope?: AcademicScope;
@@ -33,6 +34,7 @@ export function EnrollmentApplicationTablePresentation({
   page,
   size,
   status,
+  hasFilters = Boolean(status),
   canApprove,
   canReject,
   scope,
@@ -61,7 +63,7 @@ export function EnrollmentApplicationTablePresentation({
   }
 
   if (data.items.length === 0) {
-    return <EnrollmentApplicationEmptyState hasFilter={Boolean(status)} isNavigating={isNavigating} size={size} totalItems={data.totalItems} />;
+    return <EnrollmentApplicationEmptyState hasFilter={hasFilters} isNavigating={isNavigating} size={size} totalItems={data.totalItems} />;
   }
 
   return (

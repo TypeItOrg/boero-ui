@@ -82,6 +82,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             width={875}
             height={1202}
             src="/boero-logo.webp"
+            loading="eager"
             alt="Logo del Conservatorio Superior de Música Felipe Boero"
             className="h-28 w-20 shrink-0 object-contain @2xl/home-hero:h-32 @2xl/home-hero:w-24"
           />
