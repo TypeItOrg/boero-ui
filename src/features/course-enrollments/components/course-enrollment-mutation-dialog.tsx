@@ -4,7 +4,7 @@ import { ActionForm } from "@common/components/action-form";
 import { safelyRunAction } from "@common/utils/safe-action.util";
 
 import * as React from "react";
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, GraduationCapIcon, UserMinusIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
 import { Field, FieldLabel } from "@common/components/ui/field";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { Textarea } from "@common/components/ui/textarea";
 import { updateCourseAcademicStatusAction, withdrawCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
@@ -32,10 +33,12 @@ type CourseEnrollmentMutationDialogProps = {
   onUpdated: () => void;
 };
 
-const ACADEMIC_STATUS_OPTIONS = Object.values(ACADEMIC_ENROLLMENT_STATUS).map((value) => ({
-  value,
-  label: ACADEMIC_ENROLLMENT_STATUS_LABELS[value],
-}));
+const ACADEMIC_STATUS_OPTIONS = Object.values(ACADEMIC_ENROLLMENT_STATUS)
+  .map((value) => ({
+    value,
+    label: ACADEMIC_ENROLLMENT_STATUS_LABELS[value],
+  }))
+  .filter((option) => option.value !== ACADEMIC_ENROLLMENT_STATUS.PENDING_RESULT);
 
 export function CourseEnrollmentMutationDialog({
   enrollment,
@@ -79,14 +82,36 @@ export function CourseEnrollmentMutationDialog({
     onOpenChange(nextOpen);
   }
 
+  const availableAcademicStatusOptions = ACADEMIC_STATUS_OPTIONS.filter(
+    (option) => enrollment.status !== COURSE_ENROLLMENT_STATUS.COMPLETED || option.value !== ACADEMIC_ENROLLMENT_STATUS.IN_PROGRESS,
+  );
+  const defaultAcademicStatus = availableAcademicStatusOptions.some((option) => option.value === enrollment.academicStatus)
+    ? enrollment.academicStatus
+    : undefined;
+
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <ActionForm action={formAction} className="space-y-4">
           <AlertDialogHeader>
-            <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Actualizar resultado académico"}</AlertDialogTitle>
+            <div
+              className={
+                mode === "withdraw"
+                  ? "bg-destructive/10 text-destructive mb-1 flex size-12 items-center justify-center rounded-2xl"
+                  : "bg-primary/10 text-primary mb-1 flex size-12 items-center justify-center rounded-2xl"
+              }
+            >
+              {mode === "withdraw" ? (
+                <UserMinusIcon className="size-6" aria-hidden="true" />
+              ) : (
+                <GraduationCapIcon className="size-6" aria-hidden="true" />
+              )}
+            </div>
+            <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Actualizar estado académico"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {enrollment.academicSpaceName} · {enrollment.studentName}
+              {mode === "withdraw" ? "Estás por registrar la baja de " : "Estás por actualizar el estado académico de "}
+              <span className="text-foreground font-semibold">{enrollment.studentName}</span> en{" "}
+              <span className="text-foreground font-semibold">{enrollment.academicSpaceName}</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -102,37 +127,41 @@ export function CourseEnrollmentMutationDialog({
               <FieldLabel htmlFor="type" required>
                 Tipo de baja
               </FieldLabel>
-              <select
-                id="type"
-                name="type"
-                defaultValue="ADMINISTRATIVE"
-                disabled={isPending}
-                className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-              >
-                <option value="ADMINISTRATIVE">Baja administrativa</option>
-                <option value="VOLUNTARY">Baja voluntaria</option>
-              </select>
+              <Select name="type" defaultValue="ADMINISTRATIVE" disabled={isPending} required>
+                <SelectTrigger id="type" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="ADMINISTRATIVE" className="px-2.5 py-1.5">
+                      Baja administrativa
+                    </SelectItem>
+                    <SelectItem value="VOLUNTARY" className="px-2.5 py-1.5">
+                      Baja voluntaria
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </Field>
           ) : (
             <Field>
               <FieldLabel htmlFor="status" required>
                 Resultado
               </FieldLabel>
-              <select
-                id="status"
-                name="status"
-                defaultValue={enrollment.academicStatus}
-                disabled={isPending}
-                className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm outline-none focus-visible:ring-2"
-              >
-                {ACADEMIC_STATUS_OPTIONS.filter(
-                  (option) => enrollment.status !== COURSE_ENROLLMENT_STATUS.COMPLETED || option.value !== ACADEMIC_ENROLLMENT_STATUS.IN_PROGRESS,
-                ).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <Select name="status" defaultValue={defaultAcademicStatus} disabled={isPending} required>
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue placeholder="Seleccioná un resultado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {availableAcademicStatusOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </Field>
           )}
 
@@ -148,7 +177,7 @@ export function CourseEnrollmentMutationDialog({
               Cancelar
             </Button>
             <Button type="submit" size="lg" variant={mode === "withdraw" ? "destructive" : "default"} disabled={isPending}>
-              {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Guardar resultado"}
+              {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Actualizar estado"}
             </Button>
           </AlertDialogFooter>
         </ActionForm>

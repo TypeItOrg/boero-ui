@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 import { EllipsisVerticalIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { Badge } from "@common/components/ui/badge";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
@@ -127,7 +127,12 @@ export function CourseEnrollmentTable({
                 canReadWaitlist && scopeIncludesTrainingPath(permissionScopes, P.COURSE_WAITLIST_READ, enrollment.trainingPathId);
               const hasActions = Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult;
 
-              function renderActions(Item: typeof DropdownMenuItem | typeof ContextMenuItem): React.ReactElement {
+              function renderActions(
+                Item: typeof DropdownMenuItem | typeof ContextMenuItem,
+                Separator: typeof DropdownMenuSeparator | typeof ContextMenuSeparator,
+              ): React.ReactElement {
+                const hasActionBeforeWithdrawal = Boolean(detailBasePath) || canViewWaitlist || canUpdateResult;
+
                 return (
                   <>
                     {detailBasePath ? (
@@ -144,15 +149,18 @@ export function CourseEnrollmentTable({
                         </Link>
                       </Item>
                     ) : null}
-                    {canWithdrawEnrollment ? (
-                      <Item variant="destructive" className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "withdraw" })}>
-                        Registrar baja
-                      </Item>
-                    ) : null}
                     {canUpdateResult ? (
                       <Item className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "academic" })}>
-                        Resultado
+                        Actualizar estado académico
                       </Item>
+                    ) : null}
+                    {canWithdrawEnrollment ? (
+                      <>
+                        {hasActionBeforeWithdrawal ? <Separator /> : null}
+                        <Item variant="destructive" className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "withdraw" })}>
+                          Registrar baja
+                        </Item>
+                      </>
                     ) : null}
                   </>
                 );
@@ -169,8 +177,8 @@ export function CourseEnrollmentTable({
                               <EllipsisVerticalIcon />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-48 p-1.5">
-                            {renderActions(DropdownMenuItem)}
+                          <DropdownMenuContent align="start" className="w-56 p-1.5">
+                            {renderActions(DropdownMenuItem, DropdownMenuSeparator)}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       ) : null}
@@ -209,7 +217,7 @@ export function CourseEnrollmentTable({
               return (
                 <ContextMenu key={enrollment.id}>
                   <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
-                  <ContextMenuContent className="w-48 p-1.5">{renderActions(ContextMenuItem)}</ContextMenuContent>
+                  <ContextMenuContent className="w-56 p-1.5">{renderActions(ContextMenuItem, ContextMenuSeparator)}</ContextMenuContent>
                 </ContextMenu>
               );
             })}

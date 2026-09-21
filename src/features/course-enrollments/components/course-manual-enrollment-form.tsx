@@ -11,11 +11,12 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
 import * as React from "react";
-import { CircleAlertIcon, Loader2Icon } from "lucide-react";
+import { CircleAlertIcon, UserRoundCheckIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldLabel } from "@common/components/ui/field";
+import { Skeleton } from "@common/components/ui/skeleton";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
 import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 import { createManualCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
@@ -92,7 +93,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
   }, [state, isPending]);
 
   return (
-    <ActionForm action={formAction} className="flex flex-col gap-5">
+    <ActionForm action={formAction} className="flex min-w-0 flex-col gap-5">
       <input type="hidden" name="returnTo" value={returnTo} />
       {state.error ? (
         <Alert ref={errorRef} tabIndex={-1} variant="destructive">
@@ -102,74 +103,86 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
         </Alert>
       ) : null}
 
-      <div className="bg-muted/25 grid gap-5 rounded-xl border p-5 sm:grid-cols-2">
-        <Field>
-          <FieldLabel htmlFor="studentId" required>
-            Estudiante
-          </FieldLabel>
-          <AsyncDropdown<StudentSummary>
-            id="studentId"
-            name="studentId"
-            value={studentId}
-            onValueChange={(id) => {
-              setStudentId(id);
-            }}
-            disabled={isPending}
-            queryKey={["manual-enrollment-students"]}
-            fetchPage={(input) => fetchCatalog<StudentSummary>("students", input)}
-            getItemValue={(student) => student.studentId}
-            getItemLabel={(student) => `${student.lastName}, ${student.firstName} · DNI ${student.documentNumber}`}
-            placeholder="Seleccionar estudiante"
-          />
-        </Field>
+      <section aria-labelledby="manual-enrollment-student-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <div className="flex items-center gap-3.5">
+            <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
+              <UserRoundCheckIcon className="size-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <h2 id="manual-enrollment-student-title" className="text-base font-semibold">
+                Estudiante y curso
+              </h2>
+              <p className="text-muted-foreground text-sm">Seleccioná quién realizará la cursada y el curso al que se incorporará.</p>
+            </div>
+          </div>
+        </header>
 
-        <Field>
-          <FieldLabel htmlFor="courseId" required>
-            Curso
-          </FieldLabel>
-          <AsyncDropdown<Course>
-            id="courseId"
-            name="courseId"
-            value={courseId}
-            onValueChange={(value) => handleCourseChange(value ?? "")}
-            disabled={isPending}
-            queryKey={["manual-enrollment-courses"]}
-            fetchPage={(input) => fetchCatalog<Course>("course-enrollment-options", input)}
-            getItemValue={(course) => course.id}
-            getItemLabel={(course) =>
-              [
-                course.academicSpaceName,
-                course.instrumentName,
-                course.trainingPathName,
-                course.studyPlanName,
-                course.academicLevelName ?? "Sin nivel",
-                course.year,
-              ]
-                .filter(Boolean)
-                .join(" · ")
-            }
-            estimateSize={96}
-            renderItem={(course) => (
-              <div className="grid min-w-0 gap-1 text-left">
-                <span className="line-clamp-2 font-medium">{course.academicSpaceName}</span>
-                <span className="text-primary text-xs">
-                  {[course.academicLevelName ?? "Sin nivel", course.instrumentName, course.year].filter(Boolean).join(" · ")}
-                </span>
-                <span className="text-muted-foreground truncate text-xs" title={`${course.trainingPathName} · ${course.studyPlanName}`}>
-                  {course.trainingPathName} · {course.studyPlanName}
-                </span>
-              </div>
-            )}
-            placeholder="Seleccionar curso"
-          />
-        </Field>
-      </div>
+        <div className="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
+          <Field className="min-w-0">
+            <FieldLabel htmlFor="studentId" required>
+              Estudiante
+            </FieldLabel>
+            <AsyncDropdown<StudentSummary>
+              id="studentId"
+              name="studentId"
+              value={studentId}
+              onValueChange={(id) => {
+                setStudentId(id);
+              }}
+              disabled={isPending}
+              queryKey={["manual-enrollment-students"]}
+              fetchPage={(input) => fetchCatalog<StudentSummary>("students", input)}
+              getItemValue={(student) => student.studentId}
+              getItemLabel={(student) => `${student.lastName}, ${student.firstName} · ${student.documentNumber}`}
+              placeholder="Seleccionar estudiante"
+            />
+          </Field>
 
-      {loadingOptions ? (
-        <div className="text-muted-foreground flex items-center gap-2 text-sm" role="status">
-          <Loader2Icon className="size-4 animate-spin" /> Cargando clases y horarios…
+          <Field className="min-w-0">
+            <FieldLabel htmlFor="courseId" required>
+              Curso
+            </FieldLabel>
+            <AsyncDropdown<Course>
+              id="courseId"
+              name="courseId"
+              value={courseId}
+              onValueChange={(value) => handleCourseChange(value ?? "")}
+              disabled={isPending}
+              queryKey={["manual-enrollment-courses"]}
+              fetchPage={(input) => fetchCatalog<Course>("course-enrollment-options", input)}
+              getItemValue={(course) => course.id}
+              getItemLabel={(course) =>
+                [
+                  course.academicSpaceName,
+                  course.instrumentName,
+                  course.trainingPathName,
+                  course.studyPlanName,
+                  course.academicLevelName ?? "Sin nivel",
+                  course.year,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              }
+              estimateSize={96}
+              renderItem={(course) => (
+                <div className="grid min-w-0 gap-1 text-left">
+                  <span className="line-clamp-2 font-medium">{course.academicSpaceName}</span>
+                  <span className="text-primary text-xs">
+                    {[course.academicLevelName ?? "Sin nivel", course.instrumentName, course.year].filter(Boolean).join(" · ")}
+                  </span>
+                  <span className="text-muted-foreground truncate text-xs" title={`${course.trainingPathName} · ${course.studyPlanName}`}>
+                    {course.trainingPathName} · {course.studyPlanName}
+                  </span>
+                </div>
+              )}
+              placeholder="Seleccionar curso"
+            />
+          </Field>
         </div>
-      ) : null}
+      </section>
+
+      {loadingOptions ? <CourseEnrollmentAssignmentSkeleton /> : null}
       {optionsError ? (
         <Alert variant="destructive">
           <CircleAlertIcon />
@@ -189,6 +202,44 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
         </Button>
       </div>
     </ActionForm>
+  );
+}
+
+function CourseEnrollmentAssignmentSkeleton(): React.ReactElement {
+  return (
+    <div className="grid min-w-0 gap-5" role="status" aria-label="Cargando clases y horarios">
+      <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+        <div className="-mx-5 flex items-center gap-3.5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <Skeleton className="size-11 shrink-0 rounded-xl" />
+          <div className="grid flex-1 gap-2">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-4 w-full max-w-md" />
+          </div>
+        </div>
+        <div className="mt-5 grid gap-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-4 w-56 max-w-full" />
+        </div>
+      </section>
+
+      <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
+        <div className="-mx-5 flex items-center gap-3.5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <Skeleton className="size-11 shrink-0 rounded-xl" />
+          <div className="grid flex-1 gap-2">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-full max-w-sm" />
+          </div>
+        </div>
+        <div className="bg-background mt-5 flex items-center gap-3 rounded-lg border p-4">
+          <Skeleton className="size-4 shrink-0 rounded-sm" />
+          <div className="grid gap-2">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
