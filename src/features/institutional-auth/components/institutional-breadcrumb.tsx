@@ -33,7 +33,8 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   "course-enrollments": "Cursadas",
   "my-course-enrollments": "Mis materias",
   "my-schedules": "Mis horarios",
-  "my-teaching": "Mis clases y cursos",
+  "my-teaching": "Mis clases",
+  schedules: "Mis horarios",
   waitlist: "Lista de espera",
 };
 

@@ -12,18 +12,18 @@ import { getScheduleWeek, isScheduleDate, shiftScheduleWeek } from "@features/co
 import { cn } from "@common/utils/cn.util";
 import { MyScheduleEvent } from "@features/course-enrollments/components/my-schedule-event";
 import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
-import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import type { WeeklyScheduleItem } from "@features/course-enrollments/types/weekly-schedule-item.types";
 
 export function MyWeeklySchedule({
-  enrollments,
+  items,
   referenceDate,
   weekStart,
 }: {
-  enrollments: CourseEnrollment[];
+  items: WeeklyScheduleItem[];
   referenceDate: string;
   weekStart: string;
 }): React.ReactElement {
-  const schedules = enrollments.flatMap((enrollment) => enrollment.schedules.map((schedule) => ({ enrollment, schedule })));
+  const schedules = items.flatMap((item) => item.schedules.map((schedule) => ({ item, schedule })));
 
   const [selectedDay, setSelectedDay] = useState(schedules[0]?.schedule.dayOfWeek ?? "MONDAY");
 
@@ -128,7 +128,7 @@ export function MyWeeklySchedule({
             </EmptyMedia>
             <EmptyTitle className="mt-2 text-base">No tenés clases programadas esta semana</EmptyTitle>
             <EmptyDescription>
-              Podés recorrer las semanas para consultar los horarios de tus materias o volver a la semana actual con el botón «Hoy».
+              Podés recorrer las semanas para consultar los horarios de tus clases o volver a la semana actual con el botón «Hoy».
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -207,10 +207,10 @@ export function MyWeeklySchedule({
                       <div key={hour} className="border-b last:border-b-0" />
                     ))}
                   </div>
-                  {positionedLessons.map(({ enrollment, schedule, start, end, lane }) => (
+                  {positionedLessons.map(({ item, schedule, start, end, lane }) => (
                     <MyScheduleEvent
-                      key={`${weekStart}-${enrollment.id}-${schedule.id}`}
-                      enrollment={enrollment}
+                      key={`${weekStart}-${item.id}-${schedule.id}`}
+                      item={item}
                       schedule={schedule}
                       dayLabel={label}
                       duration={end - start}

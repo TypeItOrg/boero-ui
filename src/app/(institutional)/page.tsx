@@ -160,10 +160,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
                 className="[&>a]:bg-background"
               />
               {enrollmentLinks.length > 0 ? (
-                <nav
-                  aria-label="Inscripciones académicas"
-                  className={cn("[&>a]:bg-background grid gap-4", enrollmentLinks.length > 1 && "sm:grid-cols-2")}
-                >
+                <nav aria-label="Inscripciones académicas" className="[&>a]:bg-background grid gap-4">
                   {enrollmentLinks.map((link) => (
                     <HomeAccessRow key={link.href} link={link} />
                   ))}
@@ -176,15 +173,12 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
         {enrollmentLinks.length > 0 && academicResources.length === 0 ? (
           <HomeSubsection
             id="enrollment-management-title"
-            title="Inscripciones"
-            description="Gestioná y consultá tus trámites y solicitudes de inscripción."
+            title="Cursadas e inscripciones"
+            description="Accedé a tus clases y gestioná las cursadas y solicitudes de inscripción."
             icon={ClipboardListIcon}
             imageSrc={!hasInstitutionalAccess ? "/gestion-institucional.webp" : undefined}
           >
-            <nav
-              aria-label="Inscripciones"
-              className={cn("[&>a]:bg-background grid gap-4", hasInstitutionalAccess && enrollmentLinks.length > 1 && "sm:grid-cols-2")}
-            >
+            <nav aria-label="Cursadas e inscripciones" className="[&>a]:bg-background grid gap-4">
               {enrollmentLinks.map((link) => (
                 <HomeAccessRow key={link.href} link={link} />
               ))}

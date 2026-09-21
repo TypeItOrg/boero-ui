@@ -6,7 +6,9 @@ import {
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
+  GraduationCapIcon,
   KeyRoundIcon,
+  ScrollTextIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
   UserRoundPlusIcon,
@@ -95,6 +97,30 @@ export function getInstitutionalHomeTasks(user: Pick<InstitutionalUser, "permiss
 
 export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
   const links: InstitutionalHomeLink[] = [];
+
+  if (hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)) {
+    links.push({
+      href: "/course-enrollments",
+      title: "Cursadas",
+      description: "Consultá y gestioná las cursadas de la institución.",
+      icon: ScrollTextIcon,
+    });
+  }
+
+  if (user.roles.includes("Profesor")) {
+    links.push({
+      href: "/my-teaching",
+      title: "Mis clases",
+      description: "Accedé a tus clases, horarios y estudiantes.",
+      icon: GraduationCapIcon,
+    });
+    links.push({
+      href: "/my-teaching/schedules",
+      title: "Mis horarios",
+      description: "Consultá la semana con los días y horarios de tus clases.",
+      icon: CalendarRangeIcon,
+    });
+  }
 
   if (canStartEnrollmentApplication(user)) {
     links.push({

@@ -75,11 +75,12 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
       ? [{ title: "Cursadas", url: "/course-enrollments", icon: ScrollTextIcon }]
       : []),
+    ...(user.roles.includes("Profesor") ? [{ title: "Mis clases", url: "/my-teaching", icon: GraduationCapIcon }] : []),
+    ...(user.roles.includes("Profesor") ? [{ title: "Mis horarios", url: "/my-teaching/schedules", icon: CalendarRangeIcon }] : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
   ];
 
   const enrollmentItems: NavigationItem[] = [
-    ...(user.roles.includes("Profesor") ? [{ title: "Mis clases y cursos", url: "/my-teaching", icon: GraduationCapIcon }] : []),
     ...(canReadEnrollmentPeriods ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }] : []),
     ...(canStartEnrollmentApplication(user) ? [{ title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon }] : []),
     ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),

@@ -9,6 +9,7 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import type { WeeklyScheduleItem } from "@features/course-enrollments/types/weekly-schedule-item.types";
 
 export const metadata: Metadata = { title: "Mis horarios" };
 
@@ -22,6 +23,13 @@ export default async function MySchedulesPage({
   const params = await searchParams;
   const week = getScheduleWeek(params.week, referenceDate);
   const data = await fetchMyWeeklySchedules(user.institutionId, week);
+  const items: WeeklyScheduleItem[] = data.enrollments.map((enrollment) => ({
+    id: enrollment.id,
+    title: enrollment.academicSpaceName,
+    instrumentName: enrollment.instrumentName,
+    context: [enrollment.trainingPathName, enrollment.studyPlanName, enrollment.academicLevelName].filter(Boolean).join(" · "),
+    schedules: enrollment.schedules,
+  }));
 
   return (
     <PlatformPageShell
@@ -31,7 +39,7 @@ export default async function MySchedulesPage({
       actions={<PlatformPageIcon icon={CalendarRangeIcon} />}
     >
       <DataTableNavigationProvider>
-        <MyWeeklySchedule enrollments={data.enrollments} referenceDate={referenceDate} weekStart={data.weekStart} />
+        <MyWeeklySchedule items={items} referenceDate={referenceDate} weekStart={data.weekStart} />
       </DataTableNavigationProvider>
     </PlatformPageShell>
   );
