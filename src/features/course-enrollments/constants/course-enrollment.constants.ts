@@ -8,6 +8,7 @@ export const ACADEMIC_ENROLLMENT_STATUS_LABELS: Record<AcademicEnrollmentStatus,
   PROMOTED: "Promocionado",
   PASSED: "Aprobado",
   FAILED: "Desaprobado",
+  NOT_APPLICABLE: "Sin efecto",
 };
 
 export const COURSE_ENROLLMENT_STATUS_LABELS: Record<CourseEnrollmentStatus, string> = {
@@ -22,10 +23,12 @@ export const COURSE_ENROLLMENT_STATUS_OPTIONS = (Object.keys(COURSE_ENROLLMENT_S
   label: COURSE_ENROLLMENT_STATUS_LABELS[status],
 }));
 
-export const ACADEMIC_ENROLLMENT_STATUS_OPTIONS = (Object.keys(ACADEMIC_ENROLLMENT_STATUS_LABELS) as AcademicEnrollmentStatus[]).map((status) => ({
-  value: status,
-  label: ACADEMIC_ENROLLMENT_STATUS_LABELS[status],
-}));
+export const ACADEMIC_ENROLLMENT_STATUS_OPTIONS = (Object.keys(ACADEMIC_ENROLLMENT_STATUS_LABELS) as AcademicEnrollmentStatus[])
+  .filter((status) => status !== "NOT_APPLICABLE")
+  .map((status) => ({
+    value: status,
+    label: ACADEMIC_ENROLLMENT_STATUS_LABELS[status],
+  }));
 
 export const COURSE_ENROLLMENT_OPTIONS_TIMEOUT_MS = 15_000;
 

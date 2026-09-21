@@ -21,7 +21,6 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from "@common/components/ui/textarea";
 import { updateCourseAcademicStatusAction, withdrawCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
-import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import { ACADEMIC_ENROLLMENT_STATUS_LABELS, COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 
@@ -33,12 +32,15 @@ type CourseEnrollmentMutationDialogProps = {
   onUpdated: () => void;
 };
 
-const ACADEMIC_STATUS_OPTIONS = Object.values(ACADEMIC_ENROLLMENT_STATUS)
-  .map((value) => ({
-    value,
-    label: ACADEMIC_ENROLLMENT_STATUS_LABELS[value],
-  }))
-  .filter((option) => option.value !== ACADEMIC_ENROLLMENT_STATUS.PENDING_RESULT);
+const ACADEMIC_STATUS_OPTIONS = [
+  ACADEMIC_ENROLLMENT_STATUS.REGULARIZED,
+  ACADEMIC_ENROLLMENT_STATUS.PROMOTED,
+  ACADEMIC_ENROLLMENT_STATUS.PASSED,
+  ACADEMIC_ENROLLMENT_STATUS.FAILED,
+].map((value) => ({
+  value,
+  label: ACADEMIC_ENROLLMENT_STATUS_LABELS[value],
+}));
 
 export function CourseEnrollmentMutationDialog({
   enrollment,
@@ -82,9 +84,7 @@ export function CourseEnrollmentMutationDialog({
     onOpenChange(nextOpen);
   }
 
-  const availableAcademicStatusOptions = ACADEMIC_STATUS_OPTIONS.filter(
-    (option) => enrollment.status !== COURSE_ENROLLMENT_STATUS.COMPLETED || option.value !== ACADEMIC_ENROLLMENT_STATUS.IN_PROGRESS,
-  );
+  const availableAcademicStatusOptions = ACADEMIC_STATUS_OPTIONS;
   const defaultAcademicStatus = availableAcademicStatusOptions.some((option) => option.value === enrollment.academicStatus)
     ? enrollment.academicStatus
     : undefined;
@@ -107,9 +107,9 @@ export function CourseEnrollmentMutationDialog({
                 <GraduationCapIcon className="size-6" aria-hidden="true" />
               )}
             </div>
-            <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Actualizar estado académico"}</AlertDialogTitle>
+            <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Registrar resultado"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {mode === "withdraw" ? "Estás por registrar la baja de " : "Estás por actualizar el estado académico de "}
+              {mode === "withdraw" ? "Estás por registrar la baja de " : "Estás por registrar el resultado académico de "}
               <span className="text-foreground font-semibold">{enrollment.studentName}</span> en{" "}
               <span className="text-foreground font-semibold">{enrollment.academicSpaceName}</span>.
             </AlertDialogDescription>
@@ -177,7 +177,7 @@ export function CourseEnrollmentMutationDialog({
               Cancelar
             </Button>
             <Button type="submit" size="lg" variant={mode === "withdraw" ? "destructive" : "default"} disabled={isPending}>
-              {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Actualizar estado"}
+              {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Registrar resultado"}
             </Button>
           </AlertDialogFooter>
         </ActionForm>

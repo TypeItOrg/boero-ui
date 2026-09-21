@@ -44,7 +44,7 @@ export function CourseEnrollmentDetailActions({
         ) : null}
         {canUpdateResult ? (
           <Button size="lg" onClick={() => setMode("academic")}>
-            Actualizar resultado
+            Registrar resultado
           </Button>
         ) : null}
         {canWithdraw && enrollment.status === COURSE_ENROLLMENT_STATUS.ENROLLED ? (

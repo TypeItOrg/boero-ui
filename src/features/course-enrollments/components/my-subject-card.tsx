@@ -2,15 +2,11 @@ import { ClockIcon, Music2Icon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import {
-  ACADEMIC_ENROLLMENT_STATUS_LABELS,
-  COURSE_DAY_LABELS,
-  COURSE_ENROLLMENT_STATUS_LABELS,
-} from "@features/course-enrollments/constants/course-enrollment.constants";
+import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { MY_SUBJECTS_MESSAGES } from "@features/course-enrollments/constants/my-subjects.constants";
-import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
 
 type MySubjectCardProps = {
   enrollment: CourseEnrollment;
@@ -25,7 +21,6 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
     enrollment.status === COURSE_ENROLLMENT_STATUS.WITHDRAWN || enrollment.status === COURSE_ENROLLMENT_STATUS.ADMINISTRATIVELY_WITHDRAWN;
   const showWithdraw = canWithdraw && isEnrolled;
   const showAcademicAction = canUpdateAcademicStatus && !isWithdrawn;
-  const showResult = enrollment.academicStatus !== ACADEMIC_ENROLLMENT_STATUS.IN_PROGRESS;
   const days = Object.keys(COURSE_DAY_LABELS);
   const schedules = enrollment.schedules
     .filter((schedule) => !isEnrolled || !schedule.releasedAt)
@@ -41,7 +36,7 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
               <h2 className="text-lg leading-snug font-semibold tracking-tight wrap-break-word">{enrollment.academicSpaceName}</h2>
             </div>
             <Badge variant={isEnrolled ? "success" : "secondary"} className="mt-1 shrink-0">
-              {COURSE_ENROLLMENT_STATUS_LABELS[enrollment.status]}
+              {getCourseEnrollmentSituationLabel(enrollment.status, enrollment.academicStatus)}
             </Badge>
           </div>
           <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -92,12 +87,6 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
           )}
         </div>
       </div>
-      {showResult ? (
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t px-4 py-3">
-          <span className="text-muted-foreground text-sm">Resultado académico</span>
-          <Badge variant="outline">{ACADEMIC_ENROLLMENT_STATUS_LABELS[enrollment.academicStatus]}</Badge>
-        </div>
-      ) : null}
       {showWithdraw || showAcademicAction ? (
         <div className="flex flex-wrap gap-2 border-t px-4 py-3">
           {showWithdraw ? (
@@ -107,7 +96,7 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
           ) : null}
           {showAcademicAction ? (
             <Button variant="outline" size="sm" onClick={() => onMutation(enrollment, "academic")}>
-              Actualizar resultado
+              Registrar resultado
             </Button>
           ) : null}
         </div>

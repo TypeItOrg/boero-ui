@@ -8,6 +8,7 @@ import {
   COURSE_ENROLLMENT_STATUS_LABELS,
   COURSE_ENROLLMENT_OPERATION_LABELS,
 } from "@features/course-enrollments/constants/course-enrollment.constants";
+import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
 import {
@@ -44,14 +45,12 @@ export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollment
           <Detail label="Fecha de alta" value={formatEnrollmentApplicationDate(enrollment.enrolledAt)} />
           <Detail label="Clase" value={enrollment.courseClassLabel} />
           <Detail
-            label="Estado"
+            label="Situación"
             value={
-              <Badge variant={enrollment.status === "ENROLLED" ? "success" : "secondary"}>{COURSE_ENROLLMENT_STATUS_LABELS[enrollment.status]}</Badge>
+              <Badge variant={enrollment.status === "ENROLLED" ? "success" : "secondary"}>
+                {getCourseEnrollmentSituationLabel(enrollment.status, enrollment.academicStatus)}
+              </Badge>
             }
-          />
-          <Detail
-            label="Resultado académico"
-            value={<Badge variant="outline">{ACADEMIC_ENROLLMENT_STATUS_LABELS[enrollment.academicStatus]}</Badge>}
           />
         </dl>
       </section>

@@ -9,7 +9,12 @@ import { redirect } from "next/navigation";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
 
-const allowedAcademicStatuses = new Set<string>(Object.values(ACADEMIC_ENROLLMENT_STATUS));
+const allowedAcademicStatuses = new Set<string>([
+  ACADEMIC_ENROLLMENT_STATUS.REGULARIZED,
+  ACADEMIC_ENROLLMENT_STATUS.PROMOTED,
+  ACADEMIC_ENROLLMENT_STATUS.PASSED,
+  ACADEMIC_ENROLLMENT_STATUS.FAILED,
+]);
 
 type CourseEnrollmentActionResult = { error?: string };
 

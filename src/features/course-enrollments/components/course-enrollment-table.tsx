@@ -22,10 +22,7 @@ import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
 import { CourseEnrollmentSchedules } from "@features/course-enrollments/components/course-enrollment-schedules";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
-import {
-  ACADEMIC_ENROLLMENT_STATUS_LABELS,
-  COURSE_ENROLLMENT_STATUS_LABELS,
-} from "@features/course-enrollments/constants/course-enrollment.constants";
+import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
 import { ScrollTextIcon } from "lucide-react";
 
 type CourseEnrollmentTableProps = {
@@ -64,7 +61,7 @@ export function CourseEnrollmentTable({
   if (data.items.length === 0) {
     return (
       <div className="flex h-full flex-col gap-4">
-        <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isNavigating}>
+        <div className="relative flex flex-1 overflow-hidden rounded-lg border" aria-busy={isNavigating}>
           <Empty className="min-h-56 p-6">
             <EmptyHeader className="max-w-sm">
               <EmptyMedia variant="icon">
@@ -108,8 +105,7 @@ export function CourseEnrollmentTable({
               <TableHead>Plan</TableHead>
               <TableHead>Instrumento</TableHead>
               <TableHead>Horarios</TableHead>
-              <TableHead>Cursada</TableHead>
-              <TableHead>Resultado</TableHead>
+              <TableHead>Situación</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -151,7 +147,7 @@ export function CourseEnrollmentTable({
                     ) : null}
                     {canUpdateResult ? (
                       <Item className="px-2.5 py-1.5" onSelect={() => setMutation({ enrollment, mode: "academic" })}>
-                        Actualizar estado académico
+                        Registrar resultado
                       </Item>
                     ) : null}
                     {canWithdrawEnrollment ? (
@@ -199,12 +195,7 @@ export function CourseEnrollmentTable({
                   </TableCell>
                   <TableCell>
                     <Badge variant={enrollment.status === "ENROLLED" ? "success" : "secondary"}>
-                      {COURSE_ENROLLMENT_STATUS_LABELS[enrollment.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={enrollment.academicStatus === "IN_PROGRESS" ? "outline" : "secondary"}>
-                      {ACADEMIC_ENROLLMENT_STATUS_LABELS[enrollment.academicStatus]}
+                      {getCourseEnrollmentSituationLabel(enrollment.status, enrollment.academicStatus)}
                     </Badge>
                   </TableCell>
                 </TableRow>

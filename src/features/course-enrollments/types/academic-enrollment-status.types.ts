@@ -5,6 +5,7 @@ export const ACADEMIC_ENROLLMENT_STATUS = {
   PROMOTED: "PROMOTED",
   PASSED: "PASSED",
   FAILED: "FAILED",
+  NOT_APPLICABLE: "NOT_APPLICABLE",
 } as const;
 
 export type AcademicEnrollmentStatus = (typeof ACADEMIC_ENROLLMENT_STATUS)[keyof typeof ACADEMIC_ENROLLMENT_STATUS];
