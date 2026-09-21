@@ -183,7 +183,7 @@ export function CourseEnrollmentAssignmentFields({
                     </Field>
 
                     {checked ? (
-                      <div className="grid min-w-0 gap-4 border-t p-4 sm:grid-cols-2">
+                      <div className={cn("grid min-w-0 gap-4 border-t p-4", options.format === "INDIVIDUAL" && "sm:grid-cols-2")}>
                         <Field className="min-w-0" data-invalid={invalid}>
                           <FieldLabel htmlFor={`schedule-${day.id}`} required>
                             Horario
