@@ -1,11 +1,14 @@
 "use client";
 
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import {
   AlertDialog,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -50,18 +53,22 @@ export function EnrollmentPeriodDeleteDialog({
       <AlertDialogContent>
         <form action={action}>
           <AlertDialogHeader>
+            <div className="bg-destructive/10 text-destructive mb-1 flex size-12 items-center justify-center rounded-2xl">
+              <Trash2Icon className="size-6" aria-hidden="true" />
+            </div>
             <AlertDialogTitle>¿Eliminar período de inscripción?</AlertDialogTitle>
             <AlertDialogDescription>El período dejará de estar disponible para nuevas inscripciones.</AlertDialogDescription>
           </AlertDialogHeader>
-          {state.error && (
-            <p role="alert" className="text-destructive my-3 text-sm">
-              {state.error}
-            </p>
-          )}
-          <AlertDialogFooter>
-            <Button type="button" variant="outline" disabled={pending} onClick={onClose}>
+          {state.error ? (
+            <Alert className="mt-4" variant="destructive">
+              <CircleAlertIcon aria-hidden="true" />
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
+          ) : null}
+          <AlertDialogFooter className="mt-5">
+            <AlertDialogCancel type="button" disabled={pending}>
               Cancelar
-            </Button>
+            </AlertDialogCancel>
             <Button type="submit" variant="destructive" disabled={pending}>
               {pending ? "Eliminando…" : "Eliminar período"}
             </Button>

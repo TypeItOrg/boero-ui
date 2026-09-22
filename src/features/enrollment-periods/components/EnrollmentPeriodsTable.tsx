@@ -30,6 +30,7 @@ import { ENROLLMENT_PERIOD_STATUS, type EnrollmentPeriodStatus } from "@features
 import { updateEnrollmentPeriodStatusAction } from "@features/enrollment-periods/actions/enrollment-period.actions";
 import { EnrollmentPeriodDeleteDialog } from "@features/enrollment-periods/components/enrollment-period-delete-dialog";
 import { EnrollmentPeriodEmptyState } from "@features/enrollment-periods/components/enrollment-period-empty-state";
+import { EnrollmentPeriodNameCell } from "@features/enrollment-periods/components/enrollment-period-name-cell";
 import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
 import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
 import { formatEnrollmentPeriodDateTime } from "@features/enrollment-periods/utils/enrollment-period-date.util";
@@ -290,18 +291,7 @@ function EnrollmentPeriodsTableContent({
                             </div>
                           </TableCell>
                           <TableCell className="font-medium">
-                            <div>{period.name}</div>
-                            {period.limitedView ? <span className="text-muted-foreground text-xs">Vista limitada a tus trayectos</span> : null}
-                            <div className="text-muted-foreground mt-1 max-w-md text-xs font-normal">
-                              {!period.scopeConfigured
-                                ? "Pendiente de configurar oferta"
-                                : period.offerings
-                                    .map(
-                                      (offering) =>
-                                        `${offering.trainingPathName} · ${offering.studyPlanName} v${offering.versionNumber}: ${[...offering.academicLevels.map((level) => level.name), ...(offering.includeUnassigned ? ["Sin nivel"] : [])].join(", ")}`,
-                                    )
-                                    .join("; ")}
-                            </div>
+                            <EnrollmentPeriodNameCell period={period} />
                           </TableCell>
                           <TableCell>Ciclo {period.academicYearNumber}</TableCell>
                           <TableCell>{formatEnrollmentPeriodDateTime(period.startDate)}</TableCell>

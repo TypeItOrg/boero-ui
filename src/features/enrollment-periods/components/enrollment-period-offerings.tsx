@@ -1,13 +1,16 @@
 "use client";
 
+import { formatStudyPlanLabel, formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { useCallback, useEffect, useState } from "react";
 import { BookOpenCheckIcon, Trash2Icon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { Checkbox } from "@common/components/ui/checkbox";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { FieldLabel } from "@common/components/ui/field";
 import { Skeleton } from "@common/components/ui/skeleton";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+import { cn } from "@common/utils/cn.util";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicLevel } from "@features/academic/types/academic-level.types";
@@ -53,7 +56,7 @@ export function EnrollmentPeriodOfferings({ institutionId, scope, value, onChang
           fetchPage={fetchPlans}
           queryKey={["period-active-plans", scope, institutionId, operation]}
           getItemValue={(plan) => plan.id}
-          getItemLabel={(plan) => `${plan.trainingPathName} · ${plan.name} · v${plan.versionNumber ?? 1}`}
+          getItemLabel={formatStudyPlanLabel}
           placeholder="Buscar trayecto o plan…"
           disabled={disabled}
           onValueChange={(_id, plan) => {
@@ -75,9 +78,15 @@ export function EnrollmentPeriodOfferings({ institutionId, scope, value, onChang
         />
       </div>
       {value.length === 0 ? (
-        <p className="text-muted-foreground rounded-lg border border-dashed p-4 text-sm">
-          Todavía no hay planes seleccionados. La convocatoria necesita una oferta explícita.
-        </p>
+        <Empty className="bg-background min-h-56 rounded-lg border border-solid p-6">
+          <EmptyHeader className="max-w-md">
+            <EmptyMedia variant="icon">
+              <BookOpenCheckIcon className="size-5" aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyTitle className="mt-2 text-base">Todavía no hay planes seleccionados</EmptyTitle>
+            <EmptyDescription>La convocatoria necesita una oferta explícita.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : null}
       {value.map((offering) => (
         <OfferingLevels
@@ -132,72 +141,96 @@ function OfferingLevels({
     return () => controller.abort();
   }, [institutionId, scope, offering.studyPlanId, operation, attempt]);
   return (
-    <div className="bg-background grid gap-3 rounded-lg border p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-medium">{offering.trainingPathName}</p>
-          <p className="text-muted-foreground text-sm">
-            {offering.studyPlanName} · Versión {offering.versionNumber}
-          </p>
+    <article className="bg-background overflow-hidden rounded-xl border shadow-xs">
+      <header className="bg-muted/20 flex items-start justify-between gap-4 border-b px-4 py-3.5">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="truncate text-base font-semibold">{offering.trainingPathName}</h3>
+          </div>
+          <p className="text-muted-foreground mt-0.5 truncate text-sm">{formatStudyPlanName(offering)}</p>
         </div>
         <Button
           type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="text-muted-foreground hover:text-destructive shrink-0"
+          variant="destructive"
+          size="sm"
           onClick={onRemove}
           disabled={disabled}
-          aria-label={`Quitar ${offering.studyPlanName}`}
+          aria-label={`Quitar ${formatStudyPlanLabel(offering)}`}
         >
-          <Trash2Icon aria-hidden="true" />
+          <Trash2Icon data-icon="inline-start" aria-hidden="true" />
+          Quitar
         </Button>
-      </div>
+      </header>
       {error ? (
-        <div role="alert" className="text-destructive text-sm">
+        <div role="alert" className="text-destructive px-4 py-5 text-sm">
           {error}{" "}
           <Button type="button" variant="link" onClick={() => setAttempt(attempt + 1)}>
             Reintentar
           </Button>
         </div>
       ) : !levels ? (
-        <div role="status">
+        <div role="status" className="grid gap-3 p-4">
+          <Skeleton className="h-4 w-32" aria-hidden="true" />
           <Skeleton className="h-10 w-full" aria-hidden="true" />
           <span className="sr-only">Cargando niveles</span>
         </div>
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid gap-4 p-4">
           {levels.length === 0 ? (
             <p className="text-muted-foreground text-sm">Este plan no tiene niveles.</p>
           ) : (
-            levels.map((level) => (
-              <label key={level.id} className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
-                <Checkbox
-                  checked={offering.academicLevels.some((selected) => selected.id === level.id)}
-                  disabled={disabled}
-                  onCheckedChange={(checked) =>
-                    onChange({
-                      ...offering,
-                      academicLevels:
-                        checked === true
-                          ? [...offering.academicLevels.filter((item) => item.id !== level.id), level]
-                          : offering.academicLevels.filter((item) => item.id !== level.id),
-                    })
-                  }
-                />
-                {level.name}
-              </label>
-            ))
+            <fieldset className="grid gap-2.5">
+              <legend className="mb-2 text-sm font-medium">Niveles habilitados</legend>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2">
+                {levels.map((level) => {
+                  const isSelected = offering.academicLevels.some((selected) => selected.id === level.id);
+
+                  return (
+                    <label
+                      key={level.id}
+                      className={cn(
+                        "hover:bg-muted/40 flex min-h-10 cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm transition-colors",
+                        isSelected && "border-primary/40 bg-primary/5 hover:bg-primary/10",
+                        disabled && "cursor-not-allowed opacity-50",
+                      )}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        disabled={disabled}
+                        onCheckedChange={(checked) =>
+                          onChange({
+                            ...offering,
+                            academicLevels:
+                              checked === true
+                                ? [...offering.academicLevels.filter((item) => item.id !== level.id), level]
+                                : offering.academicLevels.filter((item) => item.id !== level.id),
+                          })
+                        }
+                      />
+                      <span className="font-medium">{level.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
           )}
-          <label className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+          <label
+            className={cn(
+              "bg-muted/25 hover:bg-muted/40 flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+              offering.includeUnassigned && "border-primary/40 bg-primary/5 hover:bg-primary/10",
+              disabled && "cursor-not-allowed opacity-50",
+            )}
+          >
             <Checkbox
+              className="mt-0.5"
               checked={offering.includeUnassigned}
               disabled={disabled}
               onCheckedChange={(checked) => onChange({ ...offering, includeUnassigned: checked === true })}
             />
-            Incluir espacios sin nivel asignado
+            <span className="text-sm font-medium">Espacios sin nivel asignado</span>
           </label>
         </div>
       )}
-    </div>
+    </article>
   );
 }
