@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { notFound } from "next/navigation";
@@ -57,7 +58,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
     const breadcrumb = props.renderBreadcrumb({
       hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.VERSIONS],
       segmentLabels: {
-        [props.id]: curriculum.studyPlan.name,
+        [props.id]: formatStudyPlanLabel(curriculum.studyPlan),
         [ACADEMIC_ROUTE_SEGMENT.NEW]: "Nueva versión",
       },
     });
@@ -81,7 +82,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
     if (props.nestedId === ACADEMIC_ROUTE_SEGMENT.NEW) {
       const breadcrumb = props.renderBreadcrumb({
         hiddenSegments: [AcademicResource.ACADEMIC_LEVEL],
-        segmentLabels: { [props.id]: curriculum.studyPlan.name },
+        segmentLabels: { [props.id]: formatStudyPlanLabel(curriculum.studyPlan) },
       });
       return <NewLevel breadcrumb={breadcrumb} id={props.id} institutionId={props.institutionId} planPath={planPath} scope={props.scope} />;
     }
@@ -91,7 +92,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
       const breadcrumb = props.renderBreadcrumb({
         hiddenSegments: [AcademicResource.ACADEMIC_LEVEL, level.id],
         segmentLabels: {
-          [props.id]: curriculum.studyPlan.name,
+          [props.id]: formatStudyPlanLabel(curriculum.studyPlan),
           [ACADEMIC_ROUTE_SEGMENT.EDIT]: `Editar ${level.name}`,
         },
       });
@@ -106,7 +107,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
       if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
       const breadcrumb = props.renderBreadcrumb({
         hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
-        segmentLabels: { [props.id]: curriculum.studyPlan.name },
+        segmentLabels: { [props.id]: formatStudyPlanLabel(curriculum.studyPlan) },
       });
       return (
         <NewPlanSpace
@@ -124,7 +125,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
     if (!space || space.studyPlanId !== props.id) notFound();
     const spacePath = `${planPath}/spaces/${space.id}`;
     const spaceBreadcrumbLabels = {
-      [props.id]: curriculum.studyPlan.name,
+      [props.id]: formatStudyPlanLabel(curriculum.studyPlan),
       [space.id]: space.academicSpaceName,
     };
     const spaceBreadcrumb = props.renderBreadcrumb({

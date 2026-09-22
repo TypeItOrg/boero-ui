@@ -1,8 +1,8 @@
-import { BookOpenCheckIcon, CalendarRangeIcon, RouteIcon } from "lucide-react";
+import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import { ArrowRightIcon, BookOpenIcon, CalendarDaysIcon, RouteIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { formatDisplayDate } from "@common/utils/date-input.util";
 import { AcademicOfferPagination } from "@features/academic-offers/components/academic-offer-pagination";
@@ -33,54 +33,64 @@ export function AcademicOfferList({ items, page, size, totalItems, totalPages }:
 
   return (
     <div className="flex h-full flex-1 flex-col justify-between gap-5">
-      <div className="flex flex-wrap items-stretch gap-4">
+      <div className="flex flex-col gap-3">
         {items.map((offer) => (
           <AcademicOfferCard key={offer.studyPlanId} offer={offer} />
         ))}
       </div>
-      <AcademicOfferPagination page={page} size={size} totalItems={totalItems} totalPages={totalPages} />
+      <div className="border-t pt-4">
+        <AcademicOfferPagination page={page} size={size} totalItems={totalItems} totalPages={totalPages} />
+      </div>
     </div>
   );
 }
 
 function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): React.ReactElement {
-  return (
-    <Card className="flex-[1_0_min(300px,100%)] transition-shadow hover:shadow-md">
-      <CardHeader className="gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <span className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-            <RouteIcon aria-hidden="true" className="size-5" />
-          </span>
-          <Badge variant="success">Inscripción habilitada</Badge>
-        </div>
-        <div>
-          <CardTitle className="text-lg font-semibold">{offer.trainingPathName}</CardTitle>
-          {offer.trainingPathDescription ? <p className="text-muted-foreground mt-1 line-clamp-3 text-sm">{offer.trainingPathDescription}</p> : null}
-        </div>
-      </CardHeader>
-      <CardContent className="mt-auto grid gap-2 text-sm">
-        <p className="flex items-center gap-2">
-          <BookOpenCheckIcon aria-hidden="true" className="text-muted-foreground size-4" />
-          <span>{offer.studyPlanName}</span>
-        </p>
-        <p className="text-muted-foreground flex items-center gap-2">
-          <CalendarRangeIcon aria-hidden="true" className="size-4" />
-          {formatValidity(offer.effectiveFrom, offer.effectiveTo)}
-        </p>
-      </CardContent>
-      <CardFooter className="justify-end">
-        <ReturnToLink
-          href={`/academic-offers/${offer.studyPlanId}`}
-          className="text-primary focus-visible:ring-ring inline-flex items-center gap-2 rounded-md font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
-        >
-          Ver espacios académicos
-        </ReturnToLink>
-      </CardFooter>
-    </Card>
-  );
-}
+  const studyPlanLabel = formatStudyPlanName(offer);
 
-function formatValidity(effectiveFrom: string, effectiveTo: string | null): string {
-  if (!effectiveTo) return `Vigente desde ${formatDisplayDate(effectiveFrom)}`;
-  return `Vigente del ${formatDisplayDate(effectiveFrom)} al ${formatDisplayDate(effectiveTo)}`;
+  return (
+    <article className="bg-background border-border min-w-0 rounded-xl border">
+      <div className="flex flex-col gap-4 p-5 @3xl/page-shell:flex-row @3xl/page-shell:items-center @3xl/page-shell:gap-8 @3xl/page-shell:p-6">
+        <div className="flex min-w-0 flex-1 items-stretch gap-4">
+          <span className="bg-primary/10 text-primary flex size-14 shrink-0 items-center justify-center self-start rounded-xl">
+            <RouteIcon aria-hidden="true" className="size-7" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-heading text-lg leading-snug font-semibold break-words @3xl/page-shell:text-xl">{offer.trainingPathName}</h2>
+            {offer.trainingPathDescription ? (
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed break-words">{offer.trainingPathDescription}</p>
+            ) : null}
+            <div className="mt-1.5 flex flex-col gap-x-3 gap-y-1.5 text-sm @3xl/page-shell:flex-row @3xl/page-shell:flex-wrap">
+              <p className="flex min-w-0 items-start gap-2">
+                <BookOpenIcon aria-hidden="true" className="text-primary/70 mt-0.5 size-4 shrink-0" />
+                <span className="break-words">
+                  <span className="text-muted-foreground">Plan de estudio: </span>
+                  <span className="font-medium">{studyPlanLabel}</span>
+                </span>
+              </p>
+              <p className="text-muted-foreground flex items-start gap-2">
+                <CalendarDaysIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  {offer.effectiveTo
+                    ? `Vigente del ${formatDisplayDate(offer.effectiveFrom)} al ${formatDisplayDate(offer.effectiveTo)}`
+                    : `Vigente desde ${formatDisplayDate(offer.effectiveFrom)}`}
+                </span>
+              </p>
+              {offer.enrollmentOpen ? <Badge variant="success">Inscripción habilitada</Badge> : null}
+            </div>
+          </div>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2 self-end @3xl/page-shell:self-center">
+          <ReturnToLink
+            href={`/academic-offers/${offer.studyPlanId}`}
+            aria-label={`Ver espacios académicos de ${formatStudyPlanLabel(offer)}`}
+            title="Ver espacios académicos"
+            className="border-primary/20 bg-primary/5 text-primary hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:ring-ring focus-visible:bg-primary focus-visible:text-primary-foreground inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            <ArrowRightIcon aria-hidden="true" className="size-5" />
+          </ReturnToLink>
+        </div>
+      </div>
+    </article>
+  );
 }

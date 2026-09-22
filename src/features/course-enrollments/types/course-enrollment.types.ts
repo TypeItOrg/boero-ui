@@ -12,6 +12,7 @@ export interface CourseEnrollment {
   academicSpaceName: string;
   academicLevelName?: string | null;
   studyPlanName: string;
+  studyPlanVersion?: number | null;
   trainingPathName: string;
   trainingPathId: string;
   instrumentId?: string | null;

@@ -1,3 +1,4 @@
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BookOpenCheckIcon, CalendarDaysIcon, CalendarIcon, ClockIcon, InfoIcon, TimerIcon, UserIcon, UsersIcon } from "lucide-react";
@@ -144,7 +145,7 @@ function StudyPlanSummary({ plan }: { plan: StudyPlan }): React.ReactElement {
         </div>
       </header>
 
-      <dl className="grid gap-5 pt-5 sm:grid-cols-4">
+      <dl className="grid gap-5 pt-5 sm:grid-cols-3">
         <div>
           <dt className="text-muted-foreground text-sm">Trayecto formativo</dt>
           <dd className="mt-1 font-semibold">{plan.trainingPathName}</dd>
@@ -158,10 +159,6 @@ function StudyPlanSummary({ plan }: { plan: StudyPlan }): React.ReactElement {
         <div>
           <dt className="text-muted-foreground text-sm">Vigencia</dt>
           <dd className="mt-1 font-semibold tabular-nums">{formatStudyPlanValidity(plan)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground text-sm">Versión</dt>
-          <dd className="mt-1 font-semibold">{plan.versionNumber ?? 1}</dd>
         </div>
       </dl>
     </section>
@@ -193,7 +190,7 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
           </div>
           <div>
             <dt className="text-muted-foreground text-sm">Plan de estudio</dt>
-            <dd className="mt-1 font-semibold">{course.studyPlanName}</dd>
+            <dd className="mt-1 font-semibold">{formatStudyPlanName(course)}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground text-sm">Ciclo lectivo</dt>

@@ -1,3 +1,4 @@
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { CalendarDaysIcon, HistoryIcon, ScrollTextIcon, type LucideIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -38,7 +39,7 @@ export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollment
           <Detail label="Estudiante" value={enrollment.studentName} />
           <Detail label="Curso" value={enrollment.academicSpaceName} />
           <Detail label="Trayecto formativo" value={enrollment.trainingPathName} />
-          <Detail label="Plan de estudio" value={enrollment.studyPlanName} />
+          <Detail label="Plan de estudio" value={formatStudyPlanName(enrollment)} />
           <Detail label="Nivel" value={enrollment.academicLevelName ?? "Sin nivel"} />
           <Detail label="Instrumento" value={enrollment.instrumentName ?? "—"} />
           <Detail label="Origen" value={enrollment.source === "APPLICATION" ? "Solicitud de inscripción" : "Alta manual"} />

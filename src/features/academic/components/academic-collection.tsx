@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
 import type { InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
@@ -206,7 +207,7 @@ export async function AcademicCollectionView({
               isCourse && effectiveInstitutionId
                 ? {
                     institutionId: effectiveInstitutionId,
-                    selectedLabel: selectedStudyPlan && "studyPlanName" in selectedStudyPlan ? selectedStudyPlan.studyPlanName : undefined,
+                    selectedLabel: selectedStudyPlan && "studyPlanName" in selectedStudyPlan ? formatStudyPlanLabel(selectedStudyPlan) : undefined,
                     scope,
                     value: params.studyPlanId,
                   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
 import { INSTITUTIONAL_PERMISSION as P } from "@features/institutional-auth/types/institutional-permission.types";
@@ -186,7 +187,7 @@ export function CourseEnrollmentTable({
                     <div className="text-muted-foreground text-sm">{enrollment.courseClassLabel}</div>
                   </TableCell>
                   <TableCell>
-                    <div>{enrollment.studyPlanName}</div>
+                    <div>{formatStudyPlanLabel(enrollment)}</div>
                     <div className="text-muted-foreground">{enrollment.academicLevelName ?? "Sin nivel"}</div>
                   </TableCell>
                   <TableCell>{enrollment.instrumentName ?? "—"}</TableCell>

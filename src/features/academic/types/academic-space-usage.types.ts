@@ -16,6 +16,7 @@ export type AcademicSpaceUsage = {
   plans: PaginatedResponse<{
     studyPlanId: string;
     name: string;
+    versionNumber?: number;
     trainingPathName: string;
     effectiveFrom: string | null;
     effectiveTo: string | null;

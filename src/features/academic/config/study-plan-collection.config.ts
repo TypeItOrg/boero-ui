@@ -1,3 +1,4 @@
+import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { BookPlusIcon } from "lucide-react";
 
 import { formatDisplayDate } from "@common/utils/date-input.util";
@@ -44,7 +45,7 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
       validOn,
     }),
   fetchDetail: fetchStudyPlan,
-  getTitle: (item) => (item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>).name,
+  getTitle: (item) => formatStudyPlanLabel(item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>),
   filters: ({ status, deleted }) => [
     {
       defaultValue: "all",
@@ -58,12 +59,12 @@ export const studyPlanCollectionConfig: AcademicCollectionConfig = {
   dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
   toRow: (item) => {
     const plan = item as Extract<AcademicCollection, { trainingPathId: string; effectiveFrom: string | null }>;
-    const versionNumber = plan.versionNumber ?? 1;
+
     return {
       id: plan.id,
       institutionId: plan.institutionId,
       institutionName: plan.institutionName,
-      primaryValue: versionNumber > 1 ? `${plan.name} · v${versionNumber}` : plan.name,
+      primaryValue: formatStudyPlanName(plan),
       detailValues: [plan.trainingPathName, formatDisplayDate(plan.effectiveFrom, "Sin definir"), formatDisplayDate(plan.effectiveTo, "Sin definir")],
       status: studyPlanStatusLabels[plan.status],
       active: plan.status === "ACTIVE",

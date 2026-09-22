@@ -9,6 +9,7 @@ export type Course = {
   institutionName?: string;
   studyPlanId: string;
   studyPlanName: string;
+  studyPlanVersion?: number | null;
   trainingPathId: string;
   trainingPathName: string;
   studyPlanSpaceId?: string;

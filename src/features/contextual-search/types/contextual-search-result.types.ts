@@ -3,6 +3,7 @@ export type ContextualSearchResult = {
   institutionId: string | null;
   institutionName: string | null;
   institutionActive: boolean | null;
+  studyPlanVersion?: number | null;
   title: string;
   subtitle: string | null;
   status: string | null;

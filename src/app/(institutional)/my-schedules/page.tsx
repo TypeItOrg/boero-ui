@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import type { Metadata } from "next";
 import { CalendarRangeIcon } from "lucide-react";
 
@@ -27,7 +28,7 @@ export default async function MySchedulesPage({
     id: enrollment.id,
     title: enrollment.academicSpaceName,
     instrumentName: enrollment.instrumentName,
-    context: [enrollment.trainingPathName, enrollment.studyPlanName, enrollment.academicLevelName].filter(Boolean).join(" · "),
+    context: [formatStudyPlanLabel(enrollment), enrollment.academicLevelName].filter(Boolean).join(" · "),
     schedules: enrollment.schedules,
   }));
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import * as React from "react";
 import { BuildingIcon, LibraryBigIcon, RouteIcon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -266,7 +267,7 @@ function CourseDropdownFilterControl({
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
       <span className="text-foreground text-sm font-medium">{label}</span>
-      <AsyncDropdown<{ id: string; name?: string; year?: number; type?: string; format?: string }>
+      <AsyncDropdown<{ id: string; name?: string; year?: number; type?: string; format?: string; trainingPathName?: string; versionNumber?: number }>
         className="min-w-0"
         clearLabel={`Limpiar ${label.toLowerCase()}`}
         clearable
@@ -276,6 +277,10 @@ function CourseDropdownFilterControl({
         errorMessage="No se pudieron cargar las opciones."
         fetchPage={fetchPage}
         getItemLabel={(item) => {
+          if (resource === "study-plans") {
+            return formatStudyPlanLabel(item);
+          }
+
           if (item.type && item.format) {
             const typeLabel = academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels] ?? item.type;
             const formatLabel = academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels] ?? item.format;

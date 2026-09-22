@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { ActionForm } from "@common/components/action-form";
 
 import Link from "next/link";
@@ -171,8 +172,8 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
                   <span className="text-primary text-xs">
                     {[course.academicLevelName ?? "Sin nivel", course.instrumentName, course.year].filter(Boolean).join(" · ")}
                   </span>
-                  <span className="text-muted-foreground truncate text-xs" title={`${course.trainingPathName} · ${course.studyPlanName}`}>
-                    {course.trainingPathName} · {course.studyPlanName}
+                  <span className="text-muted-foreground truncate text-xs" title={formatStudyPlanLabel(course)}>
+                    {formatStudyPlanLabel(course)}
                   </span>
                 </div>
               )}

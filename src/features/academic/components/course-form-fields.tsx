@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 
 import * as React from "react";
@@ -185,7 +186,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                     status: "ACTIVE",
                   })
                 }
-                getItemLabel={(item) => `${item.trainingPathName} · ${item.name} · v${item.versionNumber ?? 1}`}
+                getItemLabel={formatStudyPlanLabel}
                 getItemValue={(item) => item.id}
                 id="studyPlanId"
                 key={`plan-${institutionId}`}
@@ -203,7 +204,15 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 placeholder={classesLocked ? "Definido por el curso" : "Seleccionar plan"}
                 queryKey={["courses", "active-study-plans", scope, institutionId]}
                 searchPlaceholder="Buscar plan…"
-                selectedLabel={toOptionalFormString(initialValues.studyPlanName)}
+                selectedLabel={
+                  initialValues.studyPlanName
+                    ? formatStudyPlanLabel({
+                        studyPlanName: toOptionalFormString(initialValues.studyPlanName),
+                        trainingPathName: toOptionalFormString(initialValues.trainingPathName),
+                        studyPlanVersion: Number(initialValues.studyPlanVersion) || undefined,
+                      })
+                    : undefined
+                }
                 value={studyPlanId}
               />
             ) : (

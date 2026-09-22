@@ -1,3 +1,4 @@
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { BookMarkedIcon, BookOpenCheckIcon, Layers3Icon, type LucideIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -28,15 +29,17 @@ export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailTyp
 
         <div className="bg-background mt-5 flex w-full min-w-0 flex-col gap-4 rounded-xl border p-4 shadow-xs sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold">{detail.offer.studyPlanName}</h3>
+            <h3 className="font-semibold">{formatStudyPlanName(detail.offer)}</h3>
             <p className="text-muted-foreground text-sm">{formatValidity(detail.offer.effectiveFrom, detail.offer.effectiveTo)}</p>
             {detail.offer.trainingPathDescription ? (
               <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{detail.offer.trainingPathDescription}</p>
             ) : null}
           </div>
-          <Badge variant="success" className="w-fit shrink-0">
-            Inscripción habilitada
-          </Badge>
+          {detail.offer.enrollmentOpen ? (
+            <Badge variant="success" className="w-fit shrink-0">
+              Inscripción habilitada
+            </Badge>
+          ) : null}
         </div>
       </section>
 

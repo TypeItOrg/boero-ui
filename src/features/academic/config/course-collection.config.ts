@@ -1,3 +1,4 @@
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { GraduationCapIcon } from "lucide-react";
 
 import { serializeSpringSort } from "@common/utils/sort-query.util";
@@ -86,7 +87,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
       primaryValue: course.academicSpaceName,
       detailValues: [
         course.trainingPathName,
-        course.studyPlanName,
+        formatStudyPlanName(course),
         String(course.year),
         course.academicLevelName ?? "Sin nivel",
         academicSpaceTypeLabels[course.academicSpaceType],

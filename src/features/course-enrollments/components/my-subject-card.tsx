@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { ClockIcon, Music2Icon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -25,7 +26,7 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
   const schedules = enrollment.schedules
     .filter((schedule) => !isEnrolled || !schedule.releasedAt)
     .toSorted((a, b) => days.indexOf(a.dayOfWeek) - days.indexOf(b.dayOfWeek) || a.startTime.localeCompare(b.startTime));
-  const context = [enrollment.trainingPathName, enrollment.studyPlanName, enrollment.academicLevelName].filter(Boolean).join(" · ");
+  const context = [formatStudyPlanLabel(enrollment), enrollment.academicLevelName].filter(Boolean).join(" · ");
 
   return (
     <article className="bg-muted/25 @container/subject flex min-w-0 flex-col overflow-hidden rounded-xl border">

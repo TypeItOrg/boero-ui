@@ -1,3 +1,4 @@
+import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { ArrowUpRightIcon, CalendarDaysIcon, CircleAlertIcon, Layers3Icon, LibraryBigIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -109,14 +110,14 @@ function AcademicSpaceUsagePlanCard({
             <Badge variant={studyPlanStatusVariant(plan.status)}>{studyPlanStatusLabels[plan.status]}</Badge>
             <CardTitle className="mt-2 truncate text-base font-semibold">
               <ReturnToLink href={planHref} className="hover:text-primary transition-colors">
-                {plan.name}
+                {formatStudyPlanName(plan)}
               </ReturnToLink>
             </CardTitle>
             <CardDescription className="mt-1 truncate">{plan.trainingPathName}</CardDescription>
           </div>
           <ReturnToLink
             href={planHref}
-            aria-label={`Ver el plan ${plan.name}`}
+            aria-label={`Ver el plan ${formatStudyPlanLabel(plan)}`}
             className="text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 rounded-lg p-1.5 transition-colors"
           >
             <ArrowUpRightIcon className="size-4" aria-hidden="true" />
