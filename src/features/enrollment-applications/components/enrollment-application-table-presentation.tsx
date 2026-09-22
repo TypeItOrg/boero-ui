@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -120,7 +121,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName ?? applicationToApprove.trainingPathName ?? "—",
+            studyPlanName: applicationToApprove.studyPlanName
+              ? formatStudyPlanLabel(applicationToApprove)
+              : (applicationToApprove.trainingPathName ?? "—"),
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -132,7 +135,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName ?? applicationToApprove.trainingPathName ?? "—",
+            studyPlanName: applicationToApprove.studyPlanName
+              ? formatStudyPlanLabel(applicationToApprove)
+              : (applicationToApprove.trainingPathName ?? "—"),
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -146,7 +151,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName ?? applicationToReject.trainingPathName ?? "—",
+            studyPlanName: applicationToReject.studyPlanName
+              ? formatStudyPlanLabel(applicationToReject)
+              : (applicationToReject.trainingPathName ?? "—"),
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}
@@ -158,7 +165,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName ?? applicationToReject.trainingPathName ?? "—",
+            studyPlanName: applicationToReject.studyPlanName
+              ? formatStudyPlanLabel(applicationToReject)
+              : (applicationToReject.trainingPathName ?? "—"),
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}

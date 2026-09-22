@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -59,7 +60,7 @@ export default async function PlatformEnrollmentApplicationDetailPage({
             institutionId,
             applicationId,
             applicantName,
-            studyPlanName: application.studyPlanName || "",
+            studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "",
           }}
           status={application.status}
         />

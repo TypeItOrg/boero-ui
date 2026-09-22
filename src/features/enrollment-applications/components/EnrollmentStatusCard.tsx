@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import * as React from "react";
 import { format, isValid } from "date-fns";
 import {
@@ -30,6 +31,7 @@ import { EnrollmentApplicationCoursesManagement } from "@features/enrollment-app
 import {
   ENROLLMENT_APPLICATION_STATUS_LABELS,
   ENROLLMENT_DOCUMENT_TYPE_LABELS,
+  SCHOOLING_EDUCATION_LEVEL_LABELS,
 } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import {
@@ -234,12 +236,37 @@ export function EnrollmentStatusCard({
           </dl>
         </DetailCard>
 
-        <DetailCard icon={GraduationCapIcon} title="Escolaridad de base" description="Antecedentes educativos informados.">
+        <DetailCard icon={GraduationCapIcon} title="Escolaridad" description="Antecedentes educativos informados.">
           <dl className="grid gap-4 sm:grid-cols-2">
-            <DetailItem className="sm:col-span-2" label="Colegio de origen" value={academic.secondarySchool || "—"} />
-            <DetailItem label="Secundario completo" value={academic.secondaryCompleted ? "Sí" : "No"} />
-            <DetailItem label="Año de cursado o egreso" value={academic.currentGradeYear || "—"} />
-            <DetailItem className="sm:col-span-2" label="Título o especialidad" value={academic.secondaryDegreeTitle || "—"} />
+            {academic.currentlyStudying !== null && academic.currentlyStudying !== undefined ? (
+              <DetailItem label="Asiste actualmente" value={academic.currentlyStudying ? "Sí" : "No"} />
+            ) : null}
+            {academic.educationLevel ? (
+              <DetailItem
+                label={academic.currentlyStudying ? "Nivel actual" : "Máximo nivel alcanzado"}
+                value={SCHOOLING_EDUCATION_LEVEL_LABELS[academic.educationLevel]}
+              />
+            ) : null}
+            {academic.schoolOrigin ? (
+              <DetailItem
+                className="sm:col-span-2"
+                label={academic.currentlyStudying ? "Institución educativa actual" : "Última institución educativa"}
+                value={academic.schoolOrigin}
+              />
+            ) : null}
+            {academic.currentGradeYear ? <DetailItem label="Sala, grado o año" value={academic.currentGradeYear} /> : null}
+            {academic.levelCompleted !== null && academic.levelCompleted !== undefined ? (
+              <DetailItem label="Nivel completado" value={academic.levelCompleted ? "Sí" : "No"} />
+            ) : null}
+            {academic.secondaryCompleted !== null && academic.secondaryCompleted !== undefined ? (
+              <DetailItem label="Secundario completo" value={academic.secondaryCompleted ? "Sí" : "No"} />
+            ) : null}
+            {academic.secondaryDegreeTitle ? (
+              <DetailItem className="sm:col-span-2" label="Título secundario obtenido" value={academic.secondaryDegreeTitle} />
+            ) : null}
+            {!academic.educationLevel && !academic.schoolOrigin ? (
+              <DetailItem className="sm:col-span-2" label="Información disponible" value="Sin datos de escolaridad" />
+            ) : null}
           </dl>
         </DetailCard>
 
@@ -273,7 +300,7 @@ export function EnrollmentStatusCard({
           >
             <dl className="mb-5 grid gap-4 sm:grid-cols-2">
               <DetailItem label="Trayecto formativo" value={application.trainingPathName || "—"} />
-              <DetailItem label="Plan de estudio" value={application.studyPlanName || "—"} />
+              <DetailItem label="Plan de estudio" value={application.studyPlanName ? formatStudyPlanName(application) : "—"} />
             </dl>
             <div className="bg-background divide-y overflow-hidden rounded-xl border">
               {spaces.map((space) => (

@@ -9,6 +9,7 @@ export interface EnrollmentCourseOption {
   academicSpaceName: string;
   academicLevelName?: string | null;
   studyPlanName: string;
+  studyPlanVersion?: number | null;
   trainingPathName: string;
   format: "INDIVIDUAL" | "GRUPAL";
   instrumentId?: string | null;

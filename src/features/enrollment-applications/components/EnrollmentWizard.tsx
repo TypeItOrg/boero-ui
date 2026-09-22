@@ -42,7 +42,10 @@ import {
   submitEnrollmentApplicationAction,
 } from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { calculateAge, enrollmentApplicationSubmissionSchema } from "@features/enrollment-applications/schemas/enrollment-application.schema";
-import { EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import {
+  EDUCATION_LEVEL_OPTIONS,
+  SCHOOLING_EDUCATION_LEVEL_OPTIONS,
+} from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
@@ -52,6 +55,10 @@ import type { Shift } from "@features/academic/types/shift.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+import type {
+  EnrollmentAcademicBackground,
+  EnrollmentEducationLevel,
+} from "@features/enrollment-applications/types/enrollment-academic-background.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
@@ -88,7 +95,11 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "personalData.birthDate": "birthDate",
   "personalData.phoneNumber": "phoneNumber",
   "personalData.email": "email",
-  "academicBackground.secondarySchool": "secondarySchool",
+  "academicBackground.currentlyStudying": "currentlyStudying",
+  "academicBackground.educationLevel": "educationLevel",
+  "academicBackground.schoolOrigin": "schoolOrigin",
+  "academicBackground.levelCompleted": "levelCompleted",
+  "academicBackground.secondaryCompleted": "secondaryCompleted",
   "healthInclusion.adjustmentDetails": "adjustmentDetails",
   "responsible.fullName": "responsibleFullName",
   "responsible.documentNumber": "responsibleDocumentNumber",
@@ -108,6 +119,76 @@ function parseInitialBirthDate(value: string | null | undefined): Date | undefin
   const date = new Date(`${value}T00:00:00`);
 
   return isValid(date) ? date : undefined;
+}
+
+type SchoolingFormState = {
+  currentlyStudying: boolean | null;
+  educationLevel: EnrollmentEducationLevel | null;
+  schoolOrigin: string;
+  currentGradeYear: string;
+  levelCompleted: boolean | null;
+  secondaryCompleted: boolean | null;
+  secondaryDegreeTitle: string;
+};
+
+type SchoolingFormAction =
+  | { type: "attendanceChanged"; value: boolean }
+  | { type: "educationLevelChanged"; value: EnrollmentEducationLevel }
+  | { type: "schoolOriginChanged"; value: string }
+  | { type: "currentGradeYearChanged"; value: string }
+  | { type: "levelCompletedChanged"; value: boolean }
+  | { type: "secondaryCompletedChanged"; value: boolean }
+  | { type: "secondaryDegreeTitleChanged"; value: string };
+
+function createSchoolingFormState(initial?: Partial<EnrollmentAcademicBackground>): SchoolingFormState {
+  return {
+    currentlyStudying: initial?.currentlyStudying ?? null,
+    educationLevel: initial?.educationLevel ?? null,
+    schoolOrigin: initial?.schoolOrigin ?? "",
+    currentGradeYear: initial?.currentGradeYear ?? "",
+    levelCompleted: initial?.levelCompleted ?? null,
+    secondaryCompleted: initial?.secondaryCompleted ?? null,
+    secondaryDegreeTitle: initial?.secondaryDegreeTitle ?? "",
+  };
+}
+
+function schoolingFormReducer(state: SchoolingFormState, action: SchoolingFormAction): SchoolingFormState {
+  switch (action.type) {
+    case "attendanceChanged":
+      return {
+        currentlyStudying: action.value,
+        educationLevel: null,
+        schoolOrigin: "",
+        currentGradeYear: "",
+        levelCompleted: null,
+        secondaryCompleted: null,
+        secondaryDegreeTitle: "",
+      };
+    case "educationLevelChanged":
+      return {
+        ...state,
+        educationLevel: action.value,
+        schoolOrigin: action.value === "NO_SCHOOLING" ? "" : state.schoolOrigin,
+        currentGradeYear: action.value === "NO_SCHOOLING" ? "" : state.currentGradeYear,
+        levelCompleted: null,
+        secondaryCompleted: null,
+        secondaryDegreeTitle: "",
+      };
+    case "schoolOriginChanged":
+      return { ...state, schoolOrigin: action.value };
+    case "currentGradeYearChanged":
+      return { ...state, currentGradeYear: action.value };
+    case "levelCompletedChanged":
+      return { ...state, levelCompleted: action.value };
+    case "secondaryCompletedChanged":
+      return {
+        ...state,
+        secondaryCompleted: action.value,
+        secondaryDegreeTitle: action.value ? state.secondaryDegreeTitle : "",
+      };
+    case "secondaryDegreeTitleChanged":
+      return { ...state, secondaryDegreeTitle: action.value };
+  }
 }
 
 export function EnrollmentWizard({
@@ -154,13 +235,16 @@ export function EnrollmentWizard({
   const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
   const email = initialData?.personalData?.email ?? "";
 
-  // 2. Escolaridad de Base
-  const [secondarySchool, setSecondarySchool] = React.useState(initialData?.academicBackground?.secondarySchool ?? "");
-  const [currentGradeYear, setCurrentGradeYear] = React.useState(
-    initialData?.academicBackground?.currentGradeYear ? String(initialData.academicBackground.currentGradeYear) : "",
-  );
-  const [secondaryCompleted, setSecondaryCompleted] = React.useState(Boolean(initialData?.academicBackground?.secondaryCompleted));
-  const [secondaryDegreeTitle, setSecondaryDegreeTitle] = React.useState(initialData?.academicBackground?.secondaryDegreeTitle ?? "");
+  // 2. Escolaridad
+  const [schooling, dispatchSchooling] = React.useReducer(schoolingFormReducer, initialData?.academicBackground, createSchoolingFormState);
+
+  const handleCurrentlyStudyingChange = (value: string): void => {
+    dispatchSchooling({ type: "attendanceChanged", value: value === "yes" });
+  };
+
+  const handleEducationLevelChange = (value: EnrollmentEducationLevel): void => {
+    dispatchSchooling({ type: "educationLevelChanged", value });
+  };
 
   // 3. Salud e Inclusión
   const [receivesReasonableAdjustments, setReceivesReasonableAdjustments] = React.useState(
@@ -367,10 +451,14 @@ export function EnrollmentWizard({
         email,
       },
       academicBackground: {
-        secondarySchool,
-        currentGradeYear,
-        secondaryCompleted,
-        secondaryDegreeTitle,
+        currentlyStudying: schooling.currentlyStudying,
+        educationLevel: schooling.educationLevel,
+        schoolOrigin: schooling.schoolOrigin || null,
+        currentGradeYear: schooling.currentGradeYear || null,
+        levelCompleted:
+          schooling.currentlyStudying === false && schooling.educationLevel === "SECONDARY" ? schooling.secondaryCompleted : schooling.levelCompleted,
+        secondaryCompleted: schooling.secondaryCompleted,
+        secondaryDegreeTitle: schooling.secondaryDegreeTitle || null,
       },
       healthInclusion: {
         receivesReasonableAdjustments,
@@ -403,10 +491,7 @@ export function EnrollmentWizard({
     birthDate,
     phoneNumber,
     email,
-    secondarySchool,
-    currentGradeYear,
-    secondaryCompleted,
-    secondaryDegreeTitle,
+    schooling,
     receivesReasonableAdjustments,
     adjustmentDetails,
     responsibleFullName,
@@ -629,7 +714,7 @@ export function EnrollmentWizard({
               ) : saveError ? (
                 <span className="text-destructive flex items-center gap-1">
                   <AlertCircleIcon className="size-4" />
-                  Error al guardar
+                  <span>No se pudo guardar: {saveError}</span>
                 </span>
               ) : pendingInstrumentGroups.length > 0 ? (
                 <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>
@@ -838,62 +923,187 @@ export function EnrollmentWizard({
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 2: ESCOLARIDAD DE BASE */}
+        {/* PASO 2: ESCOLARIDAD */}
         {/* ========================================================================= */}
         <TabsContent value="education" className="space-y-6">
           <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
             <EnrollmentStepCardHeader
               icon={GraduationCapIcon}
-              title="2. Escolaridad de Base"
-              description="Antecedentes de escolaridad y nivel de egreso secundario."
+              title="2. Escolaridad"
+              description="Contanos sobre tu escolaridad actual o el máximo nivel que alcanzaste."
             />
-            <CardContent className="space-y-4">
-              <Field data-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}>
-                <FieldLabel htmlFor="secondarySchool" required>
-                  Colegio secundario de origen
+            <CardContent className="space-y-5">
+              <Field data-invalid={!!getFieldError(["academicBackground", "currentlyStudying"])}>
+                <FieldLabel htmlFor="currentlyStudying" required>
+                  ¿Actualmente asistís a una institución educativa?
                 </FieldLabel>
-                <Input
-                  id="secondarySchool"
-                  value={secondarySchool}
-                  onChange={(e) => setSecondarySchool(e.target.value)}
-                  placeholder="Escuela Normal Superior Víctor Mercante"
-                  aria-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}
-                />
-                <FieldError errors={[{ message: getFieldError(["academicBackground", "secondarySchool"]) }]} />
+                <Select
+                  value={schooling.currentlyStudying === null ? undefined : schooling.currentlyStudying ? "yes" : "no"}
+                  onValueChange={handleCurrentlyStudyingChange}
+                >
+                  <SelectTrigger
+                    id="currentlyStudying"
+                    className="h-9! w-full"
+                    aria-invalid={!!getFieldError(["academicBackground", "currentlyStudying"])}
+                  >
+                    <SelectValue placeholder="Seleccioná una opción" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="yes" className="px-2.5 py-1.5">
+                        Sí
+                      </SelectItem>
+                      <SelectItem value="no" className="px-2.5 py-1.5">
+                        No
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[{ message: getFieldError(["academicBackground", "currentlyStudying"]) }]} />
               </Field>
 
-              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
+              {schooling.currentlyStudying !== null ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "educationLevel"])}>
+                  <FieldLabel htmlFor="educationLevel" required>
+                    {schooling.currentlyStudying ? "Nivel educativo actual" : "Máximo nivel alcanzado"}
+                  </FieldLabel>
+                  <Select
+                    value={schooling.educationLevel ?? undefined}
+                    onValueChange={(value) => handleEducationLevelChange(value as EnrollmentEducationLevel)}
+                  >
+                    <SelectTrigger
+                      id="educationLevel"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "educationLevel"])}
+                    >
+                      <SelectValue placeholder="Seleccioná un nivel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {!schooling.currentlyStudying ? (
+                          <SelectItem value="NO_SCHOOLING" className="px-2.5 py-1.5">
+                            Sin escolarización
+                          </SelectItem>
+                        ) : null}
+                        {SCHOOLING_EDUCATION_LEVEL_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "educationLevel"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.educationLevel && schooling.educationLevel !== "NO_SCHOOLING" ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "schoolOrigin"])}>
+                  <FieldLabel htmlFor="schoolOrigin" required={schooling.currentlyStudying === true}>
+                    {schooling.currentlyStudying ? "Institución educativa actual" : "Última institución educativa (opcional)"}
+                  </FieldLabel>
+                  <Input
+                    id="schoolOrigin"
+                    maxLength={150}
+                    value={schooling.schoolOrigin}
+                    onChange={(event) => dispatchSchooling({ type: "schoolOriginChanged", value: event.target.value })}
+                    placeholder="Nombre de la institución"
+                    aria-invalid={!!getFieldError(["academicBackground", "schoolOrigin"])}
+                  />
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "schoolOrigin"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.currentlyStudying && schooling.educationLevel ? (
                 <Field>
-                  <FieldLabel htmlFor="currentGradeYear">Año de cursado o egreso (opcional)</FieldLabel>
-                  <NumericInput
+                  <FieldLabel htmlFor="currentGradeYear">Sala, grado o año de cursado (opcional)</FieldLabel>
+                  <Input
                     id="currentGradeYear"
-                    maxLength={4}
-                    value={currentGradeYear}
-                    onChange={(e) => setCurrentGradeYear(e.target.value)}
-                    placeholder="2024"
+                    maxLength={50}
+                    value={schooling.currentGradeYear}
+                    onChange={(event) => dispatchSchooling({ type: "currentGradeYearChanged", value: event.target.value })}
+                    placeholder="Sala de 4, 3.º grado o 2.º año"
                   />
                 </Field>
+              ) : null}
 
+              {schooling.currentlyStudying === false &&
+              schooling.educationLevel &&
+              schooling.educationLevel !== "NO_SCHOOLING" &&
+              schooling.educationLevel !== "SECONDARY" ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "levelCompleted"])}>
+                  <FieldLabel htmlFor="levelCompleted" required>
+                    ¿Completaste ese nivel?
+                  </FieldLabel>
+                  <Select
+                    value={schooling.levelCompleted === null ? undefined : schooling.levelCompleted ? "yes" : "no"}
+                    onValueChange={(value) => dispatchSchooling({ type: "levelCompletedChanged", value: value === "yes" })}
+                  >
+                    <SelectTrigger
+                      id="levelCompleted"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "levelCompleted"])}
+                    >
+                      <SelectValue placeholder="Seleccioná una opción" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="yes" className="px-2.5 py-1.5">
+                          Sí
+                        </SelectItem>
+                        <SelectItem value="no" className="px-2.5 py-1.5">
+                          No
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "levelCompleted"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.educationLevel && ["SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"].includes(schooling.educationLevel) ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "secondaryCompleted"])}>
+                  <FieldLabel htmlFor="secondaryCompleted" required>
+                    ¿Completaste el secundario?
+                  </FieldLabel>
+                  <Select
+                    value={schooling.secondaryCompleted === null ? undefined : schooling.secondaryCompleted ? "yes" : "no"}
+                    onValueChange={(value) => dispatchSchooling({ type: "secondaryCompletedChanged", value: value === "yes" })}
+                  >
+                    <SelectTrigger
+                      id="secondaryCompleted"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "secondaryCompleted"])}
+                    >
+                      <SelectValue placeholder="Seleccioná una opción" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="yes" className="px-2.5 py-1.5">
+                          Sí
+                        </SelectItem>
+                        <SelectItem value="no" className="px-2.5 py-1.5">
+                          No
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "secondaryCompleted"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.secondaryCompleted === true ? (
                 <Field>
-                  <FieldLabel htmlFor="secondaryDegreeTitle">Título o especialidad obtenida (opcional)</FieldLabel>
+                  <FieldLabel htmlFor="secondaryDegreeTitle">Título secundario obtenido (opcional)</FieldLabel>
                   <Input
                     id="secondaryDegreeTitle"
-                    value={secondaryDegreeTitle}
-                    onChange={(e) => setSecondaryDegreeTitle(e.target.value)}
+                    maxLength={150}
+                    value={schooling.secondaryDegreeTitle}
+                    onChange={(event) => dispatchSchooling({ type: "secondaryDegreeTitleChanged", value: event.target.value })}
                     placeholder="Bachiller en Arte y Música"
                   />
                 </Field>
-              </div>
-
-              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <FieldLabel htmlFor="secondaryCompleted" className="text-sm font-medium">
-                    ¿Secundario completo?
-                  </FieldLabel>
-                  <FieldDescription>Indicá si ya finalizaste todos los estudios secundarios y tenés título o constancia de egreso.</FieldDescription>
-                </div>
-                <Switch id="secondaryCompleted" size="lg" checked={secondaryCompleted} onCheckedChange={setSecondaryCompleted} />
-              </div>
+              ) : null}
             </CardContent>
             <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("personal")} className="gap-1.5">

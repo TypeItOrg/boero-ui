@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { useCallback } from "react";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
@@ -245,7 +246,7 @@ function CourseHeading({ course, labelId }: { course: EnrollmentCourseOption; la
         </div>
         <div className="min-w-0">
           <dt className="text-muted-foreground text-xs">Plan de estudio</dt>
-          <dd className="mt-1 text-sm font-medium break-words">{course.studyPlanName}</dd>
+          <dd className="mt-1 text-sm font-medium break-words">{formatStudyPlanName(course)}</dd>
         </div>
       </dl>
     </div>

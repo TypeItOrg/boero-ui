@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClipboardListIcon } from "lucide-react";
@@ -53,7 +54,7 @@ export default async function EnrollmentApplicationDetailPage({
     institutionId: user.institutionId,
     applicationId,
     applicantName,
-    studyPlanName: application.studyPlanName || "—",
+    studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "—",
   };
 
   return (

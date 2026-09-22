@@ -17,6 +17,11 @@ export const ENROLLMENT_SUBMISSION_ERROR_FIELDS = [
   "responsible.documentNumber",
   "responsible.phoneNumber",
   "academicBackground",
+  "academicBackground.currentlyStudying",
+  "academicBackground.educationLevel",
+  "academicBackground.schoolOrigin",
+  "academicBackground.levelCompleted",
+  "academicBackground.secondaryCompleted",
   "courses",
   "preference.preferredShift",
   "preference.previousTeacher",
@@ -72,6 +77,23 @@ export const EDUCATION_LEVEL_OPTIONS = [
   { value: "TERTIARY_COMPLETE", label: "Terciario / Universitario Completo" },
   { value: "POSTGRADUATE", label: "Posgrado" },
 ] as const;
+
+export const SCHOOLING_EDUCATION_LEVEL_OPTIONS = [
+  { value: "INITIAL", label: "Inicial" },
+  { value: "PRIMARY", label: "Primario" },
+  { value: "SECONDARY", label: "Secundario" },
+  { value: "NON_UNIVERSITY_HIGHER", label: "Superior no universitario" },
+  { value: "UNIVERSITY", label: "Universitario" },
+] as const;
+
+export const SCHOOLING_EDUCATION_LEVEL_LABELS = {
+  NO_SCHOOLING: "Sin escolarización",
+  INITIAL: "Inicial",
+  PRIMARY: "Primario",
+  SECONDARY: "Secundario",
+  NON_UNIVERSITY_HIGHER: "Superior no universitario",
+  UNIVERSITY: "Universitario",
+} as const;
 
 export const ENROLLMENT_APPLICATION_FILTER_MESSAGES = {
   UNAVAILABLE_TRAINING_PATH: "Trayecto no disponible",

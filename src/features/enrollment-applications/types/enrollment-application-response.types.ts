@@ -15,6 +15,7 @@ export interface EnrollmentApplicationResponse {
   enrollmentPeriod?: EnrollmentPeriod;
   periodOpen?: boolean;
   studyPlanName?: string;
+  studyPlanVersion?: number | null;
   trainingPathName?: string | null;
   academicYearName?: string;
   enrollmentPeriodName?: string;

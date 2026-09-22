@@ -13,6 +13,7 @@ export type EnrollmentApplication = {
   applicantDocumentNumber: string;
   studyPlanId?: string | null;
   studyPlanName?: string | null;
+  studyPlanVersion?: number | null;
   trainingPathId?: string | null;
   trainingPathName?: string | null;
   data?: Pick<EnrollmentApplicationData, "careerSelection">;

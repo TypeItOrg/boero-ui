@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { ActionForm } from "@common/components/action-form";
 import { safelyRunAction } from "@common/utils/safe-action.util";
 
@@ -102,7 +103,7 @@ export function EnrollmentApplicationCoursesManagement({
                   </Badge>
                 </div>
                 <p className="text-muted-foreground mt-1 text-sm">
-                  {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {course.studyPlanName} ·{" "}
+                  {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {formatStudyPlanName(course)} ·{" "}
                   {course.academicLevelName ?? "Sin nivel"}
                   {course.instrumentName ? ` · ${course.instrumentName}` : ""}
                 </p>
@@ -366,7 +367,7 @@ function RejectEnrollmentApplicationCourseDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Rechazar solicitud de cursada</AlertDialogTitle>
             <AlertDialogDescription>
-              {course.academicSpaceName} · {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {course.studyPlanName}
+              {course.academicSpaceName} · {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {formatStudyPlanName(course)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {state.error ? (
