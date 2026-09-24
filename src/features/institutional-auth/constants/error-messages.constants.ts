@@ -6,6 +6,7 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   INVALID_LAST_NAME: "El apellido debe tener entre 3 y 255 letras.",
   REQUIRED_BIRTH_DATE: "La fecha de nacimiento es requerida.",
   INVALID_BIRTH_DATE: "La persona debe tener al menos 3 años.",
+  GUARDIAN_MUST_BE_ADULT: "Para registrarte como tutor tenés que ser mayor de 18 años.",
   REQUIRED_DOCUMENT: "El documento es requerido.",
   INVALID_DOCUMENT: "El número de documento debe tener exactamente 8 dígitos.",
   REQUIRED_EMAIL: "El correo electrónico es requerido.",

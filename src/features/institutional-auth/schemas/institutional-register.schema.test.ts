@@ -21,7 +21,7 @@ describe("institutional register schema", () => {
     ["true", true],
     ["false", false],
   ])("parses the guardian flag %s from the raw form value", (raw, expected) => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw }));
+    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw, birthDate: "1990-01-01" }));
 
     expect(result.success && result.data.isGuardian).toBe(expected);
   });
@@ -59,5 +59,20 @@ describe("institutional register schema", () => {
     if (!result.success) {
       expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La persona debe tener al menos 3 años." }));
     }
+  });
+
+  it("rejects a guardian who is a minor", () => {
+    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: "true", birthDate: "2010-01-01" }));
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({ path: ["birthDate"], message: "Para registrarte como tutor tenés que ser mayor de 18 años." }),
+      );
+    }
+  });
+
+  it("accepts a minor who does not register as guardian", () => {
+    expect(institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: "false", birthDate: "2010-01-01" })).success).toBe(true);
   });
 });

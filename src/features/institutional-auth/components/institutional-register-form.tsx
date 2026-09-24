@@ -17,7 +17,7 @@ import { cn } from "@common/utils/cn.util";
 import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
 import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
-import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
+import { formatBirthDateInput, getLatestAdultBirthDate, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
@@ -27,6 +27,15 @@ export function InstitutionalRegisterForm(): React.ReactElement {
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
   const [birthDate, setBirthDate] = useState<Date>();
   const [isGuardian, setIsGuardian] = useState(false);
+
+  function handleGuardianChange(checked: boolean): void {
+    setIsGuardian(checked);
+
+    // A guardian must be an adult: drop a birth date that no longer fits instead of submitting it.
+    if (checked && birthDate && birthDate > getLatestAdultBirthDate()) {
+      setBirthDate(undefined);
+    }
+  }
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -113,7 +122,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
             <DatePicker
               aria-invalid={!!state.fieldErrors?.birthDate}
               id="register-birth-date"
-              maxDate={getLatestAllowedBirthDate()}
+              maxDate={isGuardian ? getLatestAdultBirthDate() : getLatestAllowedBirthDate()}
               onChange={setBirthDate}
               value={birthDate}
             />
@@ -131,11 +140,16 @@ export function InstitutionalRegisterForm(): React.ReactElement {
 
         <Field data-invalid={!!state.fieldErrors?.isGuardian} orientation="horizontal">
           <input name="isGuardian" type="hidden" value={String(isGuardian)} />
-          <Switch aria-describedby="register-is-guardian-help" checked={isGuardian} id="register-is-guardian" onCheckedChange={setIsGuardian} />
+          <Switch
+            aria-describedby="register-is-guardian-help"
+            checked={isGuardian}
+            id="register-is-guardian"
+            onCheckedChange={handleGuardianChange}
+          />
           <div className="grid gap-1">
             <FieldLabel htmlFor="register-is-guardian">Soy tutor o representante legal a cargo de menores</FieldLabel>
             <p className="text-muted-foreground text-sm" id="register-is-guardian-help">
-              Permite inscribir y gestionar las solicitudes de tus hijos o personas bajo tu tutela.
+              Permite inscribir y gestionar las solicitudes de tus hijos o personas bajo tu tutela. Tenés que ser mayor de 18 años.
             </p>
           </div>
           <FieldError errors={state.fieldErrors?.isGuardian ? [{ message: state.fieldErrors.isGuardian }] : undefined} />

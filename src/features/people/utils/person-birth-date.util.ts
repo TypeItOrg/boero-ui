@@ -15,6 +15,10 @@ export function getLatestAllowedBirthDate(today = getArgentinaToday()): Date {
   return subtractYears(today, MINIMUM_PERSON_AGE);
 }
 
+export function getLatestAdultBirthDate(today = getArgentinaToday()): Date {
+  return subtractYears(today, ADULT_AGE);
+}
+
 export function getEarliestMinorBirthDate(today = getArgentinaToday()): Date {
   const eighteenthBirthday = subtractYears(today, ADULT_AGE);
 

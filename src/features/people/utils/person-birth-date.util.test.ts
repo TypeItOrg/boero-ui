@@ -1,5 +1,6 @@
 import {
   getEarliestMinorBirthDate,
+  getLatestAdultBirthDate,
   getLatestAllowedBirthDate,
   hasMinimumPersonAge,
   isMinorBirthDate,
@@ -31,6 +32,11 @@ describe("person birth date rules", () => {
   it("returns the day after the eighteenth birthday as the earliest minor birth date", () => {
     expect(getEarliestMinorBirthDate(today)).toEqual(new Date(2008, 6, 15));
     expect(isMinorBirthDate("2008-07-15", today)).toBe(true);
+    expect(isMinorBirthDate("2008-07-14", today)).toBe(false);
+  });
+
+  it("returns the eighteenth birthday as the latest adult birth date", () => {
+    expect(getLatestAdultBirthDate(today)).toEqual(new Date(2008, 6, 14));
     expect(isMinorBirthDate("2008-07-14", today)).toBe(false);
   });
 });
