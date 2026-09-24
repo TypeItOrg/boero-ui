@@ -245,6 +245,23 @@ describe("enrollment-application.service institutional queries", () => {
     expect(path).toBe(`/api/v1/institutions/${INSTITUTION_ID}/my-enrollment-applications?page=0&size=10&sort=createdAt%2Cdesc`);
   });
 
+  it("filters the my-enrollment-applications list by dependent when provided", async () => {
+    enrollmentApplicationApiFetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ items: [], page: 0, size: 10, totalItems: 0, totalPages: 0 }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    const service = await importInstitutionalService();
+    await service.fetchMyEnrollmentApplications(INSTITUTION_ID, { page: 0, size: 10, dependentPersonId: "dependent-1" });
+
+    const [path] = enrollmentApplicationApiFetchMock.mock.calls[0];
+    expect(path).toBe(
+      `/api/v1/institutions/${INSTITUTION_ID}/my-enrollment-applications?page=0&size=10&sort=createdAt%2Cdesc&dependentPersonId=dependent-1`,
+    );
+  });
+
   it("throws an HttpResponseError when the list endpoint fails", async () => {
     enrollmentApplicationApiFetchMock.mockResolvedValue(new Response(null, { status: 500 }));
 

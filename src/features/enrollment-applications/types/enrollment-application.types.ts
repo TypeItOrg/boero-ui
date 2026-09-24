@@ -5,6 +5,8 @@ export type EnrollmentApplication = {
   applicationId: string;
   institutionId: string;
   personId: string;
+  /** Person who submitted it: the tutor when the application was made on behalf of a dependent. */
+  submittedByPersonId?: string | null;
   applicantFirstName: string;
   applicantLastName: string;
   applicantDocumentNumber: string;

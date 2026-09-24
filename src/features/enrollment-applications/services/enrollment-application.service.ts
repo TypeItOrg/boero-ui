@@ -68,11 +68,22 @@ export async function fetchInstitutionalEnrollmentApplicationById(
   return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.FETCH);
 }
 
+export type FetchMyEnrollmentApplicationsParams = FetchEnrollmentApplicationsParams & {
+  /** Only the applications whose applicant is this person (the caller themself or one of their dependents). */
+  dependentPersonId?: string;
+};
+
 export async function fetchMyEnrollmentApplications(
   institutionId: string,
-  params: FetchEnrollmentApplicationsParams,
+  params: FetchMyEnrollmentApplicationsParams,
 ): Promise<PaginatedResponse<EnrollmentApplication>> {
-  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/my-enrollment-applications?${buildListSearchParams(params)}`);
+  const searchParams = buildListSearchParams(params);
+
+  if (params.dependentPersonId) {
+    searchParams.set("dependentPersonId", params.dependentPersonId);
+  }
+
+  const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/my-enrollment-applications?${searchParams}`);
 
   return parseHttpResponse(response, ENROLLMENT_MESSAGES.FETCH_MY);
 }

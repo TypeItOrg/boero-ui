@@ -38,6 +38,7 @@ export function calculateAge(birthDate: string | Date | undefined): number | nul
 export const startEnrollmentApplicationSchema = z.object({
   studyPlanId: z.string().uuid(ENROLLMENT_MESSAGES.STUDY_PLAN_ID_INVALID),
   academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID),
+  applicantPersonId: z.string().uuid(ENROLLMENT_MESSAGES.APPLICANT_PERSON_ID_INVALID).optional(),
 });
 
 // Paso 1: Datos Personales y Contacto
@@ -145,7 +146,8 @@ export const updateEnrollmentDraftSchema = z.object({
 // Schema completo y estricto para Enviar Inscripción (valida los pasos y reglas condicionales)
 export const enrollmentApplicationSubmissionSchema = z
   .object({
-    personalData: personalDataSchema,
+    // A minor has no email of their own (their contact is the responsible's), so it is checked below only for adults.
+    personalData: personalDataSchema.extend({ email: z.string().trim().nullish() }),
     academicBackground: academicBackgroundSchema,
     healthInclusion: healthInclusionSchema,
     responsible: responsibleSchema,
@@ -158,8 +160,19 @@ export const enrollmentApplicationSubmissionSchema = z
   .superRefine((data, ctx) => {
     // 1. Condicional: Si edad < 18, tutor legal obligatorio
     const age = calculateAge(data.personalData.birthDate);
+    const isMinor = age !== null && age < 18;
 
-    if (age !== null && age < 18) {
+    if (!isMinor) {
+      const email = data.personalData.email;
+
+      if (!email) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: ENROLLMENT_MESSAGES.EMAIL_REQUIRED, path: ["personalData", "email"] });
+      } else if (!z.email().safeParse(email).success) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: ENROLLMENT_MESSAGES.EMAIL_INVALID, path: ["personalData", "email"] });
+      }
+    }
+
+    if (isMinor) {
       const resp = data.responsible;
 
       if (!resp?.fullName || resp.fullName.trim().length === 0) {

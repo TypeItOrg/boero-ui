@@ -23,6 +23,7 @@ export const ENROLLMENT_MESSAGES = {
   LOAD_FAILED: "No se pudo cargar la solicitud de inscripción.",
   STUDY_PLAN_ID_INVALID: "El plan de estudio debe ser un UUID válido",
   ACADEMIC_YEAR_ID_INVALID: "El ciclo lectivo debe ser un UUID válido",
+  APPLICANT_PERSON_ID_INVALID: "La persona a inscribir debe ser un UUID válido",
   NAME_REQUIRED: "El nombre es obligatorio",
   LAST_NAME_REQUIRED: "El apellido es obligatorio",
   DOCUMENT_REQUIRED: "El número de documento es obligatorio",

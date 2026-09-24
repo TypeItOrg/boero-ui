@@ -5,7 +5,11 @@ import { ACTIVE_ENROLLMENT_APPLICATION_STATUSES } from "@features/enrollment-app
 import { fetchMyEnrollmentApplications } from "@features/enrollment-applications/services/enrollment-application.service";
 import { fetchAcademicOffer } from "@features/academic-offers/services/academic-offer.service";
 
-export async function fetchActiveEnrollmentPaths(institutionId: string) {
+/**
+ * @param applicantPersonId Restricts the exclusions to that person's applications. A guardian's list also
+ * contains their dependents' applications, so pass the person being enrolled (themself or a dependent).
+ */
+export async function fetchActiveEnrollmentPaths(institutionId: string, applicantPersonId?: string) {
   const trainingPathIds = new Set<string>();
   const studyPlanIds = new Set<string>();
   const unresolvedStudyPlanIds = new Set<string>();
@@ -17,7 +21,12 @@ export async function fetchActiveEnrollmentPaths(institutionId: string) {
       let page = 0;
 
       while (true) {
-        const applications = await fetchMyEnrollmentApplications(institutionId, { page, size: 50, status });
+        const applications = await fetchMyEnrollmentApplications(institutionId, {
+          page,
+          size: 50,
+          status,
+          ...(applicantPersonId ? { dependentPersonId: applicantPersonId } : {}),
+        });
 
         for (const application of applications.items) {
           studyPlanIds.add(application.studyPlanId);

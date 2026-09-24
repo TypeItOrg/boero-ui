@@ -5,7 +5,26 @@ import {
   healthInclusionSchema,
   preferenceSchema,
   enrollmentApplicationSubmissionSchema,
+  startEnrollmentApplicationSchema,
 } from "@features/enrollment-applications/schemas/enrollment-application.schema";
+
+describe("startEnrollmentApplicationSchema", () => {
+  const base = { studyPlanId: "00000000-0000-4000-8000-000000000001", academicYearId: "00000000-0000-4000-8000-000000000002" };
+
+  it("accepts a self application without applicantPersonId", () => {
+    expect(startEnrollmentApplicationSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("accepts an application on behalf of a dependent", () => {
+    const applicantPersonId = "00000000-0000-4000-8000-000000000003";
+
+    expect(startEnrollmentApplicationSchema.parse({ ...base, applicantPersonId })).toEqual({ ...base, applicantPersonId });
+  });
+
+  it("rejects an applicantPersonId that is not a UUID", () => {
+    expect(startEnrollmentApplicationSchema.safeParse({ ...base, applicantPersonId: "not-a-uuid" }).success).toBe(false);
+  });
+});
 
 describe("enrollment-application.schema", () => {
   describe("calculateAge", () => {
@@ -163,6 +182,45 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(minorData);
       expect(result.success).toBe(true);
+    });
+
+    it("does not require an own email for a minor applicant (dependents have none)", () => {
+      const minorWithoutEmail = {
+        ...baseValidAdult,
+        personalData: { ...baseValidAdult.personalData, birthDate: "2012-01-01", email: "" },
+        responsible: {
+          fullName: "Carlos García",
+          documentNumber: "18123456",
+          phoneNumber: "3514998877",
+          email: "carlos@example.com",
+          occupation: "Docente",
+          educationLevel: "TERTIARY_COMPLETE",
+        },
+      };
+
+      expect(enrollmentApplicationSubmissionSchema.safeParse(minorWithoutEmail).success).toBe(true);
+      expect(
+        enrollmentApplicationSubmissionSchema.safeParse({ ...minorWithoutEmail, personalData: { ...minorWithoutEmail.personalData, email: null } })
+          .success,
+      ).toBe(true);
+    });
+
+    it("still requires a valid email for an adult applicant", () => {
+      const missing = enrollmentApplicationSubmissionSchema.safeParse({
+        ...baseValidAdult,
+        personalData: { ...baseValidAdult.personalData, email: "" },
+      });
+      const invalid = enrollmentApplicationSubmissionSchema.safeParse({
+        ...baseValidAdult,
+        personalData: { ...baseValidAdult.personalData, email: "not-an-email" },
+      });
+
+      for (const result of [missing, invalid]) {
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.issues.map((issue) => issue.path.join("."))).toContain("personalData.email");
+        }
+      }
     });
 
     it("requires health report attachment and support details if receivesReasonableAdjustments is true", () => {

@@ -53,7 +53,8 @@ export default async function EnrollmentPage({
   const [plansResponse, periodsResponse, activePaths] = await Promise.all([
     fetchAcademicOffers(person.institutionId, plansPage),
     fetchAvailableEnrollmentPeriods(periodsPage),
-    fetchActiveEnrollmentPaths(person.institutionId),
+    // Scoped to the caller: a guardian's list also holds their dependents' applications.
+    fetchActiveEnrollmentPaths(person.institutionId, user.personId ?? undefined),
   ]);
 
   const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.trainingPathId));

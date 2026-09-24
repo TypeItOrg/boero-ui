@@ -6,6 +6,8 @@ export interface EnrollmentApplicationResponse {
   applicationId: string;
   institutionId: string;
   personId: string;
+  /** Person who submitted it: the tutor when the application was made on behalf of a dependent. */
+  submittedByPersonId?: string | null;
   studyPlanId: string;
   academicYearId: string;
   enrollmentPeriodId: string;
