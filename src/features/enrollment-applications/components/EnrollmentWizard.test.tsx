@@ -208,6 +208,26 @@ describe("EnrollmentWizard", () => {
     expect(screen.getByRole("tab", { name: /tutor legal/i })).toBeInTheDocument();
   });
 
+  it("names the dependent being enrolled and marks the missing email as not applicable", async () => {
+    renderWizard({
+      initialApplication: {
+        ...BASE,
+        submittedByPersonId: "guardian-1",
+        data: { personalData: { firstName: "Mateo", lastName: "Gonzalez", birthDate: "2015-05-12" } },
+      },
+    });
+
+    expect(await screen.findByText("Inscribiendo a: Mateo Gonzalez")).toBeInTheDocument();
+    expect(screen.getByLabelText(/correo electrónico/i)).toHaveValue("No aplica");
+  });
+
+  it("does not show the enrolling notice when applying for yourself", async () => {
+    renderWizard({ initialApplication: { ...BASE, submittedByPersonId: BASE.personId } });
+
+    await screen.findByLabelText(/^nombre/i);
+    expect(screen.queryByText(/Inscribiendo a:/)).not.toBeInTheDocument();
+  });
+
   it("renders training-path and spaces tabs and loads their data", async () => {
     const trainingPaths: TrainingPath[] = [
       { id: "tp-1", name: "Formación Básica en Guitarra", description: "Trayecto inicial", active: true, institutionId: "inst-1" },

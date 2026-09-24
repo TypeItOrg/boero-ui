@@ -152,6 +152,8 @@ export function EnrollmentWizard({
   const birthDate = parseInitialBirthDate(initialData?.personalData?.birthDate);
   const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
   const email = initialData?.personalData?.email ?? "";
+  const isDependentApplication =
+    Boolean(initialApplication.submittedByPersonId) && initialApplication.submittedByPersonId !== initialApplication.personId;
 
   // 2. Escolaridad de Base
   const [secondarySchool, setSecondarySchool] = React.useState(initialData?.academicBackground?.secondarySchool ?? "");
@@ -679,6 +681,15 @@ export function EnrollmentWizard({
         </Alert>
       )}
 
+      {isDependentApplication && (
+        <Alert>
+          <UserRoundIcon />
+          <AlertTitle>
+            Inscribiendo a: {firstName} {lastName}
+          </AlertTitle>
+        </Alert>
+      )}
+
       {/* Tabs navigation */}
       <Tabs
         value={effectiveActiveTab}
@@ -832,13 +843,13 @@ export function EnrollmentWizard({
                 </Field>
 
                 <Field data-invalid={!!getFieldError(["personalData", "email"])}>
-                  <FieldLabel htmlFor="email" required>
+                  <FieldLabel htmlFor="email" required={!isDependentApplication || Boolean(email)}>
                     Correo electrónico
                   </FieldLabel>
                   <Input
                     id="email"
                     type="email"
-                    value={email}
+                    value={isDependentApplication && !email ? "No aplica" : email}
                     readOnly
                     className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="postulante@ejemplo.com"
