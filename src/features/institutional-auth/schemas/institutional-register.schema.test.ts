@@ -8,6 +8,8 @@ function createValidInput(overrides: Record<string, string> = {}) {
     lastName: "Garcia",
     birthDate: "2010-01-01",
     documentNumber: "12345678",
+    email: "ana@example.com",
+    isGuardian: "false",
     password: "password123",
     confirmPassword: "password123",
     ...overrides,
@@ -15,6 +17,24 @@ function createValidInput(overrides: Record<string, string> = {}) {
 }
 
 describe("institutional register schema", () => {
+  it.each([
+    ["true", true],
+    ["false", false],
+  ])("parses the guardian flag %s from the raw form value", (raw, expected) => {
+    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw }));
+
+    expect(result.success && result.data.isGuardian).toBe(expected);
+  });
+
+  it.each(["", "maybe", "on"])("rejects the guardian flag %p instead of treating it as false", (raw) => {
+    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw }));
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["isGuardian"] }));
+    }
+  });
+
   it("requires a birth date", () => {
     const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate: "" }));
 

@@ -13,6 +13,7 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   REQUIRED_PASSWORD: "La contraseña es requerida.",
   INVALID_PASSWORD: "La contraseña debe tener al menos 8 caracteres.",
   INVALID_PASSWORD_CONFIRMATION: "Las contraseñas no coinciden.",
+  INVALID_GUARDIAN_OPTION: "Indicá si te registrás como tutor.",
   INVALID_FORM: "Revisá los datos ingresados.",
   INVALID_CREDENTIALS: "El número de documento o la contraseña no son correctos.",
   EMAIL_CHANGE_INVALID_CREDENTIALS: "Los datos ingresados no son válidos o la cuenta ya fue verificada.",

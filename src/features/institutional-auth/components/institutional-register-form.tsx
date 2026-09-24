@@ -10,6 +10,7 @@ import { Button } from "@common/components/ui/button";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import { Switch } from "@common/components/ui/switch";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
@@ -25,6 +26,7 @@ export function InstitutionalRegisterForm(): React.ReactElement {
   const [isPending, startTransition] = useTransition();
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
   const [birthDate, setBirthDate] = useState<Date>();
+  const [isGuardian, setIsGuardian] = useState(false);
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -125,6 +127,18 @@ export function InstitutionalRegisterForm(): React.ReactElement {
           </FieldLabel>
           <Input aria-invalid={!!state.fieldErrors?.email} autoComplete="email" id="register-email" name="email" type="email" />
           <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
+        </Field>
+
+        <Field data-invalid={!!state.fieldErrors?.isGuardian} orientation="horizontal">
+          <input name="isGuardian" type="hidden" value={String(isGuardian)} />
+          <Switch aria-describedby="register-is-guardian-help" checked={isGuardian} id="register-is-guardian" onCheckedChange={setIsGuardian} />
+          <div className="grid gap-1">
+            <FieldLabel htmlFor="register-is-guardian">Soy tutor o representante legal a cargo de menores</FieldLabel>
+            <p className="text-muted-foreground text-sm" id="register-is-guardian-help">
+              Permite inscribir y gestionar las solicitudes de tus hijos o personas bajo tu tutela.
+            </p>
+          </div>
+          <FieldError errors={state.fieldErrors?.isGuardian ? [{ message: state.fieldErrors.isGuardian }] : undefined} />
         </Field>
 
         <div className="grid gap-6 sm:grid-cols-2">

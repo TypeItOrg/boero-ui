@@ -27,6 +27,8 @@ export const institutionalRegisterSchema = z
       .string()
       .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_DOCUMENT, abort: true })
       .regex(/^\d{8}$/, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_DOCUMENT),
+    // Raw form value: it must be explicit, a missing value is invalid rather than an implicit false.
+    isGuardian: z.enum(["true", "false"], INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_GUARDIAN_OPTION).transform((value) => value === "true"),
     email: z
       .string()
       .trim()
