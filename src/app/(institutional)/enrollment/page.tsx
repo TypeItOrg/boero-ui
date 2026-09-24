@@ -9,12 +9,14 @@ import { fetchAcademicOffers } from "@features/academic-offers/services/academic
 import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
+import { EnrollmentApplicantSelector } from "@features/enrollment-applications/components/enrollment-applicant-selector";
+import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
 import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { canStartEnrollmentApplication } from "@features/institutional-auth/utils/institutional-applicant-role.util";
+import { canManageDependents, canStartEnrollmentApplication } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -50,11 +52,30 @@ export default async function EnrollmentPage({
     );
   }
 
+  const dependents = canManageDependents(user) ? await fetchGuardianDependents(person.institutionId) : [];
+  const dependentOptions = dependents.map((item) => ({ id: item.dependentPersonId, name: `${item.firstName} ${item.lastName}` }));
+  // dependentId comes from the URL: only honor it when it belongs to one of this guardian's dependents.
+  const selectedDependent = dependents.find((item) => item.dependentPersonId === query.dependentId);
+
+  if (query.dependentId && !selectedDependent) {
+    return (
+      <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
+        <EnrollmentApplicantSelector dependents={dependentOptions} />
+        <Alert variant="destructive">
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>Persona no disponible</AlertTitle>
+          <AlertDescription>La persona seleccionada no está a tu cargo. Elegí a quién inscribir de la lista.</AlertDescription>
+        </Alert>
+      </PlatformPageShell>
+    );
+  }
+
+  const applicantPersonId = selectedDependent?.dependentPersonId ?? user.personId ?? undefined;
   const [plansResponse, periodsResponse, activePaths] = await Promise.all([
     fetchAcademicOffers(person.institutionId, plansPage),
     fetchAvailableEnrollmentPeriods(periodsPage),
-    // Scoped to the caller: a guardian's list also holds their dependents' applications.
-    fetchActiveEnrollmentPaths(person.institutionId, user.personId ?? undefined),
+    // Scoped to the applicant: a guardian's list also holds their dependents' applications.
+    fetchActiveEnrollmentPaths(person.institutionId, applicantPersonId),
   ]);
 
   const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.trainingPathId));
@@ -64,17 +85,27 @@ export default async function EnrollmentPage({
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
+      <EnrollmentApplicantSelector dependents={dependentOptions} selectedId={selectedDependent?.dependentPersonId} />
+      {selectedDependent && (
+        <Alert>
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>
+            Inscribiendo a: {selectedDependent.firstName} {selectedDependent.lastName}
+          </AlertTitle>
+        </Alert>
+      )}
       {hasActiveApplication && !allExcludedByActiveApplication && (
         <Alert variant="success">
           <CheckCircle2Icon className="size-4" />
-          <AlertTitle>¡Ya estás en carrera!</AlertTitle>
+          <AlertTitle>{selectedDependent ? "¡Ya está en carrera!" : "¡Ya estás en carrera!"}</AlertTitle>
           <AlertDescription>
-            Tenés una solicitud de inscripción en curso, así que esos trayectos no aparecen acá para que no la dupliques. Podés seguirla en{" "}
-            <Link href="/my-enrollment-applications">Mis inscripciones</Link>.
+            {selectedDependent ? "Esta persona tiene" : "Tenés"} una solicitud de inscripción en curso, así que esos trayectos no aparecen acá para
+            que no la dupliques. Podés seguirla en <Link href="/my-enrollment-applications">Mis inscripciones</Link>.
           </AlertDescription>
         </Alert>
       )}
       <EnrollmentStart
+        applicantPersonId={selectedDependent?.dependentPersonId}
         studyPlans={availableStudyPlans.map((plan) => ({
           id: plan.studyPlanId,
           name: plan.studyPlanName,

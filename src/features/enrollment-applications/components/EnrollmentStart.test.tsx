@@ -59,6 +59,15 @@ describe("EnrollmentStart", () => {
     expect(mockPush).toHaveBeenCalledWith("/my-enrollment-applications/app-1");
   });
 
+  it("sends the applicant person when enrolling a dependent", async () => {
+    startAction.mockResolvedValue({ application: { applicationId: "app-2" } } as Awaited<ReturnType<typeof startOrGetEnrollmentApplicationAction>>);
+    render(<EnrollmentStart applicantPersonId="dep-1" studyPlans={studyPlans} periods={periods} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
+
+    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1", applicantPersonId: "dep-1" }));
+  });
+
   it("shows an unavailable message when there are no options", () => {
     render(<EnrollmentStart studyPlans={[]} periods={[]} />);
     expect(screen.getByText("No hay períodos de inscripción abiertos")).toBeInTheDocument();

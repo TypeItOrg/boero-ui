@@ -4,6 +4,8 @@ import {
 } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { ENROLLMENT_DOCUMENT_TYPE, type EnrollmentDocumentType } from "@features/enrollment-applications/types/enrollment-document-type.types";
 
+export const ENROLLMENT_PAGE_PATH = "/enrollment";
+
 export const ENROLLMENT_APPLICATIONS_API_PATH = "/api/v1/enrollment-applications";
 
 export const ACTIVE_ENROLLMENT_APPLICATION_STATUSES = [

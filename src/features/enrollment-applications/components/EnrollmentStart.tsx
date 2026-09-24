@@ -8,6 +8,8 @@ import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applic
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface EnrollmentStartProps {
+  /** Dependent the application is for; omit to enroll the signed-in user. */
+  applicantPersonId?: string;
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods: EnrollmentPeriod[];
   allExcludedByActiveApplication?: boolean;
@@ -20,6 +22,7 @@ type EnrollmentStartState = {
 };
 
 export function EnrollmentStart({
+  applicantPersonId,
   studyPlans,
   periods,
   allExcludedByActiveApplication = false,
@@ -29,7 +32,7 @@ export function EnrollmentStart({
   const router = useRouter();
   const [state, startApplication, isStarting] = React.useActionState(
     async (_previous: EnrollmentStartState, input: { studyPlanId: string; academicYearId: string }): Promise<EnrollmentStartState> => {
-      const result = await startOrGetEnrollmentApplicationAction(input);
+      const result = await startOrGetEnrollmentApplicationAction(applicantPersonId ? { ...input, applicantPersonId } : input);
 
       if ("error" in result) {
         return { error: result.error };
