@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon, UsersIcon } from "lucide-react";
+import { PlusIcon, UserMinusIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { EmptyMedia } from "@common/components/ui/empty";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
+import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
 import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
@@ -18,6 +19,7 @@ const ADD_LABEL = "Agregar persona a cargo";
 
 export function GuardianDependentsList({ dependents, institutionId }: GuardianDependentsListProps): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dependentToUnlink, setDependentToUnlink] = useState<GuardianDependent | null>(null);
 
   return (
     <div className="flex flex-col gap-6">
@@ -29,7 +31,7 @@ export function GuardianDependentsList({ dependents, institutionId }: GuardianDe
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {dependents.map((dependent) => (
               <li key={dependent.personGuardianId}>
-                <DependentCard dependent={dependent} />
+                <DependentCard dependent={dependent} onUnlink={() => setDependentToUnlink(dependent)} />
               </li>
             ))}
           </ul>
@@ -49,6 +51,16 @@ export function GuardianDependentsList({ dependents, institutionId }: GuardianDe
       {isDialogOpen ? (
         <AddGuardianDependentDialog institutionId={institutionId} onClose={() => setIsDialogOpen(false)} onSuccess={() => setIsDialogOpen(false)} />
       ) : null}
+
+      {dependentToUnlink ? (
+        <UnlinkGuardianDependentDialog
+          dependentName={`${dependentToUnlink.firstName} ${dependentToUnlink.lastName}`}
+          dependentPersonId={dependentToUnlink.dependentPersonId}
+          institutionId={institutionId}
+          onClose={() => setDependentToUnlink(null)}
+          onSuccess={() => setDependentToUnlink(null)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -62,7 +74,7 @@ function AddButton({ onClick }: { onClick: () => void }): React.ReactElement {
   );
 }
 
-function DependentCard({ dependent }: { dependent: GuardianDependent }): React.ReactElement {
+function DependentCard({ dependent, onUnlink }: { dependent: GuardianDependent; onUnlink: () => void }): React.ReactElement {
   const age = calculateAge(dependent.birthDate ?? undefined);
 
   return (
@@ -83,6 +95,12 @@ function DependentCard({ dependent }: { dependent: GuardianDependent }): React.R
           {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
         </p>
       </CardContent>
+      <CardFooter className="justify-end">
+        <Button aria-label={`Quitar a ${dependent.firstName} ${dependent.lastName}`} onClick={onUnlink} size="sm" type="button" variant="outline">
+          <UserMinusIcon aria-hidden="true" />
+          Quitar
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

@@ -4,6 +4,9 @@ import userEvent from "@testing-library/user-event";
 jest.mock("@features/guardian-dependents/actions/create-guardian-dependent.action", () => ({
   createGuardianDependentAction: jest.fn(),
 }));
+jest.mock("@features/guardian-dependents/actions/unlink-guardian-dependent.action", () => ({
+  unlinkGuardianDependentAction: jest.fn(),
+}));
 
 import { GuardianDependentsList } from "@features/guardian-dependents/components/guardian-dependents-list";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
@@ -69,5 +72,20 @@ describe("GuardianDependentsList", () => {
     await user.click(screen.getAllByRole("button", { name: "Agregar persona a cargo" })[0]);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("opens the unlink confirmation for the chosen dependent and can dismiss it", async () => {
+    const user = userEvent.setup();
+    render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Quitar a Mateo Gonzalez" }));
+
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Mateo Gonzalez");
+
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 });
