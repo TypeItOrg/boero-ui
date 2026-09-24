@@ -15,6 +15,12 @@ export function getLatestAllowedBirthDate(today = getArgentinaToday()): Date {
   return subtractYears(today, MINIMUM_PERSON_AGE);
 }
 
+export function getEarliestMinorBirthDate(today = getArgentinaToday()): Date {
+  const eighteenthBirthday = subtractYears(today, ADULT_AGE);
+
+  return new Date(eighteenthBirthday.getFullYear(), eighteenthBirthday.getMonth(), eighteenthBirthday.getDate() + 1);
+}
+
 export function hasMinimumPersonAge(value: string, today = getArgentinaToday()): boolean {
   const birthDate = parseBirthDateInput(value);
   return birthDate !== undefined && birthDate <= getLatestAllowedBirthDate(today);

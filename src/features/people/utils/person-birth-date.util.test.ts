@@ -1,4 +1,9 @@
-import { getLatestAllowedBirthDate, hasMinimumPersonAge, isMinorBirthDate } from "@features/people/utils/person-birth-date.util";
+import {
+  getEarliestMinorBirthDate,
+  getLatestAllowedBirthDate,
+  hasMinimumPersonAge,
+  isMinorBirthDate,
+} from "@features/people/utils/person-birth-date.util";
 
 describe("person birth date rules", () => {
   const today = new Date(2026, 6, 14);
@@ -21,5 +26,11 @@ describe("person birth date rules", () => {
 
   it("uses the last valid day when subtracting years from a leap day", () => {
     expect(getLatestAllowedBirthDate(new Date(2024, 1, 29))).toEqual(new Date(2021, 1, 28));
+  });
+
+  it("returns the day after the eighteenth birthday as the earliest minor birth date", () => {
+    expect(getEarliestMinorBirthDate(today)).toEqual(new Date(2008, 6, 15));
+    expect(isMinorBirthDate("2008-07-15", today)).toBe(true);
+    expect(isMinorBirthDate("2008-07-14", today)).toBe(false);
   });
 });
