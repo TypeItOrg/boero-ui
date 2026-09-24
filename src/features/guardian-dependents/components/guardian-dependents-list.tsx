@@ -39,11 +39,12 @@ export function GuardianDependentsList({ dependents, institutionId }: GuardianDe
           </ul>
         </>
       ) : (
-        <div className="bg-muted/25 text-muted-foreground flex flex-col items-center justify-center gap-4 rounded-lg border px-4 py-12 text-center">
-          <EmptyMedia variant="icon">
+        <div className="bg-muted/25 text-muted-foreground flex flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
+          <EmptyMedia className="mb-4" variant="icon">
             <UsersIcon className="size-5" />
           </EmptyMedia>
-          <p className="text-foreground max-w-md text-sm">
+          <h3 className="text-foreground text-base font-semibold">No hay personas a cargo</h3>
+          <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
             Todavía no tenés ningún estudiante a cargo registrado. Agregá a tu primer hijo para comenzar sus inscripciones.
           </p>
           <AddButton onClick={() => setIsDialogOpen(true)} />
