@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon, UserMinusIcon, UsersIcon } from "lucide-react";
+import Link from "next/link";
+import { ClipboardPlusIcon, PlusIcon, UserMinusIcon, UsersIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/co
 import { EmptyMedia } from "@common/components/ui/empty";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
+import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
@@ -95,7 +97,16 @@ function DependentCard({ dependent, onUnlink }: { dependent: GuardianDependent; 
           {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
         </p>
       </CardContent>
-      <CardFooter className="justify-end">
+      <CardFooter className="justify-end gap-2">
+        <Button asChild size="sm">
+          <Link
+            aria-label={`Inscribir a ${dependent.firstName} ${dependent.lastName}`}
+            href={`${ENROLLMENT_PAGE_PATH}?dependentId=${dependent.dependentPersonId}`}
+          >
+            <ClipboardPlusIcon aria-hidden="true" />
+            Inscribir
+          </Link>
+        </Button>
         <Button aria-label={`Quitar a ${dependent.firstName} ${dependent.lastName}`} onClick={onUnlink} size="sm" type="button" variant="outline">
           <UserMinusIcon aria-hidden="true" />
           Quitar

@@ -74,6 +74,15 @@ describe("GuardianDependentsList", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
+  it("links to the enrollment page for each dependent", () => {
+    render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
+
+    expect(screen.getByRole("link", { name: "Inscribir a Mateo Gonzalez" })).toHaveAttribute(
+      "href",
+      "/enrollment?dependentId=019f9c3a-f891-7bc5-a98d-e65332998002",
+    );
+  });
+
   it("opens the unlink confirmation for the chosen dependent and can dismiss it", async () => {
     const user = userEvent.setup();
     render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
