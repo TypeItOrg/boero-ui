@@ -17,9 +17,25 @@ import { useRouter } from "next/navigation";
 
 type MyEnrollmentApplicationTableRowProps = {
   application: EnrollmentApplication;
+  currentPersonId?: string;
+  showApplicant?: boolean;
 };
 
-export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApplicationTableRowProps): React.ReactElement {
+function getSubmitterNote(application: EnrollmentApplication, currentPersonId?: string): string | null {
+  const { submittedByPersonId, personId } = application;
+
+  if (!submittedByPersonId || submittedByPersonId === personId) {
+    return null;
+  }
+
+  return submittedByPersonId === currentPersonId ? "Presentada por vos" : "Presentada por otro tutor";
+}
+
+export function MyEnrollmentApplicationTableRow({
+  application,
+  currentPersonId,
+  showApplicant = false,
+}: MyEnrollmentApplicationTableRowProps): React.ReactElement {
   const router = useRouter();
   const [isCancelOpen, setIsCancelOpen] = React.useState(false);
 
@@ -60,6 +76,14 @@ export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApp
                 </DropdownMenu>
               </div>
             </TableCell>
+            {showApplicant ? (
+              <TableCell>
+                <span className="block">
+                  {application.applicantFirstName} {application.applicantLastName}
+                </span>
+                <span className="text-muted-foreground block text-xs">{getSubmitterNote(application, currentPersonId)}</span>
+              </TableCell>
+            ) : null}
             <TableCell className="font-medium">{application.studyPlanName}</TableCell>
             <TableCell>{application.academicYear}</TableCell>
             <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>

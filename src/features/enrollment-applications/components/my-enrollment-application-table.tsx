@@ -7,6 +7,8 @@ import { MyEnrollmentApplicationTablePresentation } from "@features/enrollment-a
 type MyEnrollmentApplicationTableContainerProps = PaginationParams & {
   dataPromise: Promise<PaginatedResponse<EnrollmentApplication>>;
   status?: EnrollmentApplicationStatus;
+  currentPersonId?: string;
+  showApplicant?: boolean;
 };
 
 export async function MyEnrollmentApplicationTableContainer({
@@ -14,8 +16,20 @@ export async function MyEnrollmentApplicationTableContainer({
   status,
   page,
   size,
+  currentPersonId,
+  showApplicant,
 }: MyEnrollmentApplicationTableContainerProps): Promise<React.ReactElement> {
   const data = await dataPromise;
 
-  return <MyEnrollmentApplicationTablePresentation key={`${page}-${size}-${status ?? "all"}`} data={data} page={page} size={size} status={status} />;
+  return (
+    <MyEnrollmentApplicationTablePresentation
+      key={`${page}-${size}-${status ?? "all"}`}
+      currentPersonId={currentPersonId}
+      data={data}
+      page={page}
+      showApplicant={showApplicant}
+      size={size}
+      status={status}
+    />
+  );
 }

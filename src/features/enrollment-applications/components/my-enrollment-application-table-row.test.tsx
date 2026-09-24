@@ -57,4 +57,35 @@ describe("MyEnrollmentApplicationTableRow", () => {
     expect(screen.queryByText("Documentación incompleta")).not.toBeInTheDocument();
     expect(screen.getByText("—")).toBeInTheDocument();
   });
+
+  describe("applicant column", () => {
+    function renderRow(app: EnrollmentApplication, currentPersonId?: string): void {
+      render(
+        <table>
+          <tbody>
+            <MyEnrollmentApplicationTableRow application={app} currentPersonId={currentPersonId} showApplicant />
+          </tbody>
+        </table>,
+      );
+    }
+
+    it("shows the applicant and that you submitted it", () => {
+      renderRow({ ...application("DRAFT"), submittedByPersonId: "guardian-1" }, "guardian-1");
+
+      expect(screen.getByText("Ana Garcia")).toBeInTheDocument();
+      expect(screen.getByText("Presentada por vos")).toBeInTheDocument();
+    });
+
+    it("flags applications submitted by another guardian", () => {
+      renderRow({ ...application("DRAFT"), submittedByPersonId: "guardian-2" }, "guardian-1");
+
+      expect(screen.getByText("Presentada por otro tutor")).toBeInTheDocument();
+    });
+
+    it("adds no submitter note to your own applications", () => {
+      renderRow({ ...application("DRAFT"), submittedByPersonId: "00000000-0000-4000-8000-000000000003" }, "00000000-0000-4000-8000-000000000003");
+
+      expect(screen.queryByText(/Presentada por/)).not.toBeInTheDocument();
+    });
+  });
 });

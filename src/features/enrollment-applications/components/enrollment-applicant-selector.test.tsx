@@ -35,4 +35,19 @@ describe("EnrollmentApplicantSelector", () => {
 
     expect(screen.getByRole("link", { name: "Inscribirme a mí mismo" })).toHaveAttribute("aria-current", "true");
   });
+
+  it("supports a custom destination, parameter and label for filtering lists", () => {
+    render(
+      <EnrollmentApplicantSelector
+        allLabel="Todas"
+        basePath="/my-enrollment-applications"
+        dependents={DEPENDENTS}
+        paramName="dependentPersonId"
+        selectedId="dep-1"
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Todas" })).toHaveAttribute("href", "/my-enrollment-applications");
+    expect(screen.getByRole("link", { name: "Mateo Gonzalez" })).toHaveAttribute("href", "/my-enrollment-applications?dependentPersonId=dep-1");
+  });
 });
