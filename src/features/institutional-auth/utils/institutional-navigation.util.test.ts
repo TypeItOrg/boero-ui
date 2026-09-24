@@ -100,6 +100,24 @@ describe("getInstitutionalNavigationSections", () => {
     ]);
   });
 
+  it("lists the dependents page first for users who can manage dependents", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Tutor"],
+      permissions: [INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE],
+    });
+
+    expect(sections.find((section) => section.label === "Inscripciones")?.items[0]).toEqual(
+      expect.objectContaining({ title: "Mis personas a cargo", url: "/my-dependents" }),
+    );
+  });
+
+  it("hides the dependents page without the manage permission", () => {
+    const sections = getInstitutionalNavigationSections({ ...USER, roles: ["Postulante"] });
+
+    expect(sections.flatMap((section) => section.items).some((item) => item.url === "/my-dependents")).toBe(false);
+  });
+
   it("hides the applicant section for staff roles even with the management permission", () => {
     const sections = getInstitutionalNavigationSections({
       ...USER,

@@ -11,9 +11,11 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
+  canManageDependents,
   canStartEnrollmentApplication,
   canViewOwnEnrollmentApplications,
 } from "@features/institutional-auth/utils/institutional-applicant-role.util";
@@ -93,6 +95,15 @@ export function getInstitutionalHomeTasks(user: Pick<InstitutionalUser, "permiss
 
 export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
   const links: InstitutionalHomeLink[] = [];
+
+  if (canManageDependents(user)) {
+    links.push({
+      href: GUARDIAN_DEPENDENTS_PAGE_PATH,
+      title: "Mis personas a cargo",
+      description: "Registrá y gestioná a los menores a tu cargo para inscribirlos.",
+      icon: UsersIcon,
+    });
+  }
 
   if (canStartEnrollmentApplication(user)) {
     links.push({

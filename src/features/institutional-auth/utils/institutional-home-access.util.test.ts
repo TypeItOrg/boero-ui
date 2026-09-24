@@ -40,6 +40,18 @@ describe("institutional home access", () => {
     expect(links.map(({ href }) => href)).toEqual(["/enrollment", "/my-enrollment-applications"]);
   });
 
+  it("puts the dependents link first for users who can manage dependents", () => {
+    const user = {
+      institutionId: "inst-1",
+      personId: "p-1",
+      roles: ["Tutor"],
+      permissions: [INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ],
+    } as unknown as InstitutionalUser;
+
+    const links = getInstitutionalEnrollmentHomeLinks(user);
+    expect(links.map(({ href }) => href)).toEqual(["/my-dependents", "/enrollment", "/my-enrollment-applications"]);
+  });
+
   it("returns staff enrollment application link when user has enrollment read permission", () => {
     const user = {
       institutionId: "inst-1",

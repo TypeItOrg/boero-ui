@@ -29,6 +29,7 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   courses: "Cursos",
   shifts: "Turnos",
   "enrollment-applications": "Solicitudes de inscripción",
+  "my-dependents": "Mis personas a cargo",
   "my-enrollment-applications": "Mis inscripciones",
 };
 
