@@ -1,3 +1,8 @@
+import { TrainingPathDocuments } from "@features/academic/components/training-path-documents";
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import { getAcademicApiBase } from "@features/academic/utils/academic-scope.util";
+import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+import { DOCUMENT_MESSAGES } from "@features/enrollment-applications/constants/documentation.constants";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { notFound } from "next/navigation";
@@ -124,6 +129,17 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
       />
     );
   }
+  let documentRequirements: DocumentRequirement[] = [];
+  if (input.resource === AcademicResource.TRAINING_PATH && !input.action) {
+    const response = await academicApiFetch(
+      input.scope,
+      `${getAcademicApiBase(input.scope, input.institutionId)}/training-paths/${input.id}/document-requirements`,
+    );
+    if (!response.ok) {
+      throw new Error(DOCUMENT_MESSAGES.readFailed);
+    }
+    documentRequirements = (await response.json()) as DocumentRequirement[];
+  }
   const relatedPlans =
     input.resource === AcademicResource.TRAINING_PATH && input.access.studyPlanRead
       ? await TrainingPathStudyPlans({
@@ -189,6 +205,15 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
         versionAction={versionAction}
         returnTo={returnTo}
       />
+      {input.resource === AcademicResource.TRAINING_PATH ? (
+        <TrainingPathDocuments
+          scope={input.scope}
+          institutionId={input.institutionId}
+          pathId={input.id}
+          requirements={documentRequirements}
+          canEdit={canEdit}
+        />
+      ) : null}
       {curriculum ? (
         <StudyPlanCurriculumView
           curriculum={curriculum}
