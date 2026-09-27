@@ -1,7 +1,7 @@
 <div align="center">
 
 <br />
-<img src="public/logo.svg" alt="Boero" width="80" height="80" />
+<img src="public/brand/logo.svg" alt="Boero" width="80" height="80" />
 
 # Boero
 

@@ -36,7 +36,13 @@ export function InstitutionalRegisterForm(): React.ReactElement {
   return (
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
       <header className="flex flex-col items-center space-y-1 text-center">
-        <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-16 max-w-full sm:w-20 md:hidden" />
+        <Image
+          width={875}
+          height={1202}
+          src="/brand/boero-logo.webp"
+          alt="Logo de la institución"
+          className="h-auto w-16 max-w-full sm:w-20 md:hidden"
+        />
         <h1 className="text-2xl font-bold">Formá parte</h1>
         <p className="text-muted-foreground text-sm">
           <span className="hidden md:block">Completá tus datos para registrarte en una institución.</span>

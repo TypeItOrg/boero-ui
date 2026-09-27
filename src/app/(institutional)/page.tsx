@@ -71,7 +71,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
   return (
     <main className="flex min-h-full flex-1 flex-col gap-4">
       <header className="@container/home-hero relative flex h-56 min-w-0 items-center overflow-hidden shadow-sm @2xl/home-hero:h-64">
-        <Image src="/encabezado-institucional.webp" alt="" fill sizes="100vw" quality={90} preload className="object-cover object-center" />
+        <Image src="/images/institutional-header.webp" alt="" fill sizes="100vw" quality={90} preload className="object-cover object-center" />
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/25 sm:from-black/85 sm:via-black/60 sm:via-[65%] sm:to-black/15 sm:to-[90%] 2xl:from-black/85 2xl:via-black/50 2xl:via-[50%] 2xl:to-black/5 2xl:to-[100%] dark:bg-black/20"
@@ -81,7 +81,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
           <Image
             width={875}
             height={1202}
-            src="/boero-logo.webp"
+            src="/brand/boero-logo.webp"
             loading="eager"
             alt="Logo del Conservatorio Superior de Música Felipe Boero"
             className="h-28 w-20 shrink-0 object-contain @2xl/home-hero:h-32 @2xl/home-hero:w-24"
@@ -117,7 +117,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             title="Oferta académica"
             description="Conocé las propuestas vigentes de la institución."
             icon={GraduationCapIcon}
-            imageSrc="/gestion-academica.webp"
+            imageSrc="/images/academic-management.webp"
             imageSide="right"
           >
             <nav aria-label="Oferta académica" className="[&>a]:bg-background grid gap-4">
@@ -132,7 +132,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             title="Gestión institucional"
             description="Administrá la información, las personas y los accesos de la institución."
             icon={Building2Icon}
-            imageSrc="/gestion-institucional.webp"
+            imageSrc="/images/institutional-management.webp"
           >
             <nav aria-label="Gestión institucional" className="[&>a]:bg-background grid gap-4">
               {managementLinks.map((link) => (
@@ -148,7 +148,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             title="Área académica"
             description="Consultá y administrá la propuesta académica y sus inscripciones."
             icon={GraduationCapIcon}
-            imageSrc="/gestion-academica.webp"
+            imageSrc="/images/academic-management.webp"
             imageSide="right"
           >
             <div className="flex flex-col gap-4">
@@ -176,7 +176,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             title="Cursadas e inscripciones"
             description="Accedé a tus clases y gestioná las cursadas y solicitudes de inscripción."
             icon={ClipboardListIcon}
-            imageSrc={!hasInstitutionalAccess ? "/gestion-institucional.webp" : undefined}
+            imageSrc={!hasInstitutionalAccess ? "/images/institutional-management.webp" : undefined}
           >
             <nav aria-label="Cursadas e inscripciones" className="[&>a]:bg-background grid gap-4">
               {enrollmentLinks.map((link) => (
@@ -192,7 +192,7 @@ async function InstitutionalHomeContent(): Promise<React.ReactElement> {
             title="Formación"
             description="Seguí tu recorrido académico en la institución."
             icon={BookOpenIcon}
-            imageSrc="/gestion-academica.webp"
+            imageSrc="/images/academic-management.webp"
             imageSide="right"
           >
             <nav aria-label="Formación" className="[&>a]:bg-background grid gap-4">

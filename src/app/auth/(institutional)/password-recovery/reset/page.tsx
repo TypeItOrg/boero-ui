@@ -18,7 +18,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
         <CardContent className="grid-cols-2 p-0 md:grid">
           <ResetInstitutionalPasswordForm token={token} />
           <section className="from-primary to-primary/80 relative hidden bg-linear-to-l p-8 md:flex md:items-center md:justify-center lg:p-12">
-            <Image priority width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-full max-w-56" />
+            <Image priority width={875} height={1202} src="/brand/boero-logo.webp" alt="Logo de la institución" className="h-auto w-full max-w-56" />
           </section>
         </CardContent>
       </Card>
@@ -28,7 +28,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
   return (
     <Card className="animate-fade-in-up p-0">
       <CardContent className="flex flex-col items-center space-y-4 p-6 text-center md:p-8">
-        <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-20" />
+        <Image width={875} height={1202} src="/brand/boero-logo.webp" alt="Logo de la institución" className="h-auto w-20" />
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Enlace inválido</h1>
           <p className="text-muted-foreground text-sm">Solicitá un nuevo enlace de recuperación para continuar.</p>

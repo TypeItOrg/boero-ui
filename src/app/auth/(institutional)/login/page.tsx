@@ -21,7 +21,14 @@ export default async function LoginPage(): Promise<React.ReactElement> {
       <CardContent className="grid-cols-2 p-0 md:grid">
         <InstitutionalLoginForm emailVerified={emailVerified} passwordChanged={passwordChanged} />
         <section className="from-primary to-primary/80 relative hidden bg-linear-to-l p-8 md:flex md:items-center md:justify-center lg:p-12">
-          <Image priority width={875} height={1202} src={"/boero-logo.webp"} alt={"Logo de la institución"} className="h-auto w-full max-w-56" />
+          <Image
+            priority
+            width={875}
+            height={1202}
+            src={"/brand/boero-logo.webp"}
+            alt={"Logo de la institución"}
+            className="h-auto w-full max-w-56"
+          />
         </section>
       </CardContent>
     </Card>
