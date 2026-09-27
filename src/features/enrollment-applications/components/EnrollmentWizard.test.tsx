@@ -33,6 +33,10 @@ import {
   cancelEnrollmentApplicationAction,
 } from "@features/enrollment-applications/actions/enrollment-application.actions";
 
+jest.mock("@features/enrollment-applications/actions/documentation.actions", () => ({
+  mutateDocument: jest.fn(),
+}));
+
 const updateAction = jest.mocked(updateEnrollmentDraftAction);
 const submitAction = jest.mocked(submitEnrollmentApplicationAction);
 const cancelAction = jest.mocked(cancelEnrollmentApplicationAction);
@@ -84,9 +88,9 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
     responsible: {},
     preference: { preferredShift: "MORNING", allowsImageUse: true, isReenrolling: false },
     attachments: [
-      { id: "a1", attachmentType: "DNI_FRONT", originalFileName: "dni-f.png" },
-      { id: "a2", attachmentType: "DNI_BACK", originalFileName: "dni-d.png" },
-      { id: "a3", attachmentType: "PHOTO_ID", originalFileName: "foto.png" },
+      { id: "a1", requirementId: "00000000-0000-4000-8000-000000000004", originalFileName: "dni-f.png" },
+      { id: "a2", requirementId: "00000000-0000-4000-8000-000000000005", originalFileName: "dni-d.png" },
+      { id: "a3", requirementId: "00000000-0000-4000-8000-000000000006", originalFileName: "foto.png" },
     ],
   },
 };

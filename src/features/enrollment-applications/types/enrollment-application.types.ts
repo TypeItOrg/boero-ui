@@ -4,6 +4,8 @@ import type { EnrollmentApplicationData } from "@features/enrollment-application
 
 export type EnrollmentApplication = {
   canApprove?: boolean;
+  canApproveProvisionally?: boolean;
+  canConfirm?: boolean;
   canReject?: boolean;
   applicationId: string;
   institutionId: string;

@@ -59,6 +59,8 @@ export default async function PlatformEnrollmentApplicationDetailPage({
           application={{
             institutionId,
             applicationId,
+            canApproveProvisionally: application.canApproveProvisionally,
+            canConfirm: application.canConfirm,
             applicantName,
             studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "",
           }}

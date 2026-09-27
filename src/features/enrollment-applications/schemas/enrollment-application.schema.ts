@@ -1,4 +1,3 @@
-import { ENROLLMENT_DOCUMENT_TYPE } from "@features/enrollment-applications/types/enrollment-document-type.types";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { z } from "zod";
 import { parseDateInput } from "@common/utils/date-input.util";
@@ -127,7 +126,7 @@ export const careerSelectionSchema = z
 // Paso: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
-  attachmentType: z.enum(ENROLLMENT_DOCUMENT_TYPE),
+  requirementId: z.string().uuid(),
   originalFileName: z.string(),
   contentType: z.string().optional(),
   size: z.number().optional(),

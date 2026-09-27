@@ -46,6 +46,7 @@ import {
   EDUCATION_LEVEL_OPTIONS,
   SCHOOLING_EDUCATION_LEVEL_OPTIONS,
 } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { EnrollmentDocuments } from "@features/enrollment-applications/components/enrollment-documents";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
@@ -1496,6 +1497,7 @@ export function EnrollmentWizard({
           </Card>
         </TabsContent>
       </Tabs>
+      <EnrollmentDocuments application={application} />
 
       {/* Confirmation Dialog for Cancel Application */}
       {isCancelDialogOpen && (

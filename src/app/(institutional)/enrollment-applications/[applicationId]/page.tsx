@@ -53,6 +53,8 @@ export default async function EnrollmentApplicationDetailPage({
   const reviewSummary = {
     institutionId: user.institutionId,
     applicationId,
+    canApproveProvisionally: application.canApproveProvisionally,
+    canConfirm: application.canConfirm,
     applicantName,
     studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "—",
   };

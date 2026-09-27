@@ -1,0 +1,18 @@
+export const DOCUMENT_LEVEL_LABELS = {
+  AT_SUBMISSION: "Obligatorio al enviar",
+  BEFORE_CONFIRMATION: "Obligatorio para confirmar",
+  OPTIONAL: "Opcional",
+} as const;
+export const DOCUMENT_STATUS_LABELS = {
+  MISSING: "Pendiente de entrega",
+  PENDING_REVIEW: "Pendiente de revisión",
+  OBSERVED: "Observado",
+  ACCEPTED: "Aceptado",
+} as const;
+export const DOCUMENT_MESSAGES = {
+  invalid: "Revisá los datos de la documentación.",
+  failed: "No se pudo guardar la documentación.",
+  readFailed: "No se pudo consultar la documentación.",
+  file: "Seleccioná un archivo PDF, JPEG o PNG de hasta 10 MiB.",
+  note: "Indicá el motivo de la observación.",
+} as const;

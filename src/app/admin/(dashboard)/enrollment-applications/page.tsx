@@ -25,20 +25,28 @@ export default async function PlatformEnrollmentApplicationsPage({
   searchParams: Promise<EnrollmentApplicationSearchParams>;
 }): Promise<React.ReactElement> {
   const resolvedSearchParams = await searchParams;
-  const { page, size, status, trainingPathId, open } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
-  const dataPromise = fetchPlatformEnrollmentApplications({ page, size, status, trainingPathId, open });
+  const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
+  const dataPromise = fetchPlatformEnrollmentApplications({ page, size, status, trainingPathId, open, pendingDocuments });
   const { items: trainingPaths } = await fetchTrainingPaths(AcademicScope.ADMIN, undefined, { active: true, size: 100, sort: "name,asc" });
 
   return (
     <PlatformPageShell title="Solicitudes de inscripción" breadcrumb={<PlatformBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardListIcon} />}>
       <DataTableNavigationProvider>
-        <EnrollmentApplicationFilters status={status} trainingPathId={trainingPathId} open={open} trainingPaths={trainingPaths} size={size} />
+        <EnrollmentApplicationFilters
+          status={status}
+          trainingPathId={trainingPathId}
+          open={open}
+          pendingDocuments={pendingDocuments}
+          canFilterDocuments={true}
+          trainingPaths={trainingPaths}
+          size={size}
+        />
         <Suspense fallback={<EnrollmentApplicationTableSkeleton />}>
           <EnrollmentApplicationTableContainer
             page={page}
             size={size}
             status={status}
-            hasFilters={Boolean(status || trainingPathId || open)}
+            hasFilters={Boolean(status || trainingPathId || open || pendingDocuments)}
             dataPromise={dataPromise}
             canApprove
             canReject

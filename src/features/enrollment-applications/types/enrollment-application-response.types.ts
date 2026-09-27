@@ -14,6 +14,11 @@ export interface EnrollmentApplicationResponse {
   enrollmentPeriodId: string;
   enrollmentPeriod?: EnrollmentPeriod;
   periodOpen?: boolean;
+  canReadAttachments?: boolean;
+  documents?: import("@features/enrollment-applications/types/document-requirement.types").DocumentRequirement[];
+  canApproveProvisionally?: boolean;
+  canConfirm?: boolean;
+  admissionHistory?: Array<{ id: string; status: string; occurredAt: string; actorId: string | null; accountType: string }>;
   studyPlanName?: string;
   studyPlanVersion?: number | null;
   trainingPathName?: string | null;

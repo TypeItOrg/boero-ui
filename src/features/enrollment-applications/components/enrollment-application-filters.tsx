@@ -21,6 +21,8 @@ type EnrollmentApplicationFiltersProps = {
   status?: EnrollmentApplicationStatus;
   trainingPathId?: string;
   open?: boolean;
+  pendingDocuments?: boolean;
+  canFilterDocuments?: boolean;
   trainingPaths?: readonly TrainingPath[];
 };
 
@@ -29,6 +31,8 @@ export function EnrollmentApplicationFilters({
   status,
   trainingPathId,
   open,
+  pendingDocuments,
+  canFilterDocuments = false,
   trainingPaths,
 }: EnrollmentApplicationFiltersProps): React.ReactElement {
   const statusFilter: DataTableSelectFilter = {
@@ -41,6 +45,18 @@ export function EnrollmentApplicationFilters({
 
   const selectFilters: DataTableSelectFilter[] = [statusFilter];
 
+  if (canFilterDocuments) {
+    selectFilters.push({
+      defaultValue: "all",
+      label: "Documentación",
+      name: "pendingDocuments",
+      options: [
+        { label: "Toda la documentación", value: "all" },
+        { label: "Obligatoria pendiente", value: "true" },
+      ],
+      value: pendingDocuments ? "true" : "all",
+    });
+  }
   if (trainingPaths) {
     selectFilters.push({
       defaultValue: ALL_TRAINING_PATHS,

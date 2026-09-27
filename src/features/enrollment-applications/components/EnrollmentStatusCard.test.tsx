@@ -7,6 +7,10 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: jest.fn() }),
 }));
 
+jest.mock("@features/enrollment-applications/actions/documentation.actions", () => ({
+  mutateDocument: jest.fn(),
+}));
+
 describe("EnrollmentStatusCard", () => {
   const baseApp: EnrollmentApplicationResponse = {
     applicationId: "019183ab-0000-7000-8000-000000000001",
@@ -17,6 +21,35 @@ describe("EnrollmentStatusCard", () => {
     enrollmentPeriodId: "019183ab-0000-7000-8000-000000000006",
     status: "SUBMITTED",
     isEditable: false,
+    canReadAttachments: true,
+    documents: [
+      {
+        id: "019183ab-0000-7000-8000-000000000007",
+        name: "DNI frente",
+        instructions: "",
+        level: "AT_SUBMISSION",
+        allowedFormats: ["image/png"],
+        displayOrder: 0,
+        status: "PENDING_REVIEW",
+        currentAttachment: {
+          id: "att-1",
+          requirementId: "019183ab-0000-7000-8000-000000000007",
+          originalFileName: "dni-frente.png",
+          size: 1024 * 500,
+          contentType: "image/png",
+          createdAt: "2026-08-28T21:30:00Z",
+          versionStatus: "CURRENT",
+          reviewStatus: "PENDING_REVIEW",
+          uploadedBy: "019183ab-0000-7000-8000-000000000003",
+          uploaderType: "INSTITUTION",
+          reviewedBy: null,
+          reviewerType: null,
+          reviewedAt: null,
+          observation: null,
+          storagePath: null,
+        },
+      },
+    ],
     createdAt: "2026-08-28T21:30:00Z",
     updatedAt: "2026-08-28T21:30:00Z",
     data: {
@@ -46,7 +79,7 @@ describe("EnrollmentStatusCard", () => {
       attachments: [
         {
           id: "att-1",
-          attachmentType: "DNI_FRONT",
+          requirementId: "019183ab-0000-7000-8000-000000000007",
           originalFileName: "dni-frente.png",
           size: 1024 * 500,
         },

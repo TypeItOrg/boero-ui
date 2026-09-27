@@ -1,4 +1,5 @@
 "use client";
+import { EnrollmentDocuments } from "@features/enrollment-applications/components/enrollment-documents";
 
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import * as React from "react";
@@ -8,8 +9,6 @@ import {
   CheckCircle2Icon,
   ClipboardCheckIcon,
   ClockIcon,
-  ExternalLinkIcon,
-  FileTextIcon,
   GraduationCapIcon,
   HeartHandshakeIcon,
   Music2Icon,
@@ -22,7 +21,6 @@ import {
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
-import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { cn } from "@common/utils/cn.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -30,7 +28,6 @@ import { EnrollmentStepCardHeader } from "@features/enrollment-applications/comp
 import { EnrollmentApplicationCoursesManagement } from "@features/enrollment-applications/components/enrollment-application-courses-management";
 import {
   ENROLLMENT_APPLICATION_STATUS_LABELS,
-  ENROLLMENT_DOCUMENT_TYPE_LABELS,
   SCHOOLING_EDUCATION_LEVEL_LABELS,
 } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
@@ -38,8 +35,11 @@ import {
   ENROLLMENT_APPLICATION_STATUS,
   type EnrollmentApplicationStatus,
 } from "@features/enrollment-applications/types/enrollment-application-status.types";
-import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
 import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import {
+  getEnrollmentApplicationStatusLabel,
+  isEnrollmentApplicationStatus,
+} from "@features/enrollment-applications/utils/enrollment-application-status.util";
 
 interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
@@ -69,6 +69,13 @@ type DetailCardProps = {
 const SECTION_CARD_CLASS_NAME = "bg-muted/25 sm:[--card-spacing:--spacing(6)]";
 
 function getStatusBadge(status: EnrollmentApplicationStatus): React.ReactElement {
+  if (status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) {
+    return (
+      <Badge size="lg" variant="outline">
+        Admitida provisoriamente
+      </Badge>
+    );
+  }
   if (status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
     return (
       <Badge size="lg" variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300">
@@ -113,6 +120,15 @@ function getStatusBadge(status: EnrollmentApplicationStatus): React.ReactElement
 }
 
 function getStatusAlert(application: EnrollmentApplicationResponse): React.ReactElement | null {
+  if (application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) {
+    return (
+      <Alert>
+        <ClockIcon />
+        <AlertTitle>Admitida provisoriamente</AlertTitle>
+        <AlertDescription>Podés continuar con tu incorporación y completar aquí la documentación pendiente.</AlertDescription>
+      </Alert>
+    );
+  }
   if (application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
     return (
       <Alert className="bg-card border-amber-500/30 text-amber-800 dark:text-amber-300">
@@ -173,9 +189,11 @@ export function EnrollmentStatusCard({
   const health = data.healthInclusion || {};
   const responsible = data.responsible || {};
   const preference = data.preference || {};
-  const attachments = data.attachments || [];
   const spaces = application.spaces || [];
   const preferredShift = preference.preferredShift || "—";
+  const canManageApplicationCourses =
+    canManageCourses &&
+    (application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED);
 
   return (
     <div className="flex flex-col gap-4">
@@ -198,7 +216,7 @@ export function EnrollmentStatusCard({
 
       {showApplicantAlert ? getStatusAlert(application) : null}
 
-      {canManageCourses && application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED ? (
+      {canManageApplicationCourses ? (
         <EnrollmentApplicationCoursesManagement
           applicationId={application.applicationId}
           institutionId={institutionId ?? application.institutionId}
@@ -210,9 +228,7 @@ export function EnrollmentStatusCard({
         />
       ) : null}
 
-      {application.courses &&
-      application.courses.length > 0 &&
-      !(canManageCourses && application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED) ? (
+      {application.courses && application.courses.length > 0 && !canManageApplicationCourses ? (
         <EnrollmentApplicationCoursesManagement
           applicationId={application.applicationId}
           institutionId={institutionId ?? application.institutionId}
@@ -225,6 +241,17 @@ export function EnrollmentStatusCard({
         />
       ) : null}
 
+      {application.admissionHistory?.length ? (
+        <section className="space-y-3 rounded-xl border p-5">
+          <h2 className="font-semibold">Historial de inscripción</h2>
+          {application.admissionHistory.map((event) => (
+            <p key={event.id} className="text-sm">
+              {isEnrollmentApplicationStatus(event.status) ? getEnrollmentApplicationStatusLabel(event.status) : event.status} ·{" "}
+              {formatEnrollmentApplicationDateTime(event.occurredAt)}
+            </p>
+          ))}
+        </section>
+      ) : null}
       <div className="grid gap-4 xl:grid-cols-2">
         <DetailCard icon={UserRoundIcon} title="Datos personales y contacto" description="Información registrada al enviar la solicitud.">
           <dl className="grid gap-4 sm:grid-cols-2">
@@ -332,39 +359,9 @@ export function EnrollmentStatusCard({
           </dl>
         </DetailCard>
 
-        <DetailCard
-          className="xl:col-span-2"
-          icon={FileTextIcon}
-          title="Documentación presentada"
-          description={`${attachments.length} ${attachments.length === 1 ? "archivo adjunto" : "archivos adjuntos"}.`}
-        >
-          {attachments.length > 0 ? (
-            <div className="bg-background divide-y overflow-hidden rounded-xl border">
-              {attachments.map((attachment) => (
-                <div key={attachment.id} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{attachment.originalFileName}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {ENROLLMENT_DOCUMENT_TYPE_LABELS[attachment.attachmentType] || attachment.attachmentType}
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    className="shrink-0"
-                    onClick={() => window.open(getAttachmentDownloadUrl(application.applicationId, attachment.id, scope), "_blank")}
-                  >
-                    <ExternalLinkIcon />
-                    Abrir
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">No se adjuntaron documentos.</p>
-          )}
-        </DetailCard>
+        <div className="xl:col-span-2">
+          <EnrollmentDocuments key={application.updatedAt} application={application} scope={scope} />
+        </div>
       </div>
     </div>
   );

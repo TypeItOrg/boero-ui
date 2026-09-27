@@ -30,7 +30,9 @@ export function EnrollmentApplicationTableRow({
   detailHref,
 }: EnrollmentApplicationTableRowProps): React.ReactElement {
   const isPendingEvaluation = application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED;
-  const canResolve = isPendingEvaluation && (canApprove || canReject);
+  const canResolve =
+    (isPendingEvaluation || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) && (canApprove || canReject);
+  const showApprove = canResolve && canApprove && Boolean(application.canConfirm || application.canApproveProvisionally);
   const hasActions = Boolean(detailHref) || canResolve;
   const row = (
     <TableRow className="h-12">
@@ -55,12 +57,12 @@ export function EnrollmentApplicationTableRow({
                     </ReturnToLink>
                   </DropdownMenuItem>
                 ) : null}
-                {canResolve && canApprove ? (
+                {showApprove ? (
                   <DropdownMenuItem className="px-2.5 py-1.5" onSelect={() => onApprove(application)}>
-                    Aprobar inscripción
+                    {application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
                   </DropdownMenuItem>
                 ) : null}
-                {canResolve && canReject ? (
+                {isPendingEvaluation && canReject ? (
                   <>
                     {detailHref || canApprove ? <DropdownMenuSeparator /> : null}
                     <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>
@@ -108,12 +110,12 @@ export function EnrollmentApplicationTableRow({
             </ReturnToLink>
           </ContextMenuItem>
         ) : null}
-        {canResolve && canApprove ? (
+        {showApprove ? (
           <ContextMenuItem className="px-2.5 py-1.5" onSelect={() => onApprove(application)}>
-            Aprobar inscripción
+            {application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
           </ContextMenuItem>
         ) : null}
-        {canResolve && canReject ? (
+        {isPendingEvaluation && canReject ? (
           <>
             {detailHref || canApprove ? <ContextMenuSeparator /> : null}
             <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onReject(application)}>

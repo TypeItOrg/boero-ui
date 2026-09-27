@@ -120,6 +120,8 @@ export function EnrollmentApplicationTablePresentation({
           application={{
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
+            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
+            canConfirm: applicationToApprove.canConfirm,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
             studyPlanName: applicationToApprove.studyPlanName
               ? formatStudyPlanLabel(applicationToApprove)
@@ -134,6 +136,8 @@ export function EnrollmentApplicationTablePresentation({
           application={{
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
+            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
+            canConfirm: applicationToApprove.canConfirm,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
             studyPlanName: applicationToApprove.studyPlanName
               ? formatStudyPlanLabel(applicationToApprove)

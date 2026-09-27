@@ -35,7 +35,7 @@ export function PlatformEnrollmentApplicationApproveDialog({
 }: PlatformEnrollmentApplicationApproveDialogProps): React.ReactElement {
   const [state, formAction, isPending] = React.useActionState(async (): Promise<EnrollmentApplicationActionState> => {
     const result = await safelyRunAction(
-      approvePlatformEnrollmentApplicationAction(application.institutionId, application.applicationId),
+      approvePlatformEnrollmentApplicationAction(application.institutionId, application.applicationId, application.canApproveProvisionally === true),
       ENROLLMENT_MESSAGES.APPROVE,
     );
 
@@ -62,10 +62,15 @@ export function PlatformEnrollmentApplicationApproveDialog({
             <div className={cn("mb-1 flex size-12 items-center justify-center rounded-2xl", "bg-emerald-500/10 text-emerald-600")}>
               <UserCheckIcon className="size-6" />
             </div>
-            <AlertDialogTitle>Aprobar inscripción</AlertDialogTitle>
+            <AlertDialogTitle>
+              {application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Vas a aprobar la inscripción de <span className="text-foreground font-semibold">{application.applicantName}</span>. La persona quedará
-              registrada como estudiante de la institución. Después podrás gestionar la asignación de sus cursos.
+              {application.canApproveProvisionally ? "Vas a admitir provisoriamente a " : "Vas a confirmar definitivamente la inscripción de "}
+              <span className="text-foreground font-semibold">{application.applicantName}</span>.
+              {application.canApproveProvisionally
+                ? " Podrá continuar con su incorporación a cursos y completar la documentación pendiente."
+                : " Todos los documentos obligatorios están aceptados."}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -81,7 +86,7 @@ export function PlatformEnrollmentApplicationApproveDialog({
               Cancelar
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
-              {isPending ? "Aprobando…" : "Aprobar inscripción"}
+              {isPending ? "Aprobando…" : application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
             </Button>
           </AlertDialogFooter>
         </form>
