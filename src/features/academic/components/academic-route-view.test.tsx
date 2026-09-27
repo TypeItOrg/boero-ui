@@ -1,3 +1,8 @@
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+
 import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 
@@ -17,12 +22,16 @@ import {
   fetchStudyPlan,
   fetchStudyPlanCurriculum,
   fetchTrainingPath,
+  fetchTrainingPathForStudyPlanCreation,
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/services/academic-api-fetch.service", () => ({ academicApiFetch: jest.fn() }));
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({ requireInstitutionalUser: jest.fn() }));
 
 jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicSpace: jest.fn(),
@@ -32,6 +41,7 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchStudyPlan: jest.fn(),
   fetchStudyPlanCurriculum: jest.fn(),
   fetchTrainingPath: jest.fn(),
+  fetchTrainingPathForStudyPlanCreation: jest.fn(),
   fetchTrainingPaths: jest.fn(),
 }));
 jest.mock("@features/academic/components/training-path-study-plans", () => ({
@@ -45,6 +55,19 @@ const INSTRUMENT_ID = "3b9ec931-453c-4778-86a9-dc40a06d0247";
 const SHIFT_ID = "5c9ec931-453c-4778-86a9-dc40a06d0247";
 const ACADEMIC_SPACE_ID = "4c9ec931-453c-4778-86a9-dc40a06d0247";
 const LEVEL_ID = "a755b72b-04b7-4255-8bca-243f391155cc";
+
+const USER: InstitutionalUser = {
+  userId: "user-1",
+  name: "Ana",
+  lastName: "Garcia",
+  documentNumber: "12345678",
+  institutionId: INSTITUTION_ID,
+  roles: [],
+  permissions: Object.values(INSTITUTIONAL_PERMISSION),
+  permissionScopes: Object.fromEntries(
+    Object.values(INSTITUTIONAL_PERMISSION).map((permission) => [permission, { accessScope: "INSTITUTION", trainingPathIds: [] }]),
+  ),
+};
 
 const STUDY_PLAN = {
   id: STUDY_PLAN_ID,
@@ -113,6 +136,9 @@ const ACADEMIC_SPACE_USAGE: AcademicSpaceUsage = {
 
 describe("AcademicRouteView", () => {
   beforeEach(() => {
+    jest.mocked(academicApiFetch).mockResolvedValue(new Response(JSON.stringify([]), { status: 200 }));
+    jest.mocked(requireInstitutionalUser).mockResolvedValue(USER);
+    jest.mocked(fetchTrainingPathForStudyPlanCreation).mockResolvedValue(TRAINING_PATH);
     jest.mocked(fetchStudyPlan).mockResolvedValue(STUDY_PLAN);
     jest.mocked(fetchAcademicSpace).mockResolvedValue(ACADEMIC_SPACE);
     jest.mocked(fetchAcademicSpaceUsage).mockResolvedValue(ACADEMIC_SPACE_USAGE);
@@ -213,7 +239,7 @@ describe("AcademicRouteView", () => {
     ).rejects.toThrow("NEXT_HTTP_ERROR_FALLBACK;404");
   });
 
-  it("shows only the study plan name in the detail header", async () => {
+  it("shows the contextual training path and plan name in the detail header", async () => {
     const result = await AcademicRouteView({
       access: FULL_ACADEMIC_ACCESS,
       institutionId: INSTITUTION_ID,
@@ -223,7 +249,7 @@ describe("AcademicRouteView", () => {
       searchParams: {},
     });
 
-    expect(result).toHaveProperty("props.title", "Plan 2026");
+    expect(result).toHaveProperty("props.title", "Profesorado de Música · Plan 2026");
 
     render(result);
 
@@ -288,6 +314,13 @@ describe("AcademicRouteView", () => {
   });
 
   it("shows the training-path status action without the edit permission", async () => {
+    jest.mocked(requireInstitutionalUser).mockResolvedValueOnce({
+      ...USER,
+      permissionScopes: {
+        ...USER.permissionScopes,
+        [INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE]: { accessScope: "TRAINING_PATHS", trainingPathIds: [] },
+      },
+    });
     const result = await AcademicRouteView({
       access: { ...FULL_ACADEMIC_ACCESS, trainingPathUpdate: false, trainingPathStatusUpdate: true },
       institutionId: INSTITUTION_ID,
@@ -371,7 +404,7 @@ describe("AcademicRouteView", () => {
     expect(renderBreadcrumb).toHaveBeenLastCalledWith({
       hiddenSegments: [AcademicResource.ACADEMIC_LEVEL, LEVEL_ID],
       segmentLabels: {
-        [STUDY_PLAN_ID]: "Plan 2026",
+        [STUDY_PLAN_ID]: "Profesorado de Música · Plan 2026",
         [ACADEMIC_ROUTE_SEGMENT.EDIT]: "Editar Nivel 1",
       },
     });

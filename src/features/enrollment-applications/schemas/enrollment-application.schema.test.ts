@@ -51,7 +51,12 @@ describe("enrollment-application.schema", () => {
     it("validates academicBackgroundSchema", () => {
       expect(
         academicBackgroundSchema.safeParse({
-          secondarySchool: "Colegio Nacional",
+          schoolOrigin: "Colegio Nacional",
+          currentlyStudying: false,
+          educationLevel: "SECONDARY",
+          currentGradeYear: null,
+          levelCompleted: null,
+          secondaryDegreeTitle: null,
           secondaryCompleted: true,
         }).success,
       ).toBe(true);
@@ -89,6 +94,13 @@ describe("enrollment-application.schema", () => {
   });
 
   describe("enrollmentApplicationSubmissionSchema (conditional rules)", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date("2026-09-26T12:00:00Z"));
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
     const baseValidAdult = {
       personalData: {
         firstName: "Ana",
@@ -99,7 +111,10 @@ describe("enrollment-application.schema", () => {
         email: "ana@example.com",
       },
       academicBackground: {
-        secondarySchool: "Instituto San José",
+        schoolOrigin: "Instituto San José",
+        currentlyStudying: false,
+        educationLevel: "SECONDARY",
+        levelCompleted: null,
         currentGradeYear: "2013",
         secondaryCompleted: true,
         secondaryDegreeTitle: "Bachiller",
@@ -115,9 +130,9 @@ describe("enrollment-application.schema", () => {
         isReenrolling: false,
       },
       attachments: [
-        { id: "1", attachmentType: "DNI_FRONT", originalFileName: "dni-frente.jpg" },
-        { id: "2", attachmentType: "DNI_BACK", originalFileName: "dni-dorso.jpg" },
-        { id: "3", attachmentType: "PHOTO_ID", originalFileName: "foto.jpg" },
+        { id: "1", requirementId: "00000000-0000-4000-8000-000000000001", originalFileName: "dni-frente.jpg" },
+        { id: "2", requirementId: "00000000-0000-4000-8000-000000000002", originalFileName: "dni-dorso.jpg" },
+        { id: "3", requirementId: "00000000-0000-4000-8000-000000000003", originalFileName: "foto.jpg" },
       ],
     };
 
@@ -166,7 +181,7 @@ describe("enrollment-application.schema", () => {
       expect(result.success).toBe(true);
     });
 
-    it("requires health report attachment and support details if receivesReasonableAdjustments is true", () => {
+    it("requires support details if receivesReasonableAdjustments is true", () => {
       const healthSupportData = {
         ...baseValidAdult,
         healthInclusion: {

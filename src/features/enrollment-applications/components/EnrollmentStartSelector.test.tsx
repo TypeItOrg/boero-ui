@@ -28,7 +28,7 @@ describe("EnrollmentStartSelector", () => {
 
   it("shows an informative message when there are no courses available", () => {
     const { container } = render(<EnrollmentStartSelector studyPlans={[]} periods={periods} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no hay cursos a los que te puedas inscribir/i);
+    expect(container).toHaveTextContent(/no hay trayectos disponibles/i);
   });
 
   it("shows the plain training path name when it matches the option name", () => {
@@ -39,11 +39,14 @@ describe("EnrollmentStartSelector", () => {
         onStart={jest.fn()}
       />,
     );
-    expect(screen.getByRole("combobox", { name: /trayecto formativo/i })).toHaveTextContent("CAV Básico");
+    expect(screen.getByRole("radio", { name: "CAV Básico" })).toBeChecked();
   });
 
-  it("shows an informative message when there are no open enrollment periods", () => {
-    const { container } = render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no hay períodos de inscripción abiertos/i);
+  it("starts from offered training paths without requiring the legacy period list", () => {
+    const onStart = jest.fn();
+    render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={onStart} />);
+    fireEvent.click(screen.getByRole("radio", { name: "Canto — Instrumento" }));
+    fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
+    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-2" });
   });
 });

@@ -47,12 +47,12 @@ describe("CourseEnrollmentAssignmentFields", () => {
   it("shows the teachers of the selected class and updates them when the class changes", () => {
     render(<CourseEnrollmentAssignmentFields options={OPTIONS} />);
 
-    expect(screen.getByText(/Dictan esta clase: Ana Garcia, Luis Perez/)).toBeInTheDocument();
+    expect(screen.getByText(/Docentes: Ana Garcia, Luis Perez/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("combobox", { name: /clase/i }));
     fireEvent.click(screen.getByRole("option", { name: /Clase 2/ }));
 
-    expect(screen.getByText(/Dictan esta clase: Maria Lopez/)).toBeInTheDocument();
+    expect(screen.getByText(/Docentes: Maria Lopez/)).toBeInTheDocument();
   });
 
   it("reveals schedule and period selects only for checked days", () => {

@@ -83,7 +83,15 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
       phoneNumber: "3534999888",
       email: "lucas@example.com",
     },
-    academicBackground: { secondarySchool: "Colegio Nacional", secondaryCompleted: true },
+    academicBackground: {
+      currentlyStudying: false,
+      educationLevel: "SECONDARY",
+      schoolOrigin: "Colegio Nacional",
+      currentGradeYear: null,
+      levelCompleted: null,
+      secondaryCompleted: true,
+      secondaryDegreeTitle: null,
+    },
     healthInclusion: { receivesReasonableAdjustments: false },
     responsible: {},
     preference: { preferredShift: "MORNING", allowsImageUse: true, isReenrolling: false },
@@ -132,7 +140,12 @@ describe("EnrollmentWizard", () => {
 
     await screen.findByLabelText(/^nombre/i);
     await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    const schoolInput = await screen.findByLabelText(/colegio secundario/i);
+    await userEvent.click(screen.getByRole("combobox", { name: /actualmente asistís/i }));
+    await userEvent.click(screen.getByRole("option", { name: "Sí" }));
+    await userEvent.click(screen.getByRole("combobox", { name: /nivel educativo actual/i }));
+    await userEvent.click(screen.getByRole("option", { name: /secundari/i }));
+    const schoolInput = await screen.findByLabelText(/institución educativa actual/i);
+    updateAction.mockClear();
 
     jest.useFakeTimers();
     try {
@@ -147,7 +160,7 @@ describe("EnrollmentWizard", () => {
 
     await waitFor(() => expect(updateAction).toHaveBeenCalled());
     const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-    expect(payload.data.academicBackground?.secondarySchool).toBe("Colegio Nacional");
+    expect(payload.data.academicBackground?.schoolOrigin).toBe("Colegio Nacional");
   });
 
   it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
@@ -237,7 +250,7 @@ describe("EnrollmentWizard", () => {
     renderWizard({ initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } } });
     await screen.findByLabelText(/^nombre/i);
     await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    fireEvent.change(screen.getByLabelText(/colegio secundario/i), { target: { value: "Otro colegio" } });
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Otro colegio" } });
     await waitFor(() => expect(updateAction).toHaveBeenCalled(), { timeout: 3000 });
     expect(updateAction.mock.calls.at(-1)?.[1].data.courses).toEqual(courses);
   });

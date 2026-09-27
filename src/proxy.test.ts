@@ -47,8 +47,12 @@ describe("proxy", () => {
     expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url: pathname })).toBe(true);
   });
 
-  it.each(["/api/health", "/api/countries"])("does not run for the public API route %s", (pathname) => {
-    expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url: pathname })).toBe(false);
+  it.each(["/api/health", "/api/countries"])("matches but allows the public API route %s without authentication", async (pathname) => {
+    expect(unstable_doesMiddlewareMatch({ config, nextConfig: {}, url: pathname })).toBe(true);
+    const response = await proxy(createRequest(pathname, ""));
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("location")).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("allows admin routes when an access token cookie is present", async () => {

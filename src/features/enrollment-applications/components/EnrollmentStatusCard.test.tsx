@@ -62,7 +62,10 @@ describe("EnrollmentStatusCard", () => {
         email: "lucas@example.com",
       },
       academicBackground: {
-        secondarySchool: "Colegio Nacional",
+        schoolOrigin: "Colegio Nacional",
+        currentlyStudying: false,
+        educationLevel: "SECONDARY",
+        levelCompleted: null,
         secondaryCompleted: true,
         currentGradeYear: "2020",
         secondaryDegreeTitle: "Bachiller",

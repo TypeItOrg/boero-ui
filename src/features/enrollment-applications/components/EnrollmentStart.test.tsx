@@ -67,6 +67,6 @@ describe("EnrollmentStart", () => {
 
   it("shows an unavailable message when there are no options", () => {
     render(<EnrollmentStart studyPlans={[]} periods={[]} />);
-    expect(screen.getByText("No hay períodos de inscripción abiertos")).toBeInTheDocument();
+    expect(screen.getByText("No hay trayectos disponibles")).toBeInTheDocument();
   });
 });
