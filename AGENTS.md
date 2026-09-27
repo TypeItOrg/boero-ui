@@ -12,14 +12,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Use the installed Next guide when a framework API or convention is relevant to the change; content-only edits do not require a documentation tour. Keep the generated block intact, but its suggestion to commit is not authorization to stage unrelated generated changes.
 
-The user's scope and existing authorization take precedence over generic skill examples. Complete authorized work without repeated approval questions. Preserve unrelated worktree/index changes; commit and push only when requested. Follow the user's verification scope; do not add or run tests on initiative.
+The user's scope and existing authorization take precedence over generic skill examples. Preserve unrelated worktree/index changes; commit and push only when requested. Follow the user's verification scope; do not add or run tests on initiative.
+
+Finish the requested outcome, including authorized verification and fixes caused by the change, without stopping after a first draft or repeatedly asking for the same approval. Stop for an unresolved scope, data-loss or access decision. Distinguish source checks from browser-verified behavior and report blockers or unverified behavior explicitly.
 
 ## Environment availability
 
-Local development is available. Staging and production configurations are retained in `boero-infra`, but neither currently has a provisioned VPS. CI and image publication remain enabled; the automatic staging deployment job is explicitly disabled. Production deployment remains manual and must wait for infrastructure provisioning. Do not remove environment profiles or interpret configuration as evidence of a running environment.
+Local development belongs here; shared staging/production configuration and operations docs belong to `boero-infra`. For deployment work, consult those docs and this checkout's `.github/workflows/`; verify the target host before claiming a live environment. Retain environment configuration, but do not treat it or old provisioning notes as runtime evidence. Do not deploy or change deployment policy unless requested.
 
 ## Authentication refresh invariants
 
+- The proxy covers every `/api/*` route. New APIs use `/api/admin/*` for platform sessions, `/api/institutional/*` for institutional sessions, or `/api/public/*` for deliberate public access; other API paths default to institutional sessions. Keep existing public and query-scoped legacy compatibility in the centralized route-access policy, not feature-specific matcher entries. Route Handlers and the backend still enforce authorization.
 - Deduplicate in-flight refresh requests by refresh endpoint and refresh token. Concurrent requests using the same rotating token must share one backend call.
 - Treat frontend deduplication as an instance-local optimization. The backend replay cache is the cross-instance correctness boundary.
 - After a successful refresh, propagate the rotated access and refresh tokens to both the browser response cookies and the current upstream request cookies.
