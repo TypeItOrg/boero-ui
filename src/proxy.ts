@@ -7,7 +7,7 @@ import { institutionalAuthProxyPolicy } from "@features/institutional-auth/utils
 import { platformAuthProxyPolicy } from "@features/platform-auth/utils/platform-auth-proxy-policy.util";
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
-  switch (getRouteAccess(request.nextUrl.pathname)) {
+  switch (getRouteAccess(request.nextUrl.pathname, request.nextUrl.searchParams)) {
     case RouteAccess.AdminGuestOnly:
       return handleGuestOnlyRoute(request, platformAuthProxyPolicy);
     case RouteAccess.AdminSession:
@@ -22,10 +22,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: [
-    "/api/courses/:courseId/enrollment-options",
-    "/api/admin/:path*",
-    "/api/institutional/:path*",
-    "/((?!api|_next/static|_next/image|.*\\..*).*)",
-  ],
+  matcher: ["/api/:path*", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };
