@@ -22,3 +22,15 @@ export async function canMutateEnrollmentApplication(applicationId: string): Pro
 
   return application?.personId === workspaceId;
 }
+
+export async function canStartEnrollmentApplication(applicantPersonId: string | undefined): Promise<boolean> {
+  const user = await requireInstitutionalUser();
+
+  if (!isGuardian(user)) {
+    return true;
+  }
+
+  const workspaceId = await getGuardianWorkspaceId();
+
+  return Boolean(workspaceId && applicantPersonId === workspaceId);
+}

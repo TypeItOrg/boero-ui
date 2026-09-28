@@ -11,7 +11,10 @@ jest.mock("@features/guardian-workspace/utils/guardian-workspace-cookie.util", (
 }));
 
 import { fetchEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
-import { canMutateEnrollmentApplication } from "@features/enrollment-applications/utils/can-mutate-enrollment-application.util";
+import {
+  canMutateEnrollmentApplication,
+  canStartEnrollmentApplication,
+} from "@features/enrollment-applications/utils/can-mutate-enrollment-application.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
 
@@ -71,5 +74,19 @@ describe("canMutateEnrollmentApplication", () => {
     fetchApplicationMock.mockResolvedValue({ personId: ACTIVE_DEPENDENT_ID } as Awaited<ReturnType<typeof fetchEnrollmentApplicationById>>);
 
     await expect(canMutateEnrollmentApplication(APPLICATION_ID)).resolves.toBe(true);
+  });
+
+  it("rejects a guardian starting an application for another person", async () => {
+    requireUserMock.mockResolvedValue(institutionalUser(["Tutor"]));
+    getWorkspaceIdMock.mockResolvedValue(ACTIVE_DEPENDENT_ID);
+
+    await expect(canStartEnrollmentApplication(OTHER_DEPENDENT_ID)).resolves.toBe(false);
+  });
+
+  it("allows a guardian starting an application for the active workspace", async () => {
+    requireUserMock.mockResolvedValue(institutionalUser(["Tutor"]));
+    getWorkspaceIdMock.mockResolvedValue(ACTIVE_DEPENDENT_ID);
+
+    await expect(canStartEnrollmentApplication(ACTIVE_DEPENDENT_ID)).resolves.toBe(true);
   });
 });
