@@ -36,6 +36,13 @@ describe("EnrollmentApplicantSelector", () => {
     expect(screen.getByRole("link", { name: "Inscribirme a mí mismo" })).toHaveAttribute("aria-current", "true");
   });
 
+  it("hides the self option when hideSelf is set", () => {
+    render(<EnrollmentApplicantSelector dependents={DEPENDENTS} hideSelf selectedId="dep-1" />);
+
+    expect(screen.queryByRole("link", { name: "Inscribirme a mí mismo" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Mateo Gonzalez" })).toHaveAttribute("aria-current", "true");
+  });
+
   it("supports a custom destination, parameter and label for filtering lists", () => {
     render(
       <EnrollmentApplicantSelector

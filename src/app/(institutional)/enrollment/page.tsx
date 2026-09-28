@@ -16,7 +16,7 @@ import { parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { canManageDependents, canStartEnrollmentApplication } from "@features/institutional-auth/utils/institutional-applicant-role.util";
+import { canManageDependents, canStartEnrollmentApplication, isGuardian } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -55,12 +55,29 @@ export default async function EnrollmentPage({
   const dependents = canManageDependents(user) ? await fetchGuardianDependents(person.institutionId) : [];
   const dependentOptions = dependents.map((item) => ({ id: item.dependentPersonId, name: `${item.firstName} ${item.lastName}` }));
   // dependentId comes from the URL: only honor it when it belongs to one of this guardian's dependents.
-  const selectedDependent = dependents.find((item) => item.dependentPersonId === query.dependentId);
+  const guardianOnly = isGuardian(user);
+  // A guardian never applies for themself: default to their first dependent.
+  const selectedDependent =
+    dependents.find((item) => item.dependentPersonId === query.dependentId) ?? (guardianOnly && !query.dependentId ? dependents[0] : undefined);
+
+  if (guardianOnly && dependents.length === 0) {
+    return (
+      <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
+        <Alert>
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>Todavía no tenés personas a cargo</AlertTitle>
+          <AlertDescription>
+            Como tutor, solo podés inscribir a personas a tu cargo. Agregalas en <Link href="/my-dependents">Mis personas a cargo</Link>.
+          </AlertDescription>
+        </Alert>
+      </PlatformPageShell>
+    );
+  }
 
   if (query.dependentId && !selectedDependent) {
     return (
       <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
-        <EnrollmentApplicantSelector dependents={dependentOptions} />
+        <EnrollmentApplicantSelector dependents={dependentOptions} hideSelf={guardianOnly} />
         <Alert variant="destructive">
           <AlertCircleIcon className="size-4" />
           <AlertTitle>Persona no disponible</AlertTitle>
@@ -85,7 +102,7 @@ export default async function EnrollmentPage({
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
-      <EnrollmentApplicantSelector dependents={dependentOptions} selectedId={selectedDependent?.dependentPersonId} />
+      <EnrollmentApplicantSelector dependents={dependentOptions} hideSelf={guardianOnly} selectedId={selectedDependent?.dependentPersonId} />
       {selectedDependent && (
         <Alert>
           <AlertCircleIcon className="size-4" />

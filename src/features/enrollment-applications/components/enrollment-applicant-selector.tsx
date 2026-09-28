@@ -5,6 +5,8 @@ import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constant
 
 type EnrollmentApplicantSelectorProps = {
   allLabel?: string;
+  /** Hide the "myself" option, e.g. for guardians who can only apply for their dependents. */
+  hideSelf?: boolean;
   basePath?: string;
   paramName?: string;
   dependents: { id: string; name: string }[];
@@ -15,6 +17,7 @@ export function EnrollmentApplicantSelector({
   allLabel = "Inscribirme a mí mismo",
   basePath = ENROLLMENT_PAGE_PATH,
   dependents,
+  hideSelf = false,
   paramName = "dependentId",
   selectedId,
 }: EnrollmentApplicantSelectorProps): React.ReactElement | null {
@@ -24,7 +27,7 @@ export function EnrollmentApplicantSelector({
 
   return (
     <nav aria-label="Persona a inscribir" className="flex flex-wrap items-center gap-2">
-      <ApplicantLink href={basePath} isCurrent={!selectedId} label={allLabel} />
+      {!hideSelf && <ApplicantLink href={basePath} isCurrent={!selectedId} label={allLabel} />}
       {dependents.map((dependent) => (
         <ApplicantLink
           href={`${basePath}?${paramName}=${dependent.id}`}
