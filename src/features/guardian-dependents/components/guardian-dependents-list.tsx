@@ -15,7 +15,7 @@ import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/cons
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 
-type GuardianDependentsListProps = { dependents: GuardianDependent[]; institutionId: string };
+type GuardianDependentsListProps = { dependents: GuardianDependent[]; institutionId: string; initialSearch?: string };
 
 const ADD_LABEL = "Agregar persona a cargo";
 
@@ -32,10 +32,10 @@ function matchesSearch(dependent: GuardianDependent, search: string): boolean {
   return normalize(`${dependent.firstName} ${dependent.lastName}`).includes(term) || dependent.documentNumber.includes(term);
 }
 
-export function GuardianDependentsList({ dependents, institutionId }: GuardianDependentsListProps): React.ReactElement {
+export function GuardianDependentsList({ dependents, institutionId, initialSearch = "" }: GuardianDependentsListProps): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dependentToUnlink, setDependentToUnlink] = useState<GuardianDependent | null>(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const visibleDependents = dependents.filter((dependent) => matchesSearch(dependent, search));
 
   return (

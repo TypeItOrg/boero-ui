@@ -83,6 +83,18 @@ describe("GuardianDependentsList", () => {
     expect(screen.queryByText("Sofía Pérez")).not.toBeInTheDocument();
   });
 
+  it("starts filtered when an initial search is provided", () => {
+    const dependents = [
+      buildDependent(),
+      buildDependent({ personGuardianId: "g2", dependentPersonId: "d2", firstName: "Sofía", lastName: "Pérez", documentNumber: "87654321" }),
+    ];
+    render(<GuardianDependentsList dependents={dependents} initialSearch="87654321" institutionId={INSTITUTION_ID} />);
+
+    expect(screen.getByRole("textbox", { name: "Buscar por nombre o DNI" })).toHaveValue("87654321");
+    expect(screen.getByText("Sofía Pérez")).toBeInTheDocument();
+    expect(screen.queryByText("Mateo Gonzalez")).not.toBeInTheDocument();
+  });
+
   it("shows a no-results message and can clear the search", async () => {
     const user = userEvent.setup();
     render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);

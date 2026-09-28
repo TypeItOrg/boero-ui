@@ -15,18 +15,24 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Mis personas a cargo");
 }
 
-export default async function MyDependentsPage(): Promise<React.ReactElement> {
+const MAX_SEARCH_LENGTH = 100;
+
+type MyDependentsPageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+export default async function MyDependentsPage({ searchParams }: MyDependentsPageProps): Promise<React.ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!canManageDependents(user)) {
     return <InstitutionalAccessDenied description="No tenés permisos para gestionar personas a cargo." />;
   }
 
+  const { search } = await searchParams;
+  const initialSearch = typeof search === "string" ? search.trim().slice(0, MAX_SEARCH_LENGTH) : "";
   const dependents = await fetchGuardianDependents(user.institutionId);
 
   return (
     <PlatformPageShell title="Mis personas a cargo" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UsersIcon} />}>
-      <GuardianDependentsList dependents={dependents} institutionId={user.institutionId} />
+      <GuardianDependentsList key={initialSearch} dependents={dependents} initialSearch={initialSearch} institutionId={user.institutionId} />
     </PlatformPageShell>
   );
 }

@@ -2,6 +2,7 @@ import type { AcademicContextualSearchEntity } from "@features/contextual-search
 import type { ContextualSearchEntity } from "@features/contextual-search/types/contextual-search-entity.types";
 import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
 import { CONTEXTUAL_SEARCH_SCOPE, type ContextualSearchScope } from "@features/contextual-search/types/contextual-search-scope.types";
+import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import { parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
 
 const ACADEMIC_RESOURCE_BY_ENTITY: Record<AcademicContextualSearchEntity, string> = {
@@ -13,6 +14,8 @@ const ACADEMIC_RESOURCE_BY_ENTITY: Record<AcademicContextualSearchEntity, string
   course: "courses",
   shift: "shifts",
 };
+
+const PLATFORM_SCOPE_ERROR = (entityType: ContextualSearchEntity): string => `La entidad ${entityType} no pertenece a la búsqueda de plataforma.`;
 
 export function getContextualSearchResultHref(
   scope: ContextualSearchScope,
@@ -39,6 +42,8 @@ function getPlatformResultHref(entityType: ContextualSearchEntity, item: Context
       return `/admin/roles/${item.id}`;
     case "user":
       return `/admin/institutions/${getRequiredInstitutionId(item)}/people/${item.id}`;
+    case "guardian-dependent":
+      throw new Error(PLATFORM_SCOPE_ERROR(entityType));
     case "academic-year":
     case "training-path":
       return `/admin/institutions/${getRequiredInstitutionId(item)}/academic/${getAcademicResource(entityType)}/${item.id}/edit`;
@@ -55,6 +60,8 @@ function getInstitutionalResultHref(entityType: ContextualSearchEntity, item: Co
   switch (entityType) {
     case "user":
       return `/people/${item.id}`;
+    case "guardian-dependent":
+      return `${GUARDIAN_DEPENDENTS_PAGE_PATH}?${new URLSearchParams({ search: item.subtitle ?? item.title })}`;
     case "role":
       return `/roles/${item.id}`;
     case "academic-year":
@@ -80,6 +87,8 @@ function getPlatformCollectionHref(entityType: ContextualSearchEntity, searchPar
       return `/admin/accounts?${searchParams}`;
     case "user":
       return `/admin/people?${searchParams}`;
+    case "guardian-dependent":
+      throw new Error(PLATFORM_SCOPE_ERROR(entityType));
     case "role":
       return `/admin/roles?${searchParams}`;
     case "academic-year":
@@ -98,6 +107,8 @@ function getInstitutionalCollectionHref(entityType: ContextualSearchEntity, sear
   switch (entityType) {
     case "user":
       return `/people?${searchParams}`;
+    case "guardian-dependent":
+      return `${GUARDIAN_DEPENDENTS_PAGE_PATH}?${searchParams}`;
     case "role":
       return `/roles?${searchParams}`;
     case "academic-year": {

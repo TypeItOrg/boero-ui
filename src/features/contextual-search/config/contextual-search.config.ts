@@ -8,6 +8,7 @@ import {
   KeyRoundIcon,
   ShieldCheckIcon,
   UserRoundIcon,
+  UsersIcon,
   WrenchIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -33,6 +34,7 @@ export const CONTEXTUAL_SEARCH_PRESENTATION: Record<ContextualSearchEntity, Enti
   instrument: { singular: "Instrumento", plural: "Instrumentos", icon: WrenchIcon },
   course: { singular: "Curso", plural: "Cursos", icon: GraduationCapIcon },
   shift: { singular: "Turno", plural: "Turnos", icon: ClockIcon },
+  "guardian-dependent": { singular: "Persona a cargo", plural: "Personas a cargo", icon: UsersIcon },
 };
 
 export const CONTEXTUAL_SEARCH_STATUS_LABELS: Record<string, string> = {
