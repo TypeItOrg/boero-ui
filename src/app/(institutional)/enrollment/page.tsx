@@ -9,7 +9,6 @@ import { fetchAcademicOffers } from "@features/academic-offers/services/academic
 import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
-import { EnrollmentApplicantSelector } from "@features/enrollment-applications/components/enrollment-applicant-selector";
 import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
 import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
@@ -17,6 +16,8 @@ import { InstitutionalBreadcrumb } from "@features/institutional-auth/components
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { canManageDependents, canStartEnrollmentApplication, isGuardian } from "@features/institutional-auth/utils/institutional-applicant-role.util";
+import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+import { resolveGuardianWorkspaceDependent } from "@features/guardian-workspace/utils/resolve-guardian-workspace-dependent.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -53,12 +54,9 @@ export default async function EnrollmentPage({
   }
 
   const dependents = canManageDependents(user) ? await fetchGuardianDependents(person.institutionId) : [];
-  const dependentOptions = dependents.map((item) => ({ id: item.dependentPersonId, name: `${item.firstName} ${item.lastName}` }));
-  // dependentId comes from the URL: only honor it when it belongs to one of this guardian's dependents.
   const guardianOnly = isGuardian(user);
-  // A guardian never applies for themself: default to their first dependent.
-  const selectedDependent =
-    dependents.find((item) => item.dependentPersonId === query.dependentId) ?? (guardianOnly && !query.dependentId ? dependents[0] : undefined);
+  const workspaceId = guardianOnly ? await getGuardianWorkspaceId() : undefined;
+  const selectedDependent = resolveGuardianWorkspaceDependent(dependents, workspaceId);
 
   if (guardianOnly && dependents.length === 0) {
     return (
@@ -74,14 +72,13 @@ export default async function EnrollmentPage({
     );
   }
 
-  if (query.dependentId && !selectedDependent) {
+  if (guardianOnly && !selectedDependent) {
     return (
       <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
-        <EnrollmentApplicantSelector dependents={dependentOptions} hideSelf={guardianOnly} />
-        <Alert variant="destructive">
+        <Alert>
           <AlertCircleIcon className="size-4" />
-          <AlertTitle>Persona no disponible</AlertTitle>
-          <AlertDescription>La persona seleccionada no está a tu cargo. Elegí a quién inscribir de la lista.</AlertDescription>
+          <AlertTitle>Seleccioná una persona a cargo</AlertTitle>
+          <AlertDescription>Elegí una persona a cargo desde el selector de cuenta para iniciar su inscripción.</AlertDescription>
         </Alert>
       </PlatformPageShell>
     );
@@ -102,7 +99,6 @@ export default async function EnrollmentPage({
 
   return (
     <PlatformPageShell title="Nueva inscripción" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={ClipboardPlusIcon} />}>
-      <EnrollmentApplicantSelector dependents={dependentOptions} hideSelf={guardianOnly} selectedId={selectedDependent?.dependentPersonId} />
       {selectedDependent && (
         <Alert>
           <AlertCircleIcon className="size-4" />

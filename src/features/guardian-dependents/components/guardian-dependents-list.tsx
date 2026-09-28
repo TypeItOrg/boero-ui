@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { ClipboardPlusIcon, PhoneCallIcon, PlusIcon, SearchIcon, UserMinusIcon, UsersIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -10,6 +10,7 @@ import { EmptyMedia } from "@common/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
+import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
 import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
@@ -33,10 +34,22 @@ function matchesSearch(dependent: GuardianDependent, search: string): boolean {
 }
 
 export function GuardianDependentsList({ dependents, institutionId, initialSearch = "" }: GuardianDependentsListProps): React.ReactElement {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dependentToUnlink, setDependentToUnlink] = useState<GuardianDependent | null>(null);
   const [search, setSearch] = useState(initialSearch);
+  const [isSelectingWorkspace, startSelectingWorkspace] = useTransition();
   const visibleDependents = dependents.filter((dependent) => matchesSearch(dependent, search));
+
+  function handleEnrollment(dependentPersonId: string): void {
+    startSelectingWorkspace(async () => {
+      const result = await setGuardianWorkspaceAction(dependentPersonId);
+
+      if ("success" in result) {
+        router.push(ENROLLMENT_PAGE_PATH);
+      }
+    });
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,7 +63,12 @@ export function GuardianDependentsList({ dependents, institutionId, initialSearc
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {visibleDependents.map((dependent) => (
                 <li key={dependent.personGuardianId}>
-                  <DependentCard dependent={dependent} onUnlink={() => setDependentToUnlink(dependent)} />
+                  <DependentCard
+                    dependent={dependent}
+                    isSelectingWorkspace={isSelectingWorkspace}
+                    onEnroll={() => handleEnrollment(dependent.dependentPersonId)}
+                    onUnlink={() => setDependentToUnlink(dependent)}
+                  />
                 </li>
               ))}
             </ul>
@@ -132,7 +150,17 @@ function DependentField({ label, value }: { label: string; value: string }): Rea
   );
 }
 
-function DependentCard({ dependent, onUnlink }: { dependent: GuardianDependent; onUnlink: () => void }): React.ReactElement {
+function DependentCard({
+  dependent,
+  isSelectingWorkspace,
+  onEnroll,
+  onUnlink,
+}: {
+  dependent: GuardianDependent;
+  isSelectingWorkspace: boolean;
+  onEnroll: () => void;
+  onUnlink: () => void;
+}): React.ReactElement {
   const age = calculateAge(dependent.birthDate ?? undefined);
 
   return (
@@ -159,14 +187,15 @@ function DependentCard({ dependent, onUnlink }: { dependent: GuardianDependent; 
         </p>
       </CardContent>
       <CardFooter className="justify-end gap-2">
-        <Button asChild size="sm">
-          <Link
-            aria-label={`Inscribir a ${dependent.firstName} ${dependent.lastName}`}
-            href={`${ENROLLMENT_PAGE_PATH}?dependentId=${dependent.dependentPersonId}`}
-          >
-            <ClipboardPlusIcon aria-hidden="true" />
-            Inscribir
-          </Link>
+        <Button
+          aria-label={`Inscribir a ${dependent.firstName} ${dependent.lastName}`}
+          disabled={isSelectingWorkspace}
+          onClick={onEnroll}
+          size="sm"
+          type="button"
+        >
+          <ClipboardPlusIcon aria-hidden="true" />
+          Inscribir
         </Button>
         <Button aria-label={`Quitar a ${dependent.firstName} ${dependent.lastName}`} onClick={onUnlink} size="sm" type="button" variant="outline">
           <UserMinusIcon aria-hidden="true" />

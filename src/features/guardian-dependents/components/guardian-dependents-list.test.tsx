@@ -1,11 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
 jest.mock("@features/guardian-dependents/actions/create-guardian-dependent.action", () => ({
   createGuardianDependentAction: jest.fn(),
 }));
 jest.mock("@features/guardian-dependents/actions/unlink-guardian-dependent.action", () => ({
   unlinkGuardianDependentAction: jest.fn(),
+}));
+jest.mock("@features/guardian-workspace/actions/set-guardian-workspace.action", () => ({
+  setGuardianWorkspaceAction: jest.fn().mockResolvedValue({ success: true }),
 }));
 
 import { GuardianDependentsList } from "@features/guardian-dependents/components/guardian-dependents-list";
@@ -126,13 +132,15 @@ describe("GuardianDependentsList", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("links to the enrollment page for each dependent", () => {
+  it("selects the dependent workspace before starting enrollment", async () => {
+    const user = userEvent.setup();
+
     render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
 
-    expect(screen.getByRole("link", { name: "Inscribir a Mateo Gonzalez" })).toHaveAttribute(
-      "href",
-      "/enrollment?dependentId=019f9c3a-f891-7bc5-a98d-e65332998002",
-    );
+    await user.click(screen.getByRole("button", { name: "Inscribir a Mateo Gonzalez" }));
+
+    const { setGuardianWorkspaceAction } = await import("@features/guardian-workspace/actions/set-guardian-workspace.action");
+    expect(setGuardianWorkspaceAction).toHaveBeenCalledWith("019f9c3a-f891-7bc5-a98d-e65332998002");
   });
 
   it("opens the unlink confirmation for the chosen dependent and can dismiss it", async () => {

@@ -14,7 +14,12 @@ import {
   fetchEnrollmentApplicationTrainingPaths,
 } from "@features/enrollment-applications/services/enrollment-application.service";
 import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { isGuardian } from "@features/institutional-auth/utils/institutional-applicant-role.util";
+import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+import { resolveGuardianWorkspaceDependent } from "@features/guardian-workspace/utils/resolve-guardian-workspace-dependent.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -38,10 +43,24 @@ export default async function MyEnrollmentApplicationDetailPage({
 }: MyEnrollmentApplicationDetailPageProps): Promise<React.ReactElement> {
   const [{ applicationId }, { returnTo }] = await Promise.all([params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/my-enrollment-applications");
-  const application = await fetchEnrollmentApplicationById(applicationId).catch(() => null);
+  const user = await requireInstitutionalUser();
+  const guardian = isGuardian(user);
+  const [application, dependents, workspaceId] = await Promise.all([
+    fetchEnrollmentApplicationById(applicationId).catch(() => null),
+    guardian ? fetchGuardianDependents(user.institutionId) : Promise.resolve([]),
+    guardian ? getGuardianWorkspaceId() : Promise.resolve(undefined),
+  ]);
 
   if (!application) {
     notFound();
+  }
+
+  if (guardian) {
+    const selectedDependent = resolveGuardianWorkspaceDependent(dependents, workspaceId);
+
+    if (!selectedDependent || application.personId !== selectedDependent.dependentPersonId) {
+      notFound();
+    }
   }
 
   const isEditable = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
