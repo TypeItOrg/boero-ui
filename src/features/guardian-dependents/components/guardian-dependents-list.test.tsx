@@ -34,16 +34,26 @@ describe("GuardianDependentsList", () => {
     render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
 
     expect(screen.getByText("Mateo Gonzalez")).toBeInTheDocument();
-    expect(screen.getByText(/12345678/)).toBeInTheDocument();
+    expect(screen.getByText("DNI")).toBeInTheDocument();
+    expect(screen.getByText("12345678")).toBeInTheDocument();
+    expect(screen.getByText("Edad")).toBeInTheDocument();
+    expect(screen.getByText("8 años")).toBeInTheDocument();
+    expect(screen.getByText("Tu vínculo")).toBeInTheDocument();
     expect(screen.getByText("Madre")).toBeInTheDocument();
-    expect(screen.getByText("Contacto principal")).toBeInTheDocument();
+    expect(screen.getByText("Sos su contacto principal")).toBeInTheDocument();
     expect(screen.getByText(/2 inscripciones activas/)).toBeInTheDocument();
+  });
+
+  it("omits the primary contact line when the guardian is not the primary contact", () => {
+    render(<GuardianDependentsList dependents={[buildDependent({ isPrimaryContact: false })]} institutionId={INSTITUTION_ID} />);
+
+    expect(screen.queryByText("Sos su contacto principal")).not.toBeInTheDocument();
   });
 
   it("shows a dash when the birth date is unknown", () => {
     render(<GuardianDependentsList dependents={[buildDependent({ birthDate: null })]} institutionId={INSTITUTION_ID} />);
 
-    expect(screen.getByText(/Edad: —/)).toBeInTheDocument();
+    expect(screen.getByText("Edad").nextElementSibling).toHaveTextContent("—");
   });
 
   it("renders the empty state when there are no dependents", () => {
@@ -52,6 +62,36 @@ describe("GuardianDependentsList", () => {
     expect(
       screen.getByText("Todavía no tenés ningún estudiante a cargo registrado. Agregá a tu primer hijo para comenzar sus inscripciones."),
     ).toBeInTheDocument();
+  });
+
+  it("filters dependents by name (ignoring case and accents) or DNI", async () => {
+    const user = userEvent.setup();
+    const dependents = [
+      buildDependent(),
+      buildDependent({ personGuardianId: "g2", dependentPersonId: "d2", firstName: "Sofía", lastName: "Pérez", documentNumber: "87654321" }),
+    ];
+    render(<GuardianDependentsList dependents={dependents} institutionId={INSTITUTION_ID} />);
+    const search = screen.getByRole("textbox", { name: "Buscar por nombre o DNI" });
+
+    await user.type(search, "sofia");
+    expect(screen.queryByText("Mateo Gonzalez")).not.toBeInTheDocument();
+    expect(screen.getByText("Sofía Pérez")).toBeInTheDocument();
+
+    await user.clear(search);
+    await user.type(search, "1234");
+    expect(screen.getByText("Mateo Gonzalez")).toBeInTheDocument();
+    expect(screen.queryByText("Sofía Pérez")).not.toBeInTheDocument();
+  });
+
+  it("shows a no-results message and can clear the search", async () => {
+    const user = userEvent.setup();
+    render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
+
+    await user.type(screen.getByRole("textbox", { name: "Buscar por nombre o DNI" }), "zzz");
+    expect(screen.getByText("No encontramos personas a cargo que coincidan con tu búsqueda.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Limpiar búsqueda" }));
+    expect(screen.getByText("Mateo Gonzalez")).toBeInTheDocument();
   });
 
   it("opens the creation dialog from the header button", async () => {

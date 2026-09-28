@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ClipboardPlusIcon, PlusIcon, UserMinusIcon, UsersIcon } from "lucide-react";
+import { ClipboardPlusIcon, PhoneCallIcon, PlusIcon, SearchIcon, UserMinusIcon, UsersIcon, XIcon } from "lucide-react";
 
-import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { EmptyMedia } from "@common/components/ui/empty";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
 import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
@@ -19,24 +19,46 @@ type GuardianDependentsListProps = { dependents: GuardianDependent[]; institutio
 
 const ADD_LABEL = "Agregar persona a cargo";
 
+function normalize(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
+function matchesSearch(dependent: GuardianDependent, search: string): boolean {
+  const term = normalize(search.trim());
+
+  return normalize(`${dependent.firstName} ${dependent.lastName}`).includes(term) || dependent.documentNumber.includes(term);
+}
+
 export function GuardianDependentsList({ dependents, institutionId }: GuardianDependentsListProps): React.ReactElement {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dependentToUnlink, setDependentToUnlink] = useState<GuardianDependent | null>(null);
+  const [search, setSearch] = useState("");
+  const visibleDependents = dependents.filter((dependent) => matchesSearch(dependent, search));
 
   return (
     <div className="flex flex-col gap-6">
       {dependents.length > 0 ? (
         <>
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SearchInput value={search} onChange={setSearch} />
             <AddButton onClick={() => setIsDialogOpen(true)} />
           </div>
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {dependents.map((dependent) => (
-              <li key={dependent.personGuardianId}>
-                <DependentCard dependent={dependent} onUnlink={() => setDependentToUnlink(dependent)} />
-              </li>
-            ))}
-          </ul>
+          {visibleDependents.length > 0 ? (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {visibleDependents.map((dependent) => (
+                <li key={dependent.personGuardianId}>
+                  <DependentCard dependent={dependent} onUnlink={() => setDependentToUnlink(dependent)} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground bg-muted/25 rounded-lg border px-4 py-10 text-center text-sm">
+              No encontramos personas a cargo que coincidan con tu búsqueda.
+            </p>
+          )}
         </>
       ) : (
         <div className="bg-muted/25 text-muted-foreground flex flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
@@ -68,12 +90,45 @@ export function GuardianDependentsList({ dependents, institutionId }: GuardianDe
   );
 }
 
+function SearchInput({ value, onChange }: { value: string; onChange: (value: string) => void }): React.ReactElement {
+  return (
+    <InputGroup className="h-9 w-full sm:max-w-sm">
+      <InputGroupAddon align="inline-start">
+        <SearchIcon aria-hidden="true" className="text-muted-foreground size-4 shrink-0" />
+      </InputGroupAddon>
+      <InputGroupInput
+        aria-label="Buscar por nombre o DNI"
+        maxLength={100}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Buscar por nombre o DNI"
+        value={value}
+      />
+      {value.length > 0 ? (
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton aria-label="Limpiar búsqueda" onClick={() => onChange("")} size="icon-sm" type="button">
+            <XIcon aria-hidden="true" />
+          </InputGroupButton>
+        </InputGroupAddon>
+      ) : null}
+    </InputGroup>
+  );
+}
+
 function AddButton({ onClick }: { onClick: () => void }): React.ReactElement {
   return (
     <Button onClick={onClick} type="button">
       <PlusIcon aria-hidden="true" />
       {ADD_LABEL}
     </Button>
+  );
+}
+
+function DependentField({ label, value }: { label: string; value: string }): React.ReactElement {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt className="text-muted-foreground text-xs">{label}</dt>
+      <dd className="text-foreground text-sm font-medium">{value}</dd>
+    </div>
   );
 }
 
@@ -87,14 +142,19 @@ function DependentCard({ dependent, onUnlink }: { dependent: GuardianDependent; 
           {dependent.firstName} {dependent.lastName}
         </CardTitle>
       </CardHeader>
-      <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-        <p>DNI: {dependent.documentNumber}</p>
-        <p>Edad: {age ?? "—"}</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{GUARDIAN_RELATIONSHIP_LABELS[dependent.relationship]}</Badge>
-          {dependent.isPrimaryContact ? <Badge variant="outline">Contacto principal</Badge> : null}
-        </div>
-        <p>
+      <CardContent className="flex flex-col gap-4 text-sm">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+          <DependentField label="DNI" value={dependent.documentNumber} />
+          <DependentField label="Edad" value={age === null || age === undefined ? "—" : `${age} años`} />
+          <DependentField label="Tu vínculo" value={GUARDIAN_RELATIONSHIP_LABELS[dependent.relationship]} />
+        </dl>
+        {dependent.isPrimaryContact ? (
+          <p className="text-primary flex items-center gap-1.5 text-xs font-medium">
+            <PhoneCallIcon aria-hidden="true" className="size-3.5" />
+            Sos su contacto principal
+          </p>
+        ) : null}
+        <p className={dependent.activeApplicationsCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}>
           {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
         </p>
       </CardContent>
