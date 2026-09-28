@@ -12,6 +12,12 @@ export function isGuardian(user: InstitutionalUser): boolean {
   return user.roles.includes(GUARDIAN_ROLE_NAME);
 }
 
+export function canViewAcademicNavigation(user: InstitutionalUser): boolean {
+  const hasStaffRole = user.roles.some((role) => INSTITUTIONAL_STAFF_ROLE_NAMES.has(role));
+
+  return hasStaffRole || !isGuardian(user);
+}
+
 export function canManageDependents(user: InstitutionalUser): boolean {
   return hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE);
 }

@@ -100,6 +100,37 @@ describe("getInstitutionalNavigationSections", () => {
     ]);
   });
 
+  it("hides academic navigation for guardians while keeping enrollment access", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Tutor"],
+      permissions: [
+        INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ,
+        INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ,
+        INSTITUTIONAL_PERMISSION.STUDY_PLAN_READ,
+        INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE,
+      ],
+    });
+
+    expect(sections.find((section) => section.label === "Académico")).toBeUndefined();
+    expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
+      expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
+      expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
+    ]);
+  });
+
+  it("keeps academic navigation for staff users with a guardian role", () => {
+    const sections = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Tutor", "Administrador Institucional"],
+      permissions: [INSTITUTIONAL_PERMISSION.STUDY_PLAN_READ],
+    });
+
+    expect(sections.find((section) => section.label === "Académico")?.items).toEqual([
+      expect.objectContaining({ title: "Planes de estudio", url: "/study-plans" }),
+    ]);
+  });
+
   it("lists the dependents page under Personal, after Cuenta, for users who can manage dependents", () => {
     const sections = getInstitutionalNavigationSections({
       ...USER,
