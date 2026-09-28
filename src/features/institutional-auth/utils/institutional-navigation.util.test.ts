@@ -100,16 +100,17 @@ describe("getInstitutionalNavigationSections", () => {
     ]);
   });
 
-  it("lists the dependents page first for users who can manage dependents", () => {
+  it("lists the dependents page under Personal, after Cuenta, for users who can manage dependents", () => {
     const sections = getInstitutionalNavigationSections({
       ...USER,
       roles: ["Tutor"],
       permissions: [INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE],
     });
 
-    expect(sections.find((section) => section.label === "Inscripciones")?.items[0]).toEqual(
+    expect(sections.find((section) => section.label === "Personal")?.items).toEqual([
+      expect.objectContaining({ title: "Cuenta", url: "/account" }),
       expect.objectContaining({ title: "Mis personas a cargo", url: "/my-dependents" }),
-    );
+    ]);
   });
 
   it("hides the dependents page without the manage permission", () => {
