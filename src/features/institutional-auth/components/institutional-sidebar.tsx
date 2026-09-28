@@ -17,6 +17,7 @@ import {
 } from "@common/components/ui/dropdown-menu";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@common/components/ui/sidebar";
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
+import { GuardianWorkspaceMenuItems } from "@features/guardian-workspace/components/guardian-workspace-selector";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
@@ -81,6 +82,8 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                     <span className="text-muted-foreground block truncate text-xs font-normal">{user.documentNumber}</span>
                   </span>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <GuardianWorkspaceMenuItems />
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
