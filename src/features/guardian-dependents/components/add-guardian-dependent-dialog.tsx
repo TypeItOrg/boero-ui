@@ -4,6 +4,7 @@ import { startTransition, useActionState, useState, type SyntheticEvent } from "
 import { AlertCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
+import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { DatePicker } from "@common/components/ui/date-picker";
@@ -12,6 +13,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui
 import { Input } from "@common/components/ui/input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 import { createGuardianDependentAction } from "@features/guardian-dependents/actions/create-guardian-dependent.action";
 import { GUARDIAN_DEPENDENT_MESSAGES, GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependentActionState } from "@features/guardian-dependents/types/guardian-dependent-action-state.types";
@@ -38,6 +40,7 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
     }
   }, {});
   const [birthDate, setBirthDate] = useState<Date>();
+  const age = calculateAge(birthDate);
   const [relationship, setRelationship] = useState("");
   const [isPrimaryContact, setIsPrimaryContact] = useState(false);
 
@@ -116,9 +119,16 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
             </Field>
 
             <Field data-invalid={!!state.fieldErrors?.birthDate}>
-              <FieldLabel htmlFor="dependent-birth-date" required>
-                Fecha de nacimiento
-              </FieldLabel>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <FieldLabel htmlFor="dependent-birth-date" required>
+                  Fecha de nacimiento
+                </FieldLabel>
+                {age === null ? null : (
+                  <Badge variant="outline" size="lg" className="w-full justify-center sm:w-auto">
+                    {age === 1 ? "1 año" : `${age} años`}
+                  </Badge>
+                )}
+              </div>
               <input name="birthDate" type="hidden" value={formatBirthDateInput(birthDate)} />
               <DatePicker
                 aria-invalid={!!state.fieldErrors?.birthDate}

@@ -30,6 +30,7 @@ describe("AddGuardianDependentDialog", () => {
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
 
     await fillForm(user);
+    expect(screen.getByText(`${new Date().getFullYear() - BIRTH_YEAR} años`)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Agregar" }));
 
     await waitFor(() => expect(createGuardianDependentAction).toHaveBeenCalledTimes(1));
