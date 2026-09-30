@@ -1,5 +1,6 @@
 "use client";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { EllipsisVerticalIcon } from "lucide-react";
 
@@ -79,7 +80,9 @@ export function EnrollmentApplicationTableRow({
         {application.applicantLastName}, {application.applicantFirstName}
       </TableCell>
       <TableCell>{application.applicantDocumentNumber}</TableCell>
-      <TableCell>{application.trainingPathName ?? "—"}</TableCell>
+      <TableCell>
+        <OptionalValue value={application.trainingPathName} fallback="Sin trayecto formativo" />
+      </TableCell>
       <TableCell>{application.academicYear}</TableCell>
       <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
       <TableCell>
@@ -89,7 +92,10 @@ export function EnrollmentApplicationTableRow({
         {application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED && application.rejectionReason ? (
           <span className="text-destructive">{application.rejectionReason}</span>
         ) : (
-          <span className="text-muted-foreground/60">—</span>
+          <OptionalValue
+            value={null}
+            fallback={application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED ? "Sin motivo informado" : "No corresponde"}
+          />
         )}
       </TableCell>
     </TableRow>

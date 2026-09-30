@@ -12,6 +12,7 @@ import type { StudyPlanCurriculum } from "@features/academic/types/study-plan-cu
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import { approvalModeLabels, requirementTypeLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type StudyPlanCurriculumProps = {
   curriculum: StudyPlanCurriculum;
@@ -34,34 +35,31 @@ export function StudyPlanCurriculumView({
 
   return (
     <section aria-labelledby="study-plan-curriculum-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-      <div className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <BookOpenCheckIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="study-plan-curriculum-title" className="text-base font-semibold">
-              Estructura curricular
-            </h2>
-            <p className="text-muted-foreground text-sm">Organizá los niveles y espacios académicos que forman parte de este plan.</p>
-          </div>
-        </div>
-        {canEditCurriculum ? (
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="lg" variant="outline">
-              <Link href={`${planPath}/academic-levels/new`}>
-                <Layers3Icon data-icon="inline-start" />
-                Nuevo nivel
-              </Link>
-            </Button>
-            <Button asChild size="lg">
-              <Link href={`${planPath}/spaces/new`}>
-                <PlusIcon data-icon="inline-start" />
-                Incorporar espacio
-              </Link>
-            </Button>
-          </div>
-        ) : null}
+      <div className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+        <SectionHeader
+          icon={BookOpenCheckIcon}
+          title="Estructura curricular"
+          description="Organizá los niveles y espacios académicos que forman parte de este plan."
+          titleId="study-plan-curriculum-title"
+          action={
+            canEditCurriculum ? (
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="lg" variant="outline">
+                  <Link href={`${planPath}/academic-levels/new`}>
+                    <Layers3Icon data-icon="inline-start" />
+                    Nuevo nivel
+                  </Link>
+                </Button>
+                <Button asChild size="lg">
+                  <Link href={`${planPath}/spaces/new`}>
+                    <PlusIcon data-icon="inline-start" />
+                    Incorporar espacio
+                  </Link>
+                </Button>
+              </div>
+            ) : null
+          }
+        />
       </div>
 
       {isEmpty ? (

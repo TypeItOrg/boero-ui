@@ -1,3 +1,5 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { OptionalValue } from "@common/components/optional-value";
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -24,6 +26,7 @@ import {
   courseWeekDayLabels,
   studyPlanStatusLabels,
 } from "@features/academic/utils/academic-labels.util";
+import { SectionHeader } from "@common/components/section-header";
 
 export { StudyPlanSpaceDetail };
 
@@ -100,22 +103,12 @@ export function AcademicDetail({
       {academicSpaceWarning}
       <section aria-labelledby="academic-detail-info-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="border-b pb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-              <InfoIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="academic-detail-info-title" className="text-base font-semibold">
-                Información
-              </h2>
-              <p className="text-muted-foreground text-sm">{detail.description}</p>
-            </div>
-          </div>
+          <SectionHeader icon={InfoIcon} title="Información" description={detail.description} titleId="academic-detail-info-title" />
         </header>
         <div className={cn("mt-5 grid gap-4", detail.gridColsClass ?? "sm:grid-cols-2")}>
           {detail.fields.map((field) => (
             <div key={field.label} className={cn("bg-background rounded-lg border p-4", field.className)}>
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{field.label}</p>
+              <p className={DETAIL_LABEL_CLASS_NAME}>{field.label}</p>
               <div className="mt-1 font-medium">{field.value}</div>
             </div>
           ))}
@@ -132,32 +125,27 @@ function StudyPlanSummary({ plan }: { plan: StudyPlan }): React.ReactElement {
   return (
     <section aria-labelledby="study-plan-summary-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <BookOpenCheckIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="study-plan-summary-title" className="text-base font-semibold">
-              Resumen
-            </h2>
-            <p className="text-muted-foreground text-sm">Consultá el trayecto formativo, el estado y el período de vigencia del plan.</p>
-          </div>
-        </div>
+        <SectionHeader
+          icon={BookOpenCheckIcon}
+          title="Resumen"
+          description="Consultá el trayecto formativo, el estado y el período de vigencia del plan."
+          titleId="study-plan-summary-title"
+        />
       </header>
 
       <dl className="grid gap-5 pt-5 sm:grid-cols-3">
         <div>
-          <dt className="text-muted-foreground text-sm">Trayecto formativo</dt>
+          <dt className={DETAIL_LABEL_CLASS_NAME}>Trayecto formativo</dt>
           <dd className="mt-1 font-semibold">{plan.trainingPathName}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground text-sm">Estado</dt>
+          <dt className={DETAIL_LABEL_CLASS_NAME}>Estado</dt>
           <dd className="mt-1">
             <Badge variant={plan.status === "ACTIVE" ? "success" : "secondary"}>{studyPlanStatusLabels[plan.status]}</Badge>
           </dd>
         </div>
         <div>
-          <dt className="text-muted-foreground text-sm">Vigencia</dt>
+          <dt className={DETAIL_LABEL_CLASS_NAME}>Vigencia</dt>
           <dd className="mt-1 font-semibold tabular-nums">{formatStudyPlanValidity(plan)}</dd>
         </div>
       </dl>
@@ -170,54 +158,51 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
     <>
       <section aria-labelledby="course-summary-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <BookOpenCheckIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-summary-title" className="text-base font-semibold">
-                Información del curso
-              </h2>
-              <p className="text-muted-foreground text-sm">Consultá el espacio instanciado, su plan y el ciclo lectivo.</p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={BookOpenCheckIcon}
+            title="Información del curso"
+            description="Consultá el espacio instanciado, su plan y el ciclo lectivo."
+            titleId="course-summary-title"
+          />
         </header>
 
         <dl className="grid gap-5 pt-5 sm:grid-cols-3">
           <div>
-            <dt className="text-muted-foreground text-sm">Trayecto formativo</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Trayecto formativo</dt>
             <dd className="mt-1 font-semibold">{course.trainingPathName}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Plan de estudio</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Plan de estudio</dt>
             <dd className="mt-1 font-semibold">{formatStudyPlanName(course)}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Ciclo lectivo</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Ciclo lectivo</dt>
             <dd className="mt-1 font-semibold tabular-nums">{course.year}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Espacio académico</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Espacio académico</dt>
             <dd className="mt-1 font-semibold">{course.academicSpaceName}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Nivel</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Nivel</dt>
             <dd className="mt-1 font-semibold">{course.academicLevelName ?? "Sin nivel"}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Tipo</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Tipo</dt>
             <dd className="mt-1 font-semibold">{academicSpaceTypeLabels[course.academicSpaceType]}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Formato</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Formato</dt>
             <dd className="mt-1 font-semibold">{academicSpaceFormatLabels[course.academicSpaceFormat]}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Instrumento</dt>
-            <dd className="mt-1 font-semibold">{course.instrumentName ?? "—"}</dd>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Instrumento</dt>
+            <dd className="mt-1 font-semibold">
+              <OptionalValue value={course.instrumentName} fallback="Sin instrumento" />
+            </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">Estado</dt>
+            <dt className={DETAIL_LABEL_CLASS_NAME}>Estado</dt>
             <dd className="mt-1">
               <Badge
                 variant={
@@ -237,21 +222,16 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
 
       <section aria-labelledby="course-classes-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <CalendarDaysIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-classes-title" className="text-base font-semibold">
-                Clases
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                {course.classes.length === 0
-                  ? "Este curso aún no tiene clases registradas."
-                  : `${course.classes.length} ${course.classes.length === 1 ? "clase registrada" : "clases registradas"}.`}
-              </p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={CalendarDaysIcon}
+            title="Clases"
+            description={
+              course.classes.length === 0
+                ? "Este curso aún no tiene clases registradas."
+                : `${course.classes.length} ${course.classes.length === 1 ? "clase registrada" : "clases registradas"}.`
+            }
+            titleId="course-classes-title"
+          />
         </header>
 
         <div className="flex flex-col gap-4 pt-5">
@@ -324,7 +304,7 @@ function CourseSummary({ course }: { course: Course }): React.ReactElement {
                                     >
                                       <ClockIcon className="text-muted-foreground" aria-hidden="true" />
                                       <span>
-                                        {schedule.startTime.slice(0, 5)} — {schedule.endTime.slice(0, 5)}
+                                        {schedule.startTime.slice(0, 5)} a {schedule.endTime.slice(0, 5)}
                                       </span>
                                     </Badge>
                                   ))
@@ -380,5 +360,5 @@ function formatStudyPlanValidity({ effectiveFrom, effectiveTo }: Pick<StudyPlan,
 
   if (!effectiveFrom && effectiveTo) return `Hasta ${formatDisplayDate(effectiveTo)}`;
 
-  return `${formatDisplayDate(effectiveFrom)} — ${formatDisplayDate(effectiveTo)}`;
+  return `Del ${formatDisplayDate(effectiveFrom)} al ${formatDisplayDate(effectiveTo)}`;
 }

@@ -6,6 +6,7 @@ import { getAcademicApiBase } from "@features/academic/utils/academic-scope.util
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { DOCUMENT_MESSAGES } from "@features/enrollment-applications/constants/documentation.constants";
 import type { DocumentActionState } from "@features/enrollment-applications/types/document-action-state.types";
+import { parseDocumentRequirementForm } from "@features/enrollment-applications/schemas/document-requirement.schema";
 const context = z.object({ scope: z.enum(["admin", "institutional"]), applicationId: z.string().uuid() });
 export async function mutateDocument(
   scope: string,
@@ -77,23 +78,7 @@ export async function saveDocumentRequirement(
       id: z.string().uuid().nullable(),
     })
     .safeParse({ scope, institutionId, pathId, id });
-  const request = z
-    .object({
-      name: z.string().trim().min(1).max(150),
-      instructions: z.string().trim().max(1000),
-      level: z.enum(["AT_SUBMISSION", "BEFORE_CONFIRMATION", "OPTIONAL"]),
-      allowedFormats: z.array(z.enum(["application/pdf", "image/jpeg", "image/png"])).min(1),
-      displayOrder: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().max(2147483647)),
-      active: z.enum(["true", "false"]).transform((value) => value === "true"),
-    })
-    .safeParse({
-      name: form.get("name"),
-      instructions: form.get("instructions"),
-      level: form.get("level"),
-      allowedFormats: form.getAll("allowedFormats"),
-      displayOrder: form.get("displayOrder"),
-      active: form.get("active"),
-    });
+  const request = parseDocumentRequirementForm(form);
   if (!args.success || !request.success) {
     return { error: DOCUMENT_MESSAGES.invalid };
   }

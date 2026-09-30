@@ -18,6 +18,7 @@ import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import { SectionHeader } from "@common/components/section-header";
 
 type Props = {
   operation: "ENROLLMENT_PERIOD_CREATE" | "ENROLLMENT_PERIOD_UPDATE";
@@ -37,17 +38,11 @@ export function EnrollmentPeriodOfferings({ institutionId, scope, value, onChang
   return (
     <section className="bg-muted/25 grid gap-5 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <BookOpenCheckIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold">Oferta de la convocatoria</h2>
-            <p className="text-muted-foreground text-sm">
-              Elegí los planes y niveles disponibles. Con solicitudes enviadas, solo podés ampliar la oferta.
-            </p>
-          </div>
-        </div>
+        <SectionHeader
+          icon={BookOpenCheckIcon}
+          title="Oferta de la convocatoria"
+          description="Elegí los planes y niveles disponibles. Con solicitudes enviadas, solo podés ampliar la oferta."
+        />
       </header>
       <div className="grid gap-2">
         <FieldLabel htmlFor="offering-plan">Agregar trayecto y plan</FieldLabel>

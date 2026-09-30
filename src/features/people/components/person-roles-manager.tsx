@@ -12,6 +12,7 @@ import { SystemRoleCode, type SystemRoleCode as SystemRoleCodeType } from "@feat
 import { formatRoleAssignedAt } from "@features/people/utils/person-role-date.util";
 import { getRoleChanges } from "@features/people/utils/person-role-rules.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type PersonRolesManagerProps = {
   institutionId?: string;
@@ -110,15 +111,7 @@ export function PersonRolesManager({
   return (
     <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
       <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <ShieldCheckIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-foreground text-base font-semibold">Roles institucionales</h2>
-            <p className="text-muted-foreground text-sm">Los cambios de roles se aplican al guardar el usuario.</p>
-          </div>
-        </div>
+        <SectionHeader icon={ShieldCheckIcon} title="Roles institucionales" description="Los cambios de roles se aplican al guardar el usuario." />
       </header>
       <div className="mt-4 flex flex-col gap-5 sm:mt-5">
         <section className="flex flex-col gap-3">

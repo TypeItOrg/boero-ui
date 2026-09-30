@@ -1,10 +1,14 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { FileTextIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
 import { Input } from "@common/components/ui/input";
 import { Textarea } from "@common/components/ui/textarea";
 import { Badge } from "@common/components/ui/badge";
+import { Card, CardContent, CardFooter } from "@common/components/ui/card";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -24,15 +28,21 @@ import {
   DOCUMENT_MESSAGES,
 } from "@features/enrollment-applications/constants/documentation.constants";
 import { mutateDocument } from "@features/enrollment-applications/actions/documentation.actions";
+import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
 import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import { formatDocumentFileCategories } from "@features/enrollment-applications/utils/document-file-category.util";
 
 export function EnrollmentDocuments({
   application,
   scope = "institutional",
+  title = "Documentación",
+  footer,
 }: {
   application: EnrollmentApplicationResponse;
   scope?: AcademicScope;
+  title?: string;
+  footer?: React.ReactNode;
 }): React.ReactElement | null {
   const router = useRouter();
   const [documentSnapshot, setDocumentSnapshot] = React.useState({
@@ -87,94 +97,108 @@ export function EnrollmentDocuments({
     return null;
   }
   return (
-    <section className="space-y-4 rounded-xl border p-5" aria-label="Documentación">
-      <h2 className="text-lg font-semibold">Documentación</h2>
-      {error ? (
-        <p role="alert" className="text-destructive">
-          {error}
-        </p>
-      ) : null}
-      {documents.length === 0 ? <p className="text-muted-foreground">Este trayecto no solicita documentación.</p> : null}
-      {documents.map((requirement) => (
-        <article key={requirement.id} className="bg-muted/20 space-y-3 rounded-lg border p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-medium">{requirement.name}</h3>
-            <Badge variant={requirement.status === "ACCEPTED" ? "success" : "outline"}>
-              {DOCUMENT_STATUS_LABELS[requirement.status ?? "MISSING"]}
-            </Badge>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            {DOCUMENT_LEVEL_LABELS[requirement.level]} · {requirement.allowedFormats.map((value) => value.split("/")[1].toUpperCase()).join(", ")} ·
-            Hasta 10 MiB
+    <Card className="bg-muted/25 sm:[--card-spacing:--spacing(6)]" role="region" aria-label="Documentación">
+      <EnrollmentStepCardHeader icon={FileTextIcon} title={title} description="Documentos requeridos para la inscripción y estado de las entregas." />
+      <CardContent className="space-y-4">
+        {error ? (
+          <p role="alert" className="text-destructive">
+            {error}
           </p>
-          {requirement.instructions ? <p className="text-sm whitespace-pre-wrap">{requirement.instructions}</p> : null}
-          {requirement.currentAttachment ? (
-            <Delivery file={requirement.currentAttachment} applicationId={application.applicationId} scope={scope} />
-          ) : null}
-          <div className="flex flex-wrap gap-2">
-            {requirement.canUpload || requirement.canReplace ? (
-              <Button type="button" variant="outline" onClick={() => setEditing({ requirement, operation: "upload" })}>
-                {requirement.canReplace ? "Reemplazar" : "Adjuntar"}
-              </Button>
-            ) : null}
-            {requirement.canReview ? (
-              <Button type="button" onClick={() => setEditing({ requirement, operation: "review" })}>
-                Revisar
-              </Button>
-            ) : null}
-            <Button type="button" variant="outline" disabled={loading} onClick={() => void showHistory(requirement)}>
-              Ver historial
-            </Button>
-            {requirement.canWithdraw ? (
-              <Button type="button" variant="destructive" onClick={() => setEditing({ requirement, operation: "withdraw" })}>
-                Retirar entrega
-              </Button>
-            ) : null}
-          </div>
-        </article>
-      ))}
-      {history ? (
-        <section className="space-y-3 rounded-lg border p-4">
-          <div className="flex justify-between gap-2">
-            <h3 className="font-medium">Historial · {history.requirement.name}</h3>
-            <Button variant="ghost" onClick={() => setHistory(null)}>
-              Cerrar
-            </Button>
-          </div>
-          {history.items.map((file) => (
-            <div className="rounded-lg border p-3" key={file.id}>
-              <Badge variant="outline">
-                {file.versionStatus === "CURRENT" ? "Vigente" : file.versionStatus === "SUPERSEDED" ? "Reemplazada" : "Retirada"}
+        ) : null}
+        {documents.length === 0 ? (
+          <Empty className="bg-muted/25 rounded-lg px-4 py-10">
+            <EmptyHeader className="max-w-md">
+              <EmptyMedia variant="icon">
+                <FileTextIcon className="size-5" aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle className="text-base">No se requiere documentación</EmptyTitle>
+              <EmptyDescription>Este trayecto no solicita documentación para la inscripción.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : null}
+        {documents.map((requirement) => (
+          <article key={requirement.id} className="bg-muted/20 space-y-3 rounded-lg border p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-medium">{requirement.name}</h3>
+              <Badge variant={requirement.status === "ACCEPTED" ? "success" : "outline"}>
+                {DOCUMENT_STATUS_LABELS[requirement.status ?? "MISSING"]}
               </Badge>
-              <Delivery file={file} applicationId={application.applicationId} scope={scope} />
             </div>
-          ))}
-          {!history.items.length ? <p>No hay entregas registradas.</p> : null}
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              disabled={loading || history.page === 0}
-              onClick={() => void showHistory(history.requirement, history.page - 1)}
-            >
-              Anterior
-            </Button>
-            <span>
-              Página {history.page + 1} de {Math.max(1, history.totalPages)}
-            </span>
-            <Button
-              variant="outline"
-              disabled={loading || history.page + 1 >= history.totalPages}
-              onClick={() => void showHistory(history.requirement, history.page + 1)}
-            >
-              Siguiente
-            </Button>
-          </div>
-        </section>
+            <p className="text-muted-foreground text-sm">
+              {DOCUMENT_LEVEL_LABELS[requirement.level]} · {formatDocumentFileCategories(requirement.allowedFormats)} · Hasta 10 MiB
+            </p>
+            {requirement.instructions ? <p className="text-sm whitespace-pre-wrap">{requirement.instructions}</p> : null}
+            {requirement.currentAttachment ? (
+              <Delivery file={requirement.currentAttachment} applicationId={application.applicationId} scope={scope} />
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              {requirement.canUpload || requirement.canReplace ? (
+                <Button type="button" variant="outline" onClick={() => setEditing({ requirement, operation: "upload" })}>
+                  {requirement.canReplace ? "Reemplazar" : "Adjuntar"}
+                </Button>
+              ) : null}
+              {requirement.canReview ? (
+                <Button type="button" onClick={() => setEditing({ requirement, operation: "review" })}>
+                  Revisar
+                </Button>
+              ) : null}
+              <Button type="button" variant="outline" disabled={loading} onClick={() => void showHistory(requirement)}>
+                Ver historial
+              </Button>
+              {requirement.canWithdraw ? (
+                <Button type="button" variant="destructive" onClick={() => setEditing({ requirement, operation: "withdraw" })}>
+                  Retirar entrega
+                </Button>
+              ) : null}
+            </div>
+          </article>
+        ))}
+        {history ? (
+          <section className="space-y-3 rounded-lg border p-4">
+            <div className="flex justify-between gap-2">
+              <h3 className="font-medium">Historial · {history.requirement.name}</h3>
+              <Button variant="ghost" onClick={() => setHistory(null)}>
+                Cerrar
+              </Button>
+            </div>
+            {history.items.map((file) => (
+              <div className="rounded-lg border p-3" key={file.id}>
+                <Badge variant="outline">
+                  {file.versionStatus === "CURRENT" ? "Vigente" : file.versionStatus === "SUPERSEDED" ? "Reemplazada" : "Retirada"}
+                </Badge>
+                <Delivery file={file} applicationId={application.applicationId} scope={scope} />
+              </div>
+            ))}
+            {!history.items.length ? <p>No hay entregas registradas.</p> : null}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                disabled={loading || history.page === 0}
+                onClick={() => void showHistory(history.requirement, history.page - 1)}
+              >
+                Anterior
+              </Button>
+              <span>
+                Página {history.page + 1} de {Math.max(1, history.totalPages)}
+              </span>
+              <Button
+                variant="outline"
+                disabled={loading || history.page + 1 >= history.totalPages}
+                onClick={() => void showHistory(history.requirement, history.page + 1)}
+              >
+                Siguiente
+              </Button>
+            </div>
+          </section>
+        ) : null}
+        {editing ? (
+          <DocumentMutation applicationId={application.applicationId} scope={scope} {...editing} onClose={() => setEditing(null)} onSaved={refresh} />
+        ) : null}
+      </CardContent>
+      {footer ? (
+        <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">{footer}</CardFooter>
       ) : null}
-      {editing ? (
-        <DocumentMutation applicationId={application.applicationId} scope={scope} {...editing} onClose={() => setEditing(null)} onSaved={refresh} />
-      ) : null}
-    </section>
+    </Card>
   );
 }
 function Delivery({ file, applicationId, scope }: { file: DocumentDelivery; applicationId: string; scope: AcademicScope }): React.ReactElement {
@@ -184,15 +208,17 @@ function Delivery({ file, applicationId, scope }: { file: DocumentDelivery; appl
         {file.originalFileName}
       </a>
       <p className="text-muted-foreground">
-        Entrega: {formatEnrollmentApplicationDateTime(file.createdAt)} · {DOCUMENT_STATUS_LABELS[file.reviewStatus]}
+        <span className={DETAIL_LABEL_CLASS_NAME}>Entrega:</span> {formatEnrollmentApplicationDateTime(file.createdAt)} ·{" "}
+        {DOCUMENT_STATUS_LABELS[file.reviewStatus]}
       </p>
       <p>
-        Presentado por: {file.uploaderType === "PLATFORM" ? "Administración de plataforma" : "Cuenta institucional"}
+        <span className={DETAIL_LABEL_CLASS_NAME}>Presentado por:</span>{" "}
+        {file.uploaderType === "PLATFORM" ? "Administración de plataforma" : "Cuenta institucional"}
         {file.uploadedBy ? ` (${file.uploadedBy})` : ""}
       </p>
       {file.reviewedAt ? (
         <p>
-          Revisión: {formatEnrollmentApplicationDateTime(file.reviewedAt)} ·{" "}
+          <span className={DETAIL_LABEL_CLASS_NAME}>Revisión:</span> {formatEnrollmentApplicationDateTime(file.reviewedAt)} ·{" "}
           {file.reviewerType === "PLATFORM" ? "Administración de plataforma" : "Personal institucional"}
           {file.reviewedBy ? ` (${file.reviewedBy})` : ""}
         </p>

@@ -1,3 +1,4 @@
+import { OptionalValue } from "@common/components/optional-value";
 import { ClockIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -26,7 +27,7 @@ export function CourseEnrollmentSchedules({ schedules }: CourseEnrollmentSchedul
   }
 
   if (groups.size === 0) {
-    return <span className="text-muted-foreground">—</span>;
+    return <OptionalValue value={null} fallback="Sin horarios" />;
   }
 
   const dayOrder = Object.keys(COURSE_DAY_LABELS);

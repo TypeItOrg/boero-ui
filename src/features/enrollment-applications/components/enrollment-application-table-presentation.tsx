@@ -125,7 +125,7 @@ export function EnrollmentApplicationTablePresentation({
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
             studyPlanName: applicationToApprove.studyPlanName
               ? formatStudyPlanLabel(applicationToApprove)
-              : (applicationToApprove.trainingPathName ?? "—"),
+              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -141,7 +141,7 @@ export function EnrollmentApplicationTablePresentation({
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
             studyPlanName: applicationToApprove.studyPlanName
               ? formatStudyPlanLabel(applicationToApprove)
-              : (applicationToApprove.trainingPathName ?? "—"),
+              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -157,7 +157,7 @@ export function EnrollmentApplicationTablePresentation({
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
             studyPlanName: applicationToReject.studyPlanName
               ? formatStudyPlanLabel(applicationToReject)
-              : (applicationToReject.trainingPathName ?? "—"),
+              : applicationToReject.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}
@@ -171,7 +171,7 @@ export function EnrollmentApplicationTablePresentation({
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
             studyPlanName: applicationToReject.studyPlanName
               ? formatStudyPlanLabel(applicationToReject)
-              : (applicationToReject.trainingPathName ?? "—"),
+              : applicationToReject.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}

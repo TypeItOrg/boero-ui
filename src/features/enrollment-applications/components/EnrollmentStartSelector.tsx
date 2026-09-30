@@ -3,10 +3,11 @@ import * as React from "react";
 import { CheckIcon, ClipboardPlusIcon, Loader2Icon, RouteIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
-import { Card, CardHeader, CardDescription, CardContent, CardFooter } from "@common/components/ui/card";
+import { Card, CardHeader, CardContent, CardFooter } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { cn } from "@common/utils/cn.util";
 import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
+import { SectionHeader } from "@common/components/section-header";
 
 export interface EnrollmentStartStudyPlanOption {
   id: string;
@@ -28,7 +29,7 @@ interface Props {
   studyPlanPagination?: React.ReactNode;
 }
 export function formatEnrollmentStartOptionLabel(option: Pick<EnrollmentStartStudyPlanOption, "name" | "trainingPathName">): string {
-  return !option.trainingPathName || option.trainingPathName === option.name ? option.name : `${option.name} — ${option.trainingPathName}`;
+  return !option.trainingPathName || option.trainingPathName === option.name ? option.name : `${option.name} · ${option.trainingPathName}`;
 }
 
 export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting = false, studyPlanPagination }: Props): React.ReactElement {
@@ -38,17 +39,15 @@ export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting
   return (
     <Card className="bg-muted/25">
       <CardHeader className="border-b">
-        <div className="flex items-start gap-3.5">
-          <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-            <ClipboardPlusIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 pt-0.5">
-            <h2 className="font-heading text-base leading-snug font-semibold text-balance">Iniciar solicitud de inscripción</h2>
-            <CardDescription className="mt-1 text-pretty">
+        <SectionHeader
+          icon={ClipboardPlusIcon}
+          title="Iniciar solicitud de inscripción"
+          description={
+            <span className="mt-1 text-pretty">
               Elegí el trayecto formativo al que querés inscribirte. Luego vas a poder consultar los cursos disponibles.
-            </CardDescription>
-          </div>
-        </div>
+            </span>
+          }
+        />
       </CardHeader>
       <CardContent className="grid gap-5">
         {error ? (

@@ -9,10 +9,14 @@ export const DOCUMENT_STATUS_LABELS = {
   OBSERVED: "Observado",
   ACCEPTED: "Aceptado",
 } as const;
+export const DOCUMENT_FILE_CATEGORIES = [
+  { value: "images", label: "Imágenes", formats: ["image/jpeg", "image/png"] },
+  { value: "documents", label: "Documentos", formats: ["application/pdf"] },
+] as const;
 export const DOCUMENT_MESSAGES = {
   invalid: "Revisá los datos de la documentación.",
   failed: "No se pudo guardar la documentación.",
   readFailed: "No se pudo consultar la documentación.",
-  file: "Seleccioná un archivo PDF, JPEG o PNG de hasta 10 MiB.",
+  file: "Seleccioná un archivo admitido de hasta 10 MiB.",
   note: "Indicá el motivo de la observación.",
 } as const;

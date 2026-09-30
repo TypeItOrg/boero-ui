@@ -1,5 +1,6 @@
 "use client";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -190,7 +191,9 @@ export function CourseEnrollmentTable({
                     <div>{formatStudyPlanLabel(enrollment)}</div>
                     <div className="text-muted-foreground">{enrollment.academicLevelName ?? "Sin nivel"}</div>
                   </TableCell>
-                  <TableCell>{enrollment.instrumentName ?? "—"}</TableCell>
+                  <TableCell>
+                    <OptionalValue value={enrollment.instrumentName} fallback="Sin instrumento" />
+                  </TableCell>
                   <TableCell>
                     <CourseEnrollmentSchedules schedules={enrollment.schedules} />
                   </TableCell>

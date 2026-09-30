@@ -11,7 +11,7 @@ import { BuildingIcon, CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { fetchActivePlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
@@ -21,6 +21,7 @@ import type { InstitutionPermissionGroup } from "@features/roles/types/instituti
 import type { PlatformRoleFormState } from "@features/roles/types/platform-role-form-state.types";
 import type { PlatformRole } from "@features/roles/types/platform-role.types";
 import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
+import { SectionHeader } from "@common/components/section-header";
 
 const INITIAL_STATE: PlatformRoleFormState = {};
 const INSTITUTION_QUERY_KEY = ["platform", "roles", "form-institutions"] as const;
@@ -56,15 +57,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
       ) : null}
       <Card className="bg-muted/25">
         <CardHeader className="border-b">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <UserRoundCogIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <CardTitle>Datos del rol</CardTitle>
-              <CardDescription>Usá un nombre reconocible para las personas de la institución.</CardDescription>
-            </div>
-          </div>
+          <SectionHeader icon={UserRoundCogIcon} title="Datos del rol" description="Usá un nombre reconocible para las personas de la institución." />
         </CardHeader>
         <CardContent>
           <FieldGroup>
@@ -97,15 +90,7 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
       </Card>
       <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <KeyRoundIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold">Permisos</h2>
-              <p className="text-muted-foreground text-sm">Seleccioná los permisos que podrá conceder este rol.</p>
-            </div>
-          </div>
+          <SectionHeader icon={KeyRoundIcon} title="Permisos" description="Seleccioná los permisos que podrá conceder este rol." />
         </header>
         <div className="mt-5">
           <PermissionGroupsFields

@@ -1,5 +1,6 @@
 "use client";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { WAITLIST_REASON_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -70,7 +71,7 @@ export function CourseWaitlistTable({
                       Incorporar
                     </Button>
                   ) : (
-                    "—"
+                    <OptionalValue value={null} fallback="Sin acciones disponibles" />
                   )}
                 </TableCell>
                 <TableCell className="font-semibold">{entry.waitlistNumber}</TableCell>
@@ -79,9 +80,16 @@ export function CourseWaitlistTable({
                   <div className="text-muted-foreground">{entry.applicantDocumentNumber}</div>
                 </TableCell>
                 <TableCell>{new Date(entry.waitlistedAt).toLocaleDateString("es-AR")}</TableCell>
-                <TableCell>{entry.originalReason ? (WAITLIST_REASON_LABELS[entry.originalReason] ?? entry.originalReason) : "—"}</TableCell>
+                <TableCell>
+                  <OptionalValue
+                    value={entry.originalReason ? (WAITLIST_REASON_LABELS[entry.originalReason] ?? entry.originalReason) : null}
+                    fallback="Sin motivo informado"
+                  />
+                </TableCell>
                 <TableCell>{entry.hasCapacity ? "Cupo disponible" : "Sin cupos"}</TableCell>
-                <TableCell>{entry.preferredShift ?? "—"}</TableCell>
+                <TableCell>
+                  <OptionalValue value={entry.preferredShift} fallback="Sin preferencia de turno" />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

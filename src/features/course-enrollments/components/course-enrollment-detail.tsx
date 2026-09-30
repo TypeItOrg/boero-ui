@@ -1,3 +1,5 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { OptionalValue } from "@common/components/optional-value";
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { CalendarDaysIcon, HistoryIcon, ScrollTextIcon, type LucideIcon } from "lucide-react";
 
@@ -16,6 +18,7 @@ import {
   formatEnrollmentApplicationDate,
   formatEnrollmentApplicationDateTime,
 } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import { SectionHeader as SharedSectionHeader } from "@common/components/section-header";
 
 type CourseEnrollmentDetailProps = {
   enrollment: CourseEnrollment;
@@ -41,7 +44,7 @@ export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollment
           <Detail label="Trayecto formativo" value={enrollment.trainingPathName} />
           <Detail label="Plan de estudio" value={formatStudyPlanName(enrollment)} />
           <Detail label="Nivel" value={enrollment.academicLevelName ?? "Sin nivel"} />
-          <Detail label="Instrumento" value={enrollment.instrumentName ?? "—"} />
+          <Detail label="Instrumento" value={<OptionalValue value={enrollment.instrumentName} fallback="Sin instrumento" />} />
           <Detail label="Origen" value={enrollment.source === "APPLICATION" ? "Solicitud de inscripción" : "Alta manual"} />
           <Detail label="Fecha de alta" value={formatEnrollmentApplicationDate(enrollment.enrolledAt)} />
           <Detail label="Clase" value={enrollment.courseClassLabel} />
@@ -122,7 +125,9 @@ export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollment
                           current={item.newAcademicStatus ? ACADEMIC_ENROLLMENT_STATUS_LABELS[item.newAcademicStatus] : null}
                         />
                       </TableCell>
-                      <TableCell className="max-w-80 min-w-40 break-words whitespace-pre-wrap">{item.reason ?? "—"}</TableCell>
+                      <TableCell className="max-w-80 min-w-40 break-words whitespace-pre-wrap">
+                        <OptionalValue value={item.reason} fallback="Sin motivo informado" />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -148,17 +153,7 @@ function SectionHeader({
 }): React.ReactElement {
   return (
     <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-      <div className="flex items-center gap-3.5">
-        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <Icon className="size-5" aria-hidden="true" />
-        </div>
-        <div className="min-w-0">
-          <h2 id={id} className="text-base font-semibold">
-            {title}
-          </h2>
-          <p className="text-muted-foreground text-sm">{description}</p>
-        </div>
-      </div>
+      <SharedSectionHeader icon={Icon} title={title} description={description} titleId={id} />
     </header>
   );
 }
@@ -166,7 +161,7 @@ function SectionHeader({
 function Detail({ label, value }: { label: string; value: React.ReactNode }): React.ReactElement {
   return (
     <div className="min-w-0">
-      <dt className="text-muted-foreground text-sm">{label}</dt>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
       <dd className="mt-1 font-semibold break-words">{value}</dd>
     </div>
   );
@@ -180,7 +175,7 @@ function HistoryStatus({ previous, current }: { previous: string | null; current
   if (!previous) {
     return (
       <div className="space-y-1 py-1">
-        <p className="text-muted-foreground text-xs">Estado inicial</p>
+        <p className={DETAIL_LABEL_CLASS_NAME}>Estado inicial</p>
         <Badge variant="outline">{current}</Badge>
       </div>
     );
@@ -198,11 +193,11 @@ function HistoryStatus({ previous, current }: { previous: string | null; current
   return (
     <dl className="space-y-1 py-1 text-sm">
       <div className="flex gap-2">
-        <dt className="text-muted-foreground">Antes:</dt>
+        <dt className={DETAIL_LABEL_CLASS_NAME}>Antes:</dt>
         <dd>{previous}</dd>
       </div>
       <div className="flex gap-2">
-        <dt className="text-muted-foreground">Después:</dt>
+        <dt className={DETAIL_LABEL_CLASS_NAME}>Después:</dt>
         <dd className="font-medium">{current}</dd>
       </div>
     </dl>

@@ -130,7 +130,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
     );
   }
   let documentRequirements: DocumentRequirement[] = [];
-  if (input.resource === AcademicResource.TRAINING_PATH && !input.action) {
+  if (input.resource === AcademicResource.TRAINING_PATH && (!input.action || input.action === ACADEMIC_ROUTE_SEGMENT.EDIT)) {
     const response = await academicApiFetch(
       input.scope,
       `${getAcademicApiBase(input.scope, input.institutionId)}/training-paths/${input.id}/document-requirements`,
@@ -182,6 +182,8 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           id={input.id}
           returnTo={returnTo}
           initialValues={{ ...item, classes: JSON.stringify("classes" in item ? item.classes : []) } as Record<string, FormValue>}
+          documentRequirements={documentRequirements}
+          canEditDocumentRequirements={canEdit}
         />
       </AcademicShell>
     );
@@ -206,13 +208,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
         returnTo={returnTo}
       />
       {input.resource === AcademicResource.TRAINING_PATH ? (
-        <TrainingPathDocuments
-          scope={input.scope}
-          institutionId={input.institutionId}
-          pathId={input.id}
-          requirements={documentRequirements}
-          canEdit={canEdit}
-        />
+        <TrainingPathDocuments requirements={documentRequirements} editHref={canEdit ? `${detailPath}/edit` : undefined} />
       ) : null}
       {curriculum ? (
         <StudyPlanCurriculumView

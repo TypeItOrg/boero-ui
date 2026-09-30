@@ -57,7 +57,7 @@ describe("MyEnrollmentApplicationTableRow", () => {
     );
 
     expect(screen.queryByText("Documentación incompleta")).not.toBeInTheDocument();
-    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+    expect(screen.getByText("No corresponde")).toBeInTheDocument();
   });
 
   it("shows the training path instead of the study plan", () => {

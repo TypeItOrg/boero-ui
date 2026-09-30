@@ -45,7 +45,7 @@ describe("EnrollmentStartSelector", () => {
   it("starts from offered training paths without requiring the legacy period list", () => {
     const onStart = jest.fn();
     render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={onStart} />);
-    fireEvent.click(screen.getByRole("radio", { name: "Canto — Instrumento" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Canto · Instrumento" }));
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
     expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-2" });
   });

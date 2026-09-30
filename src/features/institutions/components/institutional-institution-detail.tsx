@@ -1,9 +1,11 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import Link from "next/link";
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import type { Institution } from "@features/institutions/types/institution.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionalInstitutionDetailProps = {
   canUpdate: boolean;
@@ -65,15 +67,7 @@ export function InstitutionalInstitutionDetail({ canUpdate, institution, returnT
 function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-      <div className="flex items-center gap-3.5">
-        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <Icon className="size-5" aria-hidden="true" />
-        </div>
-        <div className="min-w-0">
-          <h2 className="text-foreground font-semibold">{title}</h2>
-          <p className="text-muted-foreground text-sm">{description}</p>
-        </div>
-      </div>
+      <SectionHeader icon={Icon} title={title} description={description} />
     </header>
   );
 }
@@ -86,7 +80,7 @@ interface LocationDetailProps extends React.HTMLAttributes<HTMLDivElement> {
 function LocationDetail({ label, value, ...props }: LocationDetailProps): React.ReactElement {
   return (
     <div {...props}>
-      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className={DETAIL_LABEL_CLASS_NAME}>{label}</p>
       <p className="text-foreground mt-1.5 text-base font-medium">{value}</p>
     </div>
   );
@@ -95,7 +89,7 @@ function LocationDetail({ label, value, ...props }: LocationDetailProps): React.
 function ContactDetail({ label, value }: { label: string; value: string | null }): React.ReactElement {
   return (
     <div className="min-w-0">
-      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className={DETAIL_LABEL_CLASS_NAME}>{label}</p>
       <p className="text-foreground mt-1.5 truncate text-base font-medium">{value?.trim() || "No informado"}</p>
     </div>
   );

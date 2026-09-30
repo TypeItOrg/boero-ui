@@ -30,12 +30,12 @@ export function getApplicantDni(application: EnrollmentApplicationResponse): str
     return personal.documentNumber.trim();
   }
 
-  return "—";
+  return "Sin documento";
 }
 
 export function formatApplicationDate(dateStr?: string | null): string {
   if (!dateStr) {
-    return "—";
+    return "Sin fecha";
   }
 
   try {
@@ -57,7 +57,7 @@ export function formatApplicationDate(dateStr?: string | null): string {
 
 export function formatApplicationDateTime(dateStr?: string | null): string {
   if (!dateStr) {
-    return "—";
+    return "Sin fecha";
   }
 
   try {
@@ -81,7 +81,7 @@ export function formatApplicationDateTime(dateStr?: string | null): string {
 
 export function formatBirthDate(dateStr?: string | null): string {
   if (!dateStr) {
-    return "—";
+    return "Sin fecha de nacimiento";
   }
 
   // Handle YYYY-MM-DD

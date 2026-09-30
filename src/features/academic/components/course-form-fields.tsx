@@ -31,6 +31,7 @@ import type { CourseWeekDay } from "@features/academic/types/course-week-day.typ
 import { COURSE_WEEK_DAY } from "@features/academic/types/course-week-day.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { SectionHeader } from "@common/components/section-header";
 
 const WEEK_DAY_LABELS: Record<CourseWeekDay, string> = {
   MONDAY: "Lunes",
@@ -156,19 +157,12 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
 
       <section aria-labelledby="course-form-details-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <GraduationCapIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-form-details-title" className="text-base font-semibold">
-                Datos del curso
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                Instanciá un espacio académico de un plan activo, elegí el ciclo lectivo y armá sus clases.
-              </p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={GraduationCapIcon}
+            title="Datos del curso"
+            description="Instanciá un espacio académico de un plan activo, elegí el ciclo lectivo y armá sus clases."
+            titleId="course-form-details-title"
+          />
         </header>
         <div className="mt-5 flex flex-wrap gap-4">
           {institutionField}
@@ -334,29 +328,26 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
       </section>
 
       <section aria-labelledby="course-form-classes-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-        <header className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <CalendarDaysIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-form-classes-title" className="text-base font-semibold">
-                Clases del curso
-              </h2>
-              <p className="text-muted-foreground text-sm">Organizá docentes, días y franjas horarias para cada grupo.</p>
-            </div>
-          </div>
-          {classes.length > 0 ? (
-            <Button
-              disabled={!spaceId}
-              onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])}
-              size="lg"
-              type="button"
-              variant="outline"
-            >
-              <PlusIcon data-icon="inline-start" /> Agregar clase
-            </Button>
-          ) : null}
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <SectionHeader
+            icon={CalendarDaysIcon}
+            title="Clases del curso"
+            description="Organizá docentes, días y franjas horarias para cada grupo."
+            titleId="course-form-classes-title"
+            action={
+              classes.length > 0 ? (
+                <Button
+                  disabled={!spaceId}
+                  onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])}
+                  size="lg"
+                  type="button"
+                  variant="outline"
+                >
+                  <PlusIcon data-icon="inline-start" /> Agregar clase
+                </Button>
+              ) : null
+            }
+          />
         </header>
 
         {fieldErrors?.classes ? <FieldError className="mt-4" errors={[{ message: fieldErrors.classes }]} /> : null}

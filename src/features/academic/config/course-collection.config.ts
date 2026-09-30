@@ -92,7 +92,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
         course.academicLevelName ?? "Sin nivel",
         academicSpaceTypeLabels[course.academicSpaceType],
         academicSpaceFormatLabels[course.academicSpaceFormat],
-        course.instrumentName ?? "—",
+        { value: course.instrumentName, fallback: "Sin instrumento" },
       ],
       status: statusLabel,
       active: isActive,

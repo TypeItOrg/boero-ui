@@ -33,8 +33,6 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
       title={`Nuevo ${config.singular}`}
       breadcrumb={input.breadcrumb}
       minViewportHeight
-      headerClassName="flex-row items-center justify-between"
-      actionsClassName="self-stretch"
       actions={<AcademicPageIcon icon={config.createIcon} />}
     >
       <AcademicResourceForm
@@ -45,6 +43,7 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
         }
         parentId={contextualTrainingPath?.id}
         resource={input.resource}
+        canEditDocumentRequirements={input.access.trainingPathUpdate}
         returnTo={returnTo}
         trainingPathLocked={contextualTrainingPath !== undefined}
       />

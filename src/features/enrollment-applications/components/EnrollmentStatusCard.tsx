@@ -1,4 +1,6 @@
 "use client";
+
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import { EnrollmentDocuments } from "@features/enrollment-applications/components/enrollment-documents";
 
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
@@ -20,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { OptionalValue } from "@common/components/optional-value";
 import { Badge } from "@common/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { cn } from "@common/utils/cn.util";
@@ -56,6 +59,7 @@ type DetailItemProps = {
   className?: string;
   label: string;
   value: React.ReactNode;
+  fallback?: string;
 };
 
 type DetailCardProps = {
@@ -190,7 +194,6 @@ export function EnrollmentStatusCard({
   const responsible = data.responsible || {};
   const preference = data.preference || {};
   const spaces = application.spaces || [];
-  const preferredShift = preference.preferredShift || "—";
   const canManageApplicationCourses =
     canManageCourses &&
     (application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED);
@@ -255,30 +258,42 @@ export function EnrollmentStatusCard({
       <div className="grid gap-4 xl:grid-cols-2">
         <DetailCard icon={UserRoundIcon} title="Datos personales y contacto" description="Información registrada al enviar la solicitud.">
           <dl className="grid gap-4 sm:grid-cols-2">
-            <DetailItem label="Nombre completo" value={`${personal.firstName || ""} ${personal.lastName || ""}`.trim() || "—"} />
-            <DetailItem label="Documento" value={personal.documentNumber || "—"} />
-            <DetailItem label="Fecha de nacimiento" value={formatBusinessDate(personal.birthDate)} />
-            <DetailItem label="Teléfono" value={personal.phoneNumber || "—"} />
-            <DetailItem className="sm:col-span-2" label="Correo electrónico" value={personal.email || "—"} />
+            <DetailItem
+              label="Nombre completo"
+              value={`${personal.firstName || ""} ${personal.lastName || ""}`.trim()}
+              fallback="Sin nombre registrado"
+            />
+            <DetailItem label="Documento" value={personal.documentNumber} fallback="Sin documento" />
+            <DetailItem label="Fecha de nacimiento" value={formatBusinessDate(personal.birthDate)} fallback="Sin fecha de nacimiento" />
+            <DetailItem label="Teléfono" value={personal.phoneNumber} fallback="Sin teléfono" />
+            <DetailItem className="sm:col-span-2" label="Correo electrónico" value={personal.email} fallback="Sin correo electrónico" />
           </dl>
         </DetailCard>
 
         <DetailCard icon={GraduationCapIcon} title="Escolaridad" description="Antecedentes educativos informados.">
           <dl className="grid gap-4 sm:grid-cols-2">
-            {academic.currentlyStudying !== null && academic.currentlyStudying !== undefined ? (
-              <DetailItem label="Asiste actualmente" value={academic.currentlyStudying ? "Sí" : "No"} />
-            ) : null}
-            {academic.educationLevel ? (
-              <DetailItem
-                label={academic.currentlyStudying ? "Nivel actual" : "Máximo nivel alcanzado"}
-                value={SCHOOLING_EDUCATION_LEVEL_LABELS[academic.educationLevel]}
-              />
-            ) : null}
-            {academic.schoolOrigin ? (
+            <DetailItem
+              label="Asiste actualmente"
+              value={academic.currentlyStudying == null ? null : academic.currentlyStudying ? "Sí" : "No"}
+              fallback="Asistencia no informada"
+            />
+            <DetailItem
+              label={academic.currentlyStudying == null ? "Nivel educativo" : academic.currentlyStudying ? "Nivel actual" : "Máximo nivel alcanzado"}
+              value={academic.educationLevel ? SCHOOLING_EDUCATION_LEVEL_LABELS[academic.educationLevel] : null}
+              fallback="Nivel no informado"
+            />
+            {academic.educationLevel !== "NO_SCHOOLING" || academic.schoolOrigin ? (
               <DetailItem
                 className="sm:col-span-2"
-                label={academic.currentlyStudying ? "Institución educativa actual" : "Última institución educativa"}
+                label={
+                  academic.currentlyStudying == null
+                    ? "Institución educativa"
+                    : academic.currentlyStudying
+                      ? "Institución educativa actual"
+                      : "Última institución educativa"
+                }
                 value={academic.schoolOrigin}
+                fallback="Institución no informada"
               />
             ) : null}
             {academic.currentGradeYear ? <DetailItem label="Sala, grado o año" value={academic.currentGradeYear} /> : null}
@@ -291,27 +306,35 @@ export function EnrollmentStatusCard({
             {academic.secondaryDegreeTitle ? (
               <DetailItem className="sm:col-span-2" label="Título secundario obtenido" value={academic.secondaryDegreeTitle} />
             ) : null}
-            {!academic.educationLevel && !academic.schoolOrigin ? (
-              <DetailItem className="sm:col-span-2" label="Información disponible" value="Sin datos de escolaridad" />
-            ) : null}
           </dl>
         </DetailCard>
 
         <DetailCard icon={HeartHandshakeIcon} title="Salud e inclusión" description="Necesidades de acompañamiento declaradas.">
           <dl className="grid gap-4">
-            <DetailItem label="Ajustes razonables" value={health.receivesReasonableAdjustments ? "Sí, requiere ajustes" : "No requiere ajustes"} />
-            {health.receivesReasonableAdjustments ? <DetailItem label="Detalle" value={health.adjustmentDetails || "—"} /> : null}
+            <DetailItem
+              label="Ajustes razonables"
+              value={
+                health.receivesReasonableAdjustments ? (
+                  "Sí, requiere ajustes"
+                ) : (
+                  <span className="text-muted-foreground font-normal italic">No requiere ajustes</span>
+                )
+              }
+            />
+            {health.receivesReasonableAdjustments ? (
+              <DetailItem label="Detalle" value={health.adjustmentDetails} fallback="Sin detalle de ajustes" />
+            ) : null}
           </dl>
         </DetailCard>
         <DetailCard icon={UsersRoundIcon} title="Responsable o tutor legal" description="Información del responsable, cuando corresponde.">
           {responsible.fullName ? (
             <dl className="grid gap-4 sm:grid-cols-2">
               <DetailItem className="sm:col-span-2" label="Nombre completo" value={responsible.fullName} />
-              <DetailItem label="Documento" value={responsible.documentNumber || "—"} />
-              <DetailItem label="Teléfono" value={responsible.phoneNumber || "—"} />
-              <DetailItem className="sm:col-span-2" label="Correo electrónico" value={responsible.email || "—"} />
-              <DetailItem label="Ocupación" value={responsible.occupation || "—"} />
-              <DetailItem label="Nivel de instrucción" value={responsible.educationLevel || "—"} />
+              <DetailItem label="Documento" value={responsible.documentNumber} fallback="Sin documento" />
+              <DetailItem label="Teléfono" value={responsible.phoneNumber} fallback="Sin teléfono" />
+              <DetailItem className="sm:col-span-2" label="Correo electrónico" value={responsible.email} fallback="Sin correo electrónico" />
+              <DetailItem label="Ocupación" value={responsible.occupation} fallback="Sin ocupación informada" />
+              <DetailItem label="Nivel de instrucción" value={responsible.educationLevel} fallback="Sin nivel de instrucción informado" />
             </dl>
           ) : (
             <p className="text-muted-foreground text-sm">No se requirió tutor legal porque la persona postulante es mayor de edad.</p>
@@ -326,8 +349,12 @@ export function EnrollmentStatusCard({
             description="Trayecto y materias seleccionadas para la inscripción."
           >
             <dl className="mb-5 grid gap-4 sm:grid-cols-2">
-              <DetailItem label="Trayecto formativo" value={application.trainingPathName || "—"} />
-              <DetailItem label="Plan de estudio" value={application.studyPlanName ? formatStudyPlanName(application) : "—"} />
+              <DetailItem label="Trayecto formativo" value={application.trainingPathName} fallback="Sin trayecto formativo" />
+              <DetailItem
+                label="Plan de estudio"
+                value={application.studyPlanName ? formatStudyPlanName(application) : null}
+                fallback="Sin plan de estudio"
+              />
             </dl>
             <div className="bg-background divide-y overflow-hidden rounded-xl border">
               {spaces.map((space) => (
@@ -350,11 +377,16 @@ export function EnrollmentStatusCard({
           description="Preferencias declaradas para la cursada."
         >
           <dl className="grid gap-4 sm:grid-cols-3">
-            <DetailItem label="Turno preferente" value={preferredShift} />
+            <DetailItem label="Turno preferente" value={preference.preferredShift} fallback="Sin preferencia de turno" />
             <DetailItem label="Uso de imagen" value={preference.allowsImageUse ? "Autorizado" : "No autorizado"} />
             <DetailItem label="Estudiante reingresante" value={preference.isReenrolling ? "Sí" : "No"} />
             {preference.isReenrolling ? (
-              <DetailItem className="sm:col-span-3" label="Docente anterior" value={preference.previousTeacher || "—"} />
+              <DetailItem
+                className="sm:col-span-3"
+                label="Docente anterior"
+                value={preference.previousTeacher}
+                fallback="Sin docente anterior informado"
+              />
             ) : null}
           </dl>
         </DetailCard>
@@ -376,18 +408,20 @@ function DetailCard({ children, className, description, icon, title }: DetailCar
   );
 }
 
-function DetailItem({ className, label, value }: DetailItemProps): React.ReactElement {
+function DetailItem({ className, label, value, fallback = "Sin información" }: DetailItemProps): React.ReactElement {
   return (
     <div className={cn("min-w-0 space-y-1", className)}>
-      <dt className="text-muted-foreground text-sm">{label}</dt>
-      <dd className="text-foreground text-sm font-medium break-words">{value}</dd>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
+      <dd className="text-foreground text-sm font-medium break-words">
+        <OptionalValue value={value} fallback={fallback} />
+      </dd>
     </div>
   );
 }
 
-function formatBusinessDate(value?: string | null): string {
+function formatBusinessDate(value?: string | null): string | null {
   if (!value) {
-    return "—";
+    return null;
   }
 
   const date = new Date(`${value}T00:00:00`);

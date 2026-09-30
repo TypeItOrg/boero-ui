@@ -10,6 +10,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from "@common/compone
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { cn } from "@common/utils/cn.util";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type CourseEnrollmentAssignmentFieldsProps = {
   options: CourseEnrollmentAssignmentOptions;
@@ -90,17 +91,12 @@ export function CourseEnrollmentAssignmentFields({
         <>
           <section aria-labelledby="manual-enrollment-class-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
             <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-              <div className="flex items-center gap-3.5">
-                <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-                  <PresentationIcon className="size-5" aria-hidden="true" />
-                </div>
-                <div className="min-w-0">
-                  <h2 id="manual-enrollment-class-title" className="text-base font-semibold">
-                    Clase de cursada
-                  </h2>
-                  <p className="text-muted-foreground text-sm">Elegí el grupo docente al que se incorporará el estudiante.</p>
-                </div>
-              </div>
+              <SectionHeader
+                icon={PresentationIcon}
+                title="Clase de cursada"
+                description="Elegí el grupo docente al que se incorporará el estudiante."
+                titleId="manual-enrollment-class-title"
+              />
             </header>
 
             <Field className="mt-5 min-w-0">
@@ -119,7 +115,7 @@ export function CourseEnrollmentAssignmentFields({
                     {options.classes.map((courseClass) => (
                       <SelectItem key={courseClass.id} value={courseClass.id} className="px-2.5 py-1.5">
                         {courseClass.label}
-                        {courseClass.teachers.length > 0 ? ` — ${courseClass.teachers.map((teacher) => teacher.fullName).join(", ")}` : ""}
+                        {courseClass.teachers.length > 0 ? ` · ${courseClass.teachers.map((teacher) => teacher.fullName).join(", ")}` : ""}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -133,19 +129,14 @@ export function CourseEnrollmentAssignmentFields({
 
           <section aria-labelledby="manual-enrollment-schedule-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
             <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-              <div className="flex items-center gap-3.5">
-                <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-                  <CalendarClockIcon className="size-5" aria-hidden="true" />
-                </div>
-                <div className="min-w-0">
-                  <h2 id="manual-enrollment-schedule-title" className="text-base font-semibold">
-                    Días y horarios
-                  </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {options.format === "INDIVIDUAL" ? "Seleccioná un período por cada día elegido." : "Seleccioná como mínimo un día de la clase."}
-                  </p>
-                </div>
-              </div>
+              <SectionHeader
+                icon={CalendarClockIcon}
+                title="Días y horarios"
+                description={
+                  options.format === "INDIVIDUAL" ? "Seleccioná un período por cada día elegido." : "Seleccioná como mínimo un día de la clase."
+                }
+                titleId="manual-enrollment-schedule-title"
+              />
             </header>
 
             <div className="mt-5 grid min-w-0 gap-3">

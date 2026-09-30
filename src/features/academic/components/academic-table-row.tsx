@@ -1,3 +1,4 @@
+import { OptionalValue } from "@common/components/optional-value";
 import * as React from "react";
 import Link from "next/link";
 
@@ -137,7 +138,7 @@ export function AcademicTableRow({
           </TableCell>
           {row.detailValues.map((detail, index) => (
             <TableCell key={`${row.id}-${columns.detailLabels[index]}`} className="text-muted-foreground max-w-96 truncate">
-              {detail}
+              {typeof detail === "string" ? detail : <OptionalValue value={detail.value} fallback={detail.fallback} />}
             </TableCell>
           ))}
           <TableCell>

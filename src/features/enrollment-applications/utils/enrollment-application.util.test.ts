@@ -72,7 +72,7 @@ describe("enrollment-application.util", () => {
     });
 
     it("returns fallback when no DNI is found", () => {
-      expect(getApplicantDni(baseApplication)).toBe("—");
+      expect(getApplicantDni(baseApplication)).toBe("Sin documento");
     });
   });
 
@@ -82,9 +82,9 @@ describe("enrollment-application.util", () => {
       expect(result).toMatch(/15\/05\/2026/);
     });
 
-    it("returns — for null or undefined", () => {
-      expect(formatApplicationDate(null)).toBe("—");
-      expect(formatApplicationDate(undefined)).toBe("—");
+    it("returns contextual fallback for null or undefined", () => {
+      expect(formatApplicationDate(null)).toBe("Sin fecha");
+      expect(formatApplicationDate(undefined)).toBe("Sin fecha");
     });
   });
 
@@ -94,9 +94,9 @@ describe("enrollment-application.util", () => {
       expect(result).toContain("15/05/2026");
     });
 
-    it("returns — for null or undefined", () => {
-      expect(formatApplicationDateTime(null)).toBe("—");
-      expect(formatApplicationDateTime(undefined)).toBe("—");
+    it("returns contextual fallback for null or undefined", () => {
+      expect(formatApplicationDateTime(null)).toBe("Sin fecha");
+      expect(formatApplicationDateTime(undefined)).toBe("Sin fecha");
     });
   });
 
@@ -105,8 +105,8 @@ describe("enrollment-application.util", () => {
       expect(formatBirthDate("2000-11-20")).toBe("20/11/2000");
     });
 
-    it("returns — for null or undefined", () => {
-      expect(formatBirthDate(null)).toBe("—");
+    it("returns contextual fallback for null or undefined", () => {
+      expect(formatBirthDate(null)).toBe("Sin fecha de nacimiento");
     });
   });
 

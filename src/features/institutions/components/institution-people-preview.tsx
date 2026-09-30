@@ -5,12 +5,13 @@ import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Skeleton } from "@common/components/ui/skeleton";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { DEFAULT_PEOPLE_SORT } from "@features/people/utils/people-pagination.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionPeoplePreviewProps = {
   institutionId: string;
@@ -140,15 +141,7 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
 function UsersPreviewHeader(): React.ReactElement {
   return (
     <div className="flex items-stretch justify-between gap-4">
-      <div className="flex items-stretch gap-3.5">
-        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <UsersIcon className="size-5" aria-hidden="true" />
-        </div>
-        <div className="flex min-w-0 flex-col justify-center">
-          <CardTitle>Usuarios</CardTitle>
-          <CardDescription>Personas con acceso a la institución.</CardDescription>
-        </div>
-      </div>
+      <SectionHeader icon={UsersIcon} title="Usuarios" description="Personas con acceso a la institución." />
     </div>
   );
 }

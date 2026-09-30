@@ -155,7 +155,7 @@ describe("AcademicDetail", () => {
     expect(within(summary).getByText("CAVI")).toBeInTheDocument();
     expect(within(summary).getByText("Borrador")).toBeInTheDocument();
     expect(within(summary).getByText("Vigencia")).toBeInTheDocument();
-    expect(within(summary).getByText("01/01/2026 — 31/12/2026")).toBeInTheDocument();
+    expect(within(summary).getByText("Del 01/01/2026 al 31/12/2026")).toBeInTheDocument();
     expect(within(summary).queryByText("Hoy")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/study-plans");
     expect(screen.getByRole("link", { name: "Editar" })).toHaveAttribute(
@@ -168,7 +168,7 @@ describe("AcademicDetail", () => {
     { effectiveFrom: null, effectiveTo: null, expected: "Sin período definido" },
     { effectiveFrom: "2026-01-01", effectiveTo: null, expected: "Desde 01/01/2026" },
     { effectiveFrom: null, effectiveTo: "2026-12-31", expected: "Hasta 31/12/2026" },
-    { effectiveFrom: "2026-01-01", effectiveTo: "2026-12-31", expected: "01/01/2026 — 31/12/2026" },
+    { effectiveFrom: "2026-01-01", effectiveTo: "2026-12-31", expected: "Del 01/01/2026 al 31/12/2026" },
   ])("shows study-plan validity as $expected", ({ effectiveFrom, effectiveTo, expected }) => {
     render(<AcademicDetail item={{ ...STUDY_PLAN, effectiveFrom, effectiveTo }} resource={AcademicResource.STUDY_PLAN} basePath="" canEdit />);
 
@@ -195,7 +195,7 @@ describe("AcademicDetail", () => {
     expect(within(classesRegion).getByText("Lunes")).toBeInTheDocument();
     expect(within(classesRegion).getByText("60 min")).toBeInTheDocument();
     expect(within(classesRegion).getByText("4")).toBeInTheDocument();
-    expect(within(classesRegion).getByText("08:00 — 12:00")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("08:00 a 12:00")).toBeInTheDocument();
   });
 
   it("shows the associated instrument for an instrumental course and a placeholder otherwise", () => {
@@ -216,7 +216,7 @@ describe("AcademicDetail", () => {
 
     const plainInfo = screen.getByRole("region", { name: "Información del curso" });
     const instrumentLabel = within(plainInfo).getByText("Instrumento");
-    expect(instrumentLabel.nextElementSibling).toHaveTextContent("—");
+    expect(instrumentLabel.nextElementSibling).toHaveTextContent("Sin instrumento");
   });
 
   it("renders empty states for a course without classes", () => {
@@ -258,7 +258,7 @@ describe("AcademicDetail", () => {
     expect(within(classesRegion).getByText("Martes")).toBeInTheDocument();
     expect(within(classesRegion).getByText("25")).toBeInTheDocument();
     expect(within(classesRegion).queryByText(/Período:/)).not.toBeInTheDocument();
-    expect(within(classesRegion).getByText("08:00 — 10:00")).toBeInTheDocument();
-    expect(within(classesRegion).getByText("14:00 — 16:00")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("08:00 a 10:00")).toBeInTheDocument();
+    expect(within(classesRegion).getByText("14:00 a 16:00")).toBeInTheDocument();
   });
 });

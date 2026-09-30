@@ -11,6 +11,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common
 import { PasswordInput } from "@common/components/ui/password-input";
 import { changeInstitutionalPasswordAction } from "@features/institutional-auth/actions/change-institutional-password.action";
 import type { InstitutionalPasswordActionState } from "@features/institutional-auth/types/institutional-password-state.types";
+import { SectionHeader } from "@common/components/section-header";
 
 const INITIAL_STATE: InstitutionalPasswordActionState = {};
 
@@ -29,15 +30,11 @@ export function InstitutionalPasswordForm(): React.ReactElement {
 
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <KeyRoundIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold">Nueva contraseña</h2>
-              <p className="text-muted-foreground text-sm">Al confirmar el cambio se cerrará tu sesión en todos tus dispositivos.</p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={KeyRoundIcon}
+            title="Nueva contraseña"
+            description="Al confirmar el cambio se cerrará tu sesión en todos tus dispositivos."
+          />
         </header>
         <div className="mt-4 sm:mt-5">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">

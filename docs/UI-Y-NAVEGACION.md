@@ -27,6 +27,15 @@ La aplicación soporta modo claro y oscuro a través de `next-themes`. Todas las
 - Usar `bg-background`, `text-foreground`, `bg-card`, `border-border`, `text-muted-foreground`.
 - Evitar colores fijos como `bg-white` o `text-black` que rompen la legibilidad en modo oscuro.
 
+### Encabezados de sección responsive
+
+Reutilizar `SectionHeader` (`@common/components/section-header`) para secciones con icono, título y descripción. El icono tiene tamaño fijo: no usar `self-stretch` para hacerlo crecer con el texto.
+
+- En contenedores angostos, la descripción ocupa todo el ancho y las acciones van debajo. El título conserva su jerarquía y puede envolver sin recortarse.
+- En contenedores amplios, descripción y título se alinean junto al icono y las acciones quedan a la derecha. La adaptación usa el contenedor `section-header`, no solo el viewport.
+- `compactTitle` y `compactDescription` permiten una redacción breve para móvil sin ocultar funcionalidad ni cambiar el significado; el texto completo se conserva en escritorio.
+- Conservar `titleId` cuando la sección utiliza `aria-labelledby`. Mantener las descripciones útiles y evitar abreviar datos de negocio o reemplazar información por tooltips.
+
 ---
 
 ## 2. Invariantes en Tablas y Paginación

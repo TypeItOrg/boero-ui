@@ -13,6 +13,7 @@ import {
   approvalModeLabels,
   requirementTypeLabels,
 } from "@features/academic/utils/academic-labels.util";
+import { SectionHeader } from "@common/components/section-header";
 
 export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailType }): React.ReactElement {
   const hasSpaces = detail.levels.some((level) => level.spaces.length > 0) || detail.unassignedSpaces.length > 0;
@@ -112,17 +113,7 @@ type AcademicOfferSectionHeaderProps = {
 function AcademicOfferSectionHeader({ description, icon: Icon, title, titleId }: AcademicOfferSectionHeaderProps): React.ReactElement {
   return (
     <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-      <div className="flex items-center gap-3.5">
-        <span className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <Icon aria-hidden="true" className="size-5" />
-        </span>
-        <div className="min-w-0">
-          <h2 id={titleId} className="text-base font-semibold">
-            {title}
-          </h2>
-          <p className="text-muted-foreground text-sm">{description}</p>
-        </div>
-      </div>
+      <SectionHeader icon={Icon} title={title} description={<span className="text-muted-foreground text-sm">{description}</span>} titleId={titleId} />
     </header>
   );
 }
@@ -146,5 +137,5 @@ function AcademicOfferSpaceCard({ space }: { space: AcademicOfferSpace }): React
 
 function formatValidity(effectiveFrom: string, effectiveTo: string | null): string {
   if (!effectiveTo) return `Vigente desde ${formatDisplayDate(effectiveFrom)}`;
-  return `${formatDisplayDate(effectiveFrom)} — ${formatDisplayDate(effectiveTo)}`;
+  return `Del ${formatDisplayDate(effectiveFrom)} al ${formatDisplayDate(effectiveTo)}`;
 }

@@ -1,12 +1,13 @@
 import { CheckIcon, KeyRoundIcon } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
 import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
+import { SectionHeader } from "@common/components/section-header";
 
 const HIDDEN_PERMISSION_GROUP_CODES = new Set(["GRADES"]);
 
@@ -48,15 +49,7 @@ export function InstitutionRolePermissions({ permissionCodes, groups }: Institut
         return (
           <Card key={group.code} className="bg-muted/25 flex-[1_0_min(450px,100%)]">
             <CardHeader className="border-b">
-              <div className="flex items-stretch gap-3.5">
-                <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                  <Icon className="size-5" aria-hidden="true" />
-                </div>
-                <div className="flex min-w-0 flex-col justify-center">
-                  <CardTitle>{group.displayName}</CardTitle>
-                  <CardDescription className="line-clamp-1">{group.description}</CardDescription>
-                </div>
-              </div>
+              <SectionHeader icon={Icon} title={group.displayName} description={<span className="line-clamp-1">{group.description}</span>} />
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               <PermissionHierarchy nodes={getPermissionTree(group.permissions, permissionMap)} renderPermission={renderPermissionRow} />

@@ -25,6 +25,7 @@ import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/servi
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 import type { StudentSummary } from "@features/course-enrollments/types/student-summary.types";
 import type { Course } from "@features/academic/types/course.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type CourseManualEnrollmentFormProps = {
   returnTo: string;
@@ -106,17 +107,12 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
 
       <section aria-labelledby="manual-enrollment-student-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-              <UserRoundCheckIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <h2 id="manual-enrollment-student-title" className="text-base font-semibold">
-                Estudiante y curso
-              </h2>
-              <p className="text-muted-foreground text-sm">Seleccioná quién realizará la cursada y el curso al que se incorporará.</p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={UserRoundCheckIcon}
+            title="Estudiante y curso"
+            description="Seleccioná quién realizará la cursada y el curso al que se incorporará."
+            titleId="manual-enrollment-student-title"
+          />
         </header>
 
         <div className="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">

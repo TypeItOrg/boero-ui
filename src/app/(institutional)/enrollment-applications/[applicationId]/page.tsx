@@ -56,7 +56,7 @@ export default async function EnrollmentApplicationDetailPage({
     canApproveProvisionally: application.canApproveProvisionally,
     canConfirm: application.canConfirm,
     applicantName,
-    studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "—",
+    studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "Sin plan de estudio",
   };
 
   return (

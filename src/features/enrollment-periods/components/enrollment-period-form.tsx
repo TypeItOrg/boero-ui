@@ -29,6 +29,7 @@ import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enroll
 import { getEnrollmentPeriodDateTimeInput } from "@features/enrollment-periods/utils/enrollment-period-date.util";
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type EnrollmentPeriodFormProps = {
   initialInstitution?: { id: string; name: string };
@@ -119,19 +120,15 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
 
         <section className="bg-muted/25 @container/enrollment-period-form rounded-xl border p-5 @md/enrollment-period-form:p-6">
           <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-            <div className="flex items-center gap-3.5">
-              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                <CalendarRangeIcon className="size-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="text-base font-semibold">Información del período</h2>
-                <p className="text-muted-foreground text-sm">
-                  {AcademicScope.isAdmin(scope)
-                    ? "Definí la institución, el ciclo lectivo y las fechas habilitadas para inscribirse."
-                    : "Definí el ciclo lectivo y las fechas habilitadas para inscribirse."}
-                </p>
-              </div>
-            </div>
+            <SectionHeader
+              icon={CalendarRangeIcon}
+              title="Información del período"
+              description={
+                AcademicScope.isAdmin(scope)
+                  ? "Definí la institución, el ciclo lectivo y las fechas habilitadas para inscribirse."
+                  : "Definí el ciclo lectivo y las fechas habilitadas para inscribirse."
+              }
+            />
           </header>
 
           <div className="mt-5 grid gap-5 @2xl/enrollment-period-form:grid-cols-2">

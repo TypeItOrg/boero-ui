@@ -320,6 +320,7 @@ export function EnrollmentWizard({
   }, [birthDate]);
 
   const isMinor = calculatedAge !== null && calculatedAge < 18;
+  const hasDocumentsStep = Boolean(application.canReadAttachments) && (application.documents?.length ?? 0) > 0;
 
   const visibleTabs = React.useMemo(() => {
     const rawTabs = [
@@ -329,15 +330,22 @@ export function EnrollmentWizard({
       ...(isMinor ? [{ id: "responsible", label: "Tutor Legal" }] : []),
       { id: "spaces", label: "Cursos" },
       { id: "preferences", label: "Preferencias" },
+      ...(hasDocumentsStep ? [{ id: "documents", label: "Documentación" }] : []),
     ];
 
     return rawTabs.map((tab, index) => ({
       ...tab,
       label: `${index + 1}. ${tab.label}`,
     }));
-  }, [isMinor]);
+  }, [isMinor, hasDocumentsStep]);
 
-  const effectiveActiveTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : activeTab === "responsible" ? "spaces" : "personal";
+  const effectiveActiveTab = visibleTabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : activeTab === "responsible"
+      ? "spaces"
+      : activeTab === "documents"
+        ? "preferences"
+        : "personal";
 
   React.useLayoutEffect(() => {
     if (!hydrated) {
@@ -1488,7 +1496,11 @@ export function EnrollmentWizard({
               <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
                 Atrás
               </Button>
-              {!readOnly ? (
+              {hasDocumentsStep ? (
+                <Button type="button" size="lg" onClick={() => handleActiveTabChange("documents")} className="gap-1.5">
+                  Siguiente: Documentación
+                </Button>
+              ) : !readOnly ? (
                 <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen}>
                   Enviar inscripción
                 </Button>
@@ -1496,8 +1508,29 @@ export function EnrollmentWizard({
             </CardFooter>
           </Card>
         </TabsContent>
+
+        {hasDocumentsStep ? (
+          // Keep the refreshed document snapshot when navigating back to other steps.
+          <TabsContent value="documents" forceMount hidden={effectiveActiveTab !== "documents"} className="space-y-6">
+            <EnrollmentDocuments
+              application={application}
+              title={visibleTabs.find((tab) => tab.id === "documents")?.label}
+              footer={
+                <>
+                  <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
+                    Atrás
+                  </Button>
+                  {!readOnly ? (
+                    <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen}>
+                      Enviar inscripción
+                    </Button>
+                  ) : null}
+                </>
+              }
+            />
+          </TabsContent>
+        ) : null}
       </Tabs>
-      <EnrollmentDocuments application={application} />
 
       {/* Confirmation Dialog for Cancel Application */}
       {isCancelDialogOpen && (

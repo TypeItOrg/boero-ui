@@ -6,6 +6,7 @@ import { Badge } from "@common/components/ui/badge";
 import { Separator } from "@common/components/ui/separator";
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicRecentItem } from "@features/academic/services/academic-recent.service";
+import { SectionHeader } from "@common/components/section-header";
 
 type AcademicRecentItemsProps = {
   basePath: string;
@@ -16,17 +17,12 @@ export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProp
   return (
     <section aria-labelledby="academic-recent-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <HistoryIcon aria-hidden="true" className="size-5" />
-          </div>
-          <div>
-            <h2 id="academic-recent-title" className="text-base font-semibold">
-              Actividad reciente
-            </h2>
-            <p className="text-muted-foreground text-sm">Los últimos registros incorporados.</p>
-          </div>
-        </div>
+        <SectionHeader
+          icon={HistoryIcon}
+          title="Actividad reciente"
+          description="Los últimos registros incorporados."
+          titleId="academic-recent-title"
+        />
       </header>
       {items.length === 0 ? (
         <div className="bg-background mt-5 flex items-center gap-3 rounded-xl border p-4">

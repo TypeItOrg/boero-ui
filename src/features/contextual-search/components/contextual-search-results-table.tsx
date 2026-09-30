@@ -1,3 +1,4 @@
+import { OptionalValue } from "@common/components/optional-value";
 import { getContextualSearchLabels } from "@features/contextual-search/utils/contextual-search-label.util";
 import Link from "next/link";
 
@@ -49,7 +50,7 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
                     {CONTEXTUAL_SEARCH_STATUS_LABELS[item.status] ?? item.status}
                   </Badge>
                 ) : (
-                  "—"
+                  <OptionalValue value={null} fallback="Sin estado informado" />
                 )}
               </TableCell>
             </TableRow>

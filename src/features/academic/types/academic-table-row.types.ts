@@ -4,7 +4,7 @@ export type AcademicTableRow = {
   institutionId?: string;
   institutionName?: string;
   primaryValue: string;
-  detailValues: readonly string[];
+  detailValues: readonly (string | { value: string | null | undefined; fallback: string })[];
   status: string;
   active: boolean;
   effectiveFrom?: string | null;

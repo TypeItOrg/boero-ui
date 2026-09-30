@@ -9,7 +9,7 @@ import { CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon } from "lucid
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { saveInstitutionRoleAction } from "@features/roles/actions/save-institution-role.action";
@@ -17,6 +17,7 @@ import { PermissionGroupsFields } from "@features/roles/components/permission-gr
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionRole } from "@features/roles/types/institution-role.types";
 import type { RoleFormState } from "@features/roles/types/role-form-state.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionRoleFormProps = {
   institutionId: string;
@@ -55,15 +56,7 @@ export function InstitutionRoleForm({ institutionId, role, permissionGroups, ret
 
       <Card className="bg-muted/25">
         <CardHeader className="border-b">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <UserRoundCogIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <CardTitle>Datos del rol</CardTitle>
-              <CardDescription>Usá un nombre reconocible para las personas de la institución.</CardDescription>
-            </div>
-          </div>
+          <SectionHeader icon={UserRoundCogIcon} title="Datos del rol" description="Usá un nombre reconocible para las personas de la institución." />
         </CardHeader>
         <CardContent>
           <FieldGroup>
@@ -80,15 +73,7 @@ export function InstitutionRoleForm({ institutionId, role, permissionGroups, ret
 
       <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <KeyRoundIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold">Permisos</h2>
-              <p className="text-muted-foreground text-sm">Seleccioná los permisos que podrá conceder este rol.</p>
-            </div>
-          </div>
+          <SectionHeader icon={KeyRoundIcon} title="Permisos" description="Seleccioná los permisos que podrá conceder este rol." />
         </header>
         <div className="mt-5">
           <PermissionGroupsFields
