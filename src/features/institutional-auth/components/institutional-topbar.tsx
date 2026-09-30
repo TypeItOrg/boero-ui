@@ -2,6 +2,7 @@ import { SidebarTrigger } from "@common/components/ui/sidebar";
 import { ContextualSearch } from "@features/contextual-search/components/contextual-search";
 import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
 import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
+import { GuardianWorkspaceBadge } from "@features/guardian-workspace/components/guardian-workspace-badge";
 
 type InstitutionalTopbarProps = {
   accessSections: readonly ContextualSearchAccessSection[];
@@ -29,6 +30,7 @@ export function InstitutionalTopbar({
           </span>
           <span className="text-muted-foreground block text-xs">Portal Institucional</span>
         </div>
+        <GuardianWorkspaceBadge />
         <div className="max-w-lg min-w-0 flex-1">
           <ContextualSearch
             accessSections={accessSections}

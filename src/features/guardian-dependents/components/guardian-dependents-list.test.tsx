@@ -30,6 +30,7 @@ function buildDependent(overrides: Partial<GuardianDependent> = {}): GuardianDep
     relationship: "MOTHER",
     isPrimaryContact: true,
     activeApplicationsCount: 2,
+    roles: ["Postulante"],
     createdAt: "2026-01-01T00:00:00Z",
     ...overrides,
   };

@@ -10,5 +10,6 @@ export type GuardianDependent = {
   relationship: GuardianRelationship;
   isPrimaryContact: boolean;
   activeApplicationsCount: number;
+  roles: readonly string[];
   createdAt: string;
 };

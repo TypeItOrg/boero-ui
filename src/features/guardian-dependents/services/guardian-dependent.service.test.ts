@@ -12,6 +12,7 @@ const DEPENDENT: GuardianDependent = {
   relationship: "FATHER",
   isPrimaryContact: true,
   activeApplicationsCount: 1,
+  roles: ["Postulante"],
   createdAt: "2026-09-24T12:00:00Z",
 };
 
