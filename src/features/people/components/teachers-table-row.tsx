@@ -11,7 +11,7 @@ export function TeachersTableRow({ teacher }: TeachersTableRowProps): React.Reac
   return (
     <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
       <TableCell className="font-medium">
-        <ReturnToLink href={`/people/${teacher.id}?view=detail`}>
+        <ReturnToLink href={`/teachers/${teacher.id}`}>
           <span className="hover:underline">
             {teacher.lastName}, {teacher.firstName}
           </span>
