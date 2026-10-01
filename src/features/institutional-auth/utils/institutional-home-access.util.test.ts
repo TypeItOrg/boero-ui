@@ -19,7 +19,7 @@ describe("institutional home access", () => {
       permissions: [INSTITUTIONAL_PERMISSION.INSTITUTION_READ, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY, INSTITUTIONAL_PERMISSION.ROLE_READ],
     });
 
-    expect(links.map(({ href }) => href)).toEqual(["/account", "/institution", "/people", "/roles"]);
+    expect(links.map(({ href }) => href)).toEqual(["/account", "/institution", "/people", "/teachers", "/roles"]);
   });
 
   it("keeps creation tasks separate from navigation links", () => {

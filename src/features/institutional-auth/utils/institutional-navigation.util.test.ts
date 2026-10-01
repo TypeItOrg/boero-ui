@@ -84,7 +84,7 @@ describe("getInstitutionalNavigationSections", () => {
 
     expect(sections.map((section) => section.label)).toEqual([undefined, "Institución", "Académico", "Personal"]);
     expect(sections[0]?.items.map((item) => item.title)).toEqual(["Inicio"]);
-    expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Roles y permisos"]);
+    expect(sections[1]?.items.map((item) => item.title)).toEqual(["Institución", "Usuarios", "Docentes", "Roles y permisos"]);
   });
 
   it("shows the applicant section with new enrollment and my applications for applicant roles", () => {

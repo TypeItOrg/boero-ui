@@ -62,6 +62,13 @@ const MANAGEMENT_LINKS: readonly InstitutionalHomeLink[] = [
     permission: INSTITUTIONAL_PERMISSION.PERSON_READ_ANY,
   },
   {
+    href: "/teachers",
+    title: "Docentes",
+    description: "Consultá los docentes y su estado de acceso.",
+    icon: GraduationCapIcon,
+    permission: INSTITUTIONAL_PERMISSION.PERSON_READ_ANY,
+  },
+  {
     href: "/roles",
     title: "Roles y permisos",
     description: "Organizá los accesos y responsabilidades institucionales.",

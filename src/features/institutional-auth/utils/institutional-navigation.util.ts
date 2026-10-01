@@ -48,6 +48,7 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   const platformItems: NavigationItem[] = [
     ...(canReadInstitution ? [{ title: "Institución", url: "/institution", icon: Building2Icon }] : []),
     ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
+    ...(canManagePeople ? [{ title: "Docentes", url: "/teachers", icon: GraduationCapIcon }] : []),
     ...(canReadRoles ? [{ title: "Roles y permisos", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [

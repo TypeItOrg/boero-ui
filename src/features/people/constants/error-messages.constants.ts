@@ -5,6 +5,7 @@ export const PEOPLE_ERROR_MESSAGES = {
   UPDATE_STATUS: "No se pudo actualizar el acceso del usuario.",
   FETCH_PERSON: "No se pudo obtener el usuario",
   FETCH_PEOPLE: "No se pudieron obtener los usuarios de la institución",
+  FETCH_TEACHERS: "No se pudieron obtener los docentes de la institución",
   FETCH_PLATFORM_PEOPLE: "No se pudieron obtener los usuarios de la plataforma",
   FETCH_ROLES: "No se pudieron obtener los roles del sistema",
   FETCH_PERSON_ROLES: "No se pudieron obtener los roles del usuario",
