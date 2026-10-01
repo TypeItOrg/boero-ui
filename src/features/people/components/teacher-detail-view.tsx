@@ -1,4 +1,5 @@
 import { Badge } from "@common/components/ui/badge";
+import { TeacherWeeklySchedule } from "@features/people/components/teacher-weekly-schedule";
 import type { TeacherDetail } from "@features/people/types/teacher-detail.types";
 
 export function TeacherDetailView({ data }: { data: TeacherDetail }): React.ReactElement {
@@ -67,6 +68,13 @@ export function TeacherDetailView({ data }: { data: TeacherDetail }): React.Reac
           ) : (
             <p className="text-muted-foreground py-6 text-center text-sm">Este docente no tiene asignaciones.</p>
           )}
+        </div>
+      </section>
+      <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
+        <h2 className="font-semibold">Vista semanal</h2>
+        <p className="text-muted-foreground text-sm">Franjas ocupadas por clases asignadas.</p>
+        <div className="mt-4">
+          <TeacherWeeklySchedule courses={courses} />
         </div>
       </section>
     </div>
