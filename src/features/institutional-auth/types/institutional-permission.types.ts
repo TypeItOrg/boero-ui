@@ -1,4 +1,7 @@
 export const INSTITUTIONAL_PERMISSION = {
+  ENROLLMENT_DOCUMENT_REQUEST_CREATE: "institution:enrollment-document-request:create",
+  DOCUMENT_CATALOG_READ: "institution:document-catalog:read",
+  DOCUMENT_CATALOG_MANAGE: "institution:document-catalog:manage",
   PERSON_READ_ANY: "institution:person:read-any",
   PERSON_CREATE: "institution:person:create",
   PERSON_UPDATE_ANY: "institution:person:update-any",

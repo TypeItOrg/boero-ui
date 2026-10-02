@@ -34,6 +34,7 @@ type AcademicResourceFormProps = AcademicFormOptions & {
   returnTo: string;
   documentRequirements?: DocumentRequirement[];
   canEditDocumentRequirements?: boolean;
+  canManageDocumentCatalog?: boolean;
 };
 
 const initialState: AcademicActionState = {};
@@ -104,6 +105,7 @@ export function AcademicResourceForm({
   returnTo,
   documentRequirements,
   canEditDocumentRequirements = true,
+  canManageDocumentCatalog = false,
   ...options
 }: AcademicResourceFormProps): React.ReactElement {
   const [institution, setInstitution] = useState<InstitutionSummary>();
@@ -177,6 +179,10 @@ export function AcademicResourceForm({
         )}
         {resource === AcademicResource.TRAINING_PATH ? (
           <TrainingPathDocumentFields
+            scope={scope}
+            institutionId={effectiveInstitutionId}
+            pathId={id ?? state.trainingPathProgress?.trainingPathId}
+            canManageCatalog={scope === "admin" || canManageDocumentCatalog}
             requirements={documentRequirements}
             canEdit={canEditDocumentRequirements}
             pending={pending || state.trainingPathSaveUncertain === true}

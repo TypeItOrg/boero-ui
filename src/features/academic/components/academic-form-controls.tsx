@@ -26,6 +26,7 @@ type FormFieldProps = React.PropsWithChildren<{
 }>;
 
 type FormSelectProps = {
+  id?: string;
   defaultValue?: string | number;
   disabled?: boolean;
   name: string;
@@ -74,6 +75,7 @@ export function FormField({ label, name, error, className, children, required = 
 
 export function FormSelect({
   name,
+  id,
   defaultValue,
   disabled = false,
   options,
@@ -90,7 +92,7 @@ export function FormSelect({
     <>
       <input type="hidden" name={name} value={value} />
       <Select disabled={disabled} value={value} onValueChange={handleValueChange}>
-        <SelectTrigger id={name} className="h-9! w-full">
+        <SelectTrigger id={id ?? name} className="w-full">
           <SelectValue placeholder={placeholder}>{selectedOption?.label}</SelectValue>
         </SelectTrigger>
         <SelectContent>

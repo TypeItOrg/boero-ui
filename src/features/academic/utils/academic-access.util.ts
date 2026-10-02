@@ -7,6 +7,7 @@ export function getAcademicAccess(user: InstitutionalUser, trainingPathId?: stri
   const permits = (permission: Parameters<typeof hasInstitutionalPermission>[1]) =>
     trainingPathId === undefined ? hasInstitutionalPermission(user, permission) : hasTrainingPathPermission(user, permission, trainingPathId);
   return {
+    documentCatalogManage: hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_MANAGE),
     yearRead: permits(INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ),
     yearCreate: permits(INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_CREATE),
     yearUpdate: permits(INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_UPDATE),

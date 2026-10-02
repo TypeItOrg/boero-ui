@@ -23,6 +23,6 @@ export function getAcademicSidebarNavigationSections(
     id: "academic-settings",
     title: "Configuración",
     icon: SettingsIcon,
-    urls: ["/academic-years", "/academic-spaces", "/instruments", "/shifts"].map((url) => `${prefix}${url}`),
+    urls: ["/academic-years", "/academic-spaces", "/instruments", "/shifts", "/documentation"].map((url) => `${prefix}${url}`),
   });
 }

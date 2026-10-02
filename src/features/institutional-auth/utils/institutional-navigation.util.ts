@@ -1,4 +1,5 @@
 import {
+  FileTextIcon,
   BookCopyIcon,
   BookOpenIcon,
   BookMarkedIcon,
@@ -51,6 +52,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles y permisos", url: "/roles", icon: UserLockIcon }] : []),
   ];
   const academicItems: NavigationItem[] = [
+    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)
+      ? [{ title: "Documentación", url: "/documentation", icon: FileTextIcon }]
+      : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
       ? [{ title: "Oferta académica", url: "/academic-offers", icon: BookCopyIcon }]
       : []),

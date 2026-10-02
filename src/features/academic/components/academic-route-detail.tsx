@@ -183,6 +183,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           returnTo={returnTo}
           initialValues={{ ...item, classes: JSON.stringify("classes" in item ? item.classes : []) } as Record<string, FormValue>}
           documentRequirements={documentRequirements}
+          canManageDocumentCatalog={input.access.documentCatalogManage}
           canEditDocumentRequirements={canEdit}
         />
       </AcademicShell>

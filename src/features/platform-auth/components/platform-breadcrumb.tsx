@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
 const ROUTE_LABELS: Readonly<Record<string, string>> = {
+  documentation: "Documentación",
   institutions: "Instituciones",
   accounts: "Administradores",
   new: "Nuevo",

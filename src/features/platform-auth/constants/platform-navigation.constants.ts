@@ -1,4 +1,5 @@
 import {
+  FileTextIcon,
   BookMarkedIcon,
   BuildingIcon,
   CalendarRangeIcon,
@@ -42,6 +43,7 @@ const MANAGEMENT_NAVIGATION_ITEMS = [
 ] as const satisfies readonly NavigationItem[];
 
 const ACADEMIC_NAVIGATION_ITEMS = [
+  { title: "Documentación", url: "/admin/documentation", icon: FileTextIcon },
   {
     title: "Ciclos lectivos",
     url: "/admin/academic-years",

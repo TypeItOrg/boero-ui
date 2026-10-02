@@ -1,4 +1,10 @@
 export const ENROLLMENT_MESSAGES = {
+  requestContext: "Contexto de inscripción inválido.",
+  requestUncertain: "Recargá el detalle para confirmar el pedido anterior antes de reintentar.",
+  requestDocumentsInvalid: "Revisá los documentos seleccionados.",
+  requestValidation: "Indicá el motivo y seleccioná al menos un documento con su exigencia.",
+  requestReadFailed: "No se pudo confirmar el pedido. Recargá el detalle antes de reintentar.",
+  requestSavedRefreshFailed: "El pedido se guardó, pero no se pudo actualizar el detalle. Recargalo antes de continuar.",
   COURSE_INSTRUMENT_REQUIRED: "Elegí un instrumento para continuar con este espacio.",
   COURSE_INSTRUMENT_HINT: "Al elegirlo, este espacio se guarda en tu borrador. Podés cambiarlo antes de enviar la inscripción.",
   COURSE_INSTRUMENT_DRAFT_PENDING: "Falta elegir instrumento para guardar los espacios marcados.",

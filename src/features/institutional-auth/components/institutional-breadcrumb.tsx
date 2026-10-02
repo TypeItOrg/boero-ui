@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
 const SEGMENT_LABELS: Readonly<Record<string, string>> = {
+  documentation: "Documentación",
   people: "Usuarios",
   new: "Nuevo",
   account: "Cuenta",

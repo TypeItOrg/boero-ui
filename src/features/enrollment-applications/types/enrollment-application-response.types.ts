@@ -15,6 +15,8 @@ export interface EnrollmentApplicationResponse {
   enrollmentPeriod?: EnrollmentPeriod;
   periodOpen?: boolean;
   canReadAttachments?: boolean;
+  canRequestDocuments?: boolean;
+  documentRequests?: import("@features/enrollment-applications/types/enrollment-document-request.types").EnrollmentDocumentRequest[];
   documents?: import("@features/enrollment-applications/types/document-requirement.types").DocumentRequirement[];
   canApproveProvisionally?: boolean;
   canConfirm?: boolean;

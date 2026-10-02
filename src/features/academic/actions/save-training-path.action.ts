@@ -25,7 +25,11 @@ import { getAcademicApiBase, getAcademicResourceRoute, type AcademicScope } from
 import { documentRequirementSchema } from "@features/enrollment-applications/schemas/document-requirement.schema";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 
-const progressSchema = z.object({ trainingPathId: z.uuid(), requirementIds: z.record(z.uuid(), z.uuid()) });
+const progressSchema = z.object({
+  trainingPathId: z.uuid(),
+  requirementIds: z.record(z.uuid(), z.uuid()),
+  requirementRevisions: z.record(z.uuid(), z.number().int().min(0)).optional(),
+});
 const draftsSchema = z.array(documentRequirementSchema.extend({ clientId: z.uuid(), id: z.uuid().nullable(), dirty: z.boolean() }));
 
 export async function saveTrainingPathAction(
@@ -148,7 +152,7 @@ export async function saveTrainingPathAction(
     }
     pathId = created.data.id;
   }
-  progress = { trainingPathId: pathId, requirementIds: { ...progress?.requirementIds } };
+  progress = { trainingPathId: pathId, requirementIds: { ...progress?.requirementIds }, requirementRevisions: { ...progress?.requirementRevisions } };
   const fallback = getAcademicResourceRoute(input.scope, input.institutionId, AcademicResource.TRAINING_PATH);
   revalidatePath(fallback);
   revalidatePath(`${fallback}/${pathId}`);
@@ -162,7 +166,10 @@ export async function saveTrainingPathAction(
       {
         method: requirementId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(documentRequirementSchema.parse(draft)),
+        body: JSON.stringify({
+          ...documentRequirementSchema.parse(draft),
+          revision: progress.requirementRevisions?.[draft.clientId] ?? draft.revision,
+        }),
       },
     ).then((response) => {
       requirementResponse = response;
@@ -180,16 +187,16 @@ export async function saveTrainingPathAction(
         error: `El trayecto se guardó, pero no se pudo guardar «${draft.name}». ${error.error} Podés reintentar desde este formulario.`,
       });
     }
-    if (!requirementId) {
-      const saved = z.object({ id: z.uuid() }).safeParse(await (await request).json().catch(() => null));
-      if (!saved.success) {
-        return withProgress({
-          error: `La API no devolvió el identificador de «${draft.name}». Revisá los requisitos del trayecto antes de volver a guardarlo.`,
-          trainingPathSaveUncertain: true,
-        });
-      }
-      progress.requirementIds[draft.clientId] = saved.data.id;
+    const saved = z.object({ id: z.uuid(), revision: z.number().int().min(0) }).safeParse(await (await request).json().catch(() => null));
+    if (!saved.success) {
+      return withProgress({
+        error: `La API no devolvió el identificador de «${draft.name}». Revisá los requisitos del trayecto antes de volver a guardarlo.`,
+        trainingPathSaveUncertain: true,
+      });
     }
+    progress.requirementIds[draft.clientId] = saved.data.id;
+    progress.requirementRevisions ??= {};
+    progress.requirementRevisions[draft.clientId] = saved.data.revision;
   }
 
   if (status.nextActiveStatus !== null) {

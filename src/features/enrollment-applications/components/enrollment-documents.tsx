@@ -1,14 +1,12 @@
 "use client";
+
 import * as React from "react";
+
 import { useRouter } from "next/navigation";
-import { FileTextIcon } from "lucide-react";
-import { Button } from "@common/components/ui/button";
-import { Input } from "@common/components/ui/input";
-import { Textarea } from "@common/components/ui/textarea";
-import { Badge } from "@common/components/ui/badge";
-import { Card, CardContent, CardFooter } from "@common/components/ui/card";
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+
+import { FileTextIcon, PlusIcon, RefreshCwIcon, CircleAlertIcon } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,21 +15,31 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
 } from "@common/components/ui/alert-dialog";
+import { Badge } from "@common/components/ui/badge";
+import { Button } from "@common/components/ui/button";
+import { Card, CardContent, CardFooter } from "@common/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+import { Input } from "@common/components/ui/input";
+import { Textarea } from "@common/components/ui/textarea";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
+import { FormField } from "@features/academic/components/academic-form-controls";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
-import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
-import type { DocumentDelivery } from "@features/enrollment-applications/types/document-delivery.types";
-import type { DocumentActionState } from "@features/enrollment-applications/types/document-action-state.types";
+import { mutateDocument } from "@features/enrollment-applications/actions/documentation.actions";
+import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
+import { RequestDocumentsDialog } from "@features/enrollment-applications/components/request-documents-dialog";
 import {
   DOCUMENT_LEVEL_LABELS,
   DOCUMENT_STATUS_LABELS,
   DOCUMENT_MESSAGES,
 } from "@features/enrollment-applications/constants/documentation.constants";
-import { mutateDocument } from "@features/enrollment-applications/actions/documentation.actions";
-import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
-import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
-import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import type { DocumentActionState } from "@features/enrollment-applications/types/document-action-state.types";
+import type { DocumentDelivery } from "@features/enrollment-applications/types/document-delivery.types";
+import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import { formatDocumentFileCategories } from "@features/enrollment-applications/utils/document-file-category.util";
+import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+import { getAttachmentDownloadUrl } from "@features/enrollment-applications/utils/enrollment-application.util";
 
 export function EnrollmentDocuments({
   application,
@@ -58,6 +66,8 @@ export function EnrollmentDocuments({
     documentSnapshot.source === application.documents
       ? documentSnapshot.documents
       : (application.documents ?? []);
+  const [requesting, setRequesting] = React.useState(false);
+  const [requestUncertain, setRequestUncertain] = React.useState(false);
   const [error, setError] = React.useState("");
   const [editing, setEditing] = React.useState<{ requirement: DocumentRequirement; operation: "upload" | "review" | "withdraw" } | null>(null);
   const [history, setHistory] = React.useState<{
@@ -98,12 +108,76 @@ export function EnrollmentDocuments({
   }
   return (
     <Card className="bg-muted/25 sm:[--card-spacing:--spacing(6)]" role="region" aria-label="Documentación">
-      <EnrollmentStepCardHeader icon={FileTextIcon} title={title} description="Documentos requeridos para la inscripción y estado de las entregas." />
+      <EnrollmentStepCardHeader
+        icon={FileTextIcon}
+        title={title}
+        description="Documentos requeridos para la inscripción y estado de las entregas."
+        action={
+          <div className="flex flex-wrap gap-3 [&>button]:flex-[1_0_min(180px,100%)] sm:[&>button]:flex-none">
+            <Button
+              size="lg"
+              type="button"
+              variant="outline"
+              disabled={loading}
+              onClick={() => {
+                setLoading(true);
+                void refresh()
+                  .catch(() => setError(DOCUMENT_MESSAGES.readFailed))
+                  .finally(() => setLoading(false));
+              }}
+            >
+              <RefreshCwIcon className={loading ? "animate-spin" : undefined} />
+              Actualizar documentación
+            </Button>
+            {application.canRequestDocuments ? (
+              <>
+                <Button size="lg" type="button" disabled={requestUncertain} onClick={() => setRequesting(true)}>
+                  <PlusIcon />
+                  Solicitar documentación
+                </Button>
+                {requestUncertain ? (
+                  <Button
+                    size="lg"
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      void refresh()
+                        .then(() => setRequestUncertain(false))
+                        .catch(() => setError("No se pudo recargar el detalle. Intentá nuevamente."))
+                    }
+                  >
+                    Recargar detalle antes de reintentar
+                  </Button>
+                ) : null}
+              </>
+            ) : null}
+          </div>
+        }
+      />
       <CardContent className="space-y-4">
+        {application.documentRequests?.map((request) => (
+          <section key={request.id} className="space-y-2 border-b pb-4" aria-label="Pedido de documentación">
+            <h3 className="font-medium">Pedido de documentación adicional</h3>
+            <p className="text-sm break-words whitespace-pre-wrap">{request.reason}</p>
+            <p className="text-muted-foreground text-sm">
+              {formatEnrollmentApplicationDateTime(request.createdAt)} · Responsable: {request.actorName}
+            </p>
+          </section>
+        ))}
+        {requesting ? (
+          <RequestDocumentsDialog
+            application={application}
+            scope={scope}
+            onClose={() => setRequesting(false)}
+            onSaved={refresh}
+            onUncertain={() => setRequestUncertain(true)}
+          />
+        ) : null}
         {error ? (
-          <p role="alert" className="text-destructive">
-            {error}
-          </p>
+          <Alert variant="destructive">
+            <CircleAlertIcon />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
         {documents.length === 0 ? (
           <Empty className="bg-muted/25 rounded-lg px-4 py-10">
@@ -119,34 +193,69 @@ export function EnrollmentDocuments({
         {documents.map((requirement) => (
           <article key={requirement.id} className="bg-muted/20 space-y-3 rounded-lg border p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-medium">{requirement.name}</h3>
-              <Badge variant={requirement.status === "ACCEPTED" ? "success" : "outline"}>
-                {DOCUMENT_STATUS_LABELS[requirement.status ?? "MISSING"]}
+              <h3 className="max-w-full min-w-0 font-medium break-words">{requirement.name}</h3>
+              <Badge variant={requirement.active === false ? "secondary" : requirement.status === "ACCEPTED" ? "success" : "outline"}>
+                {requirement.active === false ? "Requisito retirado" : DOCUMENT_STATUS_LABELS[requirement.status ?? "MISSING"]}
               </Badge>
             </div>
             <p className="text-muted-foreground text-sm">
-              {DOCUMENT_LEVEL_LABELS[requirement.level]} · {formatDocumentFileCategories(requirement.allowedFormats)} · Hasta 10 MiB
+              {requirement.origin === "ADDITIONAL" && requirement.level === "AT_SUBMISSION"
+                ? "Obligatorio antes de aprobar"
+                : DOCUMENT_LEVEL_LABELS[requirement.level]}{" "}
+              · {formatDocumentFileCategories(requirement.allowedFormats)} · Hasta 10 MiB
             </p>
-            {requirement.instructions ? <p className="text-sm whitespace-pre-wrap">{requirement.instructions}</p> : null}
+            {requirement.origin === "ADDITIONAL" ? <p className="text-sm font-medium">Documentación adicional solicitada</p> : null}
+            {requirement.requestId ? (
+              <p className="text-sm break-words whitespace-pre-wrap">
+                Motivo:{" "}
+                {application.documentRequests?.find((request) => request.id === requirement.requestId)?.reason ??
+                  "Consultá el pedido administrativo en este detalle."}
+              </p>
+            ) : null}
+            {requirement.instructions ? <p className="text-sm break-words whitespace-pre-wrap">{requirement.instructions}</p> : null}
+            {requirement.specificInstructions ? (
+              <p className="text-sm break-words whitespace-pre-wrap">Para este trayecto: {requirement.specificInstructions}</p>
+            ) : null}
+            {requirement.needsReplacement ? (
+              <Alert variant="destructive">
+                <CircleAlertIcon />
+                <AlertDescription>Los formatos admitidos cambiaron. Reemplazá el archivo o retiralo si es opcional.</AlertDescription>
+              </Alert>
+            ) : null}
+            {requirement.changes?.length ? (
+              <details className="text-sm">
+                <summary className="cursor-pointer">Cambios en el requisito</summary>
+                <ul className="mt-2 space-y-1">
+                  {requirement.changes.map((change, index) => (
+                    <li key={index}>
+                      {({ ADDED: "Agregado", UPDATED: "Modificado", RETIRED: "Retirado", REACTIVATED: "Reactivado" } as Record<string, string>)[
+                        change.action
+                      ] ?? change.action}{" "}
+                      · {formatEnrollmentApplicationDateTime(change.occurredAt)}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
             {requirement.currentAttachment ? (
               <Delivery file={requirement.currentAttachment} applicationId={application.applicationId} scope={scope} />
             ) : null}
             <div className="flex flex-wrap gap-2">
               {requirement.canUpload || requirement.canReplace ? (
-                <Button type="button" variant="outline" onClick={() => setEditing({ requirement, operation: "upload" })}>
+                <Button size="lg" type="button" variant="outline" onClick={() => setEditing({ requirement, operation: "upload" })}>
                   {requirement.canReplace ? "Reemplazar" : "Adjuntar"}
                 </Button>
               ) : null}
               {requirement.canReview ? (
-                <Button type="button" onClick={() => setEditing({ requirement, operation: "review" })}>
+                <Button size="lg" type="button" onClick={() => setEditing({ requirement, operation: "review" })}>
                   Revisar
                 </Button>
               ) : null}
-              <Button type="button" variant="outline" disabled={loading} onClick={() => void showHistory(requirement)}>
+              <Button size="lg" type="button" variant="outline" disabled={loading} onClick={() => void showHistory(requirement)}>
                 Ver historial
               </Button>
               {requirement.canWithdraw ? (
-                <Button type="button" variant="destructive" onClick={() => setEditing({ requirement, operation: "withdraw" })}>
+                <Button size="lg" type="button" variant="destructive" onClick={() => setEditing({ requirement, operation: "withdraw" })}>
                   Retirar entrega
                 </Button>
               ) : null}
@@ -157,7 +266,7 @@ export function EnrollmentDocuments({
           <section className="space-y-3 rounded-lg border p-4">
             <div className="flex justify-between gap-2">
               <h3 className="font-medium">Historial · {history.requirement.name}</h3>
-              <Button variant="ghost" onClick={() => setHistory(null)}>
+              <Button size="lg" variant="ghost" onClick={() => setHistory(null)}>
                 Cerrar
               </Button>
             </div>
@@ -172,6 +281,7 @@ export function EnrollmentDocuments({
             {!history.items.length ? <p>No hay entregas registradas.</p> : null}
             <div className="flex items-center gap-3">
               <Button
+                size="lg"
                 variant="outline"
                 disabled={loading || history.page === 0}
                 onClick={() => void showHistory(history.requirement, history.page - 1)}
@@ -182,6 +292,7 @@ export function EnrollmentDocuments({
                 Página {history.page + 1} de {Math.max(1, history.totalPages)}
               </span>
               <Button
+                size="lg"
                 variant="outline"
                 disabled={loading || history.page + 1 >= history.totalPages}
                 onClick={() => void showHistory(history.requirement, history.page + 1)}
@@ -201,6 +312,7 @@ export function EnrollmentDocuments({
     </Card>
   );
 }
+
 function Delivery({ file, applicationId, scope }: { file: DocumentDelivery; applicationId: string; scope: AcademicScope }): React.ReactElement {
   return (
     <div className="space-y-1 py-2 text-sm">
@@ -227,6 +339,7 @@ function Delivery({ file, applicationId, scope }: { file: DocumentDelivery; appl
     </div>
   );
 }
+
 function DocumentMutation({
   applicationId,
   scope,
@@ -288,31 +401,50 @@ function DocumentMutation({
             </AlertDialogDescription>
           </AlertDialogHeader>
           {operation === "upload" ? (
-            <Input aria-label="Archivo" name="file" type="file" accept={requirement.allowedFormats.join(",")} required disabled={pending} />
+            <FormField name={`document-file-${requirement.id}`} label="Archivo" required>
+              <Input
+                id={`document-file-${requirement.id}`}
+                name="file"
+                type="file"
+                accept={requirement.allowedFormats.join(",")}
+                required
+                disabled={pending}
+              />
+            </FormField>
           ) : null}
           {operation === "review" ? (
-            <Textarea name="observation" aria-label="Observación" placeholder="Motivo de la observación" maxLength={2000} disabled={pending} />
+            <FormField name={`document-observation-${requirement.id}`} label="Observación">
+              <Textarea
+                id={`document-observation-${requirement.id}`}
+                name="observation"
+                placeholder="Motivo de la observación"
+                maxLength={2000}
+                disabled={pending}
+              />
+            </FormField>
           ) : null}
           {state.error ? (
-            <p role="alert" className="text-destructive text-sm">
-              {state.error}
-            </p>
+            <Alert variant="destructive">
+              <CircleAlertIcon />
+              <AlertTitle>No se pudo guardar</AlertTitle>
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
           ) : null}
           <AlertDialogFooter>
-            <Button type="button" variant="outline" disabled={pending} onClick={onClose}>
+            <Button size="lg" type="button" variant="outline" disabled={pending} onClick={onClose}>
               Cancelar
             </Button>
             {operation === "review" ? (
               <>
-                <Button type="submit" name="status" value="OBSERVED" variant="outline" disabled={pending}>
+                <Button size="lg" type="submit" name="status" value="OBSERVED" variant="outline" disabled={pending}>
                   Observar
                 </Button>
-                <Button type="submit" name="status" value="ACCEPTED" disabled={pending}>
+                <Button size="lg" type="submit" name="status" value="ACCEPTED" disabled={pending}>
                   Aceptar documento
                 </Button>
               </>
             ) : (
-              <Button type="submit" disabled={pending} variant={operation === "withdraw" ? "destructive" : "default"}>
+              <Button size="lg" type="submit" disabled={pending} variant={operation === "withdraw" ? "destructive" : "default"}>
                 {pending ? "Guardando…" : title}
               </Button>
             )}

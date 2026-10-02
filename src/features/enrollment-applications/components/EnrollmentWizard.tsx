@@ -320,7 +320,8 @@ export function EnrollmentWizard({
   }, [birthDate]);
 
   const isMinor = calculatedAge !== null && calculatedAge < 18;
-  const hasDocumentsStep = Boolean(application.canReadAttachments) && (application.documents?.length ?? 0) > 0;
+  const hasDocumentsStep =
+    Boolean(application.canReadAttachments) && (application.documents?.some((requirement) => requirement.active !== false) ?? false);
 
   const visibleTabs = React.useMemo(() => {
     const rawTabs = [
@@ -1531,6 +1532,10 @@ export function EnrollmentWizard({
           </TabsContent>
         ) : null}
       </Tabs>
+
+      {!hasDocumentsStep && application.canReadAttachments && application.documents?.some((requirement) => requirement.active === false) ? (
+        <EnrollmentDocuments application={application} title="Historial de documentación retirada" />
+      ) : null}
 
       {/* Confirmation Dialog for Cancel Application */}
       {isCancelDialogOpen && (

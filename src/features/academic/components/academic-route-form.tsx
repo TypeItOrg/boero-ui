@@ -43,6 +43,7 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
         }
         parentId={contextualTrainingPath?.id}
         resource={input.resource}
+        canManageDocumentCatalog={input.access.documentCatalogManage}
         canEditDocumentRequirements={input.access.trainingPathUpdate}
         returnTo={returnTo}
         trainingPathLocked={contextualTrainingPath !== undefined}

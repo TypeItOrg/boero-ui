@@ -1,4 +1,5 @@
 export type AcademicAccess = {
+  documentCatalogManage?: boolean;
   yearRead: boolean;
   yearCreate: boolean;
   yearUpdate: boolean;
@@ -58,6 +59,7 @@ export function canReadAcademic(access: AcademicAccess): boolean {
 }
 
 export const FULL_ACADEMIC_ACCESS: AcademicAccess = {
+  documentCatalogManage: true,
   yearRead: true,
   yearCreate: true,
   yearUpdate: true,
