@@ -72,10 +72,8 @@ export function DocumentCatalogForm({
       onPendingChange?.(false);
     }
   }, {});
-  const [associated, setAssociated] = React.useState<DocumentAssignment[]>([]);
+  const [associations, setAssociations] = React.useState<PaginatedResponse<DocumentAssignment>>();
   const [page, setPage] = React.useState(0);
-  const [totalPages, setTotalPages] = React.useState(0);
-  const [totalItems, setTotalItems] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(20);
   const [confirmed, setConfirmed] = React.useState(false);
   const [associationsLoading, setAssociationsLoading] = React.useState(Boolean(initial && allowAssignments));
@@ -117,9 +115,7 @@ export function DocumentCatalogForm({
       controller.signal,
     )
       .then((data) => {
-        setAssociated(data.items);
-        setTotalPages(data.totalPages);
-        setTotalItems(data.totalItems);
+        setAssociations(data);
         setAssociationsLoading(false);
 
         setReadError("");
@@ -159,6 +155,9 @@ export function DocumentCatalogForm({
       setReadError("No se pudo confirmar la asignación. Volvé a seleccionar el trayecto.");
     }
   };
+  const associated = associations?.items ?? [];
+  const totalPages = associations?.totalPages ?? 0;
+  const totalItems = associations?.totalItems ?? 0;
   const rows = [...associated.filter((item) => !changes[item.trainingPathId]), ...Object.values(changes)];
   return (
     <ActionForm ref={formRef} action={action} className="flex min-h-0 flex-col gap-4">

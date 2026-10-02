@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { InstitutionalPasskeyPrompt } from "@features/institutional-auth/components/institutional-passkey-prompt";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldLabel } from "@common/components/ui/field";
-import { beginPasskeyLogin, beginInstitutionalPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
+import { beginInstitutionalPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
 import type { InstitutionalPasskeyLoginInput } from "@features/institutional-auth/types/institutional-passkey-login-input.types";
 import type { BeginPasskeyLoginState } from "@features/institutional-auth/types/begin-passkey-login-state.types";
@@ -19,10 +19,9 @@ import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webau
 
 type PasskeyCeremonyState = { phase: "idle" | "requesting" | "verifying" };
 type InstitutionalPasskeyStepProps = {
-  loginAttemptId?: string;
-  input?: InstitutionalPasskeyLoginInput;
-  onFieldErrors?: (errors: BeginPasskeyLoginState["fieldErrors"]) => void;
-  isCurrentIdentity?: () => boolean;
+  input: InstitutionalPasskeyLoginInput;
+  onFieldErrors: (errors: BeginPasskeyLoginState["fieldErrors"]) => void;
+  isCurrentIdentity: () => boolean;
   rememberMe: boolean;
   onRememberMeChange: (value: boolean) => void;
   onPendingChange: (pending: boolean) => void;
@@ -31,7 +30,6 @@ type InstitutionalPasskeyStepProps = {
 };
 
 export function InstitutionalPasskeyStep({
-  loginAttemptId,
   input,
   onFieldErrors,
   isCurrentIdentity,
@@ -62,7 +60,7 @@ export function InstitutionalPasskeyStep({
   }
 
   function isCurrentCeremony(controller: AbortController): boolean {
-    return ceremonyRef.current === controller && (isCurrentIdentity?.() ?? true);
+    return ceremonyRef.current === controller && isCurrentIdentity();
   }
 
   function handleCancelCeremony(): void {
@@ -85,7 +83,7 @@ export function InstitutionalPasskeyStep({
   }
 
   async function handlePasskeyLogin(): Promise<void> {
-    if ((!input && !loginAttemptId) || ceremonyRef.current || isCurrentIdentity?.() === false) {
+    if (ceremonyRef.current || !isCurrentIdentity()) {
       return;
     }
 
@@ -93,21 +91,21 @@ export function InstitutionalPasskeyStep({
     ceremonyRef.current = controller;
     setCeremony({ phase: "requesting" });
     onError(null);
-    onFieldErrors?.({});
+    onFieldErrors({});
     const remembered = rememberMe;
 
     try {
-      const begin = input ? await beginInstitutionalPasskeyLogin(input) : await beginPasskeyLogin(loginAttemptId!);
+      const begin = await beginInstitutionalPasskeyLogin(input);
 
       if (!isCurrentCeremony(controller)) {
         return;
       }
 
       if (begin.fieldErrors) {
-        onFieldErrors?.(begin.fieldErrors);
+        onFieldErrors(begin.fieldErrors);
         return;
       }
-      if (begin.emailVerificationRequired && input) {
+      if (begin.emailVerificationRequired) {
         // Lock the identity before allowing the existing action to set context and redirect.
         verifyingRef.current = true;
         setCeremony({ phase: "verifying" });
@@ -139,7 +137,7 @@ export function InstitutionalPasskeyStep({
       setCeremony({ phase: "verifying" });
       onPendingChange(true);
       const finish = await finishPasskeyLogin({
-        loginAttemptId: input ? begin.loginAttemptId : loginAttemptId,
+        loginAttemptId: begin.loginAttemptId,
         ceremonyId: begin.ceremonyId,
         credentialJson: JSON.stringify(credential),
         rememberMe: remembered,

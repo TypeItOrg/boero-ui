@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import { isValidUuid } from "@common/utils/uuid.util";
-
-const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+import { INSTITUTION_LOGO_MIME_TYPES, MAX_INSTITUTION_LOGO_BYTES } from "@features/institutions/constants/institution-logo.constants";
 
 function unavailable(status = 503): Response {
   return NextResponse.json({ message: "Logo no disponible." }, { status, headers: { "Cache-Control": "no-store" } });
@@ -23,7 +22,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
 
     const type = response.headers.get("content-type")?.split(";")[0];
     const declaredSize = Number(response.headers.get("content-length"));
-    if (!response.body || !type || !["image/png", "image/jpeg"].includes(type) || declaredSize > MAX_LOGO_BYTES) {
+    if (!response.body || !type || !INSTITUTION_LOGO_MIME_TYPES.some((allowed) => allowed === type) || declaredSize > MAX_INSTITUTION_LOGO_BYTES) {
       await response.body?.cancel();
       return unavailable();
     }
@@ -40,21 +39,25 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
         initialSize += chunk.value.byteLength;
       }
     }
-    if (initialSize > MAX_LOGO_BYTES) {
+    if (initialSize > MAX_INSTITUTION_LOGO_BYTES) {
       await reader.cancel();
       return unavailable();
     }
-    const signature = new Uint8Array(initialSize);
+    const signature = new Uint8Array(Math.min(initialSize, 8));
     let offset = 0;
     for (const chunk of initialChunks) {
-      signature.set(chunk, offset);
-      offset += chunk.byteLength;
+      const prefix = chunk.subarray(0, signature.byteLength - offset);
+      signature.set(prefix, offset);
+      offset += prefix.byteLength;
+      if (offset === signature.byteLength) {
+        break;
+      }
     }
     const validSignature =
       type === "image/png"
         ? [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => signature[index] === byte)
         : signature[0] === 255 && signature[1] === 216 && signature[2] === 255;
-    if (!validSignature || initialSize > MAX_LOGO_BYTES) {
+    if (!validSignature) {
       await reader.cancel();
       return unavailable();
     }
@@ -81,7 +84,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
             return;
           }
           total += chunk.value.byteLength;
-          if (total > MAX_LOGO_BYTES) {
+          if (total > MAX_INSTITUTION_LOGO_BYTES) {
             await reader.cancel();
             controller.error(new Error("Logo size limit exceeded"));
             return;

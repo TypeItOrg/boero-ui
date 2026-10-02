@@ -25,7 +25,7 @@ import { DocumentDefinitionPicker } from "@features/document-catalog/components/
 import type { DocumentDefinition } from "@features/document-catalog/types/document-definition.types";
 import { getDocumentCatalogPageUrl } from "@features/document-catalog/utils/document-catalog-route.util";
 import { DOCUMENT_LEVEL_LABELS } from "@features/enrollment-applications/constants/documentation.constants";
-import { documentRequirementSchema } from "@features/enrollment-applications/schemas/document-requirement.schema";
+import { documentRequirementFormSchema } from "@features/enrollment-applications/schemas/document-requirement.schema";
 import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
 import { formatDocumentFileCategories } from "@features/enrollment-applications/utils/document-file-category.util";
 
@@ -260,7 +260,7 @@ function RequirementForm({
     setCreating(false);
   }, []);
   const [state, action, pending] = React.useActionState(async (_previous: { error?: string }, form: FormData): Promise<{ error?: string }> => {
-    const parsed = documentRequirementSchema.safeParse({
+    const parsed = documentRequirementFormSchema.safeParse({
       documentId: document?.id,
       revision: initial?.revision,
       name: document?.name,
@@ -268,8 +268,8 @@ function RequirementForm({
       allowedFormats: document?.allowedFormats,
       specificInstructions: form.get("specificInstructions"),
       level: form.get("level"),
-      displayOrder: /^\d+$/.test(String(form.get("displayOrder"))) ? Number(form.get("displayOrder")) : undefined,
-      active: form.get("active") === "true" ? true : form.get("active") === "false" ? false : undefined,
+      displayOrder: form.get("displayOrder"),
+      active: form.get("active"),
     });
     if (!parsed.success) {
       return { error: "Seleccioná un documento y revisá su configuración." };
