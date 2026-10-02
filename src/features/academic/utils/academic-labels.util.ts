@@ -61,6 +61,8 @@ export const courseWeekDayLabels: Record<CourseWeekDay, string> = {
   WEDNESDAY: "Miércoles",
   THURSDAY: "Jueves",
   FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
 };
 
 export const courseStatusLabels: Record<CourseStatus, string> = {

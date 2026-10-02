@@ -38,6 +38,8 @@ const WEEK_DAY_LABELS: Record<CourseWeekDay, string> = {
   WEDNESDAY: "Miércoles",
   THURSDAY: "Jueves",
   FRIDAY: "Viernes",
+  SATURDAY: "Sábado",
+  SUNDAY: "Domingo",
 };
 
 type ScheduleDraft = { startTime: string; endTime: string };

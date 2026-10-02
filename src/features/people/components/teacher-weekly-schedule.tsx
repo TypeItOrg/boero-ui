@@ -32,7 +32,7 @@ export function TeacherWeeklySchedule({ courses }: { courses: TeacherCourseAssig
   const total = (lastHour - firstHour) * 60;
   return (
     <div className="flex flex-col gap-3">
-      <div className="bg-muted grid grid-cols-5 gap-1 rounded-lg p-1 md:hidden">
+      <div className="bg-muted grid grid-cols-7 gap-1 rounded-lg p-1 md:hidden">
         {days.map((day) => (
           <button
             key={day}
@@ -46,7 +46,7 @@ export function TeacherWeeklySchedule({ courses }: { courses: TeacherCourseAssig
         ))}
       </div>
       <div className="overflow-x-auto rounded-xl border">
-        <div className="grid min-w-160 grid-cols-[4rem_repeat(5,minmax(0,1fr))]">
+        <div className="grid min-w-210 grid-cols-[4rem_repeat(7,minmax(0,1fr))]">
           <div className="bg-muted/25 border-r border-b" />
           {days.map((day) => (
             <div key={day} className={`bg-muted/25 border-b p-3 text-center text-xs font-semibold ${selectedDay !== day ? "hidden md:block" : ""}`}>
