@@ -5,19 +5,19 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { verifyPasskeyAuth } from "@features/institutional-auth/services/passkey-auth-verify.service";
+import { verifyPasskeyAuth, verifyDiscoverablePasskeyAuth } from "@features/institutional-auth/services/passkey-auth-verify.service";
 import { setInstitutionalAuthCookies } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import type { FinishPasskeyLoginState } from "@features/institutional-auth/types/finish-passkey-login-state.types";
 
 const finishPasskeyLoginSchema = z.object({
-  loginAttemptId: z.string().min(1),
+  loginAttemptId: z.string().min(1).optional(),
   ceremonyId: z.string().min(1),
   credentialJson: z.string().min(1),
   rememberMe: z.boolean(),
 });
 
 export async function finishPasskeyLogin(input: {
-  loginAttemptId: string;
+  loginAttemptId?: string;
   ceremonyId: string;
   credentialJson: string;
   rememberMe: boolean;
@@ -36,15 +36,15 @@ export async function finishPasskeyLogin(input: {
     return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED };
   }
 
-  const output = await verifyPasskeyAuth(
-    {
-      loginAttemptId: parsed.data.loginAttemptId,
-      ceremonyId: parsed.data.ceremonyId,
-      credential,
-      rememberMe: parsed.data.rememberMe,
-    },
-    await headers(),
-  );
+  const verification = {
+    ceremonyId: parsed.data.ceremonyId,
+    credential,
+    rememberMe: parsed.data.rememberMe,
+  };
+  const requestHeaders = await headers();
+  const output = parsed.data.loginAttemptId
+    ? await verifyPasskeyAuth({ ...verification, loginAttemptId: parsed.data.loginAttemptId }, requestHeaders)
+    : await verifyDiscoverablePasskeyAuth(verification, requestHeaders);
 
   if (!output.success) {
     return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED };

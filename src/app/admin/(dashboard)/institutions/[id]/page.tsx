@@ -1,3 +1,5 @@
+import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
+import { InstitutionPublicAccessForm } from "@features/institutions/components/institution-public-access-form";
 import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -107,6 +109,13 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
             </dl>
           </CardContent>
         </Card>
+
+        <InstitutionPublicAccessForm
+          institutionId={id}
+          publicSubdomain={institution.publicSubdomain}
+          baseDomain={process.env.INSTITUTIONAL_BASE_DOMAIN ?? ""}
+        />
+        <InstitutionLogoManager institutionId={id} institutionName={institution.name} logoUrl={institution.logoUrl} scope="platform" canUpdate />
 
         <div
           className={institution.active ? "grid flex-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]" : "flex flex-1 flex-col"}

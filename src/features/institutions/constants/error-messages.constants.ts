@@ -1,4 +1,14 @@
 export const INSTITUTION_ERROR_MESSAGES = {
+  LOGO_UPDATE: "No se pudo guardar el logo. El logo anterior se conserva. Intentá nuevamente.",
+  LOGO_REMOVE: "No se pudo eliminar el logo. Intentá nuevamente.",
+  LOGO_INVALID_FILE: "Seleccioná una imagen PNG o JPEG de hasta 2 MiB.",
+  LOGO_SINGLE_FILE: "Seleccioná una sola imagen para el logo.",
+  LOGO_INVALID_CHANGE: "No se pudo interpretar el cambio del logo. Volvé a seleccionar la imagen o deshacé el cambio.",
+  LOGO_PARTIAL_SAVE:
+    "Los datos de la institución se guardaron, pero no se pudo completar el cambio del logo. Revisá el logo y volvé a guardar los cambios.",
+  LOGO_FORBIDDEN: "No tenés permiso para modificar el logo de esta institución.",
+  PUBLIC_ACCESS_UPDATE: "No se pudo guardar el acceso público. Intentá nuevamente.",
+  PUBLIC_ACCESS_INVALID: "Usá entre 1 y 63 letras minúsculas, números o guiones, sin guiones en los extremos.",
   CREATE_INSTITUTION: "Error al crear la institución.",
   UPDATE_INSTITUTION: "Error al actualizar la institución.",
   FETCH_INSTITUTION: "No se pudo obtener la institución",

@@ -3,17 +3,18 @@
 import { ActionForm } from "@common/components/action-form";
 
 import { useActionState, useState } from "react";
-import Image from "next/image";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import Link from "next/link";
 import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
 import { requestPasswordRecovery } from "@features/institutional-auth/actions/request-institutional-password-recovery.action";
-import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
+import { type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { PasswordRecoveryActionState } from "@features/institutional-auth/types/password-recovery-action-state.types";
 
@@ -24,18 +25,12 @@ export function InstitutionalPasswordRecoveryForm(): React.ReactElement {
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
 
   return (
-    <ActionForm resetOnSuccess={Boolean(state.success)} action={formAction} className="p-6 md:p-8">
-      <header className="flex flex-col items-center space-y-1 text-center">
-        <Image
-          width={875}
-          height={1202}
-          src="/brand/boero-logo.webp"
-          alt="Logo de la institución"
-          className="h-auto w-16 max-w-full sm:w-20 md:hidden"
-        />
-        <h1 className="text-2xl font-bold">Recuperar contraseña</h1>
-        <p className="text-muted-foreground text-sm">Ingresá tu institución y documento para recibir un enlace.</p>
-      </header>
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={formAction} className="flex flex-col justify-center p-5 sm:p-8">
+      <InstitutionalAuthStepHeader
+        title="Recuperar contraseña"
+        showInstitutionName={false}
+        description="Ingresá tu documento para recibir un enlace."
+      />
 
       <div className="mt-6 space-y-6">
         {state.success ? (
@@ -54,19 +49,13 @@ export function InstitutionalPasswordRecoveryForm(): React.ReactElement {
         ) : null}
 
         <FieldGroup>
-          <Field data-invalid={!!state.fieldErrors?.institutionId}>
-            <FieldLabel htmlFor="institution-id" required>
-              Institución
-            </FieldLabel>
-            <InstitutionPicker
-              ariaInvalid={!!state.fieldErrors?.institutionId}
-              id="institution-id"
-              onValueChange={(_, item) => setInstitution(item)}
-              selectedLabel={institution?.name}
-              value={institution?.id}
-            />
-            <FieldError errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined} />
-          </Field>
+          <InstitutionalAuthInstitutionField
+            id="institution-id"
+            institution={institution}
+            onChange={setInstitution}
+            disabled={isPending}
+            error={state.fieldErrors?.institutionId}
+          />
           <Field data-invalid={!!state.fieldErrors?.documentNumber}>
             <FieldLabel htmlFor="document-number" required>
               Documento

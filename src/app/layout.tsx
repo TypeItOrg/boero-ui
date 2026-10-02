@@ -5,6 +5,8 @@ import "@app/globals.css";
 
 import { cn } from "@common/utils/cn.util";
 import { TooltipProvider } from "@common/components/ui/tooltip";
+import { getRequestInstitution } from "@common/services/institutional-host/institutional-host.service";
+import type { PublicInstitution } from "@features/institutions/types/public-institution.types";
 import { Providers } from "@app/providers";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-sans" });
@@ -19,25 +21,37 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    template: "%s | Boero",
-    default: "Boero",
-  },
-  description: "Plataforma de gestión para instituciones educativas",
-  icons: {
-    icon: [
-      {
-        url: "/brand/logo.svg",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/brand/logo-dark.svg",
-        media: "(prefers-color-scheme: dark)",
-      },
-    ],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let institution: PublicInstitution | undefined;
+
+  try {
+    institution = await getRequestInstitution();
+  } catch {
+    institution = undefined;
+  }
+
+  const brandName = institution?.name ?? "Boero";
+
+  return {
+    title: {
+      template: `%s | ${brandName}`,
+      default: brandName,
+    },
+    description: "Plataforma de gestión para instituciones educativas",
+    icons: {
+      icon: [
+        {
+          url: "/brand/logo.svg",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          url: "/brand/logo-dark.svg",
+          media: "(prefers-color-scheme: dark)",
+        },
+      ],
+    },
+  };
+}
 
 export const viewport: Viewport = {
   viewportFit: "cover",

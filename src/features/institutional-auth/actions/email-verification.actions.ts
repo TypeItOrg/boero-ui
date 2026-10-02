@@ -1,4 +1,5 @@
 "use server";
+import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
 import { redirect } from "next/navigation";
 import { authenticatedApiFetch } from "@common/services/authenticated-api-fetch.service";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
@@ -44,6 +45,10 @@ export async function resendEmailVerification(_previous: EmailVerificationState,
     documentNumber: formData.get("documentNumber"),
   });
   if (!parsed.success) return getValidationActionState(parsed.error.issues, FIELDS);
+  const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+  if (contextError) {
+    return { error: contextError };
+  }
   return submit(EMAIL_VERIFICATION_ENDPOINTS.RESEND, parsed.data);
 }
 
@@ -55,6 +60,10 @@ export async function changePendingEmail(_previous: EmailVerificationState, form
     email: formData.get("email"),
   });
   if (!parsed.success) return getValidationActionState(parsed.error.issues, FIELDS);
+  const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+  if (contextError) {
+    return { error: contextError };
+  }
   return submit(EMAIL_VERIFICATION_ENDPOINTS.CHANGE_EMAIL, parsed.data, INSTITUTIONAL_AUTH_ERROR_MESSAGES.EMAIL_CHANGE_INVALID_CREDENTIALS);
 }
 

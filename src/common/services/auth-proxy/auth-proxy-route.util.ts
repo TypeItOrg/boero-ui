@@ -1,10 +1,18 @@
 import { INSTITUTIONAL_LOGIN_PATH } from "@features/institutional-auth/utils/institutional-auth-proxy-policy.util";
 import { PLATFORM_LOGIN_PATH } from "@features/platform-auth/utils/platform-auth-proxy-policy.util";
 
+export const HEALTH_PROBE_PATH = "/api/health";
+export const INSTITUTIONAL_UNAVAILABLE_PATH = "/institutional-unavailable";
+
 const ADMIN_SESSION_ROOT_PATHS = ["/admin", "/api/admin"] as const;
-const INSTITUTIONAL_PUBLIC_ROOT_PATHS = ["/auth/register", "/auth/password-recovery", "/auth/email-verification"] as const;
+const INSTITUTIONAL_PUBLIC_ROOT_PATHS = [
+  "/auth/register",
+  "/auth/password-recovery",
+  "/auth/email-verification",
+  INSTITUTIONAL_UNAVAILABLE_PATH,
+] as const;
 const PUBLIC_API_PATHS = [
-  /^\/api\/(?:health|institutions|countries|cities)\/?$/,
+  /^\/api\/(?:institutions|countries|cities)\/?$/,
   /^\/api\/countries\/[^/]+\/provinces\/?$/,
   /^\/api\/provinces\/[^/]+\/cities\/?$/,
 ] as const;
@@ -18,6 +26,7 @@ const LEGACY_SCOPED_API_PATHS = [
 
 export enum RouteAccess {
   Public,
+  HealthProbe,
   AdminGuestOnly,
   AdminSession,
   InstitutionalGuestOnly,
@@ -25,6 +34,9 @@ export enum RouteAccess {
 }
 
 export function getRouteAccess(pathname: string, searchParams?: URLSearchParams): RouteAccess {
+  if (pathname === HEALTH_PROBE_PATH || pathname === `${HEALTH_PROBE_PATH}/`) {
+    return RouteAccess.HealthProbe;
+  }
   if (pathname === PLATFORM_LOGIN_PATH) {
     return RouteAccess.AdminGuestOnly;
   }

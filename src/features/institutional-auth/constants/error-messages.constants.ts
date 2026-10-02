@@ -25,6 +25,7 @@ export const INSTITUTIONAL_AUTH_ERROR_MESSAGES = {
   PASSWORD_RECOVERY_INVALID_TOKEN: "El enlace de recuperación es inválido o ha expirado.",
   ACCOUNT_NOT_FOUND: "No encontramos una cuenta asociada a ese documento en esta institución.",
   PASSKEY_FAILED: "No pudimos usar una llave de acceso. Podés reintentar o ingresar con tu contraseña.",
+  PASSKEY_ACCOUNT_UNAVAILABLE: "Esta cuenta no tiene una llave de acceso activa. Podés ingresar con tu contraseña.",
   PASSKEY_UNSUPPORTED: "Las llaves de acceso no están disponibles en este navegador.",
   PASSKEY_CONNECTION_FAILED: "No se pudo conectar con el servidor.",
   PASSKEY_OPERATION_FAILED: "No se pudo completar la operación. Intentá nuevamente.",

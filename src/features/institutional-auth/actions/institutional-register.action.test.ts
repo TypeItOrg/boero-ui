@@ -1,3 +1,4 @@
+jest.mock("@common/services/institutional-host/institutional-host.service", () => ({ validateRequestInstitutionId: jest.fn(async () => undefined) }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(() => {
     throw new Error("NEXT_REDIRECT");

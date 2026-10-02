@@ -43,10 +43,15 @@ export function getInitialLocation(institution: Institution): InitialLocation {
 export function applyServerErrors(
   state: InstitutionActionState,
   setError: UseFormSetError<InstitutionalInstitutionFormInput>,
-  setFormError: (error: string) => void,
+  setFormError?: (error: string) => void,
 ): void {
-  if (state.error) setFormError(state.error);
-  if (!state.fieldErrors) return;
+  if (state.error && setFormError) {
+    setFormError(state.error);
+  }
+
+  if (!state.fieldErrors) {
+    return;
+  }
 
   for (const [field, message] of Object.entries(state.fieldErrors)) {
     if (message) {

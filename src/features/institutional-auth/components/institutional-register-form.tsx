@@ -1,11 +1,13 @@
 "use client";
 
-import { SyntheticEvent, useActionState, useState, useTransition } from "react";
-import Image from "next/image";
+import { useActionState, useState } from "react";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import Link from "next/link";
+import { ActionForm } from "@common/components/action-form";
 import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
 import { Button } from "@common/components/ui/button";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
@@ -14,41 +16,24 @@ import { NumericInput } from "@common/components/ui/restricted-input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
 import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
-import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
+import { type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
 import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
 export function InstitutionalRegisterForm(): React.ReactElement {
-  const [state, formAction] = useActionState<InstitutionalRegisterActionState, FormData>(registerInstitutional, INITIAL_STATE);
-  const [isPending, startTransition] = useTransition();
+  const [state, formAction, isPending] = useActionState<InstitutionalRegisterActionState, FormData>(registerInstitutional, INITIAL_STATE);
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
   const [birthDate, setBirthDate] = useState<Date>();
 
-  function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-
-    startTransition(() => formAction(formData));
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="p-6 md:p-8">
-      <header className="flex flex-col items-center space-y-1 text-center">
-        <Image
-          width={875}
-          height={1202}
-          src="/brand/boero-logo.webp"
-          alt="Logo de la institución"
-          className="h-auto w-16 max-w-full sm:w-20 md:hidden"
-        />
-        <h1 className="text-2xl font-bold">Formá parte</h1>
-        <p className="text-muted-foreground text-sm">
-          <span className="hidden md:block">Completá tus datos para registrarte en una institución.</span>
-          <span className="md:hidden">Completá tus datos para registrarte en una institución.</span>
-        </p>
-      </header>
+    <ActionForm action={formAction} className="flex flex-col justify-center p-5 sm:p-8">
+      <InstitutionalAuthStepHeader
+        title="Formá parte"
+        description="Completá tus datos para registrarte en una institución."
+        showInstitutionName={false}
+      />
 
       <div className="mt-6 space-y-6">
         {state.error ? (
@@ -59,40 +44,32 @@ export function InstitutionalRegisterForm(): React.ReactElement {
           </Alert>
         ) : null}
 
-        <FieldGroup>
-          <Field data-invalid={!!state.fieldErrors?.institutionId}>
-            <FieldLabel htmlFor="register-institution-id" required>
-              Institución
-            </FieldLabel>
-            <input name="institutionName" type="hidden" value={institution?.name ?? ""} />
-            <InstitutionPicker
-              ariaInvalid={!!state.fieldErrors?.institutionId}
-              id="register-institution-id"
-              onValueChange={(_, item) => setInstitution(item)}
-              selectedLabel={institution?.name}
-              value={institution?.id}
-            />
-            <FieldError errors={state.fieldErrors?.institutionId ? [{ message: state.fieldErrors.institutionId }] : undefined} />
-          </Field>
+        <FieldGroup className="gap-6">
+          <InstitutionalAuthInstitutionField
+            id="institution-id"
+            institution={institution}
+            onChange={setInstitution}
+            disabled={isPending}
+            error={state.fieldErrors?.institutionId}
+          />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Field data-invalid={!!state.fieldErrors?.name}>
+              <FieldLabel htmlFor="register-name" required>
+                Nombre
+              </FieldLabel>
+              <Input aria-invalid={!!state.fieldErrors?.name} autoComplete="given-name" id="register-name" name="name" />
+              <FieldError errors={state.fieldErrors?.name ? [{ message: state.fieldErrors.name }] : undefined} />
+            </Field>
+
+            <Field data-invalid={!!state.fieldErrors?.lastName}>
+              <FieldLabel htmlFor="register-last-name" required>
+                Apellido
+              </FieldLabel>
+              <Input aria-invalid={!!state.fieldErrors?.lastName} autoComplete="family-name" id="register-last-name" name="lastName" />
+              <FieldError errors={state.fieldErrors?.lastName ? [{ message: state.fieldErrors.lastName }] : undefined} />
+            </Field>
+          </div>
         </FieldGroup>
-
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Field data-invalid={!!state.fieldErrors?.name}>
-            <FieldLabel htmlFor="register-name" required>
-              Nombre
-            </FieldLabel>
-            <Input aria-invalid={!!state.fieldErrors?.name} autoComplete="given-name" id="register-name" name="name" />
-            <FieldError errors={state.fieldErrors?.name ? [{ message: state.fieldErrors.name }] : undefined} />
-          </Field>
-
-          <Field data-invalid={!!state.fieldErrors?.lastName}>
-            <FieldLabel htmlFor="register-last-name" required>
-              Apellido
-            </FieldLabel>
-            <Input aria-invalid={!!state.fieldErrors?.lastName} autoComplete="family-name" id="register-last-name" name="lastName" />
-            <FieldError errors={state.fieldErrors?.lastName ? [{ message: state.fieldErrors.lastName }] : undefined} />
-          </Field>
-        </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
           <Field data-invalid={!!state.fieldErrors?.documentNumber}>
@@ -176,6 +153,6 @@ export function InstitutionalRegisterForm(): React.ReactElement {
           </p>
         </footer>
       </div>
-    </form>
+    </ActionForm>
   );
 }

@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := dev
 
-COMPOSE := docker compose
+# Keep Compose interpolation consistent with the local service env_file.
+COMPOSE := docker compose $(if $(wildcard .env.dev),--env-file .env.dev)
 
 .PHONY: dev build down logs clean ps test typecheck lint format format-check
 

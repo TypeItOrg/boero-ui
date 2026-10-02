@@ -1,5 +1,7 @@
 "use server";
 
+import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
+
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
@@ -23,6 +25,11 @@ export async function identifyInstitutionalUser(
 
   if (!parsed.success) {
     return { fieldErrors: getFieldErrors(parsed.error.issues, INSTITUTIONAL_IDENTIFY_FIELD_NAMES) };
+  }
+
+  const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+  if (contextError) {
+    return { error: contextError };
   }
 
   const output = await identifyInstitutionalAccount(parsed.data, await headers());

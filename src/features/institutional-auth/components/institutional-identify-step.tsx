@@ -7,8 +7,9 @@ import { Button } from "@common/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
-import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
+import { type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { InstitutionalIdentifyActionState } from "@features/institutional-auth/types/institutional-identify-state.types";
 import type { InstitutionalLoginAttempt } from "@features/institutional-auth/types/institutional-login-attempt.types";
@@ -87,25 +88,14 @@ export function InstitutionalIdentifyStep({
           </Alert>
         ) : null}
 
-        <FieldGroup>
-          <Field data-invalid={!!identifyState.fieldErrors?.institutionId}>
-            <FieldLabel htmlFor="institution-id" required>
-              Institución
-            </FieldLabel>
-            <input name="institutionName" type="hidden" value={institution?.name ?? ""} />
-            <InstitutionPicker
-              ariaInvalid={!!identifyState.fieldErrors?.institutionId}
-              disabled={disabled}
-              id="institution-id"
-              onValueChange={(_, item) => onInstitutionChange(item)}
-              selectedLabel={institution?.name}
-              value={institution?.id}
-            />
-            <FieldError errors={identifyState.fieldErrors?.institutionId ? [{ message: identifyState.fieldErrors.institutionId }] : undefined} />
-          </Field>
-        </FieldGroup>
-
-        <FieldGroup>
+        <FieldGroup className="gap-6">
+          <InstitutionalAuthInstitutionField
+            id="institution-id"
+            institution={institution}
+            onChange={onInstitutionChange}
+            disabled={disabled}
+            error={identifyState.fieldErrors?.institutionId}
+          />
           <Field data-invalid={!!identifyState.fieldErrors?.documentNumber}>
             <FieldLabel htmlFor="document-number" required>
               Documento

@@ -1,3 +1,4 @@
+import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
 import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import Link from "next/link";
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
@@ -30,6 +31,13 @@ export function InstitutionalInstitutionDetail({ canUpdate, institution, returnT
           </Button>
         ) : null}
       </div>
+      <InstitutionLogoManager
+        institutionId={institution.id}
+        institutionName={institution.name}
+        logoUrl={institution.logoUrl}
+        scope="institutional"
+        canUpdate={canUpdate}
+      />
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <InstitutionSectionHeader description="Datos de localización de la institución." icon={MapPinIcon} title="Ubicación" />
 

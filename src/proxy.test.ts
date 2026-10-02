@@ -1,3 +1,4 @@
+import { waitFor } from "@testing-library/react";
 import { NextRequest, type NextResponse } from "next/server";
 import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
 
@@ -11,10 +12,12 @@ import { config, proxy } from "@/proxy";
 describe("proxy", () => {
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();
   const originalApiUrl = process.env.BOERO_API_URL;
+  const originalPublicUrl = process.env.FRONTEND_PUBLIC_URL;
+  const originalDomain = process.env.INSTITUTIONAL_BASE_DOMAIN;
 
   function createRequest(path: string, cookie: string): NextRequest {
     return new NextRequest(`https://app.example.test${path}`, {
-      headers: { cookie },
+      headers: { cookie, host: "app.example.test" },
     });
   }
 
@@ -27,6 +30,8 @@ describe("proxy", () => {
 
   beforeEach(() => {
     process.env.BOERO_API_URL = "https://api.example.test";
+    process.env.FRONTEND_PUBLIC_URL = "https://app.example.test";
+    process.env.INSTITUTIONAL_BASE_DOMAIN = "";
     global.fetch = fetchMock;
   });
 
@@ -36,6 +41,8 @@ describe("proxy", () => {
 
   afterAll(() => {
     process.env.BOERO_API_URL = originalApiUrl;
+    process.env.FRONTEND_PUBLIC_URL = originalPublicUrl;
+    process.env.INSTITUTIONAL_BASE_DOMAIN = originalDomain;
   });
 
   it.each([
@@ -105,11 +112,12 @@ describe("proxy", () => {
 
   it("deduplicates concurrent admin refreshes for the same token", async () => {
     let resolveRefresh: ((response: Response) => void) | undefined;
-    fetchMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveRefresh = resolve;
-        }),
+    fetchMock.mockImplementation((url) =>
+      String(url).endsWith("/refresh")
+        ? new Promise((resolve) => {
+            resolveRefresh = resolve;
+          })
+        : Promise.resolve(new Response(null, { status: 200 })),
     );
 
     const firstRequest = createRequest("/admin/institutions/1", `${PLATFORM_REFRESH_TOKEN_COOKIE}=refresh-token`);
@@ -117,7 +125,7 @@ describe("proxy", () => {
     const firstResponsePromise = proxy(firstRequest);
     const secondResponsePromise = proxy(secondRequest);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/refresh"))).toHaveLength(1));
     resolveRefresh?.(
       new Response(
         JSON.stringify({
@@ -159,7 +167,7 @@ describe("proxy", () => {
 
     const [firstResponse, secondResponse] = await Promise.all([proxy(firstRequest), proxy(secondRequest)]);
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/refresh"))).toHaveLength(2);
     expect(firstResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
     expect(secondResponse.cookies.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value).toBe("new-access-token");
   });
@@ -210,6 +218,7 @@ describe("proxy", () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login?next=%2Fadmin%2Fa", {
       headers: {
+        host: "app.example.test",
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
       },
     });
@@ -223,7 +232,7 @@ describe("proxy", () => {
   it("bounds guest session checks with an abort signal", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 503 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login", {
-      headers: { cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token` },
+      headers: { host: "app.example.test", cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token` },
     });
 
     await proxy(request);
@@ -314,11 +323,12 @@ describe("proxy", () => {
 
   it("deduplicates concurrent institutional refreshes for the same token", async () => {
     let resolveRefresh: ((response: Response) => void) | undefined;
-    fetchMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveRefresh = resolve;
-        }),
+    fetchMock.mockImplementation((url) =>
+      String(url).endsWith("/refresh")
+        ? new Promise((resolve) => {
+            resolveRefresh = resolve;
+          })
+        : Promise.resolve(new Response(null, { status: 200 })),
     );
 
     const firstRequest = createRequest("/people", `${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=refresh-token`);
@@ -326,7 +336,7 @@ describe("proxy", () => {
     const firstResponsePromise = proxy(firstRequest);
     const secondResponsePromise = proxy(secondRequest);
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/refresh"))).toHaveLength(1));
     resolveRefresh?.(
       new Response(JSON.stringify({ tokens: { accessToken: "new-access", refreshToken: "new-refresh" } }), {
         status: 200,
@@ -386,6 +396,8 @@ describe("proxy", () => {
       }),
     );
 
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 200 }));
+
     const request = createRequest(
       "/auth/login",
       `${INSTITUTIONAL_ACCESS_TOKEN_COOKIE}=expired-access; ${INSTITUTIONAL_REFRESH_TOKEN_COOKIE}=valid-refresh`,
@@ -403,6 +415,7 @@ describe("proxy", () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     const request = new NextRequest("https://app.example.test/admin/auth/login?next=https://evil.com/a", {
       headers: {
+        host: "app.example.test",
         cookie: `${PLATFORM_ACCESS_TOKEN_COOKIE}=access-token`,
       },
     });

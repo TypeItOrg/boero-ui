@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { InstitutionalBrandPanel } from "@features/institutional-auth/components/institutional-brand-identity";
 
 import { Card, CardContent } from "@common/components/ui/card";
 import { InstitutionalPasswordRecoveryForm } from "@features/institutional-auth/components/institutional-password-recovery-form";
@@ -11,12 +11,10 @@ export const metadata: Metadata = {
 
 export default function PasswordRecoveryPage(): React.ReactElement {
   return (
-    <Card className="animate-fade-in-up p-0">
+    <Card className="animate-fade-in-up mx-auto w-full max-w-240 p-0">
       <CardContent className="grid-cols-2 p-0 md:grid">
         <InstitutionalPasswordRecoveryForm />
-        <section className="from-primary to-primary/80 relative hidden bg-linear-to-l p-8 md:flex md:items-center md:justify-center lg:p-12">
-          <Image priority width={875} height={1202} src="/brand/boero-logo.webp" alt="Logo de la institución" className="h-auto w-full max-w-56" />
-        </section>
+        <InstitutionalBrandPanel showInstitutionName={false} />
       </CardContent>
     </Card>
   );

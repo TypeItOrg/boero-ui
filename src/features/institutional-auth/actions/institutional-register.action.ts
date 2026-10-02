@@ -1,5 +1,7 @@
 "use server";
 
+import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
+
 import { redirect } from "next/navigation";
 
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
@@ -28,6 +30,11 @@ export async function registerInstitutional(
 
   if (!parsed.success) {
     return { fieldErrors: getFieldErrors(parsed.error.issues, INSTITUTIONAL_REGISTER_FIELD_NAMES) };
+  }
+
+  const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+  if (contextError) {
+    return { error: contextError };
   }
 
   const input = {

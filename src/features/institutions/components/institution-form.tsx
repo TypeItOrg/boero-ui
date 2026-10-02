@@ -15,6 +15,12 @@ import {
   InstitutionStatusField,
 } from "@features/institutions/components/institution-form-fields";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+import { InstitutionLogoField } from "@features/institutions/components/institution-logo-field";
+import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
+import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { institutionFormSchema, type InstitutionFormInput, type InstitutionFormValues } from "@features/institutions/schemas/institution-form.schema";
 import { createInstitutionAction } from "@features/institutions/actions/create-institution.action";
 import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
@@ -44,9 +50,8 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
   const router = useRouter();
   const isEdit = mode === FORM_MODE.EDIT;
   const defaultDestination = isEdit ? `${INSTITUTIONS_PATH}/${institution.id}` : INSTITUTIONS_PATH;
-  const destination = returnTo ?? defaultDestination;
-  const [isPending, startTransition] = React.useTransition();
-  const [formError, setFormError] = React.useState<string>();
+  const destination = getSafeReturnTo(returnTo, defaultDestination);
+  const [logoChange, setLogoChange] = React.useState<InstitutionLogoChange>({ intent: "keep" });
   const [isSlugTouched, setIsSlugTouched] = React.useState(false);
   const [active, setActive] = React.useState(() => institution?.active ?? true);
 
@@ -58,6 +63,7 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     handleSubmit,
     setValue,
     setError,
+    clearErrors,
     control,
     formState: { errors },
   } = useForm<InstitutionFormInput, unknown, InstitutionFormValues>({
@@ -67,6 +73,25 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
 
   const nameField = register("name");
   const slugField = register("slug");
+
+  const [state, formAction, isPending] = React.useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
+    const request = isEdit ? updateInstitutionAction(institution.id, formData) : createInstitutionAction(formData);
+    const result = await safelyRunAction(
+      request,
+      isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION : INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION,
+    );
+
+    setActionFieldErrors(result, setError);
+    if (result.logoError) {
+      setError("root.logo", { type: "server", message: result.logoError });
+    }
+
+    if (result.success) {
+      router.push(destination);
+    }
+
+    return result;
+  }, {});
 
   function handleNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
     nameField.onChange(event);
@@ -84,17 +109,19 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
   }
 
   function onSubmit(values: InstitutionFormValues): void {
-    setFormError(undefined);
+    if (errors.root?.logo?.type === "client") {
+      return;
+    }
+
+    clearErrors();
     const formData = createInstitutionFormData(values, active);
 
-    startTransition(async () => {
-      const result = isEdit ? await updateInstitutionAction(institution.id, formData) : await createInstitutionAction(formData);
-      const hasFieldErrors = setActionFieldErrors(result, setError);
-      setFormError(hasFieldErrors ? undefined : result.error);
+    if (isEdit) {
+      appendInstitutionLogoChange(formData, logoChange);
+    }
 
-      if (result.success) {
-        router.push(destination);
-      }
+    React.startTransition(() => {
+      formAction(formData);
     });
   }
 
@@ -102,17 +129,17 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     router.push(destination);
   }
 
-  const errorAlert = formError ? (
+  const errorAlert = state.error ? (
     <Alert variant="destructive">
       <CircleAlertIcon />
       <AlertTitle>{isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE}</AlertTitle>
-      <AlertDescription>{formError}</AlertDescription>
+      <AlertDescription>{state.error}</AlertDescription>
     </Alert>
   ) : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
+      <fieldset disabled={isPending} className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {errorAlert}
 
         <InstitutionGeneralFields
@@ -123,6 +150,22 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
           onSlugChange={handleSlugChange}
           slugField={slugField}
         />
+
+        {isEdit ? (
+          <InstitutionLogoField
+            institutionId={institution.id}
+            institutionName={institution.name}
+            logoUrl={institution.logoUrl}
+            value={logoChange}
+            disabled={isPending}
+            error={errors.root?.logo?.message}
+            onChange={(change) => {
+              clearErrors("root.logo");
+              setLogoChange(change);
+            }}
+            onError={(message) => setError("root.logo", { type: "client", message })}
+          />
+        ) : null}
 
         <InstitutionLocationFields
           control={control}
@@ -135,13 +178,19 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
         <InstitutionContactFields defaultValues={defaultValues} errors={errors} register={register} />
 
         <InstitutionStatusField active={active} onActiveChange={setActive} />
-      </div>
+      </fieldset>
 
       <div className="border-border/40 flex flex-row flex-wrap items-center justify-end gap-3 border-t pt-5 pb-6">
         <Button type="button" variant="outline" size="lg" className="flex-1 sm:flex-none" onClick={handleCancel} disabled={isPending}>
           Cancelar
         </Button>
-        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          className="flex-1 sm:flex-none"
+          disabled={isPending || errors.root?.logo?.type === "client"}
+          aria-busy={isPending}
+        >
           {getSubmitLabel({ isEdit, isPending })}
         </Button>
       </div>

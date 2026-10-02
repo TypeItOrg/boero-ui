@@ -9,7 +9,8 @@ import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
-import { InstitutionPicker } from "@features/institutional-auth/components/institution-picker";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
+import { useInstitutionalBrand } from "@features/institutional-auth/components/institutional-brand-context";
 import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import { EmailVerificationFeedback } from "@features/institutional-auth/components/email-verification-feedback";
 import { changePendingEmail, resendEmailVerification } from "@features/institutional-auth/actions/email-verification.actions";
@@ -18,12 +19,24 @@ import type { EmailVerificationState } from "@features/institutional-auth/types/
 
 export function EmailVerificationForm({ context }: { context?: EmailVerificationContext }): React.ReactElement {
   const [mode, setMode] = useState<"resend" | "change">("resend");
-  const initialIdentity = context?.institutionName ? context : context ? { ...context, institutionId: "" } : undefined;
+  const institution = useInstitutionalBrand();
+  const initialIdentity = institution
+    ? {
+        institutionId: institution.id,
+        institutionName: institution.name,
+        documentNumber: context?.institutionId === institution.id ? context.documentNumber : "",
+      }
+    : context?.institutionName
+      ? context
+      : context
+        ? { ...context, institutionId: "" }
+        : undefined;
   const [identity, setIdentity] = useState(initialIdentity);
   return (
-    <div className="flex flex-col">
-      <div className="flex-1 p-5 sm:p-8">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col justify-center p-5 sm:p-8">
         <InstitutionalAuthStepHeader
+          showInstitutionName={false}
           title={mode === "resend" ? "Verificá tu correo electrónico" : "Cambiá tu correo electrónico"}
           description={
             mode === "resend"
@@ -72,22 +85,15 @@ function VerificationRequestForm({
         }
       />
       <FieldGroup>
-        <Field data-invalid={!!state.fieldErrors?.institutionId}>
-          <FieldLabel htmlFor="verification-institution" required>
-            Institución
-          </FieldLabel>
-          <InstitutionPicker
-            id="verification-institution"
-            disabled={pending}
-            value={identity?.institutionId}
-            selectedLabel={identity?.institutionName}
-            ariaInvalid={!!state.fieldErrors?.institutionId}
-            onValueChange={(value, item) =>
-              onIdentityChange({ institutionId: value ?? "", institutionName: item?.name, documentNumber: identity?.documentNumber ?? "" })
-            }
-          />
-          <FieldError>{state.fieldErrors?.institutionId}</FieldError>
-        </Field>
+        <InstitutionalAuthInstitutionField
+          id="verification-institution"
+          institution={identity ? { id: identity.institutionId, name: identity.institutionName ?? "" } : undefined}
+          disabled={pending}
+          error={state.fieldErrors?.institutionId}
+          onChange={(item) =>
+            onIdentityChange({ institutionId: item?.id ?? "", institutionName: item?.name, documentNumber: identity?.documentNumber ?? "" })
+          }
+        />
         <Field data-invalid={!!state.fieldErrors?.documentNumber}>
           <FieldLabel htmlFor="verification-document" required>
             Documento

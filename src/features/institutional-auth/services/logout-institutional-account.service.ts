@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import { getInstitutionalAccessToken } from "@features/institutional-auth/services/get-institutional-access-token.service";
 
 export async function logoutInstitutionalAccount(): Promise<void> {
@@ -8,7 +8,7 @@ export async function logoutInstitutionalAccount(): Promise<void> {
     const accessToken = await getInstitutionalAccessToken();
     if (!accessToken) return;
 
-    await fetch(new URL("/api/v1/auth/logout", getApiUrlOrThrow()), {
+    await publicApiFetch("/api/v1/auth/logout", {
       method: "POST",
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
