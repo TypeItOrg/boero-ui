@@ -5,6 +5,7 @@ const DEPENDENTS: GuardianDependent[] = [
   {
     personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998001",
     dependentPersonId: "019f9c3a-f891-7bc5-a98d-e65332998002",
+    status: "ACTIVE",
     documentNumber: "87654321",
     firstName: "Mateo",
     lastName: "González",
@@ -22,11 +23,18 @@ describe("resolveGuardianWorkspaceDependent", () => {
     expect(resolveGuardianWorkspaceDependent(DEPENDENTS, "019f9c3a-f891-7bc5-a98d-e65332998002")).toBe(DEPENDENTS[0]);
   });
 
-  it("does not select a dependent without an active workspace", () => {
-    expect(resolveGuardianWorkspaceDependent(DEPENDENTS, undefined)).toBeUndefined();
+  it("automatically selects the only dependent without an active workspace", () => {
+    expect(resolveGuardianWorkspaceDependent(DEPENDENTS, undefined)).toBe(DEPENDENTS[0]);
   });
 
-  it("does not select a dependent outside the tutor list", () => {
-    expect(resolveGuardianWorkspaceDependent(DEPENDENTS, "019f9c3a-f891-7bc5-a98d-e65332998003")).toBeUndefined();
+  it("automatically selects the only dependent when the workspace is no longer valid", () => {
+    expect(resolveGuardianWorkspaceDependent(DEPENDENTS, "019f9c3a-f891-7bc5-a98d-e65332998003")).toBe(DEPENDENTS[0]);
+  });
+
+  it("does not automatically select when there are multiple dependents", () => {
+    const multipleDependents = [...DEPENDENTS, { ...DEPENDENTS[0], dependentPersonId: "019f9c3a-f891-7bc5-a98d-e65332998004" }];
+
+    expect(resolveGuardianWorkspaceDependent(multipleDependents, undefined)).toBeUndefined();
+    expect(resolveGuardianWorkspaceDependent(multipleDependents, "019f9c3a-f891-7bc5-a98d-e65332998003")).toBeUndefined();
   });
 });

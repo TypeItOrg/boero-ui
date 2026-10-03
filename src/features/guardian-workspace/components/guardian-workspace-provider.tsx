@@ -17,7 +17,11 @@ type GuardianWorkspaceProviderProps = React.PropsWithChildren<{
 export function GuardianWorkspaceProvider({ children, dependents, initialActiveDependentId }: GuardianWorkspaceProviderProps): React.ReactElement {
   const router = useRouter();
   const [activeDependentId, setActiveDependentId] = React.useState<string | null>(() =>
-    dependents.some((dependent) => dependent.dependentPersonId === initialActiveDependentId) ? (initialActiveDependentId ?? null) : null,
+    dependents.some((dependent) => dependent.dependentPersonId === initialActiveDependentId)
+      ? (initialActiveDependentId ?? null)
+      : dependents.length === 1
+        ? dependents[0].dependentPersonId
+        : null,
   );
   const [error, setError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
@@ -25,7 +29,9 @@ export function GuardianWorkspaceProvider({ children, dependents, initialActiveD
     ? activeDependentId
     : dependents.some((dependent) => dependent.dependentPersonId === initialActiveDependentId)
       ? (initialActiveDependentId ?? null)
-      : null;
+      : dependents.length === 1
+        ? dependents[0].dependentPersonId
+        : null;
   const activeDependent = dependents.find((dependent) => dependent.dependentPersonId === effectiveActiveDependentId) ?? null;
 
   function selectDependent(dependentPersonId: string): void {

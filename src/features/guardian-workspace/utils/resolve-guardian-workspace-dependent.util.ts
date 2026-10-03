@@ -4,9 +4,7 @@ export function resolveGuardianWorkspaceDependent(
   dependents: readonly GuardianDependent[],
   workspaceId: string | undefined,
 ): GuardianDependent | undefined {
-  if (!workspaceId) {
-    return undefined;
-  }
+  const workspaceDependent = workspaceId ? dependents.find((dependent) => dependent.dependentPersonId === workspaceId) : undefined;
 
-  return dependents.find((dependent) => dependent.dependentPersonId === workspaceId);
+  return workspaceDependent ?? (dependents.length === 1 ? dependents[0] : undefined);
 }
