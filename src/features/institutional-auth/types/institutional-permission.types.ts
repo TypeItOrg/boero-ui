@@ -48,6 +48,7 @@ export const INSTITUTIONAL_PERMISSION = {
   INSTRUMENT_RESTORE: "institution:instrument:restore",
   ENROLLMENT_PERIOD_READ: "institution:enrollment-period:read",
   GUARDIAN_DEPENDENT_MANAGE: "institution:guardian-dependent:manage",
+  GUARDIAN_LINK_REVIEW: "institution:guardian-link:review",
   ENROLLMENT_PERIOD_CREATE: "institution:enrollment-period:create",
   ENROLLMENT_PERIOD_UPDATE: "institution:enrollment-period:update",
   ENROLLMENT_PERIOD_STATUS_UPDATE: "institution:enrollment-period:update-status",

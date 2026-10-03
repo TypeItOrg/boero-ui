@@ -22,6 +22,10 @@ export function canManageDependents(user: InstitutionalUser): boolean {
   return hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.GUARDIAN_DEPENDENT_MANAGE);
 }
 
+export function canReviewGuardianLinks(user: InstitutionalUser): boolean {
+  return hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.GUARDIAN_LINK_REVIEW);
+}
+
 export function canViewOwnEnrollmentApplications(user: InstitutionalUser): boolean {
   const hasApplicantRole = user.roles.some((role) => INSTITUTIONAL_APPLICANT_ROLE_NAMES.has(role));
   const hasStaffRole = user.roles.some((role) => INSTITUTIONAL_STAFF_ROLE_NAMES.has(role));
