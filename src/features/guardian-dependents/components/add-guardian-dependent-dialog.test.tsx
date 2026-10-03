@@ -31,12 +31,15 @@ describe("AddGuardianDependentDialog", () => {
 
     await fillForm(user);
     expect(screen.getByText(`${new Date().getFullYear() - BIRTH_YEAR} años`)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     await waitFor(() => expect(createGuardianDependentAction).toHaveBeenCalledTimes(1));
     const [institutionId, , formData] = jest.mocked(createGuardianDependentAction).mock.calls[0];
 
     expect(institutionId).toBe(INSTITUTION_ID);
+    // A browser always sends the file input, empty when nothing was chosen.
+    expect(formData.getAll("documents").every((document) => document instanceof File && document.size === 0)).toBe(true);
+    formData.delete("documents");
     expect(Object.fromEntries(formData.entries())).toEqual({
       firstName: "Mateo",
       lastName: "Gonzalez",
@@ -47,13 +50,35 @@ describe("AddGuardianDependentDialog", () => {
     });
   });
 
+  it("sends the chosen supporting documents", async () => {
+    const user = userEvent.setup();
+    render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
+
+    await fillForm(user);
+    const input = screen.getByLabelText(/Documentación respaldatoria/) as HTMLInputElement;
+    await user.upload(input, new File(["%PDF-1.4"], "partida.pdf", { type: "application/pdf" }));
+    expect(input.files?.[0].name).toBe("partida.pdf");
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
+
+    await waitFor(() => expect(createGuardianDependentAction).toHaveBeenCalled());
+    const documents = jest.mocked(createGuardianDependentAction).mock.calls[0][2].getAll("documents");
+    expect(documents).toHaveLength(1);
+    // jsdom and Node's FormData do not share File, so the content is not checkable here.
+  });
+
+  it("explains that the request stays pending until the institution validates it", () => {
+    render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
+
+    expect(screen.getByText(/pendiente de validación/i)).toBeInTheDocument();
+  });
+
   it("sends isPrimaryContact as true when the checkbox is checked", async () => {
     const user = userEvent.setup();
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
 
     await fillForm(user);
     await user.click(screen.getByRole("checkbox", { name: /Contacto principal/ }));
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     await waitFor(() => expect(createGuardianDependentAction).toHaveBeenCalled());
     expect(jest.mocked(createGuardianDependentAction).mock.calls[0][2].get("isPrimaryContact")).toBe("true");
@@ -68,7 +93,7 @@ describe("AddGuardianDependentDialog", () => {
     });
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={onSuccess} />);
 
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     expect(await screen.findByText("El número de documento debe tener exactamente 8 dígitos.")).toBeInTheDocument();
     expect(screen.getByText("No se pudo registrar a la persona a cargo.")).toBeInTheDocument();
@@ -82,7 +107,7 @@ describe("AddGuardianDependentDialog", () => {
     jest.mocked(createGuardianDependentAction).mockResolvedValueOnce({ success: true });
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={onSuccess} />);
 
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1));
   });
@@ -93,10 +118,10 @@ describe("AddGuardianDependentDialog", () => {
     jest.mocked(createGuardianDependentAction).mockImplementationOnce(() => new Promise((resolve) => (resolveAction = resolve)));
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
 
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     await waitFor(() => expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled());
-    expect(screen.getByRole("button", { name: /Agregando/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Enviando/ })).toBeDisabled();
 
     resolveAction({});
     await waitFor(() => expect(screen.getByRole("button", { name: "Cancelar" })).not.toBeDisabled());
@@ -107,7 +132,7 @@ describe("AddGuardianDependentDialog", () => {
     jest.mocked(createGuardianDependentAction).mockRejectedValueOnce(new Error("network"));
     render(<AddGuardianDependentDialog institutionId={INSTITUTION_ID} onClose={jest.fn()} onSuccess={jest.fn()} />);
 
-    await user.click(screen.getByRole("button", { name: "Agregar" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar" }));
 
     expect(await screen.findByText("No se pudo registrar a la persona a cargo.")).toBeInTheDocument();
   });

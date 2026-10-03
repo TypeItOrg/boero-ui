@@ -23,6 +23,7 @@ function buildDependent(overrides: Partial<GuardianDependent> = {}): GuardianDep
   return {
     personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998001",
     dependentPersonId: "019f9c3a-f891-7bc5-a98d-e65332998002",
+    status: "ACTIVE",
     documentNumber: "12345678",
     firstName: "Mateo",
     lastName: "Gonzalez",
@@ -51,6 +52,44 @@ describe("GuardianDependentsList", () => {
     expect(screen.getByText(/2 inscripciones activas/)).toBeInTheDocument();
   });
 
+  it("shows the approved status and lets the tutor enroll or remove the person", () => {
+    render(<GuardianDependentsList dependents={[buildDependent()]} institutionId={INSTITUTION_ID} />);
+
+    expect(screen.getByText("Aprobada")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Inscribir a Mateo Gonzalez" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quitar a Mateo Gonzalez" })).toBeInTheDocument();
+  });
+
+  it("shows a pending link with a cancellation action", () => {
+    render(
+      <GuardianDependentsList
+        dependents={[buildDependent({ status: "PENDING", firstName: null, lastName: null, activeApplicationsCount: 0, roles: [] })]}
+        institutionId={INSTITUTION_ID}
+      />,
+    );
+
+    expect(screen.getByText("Pendiente de validación")).toBeInTheDocument();
+    expect(screen.getByText("DNI 12345678")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quitar a DNI 12345678" })).toHaveTextContent("Cancelar solicitud");
+    expect(screen.queryByRole("button", { name: /Inscribir a/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/inscripci[oó]n(es)? activa/)).not.toBeInTheDocument();
+  });
+
+  it("shows a rejected link without actions", () => {
+    render(
+      <GuardianDependentsList
+        dependents={[buildDependent({ status: "REJECTED", firstName: null, lastName: null, activeApplicationsCount: 0, roles: [] })]}
+        institutionId={INSTITUTION_ID}
+      />,
+    );
+
+    expect(screen.getByText("Rechazada")).toBeInTheDocument();
+    expect(screen.getByText("DNI 12345678")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Inscribir a/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Quitar a/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/inscripci[oó]n(es)? activa/)).not.toBeInTheDocument();
+  });
+
   it("omits the primary contact line when the guardian is not the primary contact", () => {
     render(<GuardianDependentsList dependents={[buildDependent({ isPrimaryContact: false })]} institutionId={INSTITUTION_ID} />);
 
@@ -67,7 +106,7 @@ describe("GuardianDependentsList", () => {
     render(<GuardianDependentsList dependents={[]} institutionId={INSTITUTION_ID} />);
 
     expect(
-      screen.getByText("Todavía no tenés ningún estudiante a cargo registrado. Agregá a tu primer hijo para comenzar sus inscripciones."),
+      screen.getByText("Todavía no tenés ninguna persona a cargo. Solicitá la vinculación con tu primera persona para comenzar sus inscripciones."),
     ).toBeInTheDocument();
   });
 
@@ -119,7 +158,7 @@ describe("GuardianDependentsList", () => {
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Agregar persona a cargo" }));
+    await user.click(screen.getByRole("button", { name: "Solicitar vinculación" }));
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
@@ -128,7 +167,7 @@ describe("GuardianDependentsList", () => {
     const user = userEvent.setup();
     render(<GuardianDependentsList dependents={[]} institutionId={INSTITUTION_ID} />);
 
-    await user.click(screen.getAllByRole("button", { name: "Agregar persona a cargo" })[0]);
+    await user.click(screen.getAllByRole("button", { name: "Solicitar vinculación" })[0]);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ClipboardPlusIcon, PhoneCallIcon, PlusIcon, SearchIcon, UserMinusIcon, UsersIcon, XIcon } from "lucide-react";
 
+import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { EmptyMedia } from "@common/components/ui/empty";
@@ -12,13 +13,22 @@ import { AddGuardianDependentDialog } from "@features/guardian-dependents/compon
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
 import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
 import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
-import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import { GUARDIAN_LINK_STATUS_LABELS, GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
+import { GUARDIAN_LINK_STATUS, type GuardianLinkStatus } from "@features/guardian-dependents/types/guardian-link-status.types";
+import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 
 type GuardianDependentsListProps = { dependents: GuardianDependent[]; institutionId: string; initialSearch?: string };
 
-const ADD_LABEL = "Agregar persona a cargo";
+const ADD_LABEL = "Solicitar vinculación";
+
+const STATUS_BADGE_VARIANT: Record<GuardianLinkStatus, "success" | "secondary" | "destructive" | "outline"> = {
+  [GUARDIAN_LINK_STATUS.ACTIVE]: "success",
+  [GUARDIAN_LINK_STATUS.PENDING]: "secondary",
+  [GUARDIAN_LINK_STATUS.REJECTED]: "destructive",
+  [GUARDIAN_LINK_STATUS.ENDED]: "outline",
+};
 
 function normalize(text: string): string {
   return text
@@ -30,7 +40,7 @@ function normalize(text: string): string {
 function matchesSearch(dependent: GuardianDependent, search: string): boolean {
   const term = normalize(search.trim());
 
-  return normalize(`${dependent.firstName} ${dependent.lastName}`).includes(term) || dependent.documentNumber.includes(term);
+  return normalize(getGuardianDependentName(dependent)).includes(term) || dependent.documentNumber.includes(term);
 }
 
 export function GuardianDependentsList({ dependents, institutionId, initialSearch = "" }: GuardianDependentsListProps): React.ReactElement {
@@ -85,7 +95,7 @@ export function GuardianDependentsList({ dependents, institutionId, initialSearc
           </EmptyMedia>
           <h3 className="text-foreground text-base font-semibold">No hay personas a cargo</h3>
           <p className="text-muted-foreground mt-1.5 mb-6 max-w-sm text-sm">
-            Todavía no tenés ningún estudiante a cargo registrado. Agregá a tu primer hijo para comenzar sus inscripciones.
+            Todavía no tenés ninguna persona a cargo. Solicitá la vinculación con tu primera persona para comenzar sus inscripciones.
           </p>
           <AddButton onClick={() => setIsDialogOpen(true)} />
         </div>
@@ -97,7 +107,7 @@ export function GuardianDependentsList({ dependents, institutionId, initialSearc
 
       {dependentToUnlink ? (
         <UnlinkGuardianDependentDialog
-          dependentName={`${dependentToUnlink.firstName} ${dependentToUnlink.lastName}`}
+          dependentName={getGuardianDependentName(dependentToUnlink)}
           dependentPersonId={dependentToUnlink.dependentPersonId}
           institutionId={institutionId}
           onClose={() => setDependentToUnlink(null)}
@@ -162,13 +172,17 @@ function DependentCard({
   onUnlink: () => void;
 }): React.ReactElement {
   const age = calculateAge(dependent.birthDate ?? undefined);
+  const name = getGuardianDependentName(dependent);
+  const isActive = dependent.status === GUARDIAN_LINK_STATUS.ACTIVE;
+  const canUnlink = isActive || dependent.status === GUARDIAN_LINK_STATUS.PENDING;
 
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>
-          {dependent.firstName} {dependent.lastName}
-        </CardTitle>
+        <CardTitle>{name}</CardTitle>
+        <Badge className="w-fit" variant={STATUS_BADGE_VARIANT[dependent.status]}>
+          {GUARDIAN_LINK_STATUS_LABELS[dependent.status]}
+        </Badge>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 text-sm">
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
@@ -182,26 +196,32 @@ function DependentCard({
             Sos su contacto principal
           </p>
         ) : null}
-        <p className={dependent.activeApplicationsCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}>
-          {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
-        </p>
+        {isActive ? (
+          <p className={dependent.activeApplicationsCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}>
+            {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
+          </p>
+        ) : (
+          <p className="text-muted-foreground">
+            {dependent.status === GUARDIAN_LINK_STATUS.PENDING
+              ? "La institución todavía tiene que validar la vinculación. Hasta entonces no podés gestionar a esta persona."
+              : "La institución rechazó la vinculación. No podés gestionar a esta persona."}
+          </p>
+        )}
       </CardContent>
-      <CardFooter className="justify-end gap-2">
-        <Button
-          aria-label={`Inscribir a ${dependent.firstName} ${dependent.lastName}`}
-          disabled={isSelectingWorkspace}
-          onClick={onEnroll}
-          size="sm"
-          type="button"
-        >
-          <ClipboardPlusIcon aria-hidden="true" />
-          Inscribir
-        </Button>
-        <Button aria-label={`Quitar a ${dependent.firstName} ${dependent.lastName}`} onClick={onUnlink} size="sm" type="button" variant="outline">
-          <UserMinusIcon aria-hidden="true" />
-          Quitar
-        </Button>
-      </CardFooter>
+      {canUnlink ? (
+        <CardFooter className="justify-end gap-2">
+          {isActive ? (
+            <Button aria-label={`Inscribir a ${name}`} disabled={isSelectingWorkspace} onClick={onEnroll} size="sm" type="button">
+              <ClipboardPlusIcon aria-hidden="true" />
+              Inscribir
+            </Button>
+          ) : null}
+          <Button aria-label={`Quitar a ${name}`} onClick={onUnlink} size="sm" type="button" variant="outline">
+            <UserMinusIcon aria-hidden="true" />
+            {dependent.status === GUARDIAN_LINK_STATUS.PENDING ? "Cancelar solicitud" : "Quitar"}
+          </Button>
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }

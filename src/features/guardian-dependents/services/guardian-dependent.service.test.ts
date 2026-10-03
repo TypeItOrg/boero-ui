@@ -5,6 +5,7 @@ const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const DEPENDENT: GuardianDependent = {
   personGuardianId: "00000000-0000-4000-8000-0000000000a1",
   dependentPersonId: "00000000-0000-4000-8000-0000000000b2",
+  status: "ACTIVE",
   documentNumber: "54123456",
   firstName: "Mateo",
   lastName: "González",

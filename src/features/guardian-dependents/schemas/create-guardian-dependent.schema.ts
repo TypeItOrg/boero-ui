@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { GUARDIAN_DEPENDENT_MESSAGES } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import { GUARDIAN_RELATIONSHIP } from "@features/guardian-dependents/types/guardian-relationship.types";
-import { hasMinimumPersonAge, isMinorBirthDate } from "@features/people/utils/person-birth-date.util";
+import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
 
 export const createGuardianDependentSchema = z.object({
   documentNumber: z
@@ -26,8 +26,7 @@ export const createGuardianDependentSchema = z.object({
   birthDate: z
     .string()
     .min(1, { message: GUARDIAN_DEPENDENT_MESSAGES.REQUIRED_BIRTH_DATE, abort: true })
-    .refine(hasMinimumPersonAge, GUARDIAN_DEPENDENT_MESSAGES.INVALID_BIRTH_DATE)
-    .refine(isMinorBirthDate, GUARDIAN_DEPENDENT_MESSAGES.DEPENDENT_MUST_BE_MINOR),
+    .refine(hasMinimumPersonAge, GUARDIAN_DEPENDENT_MESSAGES.INVALID_BIRTH_DATE),
   relationship: z.enum(Object.values(GUARDIAN_RELATIONSHIP) as [string, ...string[]], GUARDIAN_DEPENDENT_MESSAGES.INVALID_RELATIONSHIP),
   // Raw form value: it must be explicit, a missing value is invalid rather than an implicit false.
   isPrimaryContact: z.enum(["true", "false"], GUARDIAN_DEPENDENT_MESSAGES.INVALID_PRIMARY_CONTACT).transform((value) => value === "true"),

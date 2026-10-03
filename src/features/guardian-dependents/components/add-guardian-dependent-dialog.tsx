@@ -9,17 +9,21 @@ import { Button } from "@common/components/ui/button";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@common/components/ui/dialog";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 import { createGuardianDependentAction } from "@features/guardian-dependents/actions/create-guardian-dependent.action";
-import { GUARDIAN_DEPENDENT_MESSAGES, GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import {
+  GUARDIAN_ATTACHMENT_ACCEPT,
+  GUARDIAN_DEPENDENT_MESSAGES,
+  GUARDIAN_RELATIONSHIP_LABELS,
+} from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependentActionState } from "@features/guardian-dependents/types/guardian-dependent-action-state.types";
 import type { GuardianDependentFieldName } from "@features/guardian-dependents/types/guardian-dependent-field-name.types";
 import { GUARDIAN_RELATIONSHIP } from "@features/guardian-dependents/types/guardian-relationship.types";
-import { formatBirthDateInput, getEarliestMinorBirthDate, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
+import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 type AddGuardianDependentDialogProps = { institutionId: string; onClose: () => void; onSuccess: () => void };
 
@@ -73,8 +77,11 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Agregar persona a cargo</DialogTitle>
-          <DialogDescription>Registrá a un menor a tu cargo para poder gestionar sus inscripciones.</DialogDescription>
+          <DialogTitle>Solicitar vinculación</DialogTitle>
+          <DialogDescription>
+            Solicitá la vinculación con una persona a tu cargo. Queda pendiente de validación institucional y no podrás gestionarla hasta que se
+            apruebe.
+          </DialogDescription>
         </DialogHeader>
 
         <form className="flex flex-col gap-4" noValidate onSubmit={handleSubmit}>
@@ -135,7 +142,6 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
                 disabled={isPending}
                 id="dependent-birth-date"
                 maxDate={getLatestAllowedBirthDate()}
-                minDate={getEarliestMinorBirthDate()}
                 onChange={setBirthDate}
                 value={birthDate}
               />
@@ -177,12 +183,27 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
             </Field>
           </FieldGroup>
 
+          <Field data-invalid={!!state.fieldErrors?.documents}>
+            <FieldLabel htmlFor="dependent-documents">Documentación respaldatoria</FieldLabel>
+            <Input
+              accept={GUARDIAN_ATTACHMENT_ACCEPT}
+              aria-invalid={!!state.fieldErrors?.documents}
+              disabled={isPending}
+              id="dependent-documents"
+              multiple
+              name="documents"
+              type="file"
+            />
+            <FieldDescription>Opcional. PDF, PNG o JPG, hasta 5 archivos de 10 MB.</FieldDescription>
+            <FieldError errors={getErrors("documents")} />
+          </Field>
+
           <DialogFooter>
             <Button disabled={isPending} onClick={onClose} type="button" variant="outline">
               Cancelar
             </Button>
             <Button disabled={isPending} type="submit">
-              {isPending ? "Agregando…" : "Agregar"}
+              {isPending ? "Enviando…" : "Solicitar"}
             </Button>
           </DialogFooter>
         </form>

@@ -53,7 +53,7 @@ describe("createGuardianDependentSchema", () => {
     expect(issuePaths(createValidInput({ birthDate: "2999-01-01" }))).toContain("birthDate");
   });
 
-  it("rejects a dependent who is already an adult", () => {
-    expect(issuePaths(createValidInput({ birthDate: "1990-01-01" }))).toContain("birthDate");
+  it("accepts an adult as the person in charge", () => {
+    expect(issuePaths(createValidInput({ birthDate: "1990-01-01" }))).toEqual([]);
   });
 });
