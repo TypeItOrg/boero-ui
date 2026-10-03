@@ -9,6 +9,7 @@ import { fetchAcademicOffers } from "@features/academic-offers/services/academic
 import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
+import { filterActiveGuardianDependents } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
 import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
@@ -53,7 +54,7 @@ export default async function EnrollmentPage({
     );
   }
 
-  const dependents = canManageDependents(user) ? await fetchGuardianDependents(person.institutionId) : [];
+  const dependents = canManageDependents(user) ? filterActiveGuardianDependents(await fetchGuardianDependents(person.institutionId)) : [];
   const guardianOnly = isGuardian(user);
   const workspaceId = guardianOnly ? await getGuardianWorkspaceId() : undefined;
   const selectedDependent = resolveGuardianWorkspaceDependent(dependents, workspaceId);

@@ -2,6 +2,7 @@
 
 import { isValidUuid } from "@common/utils/action-argument.util";
 import { GUARDIAN_WORKSPACE_MESSAGES } from "@features/guardian-workspace/constants/guardian-workspace.constants";
+import { filterActiveGuardianDependents } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { canManageDependents } from "@features/institutional-auth/utils/institutional-applicant-role.util";
@@ -21,7 +22,8 @@ export async function setGuardianWorkspaceAction(dependentPersonId: string): Pro
   }
 
   try {
-    const dependents = await fetchGuardianDependents(user.institutionId);
+    // Only an approved link lets the tutor work on behalf of the person.
+    const dependents = filterActiveGuardianDependents(await fetchGuardianDependents(user.institutionId));
     const belongsToUser = dependents.some((dependent) => dependent.dependentPersonId === dependentPersonId);
 
     if (!belongsToUser) {

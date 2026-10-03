@@ -13,6 +13,7 @@ function buildDependent(overrides: Partial<GuardianDependent> = {}): GuardianDep
   return {
     personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998001",
     dependentPersonId: "019f9c3a-f891-7bc5-a98d-e65332998002",
+    status: "ACTIVE",
     documentNumber: "22222222",
     firstName: "Martin",
     lastName: "Crossetin",

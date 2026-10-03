@@ -3,6 +3,7 @@
 import { UserRoundIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
+import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { useGuardianWorkspace } from "@features/guardian-workspace/components/guardian-workspace-provider";
 
 export function GuardianWorkspaceBadge(): React.ReactElement | null {
@@ -21,7 +22,7 @@ export function GuardianWorkspaceBadge(): React.ReactElement | null {
     );
   }
 
-  const fullName = `${activeDependent.firstName} ${activeDependent.lastName}`;
+  const fullName = getGuardianDependentName(activeDependent);
   const roleLabel = activeDependent.roles.join(", ");
 
   return (

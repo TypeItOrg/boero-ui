@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@common/components/ui/dropdown-menu";
 import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { useGuardianWorkspace } from "@features/guardian-workspace/components/guardian-workspace-provider";
 
 export function GuardianWorkspaceMenuItems(): React.ReactElement {
@@ -38,7 +39,7 @@ export function GuardianWorkspaceMenuItems(): React.ReactElement {
           <DropdownMenuRadioItem disabled={isPending} key={dependent.dependentPersonId} value={dependent.dependentPersonId}>
             <UserRoundIcon />
             <span className="min-w-0">
-              <span className="block truncate">{getFullName(dependent)}</span>
+              <span className="block truncate">{getGuardianDependentName(dependent)}</span>
               <span className="text-muted-foreground block text-xs">DNI {dependent.documentNumber}</span>
             </span>
           </DropdownMenuRadioItem>
@@ -54,8 +55,4 @@ export function GuardianWorkspaceMenuItems(): React.ReactElement {
       </DropdownMenuItem>
     </>
   );
-}
-
-function getFullName(dependent: { firstName: string; lastName: string }): string {
-  return `${dependent.firstName} ${dependent.lastName}`;
 }

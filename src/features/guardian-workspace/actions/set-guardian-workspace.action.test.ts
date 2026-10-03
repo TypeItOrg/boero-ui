@@ -33,6 +33,7 @@ describe("setGuardianWorkspaceAction", () => {
       {
         personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998006",
         dependentPersonId: DEPENDENT_ID,
+        status: "ACTIVE",
         documentNumber: "87654321",
         firstName: "Mateo",
         lastName: "González",
@@ -54,6 +55,14 @@ describe("setGuardianWorkspaceAction", () => {
 
   it("rejects a dependent that does not belong to the tutor", async () => {
     await expect(setGuardianWorkspaceAction("019f9c3a-f891-7bc5-a98d-e65332998007")).resolves.toEqual({ error: expect.any(String) });
+    expect(setGuardianWorkspaceId).not.toHaveBeenCalled();
+  });
+
+  it.each(["PENDING", "REJECTED", "ENDED"] as const)("rejects a dependent whose link is %s", async (status) => {
+    const [active] = await jest.mocked(fetchGuardianDependents)("ignored");
+    jest.mocked(fetchGuardianDependents).mockResolvedValue([{ ...active, status }]);
+
+    await expect(setGuardianWorkspaceAction(DEPENDENT_ID)).resolves.toEqual({ error: expect.any(String) });
     expect(setGuardianWorkspaceId).not.toHaveBeenCalled();
   });
 
