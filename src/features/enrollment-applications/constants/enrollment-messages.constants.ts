@@ -48,6 +48,7 @@ export const ENROLLMENT_MESSAGES = {
   DOCUMENT_REQUIRED: "El número de documento es obligatorio",
   BIRTH_DATE_REQUIRED: "La fecha de nacimiento es obligatoria",
   PHONE_REQUIRED: "El teléfono de contacto es obligatorio",
+  NATIONALITY_REQUIRED: "La nacionalidad es obligatoria",
   EMAIL_REQUIRED: "El correo electrónico es obligatorio",
   EMAIL_INVALID: "El correo electrónico no es válido",
   CURRENTLY_STUDYING_REQUIRED: "Indicá si actualmente asistís a una institución educativa",

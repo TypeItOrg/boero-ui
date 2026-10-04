@@ -48,6 +48,7 @@ export const personalDataSchema = z.object({
   birthDate: z.string().trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
   phoneNumber: z.string().trim().nullish(),
   email: z.string().trim().min(1, ENROLLMENT_MESSAGES.EMAIL_REQUIRED).email(ENROLLMENT_MESSAGES.EMAIL_INVALID),
+  nationality: z.string().trim().nullish(),
 });
 
 const educationLevelSchema = z.enum(["NO_SCHOOLING", "INITIAL", "PRIMARY", "SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"]);
@@ -179,6 +180,22 @@ export const enrollmentApplicationSubmissionSchema = z
     attachments: z.array(enrollmentAttachmentSchema).default([]),
   })
   .superRefine((data, ctx) => {
+    if (!data.personalData.phoneNumber || data.personalData.phoneNumber.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: ENROLLMENT_MESSAGES.PHONE_REQUIRED,
+        path: ["personalData", "phoneNumber"],
+      });
+    }
+
+    if (!data.personalData.nationality || data.personalData.nationality.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: ENROLLMENT_MESSAGES.NATIONALITY_REQUIRED,
+        path: ["personalData", "nationality"],
+      });
+    }
+
     // 1. Condicional: Si edad < 18, tutor legal obligatorio
     const age = calculateAge(data.personalData.birthDate);
 
