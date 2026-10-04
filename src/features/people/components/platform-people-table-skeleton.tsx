@@ -5,13 +5,13 @@ export function PlatformPeopleTableSkeleton(): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="h-full overflow-hidden rounded-lg border">
-        <Table containerClassName="table-scrollbar" className="min-w-260">
+        <Table containerClassName="table-scrollbar" className="min-w-280">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow>
               <TableHead className="w-16 pl-4">
                 <span className="sr-only">Acciones</span>
               </TableHead>
-              {Array.from({ length: 6 }).map((_, index) => (
+              {Array.from({ length: 7 }).map((_, index) => (
                 <TableHead key={index}>
                   <Skeleton className="h-4 w-20" />
                 </TableHead>
@@ -38,6 +38,9 @@ export function PlatformPeopleTableSkeleton(): React.ReactElement {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-5 w-52" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-20 rounded-full" />
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-5 w-24 rounded-full" />

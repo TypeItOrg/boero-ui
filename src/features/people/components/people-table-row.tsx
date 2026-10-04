@@ -77,11 +77,9 @@ export function PeopleTableRow({
       <TableCell>{person.documentNumber}</TableCell>
       <TableCell>{person.phoneNumber ? person.phoneNumber : <span className="text-muted-foreground/60">Sin teléfono</span>}</TableCell>
       <TableCell>{person.email ? person.email : <span className="text-muted-foreground/60">Sin email</span>}</TableCell>
-      {PeopleScope.isInstitutional(scope) ? (
-        <TableCell>
-          <Badge variant={person.enabled ? "secondary" : "outline"}>{person.enabled ? "Activo" : "Inactivo"}</Badge>
-        </TableCell>
-      ) : null}
+      <TableCell>
+        <Badge variant={person.enabled ? "secondary" : "outline"}>{person.enabled ? "Activo" : "Inactivo"}</Badge>
+      </TableCell>
       <TableCell>
         {person.roles && person.roles.length > 0 ? (
           <div className="flex flex-wrap gap-1">

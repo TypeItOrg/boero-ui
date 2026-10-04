@@ -5,7 +5,7 @@ export function PeopleTableSkeleton(): React.ReactElement {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="h-full overflow-hidden rounded-lg border">
-        <Table containerClassName="table-scrollbar" className="min-w-190">
+        <Table containerClassName="table-scrollbar" className="min-w-205">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors">
               <TableHead className="w-16 pl-4">
@@ -25,6 +25,9 @@ export function PeopleTableSkeleton(): React.ReactElement {
               </TableHead>
               <TableHead>
                 <Skeleton className="h-4 w-10" />
+              </TableHead>
+              <TableHead>
+                <Skeleton className="h-4 w-14" />
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -48,6 +51,9 @@ export function PeopleTableSkeleton(): React.ReactElement {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-6 w-24 rounded-full" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-6 w-20 rounded-full" />
                 </TableCell>
               </TableRow>
             ))}
