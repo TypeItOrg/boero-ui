@@ -4,6 +4,7 @@ import { ScrollTextIcon } from "lucide-react";
 
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { CourseEnrollmentDetailActions } from "@features/course-enrollments/components/course-enrollment-detail-actions";
+import { CourseEnrollmentDetailGradeSection } from "@features/course-enrollments/components/course-enrollment-detail-grade-section";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { hasInstitutionalPermission, hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
@@ -57,6 +58,14 @@ export default async function CourseEnrollmentDetailPage({
         canReadWaitlist={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ, enrollment.trainingPathId)}
       />
       <CourseEnrollmentDetail enrollment={enrollment} history={history} />
+      <CourseEnrollmentDetailGradeSection
+        enrollment={enrollment}
+        canRead={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_READ, enrollment.trainingPathId)}
+        canCreate={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_CREATE, enrollment.trainingPathId)}
+        canUpdate={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_UPDATE, enrollment.trainingPathId)}
+        canDelete={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_DELETE, enrollment.trainingPathId)}
+        canPublish={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_PUBLISH, enrollment.trainingPathId)}
+      />
     </PlatformPageShell>
   );
 }

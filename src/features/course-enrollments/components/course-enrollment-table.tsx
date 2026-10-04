@@ -22,6 +22,8 @@ import type { CourseEnrollment } from "@features/course-enrollments/types/course
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
+import { CourseEnrollmentGradeDialog } from "@features/course-enrollments/components/course-enrollment-grade-dialog";
+import { COURSE_ENROLLMENT_GRADE_MESSAGES } from "@features/course-enrollments/constants/course-enrollment-grade.constants";
 import { CourseEnrollmentSchedules } from "@features/course-enrollments/components/course-enrollment-schedules";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
 import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
@@ -39,6 +41,11 @@ type CourseEnrollmentTableProps = {
   canUpdateAcademicStatus?: boolean;
   canReadWaitlist?: boolean;
   detailBasePath?: string;
+  gradeMode?: "institutional" | "teacher";
+  canReadGrades?: boolean;
+  canCreateGrade?: boolean;
+  canUpdateGrade?: boolean;
+  canDeleteGrade?: boolean;
 };
 
 export function CourseEnrollmentTable({
@@ -53,12 +60,18 @@ export function CourseEnrollmentTable({
   canUpdateAcademicStatus = false,
   canReadWaitlist = false,
   detailBasePath,
+  gradeMode,
+  canReadGrades = false,
+  canCreateGrade = false,
+  canUpdateGrade = false,
+  canDeleteGrade = false,
 }: CourseEnrollmentTableProps): React.ReactElement {
   const router = useRouter();
   const { isPending: isNavigating } = useDataTableNavigation();
   const [mutation, setMutation] = React.useState<{ enrollment: CourseEnrollment; mode: "withdraw" | "academic" }>();
+  const [gradeEnrollment, setGradeEnrollment] = React.useState<CourseEnrollment | null>(null);
   const hasFilters = status !== undefined || academicStatus !== undefined;
-  const showActionsColumn = Boolean(detailBasePath) || canReadWaitlist || canWithdraw || canUpdateAcademicStatus;
+  const showActionsColumn = Boolean(detailBasePath) || canReadWaitlist || canWithdraw || canUpdateAcademicStatus || canReadGrades;
 
   if (data.items.length === 0) {
     return (
@@ -123,13 +136,19 @@ export function CourseEnrollmentTable({
                 enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN";
               const canViewWaitlist =
                 canReadWaitlist && scopeIncludesTrainingPath(permissionScopes, P.COURSE_WAITLIST_READ, enrollment.trainingPathId);
-              const hasActions = Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult;
+              const canViewGrades =
+                canReadGrades &&
+                (gradeMode === "teacher" ||
+                  scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_READ, enrollment.trainingPathId));
+              const hasActions =
+                Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult || canViewGrades;
 
               function renderActions(
                 Item: typeof DropdownMenuItem | typeof ContextMenuItem,
                 Separator: typeof DropdownMenuSeparator | typeof ContextMenuSeparator,
               ): React.ReactElement {
-                const hasActionBeforeWithdrawal = Boolean(detailBasePath) || canViewWaitlist || canUpdateResult;
+                const hasActionBeforeWithdrawal =
+                  Boolean(detailBasePath) || canViewWaitlist || canUpdateResult || canViewGrades;
 
                 return (
                   <>
@@ -145,6 +164,11 @@ export function CourseEnrollmentTable({
                         <Link href={`/course-enrollments/${enrollment.courseId}/waitlist`} className="px-2.5 py-1.5">
                           Ver lista de espera
                         </Link>
+                      </Item>
+                    ) : null}
+                    {canViewGrades && gradeMode ? (
+                      <Item className="px-2.5 py-1.5" onSelect={() => setGradeEnrollment(enrollment)}>
+                        {COURSE_ENROLLMENT_GRADE_MESSAGES.VIEW_GRADES}
                       </Item>
                     ) : null}
                     {canUpdateResult ? (
@@ -241,6 +265,38 @@ export function CourseEnrollmentTable({
             }
           }}
           onUpdated={() => router.refresh()}
+        />
+      ) : null}
+
+      {gradeEnrollment && gradeMode ? (
+        <CourseEnrollmentGradeDialog
+          enrollment={gradeEnrollment}
+          mode={gradeMode}
+          canCreate={
+            gradeMode === "teacher"
+              ? canCreateGrade
+              : canCreateGrade &&
+                scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_CREATE, gradeEnrollment.trainingPathId)
+          }
+          canUpdate={
+            gradeMode === "teacher"
+              ? canUpdateGrade
+              : canUpdateGrade &&
+                scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_UPDATE, gradeEnrollment.trainingPathId)
+          }
+          canDelete={
+            gradeMode === "teacher"
+              ? canDeleteGrade
+              : canDeleteGrade &&
+                scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_DELETE, gradeEnrollment.trainingPathId)
+          }
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setGradeEnrollment(null);
+            }
+          }}
+          onChanged={() => router.refresh()}
         />
       ) : null}
     </div>

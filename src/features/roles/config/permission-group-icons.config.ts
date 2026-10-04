@@ -1,8 +1,7 @@
-import { Building2Icon, ClipboardCheckIcon, GraduationCapIcon, ShieldCheckIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
+import { Building2Icon, GraduationCapIcon, ShieldCheckIcon, UsersRoundIcon, type LucideIcon } from "lucide-react";
 
 const PERMISSION_GROUP_ICONS: Readonly<Record<string, LucideIcon>> = {
   ACADEMIC: GraduationCapIcon,
-  GRADES: ClipboardCheckIcon,
   INSTITUTION: Building2Icon,
   PEOPLE: UsersRoundIcon,
   ROLES: ShieldCheckIcon,

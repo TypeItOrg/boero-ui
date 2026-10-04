@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+import { BulkPublishGradesButton } from "@features/course-enrollments/components/bulk-publish-grades-button";
 import { CourseEnrollmentFilters } from "@features/course-enrollments/components/course-enrollment-filters";
 import { CourseEnrollmentTable } from "@features/course-enrollments/components/course-enrollment-table";
 import { CourseEnrollmentTableSkeleton } from "@features/course-enrollments/components/course-enrollment-table-skeleton";
@@ -51,14 +52,22 @@ export default async function CourseEnrollmentsPage({
   const canWithdraw = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_WITHDRAW);
   const canUpdateAcademicStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE);
   const canReadWaitlist = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ);
+  const canReadGrades = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_READ);
+  const canCreateGrade = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_CREATE);
+  const canUpdateGrade = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_UPDATE);
+  const canDeleteGrade = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_DELETE);
+  const canPublishGrades = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_PUBLISH);
 
   return (
     <PlatformPageShell title="Cursadas" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={GraduationCapIcon} />}>
-      {canCreate ? (
+      {canCreate || canPublishGrades ? (
         <div className="flex flex-wrap items-center gap-2">
-          <Button asChild size="lg">
-            <Link href={appendReturnTo("/course-enrollments/new", returnTo)}>Alta manual</Link>
-          </Button>
+          {canCreate ? (
+            <Button asChild size="lg">
+              <Link href={appendReturnTo("/course-enrollments/new", returnTo)}>Alta manual</Link>
+            </Button>
+          ) : null}
+          {canPublishGrades ? <BulkPublishGradesButton /> : null}
         </div>
       ) : null}
       <DataTableNavigationProvider>
@@ -76,6 +85,11 @@ export default async function CourseEnrollmentsPage({
             canUpdateAcademicStatus={canUpdateAcademicStatus}
             canReadWaitlist={canReadWaitlist}
             detailBasePath="/course-enrollments"
+            gradeMode="institutional"
+            canReadGrades={canReadGrades}
+            canCreateGrade={canCreateGrade}
+            canUpdateGrade={canUpdateGrade}
+            canDeleteGrade={canDeleteGrade}
           />
         </Suspense>
       </DataTableNavigationProvider>

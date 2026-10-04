@@ -180,15 +180,15 @@ describe("PermissionGroupsFields", () => {
     expect(trainingPathBranch).not.toContainElement(createYearField);
   });
 
-  it("hides GRADES permission group", () => {
+  it("renders all permission groups without hidden groups", () => {
     const gradesGroup: InstitutionPermissionGroup = {
-      code: "GRADES",
-      displayName: "Calificaciones",
-      description: "Gestión de calificaciones",
+      code: "ENROLLMENT",
+      displayName: "Inscripciones",
+      description: "Gestión de inscripciones",
       permissions: [
         {
-          code: "institution:grades:enter",
-          description: "Cargar calificaciones",
+          code: "institution:course-enrollment-grade:read",
+          description: "Consultar notas de estudiantes",
           grantable: true,
           requiredPermissions: [],
         },
@@ -197,6 +197,6 @@ describe("PermissionGroupsFields", () => {
 
     render(<PermissionGroupsFields groups={[...mockPermissionGroups, gradesGroup]} />);
 
-    expect(screen.queryByText("Calificaciones")).not.toBeInTheDocument();
+    expect(screen.getByText("Inscripciones")).toBeInTheDocument();
   });
 });

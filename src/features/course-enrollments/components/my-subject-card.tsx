@@ -1,9 +1,12 @@
 import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { ClockIcon, Music2Icon } from "lucide-react";
+import * as React from "react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
+import { COURSE_ENROLLMENT_GRADE_MESSAGES } from "@features/course-enrollments/constants/course-enrollment-grade.constants";
+import { StudentGradeDialog } from "@features/course-enrollments/components/student-grade-dialog";
 import { MY_SUBJECTS_MESSAGES } from "@features/course-enrollments/constants/my-subjects.constants";
 import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
@@ -17,6 +20,7 @@ type MySubjectCardProps = {
 };
 
 export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus, onMutation }: MySubjectCardProps): React.ReactElement {
+  const [isGradesOpen, setIsGradesOpen] = React.useState(false);
   const isEnrolled = enrollment.status === COURSE_ENROLLMENT_STATUS.ENROLLED;
   const isWithdrawn =
     enrollment.status === COURSE_ENROLLMENT_STATUS.WITHDRAWN || enrollment.status === COURSE_ENROLLMENT_STATUS.ADMINISTRATIVELY_WITHDRAWN;
@@ -88,8 +92,10 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
           )}
         </div>
       </div>
-      {showWithdraw || showAcademicAction ? (
-        <div className="flex flex-wrap gap-2 border-t px-4 py-3">
+      <div className="flex flex-wrap gap-2 border-t px-4 py-3">
+        <Button variant="outline" size="sm" onClick={() => setIsGradesOpen(true)}>
+          {COURSE_ENROLLMENT_GRADE_MESSAGES.VIEW_GRADES}
+        </Button>
           {showWithdraw ? (
             <Button variant="outline" size="sm" onClick={() => onMutation(enrollment, "withdraw")}>
               Registrar baja
@@ -100,8 +106,8 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
               Registrar resultado
             </Button>
           ) : null}
-        </div>
-      ) : null}
+      </div>
+      <StudentGradeDialog enrollment={enrollment} open={isGradesOpen} onOpenChange={setIsGradesOpen} />
     </article>
   );
 }
