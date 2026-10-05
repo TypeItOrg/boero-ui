@@ -35,7 +35,7 @@ export function GuardianLinkRequests({ requests, institutionId }: GuardianLinkRe
   const [rows, setRows] = useState(requests);
   const [search, setSearch] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("PENDING");
+  const [status, setStatus] = useState<StatusFilter>("ALL");
   const normalizedSearch = search.trim().toLocaleLowerCase();
   const filteredRows = useMemo(
     () =>

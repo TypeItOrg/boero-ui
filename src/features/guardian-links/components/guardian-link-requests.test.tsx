@@ -50,6 +50,23 @@ describe("GuardianLinkRequests", () => {
     expect(screen.getByText("24/09/2026 09:00")).toBeInTheDocument();
   });
 
+  it("shows pending, accepted and rejected requests in the default view", () => {
+    render(
+      <GuardianLinkRequests
+        institutionId={INSTITUTION_ID}
+        requests={[
+          buildRequest(),
+          buildRequest({ personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998002", status: "ACTIVE" }),
+          buildRequest({ personGuardianId: "019f9c3a-f891-7bc5-a98d-e65332998003", status: "REJECTED" }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Pendientes")).toBeInTheDocument();
+    expect(screen.getByText("Aceptadas")).toBeInTheDocument();
+    expect(screen.getByText("Rechazadas")).toBeInTheDocument();
+  });
+
   it("tells when the request has no supporting documents", () => {
     render(<GuardianLinkRequests institutionId={INSTITUTION_ID} requests={[buildRequest({ attachments: [] })]} />);
 
