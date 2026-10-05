@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { UsersIcon } from "lucide-react";
 
 import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";
-import { fetchPendingGuardianLinkRequests } from "@features/guardian-links/services/guardian-link.service";
+import { fetchInstitutionGuardianLinkRequests } from "@features/guardian-links/services/guardian-link.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -22,7 +22,7 @@ export default async function GuardianLinksPage(): Promise<React.ReactElement> {
     return <InstitutionalAccessDenied description="No tenés permisos para validar vinculaciones." />;
   }
 
-  const requests = await fetchPendingGuardianLinkRequests(user.institutionId);
+  const requests = await fetchInstitutionGuardianLinkRequests(user.institutionId);
 
   return (
     <PlatformPageShell title="Solicitudes de vinculación" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UsersIcon} />}>
