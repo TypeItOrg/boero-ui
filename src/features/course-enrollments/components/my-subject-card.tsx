@@ -62,7 +62,7 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
             </div>
           </dl>
         </div>
-        <div className="min-w-0 border-t pt-4 @xl/subject:border-t-0 @xl/subject:border-l @xl/subject:pt-0 @xl/subject:pl-6">
+        <div className="-mx-4 min-w-0 border-t px-4 pt-4 @xl/subject:mx-0 @xl/subject:border-t-0 @xl/subject:border-l @xl/subject:px-0 @xl/subject:pt-0 @xl/subject:pl-6">
           <h3 className="text-muted-foreground mb-2 flex items-center gap-2 text-xs font-medium tracking-wider uppercase">
             <ClockIcon className="size-3.5" aria-hidden="true" />
             {isEnrolled ? "Horarios" : "Horarios de la cursada"}

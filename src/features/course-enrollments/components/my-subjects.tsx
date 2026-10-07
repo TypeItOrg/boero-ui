@@ -8,6 +8,8 @@ import { useDataTableNavigation } from "@common/components/ui/data-table-navigat
 import { DataTableFilters } from "@common/components/ui/data-table-filters";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import { cn } from "@common/utils/cn.util";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
@@ -38,6 +40,9 @@ export function MySubjects({ data, page, size, status, academicStatus, canWithdr
   const { isPending, navigate } = useDataTableNavigation();
   const [mutation, setMutation] = React.useState<{ enrollment: CourseEnrollment; mode: "withdraw" | "academic" }>();
   const isHistory = status !== COURSE_ENROLLMENT_STATUS.ENROLLED;
+  const hasFilters = isHistory && (status !== COURSE_ENROLLMENT_STATUS.COMPLETED || academicStatus !== undefined);
+  const hasItemsOnOtherPages = data.totalItems > 0;
+  const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : BookOpenIcon;
   const view = isHistory ? "history" : "current";
 
   function changeView(value: string): void {
@@ -120,15 +125,32 @@ export function MySubjects({ data, page, size, status, academicStatus, canWithdr
           <Empty className="bg-muted/25 min-h-56 flex-1 rounded-lg border border-solid px-4 py-12">
             <EmptyHeader className="max-w-md">
               <EmptyMedia variant="icon">
-                {isHistory ? <SearchIcon className="size-5" aria-hidden="true" /> : <BookOpenIcon className="size-5" aria-hidden="true" />}
+                <EmptyIcon className="size-5" aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle className="mt-2 text-base">
-                {isHistory ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT}
+                {hasItemsOnOtherPages
+                  ? "No hay materias en esta página"
+                  : hasFilters
+                    ? "No se encontraron materias"
+                    : isHistory
+                      ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY
+                      : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT}
               </EmptyTitle>
               <EmptyDescription>
-                {isHistory ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY_DESCRIPTION : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT_DESCRIPTION}
+                {hasItemsOnOtherPages
+                  ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
+                  : hasFilters
+                    ? DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION
+                    : isHistory
+                      ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY_DESCRIPTION
+                      : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT_DESCRIPTION}
               </EmptyDescription>
             </EmptyHeader>
+            <DataTableEmptyStateActions
+              hasFilters={hasFilters}
+              hasItemsOnOtherPages={hasItemsOnOtherPages}
+              onFirstPage={() => navigate({ page: "0" })}
+            />
           </Empty>
         )}
         {data.totalPages > 1 || page > 0 || size !== COURSE_ENROLLMENT_PAGE_SIZE_OPTIONS[0] ? (

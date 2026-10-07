@@ -15,7 +15,9 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { Badge } from "@common/components/ui/badge";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
@@ -55,9 +57,11 @@ export function CourseEnrollmentTable({
   detailBasePath,
 }: CourseEnrollmentTableProps): React.ReactElement {
   const router = useRouter();
-  const { isPending: isNavigating } = useDataTableNavigation();
+  const { isPending: isNavigating, navigate } = useDataTableNavigation();
   const [mutation, setMutation] = React.useState<{ enrollment: CourseEnrollment; mode: "withdraw" | "academic" }>();
   const hasFilters = status !== undefined || academicStatus !== undefined;
+  const hasItemsOnOtherPages = data.totalItems > 0;
+  const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : ScrollTextIcon;
   const showActionsColumn = Boolean(detailBasePath) || canReadWaitlist || canWithdraw || canUpdateAcademicStatus;
 
   if (data.items.length === 0) {
@@ -67,15 +71,24 @@ export function CourseEnrollmentTable({
           <Empty className="min-h-56 p-6">
             <EmptyHeader className="max-w-sm">
               <EmptyMedia variant="icon">
-                {hasFilters ? <SearchIcon className="size-5" aria-hidden="true" /> : <ScrollTextIcon className="size-5" aria-hidden="true" />}
+                <EmptyIcon className="size-5" aria-hidden="true" />
               </EmptyMedia>
-              <EmptyTitle className="text-base">{hasFilters ? "No se encontraron cursadas" : emptyMessage}</EmptyTitle>
+              <EmptyTitle className="text-base">
+                {hasItemsOnOtherPages ? "No hay cursadas en esta página" : hasFilters ? "No se encontraron cursadas" : emptyMessage}
+              </EmptyTitle>
               <EmptyDescription>
-                {hasFilters
-                  ? "No encontramos ninguna cursada que coincida con los filtros seleccionados."
-                  : "Las cursadas registradas van a aparecer acá junto con sus horarios, estado y resultado académico."}
+                {hasItemsOnOtherPages
+                  ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
+                  : hasFilters
+                    ? DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION
+                    : "Las cursadas registradas van a aparecer acá junto con sus horarios, estado y resultado académico."}
               </EmptyDescription>
             </EmptyHeader>
+            <DataTableEmptyStateActions
+              hasFilters={hasFilters}
+              hasItemsOnOtherPages={hasItemsOnOtherPages}
+              onFirstPage={() => navigate({ page: "0" })}
+            />
           </Empty>
           {isNavigating && (
             <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
