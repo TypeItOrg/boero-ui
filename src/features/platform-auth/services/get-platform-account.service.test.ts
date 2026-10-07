@@ -2,6 +2,7 @@ describe("getPlatformAccount", () => {
   type GetPlatformAccountModule = typeof import("@features/platform-auth/services/get-platform-account.service");
 
   const originalApiUrl = process.env.BOERO_API_URL;
+  const originalBaseDomain = process.env.INSTITUTIONAL_BASE_DOMAIN;
   const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();
 
   function mockAccessToken(accessToken: string | undefined): void {
@@ -17,6 +18,10 @@ describe("getPlatformAccount", () => {
   beforeEach(() => {
     process.env.BOERO_API_URL = "https://api.example.test";
     jest.resetModules();
+    process.env.INSTITUTIONAL_BASE_DOMAIN = "";
+    jest.doMock("next/headers", () => ({
+      headers: jest.fn().mockResolvedValue(new Headers({ host: "localhost:3000" })),
+    }));
     global.fetch = fetchMock;
   });
 
@@ -26,6 +31,11 @@ describe("getPlatformAccount", () => {
 
   afterAll(() => {
     process.env.BOERO_API_URL = originalApiUrl;
+    if (originalBaseDomain === undefined) {
+      delete process.env.INSTITUTIONAL_BASE_DOMAIN;
+    } else {
+      process.env.INSTITUTIONAL_BASE_DOMAIN = originalBaseDomain;
+    }
   });
 
   it("returns null when there is no access token", async () => {
