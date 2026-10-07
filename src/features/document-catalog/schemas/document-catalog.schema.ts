@@ -8,10 +8,21 @@ export const documentAssignmentSchema = z.object({
   specificInstructions: z.string().trim().max(1000).nullable(),
 });
 export const documentDefinitionSchema = z.object({
-  name: z.string().trim().min(1).max(150),
-  instructions: z.string().trim().max(1000),
-  allowedFormats: z.array(z.enum(["application/pdf", "image/jpeg", "image/png"])).min(1),
-  active: z.boolean(),
+  name: z
+    .string({ error: "Ingresá el nombre del documento." })
+    .trim()
+    .min(1, "Ingresá el nombre del documento.")
+    .max(150, "El nombre no puede superar los 150 caracteres."),
+  instructions: z
+    .string({ error: "Revisá las instrucciones generales." })
+    .trim()
+    .max(1000, "Las instrucciones no pueden superar los 1000 caracteres."),
+  allowedFormats: z
+    .array(z.enum(["application/pdf", "image/jpeg", "image/png"], { error: "Seleccioná tipos de archivo válidos." }), {
+      error: "Seleccioná al menos un tipo de archivo.",
+    })
+    .min(1, "Seleccioná al menos un tipo de archivo."),
+  active: z.boolean({ error: "Seleccioná un estado válido." }),
   revision: z.number().int().min(0).optional(),
   assignments: z.array(documentAssignmentSchema),
 });

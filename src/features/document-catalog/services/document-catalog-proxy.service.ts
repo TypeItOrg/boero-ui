@@ -5,6 +5,12 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 import { getAcademicApiBase } from "@features/academic/utils/academic-scope.util";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { PAGE_SIZE_OPTIONS } from "@common/utils/pagination-query.util";
+import {
+  DOCUMENT_ASSIGNMENT_API_SORT_FIELDS,
+  DOCUMENT_ASSIGNMENT_SORT_FIELDS,
+} from "@features/document-catalog/constants/document-assignment-sort.constants";
+import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 export async function readDocumentCatalog(
   request: NextRequest,
   context: { params: Promise<{ institutionId: string; segments?: string[] }> },
@@ -31,17 +37,28 @@ export async function readDocumentCatalog(
       trainingPathId: z.uuid().optional(),
       applicationId: z.uuid().optional(),
       forTrainingPathCreation: z.enum(["true", "false"]).optional(),
+      sortField: z.enum(DOCUMENT_ASSIGNMENT_SORT_FIELDS).optional(),
+      sortDirection: z.enum(["asc", "desc"]).optional(),
     })
+    .refine((value) => (value.sortField === undefined) === (value.sortDirection === undefined))
     .safeParse(Object.fromEntries(request.nextUrl.searchParams));
-  if (!input.success) {
+  if (!input.success || (input.data.sortField !== undefined && segments.length !== 2)) {
     return Response.json({ message: "Revisá los filtros." }, { status: 400 });
   }
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(input.data)) {
-    if (value !== undefined) {
+    if (value !== undefined && key !== "sortField" && key !== "sortDirection") {
       query.set(key, String(value));
     }
   }
+  if (input.data.sortField && input.data.sortDirection) {
+    query.append(
+      "sort",
+      serializeSpringSort({ field: DOCUMENT_ASSIGNMENT_API_SORT_FIELDS[input.data.sortField], direction: input.data.sortDirection }),
+    );
+    query.append("sort", "id,asc");
+  }
+
   try {
     const response = await academicApiFetch(
       scope,

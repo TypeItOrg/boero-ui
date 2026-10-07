@@ -17,6 +17,7 @@ export function DocumentDefinitionPicker({
   applicationId,
   forTrainingPathCreation = false,
   value,
+  selectedValues,
   onSelect,
   disabled = false,
 }: {
@@ -26,6 +27,7 @@ export function DocumentDefinitionPicker({
   applicationId?: string;
   forTrainingPathCreation?: boolean;
   value?: DocumentDefinition;
+  selectedValues?: readonly string[];
   onSelect: (item: DocumentDefinition) => void;
   disabled?: boolean;
 }): React.ReactElement {
@@ -55,6 +57,13 @@ export function DocumentDefinitionPicker({
         aria-required
         disabled={disabled}
         value={value?.id}
+        selectedValues={selectedValues}
+        selectedLabel={
+          selectedValues?.length
+            ? `${selectedValues.length} ${selectedValues.length === 1 ? "documento seleccionado" : "documentos seleccionados"}`
+            : undefined
+        }
+        closeOnSelect={selectedValues === undefined}
         defaultOption={value ? { value: value.id, label: value.name } : undefined}
         queryKey={["document-definitions", scope, institutionId, trainingPathId, applicationId, forTrainingPathCreation]}
         fetchPage={fetchPage}

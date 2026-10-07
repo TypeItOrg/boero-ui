@@ -6,6 +6,7 @@ export type DocumentDefinition = {
   allowedFormats: string[];
   active: boolean;
   revision: number;
+  canChangeInstitution?: boolean;
   affectedTrainingPaths?: number | null;
   affectedDrafts?: number | null;
 };
