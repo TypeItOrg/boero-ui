@@ -63,12 +63,13 @@ export function FileUploadSelection({
           <div
             className={cn(
               "flex shrink-0 items-center gap-3",
-              hasAdministrativeActions && "col-span-2 flex-wrap justify-end @xl/file-selection:flex-nowrap",
+              hasAdministrativeActions &&
+                "col-span-2 grid w-full gap-2 border-t pt-3 @xl/file-selection:flex @xl/file-selection:w-auto @xl/file-selection:flex-nowrap @xl/file-selection:gap-3 @xl/file-selection:border-0 @xl/file-selection:pt-0",
             )}
           >
-            <div className="flex shrink-0 items-center gap-1">
+            <div className={cn("flex shrink-0 items-center gap-1", hasAdministrativeActions && "justify-between @xl/file-selection:justify-start")}>
               {previewAction}
-              {secondaryActions}
+              {secondaryActions ? <div className="flex items-center gap-1">{secondaryActions}</div> : null}
               {onRemove && removeLabel ? (
                 <Button
                   type="button"

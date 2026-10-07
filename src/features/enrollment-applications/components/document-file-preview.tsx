@@ -24,6 +24,7 @@ export function DocumentFilePreview({
   contentType,
   compact = false,
   iconOnly = false,
+  triggerLabel,
   className,
 }: {
   src: string;
@@ -31,6 +32,7 @@ export function DocumentFilePreview({
   contentType: string;
   compact?: boolean;
   iconOnly?: boolean;
+  triggerLabel?: React.ReactNode;
   className?: string;
 }): React.ReactElement {
   const [failed, setFailed] = React.useState(false);
@@ -73,8 +75,16 @@ export function DocumentFilePreview({
     <Dialog>
       {iconOnly ? (
         <DialogTrigger asChild>
-          <Button type="button" variant="ghost" size="icon-lg" className="size-11 shrink-0" aria-label={`Ver ${name}`} title="Ver documento">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-lg"
+            className={cn("size-11 shrink-0", triggerLabel && "w-auto gap-2 px-2 @xl/file-selection:w-11 @xl/file-selection:p-0")}
+            aria-label={`Ver ${name}`}
+            title="Ver documento"
+          >
             <EyeIcon aria-hidden="true" />
+            {triggerLabel}
           </Button>
         </DialogTrigger>
       ) : (

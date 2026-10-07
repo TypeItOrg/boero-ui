@@ -220,13 +220,14 @@ export function EnrollmentDocuments({
                       />
                     </div>
                     <div className="flex flex-wrap items-center gap-2 @3xl/documents:justify-end">
-                      <Badge variant="secondary" size="lg">
+                      <Badge variant="secondary" size="lg" className={administrativeView ? "w-full @xl/documents:w-fit" : undefined}>
                         {requirement.origin === "ADDITIONAL" && requirement.level === "AT_SUBMISSION"
                           ? "Obligatorio antes de aprobar"
                           : DOCUMENT_LEVEL_LABELS[requirement.level]}
                       </Badge>
                       <Badge
                         size="lg"
+                        className={administrativeView ? "w-full @xl/documents:w-fit" : undefined}
                         variant={
                           requirement.active === false
                             ? "secondary"
@@ -420,6 +421,9 @@ function DocumentSavedFile({
           name={file.originalFileName}
           contentType={file.contentType}
           iconOnly
+          triggerLabel={
+            secondaryActions !== undefined || primaryAction !== undefined ? <span className="@xl/file-selection:hidden">Ver</span> : undefined
+          }
         />
       }
       secondaryActions={secondaryActions}
@@ -524,19 +528,27 @@ function AdministrativeDocument({
           secondaryActions={secondaryActions}
           primaryAction={
             requirement.canReview ? (
-              <Button type="button" size="lg" disabled={actionsDisabled} onClick={onReview}>
+              <Button
+                type="button"
+                size="lg"
+                className="h-11 w-full @xl/file-selection:h-9 @xl/file-selection:w-auto"
+                disabled={actionsDisabled}
+                onClick={onReview}
+              >
                 Revisar documento
               </Button>
             ) : undefined
           }
         />
       ) : (
-        <div className="bg-muted/50 flex min-w-0 items-center gap-3 rounded-lg p-3">
+        <div className="bg-muted/50 grid min-w-0 grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 rounded-lg p-3 @xl/documents:flex">
           <div className="bg-background text-muted-foreground flex size-12 shrink-0 items-center justify-center rounded-md">
             <FileTextIcon className="size-5" aria-hidden="true" />
           </div>
           <p className="text-muted-foreground min-w-0 flex-1 text-sm">Todavía no se adjuntó documentación.</p>
-          <div className="flex shrink-0 items-center gap-1">{secondaryActions}</div>
+          <div className="col-span-2 flex shrink-0 items-center justify-end gap-1 border-t pt-2 @xl/documents:border-0 @xl/documents:pt-0">
+            {secondaryActions}
+          </div>
         </div>
       )}
       {assistedUpload && canUpload ? (
