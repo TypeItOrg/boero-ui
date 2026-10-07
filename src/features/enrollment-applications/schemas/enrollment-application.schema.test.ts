@@ -41,6 +41,7 @@ describe("enrollment-application.schema", () => {
         birthDate: "2000-01-01",
         phoneNumber: "3534123456",
         email: "juan@example.com",
+        nationality: "Argentina",
       };
       expect(personalDataSchema.safeParse(valid).success).toBe(true);
 
@@ -109,6 +110,7 @@ describe("enrollment-application.schema", () => {
         birthDate: "1995-05-15",
         phoneNumber: "3514001122",
         email: "ana@example.com",
+        nationality: "Argentina",
       },
       academicBackground: {
         schoolOrigin: "Instituto San José",

@@ -38,6 +38,9 @@ export function PlatformPeopleTableRow({ canUpdate, person }: { canUpdate: boole
           <TableCell>{person.phoneNumber || <span className="text-muted-foreground/60">Sin teléfono</span>}</TableCell>
           <TableCell>{person.email || <span className="text-muted-foreground/60">Sin email</span>}</TableCell>
           <TableCell>
+            <Badge variant={person.enabled ? "secondary" : "outline"}>{person.enabled ? "Activo" : "Inactivo"}</Badge>
+          </TableCell>
+          <TableCell>
             {person.roles.length ? (
               <div className="flex flex-wrap gap-1">
                 {person.roles.map((role) => (

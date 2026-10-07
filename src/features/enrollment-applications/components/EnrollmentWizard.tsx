@@ -96,6 +96,7 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "personalData.birthDate": "birthDate-account-link",
   "personalData.phoneNumber": "phoneNumber",
   "personalData.email": "email",
+  "personalData.nationality": "nationality",
   "academicBackground.currentlyStudying": "currentlyStudying",
   "academicBackground.educationLevel": "educationLevel",
   "academicBackground.schoolOrigin": "schoolOrigin",
@@ -248,6 +249,7 @@ export function EnrollmentWizard({
   const birthDateRequiresProfileUpdate = !birthDate && !readOnly;
   const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
   const email = initialData?.personalData?.email ?? "";
+  const nationality = initialData?.personalData?.nationality ?? "";
 
   // 2. Escolaridad
   const [schooling, dispatchSchooling] = React.useReducer(schoolingFormReducer, initialData?.academicBackground, createSchoolingFormState);
@@ -472,6 +474,7 @@ export function EnrollmentWizard({
         birthDate: birthDate && isValid(birthDate) ? format(birthDate, "yyyy-MM-dd") : null,
         phoneNumber,
         email,
+        nationality,
       },
       academicBackground: {
         currentlyStudying: schooling.currentlyStudying,
@@ -514,6 +517,7 @@ export function EnrollmentWizard({
     birthDate,
     phoneNumber,
     email,
+    nationality,
     schooling,
     receivesReasonableAdjustments,
     adjustmentDetails,
@@ -927,7 +931,9 @@ export function EnrollmentWizard({
 
               <div className="grid gap-4 @min-[48rem]:grid-cols-2">
                 <Field data-invalid={!!getFieldError(["personalData", "phoneNumber"])}>
-                  <FieldLabel htmlFor="phoneNumber">Teléfono de contacto</FieldLabel>
+                  <FieldLabel htmlFor="phoneNumber" required>
+                    Teléfono de contacto
+                  </FieldLabel>
                   <PhoneInput
                     id="phoneNumber"
                     value={phoneNumber}
@@ -956,6 +962,23 @@ export function EnrollmentWizard({
                     aria-invalid={!!getFieldError(["personalData", "email"])}
                   />
                   <FieldError errors={[{ message: getFieldError(["personalData", "email"]) }]} />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
+                <Field className="@min-[48rem]:col-span-2" data-invalid={!!getFieldError(["personalData", "nationality"])}>
+                  <FieldLabel htmlFor="nationality" required>
+                    Nacionalidad
+                  </FieldLabel>
+                  <Input
+                    id="nationality"
+                    value={nationality}
+                    readOnly
+                    className={READ_ONLY_INPUT_CLASS_NAME}
+                    placeholder="Sin nacionalidad informada"
+                    aria-invalid={!!getFieldError(["personalData", "nationality"])}
+                  />
+                  <FieldError errors={[{ message: getFieldError(["personalData", "nationality"]) }]} />
                 </Field>
               </div>
             </CardContent>

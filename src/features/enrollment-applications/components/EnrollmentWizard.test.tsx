@@ -82,6 +82,7 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
       birthDate: "1990-04-10",
       phoneNumber: "3534999888",
       email: "lucas@example.com",
+      nationality: "Argentina",
     },
     academicBackground: {
       currentlyStudying: false,

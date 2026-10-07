@@ -5,4 +5,5 @@ export interface EnrollmentPersonalData {
   birthDate: string | null;
   phoneNumber: string;
   email: string;
+  nationality: string | null;
 }

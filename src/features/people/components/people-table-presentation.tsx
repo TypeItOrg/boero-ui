@@ -90,7 +90,7 @@ export function PeopleTablePresentation({
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isNavigating}>
-        <Table containerClassName="table-scrollbar" className="min-w-190">
+        <Table containerClassName="table-scrollbar" className="min-w-205">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
               <TableHead className="w-16 pl-4">
@@ -100,7 +100,7 @@ export function PeopleTablePresentation({
               <DataTableSortableHead<PeopleSortField> field="documentNumber" label="Documento" sort={sort} onSortChange={updateSort} />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
-              {PeopleScope.isInstitutional(scope) ? <TableHead>Estado</TableHead> : null}
+              <TableHead>Estado</TableHead>
               <TableHead>Rol</TableHead>
             </TableRow>
           </TableHeader>

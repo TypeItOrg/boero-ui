@@ -59,7 +59,7 @@ export function PlatformPeopleTablePresentation({
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isPending}>
-        <Table containerClassName="table-scrollbar" className="min-w-260">
+        <Table containerClassName="table-scrollbar" className="min-w-280">
           <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
             <TableRow className="h-11">
               <TableHead className="w-16 pl-4">
@@ -70,6 +70,7 @@ export function PlatformPeopleTablePresentation({
               <DataTableSortableHead<PlatformPeopleSortField> field="institutionName" label="Institución" sort={sort} onSortChange={updateSort} />
               <TableHead>Teléfono</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead>Roles</TableHead>
             </TableRow>
           </TableHeader>
