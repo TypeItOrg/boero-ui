@@ -8,6 +8,7 @@ import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants
 import { useActionState, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@common/components/ui/button";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@common/components/ui/dialog";
 import { Input } from "@common/components/ui/input";
 import { Label } from "@common/components/ui/label";
@@ -97,7 +98,11 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
             <DialogDescription>Configurá las fechas de inicio y fin para habilitar las pre-inscripciones.</DialogDescription>
           </DialogHeader>
 
-          {error && <div className="bg-destructive/15 text-destructive my-2 rounded p-3 text-sm font-medium">{error}</div>}
+          {error && (
+            <Alert variant="destructive" className="my-2">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
           <div className="grid gap-4 py-4">
             {!period && (

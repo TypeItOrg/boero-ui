@@ -4,6 +4,7 @@ import { formatStudyPlanLabel, formatStudyPlanName } from "@features/academic/ut
 import { useCallback, useEffect, useState } from "react";
 import { BookOpenCheckIcon, Trash2Icon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
@@ -157,11 +158,15 @@ function OfferingLevels({
         </Button>
       </header>
       {error ? (
-        <div role="alert" className="text-destructive px-4 py-5 text-sm">
-          {error}{" "}
-          <Button type="button" variant="link" onClick={() => setAttempt(attempt + 1)}>
-            Reintentar
-          </Button>
+        <div className="px-4 py-5">
+          <Alert variant="destructive">
+            <AlertDescription>
+              {error}{" "}
+              <Button type="button" variant="link" onClick={() => setAttempt(attempt + 1)}>
+                Reintentar
+              </Button>
+            </AlertDescription>
+          </Alert>
         </div>
       ) : !levels ? (
         <div role="status" className="grid gap-3 p-4">
