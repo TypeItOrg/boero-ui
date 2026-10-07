@@ -7,11 +7,13 @@ import { safelyRunAction } from "@common/utils/safe-action.util";
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
+import { BookOpenIcon, CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+import { Card, CardContent } from "@common/components/ui/card";
+import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -79,19 +81,19 @@ export function EnrollmentApplicationCoursesManagement({
       : `/course-enrollments/${courseId}/waitlist`;
 
   return (
-    <section className="bg-muted/25 rounded-xl border p-5 md:p-6" aria-labelledby="application-courses-title">
-      <header className="mb-5 flex flex-col gap-1 border-b pb-5">
-        <h2 id="application-courses-title" className="text-base font-semibold">
-          Solicitudes de cursada
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          {readOnly
+    <Card className="bg-muted/25 sm:[--card-spacing:--spacing(6)]" role="region" aria-labelledby="application-courses-title">
+      <EnrollmentStepCardHeader
+        icon={BookOpenIcon}
+        title="Solicitudes de cursada"
+        titleId="application-courses-title"
+        description={
+          readOnly
             ? "Consultá el estado de cada curso solicitado y cualquier motivo informado por la institución."
-            : "Gestioná cada curso de forma independiente después de aprobar la documentación."}
-        </p>
-      </header>
+            : "Gestioná cada curso de forma independiente después de aprobar la documentación."
+        }
+      />
 
-      <div className="grid gap-3">
+      <CardContent className="grid gap-3">
         {courses.map((course) => (
           <article key={course.applicationCourseId} className="bg-background rounded-xl border p-4">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
@@ -135,7 +137,7 @@ export function EnrollmentApplicationCoursesManagement({
             </div>
           </article>
         ))}
-      </div>
+      </CardContent>
 
       {!readOnly && courseToEnroll ? (
         <EnrollmentApplicationCourseDialog
@@ -167,7 +169,7 @@ export function EnrollmentApplicationCoursesManagement({
           onResolved={() => router.refresh()}
         />
       ) : null}
-    </section>
+    </Card>
   );
 }
 

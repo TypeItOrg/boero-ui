@@ -1,3 +1,5 @@
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
+
 import {
   ENROLLMENT_APPLICATION_STATUS,
   type EnrollmentApplicationStatus,
@@ -92,5 +94,5 @@ export const SCHOOLING_EDUCATION_LEVEL_LABELS = {
 export const ENROLLMENT_APPLICATION_FILTER_MESSAGES = {
   UNAVAILABLE_TRAINING_PATH: "Trayecto no disponible",
   NO_RESULTS_TITLE: "No se encontraron solicitudes",
-  NO_RESULTS_DESCRIPTION: "No encontramos solicitudes de inscripción que coincidan con los filtros seleccionados.",
+  NO_RESULTS_DESCRIPTION: DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION,
 } as const;

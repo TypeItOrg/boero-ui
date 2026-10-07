@@ -45,7 +45,7 @@ export const personalDataSchema = z.object({
   firstName: z.string().trim().min(1, ENROLLMENT_MESSAGES.NAME_REQUIRED),
   lastName: z.string().trim().min(1, ENROLLMENT_MESSAGES.LAST_NAME_REQUIRED),
   documentNumber: z.string().trim().min(1, ENROLLMENT_MESSAGES.DOCUMENT_REQUIRED),
-  birthDate: z.string().trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
+  birthDate: z.string({ error: ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED }).trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
   phoneNumber: z.string().trim().nullish(),
   email: z.string().trim().min(1, ENROLLMENT_MESSAGES.EMAIL_REQUIRED).email(ENROLLMENT_MESSAGES.EMAIL_INVALID),
 });

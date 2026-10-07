@@ -18,5 +18,7 @@ export const DOCUMENT_MESSAGES = {
   failed: "No se pudo guardar la documentación.",
   readFailed: "No se pudo consultar la documentación.",
   file: "Seleccioná un archivo admitido de hasta 10 MiB.",
+  singleFile: "Seleccioná un solo archivo.",
+  refreshAfterUploadFailed: "El archivo se guardó, pero no se pudo actualizar la documentación. Usá Actualizar detalle antes de continuar.",
   note: "Indicá el motivo de la observación.",
 } as const;

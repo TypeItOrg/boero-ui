@@ -71,6 +71,8 @@ export default async function PlatformEnrollmentApplicationDetailPage({
       <EnrollmentStatusCard
         application={application}
         showApplicantAlert={false}
+        showRequirementChanges
+        administrativeView
         scope={AcademicScope.ADMIN}
         institutionId={institutionId}
         canManageCourses

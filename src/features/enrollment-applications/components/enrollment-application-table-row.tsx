@@ -50,7 +50,7 @@ export function EnrollmentApplicationTableRow({
                   <EllipsisVerticalIcon />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48 p-1.5">
+              <DropdownMenuContent align="start" className="w-max min-w-48 p-1.5">
                 {detailHref ? (
                   <DropdownMenuItem asChild>
                     <ReturnToLink href={detailHref} className="px-2.5 py-1.5">
@@ -108,7 +108,7 @@ export function EnrollmentApplicationTableRow({
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
-      <ContextMenuContent className="w-48 p-1.5">
+      <ContextMenuContent className="w-max min-w-48 p-1.5">
         {detailHref ? (
           <ContextMenuItem asChild>
             <ReturnToLink href={detailHref} className="px-2.5 py-1.5">

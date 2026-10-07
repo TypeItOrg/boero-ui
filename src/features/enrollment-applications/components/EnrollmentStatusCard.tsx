@@ -13,6 +13,7 @@ import {
   ClockIcon,
   GraduationCapIcon,
   HeartHandshakeIcon,
+  HistoryIcon,
   Music2Icon,
   SlidersHorizontalIcon,
   UserRoundIcon,
@@ -47,6 +48,8 @@ import {
 interface EnrollmentStatusCardProps {
   application: EnrollmentApplicationResponse;
   showApplicantAlert?: boolean;
+  showRequirementChanges?: boolean;
+  administrativeView?: boolean;
   scope?: AcademicScope;
   institutionId?: string;
   canManageCourses?: boolean;
@@ -180,6 +183,8 @@ function getStatusAlert(application: EnrollmentApplicationResponse): React.React
 export function EnrollmentStatusCard({
   application,
   showApplicantAlert = true,
+  showRequirementChanges = false,
+  administrativeView = false,
   scope = AcademicScope.INSTITUTIONAL,
   institutionId,
   canManageCourses = false,
@@ -202,17 +207,20 @@ export function EnrollmentStatusCard({
     <div className="flex flex-col gap-4">
       <Card className={SECTION_CARD_CLASS_NAME}>
         <CardHeader>
-          <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
+          <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 @xl/card-header:grid-cols-[auto_minmax(0,1fr)_auto] @xl/card-header:gap-x-3.5 @xl/card-header:gap-y-0.5">
+            <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl @xl/card-header:row-span-2 @xl/card-header:size-11">
               <ClipboardCheckIcon className="size-5" aria-hidden="true" />
             </div>
-            <div className="flex min-w-0 flex-col justify-center">
-              <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
-                <h2 className="font-heading text-base leading-snug font-medium text-balance">Estado de la solicitud</h2>
-                <div className="@2xl/page-shell:ml-auto">{getStatusBadge(application.status)}</div>
-              </div>
-              <p className="text-muted-foreground text-sm text-pretty">Actualizada el {formatEnrollmentApplicationDateTime(application.updatedAt)}</p>
+            <h2 className="font-heading min-w-0 text-base leading-snug font-medium text-balance break-words">Estado de la solicitud</h2>
+            <div className="col-span-2 min-w-0 @xl/card-header:col-span-1 @xl/card-header:col-start-3 @xl/card-header:row-span-2 @xl/card-header:row-start-1 @xl/card-header:justify-self-end">
+              {getStatusBadge(application.status)}
             </div>
+            <p className="text-muted-foreground col-span-2 min-w-0 text-sm text-pretty @xl/card-header:col-span-1 @xl/card-header:col-start-2 @xl/card-header:row-start-2">
+              Actualizada el{" "}
+              <time dateTime={application.updatedAt} className="tabular-nums">
+                {formatEnrollmentApplicationDateTime(application.updatedAt)}
+              </time>
+            </p>
           </div>
         </CardHeader>
       </Card>
@@ -245,14 +253,36 @@ export function EnrollmentStatusCard({
       ) : null}
 
       {application.admissionHistory?.length ? (
-        <section className="space-y-3 rounded-xl border p-5">
-          <h2 className="font-semibold">Historial de inscripción</h2>
-          {application.admissionHistory.map((event) => (
-            <p key={event.id} className="text-sm">
-              {isEnrollmentApplicationStatus(event.status) ? getEnrollmentApplicationStatusLabel(event.status) : event.status} ·{" "}
-              {formatEnrollmentApplicationDateTime(event.occurredAt)}
-            </p>
-          ))}
+        <section aria-labelledby="enrollment-admission-history-title">
+          <Card className={SECTION_CARD_CLASS_NAME}>
+            <EnrollmentStepCardHeader
+              icon={HistoryIcon}
+              title="Historial de inscripción"
+              titleId="enrollment-admission-history-title"
+              description="Cambios de estado de la solicitud."
+              descriptionBreakpoint="sm"
+            />
+            <CardContent>
+              <ol className="m-0 list-none p-0">
+                {application.admissionHistory.map((event) => (
+                  <li key={event.id} className="group grid grid-cols-[1rem_minmax(0,1fr)] gap-x-3">
+                    <div className="relative flex justify-center" aria-hidden="true">
+                      <span className="bg-border absolute top-2.5 -bottom-2.5 w-px group-last:hidden" />
+                      <span className="bg-muted-foreground relative mt-1.5 size-2 shrink-0 rounded-full" />
+                    </div>
+                    <div className="flex min-w-0 flex-col gap-1 pb-5 group-last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                      <p className="min-w-0 text-sm font-medium break-words">
+                        {isEnrollmentApplicationStatus(event.status) ? getEnrollmentApplicationStatusLabel(event.status) : event.status}
+                      </p>
+                      <time dateTime={event.occurredAt} className="text-muted-foreground shrink-0 text-sm tabular-nums">
+                        {formatEnrollmentApplicationDateTime(event.occurredAt)}
+                      </time>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
         </section>
       ) : null}
       <div className="grid gap-4 xl:grid-cols-2">
@@ -284,7 +314,6 @@ export function EnrollmentStatusCard({
             />
             {academic.educationLevel !== "NO_SCHOOLING" || academic.schoolOrigin ? (
               <DetailItem
-                className="sm:col-span-2"
                 label={
                   academic.currentlyStudying == null
                     ? "Institución educativa"
@@ -392,7 +421,13 @@ export function EnrollmentStatusCard({
         </DetailCard>
 
         <div className="xl:col-span-2">
-          <EnrollmentDocuments key={application.updatedAt} application={application} scope={scope} />
+          <EnrollmentDocuments
+            key={application.updatedAt}
+            application={application}
+            scope={scope}
+            showRequirementChanges={showRequirementChanges}
+            administrativeView={administrativeView}
+          />
         </div>
       </div>
     </div>
@@ -402,7 +437,7 @@ export function EnrollmentStatusCard({
 function DetailCard({ children, className, description, icon, title }: DetailCardProps): React.ReactElement {
   return (
     <Card className={cn(SECTION_CARD_CLASS_NAME, className)}>
-      <EnrollmentStepCardHeader icon={icon} title={title} description={description} />
+      <EnrollmentStepCardHeader icon={icon} title={title} description={description} descriptionBreakpoint="sm" />
       <CardContent>{children}</CardContent>
     </Card>
   );

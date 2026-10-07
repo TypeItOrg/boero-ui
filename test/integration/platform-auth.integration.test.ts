@@ -5,6 +5,11 @@ import { NextRequest, type NextResponse } from "next/server";
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 
 const API_URL = "https://api.example.test";
+const originalEnvironment = {
+  BOERO_API_URL: process.env.BOERO_API_URL,
+  FRONTEND_PUBLIC_URL: process.env.FRONTEND_PUBLIC_URL,
+  INSTITUTIONAL_BASE_DOMAIN: process.env.INSTITUTIONAL_BASE_DOMAIN,
+};
 const PLATFORM_ACCESS_TOKEN_COOKIE = "platform_access_token";
 const PLATFORM_REFRESH_TOKEN_COOKIE = "platform_refresh_token";
 const AUTH_COOKIE_NAMES = [PLATFORM_ACCESS_TOKEN_COOKIE, PLATFORM_REFRESH_TOKEN_COOKIE] as const;
@@ -153,10 +158,19 @@ afterEach(() => {
 
 afterAll(() => {
   server.close();
+  for (const [key, value] of Object.entries(originalEnvironment)) {
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  }
 });
 
 beforeEach(() => {
   process.env.BOERO_API_URL = API_URL;
+  process.env.FRONTEND_PUBLIC_URL = "https://app.example.test";
+  process.env.INSTITUTIONAL_BASE_DOMAIN = "example.test";
   cookieJar = new PlatformCookieJar();
   lastAccountAuthorization = null;
   redirectMock = jest.fn((url: string) => {
@@ -168,6 +182,7 @@ beforeEach(() => {
     headers: jest.fn(
       async () =>
         new Headers({
+          host: "app.example.test",
           "user-agent": "Mozilla/5.0",
           "x-real-ip": "203.0.113.20",
         }),
@@ -200,6 +215,7 @@ function createLoginFormData(next: string): FormData {
 function createPlatformRequest(path = "/admin"): NextRequest {
   return new NextRequest(`https://app.example.test${path}`, {
     headers: {
+      host: "app.example.test",
       cookie: cookieJar.toRequestCookieHeader(),
     },
   });

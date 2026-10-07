@@ -86,7 +86,7 @@ describe("EnrollmentCoursesSelector", () => {
     renderSelector();
     expect(screen.getAllByRole("checkbox")).toHaveLength(2);
     expect(screen.getByRole("checkbox", { name: /Teoría musical/ })).toBeInTheDocument();
-    expect(screen.getByText(/Sin nivel/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Sin nivel" })).toBeInTheDocument();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 

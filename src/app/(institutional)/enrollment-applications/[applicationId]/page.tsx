@@ -83,6 +83,8 @@ export default async function EnrollmentApplicationDetailPage({
       <EnrollmentStatusCard
         application={application}
         showApplicantAlert={false}
+        showRequirementChanges
+        administrativeView
         scope={AcademicScope.INSTITUTIONAL}
         canManageCourses={
           hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_READ, application.trainingPathId ?? "") ||

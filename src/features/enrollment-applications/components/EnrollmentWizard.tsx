@@ -93,7 +93,7 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "personalData.firstName": "firstName",
   "personalData.lastName": "lastName",
   "personalData.documentNumber": "documentNumber",
-  "personalData.birthDate": "birthDate",
+  "personalData.birthDate": "birthDate-account-link",
   "personalData.phoneNumber": "phoneNumber",
   "personalData.email": "email",
   "academicBackground.currentlyStudying": "currentlyStudying",
@@ -206,6 +206,18 @@ export function EnrollmentWizard({
   const initialData = initialApplication.data;
   const readOnly = requestedReadOnly || initialApplication.periodOpen === false;
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse>(initialApplication);
+  const [documentsBlocked, setDocumentsBlocked] = React.useState(false);
+  const blockedDocumentsRef = React.useRef(new Set<string>());
+
+  function changeDocumentBlocked(id: string, blocked: boolean): void {
+    if (blocked) {
+      blockedDocumentsRef.current.add(id);
+    } else {
+      blockedDocumentsRef.current.delete(id);
+    }
+    setDocumentsBlocked(blockedDocumentsRef.current.size > 0);
+  }
+
   const [activeTab, setActiveTab] = React.useState<string>(() => {
     const requestedTab = searchParams.get("tab");
 
@@ -233,6 +245,7 @@ export function EnrollmentWizard({
   const lastName = initialData?.personalData?.lastName ?? "";
   const documentNumber = initialData?.personalData?.documentNumber ?? "";
   const birthDate = parseInitialBirthDate(initialData?.personalData?.birthDate);
+  const birthDateRequiresProfileUpdate = !birthDate && !readOnly;
   const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
   const email = initialData?.personalData?.email ?? "";
 
@@ -597,6 +610,10 @@ export function EnrollmentWizard({
   }, [autosaveTarget, debouncedData, saveDraft]);
 
   async function submitApplication(): Promise<{ error?: string; issues?: z.ZodIssue[] }> {
+    if (blockedDocumentsRef.current.size > 0) {
+      return { error: ENROLLMENT_MESSAGES.DOCUMENTS_SAVE_PENDING };
+    }
+
     if (!application?.applicationId || isCancelDialogOpen) {
       return {};
     }
@@ -653,7 +670,9 @@ export function EnrollmentWizard({
 
     try {
       await draftSaveQueue.current;
-      await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
+      const savedApplication = await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
+      setApplication(savedApplication);
+
       setApplication(await submitEnrollmentApplicationAction(application.applicationId).then(unwrapEnrollmentResult));
       router.refresh();
 
@@ -676,6 +695,8 @@ export function EnrollmentWizard({
     return issue?.message;
   };
 
+  const birthDateError = getFieldError(["personalData", "birthDate"]);
+
   // If application is no longer in draft (SUBMITTED, APPROVED, REJECTED, CANCELLED), render read-only status view
   if (application.status !== ENROLLMENT_APPLICATION_STATUS.DRAFT) {
     return <EnrollmentStatusCard application={application} />;
@@ -689,7 +710,7 @@ export function EnrollmentWizard({
         </Button>
 
         {!requestedReadOnly && (
-          <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)}>
+          <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)} disabled={documentsBlocked}>
             <BanIcon className="size-4" />
             Cancelar
           </Button>
@@ -728,6 +749,8 @@ export function EnrollmentWizard({
                 </span>
               ) : pendingInstrumentGroups.length > 0 ? (
                 <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>
+              ) : documentsBlocked ? (
+                <span>{ENROLLMENT_MESSAGES.DOCUMENTS_DRAFT_PENDING}</span>
               ) : (
                 <>
                   <CheckCircle2Icon className="size-4 text-emerald-500" />
@@ -862,7 +885,7 @@ export function EnrollmentWizard({
                   <FieldError errors={[{ message: getFieldError(["personalData", "documentNumber"]) }]} />
                 </Field>
 
-                <Field data-invalid={!!getFieldError(["personalData", "birthDate"])}>
+                <Field data-invalid={!!birthDateError}>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <FieldLabel htmlFor="birthDate" required>
                       Fecha de nacimiento
@@ -879,14 +902,26 @@ export function EnrollmentWizard({
                     readOnly
                     className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="dd/mm/aaaa"
-                    aria-invalid={!!getFieldError(["personalData", "birthDate"])}
+                    aria-invalid={!!birthDateError}
+                    aria-describedby={
+                      [birthDateRequiresProfileUpdate ? "birthDate-account-help" : undefined, birthDateError ? "birthDate-error" : undefined]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
                   />
+                  {birthDateRequiresProfileUpdate && (
+                    <FieldDescription id="birthDate-account-help">
+                      <ReturnToLink id="birthDate-account-link" href="/account/edit" className="underline underline-offset-4">
+                        Completar fecha de nacimiento en Cuenta
+                      </ReturnToLink>
+                    </FieldDescription>
+                  )}
                   {isMinor && (
                     <FieldDescription className="text-xs text-amber-600 dark:text-amber-400">
                       Al ser menor de 18 años, deberás completar los datos del tutor en el paso 4.
                     </FieldDescription>
                   )}
-                  <FieldError errors={[{ message: getFieldError(["personalData", "birthDate"]) }]} />
+                  <FieldError id="birthDate-error" errors={[{ message: birthDateError }]} />
                 </Field>
               </div>
 
@@ -1386,7 +1421,11 @@ export function EnrollmentWizard({
                   <AlertDescription>La institución no tiene cursos activos para el trayecto y ciclo seleccionados.</AlertDescription>
                 </Alert>
               )}
-              {courseOptionsError ? <p className="text-destructive mt-3 text-sm">{courseOptionsError}</p> : null}
+              {courseOptionsError ? (
+                <Alert variant="destructive" className="mt-3">
+                  <AlertDescription>{courseOptionsError}</AlertDescription>
+                </Alert>
+              ) : null}
             </CardContent>
             <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button
@@ -1502,7 +1541,12 @@ export function EnrollmentWizard({
                   Siguiente: Documentación
                 </Button>
               ) : !readOnly ? (
-                <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen}>
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => setIsSubmitDialogOpen(true)}
+                  disabled={saving || isCancelDialogOpen || documentsBlocked}
+                >
                   Enviar inscripción
                 </Button>
               ) : null}
@@ -1516,13 +1560,21 @@ export function EnrollmentWizard({
             <EnrollmentDocuments
               application={application}
               title={visibleTabs.find((tab) => tab.id === "documents")?.label}
+              autoSave
+              disabled={readOnly || isSubmitDialogOpen || isCancelDialogOpen}
+              onUploadBlockedChange={changeDocumentBlocked}
               footer={
                 <>
                   <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
                     Atrás
                   </Button>
                   {!readOnly ? (
-                    <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen}>
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => setIsSubmitDialogOpen(true)}
+                      disabled={saving || isCancelDialogOpen || documentsBlocked}
+                    >
                       Enviar inscripción
                     </Button>
                   ) : null}
