@@ -14,7 +14,6 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   people: "Usuarios",
   roles: "Roles",
   edit: "Editar",
-  academic: "Académico",
   "academic-years": "Ciclos lectivos",
   "training-paths": "Trayectos formativos",
   "study-plans": "Planes de estudio",
@@ -62,7 +61,7 @@ function getSegments(
   }
 
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/admin" }];
-  const hiddenSegmentSet = new Set(hiddenSegments);
+  const hiddenSegmentSet = new Set(["academic", ...hiddenSegments]);
   const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
 
   let accumulatedPath = "/admin";

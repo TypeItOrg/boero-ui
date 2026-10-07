@@ -166,6 +166,9 @@ export function DataTableFilters({
   if (!hasAdvanced) {
     return (
       <form
+        onSubmit={(event) => {
+          event.preventDefault();
+        }}
         className={cn("bg-muted/25 flex flex-row flex-wrap gap-3 rounded-lg border p-4 md:items-end [&>*]:flex-[1_0_min(250px,100%)]", className)}
       >
         {filterFields}
@@ -235,6 +238,9 @@ export function DataTableFilters({
 
   return (
     <form
+      onSubmit={(event) => {
+        event.preventDefault();
+      }}
       className={cn(
         "bg-muted/25 flex flex-row flex-wrap items-end gap-3 rounded-lg border p-4 [&>*:not([data-filter-trigger])]:flex-[1_1_min(200px,100%)]",
         className,
@@ -346,6 +352,7 @@ function DataTableSearchFilter({ initialValue, onValueChange, placeholder }: Dat
         <InputGroupInput
           ref={inputRef}
           name="search"
+          autoComplete="off"
           value={value}
           onChange={(event) => setValue(event.target.value)}
           maxLength={100}

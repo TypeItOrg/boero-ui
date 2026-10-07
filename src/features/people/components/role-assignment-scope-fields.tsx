@@ -47,7 +47,7 @@ export function RoleAssignmentScopeFields({
     [institutionId, scope],
   );
   return (
-    <fieldset className="grid gap-3 border-t pt-3" disabled={disabled}>
+    <fieldset className="-mx-3 grid min-w-0 gap-3 border-t px-3 pt-3" disabled={disabled}>
       <div className="grid gap-1.5 text-sm">
         <label htmlFor={scopeId} className="font-medium">
           {M.LABEL}
