@@ -246,7 +246,7 @@ describe("AcademicFormFields", () => {
     expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Inactivo");
   });
 
-  it("submits explicit instrumental values when unchecked, checked and locked", async () => {
+  it("submits explicit instrumental values when selecting no, yes and when locked", async () => {
     const user = userEvent.setup();
     const { container, unmount } = render(
       <form>
@@ -255,9 +255,11 @@ describe("AcademicFormFields", () => {
     );
     const form = container.querySelector("form")!;
     expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
-    await user.click(screen.getByRole("checkbox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("combobox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("option", { name: "Sí" }));
     expect(new FormData(form).getAll("instrumental")).toEqual(["true"]);
-    await user.click(screen.getByRole("checkbox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("combobox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("option", { name: "No" }));
     expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
     unmount();
     const locked = render(
@@ -268,7 +270,7 @@ describe("AcademicFormFields", () => {
         />
       </form>,
     );
-    expect(screen.getByRole("checkbox", { name: "Espacio instrumental" })).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "Espacio instrumental" })).toBeDisabled();
     expect(new FormData(locked.container.querySelector("form")!).getAll("instrumental")).toEqual(["true"]);
   });
 
@@ -370,7 +372,7 @@ describe("AcademicFormFields", () => {
     expect(screen.getByText("El nombre se genera automáticamente a partir del orden (Nivel 1, Nivel 2, …).")).toBeInTheDocument();
 
     const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
-    expect(orderField).toHaveClass("sm:max-w-48", "flex-none");
+    expect(orderField).toHaveClass("w-full", "flex-none");
   });
 
   it("marks an end date before the start date as invalid", async () => {

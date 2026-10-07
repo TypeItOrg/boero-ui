@@ -1,8 +1,9 @@
 import * as React from "react";
 import { GraduationCapIcon, SearchIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
+import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 
@@ -12,6 +13,7 @@ type AcademicTableEmptyStateProps = {
   hasItemsOnOtherPages: boolean;
   onFirstPage: () => void;
   showingDeleted: boolean;
+  plural?: string;
   supportingDescription?: string;
 };
 
@@ -21,10 +23,11 @@ export function AcademicTableEmptyState({
   hasItemsOnOtherPages,
   onFirstPage,
   showingDeleted,
+  plural = "registros académicos",
   supportingDescription,
 }: AcademicTableEmptyStateProps): React.ReactElement {
-  const Icon = hasFilters ? SearchIcon : GraduationCapIcon;
-  const copy = getEmptyStateCopy(hasFilters, hasItemsOnOtherPages, showingDeleted);
+  const Icon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : GraduationCapIcon;
+  const copy = getEmptyStateCopy(hasFilters, hasItemsOnOtherPages, showingDeleted, plural);
   const description = supportingDescription ?? copy.description;
 
   return (
@@ -36,38 +39,45 @@ export function AcademicTableEmptyState({
         <EmptyTitle className="mt-2 text-base">{copy.title}</EmptyTitle>
         <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
-      {createAction}
-      {hasItemsOnOtherPages ? (
-        <Button type="button" variant="outline" size="sm" className="mt-6" onClick={onFirstPage}>
-          Volver a la primera página
-        </Button>
-      ) : null}
+      <DataTableEmptyStateActions
+        createAction={showingDeleted ? undefined : createAction}
+        hasFilters={hasFilters}
+        hasItemsOnOtherPages={hasItemsOnOtherPages}
+        onFirstPage={onFirstPage}
+      />
     </Empty>
   );
 }
 
-function getEmptyStateCopy(hasFilters: boolean, hasItemsOnOtherPages: boolean, showingDeleted: boolean): { title: string; description: string } {
+function getEmptyStateCopy(
+  hasFilters: boolean,
+  hasItemsOnOtherPages: boolean,
+  showingDeleted: boolean,
+  plural: string,
+): { title: string; description: string } {
   if (hasItemsOnOtherPages) {
     return {
-      title: "No hay elementos en esta página",
-      description: "Volvé a la primera página para ver los resultados.",
+      title: `No hay ${plural} en esta página`,
+      description: DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION,
     };
   }
   if (hasFilters) {
-    if (showingDeleted) {
-      return {
-        title: "No hay registros eliminados",
-        description: "No hay registros eliminados para mostrar. Esta vista separa los registros eliminados de los vigentes.",
-      };
-    }
     return {
-      title: "No se encontraron resultados",
-      description: "No encontramos elementos que coincidan con los filtros.",
+      title: `No se encontraron ${plural}`,
+      description: DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION,
     };
   }
+
+  if (showingDeleted) {
+    return {
+      title: `Sin ${plural} eliminados para mostrar`,
+      description: "Los registros eliminados se muestran en esta vista, separados de los vigentes.",
+    };
+  }
+
   return {
-    title: "No hay registros académicos",
-    description: "Todavía no se registraron elementos en esta sección.",
+    title: `Sin ${plural} para mostrar`,
+    description: `Todavía no hay ${plural} para mostrar en esta sección.`,
   };
 }
 

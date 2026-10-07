@@ -38,7 +38,7 @@ export async function TrainingPathStudyPlans({
 
   return (
     <section aria-labelledby="training-path-study-plans-title" className="bg-muted/25 flex flex-col gap-5 rounded-xl border p-5 md:p-6">
-      <header className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <header className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
         <SectionHeader
           icon={BookMarkedIcon}
           title="Planes de estudio"

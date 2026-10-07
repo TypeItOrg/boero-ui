@@ -208,9 +208,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
         versionAction={versionAction}
         returnTo={returnTo}
       />
-      {input.resource === AcademicResource.TRAINING_PATH ? (
-        <TrainingPathDocuments requirements={documentRequirements} editHref={canEdit ? `${detailPath}/edit` : undefined} />
-      ) : null}
+      {input.resource === AcademicResource.TRAINING_PATH ? <TrainingPathDocuments requirements={documentRequirements} /> : null}
       {curriculum ? (
         <StudyPlanCurriculumView
           curriculum={curriculum}

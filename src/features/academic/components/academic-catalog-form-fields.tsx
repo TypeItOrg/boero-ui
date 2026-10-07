@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { Checkbox } from "@common/components/ui/checkbox";
-import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 import { toFormControlValue } from "@common/utils/form-value.util";
 import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
 import { ACADEMIC_SPACE_FORMAT } from "@features/academic/types/academic-space-format.types";
@@ -13,6 +10,11 @@ import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/ac
 const ACTIVE_STATUS_OPTIONS = [
   { value: "true", label: "Activo" },
   { value: "false", label: "Inactivo" },
+];
+
+const INSTRUMENTAL_OPTIONS = [
+  { value: "true", label: "Sí" },
+  { value: "false", label: "No" },
 ];
 
 type ActiveStatusFieldProps = {
@@ -63,7 +65,6 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
   const instrumentalLocked = Boolean(initialValues.id && initialValues.instrumentalLocked);
-  const [instrumental, setInstrumental] = useState(initialValues.instrumental === true);
 
   return (
     <>
@@ -82,27 +83,17 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
           options={ACADEMIC_SPACE_FORMAT.map((format) => ({ value: format, label: academicSpaceFormatLabels[format] }))}
         />
       </FormField>
-      <Field
-        orientation="horizontal"
-        data-disabled={instrumentalLocked}
-        data-invalid={Boolean(fieldErrors?.instrumental)}
-        className="flex-[1_0_min(350px,100%)] flex-wrap self-end pb-2"
-      >
-        <input type="hidden" name="instrumental" value={String(instrumental)} />
-        <Checkbox
-          id="instrumental"
-          checked={instrumental}
-          onCheckedChange={(checked) => setInstrumental(checked === true)}
+      <FormField label="Espacio instrumental" name="instrumental" error={fieldErrors?.instrumental}>
+        <FormSelect
+          name="instrumental"
+          defaultValue={String(initialValues.instrumental === true)}
           disabled={instrumentalLocked}
+          options={INSTRUMENTAL_OPTIONS}
         />
-        <FieldLabel htmlFor="instrumental" className="font-normal">
-          Espacio instrumental
-        </FieldLabel>
-        <FieldError className="basis-full" errors={fieldErrors?.instrumental ? [{ message: fieldErrors.instrumental }] : undefined} />
         {instrumentalLocked ? (
-          <p className="text-muted-foreground basis-full text-xs">No se puede modificar porque el espacio ya tiene cursos asociados.</p>
+          <p className="text-muted-foreground text-xs">No se puede modificar porque el espacio ya tiene cursos asociados.</p>
         ) : null}
-      </Field>
+      </FormField>
       {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />
     </>

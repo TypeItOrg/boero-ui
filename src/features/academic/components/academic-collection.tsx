@@ -138,7 +138,7 @@ export async function AcademicCollectionView({
     params.academicSpaceId !== undefined ||
     params.studyPlanId !== undefined ||
     params.year !== undefined ||
-    filters.some((filter) => filter.value !== filter.defaultValue) ||
+    filters.some((filter) => filter.name !== "deleted" && filter.value !== filter.defaultValue) ||
     yearFilters.some((filter) => filter.value !== filter.defaultValue) ||
     dateFilters.some((filter) => filter.value !== undefined) ||
     params.startDate !== undefined ||

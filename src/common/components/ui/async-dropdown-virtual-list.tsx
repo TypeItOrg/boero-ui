@@ -6,12 +6,22 @@ import { CircleAlertIcon, RefreshCwIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { CommandItem } from "@common/components/ui/command";
+import { DropdownOptionContent } from "@common/components/ui/dropdown-option-content";
+import {
+  DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES,
+  DROPDOWN_GROUP_HEADING_CLASS_NAME,
+  DROPDOWN_GROUP_HEADING_ESTIMATE_SIZE,
+} from "@common/constants/dropdown-group.constants";
 import { Skeleton } from "@common/components/ui/skeleton";
 import type { AsyncDropdownDefaultOption } from "@common/types/async-dropdown-default-option.types";
 import type { AsyncDropdownRenderItemState } from "@common/types/async-dropdown-render-item-state.types";
+import type { AsyncDropdownRow } from "@common/types/async-dropdown-row.types";
+import { groupDropdownItems } from "@common/utils/dropdown-groups.util";
 import { cn } from "@common/utils/cn.util";
 
 type AsyncDropdownItemProps<TItem> = {
+  getItemDisplayLabel?: (item: TItem) => string;
+  getItemDescription?: (item: TItem) => string | undefined;
   getItemLabel: (item: TItem) => string;
   getItemValue: (item: TItem) => string;
   item: TItem;
@@ -24,7 +34,12 @@ type VirtualizedDropdownItemsProps<TItem> = {
   defaultOption?: AsyncDropdownDefaultOption;
   estimateSize: number;
   getItemLabel: (item: TItem) => string;
+  getItemDisplayLabel?: (item: TItem) => string;
+  getItemDescription?: (item: TItem) => string | undefined;
+  getItemGroup?: (item: TItem) => string | undefined;
   getItemValue: (item: TItem) => string;
+  groupOrder?: readonly string[];
+  compareGroups?: (left: string, right: string) => number;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   items: TItem[];
@@ -42,7 +57,12 @@ export function VirtualizedDropdownItems<TItem>({
   defaultOption,
   estimateSize,
   getItemLabel,
+  getItemDisplayLabel,
+  getItemDescription,
+  getItemGroup,
   getItemValue,
+  groupOrder,
+  compareGroups,
   hasNextPage,
   isFetchingNextPage,
   items,
@@ -58,8 +78,38 @@ export function VirtualizedDropdownItems<TItem>({
   const parentRef = React.useRef<HTMLDivElement | null>(null);
   const hasDefault = defaultOption !== undefined && showDefaultOption;
   const selectedValueSet = React.useMemo(() => new Set(selectedValues ?? (value ? [value] : [])), [selectedValues, value]);
-  const offset = hasDefault ? 1 : 0;
-  const virtualCount = hasNextPage ? items.length + offset + 1 : items.length + offset;
+  const rows = React.useMemo(() => {
+    const result: AsyncDropdownRow<TItem>[] = [];
+
+    if (hasDefault) {
+      result.push({ kind: "default", key: "__async-dropdown-default" });
+    }
+
+    for (const group of groupDropdownItems(items, getItemGroup, groupOrder, compareGroups)) {
+      if (group.label !== undefined) {
+        result.push({ kind: "group", key: `group:${group.label}`, label: group.label });
+      }
+
+      for (const [index, item] of group.items.entries()) {
+        result.push({
+          kind: "item",
+          key: `item:${getItemValue(item)}`,
+          item,
+          isFirstInGroup: group.label !== undefined && index === 0,
+          isLastInGroup: group.label !== undefined && index === group.items.length - 1,
+        });
+      }
+    }
+
+    if (hasNextPage) {
+      result.push({ kind: "loader", key: "__async-dropdown-loader" });
+    }
+
+    return result;
+  }, [compareGroups, getItemGroup, getItemValue, groupOrder, hasDefault, hasNextPage, items]);
+  const measureRows = getItemGroup !== undefined || getItemDisplayLabel !== undefined || getItemDescription !== undefined;
+  const scrollAnchor = React.useRef<{ key: string; offset: number } | null>(null);
+  const virtualCount = rows.length;
   const viewportHeight = getViewportHeight({
     itemCount: virtualCount,
     itemSize: estimateSize,
@@ -70,12 +120,8 @@ export function VirtualizedDropdownItems<TItem>({
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: virtualCount,
-    estimateSize: () => estimateSize,
-    getItemKey: (index) => {
-      if (hasDefault && index === 0) return "__async-dropdown-default";
-      const itemIndex = index - offset;
-      return itemIndex < items.length ? getItemValue(items[itemIndex]) : "__async-dropdown-loader";
-    },
+    estimateSize: (index) => (rows[index].kind === "group" ? DROPDOWN_GROUP_HEADING_ESTIMATE_SIZE : estimateSize),
+    getItemKey: (index) => rows[index].key,
     getScrollElement: () => parentRef.current,
     initialRect: {
       height: viewportHeight,
@@ -87,7 +133,8 @@ export function VirtualizedDropdownItems<TItem>({
 
   const virtualItems = rowVirtualizer.getVirtualItems();
   const virtualContentHeight = rowVirtualizer.getTotalSize();
-  const hasScrollableOverflow = virtualContentHeight > viewportHeight;
+  const measuredViewportHeight = measureRows ? Math.min(listHeight, Math.max(estimateSize, virtualContentHeight)) : viewportHeight;
+  const hasScrollableOverflow = virtualContentHeight > measuredViewportHeight;
   const lastVirtualIndex = virtualItems.at(-1)?.index;
 
   React.useEffect(() => {
@@ -96,30 +143,85 @@ export function VirtualizedDropdownItems<TItem>({
   }, [rowVirtualizer]);
 
   React.useEffect(() => {
-    if (lastVirtualIndex === undefined || !hasNextPage || isFetchingNextPage) return;
-    const itemIndex = lastVirtualIndex - offset;
-    if (itemIndex >= items.length - 1) loadNextPage();
-  }, [hasNextPage, isFetchingNextPage, items.length, lastVirtualIndex, loadNextPage, offset]);
+    if (lastVirtualIndex === undefined || !hasNextPage || isFetchingNextPage) {
+      return;
+    }
+
+    if (lastVirtualIndex >= rows.length - 2) {
+      loadNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, lastVirtualIndex, loadNextPage, rows.length]);
+
+  React.useLayoutEffect(() => {
+    const anchor = scrollAnchor.current;
+
+    if (!getItemGroup || !anchor) {
+      return;
+    }
+
+    const index = rows.findIndex((row) => row.key === anchor.key);
+    const position = index >= 0 ? rowVirtualizer.getOffsetForIndex(index, "start") : undefined;
+
+    if (position) {
+      rowVirtualizer.scrollToOffset(position[0] - anchor.offset);
+    }
+  }, [getItemGroup, rows, rowVirtualizer]);
+
+  function rememberScrollAnchor(): void {
+    if (!getItemGroup || !parentRef.current) {
+      return;
+    }
+
+    const scrollTop = parentRef.current.scrollTop;
+    const firstItem = rowVirtualizer.getVirtualItems().find((row) => row.end > scrollTop && rows[row.index].kind === "item");
+
+    if (firstItem) {
+      scrollAnchor.current = { key: rows[firstItem.index].key, offset: firstItem.start - scrollTop };
+    }
+  }
 
   return (
     <div
       ref={parentRef}
       aria-busy={isFetchingNextPage}
-      className={cn("overflow-y-auto overscroll-contain", hasScrollableOverflow && "pr-2", listClassName)}
-      style={{ height: viewportHeight }}
+      onScroll={rememberScrollAnchor}
+      className={cn("overflow-y-auto overscroll-contain", hasScrollableOverflow && !getItemGroup && "pr-2", listClassName)}
+      style={{ height: measuredViewportHeight }}
     >
       <div className="relative w-full" style={{ height: virtualContentHeight }}>
         {virtualItems.map((virtualItem) => {
+          const row = rows[virtualItem.index];
           const rowStyle = {
-            height: virtualItem.size,
+            height: measureRows ? undefined : virtualItem.size,
             transform: `translateY(${virtualItem.start}px)`,
           };
 
-          if (hasDefault && virtualItem.index === 0) {
+          if (row.kind === "group") {
             return (
-              <div key={virtualItem.key} className="absolute top-0 left-0 w-full" style={rowStyle}>
+              <div
+                key={virtualItem.key}
+                ref={rowVirtualizer.measureElement}
+                data-index={virtualItem.index}
+                aria-hidden="true"
+                className={cn("absolute top-0 left-0 w-full", DROPDOWN_GROUP_HEADING_CLASS_NAME)}
+                style={rowStyle}
+              >
+                {row.label}
+              </div>
+            );
+          }
+
+          if (row.kind === "default" && defaultOption) {
+            return (
+              <div
+                key={virtualItem.key}
+                ref={measureRows ? rowVirtualizer.measureElement : undefined}
+                data-index={virtualItem.index}
+                className={cn("absolute top-0 left-0 w-full", getItemGroup && "px-1")}
+                style={rowStyle}
+              >
                 <CommandItem
-                  className="h-full"
+                  className={measureRows ? "min-h-9" : "h-full"}
                   data-checked={value === defaultOption.value}
                   onSelect={() => onSelect(undefined)}
                   value="__async-dropdown-default"
@@ -130,25 +232,42 @@ export function VirtualizedDropdownItems<TItem>({
             );
           }
 
-          const item = items[virtualItem.index - offset];
-
-          if (!item) {
+          if (row.kind !== "item") {
             return (
-              <div key={virtualItem.key} className="absolute top-0 left-0 w-full" style={rowStyle}>
+              <div
+                key={virtualItem.key}
+                ref={measureRows ? rowVirtualizer.measureElement : undefined}
+                data-index={virtualItem.index}
+                className="absolute top-0 left-0 w-full"
+                style={rowStyle}
+              >
                 <LoadingMoreRow itemSize={estimateSize} />
               </div>
             );
           }
 
           return (
-            <div key={virtualItem.key} className="absolute top-0 left-0 w-full" style={rowStyle}>
+            <div
+              key={virtualItem.key}
+              ref={measureRows ? rowVirtualizer.measureElement : undefined}
+              data-index={virtualItem.index}
+              className={cn(
+                "absolute top-0 left-0 w-full",
+                getItemGroup && "px-1",
+                row.isFirstInGroup && DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES.virtual.first,
+                row.isLastInGroup && DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES.virtual.last,
+              )}
+              style={rowStyle}
+            >
               <AsyncDropdownItem
                 getItemLabel={getItemLabel}
+                getItemDisplayLabel={getItemDisplayLabel}
+                getItemDescription={getItemDescription}
                 getItemValue={getItemValue}
-                item={item}
+                item={row.item}
                 onSelect={onSelect}
                 renderItem={renderItem}
-                selected={selectedValueSet.has(getItemValue(item))}
+                selected={selectedValueSet.has(getItemValue(row.item))}
               />
             </div>
           );
@@ -214,6 +333,8 @@ export function DropdownEmptyState({
 
 function AsyncDropdownItem<TItem>({
   getItemLabel,
+  getItemDisplayLabel,
+  getItemDescription,
   getItemValue,
   item,
   onSelect,
@@ -221,8 +342,20 @@ function AsyncDropdownItem<TItem>({
   selected,
 }: AsyncDropdownItemProps<TItem>): React.ReactElement {
   return (
-    <CommandItem className="h-full" data-checked={selected} onSelect={() => onSelect(item)} value={getItemValue(item)}>
-      {renderItem ? renderItem(item, { selected }) : <span className="truncate">{getItemLabel(item)}</span>}
+    <CommandItem
+      aria-label={getItemLabel(item)}
+      className={getItemDisplayLabel || getItemDescription ? "min-h-9" : "h-full"}
+      data-checked={selected}
+      onSelect={() => onSelect(item)}
+      value={getItemValue(item)}
+    >
+      {renderItem ? (
+        renderItem(item, { selected })
+      ) : getItemDisplayLabel || getItemDescription ? (
+        <DropdownOptionContent label={getItemDisplayLabel?.(item) ?? getItemLabel(item)} description={getItemDescription?.(item)} />
+      ) : (
+        <span className="truncate">{getItemLabel(item)}</span>
+      )}
     </CommandItem>
   );
 }

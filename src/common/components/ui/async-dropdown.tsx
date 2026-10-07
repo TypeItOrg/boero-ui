@@ -35,6 +35,7 @@ type SelectedTextInput<TItem> = {
 
 export function AsyncDropdown<TItem>({
   ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
   "aria-required": ariaRequired,
   className,
   contentClassName,
@@ -52,7 +53,12 @@ export function AsyncDropdown<TItem>({
   estimateSize = DEFAULT_ESTIMATED_ITEM_SIZE,
   fetchPage,
   getItemLabel,
+  getItemDisplayLabel,
+  getItemDescription,
+  getItemGroup,
   getItemValue,
+  groupOrder,
+  compareGroups,
   id,
   listClassName,
   listHeight = DEFAULT_LIST_HEIGHT,
@@ -147,7 +153,7 @@ export function AsyncDropdown<TItem>({
     );
   } else {
     commandListContent = (
-      <CommandGroup className="px-1 pt-2 pb-1">
+      <CommandGroup className={cn("px-1 pt-2 pb-1", getItemGroup && "px-0")}>
         {items.length === 0 ? (
           <CommandItem
             className="h-9"
@@ -162,7 +168,12 @@ export function AsyncDropdown<TItem>({
             key={virtualListKey}
             estimateSize={estimateSize}
             getItemLabel={getItemLabel}
+            getItemDisplayLabel={getItemDisplayLabel}
+            getItemDescription={getItemDescription}
+            getItemGroup={getItemGroup}
             getItemValue={getItemValue}
+            groupOrder={groupOrder}
+            compareGroups={compareGroups}
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}
             items={items}
@@ -191,10 +202,10 @@ export function AsyncDropdown<TItem>({
               aria-expanded={isOpen}
               aria-haspopup="listbox"
               aria-invalid={ariaInvalid}
+              aria-describedby={ariaDescribedBy}
               aria-required={ariaRequired}
               className={cn(
                 "w-full justify-between text-base focus-visible:ring-1 aria-invalid:ring-0 aria-invalid:focus-visible:ring-1 md:text-sm",
-                canClear && "pr-16",
                 className,
               )}
               disabled={disabled}
@@ -204,7 +215,9 @@ export function AsyncDropdown<TItem>({
               type="button"
               variant="outline"
             >
-              <span className={cn("truncate font-normal", isPlaceholder && "text-muted-foreground")}>{selectedText}</span>
+              <span className={cn("min-w-0 flex-1 truncate text-left font-normal", canClear && "mr-8", isPlaceholder && "text-muted-foreground")}>
+                {selectedText}
+              </span>
               <ChevronsUpDownIcon data-icon="inline-end" />
             </Button>
           </PopoverTrigger>
@@ -223,7 +236,7 @@ export function AsyncDropdown<TItem>({
           ) : null}
         </div>
         <PopoverContent align="start" className={cn("w-(--radix-popover-trigger-width) gap-0 p-0", contentClassName)}>
-          <Command shouldFilter={false} loop>
+          <Command className={getItemGroup ? "px-0 [&_[data-slot=command-input-wrapper]]:px-2" : undefined} shouldFilter={false} loop>
             <CommandInput disabled={disabled} onValueChange={setSearch} placeholder={searchPlaceholder} value={search} />
             <CommandList aria-multiselectable={selectedValues !== undefined || undefined} className="max-h-none overflow-visible p-0">
               {commandListContent}

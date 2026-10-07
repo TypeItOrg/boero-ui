@@ -38,7 +38,7 @@ export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProp
         <div className="bg-background mt-5 flex flex-col rounded-xl border px-4">
           {items.map((item, index) => (
             <Fragment key={item.resource}>
-              {index > 0 ? <Separator /> : null}
+              {index > 0 ? <Separator className="-mx-4 data-horizontal:w-auto" /> : null}
               <RecentItemRow basePath={basePath} item={item} />
             </Fragment>
           ))}

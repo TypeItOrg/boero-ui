@@ -11,18 +11,7 @@ jest.mock("@features/academic/services/academic-options.service", () => ({
 }));
 
 jest.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
-    getVirtualItems: () =>
-      Array.from({ length: count }, (_, index) => ({
-        index,
-        key: `virtual-${index}`,
-        size: estimateSize(),
-        start: index * estimateSize(),
-      })),
-    getTotalSize: () => count * estimateSize(),
-    scrollToOffset: jest.fn(),
-    measure: jest.fn(),
-  }),
+  useVirtualizer: jest.requireActual("@/../test/utils/mock-virtualizer").mockVirtualizer,
 }));
 
 describe("Academic Option Dropdowns", () => {
@@ -104,7 +93,10 @@ describe("Academic Option Dropdowns", () => {
 
       await user.click(screen.getByRole("combobox"));
 
-      expect(await screen.findByText("Armonía · Asignatura · Individual")).toBeInTheDocument();
+      expect(await screen.findByRole("option", { name: "Armonía · Asignatura · Individual" })).toBeInTheDocument();
+      expect(screen.getByText("Armonía")).toBeInTheDocument();
+      expect(screen.getByText("Asignatura")).toBeInTheDocument();
+      expect(screen.getByText("Individual")).toBeInTheDocument();
     });
   });
 });

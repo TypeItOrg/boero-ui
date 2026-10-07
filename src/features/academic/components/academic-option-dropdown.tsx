@@ -8,7 +8,7 @@ import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-f
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
+import { ACADEMIC_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type AcademicOptionDropdownProps = {
@@ -70,6 +70,7 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
 
   return (
     <AsyncDropdown<AcademicSpace>
+      {...ACADEMIC_SPACE_OPTION_PRESENTATION}
       ariaInvalid={props.ariaInvalid}
       disabled={props.disabled}
       emptyDescription="Todavía no se registraron espacios académicos en esta institución."
@@ -78,13 +79,13 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
       emptyTitle="No hay espacios académicos"
       errorMessage="No se pudieron cargar los espacios académicos."
       fetchPage={fetchPage}
-      getItemLabel={(item) => `${item.name} · ${academicSpaceTypeLabels[item.type]} · ${academicSpaceFormatLabels[item.format]}`}
+      getItemLabel={getAcademicSpaceOptionLabel}
       getItemValue={(item) => item.id}
       id={props.name}
       name={props.name}
       onValueChange={(nextValue, item) => {
         setValue(nextValue);
-        setSelectedLabel(item ? `${item.name} · ${academicSpaceTypeLabels[item.type]} · ${academicSpaceFormatLabels[item.format]}` : undefined);
+        setSelectedLabel(item ? getAcademicSpaceOptionLabel(item) : undefined);
       }}
       placeholder="Seleccionar espacio"
       queryKey={["academic-options", "academic-spaces", props.scope, props.institutionId]}

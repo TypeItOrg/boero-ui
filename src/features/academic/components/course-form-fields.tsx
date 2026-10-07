@@ -31,6 +31,7 @@ import type { CourseWeekDay } from "@features/academic/types/course-week-day.typ
 import { COURSE_WEEK_DAY } from "@features/academic/types/course-week-day.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { STUDY_PLAN_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 import { SectionHeader } from "@common/components/section-header";
 
 const WEEK_DAY_LABELS: Record<CourseWeekDay, string> = {
@@ -54,10 +55,6 @@ type ClassDraft = {
   teachers: { personId: string; fullName: string }[];
   days: DayDraft[];
 };
-
-function getCourseSpaceLabel(item: CourseSpaceOption): string {
-  return `${item.name}${item.academicLevelName ? ` · ${item.academicLevelName}` : ""} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`;
-}
 
 function emptySchedule(): ScheduleDraft {
   return { startTime: "", endTime: "" };
@@ -224,6 +221,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
             {institutionId && scope ? (
               studyPlanId ? (
                 <AsyncDropdown<CourseSpaceOption>
+                  {...STUDY_PLAN_SPACE_OPTION_PRESENTATION}
                   ariaInvalid={Boolean(fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format)}
                   disabled={editing || classesLocked}
                   emptyDescription="Incorporá espacios al plan para poder instanciarlos."
@@ -232,7 +230,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   emptyTitle="No hay espacios"
                   errorMessage="No se pudieron cargar los espacios del plan."
                   fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
-                  getItemLabel={getCourseSpaceLabel}
+                  getItemLabel={getAcademicSpaceOptionLabel}
                   getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
                   id="academicSpaceId"
                   key={`space-${institutionId}-${studyPlanId}`}
@@ -244,7 +242,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                     setInstrumentId(undefined);
                     setInstrumental(Boolean(item?.instrumental));
                     if (item) {
-                      setSpaceLabel(getCourseSpaceLabel(item));
+                      setSpaceLabel(getAcademicSpaceOptionLabel(item));
                       setFormat(item.format);
                     }
                   }}

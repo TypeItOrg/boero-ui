@@ -8,18 +8,7 @@ import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-f
 import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: ({ count, estimateSize }: { count: number; estimateSize: () => number }) => ({
-    getVirtualItems: () =>
-      Array.from({ length: count }, (_, index) => ({
-        index,
-        key: `virtual-${index}`,
-        size: estimateSize(),
-        start: index * estimateSize(),
-      })),
-    getTotalSize: () => count * estimateSize(),
-    scrollToOffset: jest.fn(),
-    measure: jest.fn(),
-  }),
+  useVirtualizer: jest.requireActual("@/../test/utils/mock-virtualizer").mockVirtualizer,
 }));
 
 type Item = {

@@ -10,8 +10,12 @@ import { REQUIREMENT_STAGE } from "@features/academic/types/requirement-stage.ty
 import { REQUIREMENT_TYPE } from "@features/academic/types/requirement-type.types";
 import { STUDY_PLAN_STATUS } from "@features/academic/types/study-plan-status.types";
 import {
-  academicSpaceFormatLabels,
-  academicSpaceTypeLabels,
+  ACADEMIC_SPACE_OPTION_PRESENTATION,
+  getAcademicSpaceOptionDescription,
+  getAcademicSpaceOptionGroup,
+  getAcademicSpaceOptionLabel,
+} from "@features/academic/utils/academic-space-option.util";
+import {
   approvalModeLabels,
   requiredConditionLabels,
   requirementStageLabels,
@@ -81,7 +85,7 @@ export function StudyPlanFields({
 export function AcademicLevelFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   return (
     <>
-      <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} className="w-full flex-none sm:max-w-48" required>
+      <FormField label="Orden" name="displayOrder" error={fieldErrors?.displayOrder} className="w-full flex-none" required>
         <NumericInput
           aria-invalid={Boolean(fieldErrors?.displayOrder)}
           defaultValue={toFormControlValue(initialValues.displayOrder ?? 1)}
@@ -124,9 +128,13 @@ export function StudyPlanSpaceFields({
             name="academicSpaceId"
             defaultValue={initialAcademicSpaceId ?? ""}
             placeholder="Seleccionar espacio"
+            groupOrder={ACADEMIC_SPACE_OPTION_PRESENTATION.groupOrder}
             options={academicSpaces.map((space) => ({
               value: space.id,
-              label: `${space.name} · ${academicSpaceTypeLabels[space.type]} · ${academicSpaceFormatLabels[space.format]}`,
+              label: getAcademicSpaceOptionLabel(space),
+              displayLabel: space.name,
+              description: getAcademicSpaceOptionDescription(space),
+              group: getAcademicSpaceOptionGroup(space),
             }))}
           />
         )}

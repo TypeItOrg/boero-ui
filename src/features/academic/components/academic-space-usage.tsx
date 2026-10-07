@@ -25,7 +25,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
 
   return (
     <section aria-labelledby="academic-space-usage-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-      <header className="border-b pb-5">
+      <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
         <SectionHeader
           icon={LibraryBigIcon}
           title="Uso en planes de estudio"
@@ -58,7 +58,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
             ))}
           </div>
           {plans.totalPages > 1 ? (
-            <div className="mt-5 border-t pt-5">
+            <div className="-mx-5 mt-5 border-t px-5 pt-5 md:-mx-6 md:px-6">
               <AcademicSpaceUsagePagination page={plans.page} size={plans.size} totalItems={plans.totalItems} totalPages={plans.totalPages} />
             </div>
           ) : null}
@@ -127,7 +127,7 @@ function AcademicSpaceUsagePlanCard({
           <span>{formatPlanValidity(plan.effectiveFrom, plan.effectiveTo)}</span>
         </div>
 
-        <div className="border-t pt-3">
+        <div className="-mx-(--card-spacing) border-t px-(--card-spacing) pt-3">
           <p className={`${DETAIL_LABEL_CLASS_NAME} mb-2`}>{plan.placements.length === 1 ? "Ubicación curricular" : "Ubicaciones curriculares"}</p>
           <div className="flex flex-col gap-2">
             {plan.placements.map((placement) => (

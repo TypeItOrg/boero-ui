@@ -102,7 +102,7 @@ export function AcademicDetail({
       {headerActions}
       {academicSpaceWarning}
       <section aria-labelledby="academic-detail-info-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-        <header className="border-b pb-5">
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
           <SectionHeader icon={InfoIcon} title="Información" description={detail.description} titleId="academic-detail-info-title" />
         </header>
         <div className={cn("mt-5 grid gap-4", detail.gridColsClass ?? "sm:grid-cols-2")}>
