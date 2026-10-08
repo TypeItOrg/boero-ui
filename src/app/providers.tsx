@@ -5,6 +5,7 @@ import { useState, type ReactElement, type ReactNode } from "react";
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
+import { Toaster } from "@common/components/ui/sonner";
 import { isHttpResponseError } from "@common/utils/http-response-error.util";
 
 import { getRedirectPath } from "@features/platform-auth/utils/platform-auth-paths.util";
@@ -17,8 +18,11 @@ export function Providers({ children }: { children: ReactNode }): ReactElement {
       }
 
       client.clear();
+
       const currentPath = window.location.pathname + window.location.search;
+
       const loginPath = window.location.pathname.startsWith("/admin") ? "/admin/auth/login" : "/auth/login";
+
       window.location.href = getRedirectPath(loginPath, currentPath);
     }
 
@@ -48,7 +52,10 @@ export function Providers({ children }: { children: ReactNode }): ReactElement {
       disableTransitionOnChange
       scriptProps={{ type: typeof window === "undefined" ? "text/javascript" : "text/plain" }}
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <Toaster />
+      </QueryClientProvider>
     </NextThemesProvider>
   );
 }
