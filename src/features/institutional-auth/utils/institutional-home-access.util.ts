@@ -1,10 +1,14 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  BookCopyIcon,
+  BookOpenIcon,
+  CalendarRangeIcon,
   Building2Icon,
   ClipboardListIcon,
   FilePenLineIcon,
   GraduationCapIcon,
   KeyRoundIcon,
+  ScrollTextIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
   UserRoundPlusIcon,
@@ -40,7 +44,7 @@ const ACADEMIC_OFFER_LINK: InstitutionalHomeLink = {
   href: "/academic-offers",
   title: "Oferta académica",
   description: "Explorá los trayectos disponibles y sus espacios académicos.",
-  icon: GraduationCapIcon,
+  icon: BookCopyIcon,
   permission: INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ,
 };
 
@@ -105,6 +109,30 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
     });
   }
 
+  if (hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)) {
+    links.push({
+      href: "/course-enrollments",
+      title: "Cursadas",
+      description: "Consultá y gestioná las cursadas de la institución.",
+      icon: ScrollTextIcon,
+    });
+  }
+
+  if (user.roles.includes("Profesor")) {
+    links.push({
+      href: "/my-teaching",
+      title: "Mis clases",
+      description: "Accedé a tus clases, horarios y estudiantes.",
+      icon: GraduationCapIcon,
+    });
+    links.push({
+      href: "/my-teaching/schedules",
+      title: "Mis horarios",
+      description: "Consultá la semana con los días y horarios de tus clases.",
+      icon: CalendarRangeIcon,
+    });
+  }
+
   if (canStartEnrollmentApplication(user)) {
     links.push({
       href: "/enrollment",
@@ -133,6 +161,22 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
   }
 
   return links;
+}
+
+export function getInstitutionalFormationHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
+  if (!canViewOwnEnrollmentApplications(user)) {
+    return [];
+  }
+
+  return [
+    { href: "/my-course-enrollments", title: "Mis materias", description: "Consultá tus materias y resultados académicos.", icon: BookOpenIcon },
+    {
+      href: "/my-schedules",
+      title: "Mis horarios",
+      description: "Organizá tu semana con los días y horarios de tus clases.",
+      icon: CalendarRangeIcon,
+    },
+  ];
 }
 
 export function getInstitutionalAcademicOfferLink(user: Pick<InstitutionalUser, "permissions">): InstitutionalHomeLink | undefined {

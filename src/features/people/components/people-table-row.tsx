@@ -124,14 +124,19 @@ export function PeopleTableRow({
             </PersonNavigationLink>
           </ContextMenuItem>
         ) : null}
-        {canUpdatePersonStatus ? (
+        {canUpdatePersonStatus && !person.enabled ? (
           <ContextMenuItem className="px-2.5 py-1.5" onSelect={() => onUpdateStatus(person)}>
-            {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+            Activar acceso
+          </ContextMenuItem>
+        ) : null}
+        {(canUpdatePersonStatus && person.enabled) || canDeletePerson ? <ContextMenuSeparator /> : null}
+        {canUpdatePersonStatus && person.enabled ? (
+          <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onUpdateStatus(person)}>
+            Desactivar acceso
           </ContextMenuItem>
         ) : null}
         {canDeletePerson ? (
           <>
-            {canOpenPerson || canUpdatePersonStatus ? <ContextMenuSeparator /> : null}
             <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => onDelete(person)}>
               Eliminar
             </ContextMenuItem>
@@ -191,14 +196,19 @@ function PersonActionsMenu({
               </PersonNavigationLink>
             </DropdownMenuItem>
           ) : null}
-          {canUpdateStatus ? (
+          {canUpdateStatus && !person.enabled ? (
             <DropdownMenuItem className="px-2.5 py-1.5" onSelect={onUpdateStatus}>
-              {person.enabled ? "Desactivar acceso" : "Activar acceso"}
+              Activar acceso
+            </DropdownMenuItem>
+          ) : null}
+          {(canUpdateStatus && person.enabled) || canDelete ? <DropdownMenuSeparator /> : null}
+          {canUpdateStatus && person.enabled ? (
+            <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onUpdateStatus}>
+              Desactivar acceso
             </DropdownMenuItem>
           ) : null}
           {canDelete ? (
             <>
-              {canEdit || canUpdateStatus ? <DropdownMenuSeparator /> : null}
               <DropdownMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={onDelete}>
                 Eliminar
               </DropdownMenuItem>

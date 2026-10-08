@@ -1,5 +1,8 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+
 import Link from "next/link";
 import { useActionState } from "react";
 
@@ -24,6 +27,7 @@ const INITIAL_STATE: AcademicActionState = {};
 export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }: StudyPlanVersionFormProps): React.ReactElement {
   const action = createStudyPlanVersionAction.bind(null, scope, institutionId, source.id, returnTo);
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
+  const formRef = useActionFormErrorFocus(state, pending);
   const initialValues = {
     name: source.name,
     effectiveFrom: "",
@@ -32,7 +36,7 @@ export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }:
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (
-    <form action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm ref={formRef} action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">
@@ -68,6 +72,6 @@ export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }:
           {pending ? "Creando…" : "Crear versión"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

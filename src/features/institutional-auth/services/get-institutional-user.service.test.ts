@@ -45,9 +45,11 @@ describe("getInstitutionalUser", () => {
     await expect(getInstitutionalUser()).resolves.toBeNull();
 
     expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/me", "https://api.example.test"), {
-      headers: { Authorization: "Bearer access-token" },
+      headers: expect.any(Headers),
+      signal: expect.any(AbortSignal),
       cache: "no-store",
     });
+    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).get("Authorization")).toBe("Bearer access-token");
   });
 
   it("returns the current institutional user", async () => {

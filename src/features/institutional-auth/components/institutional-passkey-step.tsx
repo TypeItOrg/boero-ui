@@ -8,7 +8,10 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { InstitutionalPasskeyPrompt } from "@features/institutional-auth/components/institutional-passkey-prompt";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldLabel } from "@common/components/ui/field";
-import { beginPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
+import { beginInstitutionalPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
+import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
+import type { InstitutionalPasskeyLoginInput } from "@features/institutional-auth/types/institutional-passkey-login-input.types";
+import type { BeginPasskeyLoginState } from "@features/institutional-auth/types/begin-passkey-login-state.types";
 import { finishPasskeyLogin } from "@features/institutional-auth/actions/finish-passkey-login.action";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { getPasskeyAssertion, isUserCancelled, toPublicKeyRequestOptions } from "@features/institutional-auth/utils/passkey-authentication.util";
@@ -16,7 +19,9 @@ import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webau
 
 type PasskeyCeremonyState = { phase: "idle" | "requesting" | "verifying" };
 type InstitutionalPasskeyStepProps = {
-  loginAttemptId: string;
+  input: InstitutionalPasskeyLoginInput;
+  onFieldErrors: (errors: BeginPasskeyLoginState["fieldErrors"]) => void;
+  isCurrentIdentity: () => boolean;
   rememberMe: boolean;
   onRememberMeChange: (value: boolean) => void;
   onPendingChange: (pending: boolean) => void;
@@ -25,7 +30,9 @@ type InstitutionalPasskeyStepProps = {
 };
 
 export function InstitutionalPasskeyStep({
-  loginAttemptId,
+  input,
+  onFieldErrors,
+  isCurrentIdentity,
   rememberMe,
   onRememberMeChange,
   onPendingChange,
@@ -34,6 +41,7 @@ export function InstitutionalPasskeyStep({
 }: InstitutionalPasskeyStepProps): React.ReactElement {
   const [ceremony, setCeremony] = useState<PasskeyCeremonyState>({ phase: "idle" });
   const ceremonyRef = useRef<AbortController | null>(null);
+  const verifyingRef = useRef(false);
   const webauthnSupported = useWebAuthnSupport();
   const passkeyPending = ceremony.phase !== "idle";
   const passkeyVerifying = ceremony.phase === "verifying";
@@ -51,15 +59,23 @@ export function InstitutionalPasskeyStep({
     ceremonyRef.current = null;
   }
 
+  function isCurrentCeremony(controller: AbortController): boolean {
+    return ceremonyRef.current === controller && isCurrentIdentity();
+  }
+
   function handleCancelCeremony(): void {
-    if (passkeyVerifying) return;
+    if (verifyingRef.current) {
+      return;
+    }
 
     abortCeremony();
     setCeremony({ phase: "idle" });
   }
 
   function handleUsePassword(): void {
-    if (passkeyVerifying) return;
+    if (verifyingRef.current) {
+      return;
+    }
 
     abortCeremony();
     setCeremony({ phase: "idle" });
@@ -67,17 +83,43 @@ export function InstitutionalPasskeyStep({
   }
 
   async function handlePasskeyLogin(): Promise<void> {
-    if (!loginAttemptId || ceremonyRef.current) return;
+    if (ceremonyRef.current || !isCurrentIdentity()) {
+      return;
+    }
 
     const controller = new AbortController();
     ceremonyRef.current = controller;
     setCeremony({ phase: "requesting" });
     onError(null);
+    onFieldErrors({});
+    const remembered = rememberMe;
 
     try {
-      const begin = await beginPasskeyLogin(loginAttemptId);
+      const begin = await beginInstitutionalPasskeyLogin(input);
 
-      if (ceremonyRef.current !== controller) return;
+      if (!isCurrentCeremony(controller)) {
+        return;
+      }
+
+      if (begin.fieldErrors) {
+        onFieldErrors(begin.fieldErrors);
+        return;
+      }
+      if (begin.emailVerificationRequired) {
+        // Lock the identity before allowing the existing action to set context and redirect.
+        verifyingRef.current = true;
+        setCeremony({ phase: "verifying" });
+        onPendingChange(true);
+        const formData = new FormData();
+        formData.set("institutionId", input.institutionId);
+        formData.set("institutionName", input.institutionName ?? "");
+        formData.set("documentNumber", input.documentNumber.trim());
+        const result = await identifyInstitutionalUser({}, formData);
+        if (isCurrentCeremony(controller)) {
+          onError(result.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED);
+        }
+        return;
+      }
 
       if (begin.error || !begin.ceremonyId || !begin.options) {
         onError(begin.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED);
@@ -87,18 +129,23 @@ export function InstitutionalPasskeyStep({
       const requestOptions = toPublicKeyRequestOptions(begin.options);
       const credential = await getPasskeyAssertion(requestOptions, controller.signal);
 
-      if (ceremonyRef.current !== controller) return;
+      if (!isCurrentCeremony(controller)) {
+        return;
+      }
 
+      verifyingRef.current = true;
       setCeremony({ phase: "verifying" });
       onPendingChange(true);
       const finish = await finishPasskeyLogin({
-        loginAttemptId,
+        loginAttemptId: begin.loginAttemptId,
         ceremonyId: begin.ceremonyId,
         credentialJson: JSON.stringify(credential),
-        rememberMe,
+        rememberMe: remembered,
       });
 
-      if (ceremonyRef.current !== controller) return;
+      if (!isCurrentCeremony(controller)) {
+        return;
+      }
 
       if (finish.error) {
         onError(finish.error);
@@ -114,7 +161,9 @@ export function InstitutionalPasskeyStep({
         console.debug("[passkey] login ceremony settled with error", error instanceof DOMException ? error.name : error?.constructor?.name);
       }
 
-      if (ceremonyRef.current !== controller) return;
+      if (!isCurrentCeremony(controller)) {
+        return;
+      }
 
       if (isUserCancelled(error)) {
         return;
@@ -122,8 +171,9 @@ export function InstitutionalPasskeyStep({
 
       onError(INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED);
     } finally {
-      if (ceremonyRef.current === controller) {
+      if (isCurrentCeremony(controller)) {
         ceremonyRef.current = null;
+        verifyingRef.current = false;
         onPendingChange(false);
         setCeremony({ phase: "idle" });
       }
@@ -146,6 +196,7 @@ export function InstitutionalPasskeyStep({
             id="remember-me-passkey"
             className="mt-px"
             checked={rememberMe}
+            disabled={passkeyPending}
             onCheckedChange={(checked) => onRememberMeChange(checked === true)}
           />
           <FieldLabel htmlFor="remember-me-passkey" className="font-normal">

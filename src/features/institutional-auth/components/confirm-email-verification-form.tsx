@@ -12,9 +12,10 @@ export function ConfirmEmailVerificationForm({ token }: { token?: string }): Rea
   const [state, action, pending] = useActionState<EmailVerificationState, FormData>(confirmEmailVerification, {});
 
   return (
-    <div className="flex min-h-[28rem] flex-col">
+    <div className="flex h-full flex-col">
       <div className="flex flex-1 flex-col justify-center p-5 sm:p-8">
         <InstitutionalAuthStepHeader
+          showInstitutionName={false}
           title={token ? "Confirmá tu correo electrónico" : "Enlace inválido"}
           description={
             token

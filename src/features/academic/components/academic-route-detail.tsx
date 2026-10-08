@@ -1,3 +1,10 @@
+import { TrainingPathDocuments } from "@features/academic/components/training-path-documents";
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import { getAcademicApiBase } from "@features/academic/utils/academic-scope.util";
+import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+import { DOCUMENT_MESSAGES } from "@features/enrollment-applications/constants/documentation.constants";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { notFound } from "next/navigation";
 import { GitBranchPlusIcon } from "lucide-react";
 
@@ -67,6 +74,12 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   const [curriculum, fetchedItem, academicSpaceUsage] = await Promise.all([curriculumPromise, itemPromise, academicSpaceUsagePromise]);
   const item = curriculum?.studyPlan ?? fetchedItem;
   if (!item) notFound();
+  if (input.scope === "institutional") {
+    const pathId = input.resource === AcademicResource.TRAINING_PATH ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : undefined;
+    if (pathId) {
+      input = { ...input, access: getAcademicAccess(await requireInstitutionalUser(), pathId) };
+    }
+  }
   const detailPath = `${input.basePath}/${input.resource}/${input.id}`;
   const collectionPath = `${input.basePath}/${input.resource}`;
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);
@@ -116,6 +129,17 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
       />
     );
   }
+  let documentRequirements: DocumentRequirement[] = [];
+  if (input.resource === AcademicResource.TRAINING_PATH && (!input.action || input.action === ACADEMIC_ROUTE_SEGMENT.EDIT)) {
+    const response = await academicApiFetch(
+      input.scope,
+      `${getAcademicApiBase(input.scope, input.institutionId)}/training-paths/${input.id}/document-requirements`,
+    );
+    if (!response.ok) {
+      throw new Error(DOCUMENT_MESSAGES.readFailed);
+    }
+    documentRequirements = (await response.json()) as DocumentRequirement[];
+  }
   const relatedPlans =
     input.resource === AcademicResource.TRAINING_PATH && input.access.studyPlanRead
       ? await TrainingPathStudyPlans({
@@ -158,6 +182,9 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           id={input.id}
           returnTo={returnTo}
           initialValues={{ ...item, classes: JSON.stringify("classes" in item ? item.classes : []) } as Record<string, FormValue>}
+          documentRequirements={documentRequirements}
+          canManageDocumentCatalog={input.access.documentCatalogManage}
+          canEditDocumentRequirements={canEdit}
         />
       </AcademicShell>
     );
@@ -181,6 +208,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
         versionAction={versionAction}
         returnTo={returnTo}
       />
+      {input.resource === AcademicResource.TRAINING_PATH ? <TrainingPathDocuments requirements={documentRequirements} /> : null}
       {curriculum ? (
         <StudyPlanCurriculumView
           curriculum={curriculum}

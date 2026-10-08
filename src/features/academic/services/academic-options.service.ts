@@ -1,3 +1,4 @@
+import type { AcademicOptionOperation } from "@features/academic/types/academic-option-operation.types";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
@@ -14,7 +15,13 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
   scope: AcademicScope,
   institutionId: string,
   { page, search, signal, size }: AsyncDropdownFetchPageInput,
-  options: { active?: AcademicOptionActiveFilter; status?: "DRAFT" | "ACTIVE" | "INACTIVE" } = {},
+  options: {
+    operation?: AcademicOptionOperation;
+    published?: boolean;
+    trainingPathId?: string;
+    active?: AcademicOptionActiveFilter;
+    status?: "DRAFT" | "ACTIVE" | "INACTIVE";
+  } = {},
 ): Promise<AsyncDropdownPage<TItem>> {
   const searchParams = new URLSearchParams({
     institutionId,
@@ -23,8 +30,19 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     size: String(size),
   });
 
+  if (options.operation) {
+    searchParams.set("operation", options.operation);
+  }
+
   if (options.active !== undefined) {
     searchParams.set("active", String(options.active));
+  }
+
+  if (options.published) {
+    searchParams.set("published", "true");
+  }
+  if (options.trainingPathId) {
+    searchParams.set("trainingPathId", options.trainingPathId);
   }
 
   if (options.status) {

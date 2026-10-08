@@ -3,7 +3,10 @@
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
-import { ENROLLMENT_APPLICATION_STATUS_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import {
+  ENROLLMENT_APPLICATION_FILTER_MESSAGES,
+  ENROLLMENT_APPLICATION_STATUS_OPTIONS,
+} from "@features/enrollment-applications/constants/enrollment-application.constants";
 
 const ALL_STATUSES = "all";
 
@@ -18,6 +21,8 @@ type EnrollmentApplicationFiltersProps = {
   status?: EnrollmentApplicationStatus;
   trainingPathId?: string;
   open?: boolean;
+  pendingDocuments?: boolean;
+  canFilterDocuments?: boolean;
   trainingPaths?: readonly TrainingPath[];
 };
 
@@ -26,6 +31,8 @@ export function EnrollmentApplicationFilters({
   status,
   trainingPathId,
   open,
+  pendingDocuments,
+  canFilterDocuments = false,
   trainingPaths,
 }: EnrollmentApplicationFiltersProps): React.ReactElement {
   const statusFilter: DataTableSelectFilter = {
@@ -38,6 +45,18 @@ export function EnrollmentApplicationFilters({
 
   const selectFilters: DataTableSelectFilter[] = [statusFilter];
 
+  if (canFilterDocuments) {
+    selectFilters.push({
+      defaultValue: "all",
+      label: "Documentación",
+      name: "pendingDocuments",
+      options: [
+        { label: "Toda la documentación", value: "all" },
+        { label: "Obligatoria pendiente", value: "true" },
+      ],
+      value: pendingDocuments ? "true" : "all",
+    });
+  }
   if (trainingPaths) {
     selectFilters.push({
       defaultValue: ALL_TRAINING_PATHS,
@@ -46,6 +65,9 @@ export function EnrollmentApplicationFilters({
       options: [
         { label: "Todos los trayectos", value: ALL_TRAINING_PATHS },
         ...trainingPaths.map((trainingPath) => ({ label: trainingPath.name, value: trainingPath.id })),
+        ...(trainingPathId && !trainingPaths.some((trainingPath) => trainingPath.id === trainingPathId)
+          ? [{ label: ENROLLMENT_APPLICATION_FILTER_MESSAGES.UNAVAILABLE_TRAINING_PATH, value: trainingPathId }]
+          : []),
       ],
       value: trainingPathId ?? ALL_TRAINING_PATHS,
     });

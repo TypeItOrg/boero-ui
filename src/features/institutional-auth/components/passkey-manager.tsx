@@ -12,6 +12,7 @@ import { revokePasskeyAction } from "@features/institutional-auth/actions/passke
 import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webauthn-support.hook";
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 import type { ReAuthenticateState } from "@features/institutional-auth/types/re-authenticate-state.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type PasskeyOperation = { kind: "register"; label: string } | { kind: "revoke"; passkey: Passkey };
 type PasskeyDialog = PasskeyOperation | { kind: "rename"; passkey: Passkey } | { kind: "reauth"; next: PasskeyOperation };
@@ -46,30 +47,28 @@ export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyMa
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
-        <header className="-mx-4 flex flex-wrap items-center justify-between gap-3 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <FingerprintIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold">Tus llaves de acceso</h2>
-              <p className="text-muted-foreground text-sm">
-                {initialPasskeys.length === 0
-                  ? "Todavía no registraste ninguna llave de acceso."
-                  : `${initialPasskeys.length} de ${maxActivePasskeys} llaves de acceso en uso.`}
-              </p>
-            </div>
-          </div>
-          <Button
-            className="w-full sm:w-auto"
-            disabled={initialPasskeys.length >= maxActivePasskeys || !webauthnSupported}
-            onClick={() => setDialog({ kind: "register", label: "" })}
-            size="lg"
-            type="button"
-          >
-            <PlusIcon aria-hidden="true" className="size-4" />
-            Añadir llave de acceso
-          </Button>
+        <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
+          <SectionHeader
+            icon={FingerprintIcon}
+            title="Tus llaves de acceso"
+            description={
+              initialPasskeys.length === 0
+                ? "Todavía no registraste ninguna llave de acceso."
+                : `${initialPasskeys.length} de ${maxActivePasskeys} llaves de acceso en uso.`
+            }
+            action={
+              <Button
+                className="w-full @xl/section-header:w-auto"
+                disabled={initialPasskeys.length >= maxActivePasskeys || !webauthnSupported}
+                onClick={() => setDialog({ kind: "register", label: "" })}
+                size="lg"
+                type="button"
+              >
+                <PlusIcon aria-hidden="true" className="size-4" />
+                Añadir llave de acceso
+              </Button>
+            }
+          />
         </header>
 
         {webauthnSupported === false ? (

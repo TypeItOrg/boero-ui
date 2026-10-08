@@ -5,8 +5,7 @@ import type { EnrollmentHealthInclusion } from "@features/enrollment-application
 import type { EnrollmentResponsible } from "@features/enrollment-applications/types/enrollment-responsible.types";
 import type { EnrollmentPreference } from "@features/enrollment-applications/types/enrollment-preference.types";
 import type { EnrollmentCareerSelection } from "@features/enrollment-applications/types/enrollment-career-selection.types";
-import type { EnrollmentAcademicSpaceSelection } from "@features/enrollment-applications/types/enrollment-academic-space-selection.types";
-import type { EnrollmentInstrumentSelection } from "@features/enrollment-applications/types/enrollment-instrument-selection.types";
+import type { EnrollmentCourseSelection } from "@features/enrollment-applications/types/enrollment-course-selection.types";
 
 export interface EnrollmentApplicationData {
   personalData?: Partial<EnrollmentPersonalData>;
@@ -15,8 +14,7 @@ export interface EnrollmentApplicationData {
   responsible?: Partial<EnrollmentResponsible>;
   preference?: Partial<EnrollmentPreference>;
   careerSelection?: EnrollmentCareerSelection;
-  academicSpaceSelection?: EnrollmentAcademicSpaceSelection;
-  instrumentSelection?: EnrollmentInstrumentSelection;
+  courses?: EnrollmentCourseSelection[];
   attachments?: EnrollmentAttachment[];
   [key: string]: unknown;
 }

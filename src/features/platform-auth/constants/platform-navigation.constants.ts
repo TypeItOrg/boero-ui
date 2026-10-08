@@ -1,8 +1,10 @@
 import {
+  FileTextIcon,
   BookMarkedIcon,
   BuildingIcon,
   CalendarRangeIcon,
   ClipboardListIcon,
+  ClockIcon,
   FingerprintIcon,
   GraduationCapIcon,
   HouseIcon,
@@ -41,6 +43,7 @@ const MANAGEMENT_NAVIGATION_ITEMS = [
 ] as const satisfies readonly NavigationItem[];
 
 const ACADEMIC_NAVIGATION_ITEMS = [
+  { title: "Documentación", url: "/admin/documentation", icon: FileTextIcon },
   {
     title: "Ciclos lectivos",
     url: "/admin/academic-years",
@@ -70,6 +73,11 @@ const ACADEMIC_NAVIGATION_ITEMS = [
     title: "Cursos",
     url: "/admin/courses",
     icon: GraduationCapIcon,
+  },
+  {
+    title: "Turnos",
+    url: "/admin/shifts",
+    icon: ClockIcon,
   },
 ] as const satisfies readonly NavigationItem[];
 

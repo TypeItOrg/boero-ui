@@ -28,14 +28,10 @@ export function canReviewGuardianLinks(user: InstitutionalUser): boolean {
 
 export function canViewOwnEnrollmentApplications(user: InstitutionalUser): boolean {
   const hasApplicantRole = user.roles.some((role) => INSTITUTIONAL_APPLICANT_ROLE_NAMES.has(role));
-  const hasStaffRole = user.roles.some((role) => INSTITUTIONAL_STAFF_ROLE_NAMES.has(role));
 
-  return hasApplicantRole && !hasStaffRole;
+  return hasApplicantRole;
 }
 
 export function canStartEnrollmentApplication(user: InstitutionalUser): boolean {
-  // Guardians go through the same flow, applying on behalf of their dependents.
-  const canApply = user.roles.includes("Postulante") || isGuardian(user);
-
-  return canApply && canViewOwnEnrollmentApplications(user) && hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ);
+  return canViewOwnEnrollmentApplications(user);
 }

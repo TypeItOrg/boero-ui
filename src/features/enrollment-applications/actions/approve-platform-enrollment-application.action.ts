@@ -16,8 +16,9 @@ const UPDATE_PATH = "/admin/enrollment-applications";
 export async function approvePlatformEnrollmentApplicationAction(
   institutionId: string,
   applicationId: string,
+  provisional = false,
 ): Promise<EnrollmentApplicationActionState> {
-  if (!isValidUuid(institutionId) || !isValidUuid(applicationId)) {
+  if (!isValidUuid(institutionId) || !isValidUuid(applicationId) || typeof provisional !== "boolean") {
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
@@ -28,7 +29,9 @@ export async function approvePlatformEnrollmentApplicationAction(
   }
 
   const errorState = await getResponseErrorActionState(
-    platformApiFetch(`/api/v1/admin/enrollment-applications/${institutionId}/${applicationId}/approve`, { method: "POST" }),
+    platformApiFetch(`/api/v1/admin/enrollment-applications/${institutionId}/${applicationId}/${provisional ? "approve-provisionally" : "approve"}`, {
+      method: "POST",
+    }),
     [],
     ENROLLMENT_MESSAGES.APPROVE,
   );

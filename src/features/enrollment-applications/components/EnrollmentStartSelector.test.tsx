@@ -17,22 +17,36 @@ describe("EnrollmentStartSelector", () => {
     { id: "period-2", academicYearId: "year-2", academicYearNumber: 2027, name: "Inscripción 2027" },
   ];
 
-  it("pre-selects the first study plan and period but lets the applicant change them", () => {
+  it("pre-selects the first study plan and starts without an academic year", () => {
     const onStart = jest.fn();
     render(<EnrollmentStartSelector studyPlans={studyPlans} periods={periods} onStart={onStart} />);
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    expect(onStart).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1" });
+    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-1" });
   });
 
-  it("shows an informative message when there are no study plans available", () => {
+  it("shows an informative message when there are no courses available", () => {
     const { container } = render(<EnrollmentStartSelector studyPlans={[]} periods={periods} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no se encuentran planes de estudio disponibles/i);
+    expect(container).toHaveTextContent(/no hay trayectos disponibles/i);
   });
 
-  it("shows an informative message when there are no open enrollment periods", () => {
-    const { container } = render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={jest.fn()} />);
-    expect(container).toHaveTextContent(/no hay períodos de inscripción abiertos/i);
+  it("shows the plain training path name when it matches the option name", () => {
+    render(
+      <EnrollmentStartSelector
+        studyPlans={[{ id: "path-1", name: "CAV Básico", trainingPathName: "CAV Básico" }]}
+        periods={periods}
+        onStart={jest.fn()}
+      />,
+    );
+    expect(screen.getByRole("radio", { name: "CAV Básico" })).toBeChecked();
+  });
+
+  it("starts from offered training paths without requiring the legacy period list", () => {
+    const onStart = jest.fn();
+    render(<EnrollmentStartSelector studyPlans={studyPlans} periods={[]} onStart={onStart} />);
+    fireEvent.click(screen.getByRole("radio", { name: "Canto · Instrumento" }));
+    fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
+    expect(onStart).toHaveBeenCalledWith({ trainingPathId: "plan-2" });
   });
 });

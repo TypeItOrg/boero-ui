@@ -13,8 +13,12 @@ import type { EnrollmentApplicationActionState } from "@features/enrollment-appl
 
 const UPDATE_PATH = "/enrollment-applications";
 
-export async function approveEnrollmentApplicationAction(institutionId: string, applicationId: string): Promise<EnrollmentApplicationActionState> {
-  if (!isValidUuid(institutionId) || !isValidUuid(applicationId)) {
+export async function approveEnrollmentApplicationAction(
+  institutionId: string,
+  applicationId: string,
+  provisional = false,
+): Promise<EnrollmentApplicationActionState> {
+  if (!isValidUuid(institutionId) || !isValidUuid(applicationId) || typeof provisional !== "boolean") {
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
@@ -29,7 +33,10 @@ export async function approveEnrollmentApplicationAction(institutionId: string, 
   }
 
   const errorState = await getResponseErrorActionState(
-    institutionalApiFetch(`/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/approve`, { method: "POST" }),
+    institutionalApiFetch(
+      `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/${provisional ? "approve-provisionally" : "approve"}`,
+      { method: "POST" },
+    ),
     [],
     ENROLLMENT_MESSAGES.APPROVE,
   );

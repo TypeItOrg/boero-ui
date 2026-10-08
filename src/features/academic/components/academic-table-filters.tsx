@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import * as React from "react";
 import { BuildingIcon, LibraryBigIcon, RouteIcon } from "lucide-react";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -16,7 +17,7 @@ import { fetchAcademicOptionPage } from "@features/academic/services/academic-op
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
-import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
+import { ACADEMIC_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type AcademicTableFiltersProps = {
@@ -266,7 +267,8 @@ function CourseDropdownFilterControl({
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
       <span className="text-foreground text-sm font-medium">{label}</span>
-      <AsyncDropdown<{ id: string; name?: string; year?: number; type?: string; format?: string }>
+      <AsyncDropdown<{ id: string; name?: string; year?: number; type?: string; format?: string; trainingPathName?: string; versionNumber?: number }>
+        {...(resource === "academic-spaces" ? ACADEMIC_SPACE_OPTION_PRESENTATION : {})}
         className="min-w-0"
         clearLabel={`Limpiar ${label.toLowerCase()}`}
         clearable
@@ -276,10 +278,12 @@ function CourseDropdownFilterControl({
         errorMessage="No se pudieron cargar las opciones."
         fetchPage={fetchPage}
         getItemLabel={(item) => {
+          if (resource === "study-plans") {
+            return formatStudyPlanLabel(item);
+          }
+
           if (item.type && item.format) {
-            const typeLabel = academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels] ?? item.type;
-            const formatLabel = academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels] ?? item.format;
-            return `${item.name} · ${typeLabel} · ${formatLabel}`;
+            return getAcademicSpaceOptionLabel(item);
           }
           return item.year !== undefined ? String(item.year) : (item.name ?? "");
         }}

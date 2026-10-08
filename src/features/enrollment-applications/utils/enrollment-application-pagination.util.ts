@@ -12,12 +12,14 @@ export type EnrollmentApplicationSearchParams = PaginationSearchParams & {
   status?: string;
   trainingPathId?: string;
   open?: string;
+  pendingDocuments?: string;
 };
 
 export type EnrollmentApplicationPaginationParams = PaginationParams & {
   status?: EnrollmentApplicationStatus;
   trainingPathId?: string;
   open?: boolean;
+  pendingDocuments?: boolean;
 };
 
 export function parseEnrollmentApplicationPaginationParams(searchParams: EnrollmentApplicationSearchParams): EnrollmentApplicationPaginationParams {
@@ -32,5 +34,6 @@ export function parseEnrollmentApplicationPaginationParams(searchParams: Enrollm
     status: isEnrollmentApplicationStatus(searchParams.status) ? searchParams.status : undefined,
     trainingPathId: searchParams.trainingPathId || undefined,
     open: searchParams.open === "true",
+    pendingDocuments: searchParams.pendingDocuments === "true",
   };
 }

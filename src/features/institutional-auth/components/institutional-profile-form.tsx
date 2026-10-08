@@ -13,6 +13,7 @@ import { DateField, TextField } from "@features/institutional-auth/components/in
 import { InstitutionalProfileLocationSection } from "@features/institutional-auth/components/institutional-profile-location-section";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionalProfileFormProps = {
   person: InstitutionalPerson;
@@ -57,15 +58,11 @@ export function InstitutionalProfileForm({ person, returnTo = "/account" }: Inst
       ) : null}
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
         <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <UserRoundIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold">Datos personales</h2>
-              <p className="text-muted-foreground text-sm">Actualizá la información con la que te identifica tu institución.</p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={UserRoundIcon}
+            title="Datos personales"
+            description="Actualizá la información con la que te identifica tu institución."
+          />
         </header>
         <div className="mt-4 sm:mt-5">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">

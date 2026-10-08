@@ -8,9 +8,18 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 import { institutionFormSchema } from "@features/institutions/schemas/institution-form.schema";
 import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
+import { parseInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
+import { saveInstitutionLogoChange } from "@features/institutions/services/save-institution-logo-change.service";
 
 export async function updateInstitutionAction(id: string, formData: FormData): Promise<InstitutionActionState> {
-  if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
+  if (!isValidUuid(id)) {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
+
+  const rawActive = formData.get("active");
+  if (rawActive !== "true" && rawActive !== "false") {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
 
   const payload = {
     name: formData.get("name"),
@@ -29,7 +38,12 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
     return getValidationActionState(parsed.error.issues, INSTITUTION_FORM_FIELD_NAMES);
   }
 
-  const active = formData.get("active") === "true";
+  const logoChange = parseInstitutionLogoChange(formData);
+  if ("error" in logoChange) {
+    return { logoError: logoChange.error };
+  }
+
+  const active = rawActive === "true";
 
   const response = platformApiFetch(`/api/v1/admin/institutions/${id}`, {
     method: "PUT",
@@ -43,10 +57,14 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
   });
 
   const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION);
-  if (errorState) return errorState;
+  if (errorState) {
+    return errorState;
+  }
+
+  const logoError = await saveInstitutionLogoChange(id, "platform", logoChange);
 
   revalidatePath("/admin/institutions");
   revalidatePath(`/admin/institutions/${id}`);
   revalidatePath(`/admin/institutions/${id}/edit`);
-  return { success: true };
+  return logoError ?? { success: true };
 }

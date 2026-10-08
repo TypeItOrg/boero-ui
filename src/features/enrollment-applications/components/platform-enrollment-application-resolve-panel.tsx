@@ -32,21 +32,25 @@ export function PlatformEnrollmentApplicationResolvePanel({
     router.refresh();
   }
 
-  if (status !== ENROLLMENT_APPLICATION_STATUS.SUBMITTED) {
+  if (status !== ENROLLMENT_APPLICATION_STATUS.SUBMITTED && status !== ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) {
     return null;
   }
 
   return (
     <>
       <div className="flex w-full flex-col gap-2 @2xl/page-shell:w-auto @2xl/page-shell:flex-row">
-        <Button type="button" size="lg" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowApproveDialog(true)}>
-          <BadgeCheckIcon aria-hidden="true" />
-          Aprobar inscripción
-        </Button>
-        <Button type="button" size="lg" variant="destructive" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowRejectDialog(true)}>
-          <BanIcon aria-hidden="true" />
-          Rechazar inscripción
-        </Button>
+        {application.canApproveProvisionally || application.canConfirm ? (
+          <Button type="button" size="lg" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowApproveDialog(true)}>
+            <BadgeCheckIcon aria-hidden="true" />
+            {application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
+          </Button>
+        ) : null}
+        {status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED ? (
+          <Button type="button" size="lg" variant="destructive" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowRejectDialog(true)}>
+            <BanIcon aria-hidden="true" />
+            Rechazar inscripción
+          </Button>
+        ) : null}
       </div>
 
       {showApproveDialog ? (

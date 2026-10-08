@@ -1,3 +1,7 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
+import type { InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import { DataTableAdvancedFiltersTrigger } from "@common/components/ui/data-table-advanced-filters-trigger";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { Sheet } from "@common/components/ui/sheet";
@@ -5,7 +9,6 @@ import { countActiveAdvancedFilters } from "@common/utils/count-active-advanced-
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
 import { ACADEMIC_COLLECTION_CONFIG, type AcademicTableColumns } from "@features/academic/config/academic-collection.config";
-import { fetchAcademicSpace, fetchStudyPlan, fetchTrainingPath } from "@features/academic/services/academic.service";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { parseAcademicPaginationParams, type AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
@@ -17,6 +20,7 @@ type AcademicCollectionProps = {
   basePath: string;
   canCreate: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canDelete: boolean;
   canChangeStatus: boolean;
   canUpdate: boolean;
@@ -35,6 +39,7 @@ type AcademicCollectionProps = {
 export async function AcademicCollectionView({
   basePath,
   canCreate,
+  canReadWaitlist = false,
   canCreateVersion = canCreate,
   canDelete,
   canChangeStatus,
@@ -55,25 +60,38 @@ export async function AcademicCollectionView({
   const parsedParams = parseAcademicPaginationParams(searchParams, resource);
   const params = isTrainingPathFixed ? { ...parsedParams, trainingPathId: fixedTrainingPathId } : parsedParams;
   const effectiveInstitutionId = global ? params.institutionId : institutionId;
-  const dataPromise = config.fetchPage({ ...params, global, institutionId: effectiveInstitutionId, scope });
-  const trainingPathId = params.trainingPathId;
-  const shouldFetchTrainingPath = resource === AcademicResource.STUDY_PLAN && trainingPathId && !isTrainingPathFixed;
-  const selectedTrainingPathPromise =
-    shouldFetchTrainingPath && effectiveInstitutionId ? fetchTrainingPath(scope, effectiveInstitutionId, trainingPathId) : Promise.resolve(null);
-  const [data, selectedTrainingPath] = await Promise.all([dataPromise, selectedTrainingPathPromise]);
-  const selectedStudyPlanPromise =
-    resource === AcademicResource.COURSE && params.studyPlanId && effectiveInstitutionId
-      ? fetchStudyPlan(scope, effectiveInstitutionId, params.studyPlanId)
-      : Promise.resolve(null);
-  const selectedSpacePromise =
-    resource === AcademicResource.COURSE && params.academicSpaceId && effectiveInstitutionId
-      ? fetchAcademicSpace(scope, effectiveInstitutionId, params.academicSpaceId)
-      : Promise.resolve(null);
-  const [selectedStudyPlan, selectedAcademicSpace] = await Promise.all([selectedStudyPlanPromise, selectedSpacePromise]);
-  const rows = data.items.map(config.toRow).map((row) => {
-    if (!isTrainingPathFixed || resource !== AcademicResource.STUDY_PLAN) return row;
-    return { ...row, detailValues: row.detailValues.slice(1) };
-  });
+  const data = await config.fetchPage({ ...params, global, institutionId: effectiveInstitutionId, scope });
+  const selectedTrainingPath = data.items.find((item) => "trainingPathId" in item && item.trainingPathId === params.trainingPathId);
+  const selectedStudyPlan = data.items.find((item) => "studyPlanId" in item && item.studyPlanId === params.studyPlanId);
+  const selectedAcademicSpace = data.items.find((item) => "academicSpaceId" in item && item.academicSpaceId === params.academicSpaceId);
+  const user = scope === "institutional" ? await requireInstitutionalUser() : null;
+  const rows = data.items
+    .map((item) => {
+      const row = config.toRow(item);
+      const permissionResource =
+        resource === "training-paths" ? "training-path" : resource === "study-plans" ? "study-plan" : resource === "courses" ? "course" : null;
+      if (!user || !permissionResource) {
+        return row;
+      }
+      const pathId = resource === "training-paths" ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : "";
+      const permits = (action: string) =>
+        scopeIncludesTrainingPath(user.permissionScopes, `institution:${permissionResource}:${action}` as InstitutionalPermission, pathId);
+      return {
+        ...row,
+        scopedActions: {
+          update: permits("update"),
+          delete: permits("delete"),
+          restore: permits("restore"),
+          status: permits("update-status"),
+          createVersion: permits("create"),
+          waitlist: scopeIncludesTrainingPath(user.permissionScopes, "institution:course-waitlist:read" as InstitutionalPermission, pathId),
+        },
+      };
+    })
+    .map((row) => {
+      if (!isTrainingPathFixed || resource !== AcademicResource.STUDY_PLAN) return row;
+      return { ...row, detailValues: row.detailValues.slice(1) };
+    });
   const filters = config.filters(params);
   const isCourse = resource === AcademicResource.COURSE;
   const isAcademicYear = resource === AcademicResource.ACADEMIC_YEAR;
@@ -120,7 +138,7 @@ export async function AcademicCollectionView({
     params.academicSpaceId !== undefined ||
     params.studyPlanId !== undefined ||
     params.year !== undefined ||
-    filters.some((filter) => filter.value !== filter.defaultValue) ||
+    filters.some((filter) => filter.name !== "deleted" && filter.value !== filter.defaultValue) ||
     yearFilters.some((filter) => filter.value !== filter.defaultValue) ||
     dateFilters.some((filter) => filter.value !== undefined) ||
     params.startDate !== undefined ||
@@ -147,9 +165,10 @@ export async function AcademicCollectionView({
               isCourse && effectiveInstitutionId
                 ? {
                     institutionId: effectiveInstitutionId,
-                    selectedLabel: selectedAcademicSpace
-                      ? `${selectedAcademicSpace.name} · ${academicSpaceTypeLabels[selectedAcademicSpace.type]} · ${academicSpaceFormatLabels[selectedAcademicSpace.format]}`
-                      : undefined,
+                    selectedLabel:
+                      selectedAcademicSpace && "academicSpaceName" in selectedAcademicSpace
+                        ? `${selectedAcademicSpace.academicSpaceName} · ${academicSpaceTypeLabels[selectedAcademicSpace.academicSpaceType]} · ${academicSpaceFormatLabels[selectedAcademicSpace.academicSpaceFormat]}`
+                        : undefined,
                     scope,
                     value: params.academicSpaceId,
                   }
@@ -188,7 +207,7 @@ export async function AcademicCollectionView({
               isCourse && effectiveInstitutionId
                 ? {
                     institutionId: effectiveInstitutionId,
-                    selectedLabel: selectedStudyPlan?.name,
+                    selectedLabel: selectedStudyPlan && "studyPlanName" in selectedStudyPlan ? formatStudyPlanLabel(selectedStudyPlan) : undefined,
                     scope,
                     value: params.studyPlanId,
                   }
@@ -198,7 +217,8 @@ export async function AcademicCollectionView({
               isStudyPlan && !isTrainingPathFixed && effectiveInstitutionId
                 ? {
                     institutionId: effectiveInstitutionId,
-                    selectedLabel: selectedTrainingPath?.name,
+                    selectedLabel:
+                      selectedTrainingPath && "trainingPathName" in selectedTrainingPath ? selectedTrainingPath.trainingPathName : undefined,
                     scope,
                     value: params.trainingPathId,
                   }
@@ -218,6 +238,7 @@ export async function AcademicCollectionView({
             institutionId={effectiveInstitutionId}
             canCreate={canCreate && !isTrainingPathFixed}
             canCreateVersion={canCreateVersion}
+            canReadWaitlist={canReadWaitlist}
             deleted={params.deleted}
             page={params.page}
             resource={resource}

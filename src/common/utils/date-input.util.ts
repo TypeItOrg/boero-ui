@@ -20,7 +20,7 @@ export function formatDateInput(date: Date | undefined): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatDisplayDate(value: string | null | undefined, fallback = "—"): string {
+export function formatDisplayDate(value: string | null | undefined, fallback = "Sin fecha"): string {
   const date = parseDateInput(value);
   if (!date) return value || fallback;
 

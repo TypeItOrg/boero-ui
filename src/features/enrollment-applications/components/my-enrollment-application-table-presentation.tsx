@@ -45,7 +45,7 @@ export function MyEnrollmentApplicationTablePresentation({
                 <span className="sr-only">Acciones</span>
               </TableHead>
               {showApplicant ? <TableHead>Postulante</TableHead> : null}
-              <TableHead>Plan de estudio</TableHead>
+              <TableHead>Trayecto formativo</TableHead>
               <TableHead>Ciclo lectivo</TableHead>
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>

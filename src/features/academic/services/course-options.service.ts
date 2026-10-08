@@ -5,11 +5,14 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 
 type CourseOptionResource = "teachers" | "spaces";
 export type CourseTeacherOption = { id: string; fullName: string };
-type CourseSpaceOption = {
+export type CourseSpaceOption = {
   id: string;
   name: string;
   type: string;
   format: string;
+  studyPlanSpaceId?: string | null;
+  academicLevelName?: string | null;
+  instrumental?: boolean;
 };
 type CourseOption = CourseTeacherOption | CourseSpaceOption;
 

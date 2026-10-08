@@ -246,6 +246,34 @@ describe("AcademicFormFields", () => {
     expect(screen.getByRole("combobox", { name: "Estado" })).toHaveTextContent("Inactivo");
   });
 
+  it("submits explicit instrumental values when selecting no, yes and when locked", async () => {
+    const user = userEvent.setup();
+    const { container, unmount } = render(
+      <form>
+        <AcademicFormFields resource={AcademicResource.ACADEMIC_SPACE} />
+      </form>,
+    );
+    const form = container.querySelector("form")!;
+    expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
+    await user.click(screen.getByRole("combobox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("option", { name: "Sí" }));
+    expect(new FormData(form).getAll("instrumental")).toEqual(["true"]);
+    await user.click(screen.getByRole("combobox", { name: "Espacio instrumental" }));
+    await user.click(screen.getByRole("option", { name: "No" }));
+    expect(new FormData(form).getAll("instrumental")).toEqual(["false"]);
+    unmount();
+    const locked = render(
+      <form>
+        <AcademicFormFields
+          resource={AcademicResource.ACADEMIC_SPACE}
+          initialValues={{ id: "space", instrumental: true, instrumentalLocked: true }}
+        />
+      </form>,
+    );
+    expect(screen.getByRole("combobox", { name: "Espacio instrumental" })).toBeDisabled();
+    expect(new FormData(locked.container.querySelector("form")!).getAll("instrumental")).toEqual(["true"]);
+  });
+
   it("renders the academic-space status selector while editing", () => {
     const { container } = render(
       <form>
@@ -337,14 +365,14 @@ describe("AcademicFormFields", () => {
     expect(order).toHaveAttribute("inputmode", "numeric");
   });
 
-  it("places the academic level name and order in the same responsive row", () => {
+  it("asks only for the order when creating an academic level and notes the derived name", () => {
     render(<AcademicFormFields resource={AcademicResource.ACADEMIC_LEVEL} />);
 
-    const nameField = screen.getByLabelText(/Nombre/).closest('[data-slot="field"]');
-    const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
+    expect(screen.queryByLabelText(/Nombre/)).not.toBeInTheDocument();
+    expect(screen.getByText("El nombre se genera automáticamente a partir del orden (Nivel 1, Nivel 2, …).")).toBeInTheDocument();
 
-    expect(nameField).not.toHaveClass("flex-[1_0_100%]");
-    expect(orderField).toHaveClass("sm:max-w-48", "flex-none");
+    const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
+    expect(orderField).toHaveClass("w-full", "flex-none");
   });
 
   it("marks an end date before the start date as invalid", async () => {

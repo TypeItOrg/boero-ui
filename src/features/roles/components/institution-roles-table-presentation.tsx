@@ -9,6 +9,7 @@ import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { EmptyMedia } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { InstitutionRolesPagination } from "@features/roles/components/institution-roles-pagination";
 import type { InstitutionRole } from "@features/roles/types/institution-role.types";
@@ -20,7 +21,10 @@ type InstitutionRolesTablePresentationProps = {
 };
 
 export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: InstitutionRolesTablePresentationProps): React.ReactElement {
-  const { isPending } = useDataTableNavigation();
+  const { isPending, navigate } = useDataTableNavigation();
+  const hasFilters = search.trim() !== "";
+  const hasItemsOnOtherPages = roles.totalItems > 0;
+  const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : UserLockIcon;
 
   return (
     <div className="flex h-full flex-col justify-between gap-4">
@@ -74,16 +78,23 @@ export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: 
         ) : (
           <div className="bg-muted/25 text-muted-foreground flex h-full flex-1 flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
             <EmptyMedia className="mb-4" variant="icon">
-              <SearchIcon className="size-5" />
+              <EmptyIcon className="size-5" />
             </EmptyMedia>
             <h3 className="text-foreground text-base font-semibold">
-              {search.trim() !== "" ? "No se encontraron resultados" : "No hay roles registrados"}
+              {hasItemsOnOtherPages ? "No hay roles en esta página" : hasFilters ? "No se encontraron roles" : "No hay roles registrados"}
             </h3>
             <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">
-              {search.trim() !== ""
-                ? "No encontramos ningún rol que coincida con los criterios de búsqueda seleccionados."
-                : "Todavía no hay roles cargados en esta institución."}
+              {hasItemsOnOtherPages
+                ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
+                : hasFilters
+                  ? DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION
+                  : "Todavía no hay roles cargados en esta institución."}
             </p>
+            {hasItemsOnOtherPages ? (
+              <Button type="button" variant="outline" size="sm" className="mt-6" onClick={() => navigate({ page: "0" })}>
+                Volver a la primera página
+              </Button>
+            ) : null}
           </div>
         )}
 

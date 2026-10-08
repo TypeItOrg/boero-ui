@@ -1,4 +1,6 @@
 import {
+  FileTextIcon,
+  BookOpenIcon,
   BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
@@ -10,6 +12,7 @@ import {
   LibraryBigIcon,
   Music2Icon,
   RouteIcon,
+  ScrollTextIcon,
   UserLockIcon,
   UserRoundCheckIcon,
   UserRoundIcon,
@@ -54,6 +57,9 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   ];
   const academicItems: NavigationItem[] = canViewAcademicNavigation(user)
     ? [
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)
+          ? [{ title: "Documentación", url: "/documentation", icon: FileTextIcon }]
+          : []),
         ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
           ? [{ title: "Oferta académica", url: "/academic-offers", icon: GraduationCapIcon }]
           : []),
@@ -75,6 +81,11 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
         ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
           ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
           : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
+          ? [{ title: "Cursadas", url: "/course-enrollments", icon: ScrollTextIcon }]
+          : []),
+        ...(user.roles.includes("Profesor") ? [{ title: "Mis clases", url: "/my-teaching", icon: GraduationCapIcon }] : []),
+        ...(user.roles.includes("Profesor") ? [{ title: "Mis horarios", url: "/my-teaching/schedules", icon: CalendarRangeIcon }] : []),
         ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
       ]
     : [];
@@ -96,6 +107,17 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(platformItems.length > 0 ? [{ label: "Institución", items: platformItems }] : []),
     ...(academicItems.length > 0 ? [{ label: "Académico", items: academicItems }] : []),
     ...(enrollmentItems.length > 0 ? [{ label: "Inscripciones", items: enrollmentItems }] : []),
+    ...(canViewOwnEnrollmentApplications(user)
+      ? [
+          {
+            label: "Formación",
+            items: [
+              { title: "Mis materias", url: "/my-course-enrollments", icon: BookOpenIcon },
+              { title: "Mis horarios", url: "/my-schedules", icon: CalendarRangeIcon },
+            ],
+          },
+        ]
+      : []),
     {
       label: "Personal",
       items: [

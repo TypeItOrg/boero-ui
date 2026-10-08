@@ -1,4 +1,5 @@
 export type AcademicAccess = {
+  documentCatalogManage?: boolean;
   yearRead: boolean;
   yearCreate: boolean;
   yearUpdate: boolean;
@@ -31,6 +32,7 @@ export type AcademicAccess = {
   instrumentDelete: boolean;
   instrumentRestore: boolean;
   courseRead: boolean;
+  courseWaitlistRead?: boolean;
   courseCreate: boolean;
   courseUpdate: boolean;
   courseStatusUpdate: boolean;
@@ -57,6 +59,7 @@ export function canReadAcademic(access: AcademicAccess): boolean {
 }
 
 export const FULL_ACADEMIC_ACCESS: AcademicAccess = {
+  documentCatalogManage: true,
   yearRead: true,
   yearCreate: true,
   yearUpdate: true,
@@ -89,6 +92,7 @@ export const FULL_ACADEMIC_ACCESS: AcademicAccess = {
   instrumentDelete: true,
   instrumentRestore: true,
   courseRead: true,
+  courseWaitlistRead: true,
   courseCreate: true,
   courseUpdate: true,
   courseStatusUpdate: true,

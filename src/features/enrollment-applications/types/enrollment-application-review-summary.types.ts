@@ -3,4 +3,6 @@ export type EnrollmentApplicationReviewSummary = {
   applicationId: string;
   applicantName: string;
   studyPlanName: string;
+  canApproveProvisionally?: boolean;
+  canConfirm?: boolean;
 };

@@ -1,5 +1,7 @@
 "use client";
 
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
+
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -7,6 +9,8 @@ import { CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+import { ROLE_SCOPE_MESSAGES } from "@features/people/constants/role-scope.constants";
 import { createInstitutionalPersonAction, createPlatformPersonAction } from "@features/people/actions/create-person.action";
 import { updateInstitutionalPersonAction, updatePlatformPersonAction } from "@features/people/actions/update-person.action";
 import { PersonCreateFields, PersonDetailsFields, PersonPasswordFields } from "@features/people/components/person-form-fields";
@@ -36,14 +40,14 @@ type PersonFormCommonProps = {
 type CreateMode = PersonFormCommonProps & {
   mode: typeof FORM_MODE.CREATE;
   person?: never;
-  roleIds?: never;
+  assignments?: never;
   canEdit?: never;
 };
 
 type EditMode = PersonFormCommonProps & {
   mode: typeof FORM_MODE.EDIT;
   person: Person;
-  roleIds?: readonly string[];
+  assignments?: readonly RoleAssignment[];
   canEdit?: boolean;
 };
 
@@ -53,7 +57,7 @@ export function PersonForm({
   mode,
   institutionId,
   person,
-  roleIds,
+  assignments,
   formId,
   hideActions = false,
   onPendingChange,
@@ -79,16 +83,23 @@ export function PersonForm({
     resolver,
     defaultValues: getDefaultValues(person),
   });
+  const errorState = React.useMemo(() => ({ error: formError, fieldErrors: errors }), [formError, errors]);
+  const formRef = useActionFormErrorFocus(errorState, isPending);
 
   React.useEffect(() => {
     onPendingChange?.(isPending);
   }, [isPending, onPendingChange]);
 
   function onSubmit(values: PersonFormInput): void {
+    if (assignments?.some((assignment) => assignment.accessScope === "TRAINING_PATHS" && assignment.trainingPathIds.length === 0)) {
+      setFormError(ROLE_SCOPE_MESSAGES.REQUIRED_ASSIGNMENT);
+      return;
+    }
+
     setFormError(undefined);
 
     startTransition(async () => {
-      const formData = getFormData(values, isEdit, canEdit, roleIds);
+      const formData = getFormData(values, isEdit, canEdit, assignments);
       const result = await submitPerson(formData);
 
       const hasFieldErrors = setActionFieldErrors(result, setError);
@@ -121,7 +132,7 @@ export function PersonForm({
   }
 
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col gap-4">
+    <form ref={formRef} id={formId} onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col gap-4">
       {formError && (
         <Alert variant="destructive">
           <CircleAlertIcon />

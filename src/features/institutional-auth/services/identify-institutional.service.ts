@@ -1,5 +1,5 @@
 import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
-import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
 import type { IdentifyInstitutionalOutput } from "@features/institutional-auth/types/identify-institutional-output.types";
 import type { InstitutionalIdentifyInput } from "@features/institutional-auth/types/institutional-identify-input.types";
@@ -10,7 +10,7 @@ export async function identifyInstitutionalAccount(
   requestHeaders: Pick<Headers, "get">,
 ): Promise<IdentifyInstitutionalOutput> {
   try {
-    const response = await fetch(new URL("/api/v1/auth/login/identify", getApiUrlOrThrow()), {
+    const response = await publicApiFetch("/api/v1/auth/login/identify", {
       body: JSON.stringify(input),
       cache: "no-store",
       headers: createAuthRequestHeaders(requestHeaders),

@@ -1,3 +1,4 @@
+import { ENROLLMENT_PERIOD_MESSAGES } from "@features/enrollment-periods/constants/enrollment-period.messages";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarRangeIcon } from "lucide-react";
@@ -44,6 +45,10 @@ export default async function EditEnrollmentPeriodPage({ params, searchParams }:
 
   if (!period) {
     notFound();
+  }
+
+  if (!period.canUpdate) {
+    return <InstitutionalAccessDenied description={ENROLLMENT_PERIOD_MESSAGES.incompleteScope} />;
   }
 
   const destination = getSafeReturnTo(returnTo, "/enrollment-periods");

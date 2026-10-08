@@ -1,5 +1,8 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import type { StudyPlan } from "@features/academic/types/study-plan.types";
+
 import * as React from "react";
 import { CalendarDaysIcon, GraduationCapIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 
@@ -9,20 +12,27 @@ import { Badge } from "@common/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Input } from "@common/components/ui/input";
-import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { TimeInputWithIcon } from "@common/components/ui/time-input-with-icon";
 import { ToggleGroup, ToggleGroupItem } from "@common/components/ui/toggle-group";
 import { cn } from "@common/utils/cn.util";
 import { toOptionalFormString } from "@common/utils/form-value.util";
 import { FormField } from "@features/academic/components/academic-form-controls";
-import { fetchCourseSpaceOptions, fetchCourseTeacherOptions, type CourseTeacherOption } from "@features/academic/services/course-options.service";
+import {
+  fetchCourseSpaceOptions,
+  fetchCourseTeacherOptions,
+  type CourseSpaceOption,
+  type CourseTeacherOption,
+} from "@features/academic/services/course-options.service";
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
 import { COURSE_WEEK_DAY } from "@features/academic/types/course-week-day.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { STUDY_PLAN_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
+import { SectionHeader } from "@common/components/section-header";
 
 const WEEK_DAY_LABELS: Record<CourseWeekDay, string> = {
   MONDAY: "Lunes",
@@ -78,7 +88,11 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
   const initialFormat = toOptionalFormString(initialValues.academicSpaceFormat);
 
   const [studyPlanId, setStudyPlanId] = React.useState(toOptionalFormString(initialValues.studyPlanId));
-  const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
+  const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [academicSpaceId, setAcademicSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
+  const [studyPlanSpaceId, setStudyPlanSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [instrumentId, setInstrumentId] = React.useState(toOptionalFormString(initialValues.instrumentId));
+  const [instrumental, setInstrumental] = React.useState(Boolean(initialValues.academicSpaceInstrumental));
   const [spaceLabel, setSpaceLabel] = React.useState<string | undefined>(undefined);
   const [academicYearId, setAcademicYearId] = React.useState(toOptionalFormString(initialValues.academicYearId));
   const [format, setFormat] = React.useState<string | undefined>(
@@ -131,43 +145,39 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
   return (
     <>
       <input type="hidden" name="studyPlanId" value={studyPlanId ?? ""} />
-      <input type="hidden" name="academicSpaceId" value={spaceId ?? ""} />
+      <input type="hidden" name="studyPlanSpaceId" value={studyPlanSpaceId ?? ""} />
+      <input type="hidden" name="academicSpaceId" value={academicSpaceId ?? ""} />
+      <input type="hidden" name="instrumentId" value={instrumentId ?? ""} />
       <input type="hidden" name="academicYearId" value={academicYearId ?? ""} />
       <input type="hidden" name="format" value={format ?? ""} />
       <input type="hidden" name="classes" value={serializedClasses} />
 
       <section aria-labelledby="course-form-details-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <GraduationCapIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-form-details-title" className="text-base font-semibold">
-                Datos del curso
-              </h2>
-              <p className="text-muted-foreground text-sm">
-                Instanciá un espacio académico de un plan activo, elegí el ciclo lectivo y armá sus clases.
-              </p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={GraduationCapIcon}
+            title="Datos del curso"
+            description="Instanciá un espacio académico de un plan activo, elegí el ciclo lectivo y armá sus clases."
+            titleId="course-form-details-title"
+          />
         </header>
         <div className="mt-5 flex flex-wrap gap-4">
           {institutionField}
           <FormField label="Plan de estudio" name="studyPlanId" error={fieldErrors?.studyPlanId} className="flex-[1_0_min(300px,100%)]" required>
             {institutionId && scope ? (
-              <AsyncDropdown<{ id: string; name: string }>
+              <AsyncDropdown<StudyPlan>
                 ariaInvalid={Boolean(fieldErrors?.studyPlanId)}
                 disabled={editing || classesLocked}
                 emptyMessage="No se encontraron planes activos."
                 errorMessage="No se pudieron cargar los planes de estudio."
                 fetchPage={(input) =>
-                  fetchAcademicOptionPage<{ id: string; name: string }>("study-plans", scope, institutionId, input, {
+                  fetchAcademicOptionPage<StudyPlan>("study-plans", scope, institutionId, input, {
+                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
                     active: "all",
                     status: "ACTIVE",
                   })
                 }
-                getItemLabel={(item) => item.name}
+                getItemLabel={formatStudyPlanLabel}
                 getItemValue={(item) => item.id}
                 id="studyPlanId"
                 key={`plan-${institutionId}`}
@@ -175,13 +185,25 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 onValueChange={(value) => {
                   setStudyPlanId(value);
                   setSpaceId(undefined);
+                  setAcademicSpaceId(undefined);
+                  setStudyPlanSpaceId(undefined);
+                  setInstrumentId(undefined);
+                  setInstrumental(false);
                   setSpaceLabel(undefined);
                   setFormat(undefined);
                 }}
                 placeholder={classesLocked ? "Definido por el curso" : "Seleccionar plan"}
-                queryKey={["courses", "study-plans", scope, institutionId]}
+                queryKey={["courses", "active-study-plans", scope, institutionId]}
                 searchPlaceholder="Buscar plan…"
-                selectedLabel={toOptionalFormString(initialValues.studyPlanName)}
+                selectedLabel={
+                  initialValues.studyPlanName
+                    ? formatStudyPlanLabel({
+                        studyPlanName: toOptionalFormString(initialValues.studyPlanName),
+                        trainingPathName: toOptionalFormString(initialValues.trainingPathName),
+                        studyPlanVersion: Number(initialValues.studyPlanVersion) || undefined,
+                      })
+                    : undefined
+                }
                 value={studyPlanId}
               />
             ) : (
@@ -192,14 +214,15 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
           <FormField
             label="Espacio académico"
             name="academicSpaceId"
-            error={fieldErrors?.academicSpaceId}
+            error={fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format}
             className="flex-[1_0_min(300px,100%)]"
             required
           >
             {institutionId && scope ? (
               studyPlanId ? (
-                <AsyncDropdown
-                  ariaInvalid={Boolean(fieldErrors?.academicSpaceId)}
+                <AsyncDropdown<CourseSpaceOption>
+                  {...STUDY_PLAN_SPACE_OPTION_PRESENTATION}
+                  ariaInvalid={Boolean(fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format)}
                   disabled={editing || classesLocked}
                   emptyDescription="Incorporá espacios al plan para poder instanciarlos."
                   emptyIcon={GraduationCapIcon}
@@ -207,19 +230,19 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                   emptyTitle="No hay espacios"
                   errorMessage="No se pudieron cargar los espacios del plan."
                   fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
-                  getItemLabel={(item) =>
-                    `${item.name} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`
-                  }
-                  getItemValue={(item) => item.id}
+                  getItemLabel={getAcademicSpaceOptionLabel}
+                  getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
                   id="academicSpaceId"
                   key={`space-${institutionId}-${studyPlanId}`}
                   name="academicSpaceDisplay"
                   onValueChange={(value, item) => {
                     setSpaceId(value);
+                    setStudyPlanSpaceId(item?.studyPlanSpaceId ?? value);
+                    setAcademicSpaceId(item?.id);
+                    setInstrumentId(undefined);
+                    setInstrumental(Boolean(item?.instrumental));
                     if (item) {
-                      setSpaceLabel(
-                        `${item.name} · ${academicSpaceTypeLabels[item.type as keyof typeof academicSpaceTypeLabels]} · ${academicSpaceFormatLabels[item.format as keyof typeof academicSpaceFormatLabels]}`,
-                      );
+                      setSpaceLabel(getAcademicSpaceOptionLabel(item));
                       setFormat(item.format);
                     }
                   }}
@@ -237,6 +260,38 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
             )}
           </FormField>
 
+          {instrumental ? (
+            <FormField label="Instrumento" name="instrumentId" error={fieldErrors?.instrumentId} className="flex-[1_0_min(300px,100%)]" required>
+              {institutionId && scope ? (
+                <AsyncDropdown<{ id: string; name: string }>
+                  ariaInvalid={Boolean(fieldErrors?.instrumentId)}
+                  disabled={editing}
+                  emptyMessage="No hay instrumentos activos."
+                  errorMessage="No se pudieron cargar los instrumentos."
+                  fetchPage={(input) =>
+                    fetchAcademicOptionPage<{ id: string; name: string }>("instruments", scope, institutionId, input, {
+                      operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
+                      active: true,
+                    })
+                  }
+                  getItemLabel={(item) => item.name}
+                  getItemValue={(item) => item.id}
+                  id="instrumentId"
+                  key={`instrument-${institutionId}-${studyPlanSpaceId ?? "none"}`}
+                  name="instrumentDisplay"
+                  onValueChange={(value) => setInstrumentId(value)}
+                  placeholder="Seleccionar instrumento"
+                  queryKey={["courses", "instruments", scope, institutionId]}
+                  searchPlaceholder="Buscar instrumento…"
+                  selectedLabel={toOptionalFormString(initialValues.instrumentName)}
+                  value={instrumentId}
+                />
+              ) : (
+                <Input disabled placeholder="Seleccioná una institución primero" type="text" />
+              )}
+            </FormField>
+          ) : null}
+
           <FormField label="Ciclo lectivo" name="academicYearId" error={fieldErrors?.academicYearId} className="w-full flex-[1_0_100%]" required>
             {institutionId && scope ? (
               <AsyncDropdown<{ id: string; year: number }>
@@ -246,6 +301,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
                 errorMessage="No se pudieron cargar los ciclos lectivos."
                 fetchPage={(input) =>
                   fetchAcademicOptionPage<{ id: string; year: number }>("academic-years", scope, institutionId, input, {
+                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
                     active: "all",
                     status: "ACTIVE",
                   })
@@ -270,30 +326,29 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
       </section>
 
       <section aria-labelledby="course-form-classes-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-        <header className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <CalendarDaysIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="course-form-classes-title" className="text-base font-semibold">
-                Clases del curso
-              </h2>
-              <p className="text-muted-foreground text-sm">Organizá docentes, días y franjas horarias para cada grupo.</p>
-            </div>
-          </div>
-          {classes.length > 0 ? (
-            <Button
-              disabled={!spaceId}
-              onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])}
-              size="lg"
-              type="button"
-              variant="outline"
-            >
-              <PlusIcon data-icon="inline-start" /> Agregar clase
-            </Button>
-          ) : null}
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <SectionHeader
+            icon={CalendarDaysIcon}
+            title="Clases del curso"
+            description="Organizá docentes, días y franjas horarias para cada grupo."
+            titleId="course-form-classes-title"
+            action={
+              classes.length > 0 ? (
+                <Button
+                  disabled={!spaceId}
+                  onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])}
+                  size="lg"
+                  type="button"
+                  variant="outline"
+                >
+                  <PlusIcon data-icon="inline-start" /> Agregar clase
+                </Button>
+              ) : null
+            }
+          />
         </header>
+
+        {fieldErrors?.classes ? <FieldError className="mt-4" errors={[{ message: fieldErrors.classes }]} /> : null}
 
         {classes.length === 0 ? (
           <Empty className="mt-5 min-h-56 border-0 bg-transparent">
@@ -758,7 +813,9 @@ function ScheduleRangeEditor({
           {!isEmpty && !isValid ? <Badge variant="destructive">{isIncomplete ? "Incompleta" : "Inválida"}</Badge> : null}
           {isValid ? <Badge variant="outline">{duration} min</Badge> : null}
           {individual && isValid && period ? (
-            <Badge variant={isDivisible ? "success" : "destructive"}>{isDivisible ? `${duration / period} cupos` : "No divisible"}</Badge>
+            <Badge variant={isDivisible ? "success" : "destructive"}>
+              {isDivisible ? `${duration / period} ${duration === period ? "cupo" : "cupos"}` : "No divisible"}
+            </Badge>
           ) : null}
         </div>
         {canRemove ? (

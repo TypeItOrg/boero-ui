@@ -5,7 +5,7 @@ import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argu
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { personRoleIdsSchema } from "@features/people/schemas/person-role.schema";
+import { personRoleAssignmentsSchema } from "@features/people/schemas/person-role.schema";
 import { updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
@@ -33,8 +33,8 @@ async function updatePersonActionInternal(
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
-  const roleIds = parseRoleIds(formData.get("roleIds"));
-  if (roleIds === null) {
+  const assignments = parseRoleAssignments(formData.get("assignments"));
+  if (assignments === null || formData.has("roleIds")) {
     return { error: PEOPLE_ERROR_MESSAGES.INVALID_ROLE_CONFIGURATION };
   }
 
@@ -76,12 +76,12 @@ async function updatePersonActionInternal(
     if (errorState) return errorState;
   }
 
-  if (roleIds) {
+  if (assignments) {
     const roleError = await getResponseErrorActionState(
       peopleApiFetch(scope, `${getPeoplePath(scope, institutionId, personId)}/roles`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roleIds }),
+        body: JSON.stringify({ assignments }),
       }),
       PERSON_FORM_FIELD_NAMES,
       PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE,
@@ -95,11 +95,18 @@ async function updatePersonActionInternal(
   return { success: true };
 }
 
-function parseRoleIds(value: FormDataEntryValue | null): string[] | null | undefined {
-  if (value === null || typeof value !== "string") return undefined;
+function parseRoleAssignments(
+  value: FormDataEntryValue | null,
+): import("@features/people/types/role-assignment.types").RoleAssignment[] | null | undefined {
+  if (value === null) {
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    return null;
+  }
 
   try {
-    const parsed = personRoleIdsSchema.safeParse(JSON.parse(value));
+    const parsed = personRoleAssignmentsSchema.safeParse(JSON.parse(value));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;

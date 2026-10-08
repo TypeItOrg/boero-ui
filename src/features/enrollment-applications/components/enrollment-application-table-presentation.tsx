@@ -1,5 +1,6 @@
 "use client";
 
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ type EnrollmentApplicationTablePresentationProps = {
   page: number;
   size: number;
   status?: EnrollmentApplicationStatus;
+  hasFilters?: boolean;
   canApprove: boolean;
   canReject: boolean;
   scope?: AcademicScope;
@@ -33,6 +35,7 @@ export function EnrollmentApplicationTablePresentation({
   page,
   size,
   status,
+  hasFilters = Boolean(status),
   canApprove,
   canReject,
   scope,
@@ -61,7 +64,7 @@ export function EnrollmentApplicationTablePresentation({
   }
 
   if (data.items.length === 0) {
-    return <EnrollmentApplicationEmptyState hasFilter={Boolean(status)} isNavigating={isNavigating} size={size} totalItems={data.totalItems} />;
+    return <EnrollmentApplicationEmptyState hasFilter={hasFilters} isNavigating={isNavigating} size={size} totalItems={data.totalItems} />;
   }
 
   return (
@@ -75,7 +78,7 @@ export function EnrollmentApplicationTablePresentation({
               </TableHead>
               <TableHead>Estudiante</TableHead>
               <TableHead>Documento</TableHead>
-              <TableHead>Plan de estudio</TableHead>
+              <TableHead>Trayecto formativo</TableHead>
               <TableHead>Ciclo lectivo</TableHead>
               <TableHead>Fecha de solicitud</TableHead>
               <TableHead>Estado</TableHead>
@@ -87,8 +90,8 @@ export function EnrollmentApplicationTablePresentation({
               <EnrollmentApplicationTableRow
                 key={application.applicationId}
                 application={application}
-                canApprove={canApprove}
-                canReject={canReject}
+                canApprove={canApprove && application.canApprove === true}
+                canReject={canReject && application.canReject === true}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
                 detailHref={
@@ -117,8 +120,12 @@ export function EnrollmentApplicationTablePresentation({
           application={{
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
+            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
+            canConfirm: applicationToApprove.canConfirm,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName,
+            studyPlanName: applicationToApprove.studyPlanName
+              ? formatStudyPlanLabel(applicationToApprove)
+              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -129,8 +136,12 @@ export function EnrollmentApplicationTablePresentation({
           application={{
             institutionId: applicationToApprove.institutionId,
             applicationId: applicationToApprove.applicationId,
+            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
+            canConfirm: applicationToApprove.canConfirm,
             applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName,
+            studyPlanName: applicationToApprove.studyPlanName
+              ? formatStudyPlanLabel(applicationToApprove)
+              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleApproveDialogOpenChange}
@@ -144,7 +155,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName,
+            studyPlanName: applicationToReject.studyPlanName
+              ? formatStudyPlanLabel(applicationToReject)
+              : applicationToReject.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}
@@ -156,7 +169,9 @@ export function EnrollmentApplicationTablePresentation({
             institutionId: applicationToReject.institutionId,
             applicationId: applicationToReject.applicationId,
             applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName,
+            studyPlanName: applicationToReject.studyPlanName
+              ? formatStudyPlanLabel(applicationToReject)
+              : applicationToReject.trainingPathName || "Sin trayecto formativo",
           }}
           open
           onOpenChange={handleRejectDialogOpenChange}

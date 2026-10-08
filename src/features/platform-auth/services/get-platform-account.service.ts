@@ -1,14 +1,18 @@
 import "server-only";
 
 import { cache } from "react";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { requireGenericPlatformHost } from "@common/services/institutional-host/institutional-host.service";
 import { getPlatformAccessToken } from "@features/platform-auth/services/get-platform-access-token.service";
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 
 async function fetchPlatformAccount(): Promise<PlatformAccount | null> {
+  requireGenericPlatformHost(await headers());
+
   const accessToken = await getPlatformAccessToken();
 
   if (!accessToken) return null;

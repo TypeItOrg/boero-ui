@@ -7,8 +7,9 @@ import { usePathname } from "next/navigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
 const SEGMENT_LABELS: Readonly<Record<string, string>> = {
+  documentation: "Documentación",
   people: "Usuarios",
-  new: "Nuevo usuario",
+  new: "Nuevo",
   account: "Cuenta",
   edit: "Editar",
   password: "Contraseña",
@@ -32,6 +33,12 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   "guardian-links": "Solicitudes de vinculación",
   "my-dependents": "Mis personas a cargo",
   "my-enrollment-applications": "Mis inscripciones",
+  "course-enrollments": "Cursadas",
+  "my-course-enrollments": "Mis materias",
+  "my-schedules": "Mis horarios",
+  "my-teaching": "Mis clases",
+  schedules: "Mis horarios",
+  waitlist: "Lista de espera",
 };
 
 type BreadcrumbSegment = {

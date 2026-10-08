@@ -5,6 +5,7 @@ import { FieldGroup } from "@common/components/ui/field";
 import { DropdownField, TextField } from "@features/institutional-auth/components/institutional-profile-fields";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { CityDropdown, CountryDropdown } from "@features/locations/components/location-dropdowns";
+import { SectionHeader } from "@common/components/section-header";
 
 type LocationSectionProps = {
   fieldErrors: Record<string, string>;
@@ -24,15 +25,7 @@ export function InstitutionalProfileLocationSection({
   return (
     <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
       <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <MapPinIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold">Ubicación</h2>
-            <p className="text-muted-foreground text-sm">Completá tu nacionalidad, ciudad de nacimiento y domicilio.</p>
-          </div>
-        </div>
+        <SectionHeader icon={MapPinIcon} title="Ubicación" description="Completá tu nacionalidad, ciudad de nacimiento y domicilio." />
       </header>
       <div className="mt-4 sm:mt-5">
         <FieldGroup className="flex flex-row flex-wrap items-start gap-4">

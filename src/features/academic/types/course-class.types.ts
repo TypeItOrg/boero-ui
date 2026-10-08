@@ -2,6 +2,7 @@ import type { CourseWeekDay } from "@features/academic/types/course-week-day.typ
 
 export type CourseClass = {
   id: string;
+  classNumber: number;
   teachers: { personId: string; fullName: string }[];
   days: {
     dayOfWeek: CourseWeekDay;

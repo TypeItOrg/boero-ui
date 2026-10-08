@@ -1,3 +1,4 @@
+import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
@@ -123,7 +124,7 @@ function mapTrainingPath(item: TrainingPath): Omit<AcademicRecentItem, "resource
 function mapStudyPlan(item: StudyPlan): Omit<AcademicRecentItem, "resource" | "section"> {
   return {
     id: item.id,
-    label: item.name,
+    label: formatStudyPlanLabel(item),
     detail: studyPlanStatusLabels[item.status],
     active: item.status === "ACTIVE",
   };
@@ -150,7 +151,7 @@ function mapInstrument(item: Instrument): Omit<AcademicRecentItem, "resource" | 
 function mapCourse(item: Course): Omit<AcademicRecentItem, "resource" | "section"> {
   return {
     id: item.id,
-    label: `${item.academicSpaceName} · ${item.studyPlanName}`,
+    label: `${item.academicSpaceName} · ${formatStudyPlanName(item)}`,
     detail: `${item.year}`,
     active: item.active,
   };

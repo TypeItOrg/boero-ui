@@ -98,6 +98,10 @@ describe("getInstitutionalNavigationSections", () => {
       expect.objectContaining({ title: "Nueva inscripción", url: "/enrollment" }),
       expect.objectContaining({ title: "Mis inscripciones", url: "/my-enrollment-applications" }),
     ]);
+    expect(sections.find((section) => section.label === "Formación")?.items).toEqual([
+      expect.objectContaining({ title: "Mis materias", url: "/my-course-enrollments" }),
+      expect.objectContaining({ title: "Mis horarios", url: "/my-schedules" }),
+    ]);
   });
 
   it("hides academic navigation for guardians while keeping enrollment access", () => {
@@ -174,5 +178,16 @@ describe("getInstitutionalNavigationSections", () => {
     const personalSection = sections.find((section) => section.label === "Personal");
 
     expect(personalSection).toEqual({ label: "Personal", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
+  });
+  it("shows teaching without granting administration and preserves student access for teachers", () => {
+    const items = getInstitutionalNavigationSections({ ...USER, roles: ["Profesor", "Estudiante"] }).flatMap((section) => section.items);
+    expect(items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ url: "/my-teaching" }),
+        expect.objectContaining({ url: "/my-course-enrollments" }),
+        expect.objectContaining({ url: "/enrollment" }),
+      ]),
+    );
+    expect(items).not.toEqual(expect.arrayContaining([expect.objectContaining({ url: "/course-enrollments" })]));
   });
 });

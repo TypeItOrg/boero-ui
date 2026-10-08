@@ -1,13 +1,14 @@
 "use client";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import * as React from "react";
 import { EllipsisVerticalIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
@@ -52,7 +53,12 @@ export function MyEnrollmentApplicationTableRow({
               <div className="flex justify-start">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${application.studyPlanName}`} disabled={isCancelOpen}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Abrir acciones de ${application.trainingPathName ?? "la solicitud"}`}
+                      disabled={isCancelOpen}
+                    >
                       <EllipsisVerticalIcon />
                     </Button>
                   </DropdownMenuTrigger>
@@ -63,14 +69,17 @@ export function MyEnrollmentApplicationTableRow({
                       </ReturnToLink>
                     </DropdownMenuItem>
                     {canCancel ? (
-                      <DropdownMenuItem
-                        variant="destructive"
-                        className="px-2.5 py-1.5"
-                        onSelect={() => setIsCancelOpen(true)}
-                        disabled={isCancelOpen}
-                      >
-                        Cancelar
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          className="px-2.5 py-1.5"
+                          onSelect={() => setIsCancelOpen(true)}
+                          disabled={isCancelOpen}
+                        >
+                          Cancelar
+                        </DropdownMenuItem>
+                      </>
                     ) : null}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -84,7 +93,9 @@ export function MyEnrollmentApplicationTableRow({
                 <span className="text-muted-foreground block text-xs">{getSubmitterNote(application, currentPersonId)}</span>
               </TableCell>
             ) : null}
-            <TableCell className="font-medium">{application.studyPlanName}</TableCell>
+            <TableCell className="font-medium">
+              <OptionalValue value={application.trainingPathName} fallback="Sin trayecto formativo" />
+            </TableCell>
             <TableCell>{application.academicYear}</TableCell>
             <TableCell className="text-muted-foreground">{formatEnrollmentApplicationDate(application.createdAt)}</TableCell>
             <TableCell>
@@ -94,7 +105,10 @@ export function MyEnrollmentApplicationTableRow({
               {application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED && application.rejectionReason ? (
                 <span className="text-destructive">{application.rejectionReason}</span>
               ) : (
-                <span className="text-muted-foreground/60">—</span>
+                <OptionalValue
+                  value={null}
+                  fallback={application.status === ENROLLMENT_APPLICATION_STATUS.REJECTED ? "Sin motivo informado" : "No corresponde"}
+                />
               )}
             </TableCell>
           </TableRow>
@@ -106,9 +120,12 @@ export function MyEnrollmentApplicationTableRow({
             </ReturnToLink>
           </ContextMenuItem>
           {canCancel ? (
-            <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => setIsCancelOpen(true)} disabled={isCancelOpen}>
-              Cancelar
-            </ContextMenuItem>
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem variant="destructive" className="px-2.5 py-1.5" onSelect={() => setIsCancelOpen(true)} disabled={isCancelOpen}>
+                Cancelar
+              </ContextMenuItem>
+            </>
           ) : null}
         </ContextMenuContent>
       </ContextMenu>

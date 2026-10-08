@@ -1,5 +1,7 @@
 "use client";
 
+import { ActionForm } from "@common/components/action-form";
+
 import * as React from "react";
 import { useActionState, useState } from "react";
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
@@ -116,7 +118,7 @@ export function StudyPlanStatusDialog({
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent className={config.needsEffectiveTo ? "sm:max-w-lg" : undefined}>
-        <form action={formAction}>
+        <ActionForm action={formAction}>
           <AlertDialogHeader>
             <div className={cn(config.iconClassName, "mb-1 flex size-12 items-center justify-center rounded-2xl")}>
               <Icon />
@@ -165,7 +167,7 @@ export function StudyPlanStatusDialog({
               {isPending ? config.pendingLabel : config.actionLabel}
             </Button>
           </AlertDialogFooter>
-        </form>
+        </ActionForm>
       </AlertDialogContent>
     </AlertDialog>
   );

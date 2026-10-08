@@ -9,10 +9,20 @@ import {
 } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 
 describe("startEnrollmentApplicationSchema", () => {
-  const base = { studyPlanId: "00000000-0000-4000-8000-000000000001", academicYearId: "00000000-0000-4000-8000-000000000002" };
+  const base = { trainingPathId: "00000000-0000-4000-8000-000000000001" };
 
   it("accepts a self application without applicantPersonId", () => {
     expect(startEnrollmentApplicationSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("accepts an optional enrollment period and academic year", () => {
+    const input = {
+      ...base,
+      enrollmentPeriodId: "00000000-0000-4000-8000-000000000002",
+      academicYearId: "00000000-0000-4000-8000-000000000003",
+    };
+
+    expect(startEnrollmentApplicationSchema.parse(input)).toEqual(input);
   });
 
   it("accepts an application on behalf of a dependent", () => {
@@ -23,6 +33,14 @@ describe("startEnrollmentApplicationSchema", () => {
 
   it("rejects an applicantPersonId that is not a UUID", () => {
     expect(startEnrollmentApplicationSchema.safeParse({ ...base, applicantPersonId: "not-a-uuid" }).success).toBe(false);
+  });
+
+  it("rejects a missing trainingPathId", () => {
+    expect(startEnrollmentApplicationSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("rejects a trainingPathId that is not a UUID", () => {
+    expect(startEnrollmentApplicationSchema.safeParse({ ...base, trainingPathId: "not-a-uuid" }).success).toBe(false);
   });
 });
 
@@ -70,7 +88,12 @@ describe("enrollment-application.schema", () => {
     it("validates academicBackgroundSchema", () => {
       expect(
         academicBackgroundSchema.safeParse({
-          secondarySchool: "Colegio Nacional",
+          schoolOrigin: "Colegio Nacional",
+          currentlyStudying: false,
+          educationLevel: "SECONDARY",
+          currentGradeYear: null,
+          levelCompleted: null,
+          secondaryDegreeTitle: null,
           secondaryCompleted: true,
         }).success,
       ).toBe(true);
@@ -108,6 +131,13 @@ describe("enrollment-application.schema", () => {
   });
 
   describe("enrollmentApplicationSubmissionSchema (conditional rules)", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date("2026-09-26T12:00:00Z"));
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
     const baseValidAdult = {
       personalData: {
         firstName: "Ana",
@@ -118,7 +148,10 @@ describe("enrollment-application.schema", () => {
         email: "ana@example.com",
       },
       academicBackground: {
-        secondarySchool: "Instituto San José",
+        schoolOrigin: "Instituto San José",
+        currentlyStudying: false,
+        educationLevel: "SECONDARY",
+        levelCompleted: null,
         currentGradeYear: "2013",
         secondaryCompleted: true,
         secondaryDegreeTitle: "Bachiller",
@@ -127,15 +160,16 @@ describe("enrollment-application.schema", () => {
         receivesReasonableAdjustments: false,
       },
       responsible: {},
+      courses: [{ courseId: "00000000-0000-4000-8000-000000000001", preferredTeacherId: null }],
       preference: {
         preferredShift: "AFTERNOON",
         allowsImageUse: true,
         isReenrolling: false,
       },
       attachments: [
-        { id: "1", attachmentType: "DNI_FRONT", originalFileName: "dni-frente.jpg" },
-        { id: "2", attachmentType: "DNI_BACK", originalFileName: "dni-dorso.jpg" },
-        { id: "3", attachmentType: "PHOTO_ID", originalFileName: "foto.jpg" },
+        { id: "1", requirementId: "00000000-0000-4000-8000-000000000001", originalFileName: "dni-frente.jpg" },
+        { id: "2", requirementId: "00000000-0000-4000-8000-000000000002", originalFileName: "dni-dorso.jpg" },
+        { id: "3", requirementId: "00000000-0000-4000-8000-000000000003", originalFileName: "foto.jpg" },
       ],
     };
 
@@ -223,7 +257,7 @@ describe("enrollment-application.schema", () => {
       }
     });
 
-    it("requires health report attachment and support details if receivesReasonableAdjustments is true", () => {
+    it("requires support details if receivesReasonableAdjustments is true", () => {
       const healthSupportData = {
         ...baseValidAdult,
         healthInclusion: {

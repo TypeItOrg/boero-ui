@@ -31,7 +31,7 @@ export function TimeInputWithIcon({
     <TimeField
       id={id}
       aria-label={label}
-      className="group/time-field"
+      className="group/time-field w-fit"
       isDisabled={disabled}
       isInvalid={invalid}
       isRequired={required}

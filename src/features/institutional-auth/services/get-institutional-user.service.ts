@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 
-import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { authenticatedApiFetch } from "@common/services/authenticated-api-fetch.service";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { getInstitutionalAccessToken } from "@features/institutional-auth/services/get-institutional-access-token.service";
 import { parseInstitutionalUser } from "@features/institutional-auth/schemas/institutional-user.schema";
@@ -13,10 +13,7 @@ async function fetchInstitutionalUser(): Promise<InstitutionalUser | null> {
   const accessToken = await getInstitutionalAccessToken();
   if (!accessToken) return null;
 
-  const response = await fetch(new URL("/api/v1/auth/me", getApiUrlOrThrow()), {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    cache: "no-store",
-  });
+  const response = await authenticatedApiFetch("/api/v1/auth/me", accessToken);
 
   if (response.status === 401) return null;
 

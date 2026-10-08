@@ -41,6 +41,12 @@ describe("EnrollmentStart", () => {
       startDate: "2026-01-01",
       endDate: "2026-12-31",
       status: "OPEN",
+      scopeConfigured: true,
+      limitedView: false,
+      canUpdate: false,
+      canChangeStatus: false,
+      canDelete: false,
+      offerings: [],
     },
   ];
 
@@ -55,7 +61,7 @@ describe("EnrollmentStart", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1" }));
+    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ trainingPathId: "plan-1" }));
     expect(mockPush).toHaveBeenCalledWith("/my-enrollment-applications/app-1");
   });
 
@@ -65,11 +71,11 @@ describe("EnrollmentStart", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /comenzar inscripción/i }));
 
-    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ studyPlanId: "plan-1", academicYearId: "year-1", applicantPersonId: "dep-1" }));
+    await waitFor(() => expect(startAction).toHaveBeenCalledWith({ trainingPathId: "plan-1", applicantPersonId: "dep-1" }));
   });
 
   it("shows an unavailable message when there are no options", () => {
     render(<EnrollmentStart studyPlans={[]} periods={[]} />);
-    expect(screen.getByText("No hay períodos de inscripción abiertos")).toBeInTheDocument();
+    expect(screen.getByText("No hay trayectos disponibles")).toBeInTheDocument();
   });
 });

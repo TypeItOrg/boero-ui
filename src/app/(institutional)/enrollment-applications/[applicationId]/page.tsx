@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ClipboardListIcon } from "lucide-react";
@@ -10,12 +11,13 @@ import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentApplicationResolvePanel } from "@features/enrollment-applications/components/enrollment-application-resolve-panel";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { fetchInstitutionalEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
+import { formatEnrollmentApplicationBreadcrumbLabel } from "@features/enrollment-applications/utils/enrollment-application-breadcrumb.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
-import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
+import { hasInstitutionalPermission, hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -51,14 +53,18 @@ export default async function EnrollmentApplicationDetailPage({
   const reviewSummary = {
     institutionId: user.institutionId,
     applicationId,
+    canApproveProvisionally: application.canApproveProvisionally,
+    canConfirm: application.canConfirm,
     applicantName,
-    studyPlanName: application.studyPlanName || "—",
+    studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "Sin plan de estudio",
   };
 
   return (
     <PlatformPageShell
       title={applicantName}
-      breadcrumb={<InstitutionalBreadcrumb segmentLabels={{ [applicationId]: applicantName }} />}
+      breadcrumb={
+        <InstitutionalBreadcrumb segmentLabels={{ [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName) }} />
+      }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <div className="flex flex-col gap-3 @2xl/page-shell:flex-row @2xl/page-shell:items-center @2xl/page-shell:justify-between">
@@ -69,12 +75,34 @@ export default async function EnrollmentApplicationDetailPage({
         <EnrollmentApplicationResolvePanel
           application={reviewSummary}
           status={application.status}
-          canApprove={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE)}
-          canReject={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT)}
+          canApprove={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE, application.trainingPathId ?? "")}
+          canReject={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT, application.trainingPathId ?? "")}
         />
       </div>
 
-      <EnrollmentStatusCard application={application} showApplicantAlert={false} scope={AcademicScope.INSTITUTIONAL} />
+      <EnrollmentStatusCard
+        application={application}
+        showApplicantAlert={false}
+        showRequirementChanges
+        administrativeView
+        scope={AcademicScope.INSTITUTIONAL}
+        canManageCourses={
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_READ, application.trainingPathId ?? "") ||
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL, application.trainingPathId ?? "") ||
+          hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT, application.trainingPathId ?? "")
+        }
+        canEnrollCourses={hasTrainingPathPermission(
+          user,
+          INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_ENROLL,
+          application.trainingPathId ?? "",
+        )}
+        canRejectCourses={hasTrainingPathPermission(
+          user,
+          INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_COURSE_REJECT,
+          application.trainingPathId ?? "",
+        )}
+        canReadCourseWaitlist={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ, application.trainingPathId ?? "")}
+      />
     </PlatformPageShell>
   );
 }

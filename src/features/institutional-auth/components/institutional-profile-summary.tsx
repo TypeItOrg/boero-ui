@@ -1,7 +1,10 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { OptionalValue } from "@common/components/optional-value";
 import * as React from "react";
 import { HomeIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionalProfileSummaryProps = {
   person: InstitutionalPerson;
@@ -16,13 +19,13 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
         </header>
         <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <ProfileValue label="Nombre completo" value={`${person.firstName} ${person.lastName}`} />
-            <ProfileValue label="Documento" value={person.documentNumber} />
-            <ProfileValue label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
-            <ProfileValue label="Email" value={person.email} />
-            <ProfileValue label="Teléfono" value={person.phoneNumber} />
-            <ProfileValue label="Nacionalidad" value={person.nationalityCountry?.name} />
-            <ProfileValue label="Ciudad natal" value={person.birthCity?.name} />
+            <ProfileValue fallback="Sin nombre registrado" label="Nombre completo" value={`${person.firstName} ${person.lastName}`} />
+            <ProfileValue fallback="Sin documento" label="Documento" value={person.documentNumber} />
+            <ProfileValue fallback="Sin fecha de nacimiento" label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
+            <ProfileValue fallback="Sin correo electrónico" label="Email" value={person.email} />
+            <ProfileValue fallback="Sin teléfono" label="Teléfono" value={person.phoneNumber} />
+            <ProfileValue fallback="Sin nacionalidad informada" label="Nacionalidad" value={person.nationalityCountry?.name} />
+            <ProfileValue fallback="Sin ciudad natal informada" label="Ciudad natal" value={person.birthCity?.name} />
           </dl>
         </div>
       </div>
@@ -32,9 +35,9 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
         </header>
         <div className="mt-4 sm:mt-5">
           <dl className="grid gap-4 sm:grid-cols-2">
-            <ProfileValue label="Dirección" value={formatAddress(person)} />
-            <ProfileValue label="Barrio" value={person.address?.neighborhood} />
-            <ProfileValue label="Información adicional" value={person.address?.additionalInfo} />
+            <ProfileValue fallback="Sin dirección" label="Dirección" value={formatAddress(person)} />
+            <ProfileValue fallback="Sin barrio informado" label="Barrio" value={person.address?.neighborhood} />
+            <ProfileValue fallback="Sin información adicional" label="Información adicional" value={person.address?.additionalInfo} />
           </dl>
         </div>
       </div>
@@ -43,37 +46,33 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
 }
 
 function ProfileSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
-  return (
-    <div className="flex items-center gap-3.5">
-      <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-        <Icon className="size-5" aria-hidden="true" />
-      </div>
-      <div className="min-w-0">
-        <h2 className="text-foreground font-semibold">{title}</h2>
-        <p className="text-muted-foreground text-sm">{description}</p>
-      </div>
-    </div>
-  );
+  return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
-function ProfileValue({ label, value }: { label: string; value?: string | null }): React.ReactElement {
+function ProfileValue({ label, value, fallback }: { label: string; value?: string | null; fallback: string }): React.ReactElement {
   return (
     <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">{label}</dt>
-      <dd className="mt-1 text-sm font-medium">{value || "—"}</dd>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
+      <dd className="mt-1 text-sm font-medium">
+        <OptionalValue value={value} fallback={fallback} />
+      </dd>
     </div>
   );
 }
 
-function formatDate(value: string | null): string {
-  if (!value) return "—";
+function formatDate(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
   const [year, month, day] = value.split("-");
   return year && month && day ? `${day}/${month}/${year}` : value;
 }
 
-function formatAddress(person: InstitutionalPerson): string {
+function formatAddress(person: InstitutionalPerson): string | null {
   const address = person.address;
-  if (!address) return "—";
+  if (!address) {
+    return null;
+  }
   return [
     address.street,
     address.number,

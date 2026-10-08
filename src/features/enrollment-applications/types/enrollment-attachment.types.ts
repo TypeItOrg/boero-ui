@@ -1,8 +1,6 @@
-import type { EnrollmentDocumentType } from "@features/enrollment-applications/types/enrollment-document-type.types";
-
 export interface EnrollmentAttachment {
   id: string;
-  attachmentType: EnrollmentDocumentType;
+  requirementId: string;
   originalFileName: string;
   contentType?: string;
   size?: number;

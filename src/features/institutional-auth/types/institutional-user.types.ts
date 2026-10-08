@@ -1,3 +1,5 @@
+import type { PermissionAccess } from "@features/institutional-auth/types/permission-access.types";
+
 export type InstitutionalUser = {
   userId: string;
   personId?: string | null;
@@ -7,4 +9,5 @@ export type InstitutionalUser = {
   institutionId: string;
   roles: readonly string[];
   permissions: readonly string[];
+  permissionScopes?: Readonly<Record<string, PermissionAccess>>;
 };

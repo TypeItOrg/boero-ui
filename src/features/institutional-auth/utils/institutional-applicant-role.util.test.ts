@@ -22,20 +22,12 @@ function createUser(roles: string[], permissions: string[] = []): InstitutionalU
 
 describe("institutional applicant role utils", () => {
   describe("canStartEnrollmentApplication", () => {
-    it.each(["Postulante", "Tutor"])("allows a %s that can read the academic offer", (role) => {
-      const user = createUser([role], [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ]);
-
-      expect(canStartEnrollmentApplication(user)).toBe(true);
+    it.each(["Postulante", "Estudiante", "Tutor"])("allows a %s", (role) => {
+      expect(canStartEnrollmentApplication(createUser([role]))).toBe(true);
     });
 
-    it("requires the academic offer permission", () => {
-      expect(canStartEnrollmentApplication(createUser(["Tutor"]))).toBe(false);
-    });
-
-    it.each(["Estudiante", "Profesor", "Administrativo", "Administrador Institucional"])("does not allow a %s", (role) => {
-      const user = createUser([role], [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ]);
-
-      expect(canStartEnrollmentApplication(user)).toBe(false);
+    it.each(["Profesor", "Administrativo", "Administrador Institucional"])("does not allow a %s", (role) => {
+      expect(canStartEnrollmentApplication(createUser([role]))).toBe(false);
     });
   });
 
@@ -44,8 +36,8 @@ describe("institutional applicant role utils", () => {
       expect(canViewOwnEnrollmentApplications(createUser([role]))).toBe(true);
     });
 
-    it("hides the applicant views from staff even when they are also guardians", () => {
-      expect(canViewOwnEnrollmentApplications(createUser(["Tutor", "Administrativo"]))).toBe(false);
+    it("keeps the applicant views for staff who are also guardians", () => {
+      expect(canViewOwnEnrollmentApplications(createUser(["Tutor", "Administrativo"]))).toBe(true);
     });
   });
 

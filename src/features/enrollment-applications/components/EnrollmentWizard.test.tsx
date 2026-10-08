@@ -1,14 +1,9 @@
-jest.mock("@features/enrollment-applications/services/enrollment-spaces-client.service", () => ({ fetchEnrollmentSpaces: jest.fn() }));
-jest.mock("@features/enrollment-applications/actions/change-enrollment-career.action", () => ({ changeEnrollmentCareerAction: jest.fn() }));
-import { fetchEnrollmentSpaces } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
-import { changeEnrollmentCareerAction } from "@features/enrollment-applications/actions/change-enrollment-career.action";
 import * as React from "react";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
-import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
-import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
+import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -38,10 +33,28 @@ import {
   cancelEnrollmentApplicationAction,
 } from "@features/enrollment-applications/actions/enrollment-application.actions";
 
+jest.mock("@features/enrollment-applications/actions/documentation.actions", () => ({
+  mutateDocument: jest.fn(),
+}));
+
 const updateAction = jest.mocked(updateEnrollmentDraftAction);
 const submitAction = jest.mocked(submitEnrollmentApplicationAction);
 const cancelAction = jest.mocked(cancelEnrollmentApplicationAction);
-const fetchStudyPlanSpacesAction = jest.mocked(fetchEnrollmentSpaces);
+
+const COURSE_OPTION: EnrollmentCourseOption = {
+  courseId: "00000000-0000-4000-8000-000000000001",
+  studyPlanSpaceId: "00000000-0000-4000-8000-000000000002",
+  academicSpaceName: "Práctica de Conjunto",
+  academicLevelName: null,
+  studyPlanName: "Plan 2026",
+  trainingPathName: "Guitarra",
+  format: "GRUPAL",
+  instrumentId: null,
+  instrumentName: null,
+  academicYear: 2026,
+  eligibility: { eligible: true, requirements: [] },
+  hasCapacity: true,
+};
 
 const BASE: EnrollmentApplicationResponse = {
   applicationId: "app-1",
@@ -60,7 +73,8 @@ const BASE: EnrollmentApplicationResponse = {
 const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
   ...BASE,
   data: {
-    academicSpaceSelection: { studyPlanSpaceIds: ["s-1"] },
+    careerSelection: { trainingPathId: "00000000-0000-4000-8000-000000000003" },
+    courses: [{ courseId: "00000000-0000-4000-8000-000000000001", preferredTeacherId: null }],
     personalData: {
       firstName: "Lucas",
       lastName: "Mendoza",
@@ -69,20 +83,28 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
       phoneNumber: "3534999888",
       email: "lucas@example.com",
     },
-    academicBackground: { secondarySchool: "Colegio Nacional", secondaryCompleted: true },
+    academicBackground: {
+      currentlyStudying: false,
+      educationLevel: "SECONDARY",
+      schoolOrigin: "Colegio Nacional",
+      currentGradeYear: null,
+      levelCompleted: null,
+      secondaryCompleted: true,
+      secondaryDegreeTitle: null,
+    },
     healthInclusion: { receivesReasonableAdjustments: false },
     responsible: {},
     preference: { preferredShift: "MORNING", allowsImageUse: true, isReenrolling: false },
     attachments: [
-      { id: "a1", attachmentType: "DNI_FRONT", originalFileName: "dni-f.png" },
-      { id: "a2", attachmentType: "DNI_BACK", originalFileName: "dni-d.png" },
-      { id: "a3", attachmentType: "PHOTO_ID", originalFileName: "foto.png" },
+      { id: "a1", requirementId: "00000000-0000-4000-8000-000000000004", originalFileName: "dni-f.png" },
+      { id: "a2", requirementId: "00000000-0000-4000-8000-000000000005", originalFileName: "dni-d.png" },
+      { id: "a3", requirementId: "00000000-0000-4000-8000-000000000006", originalFileName: "foto.png" },
     ],
   },
 };
 
 function renderWizard(props: Partial<React.ComponentProps<typeof EnrollmentWizard>> = {}): ReturnType<typeof render> {
-  return render(<EnrollmentWizard initialApplication={BASE} initialStudyPlanSpaces={[]} initialTrainingPaths={[]} {...props} />);
+  return render(<EnrollmentWizard initialApplication={BASE} initialCourseOptions={[COURSE_OPTION]} {...props} />);
 }
 
 async function confirmSubmission(): Promise<void> {
@@ -98,7 +120,6 @@ describe("EnrollmentWizard", () => {
     // (aunque el usuario no haya tocado nada todavía), así que sin esto la
     // promesa sin resolver revienta el efecto en cada test.
     updateAction.mockResolvedValue({ application: BASE });
-    fetchStudyPlanSpacesAction.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -119,7 +140,12 @@ describe("EnrollmentWizard", () => {
 
     await screen.findByLabelText(/^nombre/i);
     await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    const schoolInput = await screen.findByLabelText(/colegio secundario/i);
+    await userEvent.click(screen.getByRole("combobox", { name: /actualmente asistís/i }));
+    await userEvent.click(screen.getByRole("option", { name: "Sí" }));
+    await userEvent.click(screen.getByRole("combobox", { name: /nivel educativo actual/i }));
+    await userEvent.click(screen.getByRole("option", { name: /secundari/i }));
+    const schoolInput = await screen.findByLabelText(/institución educativa actual/i);
+    updateAction.mockClear();
 
     jest.useFakeTimers();
     try {
@@ -134,7 +160,7 @@ describe("EnrollmentWizard", () => {
 
     await waitFor(() => expect(updateAction).toHaveBeenCalled());
     const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-    expect(payload.data.academicBackground?.secondarySchool).toBe("Colegio Nacional");
+    expect(payload.data.academicBackground?.schoolOrigin).toBe("Colegio Nacional");
   });
 
   it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
@@ -208,172 +234,24 @@ describe("EnrollmentWizard", () => {
     expect(screen.getByRole("tab", { name: /tutor legal/i })).toBeInTheDocument();
   });
 
-  it("names the dependent being enrolled and marks the missing email as not applicable", async () => {
+  it("keeps the training path outside the editable wizard", async () => {
     renderWizard({
       initialApplication: {
         ...BASE,
-        submittedByPersonId: "guardian-1",
-        data: { personalData: { firstName: "Mateo", lastName: "Gonzalez", birthDate: "2015-05-12" } },
+        data: { careerSelection: { trainingPathId: "tp-1" } },
       },
     });
 
-    expect(await screen.findByText("Inscribiendo a: Mateo Gonzalez")).toBeInTheDocument();
-    expect(screen.getByLabelText(/correo electrónico/i)).toHaveValue("No aplica");
+    expect(screen.queryByRole("tab", { name: /trayecto formativo/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /cursos/i })).toBeInTheDocument();
   });
-
-  it("does not show the enrolling notice when applying for yourself", async () => {
-    renderWizard({ initialApplication: { ...BASE, submittedByPersonId: BASE.personId } });
-
+  it("preserves saved courses and teacher preferences outside the loaded catalog page", async () => {
+    const courses = [{ courseId: "00000000-0000-4000-8000-000000000099", preferredTeacherId: "00000000-0000-4000-8000-000000000098" }];
+    renderWizard({ initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } } });
     await screen.findByLabelText(/^nombre/i);
-    expect(screen.queryByText(/Inscribiendo a:/)).not.toBeInTheDocument();
-  });
-
-  it("renders training-path and spaces tabs and loads their data", async () => {
-    const trainingPaths: TrainingPath[] = [
-      { id: "tp-1", name: "Formación Básica en Guitarra", description: "Trayecto inicial", active: true, institutionId: "inst-1" },
-    ];
-    const studyPlanSpaces: StudyPlanSpace[] = [
-      {
-        id: "s-1",
-        studyPlanId: "plan-1",
-        academicSpaceId: "as-1",
-        academicSpaceName: "Práctica de Conjunto",
-        academicLevelId: null,
-        academicLevelName: null,
-        requirementType: "REQUIRED",
-        displayOrder: 1,
-        approvalMode: "PROMOTION",
-        requiresInstrument: false,
-        allowedInstruments: [],
-      },
-    ];
-
-    renderWizard({ initialTrainingPaths: trainingPaths, initialStudyPlanSpaces: studyPlanSpaces });
-
-    expect(await screen.findByRole("tab", { name: /trayecto formativo/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /espacios e instrumentos/i })).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole("tab", { name: /trayecto formativo/i }));
-    expect(await screen.findByText("Formación Básica en Guitarra")).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole("tab", { name: /espacios e instrumentos/i }));
-    expect(await screen.findByText("Práctica de Conjunto")).toBeInTheDocument();
-  });
-
-  it("clears previously selected spaces and instruments when the applicant changes training path", async () => {
-    const DRAFT_WITH_CAREER: EnrollmentApplicationResponse = {
-      ...BASE,
-      data: {
-        careerSelection: { trainingPathId: "tp-1" },
-        academicSpaceSelection: { studyPlanSpaceIds: ["s-1"] },
-        instrumentSelection: { studyPlanSpaceInstrumentIds: { "s-1": "inst-1" } },
-      },
-    };
-
-    jest.mocked(changeEnrollmentCareerAction).mockResolvedValue({
-      application: {
-        ...DRAFT_WITH_CAREER,
-        data: {
-          careerSelection: { trainingPathId: "tp-2" },
-          academicSpaceSelection: { studyPlanSpaceIds: [] },
-          instrumentSelection: { studyPlanSpaceInstrumentIds: {} },
-        },
-      },
-    });
-    updateAction.mockResolvedValue({ application: DRAFT_WITH_CAREER });
-    const trainingPaths: TrainingPath[] = [
-      { id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" },
-      { id: "tp-2", name: "Piano", description: "", active: true, institutionId: "inst-1" },
-    ];
-    const studyPlanSpaces: StudyPlanSpace[] = [
-      {
-        id: "s-1",
-        studyPlanId: "plan-1",
-        academicSpaceId: "as-1",
-        academicSpaceName: "Práctica de Conjunto",
-        academicLevelId: null,
-        academicLevelName: null,
-        requirementType: "REQUIRED",
-        displayOrder: 1,
-        approvalMode: "PROMOTION",
-        requiresInstrument: true,
-        allowedInstruments: [{ instrumentId: "inst-1", name: "Guitarra" }],
-      },
-    ];
-    fetchStudyPlanSpacesAction.mockResolvedValue(studyPlanSpaces);
-
-    renderWizard({ initialApplication: DRAFT_WITH_CAREER, initialTrainingPaths: trainingPaths, initialStudyPlanSpaces: studyPlanSpaces });
-
-    const tab = await screen.findByRole("tab", { name: /trayecto formativo/i });
-    await userEvent.click(tab);
-    expect(await screen.findByText("Guitarra")).toBeInTheDocument();
-
-    jest.useFakeTimers();
-    try {
-      fireEvent.click(screen.getByText("Piano"));
-
-      act(() => {
-        jest.advanceTimersByTime(900);
-      });
-    } finally {
-      jest.useRealTimers();
-    }
-
-    await waitFor(() => {
-      const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
-      expect(payload.data.careerSelection).toEqual({ trainingPathId: "tp-2" });
-      expect(payload.data.academicSpaceSelection).toEqual({ studyPlanSpaceIds: [] });
-      expect(payload.data.instrumentSelection).toBeUndefined();
-    });
-  });
-
-  it("blocks submission when an available training path was not selected", async () => {
-    updateAction.mockResolvedValue({ application: COMPLETE_DRAFT });
-
-    renderWizard({
-      initialApplication: COMPLETE_DRAFT,
-      initialTrainingPaths: [{ id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" }],
-    });
-
-    await screen.findByDisplayValue("Lucas");
-    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
-    await confirmSubmission();
-
-    const dialog = await screen.findByRole("alertdialog");
-    expect(within(dialog).getByText("Hay 1 campo obligatorio incompleto.")).toBeInTheDocument();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Volver" }));
-    expect(screen.getAllByText("Debés seleccionar un trayecto formativo.")).toHaveLength(2);
-    expect(screen.getByRole("tab", { name: /trayecto formativo/i })).toHaveAttribute("data-state", "active");
-    expect(submitAction).not.toHaveBeenCalled();
-  });
-
-  it("blocks submission after spaces fail to reload for a changed training path", async () => {
-    const application: EnrollmentApplicationResponse = {
-      ...COMPLETE_DRAFT,
-      data: { ...COMPLETE_DRAFT.data, careerSelection: { trainingPathId: "tp-1" } },
-    };
-    const trainingPaths: TrainingPath[] = [
-      { id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" },
-      { id: "tp-2", name: "Piano", description: "", active: true, institutionId: "inst-1" },
-    ];
-    updateAction.mockResolvedValue({ application: COMPLETE_DRAFT });
-    fetchStudyPlanSpacesAction.mockRejectedValue(new Error("network error"));
-    jest.mocked(changeEnrollmentCareerAction).mockResolvedValue({
-      application: { ...application, data: { ...application.data, careerSelection: { trainingPathId: "tp-2" } } },
-    });
-
-    renderWizard({ initialApplication: application, initialTrainingPaths: trainingPaths });
-
-    await screen.findByDisplayValue("Lucas");
-    await userEvent.click(screen.getByRole("tab", { name: /trayecto formativo/i }));
-    fireEvent.click(screen.getByText("Piano"));
-    await waitFor(() => expect(fetchStudyPlanSpacesAction).toHaveBeenCalledWith("app-1"));
-    await userEvent.click(screen.getByRole("tab", { name: /preferencias/i }));
-    await confirmSubmission();
-
-    expect(await screen.findByText("No se pudieron cargar los espacios académicos. Reintentá antes de enviar.")).toBeInTheDocument();
-    fireEvent.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Volver" }));
-    expect(screen.getByRole("tab", { name: /espacios e instrumentos/i })).toHaveAttribute("data-state", "active");
-    expect(submitAction).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Otro colegio" } });
+    await waitFor(() => expect(updateAction).toHaveBeenCalled(), { timeout: 3000 });
+    expect(updateAction.mock.calls.at(-1)?.[1].data.courses).toEqual(courses);
   });
 });

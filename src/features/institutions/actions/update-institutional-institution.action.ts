@@ -8,9 +8,13 @@ import { institutionalApiFetch } from "@features/institutional-auth/services/ins
 import { institutionalInstitutionFormSchema } from "@features/institutions/schemas/institutional-institution-form.schema";
 import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
+import { parseInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
+import { saveInstitutionLogoChange } from "@features/institutions/services/save-institution-logo-change.service";
 
 export async function updateInstitutionalInstitutionAction(institutionId: string, formData: FormData): Promise<InstitutionActionState> {
-  if (!isValidUuid(institutionId)) return { error: INVALID_ACTION_ARGUMENTS };
+  if (!isValidUuid(institutionId)) {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
 
   const payload = {
     name: formData.get("name"),
@@ -28,6 +32,11 @@ export async function updateInstitutionalInstitutionAction(institutionId: string
     return getValidationActionState(parsed.error.issues, INSTITUTION_FORM_FIELD_NAMES);
   }
 
+  const logoChange = parseInstitutionLogoChange(formData);
+  if ("error" in logoChange) {
+    return { logoError: logoChange.error };
+  }
+
   const response = institutionalApiFetch(`/api/v1/institutions/${institutionId}`, {
     method: "PUT",
     headers: {
@@ -37,10 +46,14 @@ export async function updateInstitutionalInstitutionAction(institutionId: string
   });
 
   const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION);
-  if (errorState) return errorState;
+  if (errorState) {
+    return errorState;
+  }
+
+  const logoError = await saveInstitutionLogoChange(institutionId, "institutional", logoChange);
 
   revalidatePath("/institution");
   revalidatePath("/institution/edit");
   revalidatePath("/");
-  return { success: true };
+  return logoError ?? { success: true };
 }

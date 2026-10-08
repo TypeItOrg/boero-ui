@@ -36,20 +36,23 @@ export function EnrollmentApplicationResolvePanel({
     router.refresh();
   }
 
-  if (status !== ENROLLMENT_APPLICATION_STATUS.SUBMITTED || (!canApprove && !canReject)) {
+  if (
+    (status !== ENROLLMENT_APPLICATION_STATUS.SUBMITTED && status !== ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) ||
+    (!canApprove && !canReject)
+  ) {
     return null;
   }
 
   return (
     <>
       <div className="flex w-full flex-col gap-2 @2xl/page-shell:w-auto @2xl/page-shell:flex-row">
-        {canApprove ? (
+        {canApprove && (application.canApproveProvisionally || application.canConfirm) ? (
           <Button type="button" size="lg" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowApproveDialog(true)}>
             <BadgeCheckIcon aria-hidden="true" />
-            Aprobar inscripción
+            {application.canApproveProvisionally ? "Admitir provisoriamente" : "Confirmar inscripción definitiva"}
           </Button>
         ) : null}
-        {canReject ? (
+        {canReject && status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED ? (
           <Button type="button" size="lg" variant="destructive" className="w-full @2xl/page-shell:w-auto" onClick={() => setShowRejectDialog(true)}>
             <BanIcon aria-hidden="true" />
             Rechazar inscripción

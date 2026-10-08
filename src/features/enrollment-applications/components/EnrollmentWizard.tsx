@@ -4,10 +4,7 @@ import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import * as React from "react";
 import Link from "next/link";
-import { changeEnrollmentCareerAction } from "@features/enrollment-applications/actions/change-enrollment-career.action";
-import { fetchEnrollmentSpaces } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
-import type { ChangeEnrollmentCareerResult } from "@features/enrollment-applications/types/change-enrollment-career-result.types";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Loader2Icon,
   CheckCircle2Icon,
@@ -18,7 +15,6 @@ import {
   HeartHandshakeIcon,
   FileClockIcon,
   LibraryBigIcon,
-  RouteIcon,
   SlidersHorizontalIcon,
   UserRoundIcon,
   UsersRoundIcon,
@@ -46,23 +42,32 @@ import {
   submitEnrollmentApplicationAction,
 } from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { calculateAge, enrollmentApplicationSubmissionSchema } from "@features/enrollment-applications/schemas/enrollment-application.schema";
-import { EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import {
+  EDUCATION_LEVEL_OPTIONS,
+  SCHOOLING_EDUCATION_LEVEL_OPTIONS,
+} from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { EnrollmentDocuments } from "@features/enrollment-applications/components/enrollment-documents";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
-import { EnrollmentTrainingPathSelector } from "@features/enrollment-applications/components/EnrollmentTrainingPathSelector";
-import { EnrollmentStudyPlanSpacesSelector } from "@features/enrollment-applications/components/EnrollmentStudyPlanSpacesSelector";
+import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
-import type { TrainingPath } from "@features/academic/types/training-path.types";
+import { enrollmentCourseGroupKey } from "@features/enrollment-applications/utils/enrollment-course-group.util";
+import { fetchEnrollmentCourses } from "@features/enrollment-applications/services/enrollment-spaces-client.service";
 import type { Shift } from "@features/academic/types/shift.types";
-import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
+import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+import type {
+  EnrollmentAcademicBackground,
+  EnrollmentEducationLevel,
+} from "@features/enrollment-applications/types/enrollment-academic-background.types";
 import type { z } from "zod";
 
 interface EnrollmentWizardProps {
   initialApplication: EnrollmentApplicationResponse;
-  initialStudyPlanSpaces: readonly StudyPlanSpace[];
-  initialTrainingPaths: readonly TrainingPath[];
   initialShifts?: readonly Shift[];
+  initialCourseOptions?: readonly EnrollmentCourseOption[];
+  initialCourseOptionsPage?: number;
+  initialCourseOptionsTotalPages?: number;
   readOnly?: boolean;
   returnTo?: string;
 }
@@ -88,10 +93,14 @@ const FIELD_ID_BY_ERROR_PATH: Record<string, string> = {
   "personalData.firstName": "firstName",
   "personalData.lastName": "lastName",
   "personalData.documentNumber": "documentNumber",
-  "personalData.birthDate": "birthDate",
+  "personalData.birthDate": "birthDate-account-link",
   "personalData.phoneNumber": "phoneNumber",
   "personalData.email": "email",
-  "academicBackground.secondarySchool": "secondarySchool",
+  "academicBackground.currentlyStudying": "currentlyStudying",
+  "academicBackground.educationLevel": "educationLevel",
+  "academicBackground.schoolOrigin": "schoolOrigin",
+  "academicBackground.levelCompleted": "levelCompleted",
+  "academicBackground.secondaryCompleted": "secondaryCompleted",
   "healthInclusion.adjustmentDetails": "adjustmentDetails",
   "responsible.fullName": "responsibleFullName",
   "responsible.documentNumber": "responsibleDocumentNumber",
@@ -113,19 +122,106 @@ function parseInitialBirthDate(value: string | null | undefined): Date | undefin
   return isValid(date) ? date : undefined;
 }
 
+type SchoolingFormState = {
+  currentlyStudying: boolean | null;
+  educationLevel: EnrollmentEducationLevel | null;
+  schoolOrigin: string;
+  currentGradeYear: string;
+  levelCompleted: boolean | null;
+  secondaryCompleted: boolean | null;
+  secondaryDegreeTitle: string;
+};
+
+type SchoolingFormAction =
+  | { type: "attendanceChanged"; value: boolean }
+  | { type: "educationLevelChanged"; value: EnrollmentEducationLevel }
+  | { type: "schoolOriginChanged"; value: string }
+  | { type: "currentGradeYearChanged"; value: string }
+  | { type: "levelCompletedChanged"; value: boolean }
+  | { type: "secondaryCompletedChanged"; value: boolean }
+  | { type: "secondaryDegreeTitleChanged"; value: string };
+
+function createSchoolingFormState(initial?: Partial<EnrollmentAcademicBackground>): SchoolingFormState {
+  return {
+    currentlyStudying: initial?.currentlyStudying ?? null,
+    educationLevel: initial?.educationLevel ?? null,
+    schoolOrigin: initial?.schoolOrigin ?? "",
+    currentGradeYear: initial?.currentGradeYear ?? "",
+    levelCompleted: initial?.levelCompleted ?? null,
+    secondaryCompleted: initial?.secondaryCompleted ?? null,
+    secondaryDegreeTitle: initial?.secondaryDegreeTitle ?? "",
+  };
+}
+
+function schoolingFormReducer(state: SchoolingFormState, action: SchoolingFormAction): SchoolingFormState {
+  switch (action.type) {
+    case "attendanceChanged":
+      return {
+        currentlyStudying: action.value,
+        educationLevel: null,
+        schoolOrigin: "",
+        currentGradeYear: "",
+        levelCompleted: null,
+        secondaryCompleted: null,
+        secondaryDegreeTitle: "",
+      };
+    case "educationLevelChanged":
+      return {
+        ...state,
+        educationLevel: action.value,
+        schoolOrigin: action.value === "NO_SCHOOLING" ? "" : state.schoolOrigin,
+        currentGradeYear: action.value === "NO_SCHOOLING" ? "" : state.currentGradeYear,
+        levelCompleted: null,
+        secondaryCompleted: null,
+        secondaryDegreeTitle: "",
+      };
+    case "schoolOriginChanged":
+      return { ...state, schoolOrigin: action.value };
+    case "currentGradeYearChanged":
+      return { ...state, currentGradeYear: action.value };
+    case "levelCompletedChanged":
+      return { ...state, levelCompleted: action.value };
+    case "secondaryCompletedChanged":
+      return {
+        ...state,
+        secondaryCompleted: action.value,
+        secondaryDegreeTitle: action.value ? state.secondaryDegreeTitle : "",
+      };
+    case "secondaryDegreeTitleChanged":
+      return { ...state, secondaryDegreeTitle: action.value };
+  }
+}
+
 export function EnrollmentWizard({
   initialApplication,
-  initialStudyPlanSpaces,
-  initialTrainingPaths,
   initialShifts = [],
-  readOnly = false,
+  initialCourseOptions = [],
+  initialCourseOptionsPage = 0,
+  initialCourseOptionsTotalPages = 1,
+  readOnly: requestedReadOnly = false,
   returnTo = "/my-enrollment-applications",
 }: EnrollmentWizardProps): React.ReactElement {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialData = initialApplication.data;
+  const readOnly = requestedReadOnly || initialApplication.periodOpen === false;
   const [application, setApplication] = React.useState<EnrollmentApplicationResponse>(initialApplication);
+  const [documentsBlocked, setDocumentsBlocked] = React.useState(false);
+  const blockedDocumentsRef = React.useRef(new Set<string>());
+
+  function changeDocumentBlocked(id: string, blocked: boolean): void {
+    if (blocked) {
+      blockedDocumentsRef.current.add(id);
+    } else {
+      blockedDocumentsRef.current.delete(id);
+    }
+    setDocumentsBlocked(blockedDocumentsRef.current.size > 0);
+  }
+
   const [activeTab, setActiveTab] = React.useState<string>(() => {
-    return searchParams.get("tab") || "personal";
+    const requestedTab = searchParams.get("tab");
+
+    return requestedTab === "training-path" ? "spaces" : requestedTab || "personal";
   });
   const hydrated = React.useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerHydrationSnapshot);
 
@@ -134,7 +230,6 @@ export function EnrollmentWizard({
     async (_previous: { error?: string }, save: () => Promise<{ error?: string }>) => save(),
     {},
   );
-  const careerChangingRef = React.useRef(false);
   const draftSaveQueue = React.useRef<Promise<void>>(Promise.resolve());
   const autosaveInitializedRef = React.useRef(false);
   const lastSavedDataRef = React.useRef<string | null>(null);
@@ -150,18 +245,22 @@ export function EnrollmentWizard({
   const lastName = initialData?.personalData?.lastName ?? "";
   const documentNumber = initialData?.personalData?.documentNumber ?? "";
   const birthDate = parseInitialBirthDate(initialData?.personalData?.birthDate);
+  const birthDateRequiresProfileUpdate = !birthDate && !readOnly;
   const phoneNumber = initialData?.personalData?.phoneNumber ?? "";
   const email = initialData?.personalData?.email ?? "";
   const isDependentApplication =
     Boolean(initialApplication.submittedByPersonId) && initialApplication.submittedByPersonId !== initialApplication.personId;
 
-  // 2. Escolaridad de Base
-  const [secondarySchool, setSecondarySchool] = React.useState(initialData?.academicBackground?.secondarySchool ?? "");
-  const [currentGradeYear, setCurrentGradeYear] = React.useState(
-    initialData?.academicBackground?.currentGradeYear ? String(initialData.academicBackground.currentGradeYear) : "",
-  );
-  const [secondaryCompleted, setSecondaryCompleted] = React.useState(Boolean(initialData?.academicBackground?.secondaryCompleted));
-  const [secondaryDegreeTitle, setSecondaryDegreeTitle] = React.useState(initialData?.academicBackground?.secondaryDegreeTitle ?? "");
+  // 2. Escolaridad
+  const [schooling, dispatchSchooling] = React.useReducer(schoolingFormReducer, initialData?.academicBackground, createSchoolingFormState);
+
+  const handleCurrentlyStudyingChange = (value: string): void => {
+    dispatchSchooling({ type: "attendanceChanged", value: value === "yes" });
+  };
+
+  const handleEducationLevelChange = (value: EnrollmentEducationLevel): void => {
+    dispatchSchooling({ type: "educationLevelChanged", value });
+  };
 
   // 3. Salud e Inclusión
   const [receivesReasonableAdjustments, setReceivesReasonableAdjustments] = React.useState(
@@ -177,20 +276,18 @@ export function EnrollmentWizard({
   const [responsibleOccupation, setResponsibleOccupation] = React.useState(initialData?.responsible?.occupation ?? "");
   const [responsibleEducationLevel, setResponsibleEducationLevel] = React.useState(initialData?.responsible?.educationLevel ?? "");
 
-  // 5. Trayecto Formativo
-  const trainingPaths = initialTrainingPaths;
-  const [selectedTrainingPathId, setSelectedTrainingPathId] = React.useState(initialData?.careerSelection?.trainingPathId ?? "");
+  // 5. Trayecto Formativo (resolved when the application starts)
+  const selectedTrainingPathId = initialData?.careerSelection?.trainingPathId ?? "";
 
-  // 6. Espacios e Instrumentos
-  const [studyPlanSpaces, setStudyPlanSpaces] = React.useState<StudyPlanSpace[]>(() => [...initialStudyPlanSpaces]);
-  const [selectedStudyPlanSpaceIds, setSelectedStudyPlanSpaceIds] = React.useState<string[]>(
-    initialData?.academicSpaceSelection?.studyPlanSpaceIds ?? [],
-  );
-  const [selectedInstrumentIdsByStudyPlanSpaceId, setSelectedInstrumentIdsByStudyPlanSpaceId] = React.useState<Record<string, string>>(
-    initialData?.instrumentSelection?.studyPlanSpaceInstrumentIds ?? {},
-  );
-  const [loadingSpaces, setLoadingSpaces] = React.useState(false);
-  const [studyPlanSpacesLoadError, setStudyPlanSpacesLoadError] = React.useState(false);
+  // 6. Cursos
+  const [courseOptions, setCourseOptions] = React.useState<EnrollmentCourseOption[]>(() => [...initialCourseOptions]);
+  const [courseOptionsPage, setCourseOptionsPage] = React.useState(initialCourseOptionsPage);
+  const [courseOptionsTotalPages, setCourseOptionsTotalPages] = React.useState(initialCourseOptionsTotalPages);
+  const [loadingMoreCourses, setLoadingMoreCourses] = React.useState(false);
+  const [courseOptionsError, setCourseOptionsError] = React.useState<string>();
+  const [selectedCourseIds, setSelectedCourseIds] = React.useState<string[]>(() => (initialData?.courses ?? []).map((course) => course.courseId));
+  const [pendingInstrumentGroups, setPendingInstrumentGroups] = React.useState<string[]>([]);
+  const [invalidInstrumentGroups, setInvalidInstrumentGroups] = React.useState<string[]>([]);
 
   // 7. Preferencias
   const [preferredShift, setPreferredShift] = React.useState(initialData?.preference?.preferredShift ?? "");
@@ -207,47 +304,30 @@ export function EnrollmentWizard({
   const [isReenrolling, setIsReenrolling] = React.useState(Boolean(initialData?.preference?.isReenrolling));
   const [previousTeacher, setPreviousTeacher] = React.useState(initialData?.preference?.previousTeacher ?? "");
 
-  const reloadSpaces = async (id: string) => {
-    setLoadingSpaces(true);
+  const hasMoreCourseOptions = courseOptionsPage + 1 < courseOptionsTotalPages;
+
+  async function loadMoreCourseOptions(): Promise<void> {
+    if (loadingMoreCourses || !hasMoreCourseOptions) {
+      return;
+    }
+
+    setLoadingMoreCourses(true);
+    setCourseOptionsError(undefined);
 
     try {
-      setStudyPlanSpaces(await fetchEnrollmentSpaces(id));
-      setStudyPlanSpacesLoadError(false);
-    } catch {
-      setStudyPlanSpacesLoadError(true);
+      const nextPage = await fetchEnrollmentCourses(application.applicationId, {
+        page: courseOptionsPage + 1,
+        size: 50,
+      });
+      setCourseOptions((previous) => [...new Map([...previous, ...nextPage.items].map((course) => [course.courseId, course])).values()]);
+      setCourseOptionsPage(nextPage.page);
+      setCourseOptionsTotalPages(nextPage.totalPages);
+    } catch (error: unknown) {
+      setCourseOptionsError(error instanceof Error ? error.message : "No se pudieron cargar más cursos.");
     } finally {
-      setLoadingSpaces(false);
+      setLoadingMoreCourses(false);
     }
-  };
-
-  const [careerResult, changeCareer, isChangingCareer] = React.useActionState(
-    async (_previous: ChangeEnrollmentCareerResult | null, input: { id: string; trainingPathId: string }): Promise<ChangeEnrollmentCareerResult> => {
-      try {
-        // An older save must finish before changing the plan, so it cannot restore it later.
-        await draftSaveQueue.current;
-        const result = await changeEnrollmentCareerAction(input.id, input.trainingPathId);
-
-        if (result.error !== undefined) {
-          return result;
-        }
-
-        const updated = result.application;
-        setApplication(updated);
-        setSelectedTrainingPathId(updated.data.careerSelection?.trainingPathId || input.trainingPathId);
-        setSelectedStudyPlanSpaceIds(updated.data.academicSpaceSelection?.studyPlanSpaceIds || []);
-        setSelectedInstrumentIdsByStudyPlanSpaceId(updated.data.instrumentSelection?.studyPlanSpaceInstrumentIds || {});
-        setStudyPlanSpaces([]);
-        await reloadSpaces(updated.applicationId);
-
-        return result;
-      } catch {
-        return { error: ENROLLMENT_MESSAGES.CAREER_CHANGE_FAILED };
-      } finally {
-        careerChangingRef.current = false;
-      }
-    },
-    null,
-  );
+  }
 
   // Reactive age computation
   const calculatedAge = React.useMemo(() => {
@@ -255,6 +335,8 @@ export function EnrollmentWizard({
   }, [birthDate]);
 
   const isMinor = calculatedAge !== null && calculatedAge < 18;
+  const hasDocumentsStep =
+    Boolean(application.canReadAttachments) && (application.documents?.some((requirement) => requirement.active !== false) ?? false);
 
   const visibleTabs = React.useMemo(() => {
     const rawTabs = [
@@ -262,18 +344,24 @@ export function EnrollmentWizard({
       { id: "education", label: "Escolaridad" },
       { id: "health", label: "Salud e Inclusión" },
       ...(isMinor ? [{ id: "responsible", label: "Tutor Legal" }] : []),
-      { id: "training-path", label: "Trayecto Formativo" },
-      { id: "spaces", label: "Espacios e Instrumentos" },
+      { id: "spaces", label: "Cursos" },
       { id: "preferences", label: "Preferencias" },
+      ...(hasDocumentsStep ? [{ id: "documents", label: "Documentación" }] : []),
     ];
 
     return rawTabs.map((tab, index) => ({
       ...tab,
       label: `${index + 1}. ${tab.label}`,
     }));
-  }, [isMinor]);
+  }, [isMinor, hasDocumentsStep]);
 
-  const effectiveActiveTab = !isMinor && activeTab === "responsible" ? "training-path" : activeTab;
+  const effectiveActiveTab = visibleTabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : activeTab === "responsible"
+      ? "spaces"
+      : activeTab === "documents"
+        ? "preferences"
+        : "personal";
 
   React.useLayoutEffect(() => {
     if (!hydrated) {
@@ -292,6 +380,23 @@ export function EnrollmentWizard({
       inline: "center",
     });
     hasCenteredInitialTabRef.current = true;
+
+    const centerActiveTabOnResize = (): void => {
+      const bounds = activeTrigger.getBoundingClientRect();
+
+      if (bounds.bottom > 0 && bounds.top < window.innerHeight) {
+        activeTrigger.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+      }
+    };
+
+    const scrollViewport = activeTrigger.closest("[data-radix-scroll-area-viewport]");
+    const resizeObserver = new ResizeObserver(centerActiveTabOnResize);
+
+    if (scrollViewport) {
+      resizeObserver.observe(scrollViewport);
+    }
+
+    return () => resizeObserver.disconnect();
   }, [effectiveActiveTab, hydrated]);
 
   function handleActiveTabChange(nextTab: string): void {
@@ -308,7 +413,7 @@ export function EnrollmentWizard({
   // Focus the first invalid field once its tab has mounted after a failed
   // submission (the tab switch and this focus request commit together).
   React.useEffect(() => {
-    if (!pendingFocusFieldId) {
+    if (!pendingFocusFieldId || isSubmitDialogOpen) {
       return;
     }
 
@@ -322,34 +427,44 @@ export function EnrollmentWizard({
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [pendingFocusFieldId, effectiveActiveTab]);
+  }, [pendingFocusFieldId, effectiveActiveTab, isSubmitDialogOpen]);
 
-  const handleToggleSpace = (studyPlanSpaceId: string) => {
-    setSelectedStudyPlanSpaceIds((prev) => {
-      if (prev.includes(studyPlanSpaceId)) {
-        const updated = prev.filter((id) => id !== studyPlanSpaceId);
-        setSelectedInstrumentIdsByStudyPlanSpaceId((prevInst) => {
-          const nextInst = { ...prevInst };
-          delete nextInst[studyPlanSpaceId];
-
-          return nextInst;
-        });
-
-        return updated;
-      } else {
-        return [...prev, studyPlanSpaceId];
-      }
-    });
+  const handleToggleCourse = (courseId: string, checked: boolean) => {
+    setSelectedCourseIds((previous) => (checked ? Array.from(new Set([...previous, courseId])) : previous.filter((id) => id !== courseId)));
   };
 
-  const handleSelectInstrument = (studyPlanSpaceId: string, instrumentId: string) => {
-    setSelectedInstrumentIdsByStudyPlanSpaceId((prev) => ({
-      ...prev,
-      [studyPlanSpaceId]: instrumentId,
-    }));
+  const handleToggleInstrumentGroup = (course: EnrollmentCourseOption, checked: boolean): void => {
+    const key = enrollmentCourseGroupKey(course);
+    setInvalidInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    if (checked) {
+      setPendingInstrumentGroups((previous) => [...new Set([...previous, key])]);
+      return;
+    }
+
+    const groupIds = new Set(
+      [...courseOptions, ...(initialApplication.courses ?? [])].filter((item) => enrollmentCourseGroupKey(item) === key).map((item) => item.courseId),
+    );
+    setPendingInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setSelectedCourseIds((previous) => previous.filter((id) => !groupIds.has(id)));
+    setValidationIssues((previous) => previous.filter((issue) => issue.path[0] !== "courses"));
   };
 
-  // Structured payload for auto-save and submission
+  const handleSelectInstrument = (course: EnrollmentCourseOption): void => {
+    const key = enrollmentCourseGroupKey(course);
+    setInvalidInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setPendingInstrumentGroups((previous) => previous.filter((item) => item !== key));
+    setValidationIssues((previous) => previous.filter((issue) => issue.path[0] !== "courses"));
+    const groupIds = new Set(
+      [...courseOptions, ...(initialApplication.courses ?? [])].filter((item) => enrollmentCourseGroupKey(item) === key).map((item) => item.courseId),
+    );
+    setCourseOptions((previous) =>
+      previous.some((item) => item.courseId === course.courseId)
+        ? previous.map((item) => (item.courseId === course.courseId ? course : item))
+        : [...previous, course],
+    );
+    setSelectedCourseIds((previous) => [...previous.filter((id) => !groupIds.has(id)), course.courseId]);
+  };
+
   const structuredData: EnrollmentApplicationData = React.useMemo(() => {
     return {
       personalData: {
@@ -361,10 +476,14 @@ export function EnrollmentWizard({
         email,
       },
       academicBackground: {
-        secondarySchool,
-        currentGradeYear,
-        secondaryCompleted,
-        secondaryDegreeTitle,
+        currentlyStudying: schooling.currentlyStudying,
+        educationLevel: schooling.educationLevel,
+        schoolOrigin: schooling.schoolOrigin || null,
+        currentGradeYear: schooling.currentGradeYear || null,
+        levelCompleted:
+          schooling.currentlyStudying === false && schooling.educationLevel === "SECONDARY" ? schooling.secondaryCompleted : schooling.levelCompleted,
+        secondaryCompleted: schooling.secondaryCompleted,
+        secondaryDegreeTitle: schooling.secondaryDegreeTitle || null,
       },
       healthInclusion: {
         receivesReasonableAdjustments,
@@ -379,11 +498,10 @@ export function EnrollmentWizard({
         educationLevel: responsibleEducationLevel,
       },
       careerSelection: selectedTrainingPathId ? { trainingPathId: selectedTrainingPathId } : undefined,
-      academicSpaceSelection: { studyPlanSpaceIds: selectedStudyPlanSpaceIds },
-      instrumentSelection:
-        Object.keys(selectedInstrumentIdsByStudyPlanSpaceId).length > 0
-          ? { studyPlanSpaceInstrumentIds: selectedInstrumentIdsByStudyPlanSpaceId }
-          : undefined,
+      courses: selectedCourseIds.map((courseId) => ({
+        courseId,
+        preferredTeacherId: initialData?.courses?.find((course) => course.courseId === courseId)?.preferredTeacherId ?? null,
+      })),
       preference: {
         preferredShift,
         allowsImageUse,
@@ -398,10 +516,7 @@ export function EnrollmentWizard({
     birthDate,
     phoneNumber,
     email,
-    secondarySchool,
-    currentGradeYear,
-    secondaryCompleted,
-    secondaryDegreeTitle,
+    schooling,
     receivesReasonableAdjustments,
     adjustmentDetails,
     responsibleFullName,
@@ -411,8 +526,8 @@ export function EnrollmentWizard({
     responsibleOccupation,
     responsibleEducationLevel,
     selectedTrainingPathId,
-    selectedStudyPlanSpaceIds,
-    selectedInstrumentIdsByStudyPlanSpaceId,
+    initialData?.courses,
+    selectedCourseIds,
     preferredShift,
     allowsImageUse,
     isReenrolling,
@@ -426,7 +541,6 @@ export function EnrollmentWizard({
   const autosaveTarget =
     application?.status === ENROLLMENT_APPLICATION_STATUS.DRAFT &&
     !readOnly &&
-    !isChangingCareer &&
     !isSubmitDialogOpen &&
     !isCancelDialogOpen &&
     debouncedDataIsCurrent &&
@@ -465,7 +579,7 @@ export function EnrollmentWizard({
 
       try {
         const request = draftSaveQueue.current.then(() => {
-          if (!active || careerChangingRef.current) {
+          if (!active) {
             return null;
           }
 
@@ -477,7 +591,7 @@ export function EnrollmentWizard({
         );
         const updated = await request;
 
-        if (active && updated && !careerChangingRef.current) {
+        if (active && updated) {
           lastSavedDataRef.current = dataSignature;
           setApplication((prev) => (prev ? { ...prev, updatedAt: updated.updatedAt } : updated));
         }
@@ -497,57 +611,31 @@ export function EnrollmentWizard({
     };
   }, [autosaveTarget, debouncedData, saveDraft]);
 
-  const handleChangeCareer = (trainingPathId: string) => {
-    if (
-      !application?.isEditable ||
-      readOnly ||
-      careerChangingRef.current ||
-      isSubmitDialogOpen ||
-      isCancelDialogOpen ||
-      loadingSpaces ||
-      trainingPathId === selectedTrainingPathId
-    ) {
-      return;
+  async function submitApplication(): Promise<{ error?: string; issues?: z.ZodIssue[] }> {
+    if (blockedDocumentsRef.current.size > 0) {
+      return { error: ENROLLMENT_MESSAGES.DOCUMENTS_SAVE_PENDING };
     }
 
-    careerChangingRef.current = true;
-    React.startTransition(() => changeCareer({ id: application.applicationId, trainingPathId }));
-  };
-
-  async function submitApplication(): Promise<{ error?: string; issues?: z.ZodIssue[] }> {
-    if (!application?.applicationId || careerChangingRef.current || loadingSpaces || isCancelDialogOpen) {
+    if (!application?.applicationId || isCancelDialogOpen) {
       return {};
     }
 
     setValidationIssues([]);
-
-    if (studyPlanSpacesLoadError) {
-      handleActiveTabChange("spaces");
-
-      return { error: ENROLLMENT_MESSAGES.SPACES_RETRY };
-    }
+    setInvalidInstrumentGroups([...pendingInstrumentGroups]);
 
     const parsed = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
     const issues: z.ZodIssue[] = parsed.success ? [] : [...parsed.error.issues];
 
-    if (trainingPaths.length > 0 && !selectedTrainingPathId) {
+    if (!selectedTrainingPathId) {
       issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.TRAINING_PATH_REQUIRED, path: ["careerSelection", "trainingPathId"] });
     }
 
-    if (selectedStudyPlanSpaceIds.length === 0) {
-      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.SPACE_REQUIRED, path: ["academicSpaceSelection", "studyPlanSpaceIds"] });
+    if (pendingInstrumentGroups.length > 0) {
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_REQUIRED, path: ["courses"] });
     }
 
-    const spacesWithMissingInstrument = studyPlanSpaces.filter(
-      (space) => selectedStudyPlanSpaceIds.includes(space.id) && space.requiresInstrument && !selectedInstrumentIdsByStudyPlanSpaceId[space.id],
-    );
-
-    for (const space of spacesWithMissingInstrument) {
-      issues.push({
-        code: "custom",
-        message: ENROLLMENT_MESSAGES.INSTRUMENT_REQUIRED(space.academicSpaceName),
-        path: ["instrumentSelection", "studyPlanSpaceInstrumentIds"],
-      });
+    if (courseOptions.some((course) => selectedCourseIds.includes(course.courseId) && course.eligibility?.eligible === false)) {
+      issues.push({ code: "custom", message: ENROLLMENT_MESSAGES.ACADEMIC_SELECTION_INVALID, path: ["courses"] });
     }
 
     if (issues.length > 0) {
@@ -566,9 +654,7 @@ export function EnrollmentWizard({
           handleActiveTabChange("health");
         } else if (section === "responsible" && isMinor) {
           handleActiveTabChange("responsible");
-        } else if (section === "careerSelection") {
-          handleActiveTabChange("training-path");
-        } else if (section === "academicSpaceSelection" || section === "instrumentSelection") {
+        } else if (section === "careerSelection" || section === "courses") {
           handleActiveTabChange("spaces");
         } else if (section === "preference") {
           handleActiveTabChange("preferences");
@@ -586,8 +672,11 @@ export function EnrollmentWizard({
 
     try {
       await draftSaveQueue.current;
-      await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
+      const savedApplication = await updateEnrollmentDraftAction(application.applicationId, { data: structuredData }).then(unwrapEnrollmentResult);
+      setApplication(savedApplication);
+
       setApplication(await submitEnrollmentApplicationAction(application.applicationId).then(unwrapEnrollmentResult));
+      router.refresh();
 
       return {};
     } catch (error) {
@@ -608,6 +697,8 @@ export function EnrollmentWizard({
     return issue?.message;
   };
 
+  const birthDateError = getFieldError(["personalData", "birthDate"]);
+
   // If application is no longer in draft (SUBMITTED, APPROVED, REJECTED, CANCELLED), render read-only status view
   if (application.status !== ENROLLMENT_APPLICATION_STATUS.DRAFT) {
     return <EnrollmentStatusCard application={application} />;
@@ -620,8 +711,8 @@ export function EnrollmentWizard({
           <Link href={returnTo}>Volver</Link>
         </Button>
 
-        {!readOnly && (
-          <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)}>
+        {!requestedReadOnly && (
+          <Button type="button" variant="destructive" size="lg" onClick={() => setIsCancelDialogOpen(true)} disabled={documentsBlocked}>
             <BanIcon className="size-4" />
             Cancelar
           </Button>
@@ -633,14 +724,16 @@ export function EnrollmentWizard({
           <AlertTriangleIcon className="size-4 text-amber-600" />
           <AlertTitle className="text-amber-900">Solicitud de inscripción - Visualización</AlertTitle>
           <AlertDescription className="text-amber-800">
-            Esta solicitud ya ha sido enviada y no se puede modificar. Los datos que ves a continuación son solo de referencia.
+            {application.periodOpen === false
+              ? ENROLLMENT_MESSAGES.PERIOD_CLOSED_DRAFT
+              : "Los datos de esta solicitud se muestran solo para consulta."}
           </AlertDescription>
         </Alert>
       )}
 
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-6">
-        <div className="flex items-stretch gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
+        <div className="flex items-start gap-3.5">
+          <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
             <FileClockIcon className="size-5" aria-hidden="true" />
           </div>
           <div className="flex flex-col justify-center gap-1">
@@ -654,8 +747,12 @@ export function EnrollmentWizard({
               ) : saveError ? (
                 <span className="text-destructive flex items-center gap-1">
                   <AlertCircleIcon className="size-4" />
-                  Error al guardar
+                  <span>No se pudo guardar: {saveError}</span>
                 </span>
+              ) : pendingInstrumentGroups.length > 0 ? (
+                <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>
+              ) : documentsBlocked ? (
+                <span>{ENROLLMENT_MESSAGES.DOCUMENTS_DRAFT_PENDING}</span>
               ) : (
                 <>
                   <CheckCircle2Icon className="size-4 text-emerald-500" />
@@ -799,7 +896,7 @@ export function EnrollmentWizard({
                   <FieldError errors={[{ message: getFieldError(["personalData", "documentNumber"]) }]} />
                 </Field>
 
-                <Field data-invalid={!!getFieldError(["personalData", "birthDate"])}>
+                <Field data-invalid={!!birthDateError}>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <FieldLabel htmlFor="birthDate" required>
                       Fecha de nacimiento
@@ -816,14 +913,26 @@ export function EnrollmentWizard({
                     readOnly
                     className={READ_ONLY_INPUT_CLASS_NAME}
                     placeholder="dd/mm/aaaa"
-                    aria-invalid={!!getFieldError(["personalData", "birthDate"])}
+                    aria-invalid={!!birthDateError}
+                    aria-describedby={
+                      [birthDateRequiresProfileUpdate ? "birthDate-account-help" : undefined, birthDateError ? "birthDate-error" : undefined]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
                   />
+                  {birthDateRequiresProfileUpdate && (
+                    <FieldDescription id="birthDate-account-help">
+                      <ReturnToLink id="birthDate-account-link" href="/account/edit" className="underline underline-offset-4">
+                        Completar fecha de nacimiento en Cuenta
+                      </ReturnToLink>
+                    </FieldDescription>
+                  )}
                   {isMinor && (
                     <FieldDescription className="text-xs text-amber-600 dark:text-amber-400">
                       Al ser menor de 18 años, deberás completar los datos del tutor en el paso 4.
                     </FieldDescription>
                   )}
-                  <FieldError errors={[{ message: getFieldError(["personalData", "birthDate"]) }]} />
+                  <FieldError id="birthDate-error" errors={[{ message: birthDateError }]} />
                 </Field>
               </div>
 
@@ -870,62 +979,187 @@ export function EnrollmentWizard({
         </TabsContent>
 
         {/* ========================================================================= */}
-        {/* PASO 2: ESCOLARIDAD DE BASE */}
+        {/* PASO 2: ESCOLARIDAD */}
         {/* ========================================================================= */}
         <TabsContent value="education" className="space-y-6">
           <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
             <EnrollmentStepCardHeader
               icon={GraduationCapIcon}
-              title="2. Escolaridad de Base"
-              description="Antecedentes de escolaridad y nivel de egreso secundario."
+              title="2. Escolaridad"
+              description="Contanos sobre tu escolaridad actual o el máximo nivel que alcanzaste."
             />
-            <CardContent className="space-y-4">
-              <Field data-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}>
-                <FieldLabel htmlFor="secondarySchool" required>
-                  Colegio secundario de origen
+            <CardContent className="space-y-5">
+              <Field data-invalid={!!getFieldError(["academicBackground", "currentlyStudying"])}>
+                <FieldLabel htmlFor="currentlyStudying" required>
+                  ¿Actualmente asistís a una institución educativa?
                 </FieldLabel>
-                <Input
-                  id="secondarySchool"
-                  value={secondarySchool}
-                  onChange={(e) => setSecondarySchool(e.target.value)}
-                  placeholder="Escuela Normal Superior Víctor Mercante"
-                  aria-invalid={!!getFieldError(["academicBackground", "secondarySchool"])}
-                />
-                <FieldError errors={[{ message: getFieldError(["academicBackground", "secondarySchool"]) }]} />
+                <Select
+                  value={schooling.currentlyStudying === null ? undefined : schooling.currentlyStudying ? "yes" : "no"}
+                  onValueChange={handleCurrentlyStudyingChange}
+                >
+                  <SelectTrigger
+                    id="currentlyStudying"
+                    className="h-9! w-full"
+                    aria-invalid={!!getFieldError(["academicBackground", "currentlyStudying"])}
+                  >
+                    <SelectValue placeholder="Seleccioná una opción" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="yes" className="px-2.5 py-1.5">
+                        Sí
+                      </SelectItem>
+                      <SelectItem value="no" className="px-2.5 py-1.5">
+                        No
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FieldError errors={[{ message: getFieldError(["academicBackground", "currentlyStudying"]) }]} />
               </Field>
 
-              <div className="grid gap-4 @min-[48rem]:grid-cols-2">
+              {schooling.currentlyStudying !== null ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "educationLevel"])}>
+                  <FieldLabel htmlFor="educationLevel" required>
+                    {schooling.currentlyStudying ? "Nivel educativo actual" : "Máximo nivel alcanzado"}
+                  </FieldLabel>
+                  <Select
+                    value={schooling.educationLevel ?? undefined}
+                    onValueChange={(value) => handleEducationLevelChange(value as EnrollmentEducationLevel)}
+                  >
+                    <SelectTrigger
+                      id="educationLevel"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "educationLevel"])}
+                    >
+                      <SelectValue placeholder="Seleccioná un nivel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {!schooling.currentlyStudying ? (
+                          <SelectItem value="NO_SCHOOLING" className="px-2.5 py-1.5">
+                            Sin escolarización
+                          </SelectItem>
+                        ) : null}
+                        {SCHOOLING_EDUCATION_LEVEL_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "educationLevel"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.educationLevel && schooling.educationLevel !== "NO_SCHOOLING" ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "schoolOrigin"])}>
+                  <FieldLabel htmlFor="schoolOrigin" required={schooling.currentlyStudying === true}>
+                    {schooling.currentlyStudying ? "Institución educativa actual" : "Última institución educativa (opcional)"}
+                  </FieldLabel>
+                  <Input
+                    id="schoolOrigin"
+                    maxLength={150}
+                    value={schooling.schoolOrigin}
+                    onChange={(event) => dispatchSchooling({ type: "schoolOriginChanged", value: event.target.value })}
+                    placeholder="Nombre de la institución"
+                    aria-invalid={!!getFieldError(["academicBackground", "schoolOrigin"])}
+                  />
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "schoolOrigin"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.currentlyStudying && schooling.educationLevel ? (
                 <Field>
-                  <FieldLabel htmlFor="currentGradeYear">Año de cursado o egreso (opcional)</FieldLabel>
-                  <NumericInput
+                  <FieldLabel htmlFor="currentGradeYear">Sala, grado o año de cursado (opcional)</FieldLabel>
+                  <Input
                     id="currentGradeYear"
-                    maxLength={4}
-                    value={currentGradeYear}
-                    onChange={(e) => setCurrentGradeYear(e.target.value)}
-                    placeholder="2024"
+                    maxLength={50}
+                    value={schooling.currentGradeYear}
+                    onChange={(event) => dispatchSchooling({ type: "currentGradeYearChanged", value: event.target.value })}
+                    placeholder="Sala de 4, 3.º grado o 2.º año"
                   />
                 </Field>
+              ) : null}
 
+              {schooling.currentlyStudying === false &&
+              schooling.educationLevel &&
+              schooling.educationLevel !== "NO_SCHOOLING" &&
+              schooling.educationLevel !== "SECONDARY" ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "levelCompleted"])}>
+                  <FieldLabel htmlFor="levelCompleted" required>
+                    ¿Completaste ese nivel?
+                  </FieldLabel>
+                  <Select
+                    value={schooling.levelCompleted === null ? undefined : schooling.levelCompleted ? "yes" : "no"}
+                    onValueChange={(value) => dispatchSchooling({ type: "levelCompletedChanged", value: value === "yes" })}
+                  >
+                    <SelectTrigger
+                      id="levelCompleted"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "levelCompleted"])}
+                    >
+                      <SelectValue placeholder="Seleccioná una opción" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="yes" className="px-2.5 py-1.5">
+                          Sí
+                        </SelectItem>
+                        <SelectItem value="no" className="px-2.5 py-1.5">
+                          No
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "levelCompleted"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.educationLevel && ["SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"].includes(schooling.educationLevel) ? (
+                <Field data-invalid={!!getFieldError(["academicBackground", "secondaryCompleted"])}>
+                  <FieldLabel htmlFor="secondaryCompleted" required>
+                    ¿Completaste el secundario?
+                  </FieldLabel>
+                  <Select
+                    value={schooling.secondaryCompleted === null ? undefined : schooling.secondaryCompleted ? "yes" : "no"}
+                    onValueChange={(value) => dispatchSchooling({ type: "secondaryCompletedChanged", value: value === "yes" })}
+                  >
+                    <SelectTrigger
+                      id="secondaryCompleted"
+                      className="h-9! w-full"
+                      aria-invalid={!!getFieldError(["academicBackground", "secondaryCompleted"])}
+                    >
+                      <SelectValue placeholder="Seleccioná una opción" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="yes" className="px-2.5 py-1.5">
+                          Sí
+                        </SelectItem>
+                        <SelectItem value="no" className="px-2.5 py-1.5">
+                          No
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={[{ message: getFieldError(["academicBackground", "secondaryCompleted"]) }]} />
+                </Field>
+              ) : null}
+
+              {schooling.secondaryCompleted === true ? (
                 <Field>
-                  <FieldLabel htmlFor="secondaryDegreeTitle">Título o especialidad obtenida (opcional)</FieldLabel>
+                  <FieldLabel htmlFor="secondaryDegreeTitle">Título secundario obtenido (opcional)</FieldLabel>
                   <Input
                     id="secondaryDegreeTitle"
-                    value={secondaryDegreeTitle}
-                    onChange={(e) => setSecondaryDegreeTitle(e.target.value)}
+                    maxLength={150}
+                    value={schooling.secondaryDegreeTitle}
+                    onChange={(event) => dispatchSchooling({ type: "secondaryDegreeTitleChanged", value: event.target.value })}
                     placeholder="Bachiller en Arte y Música"
                   />
                 </Field>
-              </div>
-
-              <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <FieldLabel htmlFor="secondaryCompleted" className="text-sm font-medium">
-                    ¿Secundario completo?
-                  </FieldLabel>
-                  <FieldDescription>Indicá si ya finalizaste todos los estudios secundarios y tenés título o constancia de egreso.</FieldDescription>
-                </div>
-                <Switch id="secondaryCompleted" size="lg" checked={secondaryCompleted} onCheckedChange={setSecondaryCompleted} />
-              </div>
+              ) : null}
             </CardContent>
             <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("personal")} className="gap-1.5">
@@ -996,8 +1230,8 @@ export function EnrollmentWizard({
               <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("education")} className="gap-1.5">
                 Atrás
               </Button>
-              <Button type="button" size="lg" onClick={() => handleActiveTabChange(isMinor ? "responsible" : "training-path")} className="gap-1.5">
-                {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Trayecto Formativo"}
+              <Button type="button" size="lg" onClick={() => handleActiveTabChange(isMinor ? "responsible" : "spaces")} className="gap-1.5">
+                {isMinor ? "Siguiente: Tutor Legal" : "Siguiente: Cursos"}
               </Button>
             </CardFooter>
           </Card>
@@ -1119,8 +1353,8 @@ export function EnrollmentWizard({
                 <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("health")} className="gap-1.5">
                   Atrás
                 </Button>
-                <Button type="button" size="lg" onClick={() => handleActiveTabChange("training-path")} className="gap-1.5">
-                  Siguiente: Trayecto Formativo
+                <Button type="button" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
+                  Siguiente: Cursos
                 </Button>
               </CardFooter>
             </Card>
@@ -1128,28 +1362,81 @@ export function EnrollmentWizard({
         )}
 
         {/* ========================================================================= */}
-        {/* PASO: TRAYECTO FORMATIVO */}
+        {/* PASO 5/4: ESPACIOS CURRICULARES E INSTRUMENTOS */}
         {/* ========================================================================= */}
-        <TabsContent value="training-path" className="space-y-6">
+        <TabsContent value="spaces" className="space-y-6">
           <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
             <EnrollmentStepCardHeader
-              icon={RouteIcon}
-              title={isMinor ? "5. Trayecto Formativo" : "4. Trayecto Formativo"}
-              description="Elegí la orientación o especialidad dentro del plan de estudio."
+              icon={LibraryBigIcon}
+              title={isMinor ? "5. Cursos" : "4. Cursos"}
+              description="Marcá los espacios que querés cursar y elegí el instrumento donde corresponda. Solo podés inscribirte si cumplís sus correlatividades."
             />
             <CardContent>
-              <EnrollmentTrainingPathSelector
-                trainingPaths={trainingPaths}
-                selectedTrainingPathId={selectedTrainingPathId}
-                onSelectTrainingPath={handleChangeCareer}
-                disabled={!application.isEditable || readOnly || isChangingCareer || isSubmitDialogOpen || isCancelDialogOpen || loadingSpaces}
-                error={(!isChangingCareer && careerResult?.error) || getFieldError(["careerSelection", "trainingPathId"])}
-              />
-              {isChangingCareer && (
-                <p role="status" className="text-muted-foreground mt-3 text-sm">
-                  Guardando el trayecto y cargando sus espacios…
-                </p>
+              {selectedCourseIds
+                .filter((id) => {
+                  const saved = initialApplication.courses?.find((course) => course.courseId === id);
+                  return !courseOptions.some(
+                    (option) =>
+                      option.courseId === id ||
+                      (option.instrumental && saved && enrollmentCourseGroupKey(option) === enrollmentCourseGroupKey(saved)),
+                  );
+                })
+                .map((id) => {
+                  const selected = initialApplication.courses?.find((course) => course.courseId === id);
+                  const name = selected
+                    ? `${selected.academicSpaceName}${selected.instrumentName ? ` · ${selected.instrumentName}` : ""}`
+                    : "Curso seleccionado";
+                  return (
+                    <div key={id} className="mb-3 flex items-center justify-between gap-3 rounded-lg border p-3">
+                      <span>
+                        {name}
+                        {selected?.periodOpen === false ? (
+                          <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_CLOSED}</span>
+                        ) : selected?.withinPeriodScope === false ? (
+                          <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_EXCLUDED}</span>
+                        ) : null}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={!application.isEditable || readOnly || isSubmitDialogOpen || isCancelDialogOpen}
+                        aria-label={`Quitar ${name}`}
+                        onClick={() => handleToggleCourse(id, false)}
+                      >
+                        Quitar
+                      </Button>
+                    </div>
+                  );
+                })}
+              {courseOptions.length > 0 ? (
+                <EnrollmentCoursesSelector
+                  applicationId={application.applicationId}
+                  savedCourses={initialApplication.courses ?? []}
+                  onSelectInstrument={handleSelectInstrument}
+                  pendingInstrumentGroups={pendingInstrumentGroups}
+                  invalidInstrumentGroups={invalidInstrumentGroups}
+                  onToggleInstrumentGroup={handleToggleInstrumentGroup}
+                  courses={courseOptions}
+                  selectedCourseIds={selectedCourseIds}
+                  onToggleCourse={handleToggleCourse}
+                  disabled={!application.isEditable || readOnly || isSubmitDialogOpen || isCancelDialogOpen}
+                  error={getFieldError(["courses"])}
+                  hasMore={hasMoreCourseOptions}
+                  loadingMore={loadingMoreCourses}
+                  onLoadMore={loadMoreCourseOptions}
+                />
+              ) : (
+                <Alert variant="destructive">
+                  <AlertTitle>No hay cursos disponibles</AlertTitle>
+                  <AlertDescription>La institución no tiene cursos activos para el trayecto y ciclo seleccionados.</AlertDescription>
+                </Alert>
               )}
+              {courseOptionsError ? (
+                <Alert variant="destructive" className="mt-3">
+                  <AlertDescription>{courseOptionsError}</AlertDescription>
+                </Alert>
+              ) : null}
             </CardContent>
             <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button
@@ -1161,58 +1448,19 @@ export function EnrollmentWizard({
               >
                 Atrás
               </Button>
-              <Button type="button" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
-                Siguiente: Espacios e Instrumentos
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        {/* ========================================================================= */}
-        {/* PASO 6: ESPACIOS CURRICULARES E INSTRUMENTOS */}
-        {/* ========================================================================= */}
-        <TabsContent value="spaces" className="space-y-6">
-          <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
-            <EnrollmentStepCardHeader
-              icon={LibraryBigIcon}
-              title={isMinor ? "6. Espacios Académicos e Instrumentos" : "5. Espacios Académicos e Instrumentos"}
-              description="Seleccioná las materias que vas a cursar y el instrumento que corresponda."
-            />
-            <CardContent>
-              <EnrollmentStudyPlanSpacesSelector
-                studyPlanSpaces={studyPlanSpaces}
-                selectedStudyPlanSpaceIds={selectedStudyPlanSpaceIds}
-                selectedInstrumentIdsByStudyPlanSpaceId={selectedInstrumentIdsByStudyPlanSpaceId}
-                onToggleSpace={handleToggleSpace}
-                onSelectInstrument={handleSelectInstrument}
-                disabled={
-                  !application.isEditable || readOnly || isChangingCareer || isSubmitDialogOpen || isCancelDialogOpen || studyPlanSpacesLoadError
-                }
-                isLoading={loadingSpaces}
-                spaceError={getFieldError(["academicSpaceSelection", "studyPlanSpaceIds"])}
-                instrumentError={getFieldError(["instrumentSelection", "studyPlanSpaceInstrumentIds"])}
-              />
-              {studyPlanSpacesLoadError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertTitle>No se pudieron cargar los espacios</AlertTitle>
-                  <AlertDescription>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={loadingSpaces || isChangingCareer}
-                      onClick={() => reloadSpaces(application.applicationId)}
-                    >
-                      Reintentar
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("training-path")} className="gap-1.5">
-                Atrás
-              </Button>
-              <Button type="button" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => {
+                  if (pendingInstrumentGroups.length > 0) {
+                    setInvalidInstrumentGroups([...pendingInstrumentGroups]);
+                    document.getElementById(`instrument-${pendingInstrumentGroups[0]}`)?.focus();
+                    return;
+                  }
+                  handleActiveTabChange("preferences");
+                }}
+                className="gap-1.5"
+              >
                 Siguiente: Preferencias
               </Button>
             </CardFooter>
@@ -1226,7 +1474,7 @@ export function EnrollmentWizard({
           <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
             <EnrollmentStepCardHeader
               icon={SlidersHorizontalIcon}
-              title={isMinor ? "7. Preferencias y Consentimientos" : "6. Preferencias y Consentimientos"}
+              title={isMinor ? "6. Preferencias y Consentimientos" : "5. Preferencias y Consentimientos"}
               description="Seleccioná tu turno preferido y manifestá tus autorizaciones institucionales."
             />
             <CardContent className="space-y-5">
@@ -1299,12 +1547,16 @@ export function EnrollmentWizard({
               <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
                 Atrás
               </Button>
-              {!readOnly ? (
+              {hasDocumentsStep ? (
+                <Button type="button" size="lg" onClick={() => handleActiveTabChange("documents")} className="gap-1.5">
+                  Siguiente: Documentación
+                </Button>
+              ) : !readOnly ? (
                 <Button
                   type="button"
                   size="lg"
                   onClick={() => setIsSubmitDialogOpen(true)}
-                  disabled={saving || isChangingCareer || loadingSpaces || isCancelDialogOpen}
+                  disabled={saving || isCancelDialogOpen || documentsBlocked}
                 >
                   Enviar inscripción
                 </Button>
@@ -1312,7 +1564,41 @@ export function EnrollmentWizard({
             </CardFooter>
           </Card>
         </TabsContent>
+
+        {hasDocumentsStep ? (
+          // Keep the refreshed document snapshot when navigating back to other steps.
+          <TabsContent value="documents" forceMount hidden={effectiveActiveTab !== "documents"} className="space-y-6">
+            <EnrollmentDocuments
+              application={application}
+              title={visibleTabs.find((tab) => tab.id === "documents")?.label}
+              autoSave
+              disabled={readOnly || isSubmitDialogOpen || isCancelDialogOpen}
+              onUploadBlockedChange={changeDocumentBlocked}
+              footer={
+                <>
+                  <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("preferences")} className="gap-1.5">
+                    Atrás
+                  </Button>
+                  {!readOnly ? (
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => setIsSubmitDialogOpen(true)}
+                      disabled={saving || isCancelDialogOpen || documentsBlocked}
+                    >
+                      Enviar inscripción
+                    </Button>
+                  ) : null}
+                </>
+              }
+            />
+          </TabsContent>
+        ) : null}
       </Tabs>
+
+      {!hasDocumentsStep && application.canReadAttachments && application.documents?.some((requirement) => requirement.active === false) ? (
+        <EnrollmentDocuments application={application} title="Historial de documentación retirada" />
+      ) : null}
 
       {/* Confirmation Dialog for Cancel Application */}
       {isCancelDialogOpen && (
@@ -1320,7 +1606,10 @@ export function EnrollmentWizard({
           applicationId={application.applicationId}
           beforeCancel={() => draftSaveQueue.current}
           onClose={() => setIsCancelDialogOpen(false)}
-          onCancelled={setApplication}
+          onCancelled={(cancelledApplication) => {
+            setApplication(cancelledApplication);
+            router.refresh();
+          }}
         />
       )}
       {isSubmitDialogOpen ? <EnrollmentSubmitDialog onClose={() => setIsSubmitDialogOpen(false)} onSubmit={submitApplication} /> : null}

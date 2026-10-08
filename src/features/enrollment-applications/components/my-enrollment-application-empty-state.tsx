@@ -5,6 +5,7 @@ import { ClipboardListIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 
 type MyEnrollmentApplicationEmptyStateProps = {
   hasFilter: boolean;
@@ -43,7 +44,7 @@ export function MyEnrollmentApplicationEmptyState({
           <SearchIcon className="size-5" />
         </EmptyMedia>
         <h3 className="text-foreground text-base font-semibold">No se encontraron inscripciones</h3>
-        <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">No encontramos ninguna inscripción que coincida con el estado seleccionado.</p>
+        <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">{DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION}</p>
       </div>
     );
   } else {

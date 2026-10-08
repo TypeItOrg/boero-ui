@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { InstitutionalBrandPanel, InstitutionalBrandIdentity } from "@features/institutional-auth/components/institutional-brand-identity";
 import Link from "next/link";
 
 import { Card, CardContent } from "@common/components/ui/card";
@@ -14,21 +14,24 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
   const { token } = await searchParams;
   if (token) {
     return (
-      <Card className="animate-fade-in-up p-0">
+      <Card className="animate-fade-in-up mx-auto w-full max-w-240 p-0">
         <CardContent className="grid-cols-2 p-0 md:grid">
           <ResetInstitutionalPasswordForm token={token} />
-          <section className="from-primary to-primary/80 relative hidden bg-linear-to-l p-8 md:flex md:items-center md:justify-center lg:p-12">
-            <Image priority width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-full max-w-56" />
-          </section>
+          <InstitutionalBrandPanel showInstitutionName={false} />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="animate-fade-in-up p-0">
+    <Card className="animate-fade-in-up mx-auto w-full max-w-md p-0">
       <CardContent className="flex flex-col items-center space-y-4 p-6 text-center md:p-8">
-        <Image width={875} height={1202} src="/boero-logo.webp" alt="Logo de la institución" className="h-auto w-20" />
+        <InstitutionalBrandIdentity
+          className="w-full"
+          imageContainerClassName="size-20"
+          imageClassName="max-h-20 max-w-20"
+          showInstitutionName={false}
+        />
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Enlace inválido</h1>
           <p className="text-muted-foreground text-sm">Solicitá un nuevo enlace de recuperación para continuar.</p>

@@ -7,4 +7,5 @@ export type AcademicOfferSummary = {
   trainingPathId: string;
   trainingPathName: string;
   trainingPathDescription: string | null;
+  enrollmentOpen: boolean;
 };

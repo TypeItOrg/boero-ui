@@ -1,3 +1,5 @@
+import { OptionalValue } from "@common/components/optional-value";
+import { getContextualSearchLabels } from "@features/contextual-search/utils/contextual-search-label.util";
 import Link from "next/link";
 
 import { Badge } from "@common/components/ui/badge";
@@ -31,14 +33,15 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
       </TableHeader>
       <TableBody>
         {items.map((item) => {
+          const labels = getContextualSearchLabels(entityType, item);
           const resultHref = getContextualSearchResultHref("platform", entityType, item);
           return (
             <TableRow key={item.id}>
               <TableCell>
                 <Link href={resultHref} className="font-medium hover:underline">
-                  {item.title}
+                  {labels.title}
                 </Link>
-                {item.subtitle ? <span className="text-muted-foreground mt-0.5 block text-xs">{item.subtitle}</span> : null}
+                {labels.subtitle ? <span className="text-muted-foreground mt-0.5 block text-xs">{labels.subtitle}</span> : null}
               </TableCell>
               <TableCell className="text-muted-foreground">{item.institutionName ?? "Plataforma"}</TableCell>
               <TableCell>
@@ -47,7 +50,7 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
                     {CONTEXTUAL_SEARCH_STATUS_LABELS[item.status] ?? item.status}
                   </Badge>
                 ) : (
-                  "—"
+                  <OptionalValue value={null} fallback="Sin estado informado" />
                 )}
               </TableCell>
             </TableRow>

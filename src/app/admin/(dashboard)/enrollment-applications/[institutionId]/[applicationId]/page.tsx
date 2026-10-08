@@ -1,3 +1,4 @@
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +9,7 @@ import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 import { fetchPlatformEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
+import { formatEnrollmentApplicationBreadcrumbLabel } from "@features/enrollment-applications/utils/enrollment-application-breadcrumb.util";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { PlatformEnrollmentApplicationResolvePanel } from "@features/enrollment-applications/components/platform-enrollment-application-resolve-panel";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -40,7 +42,12 @@ export default async function PlatformEnrollmentApplicationDetailPage({
   return (
     <PlatformPageShell
       title={applicantName}
-      breadcrumb={<PlatformBreadcrumb hiddenSegments={[institutionId]} segmentLabels={{ [applicationId]: applicantName }} />}
+      breadcrumb={
+        <PlatformBreadcrumb
+          hiddenSegments={[institutionId]}
+          segmentLabels={{ [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName) }}
+        />
+      }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <div className="flex flex-col gap-3 @2xl/page-shell:flex-row @2xl/page-shell:items-center @2xl/page-shell:justify-between">
@@ -52,14 +59,27 @@ export default async function PlatformEnrollmentApplicationDetailPage({
           application={{
             institutionId,
             applicationId,
+            canApproveProvisionally: application.canApproveProvisionally,
+            canConfirm: application.canConfirm,
             applicantName,
-            studyPlanName: application.studyPlanName || "",
+            studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : "",
           }}
           status={application.status}
         />
       </div>
 
-      <EnrollmentStatusCard application={application} showApplicantAlert={false} scope={AcademicScope.ADMIN} />
+      <EnrollmentStatusCard
+        application={application}
+        showApplicantAlert={false}
+        showRequirementChanges
+        administrativeView
+        scope={AcademicScope.ADMIN}
+        institutionId={institutionId}
+        canManageCourses
+        canEnrollCourses
+        canRejectCourses
+        canReadCourseWaitlist
+      />
     </PlatformPageShell>
   );
 }

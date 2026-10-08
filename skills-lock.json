@@ -22,13 +22,13 @@
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
-      "computedHash": "036648e219443232efd9a97ea8917ac2ee19ec5ba6eb83c53cd49d99b555b647"
+      "computedHash": "2c96857d11f18ff0e461157ee388835bc18f17c4e5ba501332cdd41ad8685caa"
     },
     "simplify": {
       "source": "brianlovin/claude-config",
       "sourceType": "github",
       "skillPath": "skills/simplify/SKILL.md",
-      "computedHash": "5a1c33553e7e21c97b5c993dae8affcaaae71009653b7c85d46b52231fe29ece"
+      "computedHash": "45654ebad3aad231464d0a41deab3a6f5bd434abaa9c9e8ad675e3d5b73e96ae"
     },
     "tanstack-query": {
       "source": "tanstack-skills/tanstack-skills",

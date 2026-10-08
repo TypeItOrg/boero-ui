@@ -38,8 +38,8 @@ export default async function EnrollmentApplicationsPage({
   }
 
   const resolvedSearchParams = await searchParams;
-  const { page, size, status, trainingPathId, open } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
-  const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status, trainingPathId, open });
+  const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
+  const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status, trainingPathId, open, pendingDocuments });
   const { items: trainingPaths } = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.TRAINING_PATH_READ)
     ? await fetchTrainingPaths(AcademicScope.INSTITUTIONAL, user.institutionId, {
         active: true,
@@ -55,12 +55,21 @@ export default async function EnrollmentApplicationsPage({
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >
       <DataTableNavigationProvider>
-        <EnrollmentApplicationFilters status={status} trainingPathId={trainingPathId} open={open} trainingPaths={trainingPaths} size={size} />
+        <EnrollmentApplicationFilters
+          status={status}
+          trainingPathId={trainingPathId}
+          open={open}
+          pendingDocuments={pendingDocuments}
+          canFilterDocuments={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_ATTACHMENT_READ)}
+          trainingPaths={trainingPaths}
+          size={size}
+        />
         <Suspense fallback={<EnrollmentApplicationTableSkeleton />}>
           <EnrollmentApplicationTableContainer
             page={page}
             size={size}
             status={status}
+            hasFilters={Boolean(status || trainingPathId || open || pendingDocuments)}
             dataPromise={dataPromise}
             canApprove={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_APPROVE)}
             canReject={hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_REJECT)}

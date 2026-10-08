@@ -12,6 +12,7 @@ const customJestConfig = {
   clearMocks: true,
   maxWorkers: "50%",
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
+  testPathIgnorePatterns: ["<rootDir>/test/acceptance/", "<rootDir>/node_modules/"],
   moduleNameMapper: {
     "^msw$": "<rootDir>/node_modules/msw/lib/core/index.js",
     "^msw/node$": "<rootDir>/node_modules/msw/lib/node/index.js",
