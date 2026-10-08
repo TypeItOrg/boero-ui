@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import { QueryClient, QueryClientProvider, type DefaultOptions } from "@tanstack/react-query";
 import { render, type RenderOptions, type RenderResult } from "@testing-library/react";
@@ -39,7 +39,10 @@ export function createTestQueryClient(defaultOptions: DefaultOptions = {}): Quer
 
 export function renderWithQueryClient(ui: ReactElement, options?: Omit<RenderOptions, "wrapper">): RenderWithQueryClientResult {
   const queryClient = createTestQueryClient();
-  const result = render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>, options);
+  const result = render(ui, {
+    ...options,
+    wrapper: ({ children }: { children: ReactNode }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>,
+  });
 
   return {
     ...result,
