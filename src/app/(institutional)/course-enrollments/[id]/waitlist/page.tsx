@@ -18,7 +18,9 @@ export const metadata: Metadata = { title: "Lista de espera" };
 
 export default async function CourseWaitlistPage({ params }: { params: Promise<{ id: string }> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   const { id } = await params;
+
   const entries = await fetchCourseWaitlist(user.institutionId, id);
 
   if (!entries) {

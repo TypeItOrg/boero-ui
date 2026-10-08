@@ -12,7 +12,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/p
 import { cn } from "@common/utils/cn.util";
 
 const DISPLAY_DATE_FORMAT = "dd/MM/yyyy";
+
 const EARLIEST_DATE = new Date(1900, 0);
+
 const DEFAULT_FUTURE_YEARS = 20;
 
 type DatePickerProps = {
@@ -51,8 +53,11 @@ export function DatePicker({
   "aria-required": ariaRequired,
 }: DatePickerProps): ReactElement {
   const [open, setOpen] = useState(false);
+
   const canonicalValue = value ? format(value, DISPLAY_DATE_FORMAT) : "";
+
   const [draftState, setDraftState] = useState<{ source: string; value?: string }>(() => ({ source: canonicalValue }));
+
   const draft = draftState.source === canonicalValue ? draftState.value : undefined;
 
   if (draftState.source !== canonicalValue) {
@@ -65,7 +70,9 @@ export function DatePicker({
     draft?.length === DISPLAY_DATE_FORMAT.length && (!parsedDraft || parsedDraft < minDate || (maxDate !== undefined && parsedDraft > maxDate));
 
   const displayValue = draft ?? canonicalValue;
+
   const hasValue = displayValue.length > 0;
+
   const hasOutOfRangeValue = value !== undefined && (value < minDate || (maxDate !== undefined && value > maxDate));
 
   function setDraft(nextValue: string | undefined): void {
@@ -101,6 +108,7 @@ export function DatePicker({
     }
 
     const date = parseDate(nextDraft);
+
     const isAllowedDate = date !== undefined && date >= minDate && (!maxDate || date <= maxDate);
 
     if (isAllowedDate) {
@@ -209,6 +217,7 @@ function getDisabledDates(minDate: Date, maxDate: Date | undefined): { before: D
 
 function formatDateDraft(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 8);
+
   const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean);
 
   return parts.join("/");

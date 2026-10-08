@@ -46,7 +46,9 @@ async function fetchCourseOptionPage<TItem extends CourseOption>(
   );
 
   const items = Array.isArray(data) ? data : data.items;
+
   const pageNumber = Array.isArray(data) ? 0 : data.page;
+
   const totalPages = Array.isArray(data) ? 1 : data.totalPages;
 
   return {

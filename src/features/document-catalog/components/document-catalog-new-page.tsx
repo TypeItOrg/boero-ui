@@ -39,6 +39,7 @@ export async function DocumentCatalogNewPage({
   }>;
 }): Promise<ReactElement> {
   const params = await searchParams;
+
   let institutionId: string | undefined;
 
   if (scope === "admin") {
@@ -65,10 +66,12 @@ export async function DocumentCatalogNewPage({
   }
 
   let defaults: DocumentDefinitionDefaults | undefined;
+
   let copySourceInstitutionId: string | undefined;
 
   if (params.copyFrom !== undefined || params.sourceInstitutionId !== undefined) {
     const sourceId = z.uuid().safeParse(params.copyFrom);
+
     const sourceInstitutionId = z.uuid().safeParse(params.sourceInstitutionId);
 
     if (scope !== "admin" || !sourceId.success || !sourceInstitutionId.success) {
@@ -101,16 +104,14 @@ export async function DocumentCatalogNewPage({
   }
 
   const institution = scope === "admin" && institutionId ? await fetchInstitution(institutionId) : undefined;
+
   const returnTo = getSafeReturnTo(params.returnTo, institutionId ? getDocumentCatalogPageUrl(scope, institutionId) : "/admin/documentation");
+
   const segmentHrefs = { documentation: returnTo };
 
-  return (
-    <PlatformPageShell
-      title="Nuevo documento"
-      breadcrumb={scope === "admin" ? <PlatformBreadcrumb segmentHrefs={segmentHrefs} /> : <InstitutionalBreadcrumb segmentHrefs={segmentHrefs} />}
-      actions={<PlatformPageIcon icon={FileTextIcon} />}
-    >
-      {scope === "admin" ? (
+  function renderForm(): ReactElement | null {
+    if (scope === "admin") {
+      return (
         <PlatformDocumentCatalogNewForm
           institutionId={institutionId}
           institutionName={institution?.name}
@@ -118,9 +119,23 @@ export async function DocumentCatalogNewPage({
           defaults={defaults}
           copySourceInstitutionId={copySourceInstitutionId}
         />
-      ) : institutionId ? (
-        <DocumentCatalogForm scope={scope} institutionId={institutionId} returnTo={returnTo} />
-      ) : null}
+      );
+    }
+
+    if (institutionId) {
+      return <DocumentCatalogForm scope={scope} institutionId={institutionId} returnTo={returnTo} />;
+    }
+
+    return null;
+  }
+
+  return (
+    <PlatformPageShell
+      title="Nuevo documento"
+      breadcrumb={scope === "admin" ? <PlatformBreadcrumb segmentHrefs={segmentHrefs} /> : <InstitutionalBreadcrumb segmentHrefs={segmentHrefs} />}
+      actions={<PlatformPageIcon icon={FileTextIcon} />}
+    >
+      {renderForm()}
     </PlatformPageShell>
   );
 }

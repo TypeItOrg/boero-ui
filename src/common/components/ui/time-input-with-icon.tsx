@@ -26,6 +26,7 @@ export function TimeInputWithIcon({
   onValueChange,
 }: TimeInputWithIconProps): ReactElement {
   const validTime = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value);
+
   const time = validTime ? new Time(Number(validTime[1]), Number(validTime[2])) : null;
 
   return (

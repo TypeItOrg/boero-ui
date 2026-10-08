@@ -11,7 +11,9 @@ import { enrollmentCourseGroupKey } from "@features/enrollment-applications/util
 
 export function useEnrollmentWizardCourses(props: EnrollmentWizardProps, setValidationIssues: Dispatch<SetStateAction<z.ZodIssue[]>>) {
   const { initialApplication } = props;
+
   const initialData = initialApplication.data;
+
   const { courseOptions, rememberCourse, ...pagination } = useEnrollmentCourseOptions(props);
 
   const [selection, setSelection] = useState(() => ({

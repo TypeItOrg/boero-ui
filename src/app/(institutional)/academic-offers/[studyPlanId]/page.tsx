@@ -32,6 +32,7 @@ export function generateMetadata(): Promise<Metadata> {
 
 export default async function AcademicOfferDetailPage({ params, searchParams }: AcademicOfferDetailPageProps): Promise<ReactElement> {
   const [user, { studyPlanId }, { returnTo }] = await Promise.all([requireInstitutionalUser(), params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/academic-offers");
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)) {

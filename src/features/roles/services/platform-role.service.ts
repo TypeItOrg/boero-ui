@@ -40,7 +40,9 @@ export async function fetchPlatformRole(roleId: string): Promise<PlatformRole | 
 
 export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermissionGroup[]> {
   const response = await platformApiFetch("/api/v1/admin/permissions");
+
   const catalog = await parseHttpResponse<PlatformPermissionCatalogItem[]>(response, "No se pudo obtener el catálogo de permisos.");
+
   const groups = new Map<string, MutablePermissionGroup>();
 
   for (const permission of catalog) {

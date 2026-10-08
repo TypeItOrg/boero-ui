@@ -28,6 +28,7 @@ import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
 import { canEditAcademicResource } from "@features/academic/utils/academic-state.util";
+import { getAcademicTrainingPathId } from "@features/academic/utils/academic-training-path.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
 export async function renderPrimaryDetail(input: RouteDetailInput): Promise<ReactElement> {
@@ -59,6 +60,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
     : Promise.resolve(null);
 
   const [curriculum, fetchedItem, academicSpaceUsage] = await Promise.all([curriculumPromise, itemPromise, academicSpaceUsagePromise]);
+
   const item = curriculum?.studyPlan ?? fetchedItem;
 
   if (!item) {
@@ -66,7 +68,7 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   }
 
   if (input.scope === "institutional") {
-    const pathId = input.resource === AcademicResource.TRAINING_PATH ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : undefined;
+    const pathId = getAcademicTrainingPathId(input.resource, item);
 
     if (pathId) {
       input = { ...input, access: getAcademicAccess(await requireInstitutionalUser(), pathId) };
@@ -74,11 +76,17 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   }
 
   const detailPath = `${input.basePath}/${input.resource}/${input.id}`;
+
   const collectionPath = `${input.basePath}/${input.resource}`;
+
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);
+
   const versionReturnTo = getSafeReturnTo(input.searchParams.returnTo, detailPath);
+
   const isNoDetailResource = input.resource === AcademicResource.ACADEMIC_YEAR;
+
   const canEdit = config.canUpdate(input.access) && canEditAcademicResource(input.resource, item);
+
   const canEditCurriculum = input.access.studyPlanCurriculumUpdate && curriculum !== null && curriculum.studyPlan.status === "DRAFT";
 
   const canCreateVersion =

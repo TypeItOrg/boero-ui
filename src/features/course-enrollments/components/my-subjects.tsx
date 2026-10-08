@@ -29,6 +29,7 @@ type MySubjectsProps = {
 
 export function MySubjects({ data, page, size, status, academicStatus, canWithdraw, canUpdateAcademicStatus }: MySubjectsProps): ReactElement {
   const router = useRouter();
+
   const { isPending, navigate } = useDataTableNavigation();
 
   const [mutation, setMutation] = useState<{
@@ -37,9 +38,13 @@ export function MySubjects({ data, page, size, status, academicStatus, canWithdr
   }>();
 
   const isHistory = status !== COURSE_ENROLLMENT_STATUS.ENROLLED;
+
   const hasFilters = isHistory && (status !== COURSE_ENROLLMENT_STATUS.COMPLETED || academicStatus !== undefined);
+
   const hasItemsOnOtherPages = data.totalItems > 0;
+
   const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : BookOpenIcon;
+
   const view = isHistory ? "history" : "current";
 
   function changeView(value: string): void {

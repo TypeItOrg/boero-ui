@@ -23,7 +23,7 @@ export function EnrollmentBooleanField({
       <FieldLabel htmlFor={id} required>
         {label}
       </FieldLabel>
-      <Select value={value === null ? undefined : value ? "yes" : "no"} onValueChange={(nextValue) => onChange(nextValue === "yes")}>
+      <Select value={getAnswerValue(value)} onValueChange={(nextValue) => onChange(nextValue === "yes")}>
         <SelectTrigger id={id} className="h-9! w-full" aria-invalid={Boolean(error)}>
           <SelectValue placeholder="Seleccioná una opción" />
         </SelectTrigger>
@@ -41,4 +41,12 @@ export function EnrollmentBooleanField({
       <FieldError errors={[{ message: error }]} />
     </Field>
   );
+}
+
+function getAnswerValue(value: boolean | null): "yes" | "no" | undefined {
+  if (value === null) {
+    return undefined;
+  }
+
+  return value ? "yes" : "no";
 }

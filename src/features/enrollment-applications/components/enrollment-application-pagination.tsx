@@ -25,6 +25,7 @@ export function EnrollmentApplicationPagination({ page, size, totalItems, totalP
   }
 
   const totalLabel = totalItems === 1 ? "solicitud de inscripción." : "solicitudes de inscripción.";
+
   const summaryLabel = `${totalItems} ${totalLabel}`;
 
   return (

@@ -21,19 +21,26 @@ export function TrainingPathDocumentInstructions({
   className?: string;
 }): ReactElement | null {
   const [open, setOpen] = useState(false);
+
   const [tooltipOpen, setTooltipOpen] = useState(false);
+
   const id = useId();
+
   const titleId = `${id}-title`;
+
   const descriptionId = `${id}-description`;
+
   const hasGeneral = Boolean(instructions?.trim());
+
   const hasSpecific = Boolean(specificInstructions?.trim());
+
   const hasBoth = hasGeneral && hasSpecific;
 
   if (!hasGeneral && !hasSpecific) {
     return null;
   }
 
-  const title = hasBoth ? "Instrucciones" : hasGeneral ? "Instrucciones generales" : "Instrucciones del trayecto";
+  const title = getInstructionsTitle(hasGeneral, hasSpecific);
 
   function changeOpen(value: boolean): void {
     setOpen(value);
@@ -104,4 +111,12 @@ export function TrainingPathDocumentInstructions({
       </PopoverContent>
     </Popover>
   );
+}
+
+function getInstructionsTitle(hasGeneral: boolean, hasSpecific: boolean): string {
+  if (hasGeneral && hasSpecific) {
+    return "Instrucciones";
+  }
+
+  return hasGeneral ? "Instrucciones generales" : "Instrucciones del trayecto";
 }

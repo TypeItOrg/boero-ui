@@ -29,6 +29,7 @@ export async function DocumentCatalogPage({
   }
 
   let institutionId: string | undefined;
+
   let canManage = false;
 
   if (scope === "admin") {
@@ -50,6 +51,7 @@ export async function DocumentCatalogPage({
   }
 
   const institution = scope === "admin" && institutionId ? await fetchInstitution(institutionId) : undefined;
+
   const breadcrumb = scope === "admin" ? <PlatformBreadcrumb /> : <InstitutionalBreadcrumb />;
 
   return (

@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+import { getBooleanFilterValue } from "@common/utils/boolean-filter-value.util";
 
 const ENABLED_FILTER_OPTIONS = [
   { value: "all", label: "Todas" },
@@ -17,7 +18,7 @@ type PlatformAccountsTableFiltersProps = {
 };
 
 export function PlatformAccountsTableFilters({ enabled, search, size }: PlatformAccountsTableFiltersProps): ReactElement {
-  const enabledValue = enabled === undefined ? "all" : enabled ? "true" : "false";
+  const enabledValue = getBooleanFilterValue(enabled);
 
   const selectFilters: DataTableSelectFilter<EnabledFilterValue>[] = [
     {

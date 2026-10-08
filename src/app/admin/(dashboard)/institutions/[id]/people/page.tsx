@@ -33,9 +33,13 @@ export const metadata: Metadata = {
 
 export default async function InstitutionPeoplePage({ params, searchParams }: PeoplePageProps): Promise<ReactElement> {
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
+
   const rolesPromise = fetchSystemRoles(id, PeopleScope.ADMIN);
+
   const peoplePromise = fetchPeople(id, { page, size, search, sort, roleId });
+
   const [institution, roles] = await Promise.all([fetchInstitution(id), rolesPromise]);
 
   if (!institution) {

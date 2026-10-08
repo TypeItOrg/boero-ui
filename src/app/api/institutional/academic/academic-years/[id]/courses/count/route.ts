@@ -5,7 +5,9 @@ import { AcademicScope, getAcademicApiBase } from "@features/academic/utils/acad
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const { id } = await params;
+
   const { searchParams } = new URL(request.url);
+
   const institutionId = searchParams.get("institutionId");
 
   if (!institutionId) {

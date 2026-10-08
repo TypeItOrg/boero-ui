@@ -26,8 +26,11 @@ type PasskeyRegistrationDialogProps = {
 
 export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, onRequireReauth }: PasskeyRegistrationDialogProps): ReactElement {
   const ceremonyRef = useRef<AbortController | null>(null);
+
   const [verifying, setVerifying] = useState(false);
+
   const webauthnSupported = useWebAuthnSupport();
+
   const [state, action, isPending] = useActionState<VerifyPasskeyRegistrationState, FormData>(register, {});
 
   // WebAuthn is external to React: dismiss its prompt when this dialog unmounts.

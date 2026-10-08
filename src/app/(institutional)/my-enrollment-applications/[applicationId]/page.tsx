@@ -40,7 +40,9 @@ export default async function MyEnrollmentApplicationDetailPage({
   searchParams,
 }: MyEnrollmentApplicationDetailPageProps): Promise<ReactElement> {
   const [{ applicationId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/my-enrollment-applications");
+
   const application = await fetchEnrollmentApplicationById(applicationId).catch(() => null);
 
   if (!application) {
@@ -48,9 +50,13 @@ export default async function MyEnrollmentApplicationDetailPage({
   }
 
   const isEditable = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
+
   const detailLabel = isEditable ? "Continuar inscripción" : "Detalle de inscripción";
+
   const detailContext = [application.trainingPathName, application.academicYearName].filter(Boolean).join(" ");
+
   const breadcrumbLabel = detailContext ? `${detailLabel} · ${detailContext}` : detailLabel;
+
   const PageIcon = isEditable ? FilePenLineIcon : ClipboardListIcon;
 
   const [shifts, courses] = await Promise.all([

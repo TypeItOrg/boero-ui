@@ -17,6 +17,7 @@ import type { City } from "@features/locations/types/city.types";
 import type { Country } from "@features/locations/types/country.types";
 
 const LOCATION_PAGE_SIZE = 20;
+
 const CITY_OPTION_HEIGHT = 56;
 
 type LocationDropdownProps<TItem> = {
@@ -113,6 +114,7 @@ async function fetchLocationPage<TItem>(
   url.search = buildPaginationSearchParams({ page, size, search }).toString();
 
   const response = await fetch(url, { signal });
+
   const data = await parseHttpResponse<PaginatedResponse<TItem>>(response, LOCATION_ERROR_MESSAGES.FETCH_LOCATION_PAGE);
 
   return toAsyncDropdownPage(data);

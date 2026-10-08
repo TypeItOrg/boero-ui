@@ -18,8 +18,11 @@ function getServerHydrationSnapshot(): boolean {
 
 export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep: boolean, isSubmitDialogOpen: boolean) {
   const searchParams = useSearchParams();
+
   const tabTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
+
   const hasCenteredInitialTabRef = useRef(false);
+
   const [pendingFocusFieldId, setPendingFocusFieldId] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<string>(() => {
@@ -76,6 +79,7 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     };
 
     const scrollViewport = activeTrigger.closest("[data-radix-scroll-area-viewport]");
+
     const resizeObserver = new ResizeObserver(centerActiveTabOnResize);
 
     if (scrollViewport) {
@@ -93,6 +97,7 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     params.set("tab", nextTab);
 
     const queryString = params.toString();
+
     const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}${window.location.hash}`;
 
     window.history.replaceState(null, "", nextUrl);

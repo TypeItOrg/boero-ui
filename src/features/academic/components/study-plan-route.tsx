@@ -29,7 +29,9 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<ReactE
     props.scope === "institutional" ? getAcademicAccess(await requireInstitutionalUser(), curriculum.studyPlan.trainingPathId) : props.access;
 
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
+
   const canEditCurriculum = access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
+
   const levels = curriculum.levels.map(({ level }) => level);
 
   if (props.action === ACADEMIC_ROUTE_SEGMENT.VERSIONS) {

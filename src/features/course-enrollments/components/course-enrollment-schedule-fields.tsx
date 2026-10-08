@@ -39,8 +39,11 @@ export function CourseEnrollmentScheduleFields({
       <div className="mt-5 grid min-w-0 gap-3">
         {selectedClass?.days.map((day) => {
           const checked = checkedDays.includes(day.id);
+
           const selection = daySelections[day.id];
+
           const selectedSchedule = day.schedules.find((schedule) => schedule.id === selection?.classScheduleId);
+
           const invalid = invalidDaySet.has(day.id);
 
           return (

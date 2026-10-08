@@ -27,7 +27,9 @@ const INITIAL_STATE: AcademicActionState = {};
 
 export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }: StudyPlanVersionFormProps): ReactElement {
   const action = createStudyPlanVersionAction.bind(null, scope, institutionId, source.id, returnTo);
+
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
+
   const formRef = useActionFormErrorFocus(state, pending);
 
   const initialValues = {

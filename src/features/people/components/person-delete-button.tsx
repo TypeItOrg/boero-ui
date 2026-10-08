@@ -27,6 +27,7 @@ export function PersonDeleteButton({
   size,
 }: PersonDeleteButtonProps): ReactElement {
   const router = useRouter();
+
   const [open, setOpen] = useState(false);
 
   function handleDeleted(): void {

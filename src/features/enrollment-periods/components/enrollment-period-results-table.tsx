@@ -55,7 +55,9 @@ export function EnrollmentPeriodResultsTable({
             : `/enrollment-periods/${period.id}/edit`;
 
           const canClosePeriod = canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.CLOSED;
+
           const canDeletePeriod = canDelete && period.canDelete;
+
           const hasSensitiveActions = canClosePeriod || canDeletePeriod;
 
           const hasRegularActions =

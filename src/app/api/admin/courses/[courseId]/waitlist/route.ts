@@ -9,7 +9,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ cou
   await requirePlatformAccount();
 
   const { courseId } = await context.params;
+
   const institutionId = request.nextUrl.searchParams.get("institutionId");
+
   const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/courses/${courseId}/waitlist`);
 
   return createPassthroughResponse(response);

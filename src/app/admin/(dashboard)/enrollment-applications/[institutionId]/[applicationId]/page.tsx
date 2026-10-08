@@ -32,7 +32,9 @@ export default async function PlatformEnrollmentApplicationDetailPage({
   searchParams,
 }: PlatformEnrollmentApplicationDetailPageProps): Promise<ReactElement> {
   const [{ institutionId, applicationId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/enrollment-applications");
+
   const application = await fetchPlatformEnrollmentApplicationById(institutionId, applicationId);
 
   if (!application) {
@@ -40,7 +42,9 @@ export default async function PlatformEnrollmentApplicationDetailPage({
   }
 
   const personalData = application.data?.personalData;
+
   const personalDataName = `${personalData?.firstName || ""} ${personalData?.lastName || ""}`.trim();
+
   const applicantName = application.applicantName || personalDataName || "Solicitante";
 
   return (

@@ -21,6 +21,7 @@ type CourseEnrollmentDetailProps = {
 
 export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollmentDetailProps): ReactElement {
   const activeSchedules = enrollment.schedules.filter((schedule) => !schedule.releasedAt);
+
   const releasedSchedules = enrollment.schedules.filter((schedule) => schedule.releasedAt);
 
   return (

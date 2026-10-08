@@ -21,7 +21,9 @@ export default async function NewPlatformRolePage({
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/admin/roles");
+
   const permissionGroups = await fetchPlatformPermissionGroups();
 
   if (!permissionGroups.length) {

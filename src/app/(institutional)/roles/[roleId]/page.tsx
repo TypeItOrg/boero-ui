@@ -37,7 +37,9 @@ export default async function RoleDetailPage({
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const [{ roleId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/roles");
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) {
@@ -54,6 +56,7 @@ export default async function RoleDetailPage({
   }
 
   const canUpdate = role.editable && hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
+
   const canDelete = role.deletable && hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_DELETE);
 
   return (

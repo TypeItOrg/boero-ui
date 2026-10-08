@@ -31,6 +31,7 @@ export default async function AcademicOffersPage({ searchParams }: { searchParam
   }
 
   const { page, size } = parsePaginationQuery(await searchParams);
+
   const offers = await fetchAcademicOffers(user.institutionId, { page, size });
 
   return (

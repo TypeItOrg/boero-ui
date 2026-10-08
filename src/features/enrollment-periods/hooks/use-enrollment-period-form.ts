@@ -19,6 +19,7 @@ import { getEnrollmentPeriodDateTimeInput } from "@features/enrollment-periods/u
 
 export function useEnrollmentPeriodForm({ initialInstitution, period, returnTo, scope }: EnrollmentPeriodFormProps) {
   const router = useRouter();
+
   const isEdit = period !== undefined;
 
   const [context, setContext] = useState(() => ({
@@ -29,6 +30,7 @@ export function useEnrollmentPeriodForm({ initialInstitution, period, returnTo, 
 
   const [dates, setDates] = useState(() => {
     const start = period ? getEnrollmentPeriodDateTimeInput(period.startDate) : undefined;
+
     const end = period ? getEnrollmentPeriodDateTimeInput(period.endDate) : undefined;
 
     return { start: { date: start?.date, time: start?.time ?? "" }, end: { date: end?.date, time: end?.time ?? "" } };
@@ -53,6 +55,7 @@ export function useEnrollmentPeriodForm({ initialInstitution, period, returnTo, 
   const [state, formAction, isPending] = useActionState(
     async (_previous: EnrollmentPeriodActionState, formData: FormData): Promise<EnrollmentPeriodActionState> => {
       const startDateTime = parseLocalDateTime(formData.get("startDate"), formData.get("startTime"));
+
       const endDateTime = parseLocalDateTime(formData.get("endDate"), formData.get("endTime"));
 
       if (!startDateTime || !endDateTime) {
@@ -149,6 +152,7 @@ function parseLocalDateTime(dateValue: FormDataEntryValue | null, timeValue: For
   }
 
   const date = parseDateInput(dateValue);
+
   const time = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(timeValue);
 
   if (!date || !time) {

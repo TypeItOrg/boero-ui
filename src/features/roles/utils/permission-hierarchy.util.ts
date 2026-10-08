@@ -15,8 +15,11 @@ export function getPermissionTree(
   allPermissions: ReadonlyMap<string, InstitutionPermission>,
 ): PermissionTreeNode[] {
   const groupPermissionCodes = new Set(groupPermissions.map((permission) => permission.code));
+
   const originalOrder = new Map(groupPermissions.map((permission, index) => [permission.code, index]));
+
   const childrenByParentCode = new Map<string, InstitutionPermission[]>();
+
   const rootPermissions: InstitutionPermission[] = [];
 
   for (const permission of groupPermissions) {

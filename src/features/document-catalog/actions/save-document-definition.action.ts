@@ -57,6 +57,7 @@ export async function saveDocumentDefinition(
   }
 
   const rawTargetInstitutionId = form.get("targetInstitutionId");
+
   let targetInstitutionId: string | undefined;
 
   if (rawTargetInstitutionId !== null && rawTargetInstitutionId !== "") {
@@ -109,7 +110,9 @@ export async function saveDocumentDefinition(
   }
 
   const active = z.enum(["true", "false"]).safeParse(form.get("active"));
+
   const rawRevision = form.get("revision");
+
   const revision = rawRevision === "" || rawRevision === null ? undefined : z.string().regex(/^\d+$/).transform(Number).safeParse(rawRevision);
 
   const input = documentDefinitionSchema.safeParse({
@@ -132,6 +135,7 @@ export async function saveDocumentDefinition(
   }
 
   const effectiveId = id ?? progress.data.document?.id;
+
   let response: Response | undefined;
 
   const pending = academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/document-definitions${effectiveId ? "/" + effectiveId : ""}`, {
@@ -176,7 +180,9 @@ export async function saveDocumentDefinition(
   if (destination) {
     if (scope === "admin" && result.document.institutionId !== institutionId) {
       const origin = new URL(destination, "https://return-to.invalid");
+
       const documentPath = `${catalogPath}/${result.document.id}`.toLowerCase();
+
       const destinationPath = origin.pathname.toLowerCase();
 
       if (destinationPath === documentPath || destinationPath === `${documentPath}/edit`) {

@@ -1,4 +1,5 @@
 const MIN_SCHEDULE_YEAR = 1900;
+
 const MAX_SCHEDULE_YEAR = 2100;
 
 export function isScheduleDate(value: unknown): value is string {

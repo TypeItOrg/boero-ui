@@ -60,6 +60,7 @@ export function ActiveAcademicStatusDialog({
   );
 
   const config = ACTIVE_STATUS_DIALOG_CONFIG[resource][targetStatus];
+
   const Icon = config.icon;
 
   function handleOpenChange(nextOpen: boolean): void {
@@ -107,6 +108,7 @@ export function ActiveAcademicStatusDialog({
 
 export function ActiveAcademicStatusButton({ active, disabled = false, ...props }: ActiveAcademicStatusButtonProps): ReactElement {
   const [open, setOpen] = useState(false);
+
   const targetStatus = active ? "INACTIVE" : "ACTIVE";
 
   return (

@@ -34,10 +34,15 @@ type LocationPickerProps = {
 
 export function LocationPicker({ onValueChange, error, initialLocation }: LocationPickerProps): ReactElement {
   const [country, setCountry] = useState<Country | undefined>(() => initialLocation?.country);
+
   const [province, setProvince] = useState<Province | undefined>(() => initialLocation?.province);
+
   const [city, setCity] = useState<City | undefined>(() => initialLocation?.city);
+
   const countryError = error && !country ? LOCATION_ERROR_MESSAGES.REQUIRED_COUNTRY : undefined;
+
   const provinceError = error && country && !province ? LOCATION_ERROR_MESSAGES.REQUIRED_PROVINCE : undefined;
+
   const cityError = error && province && !city ? error : undefined;
 
   function handleSelectCountry(_value: string | undefined, item: Country | undefined): void {

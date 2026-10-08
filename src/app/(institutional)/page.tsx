@@ -34,18 +34,31 @@ export default function Home(): ReactElement {
 
 async function InstitutionalHomeContent(): Promise<ReactElement> {
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
+
   const links = getInstitutionalHomeLinks(user);
+
   const managementLinks = links.filter((link) => link.href !== "/account");
+
   const personalLink = links.find((link) => link.href === "/account");
+
   const academicOfferLink = getInstitutionalAcademicOfferLink(user);
+
   const academicResources = getReadableAcademicResources(getAcademicAccess(user));
+
   const enrollmentLinks = getInstitutionalEnrollmentHomeLinks(user);
+
   const formationLinks = getInstitutionalFormationHomeLinks(user);
+
   const hasInstitutionalAccess = managementLinks.length > 0;
+
   const hasAcademicAccess = academicResources.length > 0 || academicOfferLink !== undefined;
+
   const hasEnrollmentAccess = enrollmentLinks.length > 0;
+
   const hasManagementTools = hasInstitutionalAccess || hasAcademicAccess || hasEnrollmentAccess;
+
   const greeting = getGreeting(new Date());
+
   const primaryRole = user.roles[0] ?? "Usuario institucional";
 
   return (

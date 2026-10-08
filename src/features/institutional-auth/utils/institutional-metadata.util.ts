@@ -6,6 +6,7 @@ import { fetchInstitutionalPerson } from "@features/institutional-auth/services/
 
 export async function getInstitutionalMetadata(pageTitle: string): Promise<Metadata> {
   const person = await fetchInstitutionalPerson();
+
   const institutionName = person?.institutionName || "Boero";
 
   return {

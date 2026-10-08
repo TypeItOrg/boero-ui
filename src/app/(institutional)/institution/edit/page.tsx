@@ -29,7 +29,9 @@ type EditInstitutionalInstitutionPageProps = {
 
 export default async function EditInstitutionalInstitutionPage({ searchParams }: EditInstitutionalInstitutionPageProps): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/institution");
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_UPDATE)) {

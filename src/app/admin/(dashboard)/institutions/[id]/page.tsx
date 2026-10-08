@@ -34,7 +34,9 @@ export const metadata: Metadata = {
 
 export default async function InstitutionDetailPage({ params, searchParams }: InstitutionDetailPageProps): Promise<ReactElement> {
   const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/institutions");
+
   const institution = await fetchInstitution(id);
 
   if (!institution) {

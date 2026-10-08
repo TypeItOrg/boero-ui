@@ -22,6 +22,7 @@ export function PersonActionsMenu({
   scope,
 }: PersonActionsMenuProps): ReactElement {
   const personHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined);
+
   const personDetailHref = getPersonHref(scope, institutionId, person.id, isSelf ? person.id : undefined, true);
 
   return (

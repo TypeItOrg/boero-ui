@@ -28,10 +28,15 @@ export default async function MyCourseEnrollmentsPage({
   searchParams: Promise<CourseEnrollmentSearchParams>;
 }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   const resolvedSearchParams = await searchParams;
+
   const parsed = parseCourseEnrollmentPaginationParams(resolvedSearchParams);
+
   const { page, size } = parsed;
+
   const status = parsed.status ?? COURSE_ENROLLMENT_STATUS.ENROLLED;
+
   const academicStatus = status === COURSE_ENROLLMENT_STATUS.ENROLLED ? undefined : parsed.academicStatus;
 
   const data = await fetchMyCourseEnrollments(user.institutionId, {
@@ -42,6 +47,7 @@ export default async function MyCourseEnrollmentsPage({
   });
 
   const canWithdraw = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_WITHDRAW);
+
   const canUpdateAcademicStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE);
 
   return (

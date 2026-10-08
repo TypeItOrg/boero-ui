@@ -18,6 +18,7 @@ export function StudyPlanFields({
   trainingPaths = [],
 }: AcademicFieldsProps): ReactElement {
   const initialTrainingPathId = toOptionalFormString(initialValues.trainingPathId);
+
   const initialStatus = toOptionalFormString(initialValues.status);
 
   return (

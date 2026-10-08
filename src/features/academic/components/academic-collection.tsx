@@ -11,6 +11,7 @@ import { type AcademicCollectionProps } from "@features/academic/types/academic-
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { getAcademicCollectionFilters } from "@features/academic/utils/academic-collection-filter-state.util";
 import { parseAcademicPaginationParams } from "@features/academic/utils/academic-pagination.util";
+import { getAcademicTrainingPathId } from "@features/academic/utils/academic-training-path.util";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import type { InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
@@ -36,9 +37,13 @@ export async function AcademicCollectionView({
   searchParams,
 }: AcademicCollectionProps): Promise<ReactElement> {
   const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
   const isTrainingPathFixed = fixedTrainingPathId !== undefined;
+
   const parsedParams = parseAcademicPaginationParams(searchParams, resource);
+
   const params = isTrainingPathFixed ? { ...parsedParams, trainingPathId: fixedTrainingPathId } : parsedParams;
+
   const effectiveInstitutionId = global ? params.institutionId : institutionId;
 
   const data = await config.fetchPage({
@@ -49,22 +54,24 @@ export async function AcademicCollectionView({
   });
 
   const selectedTrainingPath = data.items.find((item) => "trainingPathId" in item && item.trainingPathId === params.trainingPathId);
+
   const selectedStudyPlan = data.items.find((item) => "studyPlanId" in item && item.studyPlanId === params.studyPlanId);
+
   const selectedAcademicSpace = data.items.find((item) => "academicSpaceId" in item && item.academicSpaceId === params.academicSpaceId);
+
   const user = scope === "institutional" ? await requireInstitutionalUser() : null;
 
   const rows = data.items
     .map((item) => {
       const row = config.toRow(item);
 
-      const permissionResource =
-        resource === "training-paths" ? "training-path" : resource === "study-plans" ? "study-plan" : resource === "courses" ? "course" : null;
+      const permissionResource = getPermissionResource(resource);
 
       if (!user || !permissionResource) {
         return row;
       }
 
-      const pathId = resource === "training-paths" ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : "";
+      const pathId = getAcademicTrainingPathId(resource, item) ?? "";
 
       const permits = (action: string) =>
         scopeIncludesTrainingPath(user.permissionScopes, `institution:${permissionResource}:${action}` as InstitutionalPermission, pathId);
@@ -96,13 +103,13 @@ export async function AcademicCollectionView({
     isTrainingPathFixed,
   });
 
+  const actionAlignment = filterState.useAdvancedFilters ? "sm:justify-between" : "sm:justify-start";
+
   return (
     <div className="flex h-full flex-col gap-4">
       <DataTableNavigationProvider>
         <Sheet>
-          <PlatformCollectionActions
-            className={filterState.useAdvancedFilters && createAction ? "sm:justify-between" : createAction ? "sm:justify-start" : undefined}
-          >
+          <PlatformCollectionActions className={createAction ? actionAlignment : undefined}>
             {filterState.useAdvancedFilters ? (
               <>
                 {createAction}
@@ -153,4 +160,17 @@ export async function AcademicCollectionView({
       </DataTableNavigationProvider>
     </div>
   );
+}
+
+function getPermissionResource(resource: AcademicResource): string | null {
+  switch (resource) {
+    case AcademicResource.TRAINING_PATH:
+      return "training-path";
+    case AcademicResource.STUDY_PLAN:
+      return "study-plan";
+    case AcademicResource.COURSE:
+      return "course";
+    default:
+      return null;
+  }
 }

@@ -9,12 +9,19 @@ import type { DocumentPdfPreviewProps } from "@features/enrollment-applications/
 
 export function useDocumentPdfPreview({ src, expanded, onError }: DocumentPdfPreviewProps) {
   const previewId = useId();
+
   const { containerRef, size } = usePreviewContainerSize();
+
   const pdf = usePreviewPdfDocument(src, onError);
+
   const [view, setView] = useState({ pageNumber: 1, fitWidth: true, zoom: null as number | null });
+
   const { pageNumber, fitWidth, zoom } = view;
+
   const { canvasRef, loading, renderedScale } = usePreviewPdfCanvas({ pdf, pageNumber, expanded, fitWidth, zoom, size, onError });
+
   const automaticFit = zoom === null;
+
   const controlsDisabled = loading || !pdf;
 
   function changePage(next: number): void {

@@ -27,6 +27,7 @@ type ActiveStatusFieldProps = {
 
 export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
+
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
   return (
@@ -40,6 +41,7 @@ export function TrainingPathFields({ initialValues = {}, fieldErrors }: Academic
 
 export function InstrumentFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
   return (
@@ -53,6 +55,7 @@ export function InstrumentFields({ canChangeStatus = true, initialValues = {}, f
 
 export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
   return (
@@ -66,7 +69,9 @@ export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldE
 
 export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
+
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
+
   const instrumentalLocked = Boolean(initialValues.id && initialValues.instrumentalLocked);
 
   return (

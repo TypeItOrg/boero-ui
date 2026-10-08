@@ -21,6 +21,7 @@ export default async function AdminAcademicPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<ReactElement> {
   const [, resolvedParams, resolvedSearchParams] = await Promise.all([requirePlatformAccount(), params, searchParams]);
+
   const institution = await fetchInstitution(resolvedParams.id);
 
   if (!institution) {

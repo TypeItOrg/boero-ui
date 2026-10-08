@@ -15,6 +15,7 @@ export function useEnrollmentCourseOptions({
   initialCourseOptionsTotalPages = 1,
 }: EnrollmentWizardProps) {
   const queryClient = useQueryClient();
+
   const queryKey = ["enrollment-course-options", initialApplication.applicationId];
 
   const query = useInfiniteQuery({

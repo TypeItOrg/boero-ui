@@ -14,7 +14,9 @@ const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
 export function InstitutionalRegisterForm(): ReactElement {
   const [state, formAction, isPending] = useActionState<InstitutionalRegisterActionState, FormData>(registerInstitutional, INITIAL_STATE);
+
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
+
   const [birthDate, setBirthDate] = useState<Date>();
 
   return (

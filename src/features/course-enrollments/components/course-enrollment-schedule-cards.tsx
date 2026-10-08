@@ -13,6 +13,7 @@ type CourseEnrollmentScheduleCardsProps = {
 
 export function CourseEnrollmentScheduleCards({ schedules }: CourseEnrollmentScheduleCardsProps): ReactElement {
   const days = [...new Set(schedules.map((schedule) => schedule.dayOfWeek))];
+
   const dayOrder = Object.keys(COURSE_DAY_LABELS);
 
   days.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));

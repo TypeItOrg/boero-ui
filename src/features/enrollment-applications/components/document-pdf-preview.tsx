@@ -33,11 +33,15 @@ function DocumentPdfPreviewView({ src, name, expanded, onError }: DocumentPdfPre
     changePage,
   } = useDocumentPdfPreview({ src, name, expanded, onError });
 
+  const fitMode = fitWidth ? "width" : "page";
+
+  const previewRole = automaticFit ? "tabpanel" : "region";
+
   return (
     <div className={cn("flex h-full min-h-0 flex-col", expanded && "gap-3")}>
       {expanded ? (
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2" aria-label="Controles de vista del PDF">
-          <Tabs value={automaticFit ? (fitWidth ? "width" : "page") : ""} onValueChange={(value) => changeFit(value === "width")}>
+          <Tabs value={automaticFit ? fitMode : ""} onValueChange={(value) => changeFit(value === "width")}>
             <TabsList className="flex h-[52px]! gap-1 p-1" aria-label="Ajuste de la vista del PDF">
               <TabsTrigger
                 value="width"
@@ -97,8 +101,8 @@ function DocumentPdfPreviewView({ src, name, expanded, onError }: DocumentPdfPre
         )}
         aria-busy={loading}
         tabIndex={expanded ? 0 : undefined}
-        role={expanded ? (automaticFit ? "tabpanel" : "region") : undefined}
-        aria-labelledby={expanded && automaticFit ? `${previewId}-${fitWidth ? "width" : "page"}` : undefined}
+        role={expanded ? previewRole : undefined}
+        aria-labelledby={expanded && automaticFit ? `${previewId}-${fitMode}` : undefined}
         aria-label={expanded && !automaticFit ? `Documento ${name}` : undefined}
       >
         {loading ? (

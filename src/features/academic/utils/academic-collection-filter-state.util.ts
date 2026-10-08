@@ -17,14 +17,23 @@ export function getAcademicCollectionFilters({
   isTrainingPathFixed: boolean;
 }) {
   const filters = config.filters(params);
+
   const isCourse = resource === AcademicResource.COURSE;
+
   const isAcademicYear = resource === AcademicResource.ACADEMIC_YEAR;
+
   const isStudyPlan = resource === AcademicResource.STUDY_PLAN;
+
   const isAcademicSpace = resource === AcademicResource.ACADEMIC_SPACE;
+
   const useAdvancedFilters = isCourse || isAcademicYear || isStudyPlan || isAcademicSpace;
+
   const advancedSelectFilterNames = new Set(isAcademicSpace ? ["type", "format", "deleted"] : ["deleted"]);
+
   const primarySelectFilters = useAdvancedFilters ? filters.filter((filter) => !advancedSelectFilterNames.has(filter.name)) : filters;
+
   const advancedSelectFilters = useAdvancedFilters ? filters.filter((filter) => advancedSelectFilterNames.has(filter.name)) : [];
+
   let customAdvancedFilters: readonly { active: boolean; key: string }[] = [];
 
   if (isCourse) {
@@ -45,10 +54,15 @@ export function getAcademicCollectionFilters({
   }
 
   const activeAdvancedCount = customAdvancedFilters.filter((filter) => filter.active).length;
+
   const advancedResetKeys = customAdvancedFilters.map((filter) => filter.key);
+
   const yearFilters = config.yearFilters?.(params) ?? [];
+
   const dateFilters = config.dateFilters?.(params) ?? [];
+
   const advancedYearFilters = isAcademicYear ? yearFilters : [];
+
   const advancedDateFilters = isAcademicYear || isStudyPlan ? dateFilters : [];
 
   const advancedBadgeCount = countActiveAdvancedFilters({

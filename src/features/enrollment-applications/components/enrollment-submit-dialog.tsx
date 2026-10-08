@@ -25,6 +25,7 @@ type EnrollmentSubmitDialogProps = {
 
 export function EnrollmentSubmitDialog({ onClose, onSubmit }: EnrollmentSubmitDialogProps): ReactElement {
   const [state, action, pending] = useActionState(async () => onSubmit(), null);
+
   const error = state?.error ?? (state?.issues?.length ? ENROLLMENT_MESSAGES.INCOMPLETE_FIELDS_SUMMARY(state.issues.length) : undefined);
 
   return (

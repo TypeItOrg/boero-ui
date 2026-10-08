@@ -15,8 +15,11 @@ export type MobileSidebarNavigation = {
 
 export function useMobileSidebarNavigation(): MobileSidebarNavigation {
   const pathname = usePathname();
+
   const { isMobile, setOpenMobile } = useSidebar();
+
   const [pendingUrl, setPendingUrl] = useState<string>();
+
   const [navigatedFromPathname, setNavigatedFromPathname] = useState<string>();
 
   function clearPendingState(): void {
@@ -26,6 +29,7 @@ export function useMobileSidebarNavigation(): MobileSidebarNavigation {
 
   if (pendingUrl) {
     const hasPathnameChanged = navigatedFromPathname !== undefined && pathname !== navigatedFromPathname;
+
     const shouldResetOnRender = (!isMobile && pathname === pendingUrl) || (hasPathnameChanged && pathname !== pendingUrl);
 
     if (shouldResetOnRender) {

@@ -28,7 +28,9 @@ export function useVirtualizedDropdownItems<TItem>({
   value,
 }: VirtualizedDropdownItemsProps<TItem>) {
   const parentRef = useRef<HTMLDivElement | null>(null);
+
   const hasDefault = defaultOption !== undefined && showDefaultOption;
+
   const selectedValueSet = useMemo(() => new Set(selectedValues ?? (value ? [value] : [])), [selectedValues, value]);
 
   const rows = useMemo(() => {
@@ -62,7 +64,9 @@ export function useVirtualizedDropdownItems<TItem>({
   }, [compareGroups, getItemGroup, getItemValue, groupOrder, hasDefault, hasNextPage, items]);
 
   const measureRows = getItemGroup !== undefined || getItemDisplayLabel !== undefined || getItemDescription !== undefined;
+
   const scrollAnchor = useRef<{ key: string; offset: number } | null>(null);
+
   const virtualCount = rows.length;
 
   const viewportHeight = getViewportHeight({
@@ -87,9 +91,13 @@ export function useVirtualizedDropdownItems<TItem>({
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
+
   const virtualContentHeight = rowVirtualizer.getTotalSize();
+
   const measuredViewportHeight = measureRows ? Math.min(listHeight, Math.max(estimateSize, virtualContentHeight)) : viewportHeight;
+
   const hasScrollableOverflow = virtualContentHeight > measuredViewportHeight;
+
   const lastVirtualIndex = virtualItems.at(-1)?.index;
 
   useEffect(() => {
@@ -115,6 +123,7 @@ export function useVirtualizedDropdownItems<TItem>({
     }
 
     const index = rows.findIndex((row) => row.key === anchor.key);
+
     const position = index >= 0 ? rowVirtualizer.getOffsetForIndex(index, "start") : undefined;
 
     if (position) {
@@ -128,6 +137,7 @@ export function useVirtualizedDropdownItems<TItem>({
     }
 
     const scrollTop = parentRef.current.scrollTop;
+
     const firstItem = rowVirtualizer.getVirtualItems().find((row) => row.end > scrollTop && rows[row.index].kind === "item");
 
     if (firstItem) {

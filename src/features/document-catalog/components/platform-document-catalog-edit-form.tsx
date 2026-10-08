@@ -25,9 +25,13 @@ export function PlatformDocumentCatalogEditForm({
   });
 
   const [pending, setPending] = useState(false);
+
   const [copyOpen, setCopyOpen] = useState(false);
+
   const copyButtonRef = useRef<HTMLButtonElement>(null);
+
   const canChangeInstitution = document.canChangeInstitution === true;
+
   const copyUrl = appendReturnTo(`/admin/documentation/new?copyFrom=${document.id}&sourceInstitutionId=${document.institutionId}`, returnTo);
 
   return (

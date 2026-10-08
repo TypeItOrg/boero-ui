@@ -38,6 +38,7 @@ export default async function TeacherClassPage({
   }
 
   const { page, size } = parseCourseEnrollmentPaginationParams(await searchParams);
+
   const data = await fetchTeacherClassEnrollments(user.institutionId, classId, page, size);
 
   return (

@@ -59,7 +59,9 @@ export function AsyncDropdownList<TItem>({
   const { fetchNextPage, hasNextPage, isError, isFetching, isFetchingNextPage, isPending, refetch } = query;
 
   let commandListContent: ReactNode;
+
   const showDefaultOption = !!defaultOption && (!search || defaultOption.label.toLowerCase().includes(search.toLowerCase()));
+
   const isLoading = isPending || (isFetching && !isFetchingNextPage);
 
   if (isLoading) {
@@ -68,8 +70,11 @@ export function AsyncDropdownList<TItem>({
     commandListContent = <ErrorState message={errorMessage} retry={() => void refetch()} />;
   } else if (items.length === 0 && !showDefaultOption) {
     const isSearching = debouncedSearch.trim() !== "";
+
     const activeIcon = isSearching ? SearchIcon : (emptyIcon ?? SearchIcon);
+
     const activeTitle = isSearching ? "No se encontraron resultados" : (emptyTitle ?? emptyMessage);
+
     const activeDescription = isSearching ? `No encontramos resultados para "${debouncedSearch.trim()}".` : emptyDescription;
 
     commandListContent = (

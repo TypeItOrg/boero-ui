@@ -41,6 +41,7 @@ export const updatePersonFormSchema = basePersonSchema
   })
   .superRefine((values, context) => {
     const password = values.password ?? "";
+
     const confirmPassword = values.confirmPassword ?? "";
 
     if (password !== "" && password.length < 8) {

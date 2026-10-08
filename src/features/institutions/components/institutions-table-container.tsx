@@ -8,6 +8,7 @@ type ContainerProps = InstitutionPaginationParams;
 
 export async function InstitutionsTableContainer(params: ContainerProps): Promise<ReactElement> {
   const data = await fetchInstitutions(params);
+
   const { page, size, sort, search, active } = params;
 
   return <InstitutionsTablePresentation key={`${page}-${size}`} data={data} page={page} size={size} sort={sort} search={search} active={active} />;

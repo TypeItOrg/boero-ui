@@ -47,7 +47,9 @@ export function AcademicTablePresentation({
   size,
 }: AcademicTablePresentationProps): ReactElement {
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
+
   const { isPending, navigate } = useDataTableNavigation();
 
   const [statusAction, setStatusAction] = useState<{
@@ -63,8 +65,11 @@ export function AcademicTablePresentation({
   }>();
 
   const returnTo = getCurrentPath(pathname, searchParams.toString());
+
   const lifecycleRow = lifecycleAction ? data.items.find((row) => row.id === lifecycleAction.id) : undefined;
+
   const showDeleteDialog = lifecycleAction?.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE && lifecycleRow?.deletedAt == null;
+
   const showRestoreDialog = lifecycleAction?.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.RESTORE && lifecycleRow?.deletedAt != null;
 
   function updateSort(nextSort: AcademicSort): void {
@@ -77,7 +82,19 @@ export function AcademicTablePresentation({
 
   if (data.items.length === 0) {
     const allowCreate = !deleted && (canCreate || createAction !== undefined);
+
     const isInitialEmptyState = !hasFilters && !deleted && data.totalItems === 0 && allowCreate;
+
+    const defaultCreateAction = (
+      <Button asChild size="lg">
+        <ReturnToLink href={`${basePath}/${resource}/new`}>
+          <PlusIcon data-icon="inline-start" />
+          {`Nuevo ${singular}`}
+        </ReturnToLink>
+      </Button>
+    );
+
+    const emptyStateCreateAction = createAction ? <div>{createAction}</div> : defaultCreateAction;
 
     return (
       <div className="relative h-full" aria-busy={isPending}>
@@ -88,18 +105,7 @@ export function AcademicTablePresentation({
           showingDeleted={deleted}
           onFirstPage={() => navigate({ page: "0", size: String(size) })}
           supportingDescription={isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined}
-          createAction={
-            allowCreate && createAction ? (
-              <div>{createAction}</div>
-            ) : allowCreate ? (
-              <Button asChild size="lg">
-                <ReturnToLink href={`${basePath}/${resource}/new`}>
-                  <PlusIcon data-icon="inline-start" />
-                  {`Nuevo ${singular}`}
-                </ReturnToLink>
-              </Button>
-            ) : null
-          }
+          createAction={allowCreate ? emptyStateCreateAction : null}
         />
         {isPending ? <DataTableLoadingOverlay label="Cargando información académica" /> : null}
       </div>

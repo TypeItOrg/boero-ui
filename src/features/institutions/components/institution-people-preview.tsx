@@ -55,7 +55,9 @@ export async function InstitutionPeoplePreview({ institutionId }: InstitutionPeo
         <div className="mt-4 flex flex-col gap-4">
           {people.items.map((person) => {
             const roles = person.roles ?? [];
+
             const primaryRole = roles[0];
+
             const additionalRoleCount = roles.length - 1;
 
             return (

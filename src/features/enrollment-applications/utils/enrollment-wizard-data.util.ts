@@ -23,6 +23,7 @@ export function buildEnrollmentWizardData({
   selectedCourseIds: string[];
 }): EnrollmentApplicationData {
   const birthDate = parseInitialBirthDate(initial?.personalData?.birthDate);
+
   const trainingPathId = initial?.careerSelection?.trainingPathId;
 
   return {

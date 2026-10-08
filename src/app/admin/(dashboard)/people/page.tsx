@@ -26,7 +26,9 @@ type PlatformPeoplePageProps = {
 
 export default async function PlatformPeoplePage({ searchParams }: PlatformPeoplePageProps): Promise<ReactElement> {
   const params = parsePlatformPeoplePaginationParams(await searchParams);
+
   const peoplePromise = fetchPlatformPeople(params);
+
   const [roleList, selectedInstitutionName] = await Promise.all([fetchSystemRolesCatalog(), getSelectedInstitutionName(params.institutionId)]);
 
   return (

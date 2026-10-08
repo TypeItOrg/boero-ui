@@ -24,6 +24,7 @@ type InstitutionStatusChartProps = {
 
 export function InstitutionStatusChart({ active, inactive }: InstitutionStatusChartProps): ReactElement {
   const total = active + inactive;
+
   const activePercentage = Math.round((active / total) * 100);
 
   const chartData = [

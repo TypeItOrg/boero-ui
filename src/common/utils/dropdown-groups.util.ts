@@ -12,6 +12,7 @@ export function groupDropdownItems<TItem>(
 
   for (const item of items) {
     const label = getItemGroup(item);
+
     const group = groups.get(label) ?? [];
 
     group.push(item);
@@ -31,6 +32,7 @@ export function groupDropdownItems<TItem>(
       }
 
       const leftIndex = groupOrder.indexOf(left);
+
       const rightIndex = groupOrder.indexOf(right);
 
       if (leftIndex >= 0 || rightIndex >= 0) {

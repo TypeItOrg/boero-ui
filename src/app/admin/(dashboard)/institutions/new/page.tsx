@@ -17,6 +17,7 @@ export const metadata = {
 
 export default async function NewInstitutionPage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/admin/institutions");
 
   return (

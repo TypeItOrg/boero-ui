@@ -30,17 +30,27 @@ export function MyWeeklySchedule({
   const [selectedDay, setSelectedDay] = useState(schedules[0]?.schedule.dayOfWeek ?? "MONDAY");
 
   const { isPending, navigate } = useDataTableNavigation();
+
   const currentWeek = getScheduleWeek(undefined, referenceDate);
+
   const previousWeek = shiftScheduleWeek(weekStart, -1);
+
   const nextWeek = shiftScheduleWeek(weekStart, 1);
 
   const startMinutes = schedules.map(({ schedule }) => toMinutes(schedule.startTime));
+
   const endMinutes = schedules.map(({ schedule }) => toMinutes(schedule.endTime));
+
   const firstHour = Math.max(0, Math.floor(Math.min(...(startMinutes.length > 0 ? startMinutes : [9 * 60])) / 60) - 1);
+
   const lastHour = Math.min(24, Math.max(firstHour + 4, Math.ceil(Math.max(...(endMinutes.length > 0 ? endMinutes : [13 * 60])) / 60) + 1));
+
   const hours = Array.from({ length: lastHour - firstHour }, (_, index) => firstHour + index);
+
   const calendarHeight = hours.length * 120;
+
   const totalMinutes = hours.length * 60;
+
   const monday = new Date(`${weekStart}T00:00:00Z`);
 
   const dates = Object.keys(COURSE_DAY_LABELS).map((_, index) => {
@@ -58,16 +68,56 @@ export function MyWeeklySchedule({
   });
 
   const firstMonth = monthFormatter.format(dates[0]);
+
   const lastMonth = monthFormatter.format(dates[6]);
+
   const monthLabel = firstMonth === lastMonth ? firstMonth : `${firstMonth} – ${lastMonth}`;
+
   const shortDateFormatter = new Intl.DateTimeFormat("es-AR", { month: "long", timeZone: "UTC" });
+
   const startMonth = shortDateFormatter.format(dates[0]);
+
   const endMonth = shortDateFormatter.format(dates[6]);
 
   const weekLabel =
     startMonth === endMonth
       ? `${dates[0].getUTCDate()} – ${dates[6].getUTCDate()} de ${endMonth}`
       : `${dates[0].getUTCDate()} de ${startMonth} – ${dates[6].getUTCDate()} de ${endMonth}`;
+
+  function renderContent(): ReactElement | null {
+    if (isPending) {
+      return <MySubjectsSkeleton />;
+    }
+
+    if (schedules.length === 0) {
+      return (
+        <Empty className="bg-muted/25 min-h-56 flex-1 rounded-lg border border-solid px-4 py-12">
+          <EmptyHeader className="max-w-md">
+            <EmptyMedia variant="icon">
+              <CalendarRangeIcon className="size-5" aria-hidden="true" />
+            </EmptyMedia>
+            <EmptyTitle className="mt-2 text-base">No tenés clases programadas esta semana</EmptyTitle>
+            <EmptyDescription>
+              Podés recorrer las semanas para consultar los horarios de tus clases o volver a la semana actual con el botón «Hoy».
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      );
+    }
+
+    return (
+      <WeeklyScheduleCalendar
+        calendarHeight={calendarHeight}
+        selectedDay={selectedDay}
+        dates={dates}
+        hours={hours}
+        schedules={schedules}
+        weekStart={weekStart}
+        firstHour={firstHour}
+        totalMinutes={totalMinutes}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4" aria-busy={isPending}>
@@ -130,32 +180,7 @@ export function MyWeeklySchedule({
           </button>
         ))}
       </nav>
-      {isPending ? (
-        <MySubjectsSkeleton />
-      ) : schedules.length === 0 ? (
-        <Empty className="bg-muted/25 min-h-56 flex-1 rounded-lg border border-solid px-4 py-12">
-          <EmptyHeader className="max-w-md">
-            <EmptyMedia variant="icon">
-              <CalendarRangeIcon className="size-5" aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle className="mt-2 text-base">No tenés clases programadas esta semana</EmptyTitle>
-            <EmptyDescription>
-              Podés recorrer las semanas para consultar los horarios de tus clases o volver a la semana actual con el botón «Hoy».
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : (
-        <WeeklyScheduleCalendar
-          calendarHeight={calendarHeight}
-          selectedDay={selectedDay}
-          dates={dates}
-          hours={hours}
-          schedules={schedules}
-          weekStart={weekStart}
-          firstHour={firstHour}
-          totalMinutes={totalMinutes}
-        />
-      )}
+      {renderContent()}
     </div>
   );
 }

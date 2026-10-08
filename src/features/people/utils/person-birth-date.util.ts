@@ -1,6 +1,7 @@
 import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
 
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
+
 const MINIMUM_PERSON_AGE = 3;
 
 const ARGENTINA_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
@@ -12,7 +13,9 @@ const ARGENTINA_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
 
 export function getLatestAllowedBirthDate(today = getArgentinaToday()): Date {
   const targetYear = today.getFullYear() - MINIMUM_PERSON_AGE;
+
   const month = today.getMonth();
+
   const lastDayOfTargetMonth = new Date(targetYear, month + 1, 0).getDate();
 
   return new Date(targetYear, month, Math.min(today.getDate(), lastDayOfTargetMonth));

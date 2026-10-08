@@ -29,6 +29,7 @@ export function appendInstitutionLogoChange(formData: FormData, change: Institut
 
 export function parseInstitutionLogoChange(formData: FormData): InstitutionLogoChange | { error: string } {
   const intent = formData.get("logoIntent");
+
   const file = formData.get("logoFile");
 
   if (formData.getAll("logoFile").length > 1) {

@@ -9,7 +9,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ app
   await requireInstitutionalUser();
 
   const { applicationId } = await context.params;
+
   const searchParams = new URLSearchParams(request.nextUrl.searchParams);
+
   const response = await institutionalApiFetch(`/api/v1/enrollment-applications/${applicationId}/courses?${searchParams.toString()}`);
 
   return createPassthroughResponse(response);

@@ -26,8 +26,11 @@ export const metadata = {
 
 export default async function PlatformRolesPage({ searchParams }: { searchParams: Promise<PlatformRolesSearchParams> }): Promise<ReactElement> {
   const params = parsePlatformRolesPaginationParams(await searchParams);
+
   const rolesPromise = fetchPlatformRoles(params);
+
   const institutionNamePromise = getInstitutionName(params.institutionId);
+
   const institutionName = await institutionNamePromise;
 
   return (

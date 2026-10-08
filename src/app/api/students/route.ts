@@ -7,7 +7,9 @@ import { institutionalApiFetch } from "@features/institutional-auth/services/ins
 
 export async function GET(request: NextRequest): Promise<Response> {
   const user = await requireInstitutionalUser();
+
   const searchParams = new URLSearchParams(request.nextUrl.searchParams);
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${user.institutionId}/students?${searchParams.toString()}`);
 
   return createPassthroughResponse(response);

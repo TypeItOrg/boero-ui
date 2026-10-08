@@ -35,7 +35,9 @@ export async function getResponseErrorActionState<TField extends string>(
 
   try {
     const error = (await resolvedResponse.json()) as BackendError;
+
     const fieldErrors = pickFieldErrors(error.fieldErrors, fields);
+
     const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
     return {

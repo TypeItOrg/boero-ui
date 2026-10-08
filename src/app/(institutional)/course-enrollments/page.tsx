@@ -39,6 +39,7 @@ export default async function CourseEnrollmentsPage({
   }
 
   const resolvedSearchParams = await searchParams;
+
   const originParams = new URLSearchParams();
 
   for (const [key, value] of Object.entries(resolvedSearchParams)) {
@@ -50,6 +51,7 @@ export default async function CourseEnrollmentsPage({
   }
 
   const returnTo = `/course-enrollments${originParams.size ? `?${originParams}` : ""}`;
+
   const { page, size, status, academicStatus } = parseCourseEnrollmentPaginationParams(resolvedSearchParams);
 
   const data = await fetchInstitutionalCourseEnrollments(user.institutionId, {
@@ -60,8 +62,11 @@ export default async function CourseEnrollmentsPage({
   });
 
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_CREATE);
+
   const canWithdraw = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_WITHDRAW);
+
   const canUpdateAcademicStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE);
+
   const canReadWaitlist = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ);
 
   return (

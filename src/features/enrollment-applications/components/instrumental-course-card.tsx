@@ -37,14 +37,25 @@ export function InstrumentalCourseCard({
   onToggle: (checked: boolean) => void;
 }): ReactElement {
   const course = variants[0];
+
   const key = enrollmentCourseGroupKey(course);
+
   const knownCourses = [...variants, ...savedCourses.filter((saved) => !variants.some((variant) => variant.courseId === saved.courseId))];
+
   const selected = knownCourses.filter((item) => enrollmentCourseGroupKey(item) === key && selectedCourseIds.includes(item.courseId));
+
   const selectedCourse = selected.length === 1 ? selected[0] : undefined;
+
   const checked = pending || selected.length > 0;
+
   const missingInstrument = checked && selected.length !== 1;
+
   const invalid = missingInstrument && showError;
+
   const selectedOption = variants.find((variant) => variant.courseId === selectedCourse?.courseId);
+
+  const showWarnings =
+    selectedOption?.hasCapacity === false || selectedOption?.eligibility?.eligible === false || course.eligibility?.eligible === false;
 
   const fetchInstruments = useCallback(
     async (input: AsyncDropdownFetchPageInput) => {
@@ -117,7 +128,7 @@ export function InstrumentalCourseCard({
             ) : null}
           </div>
         ) : null}
-        {selectedOption?.hasCapacity === false || selectedOption?.eligibility?.eligible === false || course.eligibility?.eligible === false ? (
+        {showWarnings ? (
           <div className="col-start-2 @2xl:col-span-2">
             <CourseWarnings course={selectedOption ?? course} />
           </div>

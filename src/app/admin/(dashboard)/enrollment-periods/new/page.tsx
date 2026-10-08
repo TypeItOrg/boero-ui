@@ -24,8 +24,11 @@ export default async function NewEnrollmentPeriodPage({
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const query = await searchParams;
+
   const institutionId = parseUuidQueryParam(query.institutionId);
+
   const institution = institutionId ? await fetchInstitution(institutionId) : null;
+
   const returnTo = getSafeReturnTo(query.returnTo, "/admin/enrollment-periods");
 
   return (

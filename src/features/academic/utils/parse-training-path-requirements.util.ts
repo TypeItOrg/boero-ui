@@ -3,6 +3,7 @@ import type { TrainingPathDraftParseResult } from "@features/academic/types/trai
 
 export function parseTrainingPathRequirements(form: FormData): TrainingPathDraftParseResult {
   let rawDrafts: unknown;
+
   const rawDocumentRequirements = form.get("documentRequirements");
 
   if (rawDocumentRequirements !== null && typeof rawDocumentRequirements !== "string") {

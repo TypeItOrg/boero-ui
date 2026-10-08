@@ -25,10 +25,13 @@ type MyEnrollmentApplicationTableRowProps = {
 
 export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApplicationTableRowProps): ReactElement {
   const router = useRouter();
+
   const [isCancelOpen, setIsCancelOpen] = useState(false);
 
   const canCancel = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
+
   const detailHref = `/my-enrollment-applications/${application.applicationId}`;
+
   const detailLabel = canCancel ? "Continuar inscripción" : "Ver detalle";
 
   return (

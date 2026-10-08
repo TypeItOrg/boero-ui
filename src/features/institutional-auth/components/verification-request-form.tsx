@@ -35,6 +35,8 @@ export function VerificationRequestForm({
 
   const [email, setEmail] = useState("");
 
+  const actionLabel = mode === "resend" ? "Reenviar enlace" : "Cambiar correo electrónico y enviar enlace";
+
   return (
     <ActionForm resetOnSuccess={Boolean(state.success)} action={action} noValidate className="mt-6 space-y-5">
       <EmailVerificationFeedback
@@ -120,7 +122,7 @@ export function VerificationRequestForm({
       <div className="flex flex-col gap-4">
         <Button type="submit" size="lg" className="h-auto min-h-9 py-2 whitespace-normal" disabled={pending} aria-busy={pending}>
           {pending ? <Loader2Icon className="animate-spin" /> : null}
-          {pending ? "Enviando…" : mode === "resend" ? "Reenviar enlace" : "Cambiar correo electrónico y enviar enlace"}
+          {pending ? "Enviando…" : actionLabel}
         </Button>
         <p className="text-muted-foreground text-center text-sm">
           {mode === "resend" ? "¿Necesitás usar otro correo electrónico?" : "¿No necesitás cambiarlo?"}{" "}

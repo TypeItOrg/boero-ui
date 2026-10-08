@@ -37,44 +37,46 @@ export function CourseAcademicSpaceField({
   initialValues: Record<string, FormValue>;
   spaceId: string | undefined;
 }): ReactElement {
+  const error = fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format;
+
+  function renderControl(): ReactElement {
+    if (!institutionId || !scope) {
+      return <Input disabled placeholder="Seleccioná una institución primero" type="text" />;
+    }
+
+    if (!studyPlanId) {
+      return <Input disabled placeholder="Primero seleccioná un plan de estudio" type="text" />;
+    }
+
+    return (
+      <AsyncDropdown<CourseSpaceOption>
+        {...STUDY_PLAN_SPACE_OPTION_PRESENTATION}
+        ariaInvalid={Boolean(error)}
+        disabled={editing || classesLocked}
+        emptyDescription="Incorporá espacios al plan para poder instanciarlos."
+        emptyIcon={GraduationCapIcon}
+        emptyMessage="No se encontraron espacios en este plan."
+        emptyTitle="No hay espacios"
+        errorMessage="No se pudieron cargar los espacios del plan."
+        fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
+        getItemLabel={getAcademicSpaceOptionLabel}
+        getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
+        id="academicSpaceId"
+        key={`space-${institutionId}-${studyPlanId}`}
+        name="academicSpaceDisplay"
+        onValueChange={onValueChange}
+        placeholder={classesLocked ? "Definido por el curso" : "Seleccionar espacio"}
+        queryKey={["courses", "spaces", scope, institutionId, studyPlanId]}
+        searchPlaceholder="Buscar espacio…"
+        selectedLabel={spaceLabel ?? composeInitialSpaceLabel(initialValues)}
+        value={spaceId}
+      />
+    );
+  }
+
   return (
-    <FormField
-      label="Espacio académico"
-      name="academicSpaceId"
-      error={fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format}
-      className="flex-[1_0_min(300px,100%)]"
-      required
-    >
-      {institutionId && scope ? (
-        studyPlanId ? (
-          <AsyncDropdown<CourseSpaceOption>
-            {...STUDY_PLAN_SPACE_OPTION_PRESENTATION}
-            ariaInvalid={Boolean(fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format)}
-            disabled={editing || classesLocked}
-            emptyDescription="Incorporá espacios al plan para poder instanciarlos."
-            emptyIcon={GraduationCapIcon}
-            emptyMessage="No se encontraron espacios en este plan."
-            emptyTitle="No hay espacios"
-            errorMessage="No se pudieron cargar los espacios del plan."
-            fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
-            getItemLabel={getAcademicSpaceOptionLabel}
-            getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
-            id="academicSpaceId"
-            key={`space-${institutionId}-${studyPlanId}`}
-            name="academicSpaceDisplay"
-            onValueChange={onValueChange}
-            placeholder={classesLocked ? "Definido por el curso" : "Seleccionar espacio"}
-            queryKey={["courses", "spaces", scope, institutionId, studyPlanId]}
-            searchPlaceholder="Buscar espacio…"
-            selectedLabel={spaceLabel ?? composeInitialSpaceLabel(initialValues)}
-            value={spaceId}
-          />
-        ) : (
-          <Input disabled placeholder="Primero seleccioná un plan de estudio" type="text" />
-        )
-      ) : (
-        <Input disabled placeholder="Seleccioná una institución primero" type="text" />
-      )}
+    <FormField label="Espacio académico" name="academicSpaceId" error={error} className="flex-[1_0_min(300px,100%)]" required>
+      {renderControl()}
     </FormField>
   );
 }

@@ -68,6 +68,7 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.{ts,tsx,mts}"],
     ignores: ["**/*.test.ts", "**/*.test.tsx"],
     rules: {
+      "no-nested-ternary": "error",
       "padding-line-between-statements": [
         "error",
         ...statementPaddingRules,
@@ -75,14 +76,8 @@ const eslintConfig = defineConfig([
         { blankLine: "always", prev: ["multiline-const", "multiline-let", "multiline-var"], next: "*" },
         { blankLine: "always", prev: ["const", "let", "var"], next: ["expression", "if", "switch", "for", "while", "try"] },
         { blankLine: "always", prev: "expression", next: ["const", "let", "var"] },
+        { blankLine: "always", prev: ["const", "let", "var"], next: ["const", "let", "var"] },
       ],
-    },
-  },
-  {
-    files: ["src/common/hooks/**/*.{ts,tsx}", "src/features/*/hooks/**/*.{ts,tsx}"],
-    ignores: ["**/*.test.ts", "**/*.test.tsx"],
-    rules: {
-      "no-nested-ternary": "error",
     },
   },
   {

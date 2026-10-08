@@ -22,7 +22,9 @@ export async function PlatformAcademicCollectionPage({
   searchParams: AcademicSearchParams;
 }): Promise<ReactElement> {
   const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
   const institutionId = parseUuidQueryParam(searchParams.institutionId);
+
   const institution = institutionId ? await fetchInstitution(institutionId) : null;
 
   return (

@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function EditProfilePage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/account");
 
   const person = await fetchInstitutionalPerson();

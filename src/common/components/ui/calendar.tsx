@@ -119,6 +119,7 @@ function Calendar({
 
 function CalendarDayButton({ className, day, modifiers, locale, ...props }: ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
   const defaultClassNames = getDefaultClassNames();
+
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {

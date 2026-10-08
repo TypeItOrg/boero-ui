@@ -50,8 +50,11 @@ export function PeopleTablePresentation({
   canUpdateStatus = false,
 }: PeopleTablePresentationProps): ReactElement {
   const router = useRouter();
+
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
+
   const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
+
   const [personToUpdateStatus, setPersonToUpdateStatus] = useState<PersonSummary>();
 
   function handleDeleteDialogOpenChange(open: boolean): void {

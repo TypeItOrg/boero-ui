@@ -54,13 +54,21 @@ type PlatformAccountFormProps = (CreateMode | EditMode) & {
 
 export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccountFormProps): ReactElement {
   const router = useRouter();
+
   const { account: currentAccount } = usePlatformAccount();
+
   const isEdit = mode === FORM_MODE.EDIT;
+
   const defaultDestination = isEdit ? `${PLATFORM_ACCOUNTS_PATH}/${account.platformAccountId}` : PLATFORM_ACCOUNTS_PATH;
+
   const destination = returnTo ?? defaultDestination;
+
   const isCurrentAccount = isEdit && currentAccount?.platformAccountId === account.platformAccountId;
+
   const [isPending, startTransition] = useTransition();
+
   const [formError, setFormError] = useState<string>();
+
   const defaultValues = getDefaultValues(account);
 
   const {

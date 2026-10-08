@@ -48,7 +48,9 @@ export function EnrollmentApplicationCoursesManagement({
   readOnly = false,
 }: EnrollmentApplicationCoursesManagementProps): ReactElement | null {
   const router = useRouter();
+
   const [courseToEnroll, setCourseToEnroll] = useState<EnrollmentApplicationCourse>();
+
   const [courseToReject, setCourseToReject] = useState<EnrollmentApplicationCourse>();
 
   if (courses.length === 0) {
@@ -80,9 +82,7 @@ export function EnrollmentApplicationCoursesManagement({
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">{course.academicSpaceName}</h3>
-                  <Badge variant={course.status === "ENROLLED" ? "success" : course.status === "REJECTED" ? "destructive" : "outline"}>
-                    {STATUS_LABELS[course.status]}
-                  </Badge>
+                  <Badge variant={getCourseStatusVariant(course.status)}>{STATUS_LABELS[course.status]}</Badge>
                 </div>
                 <p className="text-muted-foreground mt-1 text-sm">
                   {course.academicYear ? `Ciclo ${course.academicYear} · ` : ""}Plan {formatStudyPlanName(course)} ·{" "}
@@ -151,6 +151,17 @@ export function EnrollmentApplicationCoursesManagement({
       ) : null}
     </Card>
   );
+}
+
+function getCourseStatusVariant(status: EnrollmentApplicationCourse["status"]): "success" | "destructive" | "outline" {
+  switch (status) {
+    case "ENROLLED":
+      return "success";
+    case "REJECTED":
+      return "destructive";
+    default:
+      return "outline";
+  }
 }
 
 export { EnrollmentApplicationCourseDialog } from "@features/enrollment-applications/components/enrollment-application-course-dialog";

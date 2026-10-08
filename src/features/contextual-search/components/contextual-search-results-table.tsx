@@ -38,6 +38,7 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
       <TableBody>
         {items.map((item) => {
           const labels = getContextualSearchLabels(entityType, item);
+
           const resultHref = getContextualSearchResultHref("platform", entityType, item);
 
           return (

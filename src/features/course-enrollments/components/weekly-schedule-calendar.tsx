@@ -77,7 +77,9 @@ export function WeeklyScheduleCalendar({
 
           const positionedLessons = lessons.map((lesson) => {
             const start = toMinutes(lesson.schedule.startTime);
+
             const end = toMinutes(lesson.schedule.endTime);
+
             let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start);
 
             if (lane === -1) {

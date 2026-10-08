@@ -52,7 +52,12 @@ export function AcademicTableRow({
   resource,
   row,
 }: AcademicTableRowProps): ReactElement {
+  const activeVariant = row.active ? "success" : "secondary";
+
+  const statusVariant = row.deletedAt ? "destructive" : activeVariant;
+
   const institutionId = row.institutionId ?? "";
+
   const detailHref = `${basePath}/${resource}/${row.id}`;
 
   const actions = getAcademicRowActions(
@@ -148,7 +153,7 @@ export function AcademicTableRow({
             </TableCell>
           ))}
           <TableCell>
-            <Badge variant={row.deletedAt ? "destructive" : row.active ? "success" : "secondary"}>{row.deletedAt ? "Eliminado" : row.status}</Badge>
+            <Badge variant={statusVariant}>{row.deletedAt ? "Eliminado" : row.status}</Badge>
           </TableCell>
         </TableRow>
       </ContextMenuTrigger>

@@ -39,6 +39,7 @@ function parseAssignments(value: FormDataEntryValue | null): SubmittedAssignment
 
 export function validateEnrollmentAssignment(formData: FormData, options: CourseEnrollmentAssignmentOptions): EnrollmentAssignmentValidation {
   const courseClassId = formData.get("courseClassId");
+
   const assignments = parseAssignments(formData.get("assignments"));
 
   if (typeof courseClassId !== "string" || !isValidUuid(courseClassId) || !assignments) {
@@ -56,7 +57,9 @@ export function validateEnrollmentAssignment(formData: FormData, options: Course
   }
 
   const seenDays = new Set<string>();
+
   const messages: string[] = [];
+
   const invalidDayIds: string[] = [];
 
   for (const assignment of assignments) {

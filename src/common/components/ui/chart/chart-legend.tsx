@@ -32,6 +32,7 @@ export function ChartLegendContent({
         .filter((item) => item.type !== "none")
         .map((item, index) => {
           const key = `${nameKey ?? item.dataKey ?? "value"}`;
+
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
           return (

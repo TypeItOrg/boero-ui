@@ -25,9 +25,13 @@ export function CourseEnrollmentAssignmentFields({
   invalidDayIds = [],
 }: CourseEnrollmentAssignmentFieldsProps): ReactElement {
   const [courseClassId, setCourseClassId] = useState(options.classes[0]?.id ?? "");
+
   const [checkedDays, setCheckedDays] = useState<string[]>([]);
+
   const [daySelections, setDaySelections] = useState<Record<string, DaySelection>>({});
+
   const selectedClass = options.classes.find((courseClass) => courseClass.id === courseClassId);
+
   const invalidDaySet = useMemo(() => new Set(invalidDayIds), [invalidDayIds]);
 
   const assignments = checkedDays.map((dayId) => ({

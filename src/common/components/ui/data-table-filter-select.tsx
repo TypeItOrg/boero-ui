@@ -7,6 +7,7 @@ import { type DataTableSelectFilter } from "@common/types/data-table-select-filt
 
 export function DataTableFilterSelect<TValue extends string = string>({ filter, onValueChange }: DataTableFilterSelectProps<TValue>): ReactElement {
   const labelId = useId();
+
   const selectedLabel = filter.options.find((option) => option.value === filter.value)?.label;
 
   return (

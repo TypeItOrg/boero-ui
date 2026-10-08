@@ -13,7 +13,9 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 
 export function NotFoundContent(): ReactElement {
   const pathname = usePathname();
+
   const isPlatformAdmin = pathname.startsWith("/admin");
+
   const homeHref = isPlatformAdmin ? "/admin" : "/";
 
   return (

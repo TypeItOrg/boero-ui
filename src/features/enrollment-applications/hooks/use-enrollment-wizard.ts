@@ -15,17 +15,27 @@ import { submitEnrollmentWizard } from "@features/enrollment-applications/utils/
 
 export function useEnrollmentWizard(props: EnrollmentWizardProps) {
   const { initialApplication, initialShifts = [], readOnly: requestedReadOnly = false, returnTo = "/my-enrollment-applications" } = props;
+
   const router = useRouter();
+
   const readOnly = requestedReadOnly || initialApplication.periodOpen === false;
+
   const [application, setApplication] = useState(initialApplication);
+
   const [documentsBlocked, setDocumentsBlocked] = useState(false);
+
   const blockedDocumentsRef = useRef(new Set<string>());
+
   const [confirmation, setConfirmation] = useState<"cancel" | "submit" | null>(null);
+
   const isCancelDialogOpen = confirmation === "cancel";
+
   const isSubmitDialogOpen = confirmation === "submit";
+
   const [validationIssues, setValidationIssues] = useState<z.ZodIssue[]>([]);
 
   const courses = useEnrollmentWizardCourses(props, setValidationIssues);
+
   const form = useEnrollmentWizardForm(initialApplication.data, initialShifts, readOnly, courses.selectedCourseIds);
 
   const hasDocumentsStep =

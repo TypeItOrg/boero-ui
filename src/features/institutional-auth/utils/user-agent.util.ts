@@ -28,6 +28,7 @@ export function parseUserAgent(userAgent: string): ParsedUserAgent {
   }
 
   const browser = BROWSER_PATTERNS.find(([pattern]) => pattern.test(userAgent))?.[1] ?? UNKNOWN_LABEL;
+
   const platform = PLATFORM_PATTERNS.find(([pattern]) => pattern.test(userAgent))?.[1] ?? UNKNOWN_LABEL;
 
   return { browser, platform };

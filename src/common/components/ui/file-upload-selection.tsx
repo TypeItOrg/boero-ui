@@ -100,6 +100,7 @@ function formatFileSize(bytes: number): string {
   }
 
   const inMebibytes = bytes >= 1024 * 1024;
+
   const amount = bytes / (inMebibytes ? 1024 * 1024 : 1024);
 
   return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(amount)} ${inMebibytes ? "MB" : "KB"}`;

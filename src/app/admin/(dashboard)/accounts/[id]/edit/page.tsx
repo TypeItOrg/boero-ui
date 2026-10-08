@@ -22,8 +22,11 @@ type EditPlatformAccountPageProps = {
 
 export default async function EditPlatformAccountPage({ params, searchParams }: EditPlatformAccountPageProps): Promise<ReactElement> {
   const { id } = await params;
+
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, `/admin/accounts/${id}`);
+
   const account = await fetchPlatformAccountAdmin(id);
 
   if (!account) {

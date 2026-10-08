@@ -45,7 +45,9 @@ export function AcademicResourceLinks({
       {leadingContent}
       {resources.map((resource, index) => {
         const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
         const icon = ACADEMIC_RESOURCE_ICONS[resource];
+
         const isLastOddResource = itemCount % 2 === 1 && index === resources.length - 1;
 
         return (

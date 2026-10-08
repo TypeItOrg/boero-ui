@@ -65,6 +65,7 @@ const PROFILE_FIELDS = [
 
 function parseAddress(formData: FormData) {
   const cityId = String(formData.get("address.cityId") ?? "");
+
   const street = String(formData.get("address.street") ?? "");
 
   if (!cityId && !street) {

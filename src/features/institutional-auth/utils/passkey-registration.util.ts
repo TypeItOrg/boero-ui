@@ -10,14 +10,18 @@ import {
 } from "@features/institutional-auth/utils/webauthn-json.util";
 
 const USER_VERIFICATION_VALUES = ["required", "preferred", "discouraged"] as const;
+
 const RESIDENT_KEY_VALUES = ["required", "preferred", "discouraged"] as const;
+
 const ATTESTATION_VALUES = ["none", "indirect", "direct", "enterprise"] as const;
+
 const AUTHENTICATOR_ATTACHMENT_VALUES = ["platform", "cross-platform"] as const;
 
 type NativeCreationParser = (options: unknown) => PublicKeyCredentialCreationOptions;
 
 function nativeCreationParser(): NativeCreationParser | undefined {
   const credential = (globalThis as unknown as Record<string, unknown>).PublicKeyCredential as Record<string, unknown> | undefined;
+
   const parse = credential?.["parseCreationOptionsFromJSON"];
 
   return typeof parse === "function" ? (parse as NativeCreationParser) : undefined;
@@ -56,7 +60,9 @@ function toDescriptors(value: unknown): PublicKeyCredentialDescriptor[] {
 
 function toFallbackCreationOptions(options: unknown): PublicKeyCredentialCreationOptions {
   const source = requireRecord(options);
+
   const rp = requireRecord(source.rp);
+
   const user = requireRecord(source.user);
 
   if (!Array.isArray(source.pubKeyCredParams)) {
@@ -68,6 +74,7 @@ function toFallbackCreationOptions(options: unknown): PublicKeyCredentialCreatio
   }
 
   const rpValue: PublicKeyCredentialRpEntity = { name: requireNonEmptyString(rp.name) };
+
   const rpId = optionalString(rp.id);
 
   if (rpId !== undefined) {
@@ -102,7 +109,9 @@ function toFallbackCreationOptions(options: unknown): PublicKeyCredentialCreatio
 
   if (source.authenticatorSelection !== undefined && source.authenticatorSelection !== null) {
     const selection = requireRecord(source.authenticatorSelection);
+
     const authenticatorSelection: AuthenticatorSelectionCriteria = {};
+
     const residentKey = optionalEnum(selection.residentKey, RESIDENT_KEY_VALUES);
 
     if (residentKey !== undefined) {

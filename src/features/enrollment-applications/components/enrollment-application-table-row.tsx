@@ -39,6 +39,7 @@ export function EnrollmentApplicationTableRow({
     (isPendingEvaluation || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) && (canApprove || canReject);
 
   const showApprove = canResolve && canApprove && Boolean(application.canConfirm || application.canApproveProvisionally);
+
   const hasActions = Boolean(detailHref) || canResolve;
 
   const row = (

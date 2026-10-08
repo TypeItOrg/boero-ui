@@ -29,10 +29,15 @@ export function getEnrollmentPeriodDateTimeInput(value: string): { date: Date; t
   }
 
   const parts = new Map(ENROLLMENT_PERIOD_DATE_TIME_FORMATTER.formatToParts(instant).map((part) => [part.type, part.value]));
+
   const year = Number(parts.get("year"));
+
   const month = Number(parts.get("month"));
+
   const day = Number(parts.get("day"));
+
   const hour = parts.get("hour");
+
   const minute = parts.get("minute");
 
   if (![year, month, day].every(Number.isInteger) || !hour || !minute) {
@@ -47,6 +52,7 @@ export function getEnrollmentPeriodDateTimeInput(value: string): { date: Date; t
 
 function parseEnrollmentPeriodInstant(value: string): Date | undefined {
   const normalizedValue = EXPLICIT_OFFSET_PATTERN.test(value) ? value : `${value}Z`;
+
   const date = new Date(normalizedValue);
 
   return Number.isNaN(date.getTime()) ? undefined : date;

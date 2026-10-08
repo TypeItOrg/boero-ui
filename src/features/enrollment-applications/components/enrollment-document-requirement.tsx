@@ -45,6 +45,63 @@ export function EnrollmentDocumentRequirement({
   autoSave: boolean;
   onUploadBlockedChange: ((id: string, blocked: boolean) => void) | undefined;
 }): ReactElement {
+  const hasDocumentActions = showDeliveryHistory || showRequirementChanges || Boolean(requirement.canReview && requirement.currentAttachment);
+
+  const showApplicantActions = !administrativeView && hasDocumentActions;
+
+  function renderDocument(): ReactElement | null {
+    if (administrativeView) {
+      return (
+        <AdministrativeDocument
+          applicationId={application.applicationId}
+          scope={scope}
+          requirement={requirement}
+          disabled={disabled}
+          showDeliveryHistory={showDeliveryHistory}
+          showRequirementChanges={showRequirementChanges}
+          onSaved={refresh}
+          onReview={() => editDocument({ requirement, operation: "review" })}
+          onWithdraw={() => editDocument({ requirement, operation: "withdraw" })}
+          onActivity={(initialTab, trigger) => {
+            activityTriggerRef.current = trigger;
+            setActivity({ requirement, initialTab });
+          }}
+        />
+      );
+    }
+
+    if (requirement.canUpload || requirement.canReplace) {
+      return (
+        <DocumentUpload
+          key={requirement.id}
+          applicationId={application.applicationId}
+          scope={scope}
+          requirement={requirement}
+          onSaved={refresh}
+          autoSave={autoSave}
+          disabled={disabled}
+          onBlockedChange={onUploadBlockedChange}
+          onWithdraw={requirement.canWithdraw && !disabled ? () => editDocument({ requirement, operation: "withdraw" }) : undefined}
+        />
+      );
+    }
+
+    if (requirement.currentAttachment) {
+      return (
+        <DocumentSavedFile
+          file={requirement.currentAttachment}
+          applicationId={application.applicationId}
+          scope={scope}
+          disabled={disabled}
+          statusLabel={autoSave ? "Guardado en el borrador" : undefined}
+          onWithdraw={requirement.canWithdraw && !disabled ? () => editDocument({ requirement, operation: "withdraw" }) : undefined}
+        />
+      );
+    }
+
+    return null;
+  }
+
   return (
     <article key={requirement.id} aria-label={requirement.name} onDragOver={rejectFileDragOutside} onDrop={rejectFileDragOutside}>
       <div className="space-y-5 p-4 @3xl/documents:p-5">
@@ -68,44 +125,7 @@ export function EnrollmentDocumentRequirement({
           </Alert>
         ) : null}
         <div className="min-w-0 space-y-4">
-          {administrativeView ? (
-            <AdministrativeDocument
-              applicationId={application.applicationId}
-              scope={scope}
-              requirement={requirement}
-              disabled={disabled}
-              showDeliveryHistory={showDeliveryHistory}
-              showRequirementChanges={showRequirementChanges}
-              onSaved={refresh}
-              onReview={() => editDocument({ requirement, operation: "review" })}
-              onWithdraw={() => editDocument({ requirement, operation: "withdraw" })}
-              onActivity={(initialTab, trigger) => {
-                activityTriggerRef.current = trigger;
-                setActivity({ requirement, initialTab });
-              }}
-            />
-          ) : requirement.canUpload || requirement.canReplace ? (
-            <DocumentUpload
-              key={requirement.id}
-              applicationId={application.applicationId}
-              scope={scope}
-              requirement={requirement}
-              onSaved={refresh}
-              autoSave={autoSave}
-              disabled={disabled}
-              onBlockedChange={onUploadBlockedChange}
-              onWithdraw={requirement.canWithdraw && !disabled ? () => editDocument({ requirement, operation: "withdraw" }) : undefined}
-            />
-          ) : requirement.currentAttachment ? (
-            <DocumentSavedFile
-              file={requirement.currentAttachment}
-              applicationId={application.applicationId}
-              scope={scope}
-              disabled={disabled}
-              statusLabel={autoSave ? "Guardado en el borrador" : undefined}
-              onWithdraw={requirement.canWithdraw && !disabled ? () => editDocument({ requirement, operation: "withdraw" }) : undefined}
-            />
-          ) : null}
+          {renderDocument()}
           {requirement.currentAttachment?.observation ? (
             <Alert variant={requirement.currentAttachment.reviewStatus === "OBSERVED" ? "destructive" : "default"}>
               <CircleAlertIcon />
@@ -113,7 +133,7 @@ export function EnrollmentDocumentRequirement({
               <AlertDescription className="break-words whitespace-pre-wrap">{requirement.currentAttachment.observation}</AlertDescription>
             </Alert>
           ) : null}
-          {!administrativeView && (showDeliveryHistory || showRequirementChanges || (requirement.canReview && requirement.currentAttachment)) ? (
+          {showApplicantActions ? (
             <EnrollmentDocumentRequirementActions
               requirement={requirement}
               editDocument={editDocument}

@@ -9,6 +9,7 @@ import { useDebouncedCallback } from "@common/hooks/use-debounced-callback";
 
 export function DataTableSearchFilter({ initialValue, onValueChange, placeholder }: DataTableSearchFilterProps): ReactElement {
   const [draft, setDraft] = useState({ source: initialValue, value: initialValue });
+
   const value = draft.source === initialValue ? draft.value : initialValue;
 
   if (draft.source !== initialValue) {

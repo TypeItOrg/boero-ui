@@ -31,6 +31,7 @@ type InstitutionPickerProps = {
 };
 
 const INSTITUTION_QUERY_KEY = ["institutional-auth", "institutions"] as const;
+
 const INSTITUTION_OPTION_HEIGHT = 52;
 
 export function InstitutionPicker({ disabled, ariaInvalid, id, onValueChange, selectedLabel, value }: InstitutionPickerProps): ReactElement {

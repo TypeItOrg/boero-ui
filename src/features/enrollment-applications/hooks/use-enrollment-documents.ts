@@ -13,14 +13,22 @@ import type { EnrollmentDocumentsProps } from "@features/enrollment-applications
 
 export function useEnrollmentDocuments({ application, scope, disabled, onUploadBlockedChange }: EnrollmentDocumentsProps) {
   const router = useRouter();
+
   const [snapshot, setSnapshot] = useState({ source: application.documents, documents: application.documents ?? [] });
+
   // Autosaves retain the source; a new server document snapshot replaces the local refresh.
   const documents = snapshot.source === application.documents ? snapshot.documents : (application.documents ?? []);
+
   const [dialog, setDialog] = useState<EnrollmentDocumentDialog>(null);
+
   const [feedback, setFeedback] = useState<{ requestUncertain: boolean; error?: string }>({ requestUncertain: false });
+
   const activityTriggerRef = useRef<HTMLButtonElement>(null);
+
   const editing = dialog?.kind === "edit" ? dialog : null;
+
   const activity = dialog?.kind === "activity" ? dialog : null;
+
   const requesting = dialog?.kind === "request";
 
   function editDocument(value: { requirement: DocumentRequirement; operation: "review" | "withdraw" } | null): void {
@@ -65,6 +73,7 @@ export function useEnrollmentDocuments({ application, scope, disabled, onUploadB
 
   async function refresh(): Promise<void> {
     const response = await fetch(`/api/enrollment-applications/${application.applicationId}/documents?scope=${scope}`, { cache: "no-store" });
+
     const refreshed = await parseHttpResponse<DocumentRequirement[]>(response, DOCUMENT_MESSAGES.readFailed);
 
     setSnapshot({ source: application.documents, documents: refreshed });

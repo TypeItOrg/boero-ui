@@ -44,6 +44,7 @@ export function useEnrollmentWizardForm(
   }));
 
   const birthDate = parseInitialBirthDate(initialData?.personalData?.birthDate);
+
   const calculatedAge = calculateAge(birthDate);
 
   function updateResponsible(field: keyof EnrollmentResponsible, value: string): void {

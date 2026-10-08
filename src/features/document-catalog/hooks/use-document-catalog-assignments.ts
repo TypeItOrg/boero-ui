@@ -29,7 +29,9 @@ export function useDocumentCatalogAssignments({
   savedDocument?: DocumentDefinition;
 }) {
   const assignmentInstitutionId = targetInstitutionId ?? institutionId;
+
   const identity = JSON.stringify([scope, currentId, assignmentInstitutionId]);
+
   const [draft, setDraft] = useState<DocumentAssignmentDraft>({ identity, generation: 0, changes: {}, removed: {}, error: "" });
 
   if (draft.identity !== identity) {
@@ -147,7 +149,9 @@ export function useDocumentCatalogAssignments({
   }
 
   const associated = assignmentInstitutionId === institutionId ? (associations?.items ?? []) : [];
+
   const totalPages = assignmentInstitutionId === institutionId ? (associations?.totalPages ?? 0) : 0;
+
   const totalItems = assignmentInstitutionId === institutionId ? (associations?.totalItems ?? 0) : 0;
 
   const rows = [...associated.filter((item) => !changes[item.trainingPathId]), ...Object.values(changes)].filter(

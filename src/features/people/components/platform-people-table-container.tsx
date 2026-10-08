@@ -10,6 +10,7 @@ type PlatformPeopleTableContainerProps = PlatformPeoplePaginationParams & {
 
 export async function PlatformPeopleTableContainer(props: PlatformPeopleTableContainerProps): Promise<ReactElement> {
   const { dataPromise, ...params } = props;
+
   const data = await dataPromise;
 
   return <PlatformPeopleTablePresentation key={`${params.page}-${params.size}`} data={data} {...params} />;

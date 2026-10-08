@@ -14,8 +14,11 @@ import { requirePlatformAccount } from "@features/platform-auth/services/get-pla
 
 export default async function PlatformLayout({ children }: { children: ReactNode }): Promise<ReactElement> {
   const [account, cookieStore, requestHeaders] = await Promise.all([requirePlatformAccount(), cookies(), headers()]);
+
   const sidebarOpen = cookieStore.get("platform-sidebar-open")?.value !== "false";
+
   const sidebarGroupStates = parseSidebarNavigationGroupStates(cookieStore.get(SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES.platform)?.value);
+
   const shortcutPlatform = getContextualSearchShortcutPlatform(requestHeaders.get("user-agent"));
 
   return (

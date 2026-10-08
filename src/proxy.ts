@@ -40,6 +40,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     }
   } catch (error) {
     const status = error instanceof InstitutionalHostError ? error.status : 503;
+
     const message = error instanceof InstitutionalHostError ? error.message : "No se pudo consultar la institución. Intentá nuevamente.";
 
     if (request.nextUrl.pathname.startsWith("/api/")) {

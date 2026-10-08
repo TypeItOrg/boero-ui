@@ -25,8 +25,11 @@ export default async function EditPlatformRolePage({
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const { roleId } = await params;
+
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, `/admin/roles/${roleId}`);
+
   const [role, permissionGroups] = await Promise.all([fetchPlatformRole(roleId), fetchPlatformPermissionGroups()]);
 
   if (!role?.editable || !role.institution.active) {

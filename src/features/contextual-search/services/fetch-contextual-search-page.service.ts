@@ -13,6 +13,7 @@ export async function fetchContextualSearchPage(
   size: number,
 ): Promise<ContextualSearchPage> {
   const params = new URLSearchParams({ search, page: String(page), size: String(size) });
+
   const response = await platformApiFetch(`/api/v1/admin/search/${entityType}?${params}`);
 
   return parseHttpResponse<ContextualSearchPage>(response, "No fue posible cargar los resultados de búsqueda.");

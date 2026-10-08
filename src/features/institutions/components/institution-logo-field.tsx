@@ -39,11 +39,19 @@ export function InstitutionLogoField({
   disabled = false,
 }: InstitutionLogoFieldProps): ReactElement {
   const id = useId();
+
   const selectRef = useRef<HTMLButtonElement>(null);
+
   const [preview, setPreview] = useState<string>();
+
   const currentUrl = getInstitutionLogoUrl(institutionId, logoUrl);
+
   const selectedFile = value.intent === INSTITUTION_LOGO_INTENT.REPLACE ? value.file : undefined;
-  const displayUrl = selectedFile ? preview : value.intent === INSTITUTION_LOGO_INTENT.KEEP ? currentUrl : undefined;
+
+  const keptLogoUrl = value.intent === INSTITUTION_LOGO_INTENT.KEEP ? currentUrl : undefined;
+
+  const displayUrl = selectedFile ? preview : keptLogoUrl;
+
   const hasLogo = Boolean(selectedFile || (value.intent === INSTITUTION_LOGO_INTENT.KEEP && currentUrl));
 
   useEffect(() => {
@@ -68,6 +76,7 @@ export function InstitutionLogoField({
     }
 
     const file = files[0];
+
     const fileError = getInstitutionLogoFileError(file);
 
     if (fileError) {
@@ -155,13 +164,7 @@ export function InstitutionLogoField({
         {value.intent !== INSTITUTION_LOGO_INTENT.KEEP || error ? (
           <div aria-live="polite" aria-atomic="true" className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
             {selectedFile ? <span className="sr-only">Imagen seleccionada: {selectedFile.name}.</span> : null}
-            <p className="text-muted-foreground text-sm">
-              {value.intent === INSTITUTION_LOGO_INTENT.REMOVE
-                ? "El logo se quitará al guardar los cambios."
-                : value.intent === INSTITUTION_LOGO_INTENT.REPLACE
-                  ? "El nuevo logo se aplicará al guardar los cambios."
-                  : null}
-            </p>
+            <p className="text-muted-foreground text-sm">{getLogoChangeMessage(value.intent)}</p>
             <Button type="button" variant="ghost" size="lg" disabled={disabled} onClick={undoChange}>
               <Undo2Icon aria-hidden="true" />
               Deshacer
@@ -171,4 +174,15 @@ export function InstitutionLogoField({
       </div>
     </section>
   );
+}
+
+function getLogoChangeMessage(intent: InstitutionLogoChange["intent"]): string | null {
+  switch (intent) {
+    case INSTITUTION_LOGO_INTENT.REMOVE:
+      return "El logo se quitará al guardar los cambios.";
+    case INSTITUTION_LOGO_INTENT.REPLACE:
+      return "El nuevo logo se aplicará al guardar los cambios.";
+    default:
+      return null;
+  }
 }

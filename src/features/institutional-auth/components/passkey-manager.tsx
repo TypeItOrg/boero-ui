@@ -25,7 +25,9 @@ type PasskeyManagerProps = { initialPasskeys: Passkey[]; maxActivePasskeys: numb
 
 export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyManagerProps): ReactElement {
   const router = useRouter();
+
   const [dialog, setDialog] = useState<PasskeyDialog | null>(null);
+
   const webauthnSupported = useWebAuthnSupport();
 
   function close(): void {

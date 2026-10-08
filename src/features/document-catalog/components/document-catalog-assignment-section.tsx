@@ -56,6 +56,44 @@ export function DocumentCatalogAssignmentSection({
   pageSize: number;
   setPageSize: Dispatch<SetStateAction<number>>;
 }): ReactElement {
+  function renderAssignments(): ReactElement | null {
+    if (associationsLoading) {
+      return <Skeleton className="mt-5 h-32" role="status" aria-label="Cargando asignaciones por trayecto" />;
+    }
+
+    if (rows.length > 0) {
+      return (
+        <div className="mt-5 space-y-6">
+          {rows.map((item) => (
+            <AssignmentFields
+              key={item.trainingPathId}
+              item={item}
+              disabled={disabled}
+              onChange={(value) => setChanges((previous) => ({ ...previous, [value.trainingPathId]: value }))}
+              onRemove={() => {
+                removePath(item);
+                document.getElementById("catalog-training-path")?.focus();
+              }}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (!readError && page > 0 && associations?.items.length === 0 && totalItems > 0) {
+      return (
+        <DocumentCatalogAssignmentsEmptyState
+          hasItemsOnOtherPages
+          onFirstPage={() => {
+            setPage(0);
+          }}
+        />
+      );
+    }
+
+    return null;
+  }
+
   return (
     <section className="bg-muted/25 min-w-0 rounded-xl border p-4 sm:p-6" aria-label="Trayectos asociados" aria-busy={associationsLoading}>
       <header className="-mx-4 border-b px-4 pb-4 sm:-mx-6 sm:px-6 sm:pb-5">
@@ -108,31 +146,7 @@ export function DocumentCatalogAssignmentSection({
           </Alert>
         ) : null}
       </div>
-      {associationsLoading ? (
-        <Skeleton className="mt-5 h-32" role="status" aria-label="Cargando asignaciones por trayecto" />
-      ) : rows.length > 0 ? (
-        <div className="mt-5 space-y-6">
-          {rows.map((item) => (
-            <AssignmentFields
-              key={item.trainingPathId}
-              item={item}
-              disabled={disabled}
-              onChange={(value) => setChanges((previous) => ({ ...previous, [value.trainingPathId]: value }))}
-              onRemove={() => {
-                removePath(item);
-                document.getElementById("catalog-training-path")?.focus();
-              }}
-            />
-          ))}
-        </div>
-      ) : !readError && page > 0 && associations?.items.length === 0 && totalItems > 0 ? (
-        <DocumentCatalogAssignmentsEmptyState
-          hasItemsOnOtherPages
-          onFirstPage={() => {
-            setPage(0);
-          }}
-        />
-      ) : null}
+      {renderAssignments()}
       {currentId && totalPages > 1 ? (
         <div className="mt-5">
           <DataTablePagination

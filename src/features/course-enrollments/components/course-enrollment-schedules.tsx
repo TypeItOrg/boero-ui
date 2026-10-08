@@ -17,9 +17,13 @@ export function CourseEnrollmentSchedules({ schedules }: CourseEnrollmentSchedul
 
   for (const schedule of schedules) {
     const startTime = schedule.startTime.slice(0, 5);
+
     const endTime = schedule.endTime.slice(0, 5);
+
     const released = Boolean(schedule.releasedAt);
+
     const key = `${startTime}-${endTime}-${released}`;
+
     const group = groups.get(key);
 
     if (group) {

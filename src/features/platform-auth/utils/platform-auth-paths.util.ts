@@ -12,6 +12,7 @@ export function getSafeNextPath(next: string | null | undefined): string {
   if (next.startsWith("http://") || next.startsWith("https://")) {
     try {
       const parsedUrl = new URL(next);
+
       const path = parsedUrl.pathname + parsedUrl.search;
 
       return path === "/" ? DEFAULT_REDIRECT_PATH : path;

@@ -18,7 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SessionsPage({ searchParams }: { searchParams: Promise<PaginationSearchParams> }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
+
   const { page, size } = parseSessionsPaginationParams(resolvedSearchParams);
+
   const sessionsPromise = fetchInstitutionalSessions({ page, size });
 
   return (

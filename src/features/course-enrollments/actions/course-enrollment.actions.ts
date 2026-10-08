@@ -28,8 +28,11 @@ export async function createManualCourseEnrollmentAction(formData: FormData): Pr
   }
 
   const returnTo = getSafeReturnTo(rawReturnTo ?? undefined, "/course-enrollments");
+
   const studentId = formData.get("studentId");
+
   const courseId = formData.get("courseId");
+
   const assignmentBody = buildAssignmentBody(formData);
 
   if (typeof studentId !== "string" || typeof courseId !== "string" || !isValidUuid(studentId) || !isValidUuid(courseId) || !assignmentBody) {

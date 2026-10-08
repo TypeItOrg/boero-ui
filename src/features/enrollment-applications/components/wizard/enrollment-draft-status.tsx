@@ -17,6 +17,41 @@ export function EnrollmentDraftStatus({
   pendingInstrumentGroups: string[];
   documentsBlocked: boolean;
 }): ReactElement {
+  function renderSaveStatus(): ReactElement | null {
+    if (saving) {
+      return (
+        <>
+          <Loader2Icon className="text-primary size-4 animate-spin" />
+          <span>Guardando cambios…</span>
+        </>
+      );
+    }
+
+    if (saveError) {
+      return (
+        <span className="text-destructive flex items-center gap-1">
+          <AlertCircleIcon className="size-4" />
+          <span>No se pudo guardar: {saveError}</span>
+        </span>
+      );
+    }
+
+    if (pendingInstrumentGroups.length > 0) {
+      return <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>;
+    }
+
+    if (documentsBlocked) {
+      return <span>{ENROLLMENT_MESSAGES.DOCUMENTS_DRAFT_PENDING}</span>;
+    }
+
+    return (
+      <>
+        <CheckCircle2Icon className="size-4 text-emerald-500" />
+        <span>Borrador guardado</span>
+      </>
+    );
+  }
+
   return (
     <div className="bg-muted/25 rounded-xl border p-4 sm:p-6">
       <div className="flex items-start gap-3.5">
@@ -26,26 +61,7 @@ export function EnrollmentDraftStatus({
         <div className="flex flex-col justify-center gap-1">
           <p className="font-heading text-sm font-medium">Solicitud en borrador</p>
           <div className="text-muted-foreground flex items-center gap-2 text-xs sm:text-sm" aria-live="polite" aria-atomic="true">
-            {saving ? (
-              <>
-                <Loader2Icon className="text-primary size-4 animate-spin" />
-                <span>Guardando cambios…</span>
-              </>
-            ) : saveError ? (
-              <span className="text-destructive flex items-center gap-1">
-                <AlertCircleIcon className="size-4" />
-                <span>No se pudo guardar: {saveError}</span>
-              </span>
-            ) : pendingInstrumentGroups.length > 0 ? (
-              <span>{ENROLLMENT_MESSAGES.COURSE_INSTRUMENT_DRAFT_PENDING}</span>
-            ) : documentsBlocked ? (
-              <span>{ENROLLMENT_MESSAGES.DOCUMENTS_DRAFT_PENDING}</span>
-            ) : (
-              <>
-                <CheckCircle2Icon className="size-4 text-emerald-500" />
-                <span>Borrador guardado</span>
-              </>
-            )}
+            {renderSaveStatus()}
           </div>
         </div>
       </div>

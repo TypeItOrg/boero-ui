@@ -17,6 +17,7 @@ import type { RenamePasskeyState } from "@features/institutional-auth/types/rena
 import type { RevokePasskeyState } from "@features/institutional-auth/types/revoke-passkey-state.types";
 
 const LABEL_FIELD_NAMES = ["label"] as const;
+
 const idSchema = z.object({ id: z.string().min(1) });
 
 export async function renamePasskeyAction(id: string, _previousState: RenamePasskeyState, formData: FormData): Promise<RenamePasskeyState> {

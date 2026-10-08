@@ -21,8 +21,11 @@ export function InstitutionalBrandIdentity({
   showInstitutionName?: boolean;
 }): ReactElement {
   const institution = useInstitutionalBrand();
+
   const logoUrl = institution ? getInstitutionLogoUrl(institution.id, institution.logoUrl) : "/brand/boero-logo.webp";
+
   const [failedUrl, setFailedUrl] = useState<string>();
+
   const hasLogo = Boolean(logoUrl && failedUrl !== logoUrl);
 
   return (

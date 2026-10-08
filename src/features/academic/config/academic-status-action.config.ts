@@ -95,9 +95,13 @@ export function resolveCatalogStatusChange(
   formStatusResource: ActiveAcademicStatusResource | null;
 } {
   const activeStatusValue = formData.get("active");
+
   const initialActiveStatusValue = formData.get("initialActive");
+
   const nextActiveStatus = isValidActiveStatusValue(activeStatusValue) ? activeStatusValue : null;
+
   const formStatusResource = isFormStatusResource(resource) ? resource : null;
+
   const hasCatalogStatus = Boolean(id && formStatusResource && formData.has("active"));
 
   if (hasCatalogStatus && !isValidActiveStatusValue(activeStatusValue)) {

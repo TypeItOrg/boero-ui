@@ -37,6 +37,7 @@ export function RejectEnrollmentApplicationCourseDialog({
 }: EnrollmentApplicationCourseDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(async (_previous: { error?: string }, formData: FormData) => {
     const reason = formData.get("reason");
+
     const normalizedReason = typeof reason === "string" ? reason : "";
 
     const result = await safelyRunAction(

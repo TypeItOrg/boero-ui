@@ -18,6 +18,7 @@ type InstitutionalUnavailablePageProps = {
 
 export default async function InstitutionalUnavailablePage({ searchParams }: InstitutionalUnavailablePageProps): Promise<ReactElement> {
   const { message } = await searchParams;
+
   const homeHref = process.env.FRONTEND_PUBLIC_URL || "/";
 
   return <InstitutionalUnavailableView message={message} homeHref={homeHref} />;

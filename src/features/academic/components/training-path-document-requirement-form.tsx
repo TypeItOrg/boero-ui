@@ -36,6 +36,7 @@ export function RequirementForm({
   onPendingChange,
 }: TrainingPathRequirementFormProps): ReactElement {
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
 
   const [document, setDocument] = useState<DocumentDefinition | undefined>(

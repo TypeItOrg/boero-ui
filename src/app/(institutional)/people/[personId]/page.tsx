@@ -40,9 +40,13 @@ export default async function PersonPage({
   searchParams: Promise<{ returnTo?: QueryParamValue; view?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const { personId } = await params;
+
   const { returnTo, view } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/people");
+
   const isDetailView = view === "detail";
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) {
@@ -50,33 +54,49 @@ export default async function PersonPage({
   }
 
   const canAssignRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_ASSIGN);
+
   const canRevokeRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
+
   const canManageRoles = canAssignRoles || canRevokeRoles;
+
   const personPromise = fetchPerson(user.institutionId, personId, PeopleScope.INSTITUTIONAL);
 
-  const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = isDetailView
-    ? fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL).then((assignedRoles) => [assignedRoles, []])
-    : canManageRoles
-      ? Promise.all([
-          fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL),
-          canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
-        ])
-      : Promise.resolve([[], []]);
+  async function loadRoles(): Promise<[PersonRole[], AssignableRole[]]> {
+    if (isDetailView) {
+      return [await fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL), []];
+    }
 
-  const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
+    if (!canManageRoles) {
+      return [[], []];
+    }
+
+    return Promise.all([
+      fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL),
+      canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
+    ]);
+  }
+
+  const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, loadRoles()]);
 
   if (!person) {
     notFound();
   }
 
   const assignableRoles = systemRoles.filter((role) => role.technicalCode !== "INSTITUTIONAL_AUTHORITY");
+
   const personName = `${person.firstName} ${person.lastName}`;
+
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
+
   const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_DELETE) && user.personId !== personId;
+
+  const editTitle = canUpdate ? "Editar usuario" : "Administrar roles";
+
+  const editBreadcrumbLabel = canUpdate ? "Editar" : "Administrar roles";
 
   return (
     <PlatformPageShell
-      title={isDetailView ? "Detalle de usuario" : canUpdate ? "Editar usuario" : "Administrar roles"}
+      title={isDetailView ? "Detalle de usuario" : editTitle}
       minViewportHeight
       breadcrumb={
         <InstitutionalBreadcrumb
@@ -84,7 +104,7 @@ export default async function PersonPage({
             [personId]: appendReturnTo(`/people/${personId}?view=detail`, destination),
           }}
           segmentLabels={{ [personId]: personName }}
-          trailingLabel={isDetailView ? undefined : canUpdate ? "Editar" : "Administrar roles"}
+          trailingLabel={isDetailView ? undefined : editBreadcrumbLabel}
         />
       }
       headerClassName="flex-row items-center justify-between"

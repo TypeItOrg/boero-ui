@@ -15,6 +15,7 @@ type AcademicOfferPaginationProps = {
 
 export function AcademicOfferPagination({ page, size, totalItems, totalPages }: AcademicOfferPaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
+
   const summaryLabel = totalItems === 1 ? "1 trayecto disponible." : `${totalItems} trayectos disponibles.`;
 
   return (

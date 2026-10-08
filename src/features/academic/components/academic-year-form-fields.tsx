@@ -29,9 +29,13 @@ export function AcademicYearFields({ initialValues = {}, fieldErrors }: Academic
   });
 
   const { year: selectedYear, startDate, endDate } = selection;
+
   const hasSelectedYear = selectedYear !== undefined;
+
   const yearStart = hasSelectedYear ? new Date(selectedYear, 0, 1) : undefined;
+
   const yearEnd = hasSelectedYear ? new Date(selectedYear, 11, 31) : undefined;
+
   const followingYearEnd = hasSelectedYear ? new Date(selectedYear + 1, 11, 31) : undefined;
 
   function handleYearChange(value: string): void {

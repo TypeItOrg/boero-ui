@@ -38,8 +38,11 @@ export default async function RolesPage({
   }
 
   const params = parsePaginationQuery(await searchParams);
+
   const roles = await fetchInstitutionRoles(user.institutionId, params);
+
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_CREATE);
+
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
 
   return (

@@ -41,6 +41,7 @@ type InstitutionalInstitutionFormProps = {
 
 export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): ReactElement {
   const router = useRouter();
+
   const destination = getSafeReturnTo(returnTo, "/institution");
 
   const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
@@ -48,6 +49,7 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
   });
 
   const initialLocation = useMemo(() => getInitialLocation(institution), [institution]);
+
   const defaultValues = useMemo(() => getDefaultValues(institution), [institution]);
 
   const {

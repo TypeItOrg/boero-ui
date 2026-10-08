@@ -72,9 +72,13 @@ function PersonFormView({
   returnTo,
 }: PersonFormProps): ReactElement {
   const router = useRouter();
+
   const isEdit = mode === FORM_MODE.EDIT;
+
   const listPath = PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`;
+
   const destination = returnTo ?? listPath;
+
   const resolver = getPersonFormResolver(isEdit);
 
   const {
@@ -98,7 +102,9 @@ function PersonFormView({
 
       try {
         const formData = getFormData(values, isEdit, canEdit, assignments);
+
         const result = await submitPerson(formData);
+
         const hasFieldErrors = setActionFieldErrors(result, setError);
 
         if (result.success) {
@@ -114,7 +120,9 @@ function PersonFormView({
   );
 
   const formError = actionState.error;
+
   const errorState = useMemo(() => ({ error: formError, fieldErrors: errors }), [formError, errors]);
+
   const formRef = useActionFormErrorFocus(errorState, isPending);
 
   function onSubmit(values: PersonFormInput): void {

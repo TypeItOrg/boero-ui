@@ -43,6 +43,7 @@ export async function AcademicRouteView({
   searchParams,
 }: AcademicRouteViewProps): Promise<ReactElement> {
   const basePath = getAcademicRouteBase(scope, institutionId);
+
   const breadcrumb = renderBreadcrumb();
 
   if (segments.length === 0) {
@@ -54,6 +55,7 @@ export async function AcademicRouteView({
   }
 
   const [resourceSegment, id, action, nestedId, nestedAction, leaf, leafId] = segments;
+
   const collectionResource = parseAcademicCollectionResource(resourceSegment);
 
   if (collectionResource) {

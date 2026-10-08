@@ -32,7 +32,9 @@ export function PlatformRoleDeleteButton({
   roleName: string;
 }): ReactElement {
   const router = useRouter();
+
   const [isPending, startTransition] = useTransition();
+
   const [error, setError] = useState<string>();
 
   function handleDelete(): void {

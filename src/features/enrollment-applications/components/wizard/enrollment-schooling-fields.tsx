@@ -26,6 +26,10 @@ export function EnrollmentSchoolingFields({
   handleEducationLevelChange: (value: EnrollmentEducationLevel) => void;
   dispatchSchooling: ActionDispatch<[action: SchoolingFormAction]>;
 }): ReactElement {
+  const hasSchooling = Boolean(schooling.educationLevel && schooling.educationLevel !== "NO_SCHOOLING");
+
+  const showLevelCompletion = schooling.currentlyStudying === false && hasSchooling && schooling.educationLevel !== "SECONDARY";
+
   return (
     <CardContent className="space-y-5">
       <EnrollmentBooleanField
@@ -67,7 +71,7 @@ export function EnrollmentSchoolingFields({
         </Field>
       ) : null}
 
-      {schooling.educationLevel && schooling.educationLevel !== "NO_SCHOOLING" ? (
+      {hasSchooling ? (
         <Field data-invalid={!!getFieldError(["academicBackground", "schoolOrigin"])}>
           <FieldLabel htmlFor="schoolOrigin" required={schooling.currentlyStudying === true}>
             {schooling.currentlyStudying ? "Institución educativa actual" : "Última institución educativa (opcional)"}
@@ -97,10 +101,7 @@ export function EnrollmentSchoolingFields({
         </Field>
       ) : null}
 
-      {schooling.currentlyStudying === false &&
-      schooling.educationLevel &&
-      schooling.educationLevel !== "NO_SCHOOLING" &&
-      schooling.educationLevel !== "SECONDARY" ? (
+      {showLevelCompletion ? (
         <EnrollmentBooleanField
           id="levelCompleted"
           label="¿Completaste ese nivel?"

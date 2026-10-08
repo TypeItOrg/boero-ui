@@ -31,8 +31,11 @@ export const metadata: Metadata = {
 
 export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<ReactElement> {
   const { id, personId } = await params;
+
   const { returnTo, view } = await searchParams;
+
   const isDetailView = view === "detail";
+
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
 
   const [person, assignedRoles, systemRoles] = await Promise.all([

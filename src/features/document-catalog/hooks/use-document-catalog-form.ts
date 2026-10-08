@@ -36,6 +36,7 @@ export function useDocumentCatalogForm({
   layout = "page",
 }: DocumentCatalogFormProps) {
   const router = useRouter();
+
   const [name, setName] = useState(initial?.name ?? defaults?.name ?? "");
 
   const [allowedFormats, setAllowedFormats] = useState<string[]>(
@@ -43,8 +44,11 @@ export function useDocumentCatalogForm({
   );
 
   const [confirmationData, setConfirmationData] = useState<FormData>();
+
   const [confirmationState, setConfirmationState] = useState<DocumentCatalogActionState>();
+
   const [saveUncertainError, setSaveUncertainError] = useState("");
+
   const saveButtonRef = useRef<HTMLButtonElement>(null);
 
   const [directState, action, pending] = useActionState(async (previous: DocumentCatalogActionState, form: FormData) => {
@@ -67,6 +71,7 @@ export function useDocumentCatalogForm({
   }, {});
 
   const state = confirmationState ?? directState;
+
   const currentId = state.document?.id ?? initial?.id;
 
   const {
@@ -97,11 +102,17 @@ export function useDocumentCatalogForm({
   });
 
   const { impact, impactError } = useDocumentCatalogImpact(scope, institutionId, currentId, state.document);
+
   const disabled = pending || state.uncertain === true || Boolean(saveUncertainError);
+
   const hasValidRequiredFields = Boolean(institutionId) && requiredDocumentFieldsSchema.safeParse({ name, allowedFormats }).success;
+
   const formRef = useActionFormErrorFocus(state, pending || Boolean(confirmationData));
+
   const isDialog = layout === "dialog";
+
   const Footer = isDialog ? DialogFooter : ("div" as const);
+
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return {

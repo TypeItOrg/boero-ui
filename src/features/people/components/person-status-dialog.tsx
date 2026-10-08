@@ -41,8 +41,11 @@ export function PersonStatusDialog({
   onUpdated,
 }: PersonStatusDialogProps): ReactElement {
   const [isPending, startTransition] = useTransition();
+
   const [error, setError] = useState<string>();
+
   const nextEnabled = !enabled;
+
   const actionLabel = nextEnabled ? "Activar usuario" : "Desactivar usuario";
 
   function handleOpenChange(nextOpen: boolean): void {

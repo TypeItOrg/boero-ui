@@ -63,6 +63,7 @@ export function InstitutionalBreadcrumb({
   trailingLabel,
 }: InstitutionalBreadcrumbProps): ReactElement {
   const pathname = usePathname();
+
   const segments = getSegments(pathname, segmentLabels, segmentHrefs, hiddenSegments, trailingLabel);
 
   return (
@@ -99,10 +100,15 @@ function getSegments(
   trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const parts = pathname.split("/").filter(Boolean);
+
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/" }];
+
   const hiddenSegmentSet = new Set(hiddenSegments);
+
   const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
+
   let accumulatedPath = "";
+
   let visiblePartIndex = 0;
 
   for (const part of parts) {
@@ -113,6 +119,7 @@ function getSegments(
     }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
+
     const label = customSegmentLabels[part] ?? SEGMENT_LABELS[part] ?? "Editar";
 
     segments.push({

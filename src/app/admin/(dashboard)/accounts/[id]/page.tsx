@@ -28,7 +28,9 @@ export const metadata: Metadata = {
 
 export default async function PlatformAccountDetailPage({ params, searchParams }: PlatformAccountDetailPageProps): Promise<ReactElement> {
   const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/accounts");
+
   const account = await fetchPlatformAccountAdmin(id);
 
   if (!account) {

@@ -24,6 +24,7 @@ type AcademicActionProps = {
 
 export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): ReactNode {
   const orderedActions = orderAcademicActions(actions);
+
   const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
 
   return orderedActions.map((action, index) => {
@@ -94,6 +95,7 @@ export function AcademicRowActions({ actions, label, onLifecycleAction, onStatus
 
 export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): ReactNode {
   const orderedActions = orderAcademicActions(actions);
+
   const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
 
   return orderedActions.map((action, index) => {

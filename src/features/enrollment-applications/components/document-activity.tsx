@@ -28,9 +28,9 @@ export function DocumentActivity({
 }: DocumentActivityProps): ReactElement {
   const { page, loading, error, history, retry, changePage } = useDocumentDeliveryHistory(applicationId, scope, requirement.id);
 
-  const deliveries = (
-    <>
-      {loading ? (
+  function renderDeliveries(): ReactElement | null {
+    if (loading) {
+      return (
         <div role="status" className="space-y-5">
           <span className="sr-only">Cargando entregas…</span>
           {[0, 1].map((item) => (
@@ -41,7 +41,11 @@ export function DocumentActivity({
             </div>
           ))}
         </div>
-      ) : error ? (
+      );
+    }
+
+    if (error) {
+      return (
         <Alert variant="destructive">
           <CircleAlertIcon />
           <AlertTitle>No se pudo cargar el historial</AlertTitle>
@@ -52,30 +56,40 @@ export function DocumentActivity({
             </Button>
           </AlertDescription>
         </Alert>
-      ) : history.items.length > 0 ? (
+      );
+    }
+
+    if (history.items.length > 0) {
+      return (
         <ol className="divide-y">
           {history.items.map((file) => (
             <li key={file.id} className="space-y-3 py-5 first:pt-0">
               <div className="flex items-center gap-2">
-                <Badge variant={file.versionStatus === "CURRENT" ? "secondary" : "outline"}>
-                  {file.versionStatus === "CURRENT" ? "Entrega vigente" : file.versionStatus === "SUPERSEDED" ? "Reemplazada" : "Retirada"}
-                </Badge>
+                <Badge variant={file.versionStatus === "CURRENT" ? "secondary" : "outline"}>{getDeliveryVersionLabel(file.versionStatus)}</Badge>
               </div>
               <Delivery file={file} applicationId={applicationId} scope={scope} showReviewStatus />
             </li>
           ))}
         </ol>
-      ) : (
-        <Empty className="py-12">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <HistoryIcon aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle>Todavía no hay entregas</EmptyTitle>
-            <EmptyDescription>Cuando se presente un archivo, sus versiones van a aparecer acá.</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      )}
+      );
+    }
+
+    return (
+      <Empty className="py-12">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <HistoryIcon aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyTitle>Todavía no hay entregas</EmptyTitle>
+          <EmptyDescription>Cuando se presente un archivo, sus versiones van a aparecer acá.</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
+  const deliveries = (
+    <>
+      {renderDeliveries()}
       {!loading && !error && history.totalPages > 1 ? (
         <div className="mt-3 flex items-center justify-between gap-3 border-t pt-4">
           <Button type="button" variant="outline" className="min-h-11" disabled={page === 0} onClick={() => changePage(page - 1)}>
@@ -145,4 +159,15 @@ export function DocumentActivity({
       </SheetContent>
     </Sheet>
   );
+}
+
+function getDeliveryVersionLabel(status: string): string {
+  switch (status) {
+    case "CURRENT":
+      return "Entrega vigente";
+    case "SUPERSEDED":
+      return "Reemplazada";
+    default:
+      return "Retirada";
+  }
 }

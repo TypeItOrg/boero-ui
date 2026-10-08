@@ -51,9 +51,13 @@ export const DEFAULT_COURSE_SORT = {
 } as const satisfies CourseSort;
 
 const DEFAULT_PAGE_SIZE = 10;
+
 const academicYearSortFields = new Set<AcademicYearSortField>(ACADEMIC_YEAR_SORT_FIELDS);
+
 const trainingPathSortFields = new Set<TrainingPathSortField>(TRAINING_PATH_SORT_FIELDS);
+
 const studyPlanSortFields = new Set<StudyPlanSortField>(STUDY_PLAN_SORT_FIELDS);
+
 const courseSortFields = new Set(COURSE_SORT_FIELDS);
 
 export type AcademicSearchParams = PaginationSearchParams &
@@ -140,6 +144,7 @@ function parseAcademicSort(searchParams: AcademicSearchParams, resource: Academi
 
 export function getAcademicRegistrationSummary(totalItems: number, singular: string, plural: string): string {
   const label = totalItems === 1 ? singular : plural;
+
   const participle = totalItems === 1 ? "registrado" : "registrados";
 
   return `${totalItems} ${label} ${participle}.`;

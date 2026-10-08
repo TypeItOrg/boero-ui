@@ -38,6 +38,7 @@ export async function institutionalPasswordLogin(
   }
 
   const rememberMe = rawRememberMe === "on";
+
   const output = await passwordLoginInstitutionalAccount({ loginAttemptId: bound.data.loginAttemptId, password, rememberMe }, await headers());
 
   if (!output.success) {

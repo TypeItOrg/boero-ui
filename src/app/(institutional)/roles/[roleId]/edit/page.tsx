@@ -31,8 +31,11 @@ export default async function EditRolePage({
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const { roleId } = await params;
+
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, `/roles/${roleId}`);
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE)) {

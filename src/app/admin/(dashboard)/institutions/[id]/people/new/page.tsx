@@ -24,8 +24,11 @@ type NewPersonPageProps = {
 
 export default async function NewPersonPage({ params, searchParams }: NewPersonPageProps): Promise<ReactElement> {
   const { id } = await params;
+
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
+
   const institution = await fetchInstitution(id);
 
   if (!institution) {

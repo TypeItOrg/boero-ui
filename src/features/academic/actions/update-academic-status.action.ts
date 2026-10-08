@@ -52,6 +52,7 @@ export async function updateAcademicStatusAction(
   }
 
   const raw = STATUS_INPUT_BUILDERS[context.data.resource](formData);
+
   const parsed = academicStatusSchema.safeParse(raw);
 
   if (!parsed.success) {
@@ -59,6 +60,7 @@ export async function updateAcademicStatusAction(
   }
 
   const body = getStatusRequestBody(parsed.data);
+
   const path = `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}/status`;
 
   const error = await getResponseErrorActionState(

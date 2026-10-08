@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+import { getBooleanFilterValue } from "@common/utils/boolean-filter-value.util";
 
 const ACTIVE_FILTER_OPTIONS = [
   { value: "all", label: "Todas" },
@@ -17,7 +18,7 @@ type InstitutionsTableFiltersProps = {
 };
 
 export function InstitutionsTableFilters({ active, search, size }: InstitutionsTableFiltersProps): ReactElement {
-  const activeValue = active === undefined ? "all" : active ? "true" : "false";
+  const activeValue = getBooleanFilterValue(active);
 
   const selectFilters: DataTableSelectFilter<ActiveFilterValue>[] = [
     {

@@ -19,10 +19,15 @@ type PlatformAccountStatusControlProps = {
 
 export function PlatformAccountStatusControl({ accountId, enabled }: PlatformAccountStatusControlProps): ReactElement {
   const router = useRouter();
+
   const { account: currentAccount } = usePlatformAccount();
+
   const [isPending, startTransition] = useTransition();
+
   const [error, setError] = useState<string>();
+
   const isCurrentAccount = currentAccount?.platformAccountId === accountId;
+
   const nextEnabled = !enabled;
 
   function updateStatus(): void {

@@ -24,6 +24,7 @@ export function changeCourseStudyPlan(selection: CourseFormSelection, studyPlanI
 
 export function changeCourseAcademicSpace(selection: CourseFormSelection, value: string | undefined, item?: CourseSpaceOption): CourseFormSelection {
   const instrumental = Boolean(item?.instrumental);
+
   const studyPlanSpaceId = item?.studyPlanSpaceId ?? value;
 
   return {

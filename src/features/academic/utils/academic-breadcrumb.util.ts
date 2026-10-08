@@ -21,6 +21,7 @@ export function getAcademicBreadcrumbLabels(segments: string[] | undefined): Rea
   }
 
   const parentSegment = segments.at(-2);
+
   const label = parentSegment ? NEW_LABELS[parentSegment] : undefined;
 
   return label ? { [ACADEMIC_ROUTE_SEGMENT.NEW]: label } : {};

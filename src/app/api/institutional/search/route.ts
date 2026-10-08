@@ -5,6 +5,7 @@ import { institutionalApiFetch } from "@features/institutional-auth/services/ins
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
+
   const parsed = institutionalContextualSearchRequestSchema.safeParse(Object.fromEntries(url.searchParams));
 
   if (!parsed.success) {

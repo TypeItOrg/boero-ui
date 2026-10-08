@@ -40,6 +40,83 @@ export function DocumentCatalogAssignmentList({
   size: number;
   setSize: Dispatch<SetStateAction<number>>;
 }): ReactElement {
+  function renderAssignments(): ReactElement | null {
+    if (query.isError) {
+      return (
+        <Alert variant="destructive">
+          <CircleAlertIcon />
+          <AlertTitle>No se pudieron consultar los trayectos</AlertTitle>
+          <AlertDescription className="flex flex-wrap items-center gap-3">
+            <span>Reintentá la consulta para ver las asignaciones.</span>
+            <Button type="button" size="lg" variant="outline" disabled={query.isFetching} onClick={() => void query.refetch()}>
+              Reintentar
+            </Button>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    if (query.isLoading) {
+      return <Skeleton className="h-44 w-full rounded-lg" role="status" aria-label="Cargando trayectos asociados" />;
+    }
+
+    if (query.data?.items.length) {
+      return (
+        <div className="min-w-0 overflow-hidden rounded-lg border">
+          <Table className="min-w-2xl table-fixed" aria-label="Trayectos asignados al documento">
+            <TableHeader className="bg-muted">
+              <TableRow>
+                <DataTableSortableHead<DocumentAssignmentSortField>
+                  scope="col"
+                  field="trainingPathName"
+                  label="Trayecto"
+                  sort={sort}
+                  onSortChange={updateSort}
+                />
+                <DataTableSortableHead<DocumentAssignmentSortField>
+                  scope="col"
+                  className="w-64"
+                  field="level"
+                  label="Exigencia"
+                  sort={sort}
+                  onSortChange={updateSort}
+                />
+                <DataTableSortableHead<DocumentAssignmentSortField>
+                  scope="col"
+                  className="w-24 text-right [&_button]:-mr-2 [&_button]:ml-auto"
+                  field="displayOrder"
+                  label="Orden"
+                  sort={sort}
+                  onSortChange={updateSort}
+                />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {query.data.items.map((path) => (
+                <TableRow key={path.trainingPathId}>
+                  <TableCell className="py-3 whitespace-normal">
+                    <p className="font-medium break-words">{path.trainingPathName}</p>
+                    {path.specificInstructions ? <AssignmentInstructions instructions={path.specificInstructions} /> : null}
+                  </TableCell>
+                  <TableCell className="py-3 whitespace-normal">{DOCUMENT_LEVEL_LABELS[path.level]}</TableCell>
+                  <TableCell className="py-3 text-right tabular-nums">{path.displayOrder}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      );
+    }
+
+    return (
+      <DocumentCatalogAssignmentsEmptyState
+        withinReadScope
+        hasItemsOnOtherPages={Boolean(query.data && query.data.totalItems > 0)}
+        onFirstPage={() => setPage(0)}
+      />
+    );
+  }
+
   return (
     <section aria-labelledby="document-paths-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
@@ -52,70 +129,7 @@ export function DocumentCatalogAssignmentList({
       </header>
       <div className="pt-5" aria-busy={query.isFetching}>
         <div className="relative min-w-0 overflow-hidden rounded-lg">
-          {query.isError ? (
-            <Alert variant="destructive">
-              <CircleAlertIcon />
-              <AlertTitle>No se pudieron consultar los trayectos</AlertTitle>
-              <AlertDescription className="flex flex-wrap items-center gap-3">
-                <span>Reintentá la consulta para ver las asignaciones.</span>
-                <Button type="button" size="lg" variant="outline" disabled={query.isFetching} onClick={() => void query.refetch()}>
-                  Reintentar
-                </Button>
-              </AlertDescription>
-            </Alert>
-          ) : query.isLoading ? (
-            <Skeleton className="h-44 w-full rounded-lg" role="status" aria-label="Cargando trayectos asociados" />
-          ) : query.data?.items.length ? (
-            <div className="min-w-0 overflow-hidden rounded-lg border">
-              <Table className="min-w-2xl table-fixed" aria-label="Trayectos asignados al documento">
-                <TableHeader className="bg-muted">
-                  <TableRow>
-                    <DataTableSortableHead<DocumentAssignmentSortField>
-                      scope="col"
-                      field="trainingPathName"
-                      label="Trayecto"
-                      sort={sort}
-                      onSortChange={updateSort}
-                    />
-                    <DataTableSortableHead<DocumentAssignmentSortField>
-                      scope="col"
-                      className="w-64"
-                      field="level"
-                      label="Exigencia"
-                      sort={sort}
-                      onSortChange={updateSort}
-                    />
-                    <DataTableSortableHead<DocumentAssignmentSortField>
-                      scope="col"
-                      className="w-24 text-right [&_button]:-mr-2 [&_button]:ml-auto"
-                      field="displayOrder"
-                      label="Orden"
-                      sort={sort}
-                      onSortChange={updateSort}
-                    />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {query.data.items.map((path) => (
-                    <TableRow key={path.trainingPathId}>
-                      <TableCell className="py-3 whitespace-normal">
-                        <p className="font-medium break-words">{path.trainingPathName}</p>
-                        {path.specificInstructions ? <AssignmentInstructions instructions={path.specificInstructions} /> : null}
-                      </TableCell>
-                      <TableCell className="py-3 whitespace-normal">{DOCUMENT_LEVEL_LABELS[path.level]}</TableCell>
-                      <TableCell className="py-3 text-right tabular-nums">{path.displayOrder}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <DocumentCatalogAssignmentsEmptyState
-              withinReadScope
-              hasItemsOnOtherPages={Boolean(query.data && query.data.totalItems > 0)}
-              onFirstPage={() => setPage(0)}
-            />
-          )}
+          {renderAssignments()}
           {query.isFetching && !query.isLoading ? <DataTableLoadingOverlay label="Cargando trayectos asociados" /> : null}
         </div>
         {query.data && !query.isError && query.data.totalItems > 0 ? (

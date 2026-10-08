@@ -38,6 +38,8 @@ export function CourseEnrollmentMutationFields({
   }[];
   onOpenChange: (open: boolean) => void;
 }): ReactElement {
+  const actionLabel = mode === "withdraw" ? "Registrar baja" : "Registrar resultado";
+
   return (
     <ActionForm action={formAction} className="space-y-4">
       <AlertDialogHeader>
@@ -54,7 +56,7 @@ export function CourseEnrollmentMutationFields({
             <GraduationCapIcon className="size-6" aria-hidden="true" />
           )}
         </div>
-        <AlertDialogTitle>{mode === "withdraw" ? "Registrar baja" : "Registrar resultado"}</AlertDialogTitle>
+        <AlertDialogTitle>{actionLabel}</AlertDialogTitle>
         <AlertDialogDescription>
           {mode === "withdraw" ? "Estás por registrar la baja de " : "Estás por registrar el resultado académico de "}
           <span className="text-foreground font-semibold">{enrollment.studentName}</span> en{" "}
@@ -124,7 +126,7 @@ export function CourseEnrollmentMutationFields({
           Cancelar
         </Button>
         <Button type="submit" size="lg" variant={mode === "withdraw" ? "destructive" : "default"} disabled={isPending}>
-          {isPending ? "Guardando…" : mode === "withdraw" ? "Registrar baja" : "Registrar resultado"}
+          {isPending ? "Guardando…" : actionLabel}
         </Button>
       </AlertDialogFooter>
     </ActionForm>

@@ -52,8 +52,11 @@ export function EnrollmentCoursesSelector({
 
   for (const course of courses) {
     const planKey = JSON.stringify([course.studyPlanName, course.studyPlanVersion, course.academicYear]);
+
     const groups = plans.get(planKey) ?? new Map<string, EnrollmentCourseOption[]>();
+
     const key = course.instrumental ? enrollmentCourseGroupKey(course) : course.courseId;
+
     const group = groups.get(key) ?? [];
 
     if (!group.some((item) => item.courseId === course.courseId)) {
@@ -68,10 +71,12 @@ export function EnrollmentCoursesSelector({
     <div className="@container space-y-4">
       {[...plans.entries()].map(([planKey, groups]) => {
         const plan = [...groups.values()][0][0];
+
         const levels = new Map<string, Map<string, EnrollmentCourseOption[]>>();
 
         for (const [key, variants] of groups) {
           const levelName = variants[0].academicLevelName ?? "Sin nivel";
+
           const level = levels.get(levelName) ?? new Map<string, EnrollmentCourseOption[]>();
 
           level.set(key, variants);

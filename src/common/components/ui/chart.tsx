@@ -31,6 +31,7 @@ function ChartContainer({
   };
 }) {
   const uniqueId = useId();
+
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`;
 
   return (

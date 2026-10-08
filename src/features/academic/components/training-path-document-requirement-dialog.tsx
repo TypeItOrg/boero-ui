@@ -39,6 +39,8 @@ export function TrainingPathDocumentRequirementDialog({
   drafts: TrainingPathDocumentDraft[];
   setDialogBusy: Dispatch<SetStateAction<boolean>>;
 }): ReactElement {
+  const content = getDialogContent(creating, Boolean(editing));
+
   return (
     <Dialog
       open
@@ -85,16 +87,8 @@ export function TrainingPathDocumentRequirementDialog({
               <FileTextIcon className="size-6" aria-hidden="true" />
             )}
           </div>
-          <DialogTitle className="leading-snug font-semibold">
-            {creating ? "Crear documento del catálogo" : editing ? "Configurar requisito" : "Seleccionar documento"}
-          </DialogTitle>
-          <DialogDescription className="max-w-sm text-pretty">
-            {creating
-              ? "Definí el nombre, las instrucciones y los archivos admitidos."
-              : editing
-                ? "Ajustá cómo se solicitará este documento."
-                : "Seleccioná un documento y definí cómo se solicitará."}
-          </DialogDescription>
+          <DialogTitle className="leading-snug font-semibold">{content.title}</DialogTitle>
+          <DialogDescription className="max-w-sm text-pretty">{content.description}</DialogDescription>
         </DialogHeader>
         <RequirementForm
           key={editing?.clientId ?? "new"}
@@ -127,4 +121,19 @@ export function TrainingPathDocumentRequirementDialog({
       </DialogContent>
     </Dialog>
   );
+}
+
+function getDialogContent(creating: boolean, editing: boolean): { title: string; description: string } {
+  if (creating) {
+    return {
+      title: "Crear documento del catálogo",
+      description: "Definí el nombre, las instrucciones y los archivos admitidos.",
+    };
+  }
+
+  if (editing) {
+    return { title: "Configurar requisito", description: "Ajustá cómo se solicitará este documento." };
+  }
+
+  return { title: "Seleccionar documento", description: "Seleccioná un documento y definí cómo se solicitará." };
 }

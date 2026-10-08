@@ -10,8 +10,8 @@ import { ScrollTextIcon } from "lucide-react";
 import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import { getDataTableEmptyContent } from "@common/utils/data-table-empty-content.util";
 
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
@@ -48,6 +48,7 @@ export function CourseEnrollmentTable({
   detailBasePath,
 }: CourseEnrollmentTableProps): ReactElement {
   const router = useRouter();
+
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
 
   const [mutation, setMutation] = useState<{
@@ -56,11 +57,23 @@ export function CourseEnrollmentTable({
   }>();
 
   const hasFilters = status !== undefined || academicStatus !== undefined;
+
   const hasItemsOnOtherPages = data.totalItems > 0;
+
   const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : ScrollTextIcon;
+
   const showActionsColumn = Boolean(detailBasePath) || canReadWaitlist || canWithdraw || canUpdateAcademicStatus;
 
   if (data.items.length === 0) {
+    const emptyContent = getDataTableEmptyContent({
+      hasItemsOnOtherPages,
+      hasFilters,
+      pageTitle: "No hay cursadas en esta página",
+      filteredTitle: "No se encontraron cursadas",
+      emptyTitle: emptyMessage,
+      emptyDescription: "Las cursadas registradas van a aparecer acá junto con sus horarios, estado y resultado académico.",
+    });
+
     return (
       <div className="flex h-full flex-col gap-4">
         <div className="relative flex flex-1 overflow-hidden rounded-lg border" aria-busy={isNavigating}>
@@ -69,16 +82,8 @@ export function CourseEnrollmentTable({
               <EmptyMedia variant="icon">
                 <EmptyIcon className="size-5" aria-hidden="true" />
               </EmptyMedia>
-              <EmptyTitle className="text-base">
-                {hasItemsOnOtherPages ? "No hay cursadas en esta página" : hasFilters ? "No se encontraron cursadas" : emptyMessage}
-              </EmptyTitle>
-              <EmptyDescription>
-                {hasItemsOnOtherPages
-                  ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
-                  : hasFilters
-                    ? DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION
-                    : "Las cursadas registradas van a aparecer acá junto con sus horarios, estado y resultado académico."}
-              </EmptyDescription>
+              <EmptyTitle className="text-base">{emptyContent.title}</EmptyTitle>
+              <EmptyDescription>{emptyContent.description}</EmptyDescription>
             </EmptyHeader>
             <DataTableEmptyStateActions
               hasFilters={hasFilters}

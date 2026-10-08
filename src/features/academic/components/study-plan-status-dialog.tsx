@@ -103,12 +103,19 @@ export function StudyPlanStatusDialog({
   );
 
   const config = STATUS_DIALOG_CONFIG[targetStatus];
+
   const Icon = config.icon;
+
   const [effectiveTo, setEffectiveTo] = useState<Date>();
+
   const [effectiveToDraft, setEffectiveToDraft] = useState("");
+
   const effectiveFromDate = parseDateInput(effectiveFrom);
+
   const hasInvalidEffectiveTo = effectiveFromDate !== undefined && effectiveTo !== undefined && effectiveTo < effectiveFromDate;
+
   const effectiveToError = hasInvalidEffectiveTo ? "La fecha final no puede ser anterior al inicio del plan." : state.fieldErrors?.effectiveTo;
+
   const effectiveToId = useId();
 
   function handleOpenChange(nextOpen: boolean): void {

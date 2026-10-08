@@ -19,6 +19,7 @@ const DataTableNavigationContext = createContext<DataTableNavigationContextValue
 
 export function DataTableNavigationProvider({ children }: PropsWithChildren): ReactElement {
   const { navigate: navigateToSearchParams } = useSearchParamNavigation();
+
   const [isPending, startTransition] = useTransition();
 
   const navigate = useCallback(

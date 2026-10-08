@@ -28,9 +28,13 @@ export function PersonRolesManager({
   scope = PeopleScope.ADMIN,
 }: PersonRolesManagerProps): ReactElement {
   const initialRoleCodes = useMemo(() => assignedRoles.map((role) => role.roleId), [assignedRoles]);
+
   const initialRoleCodeSet = useMemo(() => new Set(initialRoleCodes), [initialRoleCodes]);
+
   const selectedRoleCodeSet = useMemo(() => new Set(selectedRoleCodes), [selectedRoleCodes]);
+
   const assignedRolesByCode = useMemo(() => new Map(assignedRoles.map((role) => [role.roleId, role])), [assignedRoles]);
+
   const rolesByCode = useMemo(() => new Map(roles.map((role) => [role.id, role])), [roles]);
 
   const selectedRoles = useMemo(
@@ -86,8 +90,11 @@ export function PersonRolesManager({
     }
 
     const roleChanges = getRoleChanges(initialRoleCodes, nextRoleCodes);
+
     const requiresExplicitRevocation = roleChanges.revocations.length > 0;
+
     const canAssign = roleChanges.assignments.length === 0 || canAssignRoles;
+
     const canRevoke = !requiresExplicitRevocation || canRevokeRoles;
 
     return canAssign && canRevoke;
@@ -118,8 +125,11 @@ export function PersonRolesManager({
             <div className="flex flex-col gap-2">
               {selectedRoles.map((role) => {
                 const isPendingAssignment = !initialRoleCodeSet.has(role.roleId);
+
                 const nextRoleCodes = selectedRoleCodes.filter((currentRoleCode) => currentRoleCode !== role.roleId);
+
                 const isInstitutionalAuthority = role.technicalCode === SystemRoleCode.INSTITUTIONAL_AUTHORITY;
+
                 const isRevokable = !isInstitutionalAuthority || PeopleScope.isAdmin(scope);
 
                 return (
@@ -157,6 +167,7 @@ export function PersonRolesManager({
             <div className="flex flex-col gap-2">
               {availableRoles.map((role) => {
                 const isPendingRevocation = initialRoleCodeSet.has(role.id);
+
                 const roleSelection = getRoleSelection(role.id);
 
                 return (

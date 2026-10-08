@@ -49,6 +49,7 @@ export function CourseEnrollmentResultsTable({
             enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN";
 
           const canViewWaitlist = canReadWaitlist && scopeIncludesTrainingPath(permissionScopes, P.COURSE_WAITLIST_READ, enrollment.trainingPathId);
+
           const hasActions = Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult;
 
           function renderActions(

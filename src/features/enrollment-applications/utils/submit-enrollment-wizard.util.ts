@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 
 import type { z } from "zod";
 
+import { getErrorMessage } from "@common/utils/error-message.util";
+
 import {
   submitEnrollmentApplicationAction,
   updateEnrollmentDraftAction,
@@ -63,6 +65,7 @@ export async function submitEnrollmentWizard({
   setInvalidInstrumentGroups([...pendingInstrumentGroups]);
 
   const parsed = enrollmentApplicationSubmissionSchema.safeParse(structuredData);
+
   const issues: z.ZodIssue[] = parsed.success ? [] : [...parsed.error.issues];
 
   if (!selectedTrainingPathId) {
@@ -137,7 +140,7 @@ export async function submitEnrollmentWizard({
     return {};
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : ENROLLMENT_MESSAGES.SUBMISSION_FAILED,
+      error: getErrorMessage(error, ENROLLMENT_MESSAGES.SUBMISSION_FAILED),
     };
   }
 }

@@ -52,6 +52,57 @@ export function DocumentUpload({
     onCancel,
   });
 
+  const savedStatusLabel = committed ? "Guardado; falta actualizar el detalle" : "Sin guardar";
+
+  const selectionStatusLabel = pending ? "Guardando documento…" : savedStatusLabel;
+
+  function renderAttachment(): ReactElement | null {
+    if (selectedFile) {
+      return (
+        <>
+          <FileUploadSelection
+            label="Archivo seleccionado"
+            name={selectedFile.name}
+            file={selectedFile}
+            preview={
+              preview ? (
+                <DocumentFilePreview key={preview} src={preview} name={selectedFile.name} contentType={selectedFile.type} compact />
+              ) : undefined
+            }
+            previewAction={
+              preview ? <DocumentFilePreview src={preview} name={selectedFile.name} contentType={selectedFile.type} iconOnly /> : undefined
+            }
+            statusLabel={selectionStatusLabel}
+            removeLabel="Quitar archivo seleccionado"
+            disabled={disabled}
+            onRemove={committed ? undefined : removeSelection}
+          />
+          {!autoSave || (!pending && state.error) ? (
+            <Button type="submit" size="lg" className="min-h-11 w-full" disabled={disabled}>
+              {pending ? <LoaderCircleIcon className="animate-spin" /> : <UploadIcon />}
+              {onCancel && !pending && !committed ? "Guardar entrega en nombre del aspirante" : submitLabel}
+            </Button>
+          ) : null}
+        </>
+      );
+    }
+
+    if (requirement.currentAttachment && !onCancel) {
+      return (
+        <DocumentSavedFile
+          file={requirement.currentAttachment}
+          applicationId={applicationId}
+          scope={scope}
+          disabled={disabled}
+          statusLabel={autoSave ? "Guardado en el borrador" : undefined}
+          onWithdraw={onWithdraw}
+        />
+      );
+    }
+
+    return null;
+  }
+
   return (
     <form
       action={action}
@@ -83,42 +134,7 @@ export function DocumentUpload({
         onSelectFiles={selectFiles}
       />
       <FieldError id={errorId}>{error}</FieldError>
-      {selectedFile ? (
-        <>
-          <FileUploadSelection
-            label="Archivo seleccionado"
-            name={selectedFile.name}
-            file={selectedFile}
-            preview={
-              preview ? (
-                <DocumentFilePreview key={preview} src={preview} name={selectedFile.name} contentType={selectedFile.type} compact />
-              ) : undefined
-            }
-            previewAction={
-              preview ? <DocumentFilePreview src={preview} name={selectedFile.name} contentType={selectedFile.type} iconOnly /> : undefined
-            }
-            statusLabel={pending ? "Guardando documento…" : committed ? "Guardado; falta actualizar el detalle" : "Sin guardar"}
-            removeLabel="Quitar archivo seleccionado"
-            disabled={disabled}
-            onRemove={committed ? undefined : removeSelection}
-          />
-          {!autoSave || (!pending && state.error) ? (
-            <Button type="submit" size="lg" className="min-h-11 w-full" disabled={disabled}>
-              {pending ? <LoaderCircleIcon className="animate-spin" /> : <UploadIcon />}
-              {onCancel && !pending && !committed ? "Guardar entrega en nombre del aspirante" : submitLabel}
-            </Button>
-          ) : null}
-        </>
-      ) : requirement.currentAttachment && !onCancel ? (
-        <DocumentSavedFile
-          file={requirement.currentAttachment}
-          applicationId={applicationId}
-          scope={scope}
-          disabled={disabled}
-          statusLabel={autoSave ? "Guardado en el borrador" : undefined}
-          onWithdraw={onWithdraw}
-        />
-      ) : null}
+      {renderAttachment()}
       {onCancel ? (
         <Button type="button" variant="outline" size="lg" disabled={pending || committed} onClick={onCancel}>
           Cancelar carga asistida

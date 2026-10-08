@@ -17,6 +17,18 @@ export function AsyncDropdownItem<TItem>({
   renderItem,
   selected,
 }: AsyncDropdownItemProps<TItem>): ReactElement {
+  function renderContent(): ReactNode {
+    if (renderItem) {
+      return renderItem(item, { selected });
+    }
+
+    if (getItemDisplayLabel || getItemDescription) {
+      return <DropdownOptionContent label={getItemDisplayLabel?.(item) ?? getItemLabel(item)} description={getItemDescription?.(item)} />;
+    }
+
+    return <span className="truncate">{getItemLabel(item)}</span>;
+  }
+
   return (
     <CommandItem
       aria-label={getItemLabel(item)}
@@ -25,13 +37,7 @@ export function AsyncDropdownItem<TItem>({
       onSelect={() => onSelect(item)}
       value={getItemValue(item)}
     >
-      {renderItem ? (
-        renderItem(item, { selected })
-      ) : getItemDisplayLabel || getItemDescription ? (
-        <DropdownOptionContent label={getItemDisplayLabel?.(item) ?? getItemLabel(item)} description={getItemDescription?.(item)} />
-      ) : (
-        <span className="truncate">{getItemLabel(item)}</span>
-      )}
+      {renderContent()}
     </CommandItem>
   );
 }

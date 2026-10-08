@@ -78,6 +78,8 @@ export function DocumentCatalogSaveConfirmation({
 
   const errors = [state.error, ...Object.values(state.fieldErrors ?? {})].filter(Boolean);
 
+  const actionLabel = context ? "Guardar cambios" : "Crear documento";
+
   return (
     <AlertDialog
       open
@@ -132,7 +134,7 @@ export function DocumentCatalogSaveConfirmation({
               Volver al formulario
             </AlertDialogCancel>
             <Button type="submit" size="lg" disabled={pending || state.uncertain === true}>
-              {pending ? "Guardando…" : context ? "Guardar cambios" : "Crear documento"}
+              {pending ? "Guardando…" : actionLabel}
             </Button>
           </AlertDialogFooter>
         </ActionForm>

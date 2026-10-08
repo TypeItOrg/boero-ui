@@ -20,8 +20,11 @@ export default async function AdminSearchPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<ReactElement> {
   const rawParams = await searchParams;
+
   const requestedType = typeof rawParams.type === "string" ? rawParams.type : undefined;
+
   const entityType = isAcademicSearchEntity(requestedType) ? requestedType : undefined;
+
   const pagination = parsePaginationQuery(rawParams);
 
   const data =
@@ -30,6 +33,7 @@ export default async function AdminSearchPage({
       : null;
 
   const title = entityType ? CONTEXTUAL_SEARCH_PRESENTATION[entityType].plural : "Resultados de búsqueda";
+
   const hasInvalidType = requestedType !== undefined && entityType === undefined;
 
   return (

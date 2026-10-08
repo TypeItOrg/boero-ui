@@ -29,6 +29,7 @@ export function YearSelect({
   ...props
 }: YearSelectProps): ReactElement {
   const years = getDescendingYears(minYear, maxYear);
+
   const selectedLabel = getSelectedLabel(value, allOptionLabel);
 
   return (

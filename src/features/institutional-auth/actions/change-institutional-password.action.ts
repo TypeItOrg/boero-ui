@@ -14,6 +14,7 @@ import type { InstitutionalPerson } from "@features/institutional-auth/types/ins
 import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const PASSWORD_FIELDS = ["currentPassword", "password", "confirmPassword"] as const;
+
 const FALLBACK_ERROR = "No se pudo cambiar tu contraseña.";
 
 export async function changeInstitutionalPasswordAction(

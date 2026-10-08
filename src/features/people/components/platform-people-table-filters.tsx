@@ -17,7 +17,9 @@ import type { SystemRoleCode } from "@features/people/types/system-role-code.typ
 import type { SystemRole } from "@features/people/types/system-role.types";
 
 const INSTITUTION_FILTER_QUERY_KEY = ["platform", "institutions", "people-filter"] as const;
+
 const INSTITUTION_FILTER_PAGE_SIZE = 20;
+
 const ALL_ROLES = "all";
 
 type RoleFilterValue = SystemRoleCode | typeof ALL_ROLES;

@@ -29,8 +29,11 @@ export function useInstitutionalLogin({ emailVerified = false, passwordChanged =
   });
 
   const [passkeyFieldErrors, setPasskeyFieldErrors] = useState<InstitutionalCredentialsLoginState["fieldErrors"]>({});
+
   const pendingRef = useRef(false);
+
   const revisionRef = useRef(0);
+
   // Keep one-time notices visible after consuming their cookies.
   const [notices] = useState({ emailVerified, passwordChanged });
 
@@ -122,8 +125,11 @@ export function useInstitutionalLogin({ emailVerified = false, passwordChanged =
   }
 
   const currentPasswordErrors = passwordState.revision === revision ? passwordState.fieldErrors : undefined;
+
   const fieldErrors = method === "PASSKEY" ? passkeyFieldErrors : currentPasswordErrors;
+
   const showNotice = !status.pending && !status.error && !Object.keys(fieldErrors ?? {}).length;
+
   const activeInstitution = fixedInstitution ?? institution;
 
   function setRememberMe(value: boolean): void {

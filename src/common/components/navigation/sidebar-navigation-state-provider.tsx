@@ -20,6 +20,7 @@ const SidebarNavigationStateContext = createContext<SidebarNavigationState | nul
 
 export function SidebarNavigationStateProvider({ children, scope, initialStates }: SidebarNavigationStateProviderProps): ReactElement {
   const [groupStates, setGroupStates] = useState(initialStates);
+
   const cookieName = SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES[scope];
 
   const setGroupOpen = useCallback((id: string, open: boolean) => {
@@ -38,6 +39,7 @@ export function SidebarNavigationStateProvider({ children, scope, initialStates 
     }
 
     const value = encodeURIComponent(JSON.stringify(groupStates));
+
     const secure = window.location.protocol === "https:" ? "; secure" : "";
 
     try {

@@ -67,7 +67,9 @@ export async function createStudyPlanVersionAction(
 
   try {
     const response = await request;
+
     const created = (await response.json()) as { id?: unknown };
+
     const parsedId = z.uuid().safeParse(created.id);
 
     if (!parsedId.success) {

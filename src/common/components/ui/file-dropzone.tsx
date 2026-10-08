@@ -40,7 +40,9 @@ export function FileDropzone({
   onSelectFiles: (files: File[], silent?: boolean) => void;
 }): ReactElement {
   const id = useId();
+
   const inputRef = useRef<HTMLInputElement>(null);
+
   const [dragActive, setDragActive] = useState(false);
 
   function handleDragOver(event: DragEvent<HTMLButtonElement>): void {
@@ -51,6 +53,7 @@ export function FileDropzone({
     event.preventDefault();
 
     const items = Array.from(event.dataTransfer.items).filter((item) => item.kind === "file");
+
     // Some browsers expose the MIME type only after the file has been dropped.
     const canDrop = !disabled && (items.length === 0 || (items.length === 1 && (!items[0].type || accept.includes(items[0].type))));
 

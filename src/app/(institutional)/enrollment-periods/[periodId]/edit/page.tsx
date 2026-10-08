@@ -33,6 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function EditEnrollmentPeriodPage({ params, searchParams }: EditEnrollmentPeriodPageProps): Promise<ReactElement> {
   const [{ periodId: rawPeriodId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const periodId = parseUuidQueryParam(rawPeriodId);
 
   if (!periodId) {

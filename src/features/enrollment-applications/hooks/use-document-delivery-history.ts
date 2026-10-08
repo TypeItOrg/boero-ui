@@ -12,6 +12,7 @@ import type { DocumentDelivery } from "@features/enrollment-applications/types/d
 
 export function useDocumentDeliveryHistory(applicationId: string, scope: AcademicScope, requirementId: string) {
   const [pagination, setPagination] = useState({ applicationId, requirementId, scope, page: 0 });
+
   const identityChanged = pagination.applicationId !== applicationId || pagination.requirementId !== requirementId || pagination.scope !== scope;
 
   if (identityChanged) {
@@ -24,6 +25,7 @@ export function useDocumentDeliveryHistory(applicationId: string, scope: Academi
     queryKey: ["document-delivery-history", scope, applicationId, requirementId, page],
     queryFn: async ({ signal }) => {
       const params = new URLSearchParams({ scope, requirementId, page: String(page) });
+
       const response = await fetch(`/api/enrollment-applications/${applicationId}/documents?${params}`, { cache: "no-store", signal });
 
       return parseHttpResponse<{ items: DocumentDelivery[]; totalPages: number }>(response, DOCUMENT_MESSAGES.readFailed);

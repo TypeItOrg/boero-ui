@@ -12,7 +12,9 @@ import { CONTEXTUAL_SEARCH_SCOPE, type ContextualSearchScope } from "@features/c
 
 export function ContextualSearchResultMetadata({ item, scope }: { item: ContextualSearchResult; scope: ContextualSearchScope }): ReactElement {
   const metadata = [item.subtitle, scope === CONTEXTUAL_SEARCH_SCOPE.PLATFORM ? item.institutionName : null].filter(Boolean).join(" · ");
+
   const statusLabel = item.status ? (CONTEXTUAL_SEARCH_STATUS_LABELS[item.status] ?? item.status) : null;
+
   const categoryLabel = item.category ? (CONTEXTUAL_SEARCH_CATEGORY_LABELS[item.category] ?? item.category) : null;
 
   return (

@@ -10,6 +10,7 @@ type PlatformRolesTableContainerProps = PlatformRolesPaginationParams & {
 
 export async function PlatformRolesTableContainer(props: PlatformRolesTableContainerProps): Promise<ReactElement> {
   const { dataPromise, ...params } = props;
+
   const data = await dataPromise;
 
   return <PlatformRolesTablePresentation data={data} {...params} />;

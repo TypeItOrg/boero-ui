@@ -43,10 +43,15 @@ export function InstitutionalPasskeyStep({
   onUsePassword,
 }: InstitutionalPasskeyStepProps): ReactElement {
   const [ceremony, setCeremony] = useState<PasskeyCeremonyState>({ phase: "idle" });
+
   const ceremonyRef = useRef<AbortController | null>(null);
+
   const verifyingRef = useRef(false);
+
   const webauthnSupported = useWebAuthnSupport();
+
   const passkeyPending = ceremony.phase !== "idle";
+
   const passkeyVerifying = ceremony.phase === "verifying";
 
   // Cancel the external browser prompt when navigating away from this step.
@@ -140,6 +145,7 @@ export function InstitutionalPasskeyStep({
       }
 
       const requestOptions = toPublicKeyRequestOptions(begin.options);
+
       const credential = await getPasskeyAssertion(requestOptions, controller.signal);
 
       if (!isCurrentCeremony(controller)) {

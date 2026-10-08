@@ -36,11 +36,17 @@ type SidebarNavigationGroupItemProps = {
 
 export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigationGroupItemProps): ReactElement | null {
   const pathname = usePathname();
+
   const { isMobile, state: sidebarState } = useSidebar();
+
   const { groupStates, setGroupOpen } = useSidebarNavigationState();
+
   const suppressNextTooltipFocus = useRef(false);
+
   const activeItem = group.items.find((item) => navigation.isActive(item.url, item.exact));
+
   const activeUrl = activeItem?.url;
+
   const navigationKey = `${pathname}:${activeUrl ?? ""}`;
 
   const [expansion, setExpansion] = useState({
@@ -70,6 +76,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
 
   if (!isMobile && sidebarState === "collapsed") {
     const CollapsedIcon = activeItem?.icon ?? Icon;
+
     const collapsedLabel = activeItem ? `${group.title} › ${activeItem.ariaLabel ?? activeItem.title}` : group.title;
 
     return (
@@ -106,6 +113,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
             <DropdownMenuSeparator />
             {group.items.map((item) => {
               const isActive = navigation.isActive(item.url, item.exact);
+
               const ItemIcon = item.icon;
 
               return (
@@ -159,6 +167,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
           <SidebarMenuSub className="my-1 mr-0 ml-4 gap-0 pr-0 pl-2">
             {group.items.map((item) => {
               const isActive = navigation.isActive(item.url, item.exact);
+
               const ItemIcon = item.icon;
 
               return (

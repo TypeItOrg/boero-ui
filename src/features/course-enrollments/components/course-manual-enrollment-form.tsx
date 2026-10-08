@@ -25,7 +25,9 @@ type CourseManualEnrollmentFormProps = {
 
 export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): ReactElement {
   const [studentId, setStudentId] = useState<string>();
+
   const [courseId, setCourseId] = useState("");
+
   const { options, error: optionsError, loading: loadingOptions } = useCourseEnrollmentOptions({ courseId });
 
   const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {

@@ -11,6 +11,7 @@ const FALLBACK_MESSAGE = "No se pudieron obtener tus sesiones activas.";
 
 export async function fetchInstitutionalSessions(params: PaginationParams): Promise<PaginatedResponse<ActiveSession>> {
   const query = new URLSearchParams({ page: String(params.page), size: String(params.size) });
+
   const response = await institutionalApiFetch(`/api/v1/auth/sessions?${query.toString()}`);
 
   return parseHttpResponse<PaginatedResponse<ActiveSession>>(response, FALLBACK_MESSAGE);

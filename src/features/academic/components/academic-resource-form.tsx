@@ -55,6 +55,7 @@ export function AcademicResourceForm({
   ...options
 }: AcademicResourceFormProps): ReactElement {
   const [institution, setInstitution] = useState<InstitutionSummary>();
+
   const effectiveInstitutionId = institutionId ?? institution?.id;
 
   const action =
@@ -63,9 +64,13 @@ export function AcademicResourceForm({
       : saveAcademicResourceAction.bind(null, scope, institutionId, resource, id, parentId, returnTo);
 
   const [state, formAction, pending] = useActionState(action, initialState);
+
   const section = FORM_SECTION_COPY[resource];
+
   const Icon = ACADEMIC_RESOURCE_ICONS[resource];
+
   const submitLabel = id || state.trainingPathProgress ? "Guardar cambios" : CREATE_ACTION_LABELS[resource];
+
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   const savedTrainingPathHref =

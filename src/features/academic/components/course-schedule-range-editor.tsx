@@ -25,12 +25,19 @@ export function ScheduleRangeEditor({
   scheduleError,
 }: ScheduleRangeEditorProps): ReactElement {
   const start = toMinutes(schedule.startTime);
+
   const end = toMinutes(schedule.endTime);
+
   const isEmpty = !schedule.startTime && !schedule.endTime;
+
   const isIncomplete = !schedule.startTime || !schedule.endTime;
+
   const isValid = !isIncomplete && start >= 0 && end >= 0 && start < end;
+
   const duration = isValid ? end - start : 0;
+
   const period = parsePositiveInt(periodDurationMinutes);
+
   const isDivisible = Boolean(period && duration % period === 0);
 
   return (

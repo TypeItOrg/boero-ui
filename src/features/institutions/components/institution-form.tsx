@@ -39,8 +39,11 @@ const INSTITUTIONS_PATH = "/admin/institutions";
 
 export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }: InstitutionFormProps): ReactElement {
   const router = useRouter();
+
   const isEdit = mode === FORM_MODE.EDIT;
+
   const defaultDestination = isEdit ? `${INSTITUTIONS_PATH}/${institution.id}` : INSTITUTIONS_PATH;
+
   const destination = getSafeReturnTo(returnTo, defaultDestination);
 
   const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
@@ -48,10 +51,13 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
   });
 
   const [publicSubdomain, setPublicSubdomain] = useState(institution?.publicSubdomain ?? "");
+
   const [isSlugTouched, setIsSlugTouched] = useState(false);
+
   const [active, setActive] = useState(() => institution?.active ?? true);
 
   const initialLocation = useMemo(() => getInitialLocation(institution), [institution]);
+
   const defaultValues = useMemo(() => getDefaultValues(institution), [institution]);
 
   const {
@@ -68,6 +74,7 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
   });
 
   const nameField = register("name");
+
   const slugField = register("slug");
 
   const [state, formAction, isPending] = useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {

@@ -29,7 +29,9 @@ type InstitutionsTablePresentationProps = PaginationParams & {
 
 export function InstitutionsTablePresentation({ data, page, size, sort, search, active }: InstitutionsTablePresentationProps): ReactElement {
   const router = useRouter();
+
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
+
   const [statusTargetInstitution, setStatusTargetInstitution] = useState<InstitutionSummary>();
 
   function navigateToPage(newPage: number): void {

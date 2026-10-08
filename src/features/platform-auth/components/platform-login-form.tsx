@@ -18,6 +18,7 @@ const INITIAL_STATE: PlatformLoginActionState = {};
 
 export function PlatformLoginForm({ next }: { next?: string }): ReactElement {
   const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(loginPlatform, INITIAL_STATE);
+
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {

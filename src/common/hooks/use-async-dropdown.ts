@@ -49,10 +49,15 @@ export function useAsyncDropdown<TItem>({
   | "clearable"
 >) {
   const [internalOpen, setInternalOpen] = useState(false);
+
   const [listRenderVersion, setListRenderVersion] = useState(0);
+
   const [search, setSearch] = useState("");
+
   const isOpen = open ?? internalOpen;
+
   const debouncedSearch = useDebouncedValue(search, debounceMs);
+
   const virtualListKey = `${listRenderVersion}-${debouncedSearch}`;
 
   const asyncQueryKey = [...queryKey, { search: debouncedSearch, size: pageSize }];
@@ -68,7 +73,9 @@ export function useAsyncDropdown<TItem>({
   });
 
   const { data } = query;
+
   const items = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
+
   const selectedItem = items.find((item) => getItemValue(item) === value);
 
   const selectedText = getSelectedText({
@@ -86,6 +93,7 @@ export function useAsyncDropdown<TItem>({
     (defaultOption !== undefined && value === defaultOption.value);
 
   const isPlaceholder = !isSelected;
+
   const canClear = clearable && value !== undefined;
 
   function setOpen(nextOpen: boolean) {

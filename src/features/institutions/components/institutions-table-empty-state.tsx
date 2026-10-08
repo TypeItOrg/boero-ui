@@ -19,6 +19,7 @@ type InstitutionsTableEmptyStateProps = {
 
 export function InstitutionsTableEmptyState({ active, isNavigating, search, size, totalItems }: InstitutionsTableEmptyStateProps): ReactElement {
   const hasFilters = search.trim() !== "" || active !== undefined;
+
   let content: ReactNode;
 
   if (totalItems > 0) {

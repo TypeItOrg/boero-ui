@@ -15,6 +15,7 @@ export async function fetchPeople(
   scope: PeopleScopeType = PeopleScope.ADMIN,
 ): Promise<PaginatedResponse<PersonSummary>> {
   const { page, size, search, sort, roleId } = params;
+
   const searchParams = buildPaginationSearchParams({ page, size, search });
 
   searchParams.set("sort", serializeSpringSort(sort));

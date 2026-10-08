@@ -27,7 +27,9 @@ export function useDocumentAssignmentPage({
   savedDocument?: DocumentDefinition;
 }) {
   const assignmentInstitutionId = targetInstitutionId ?? institutionId;
+
   const identity = JSON.stringify([scope, institutionId, assignmentInstitutionId, currentId]);
+
   const [pagination, setPagination] = useState({ identity, page: 0, size: 20 });
 
   if (pagination.identity !== identity) {
@@ -35,6 +37,7 @@ export function useDocumentAssignmentPage({
   }
 
   const page = pagination.identity === identity ? pagination.page : 0;
+
   const enabled = Boolean(institutionId && currentId && allowAssignments && assignmentInstitutionId === institutionId);
 
   const query = useQuery({

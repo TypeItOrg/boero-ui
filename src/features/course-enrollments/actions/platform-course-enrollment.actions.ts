@@ -29,6 +29,7 @@ function parseAssignments(value: FormDataEntryValue | null): { classScheduleId: 
         }
 
         const classScheduleId = (assignment as { classScheduleId?: unknown }).classScheduleId;
+
         const individualSlotId = (assignment as { individualSlotId?: unknown }).individualSlotId;
 
         return (
@@ -52,6 +53,7 @@ function buildAssignmentBody(formData: FormData): {
   assignments: { classScheduleId: string; individualSlotId: string | null }[];
 } | null {
   const courseClassId = formData.get("courseClassId");
+
   const assignments = parseAssignments(formData.get("assignments"));
 
   if (typeof courseClassId !== "string" || !isValidUuid(courseClassId) || !assignments || assignments.length === 0) {

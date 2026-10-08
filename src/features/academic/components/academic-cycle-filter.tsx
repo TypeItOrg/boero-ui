@@ -14,6 +14,7 @@ export const CYCLE_FILTER_QUERY_KEY = ["academic", "courses", "cycle-filter"] as
 
 export function CycleFilterControl({ filter, size }: { filter: CourseDropdownFilter; size: number }): ReactElement {
   const { navigate } = useDataTableNavigation();
+
   const queryKey = useMemo(() => [...CYCLE_FILTER_QUERY_KEY, filter.scope, filter.institutionId], [filter.institutionId, filter.scope]);
 
   function updateCycle(value: string | undefined): void {

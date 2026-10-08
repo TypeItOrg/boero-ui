@@ -39,10 +39,16 @@ export function DocumentFilePreview({
   className?: string;
 }): ReactElement {
   const [failedSource, setFailedSource] = useState<string>();
+
   const failed = failedSource === src;
+
   const onPreviewError = useCallback(() => setFailedSource(src), [src]);
+
   const isImage = contentType === "image/png" || contentType === "image/jpeg";
+
   const isPdf = contentType === "application/pdf";
+
+  const formatLabel = getFormatLabel(contentType);
 
   function content(expanded: boolean): ReactNode {
     if (failed || (!isImage && !isPdf)) {
@@ -136,9 +142,7 @@ export function DocumentFilePreview({
             <div className="flex flex-wrap items-center gap-2">
               <DialogTitle className="leading-snug">Vista previa</DialogTitle>
               {isImage || isPdf ? (
-                <span className="text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-wide">
-                  {isPdf ? "PDF" : contentType === "image/png" ? "PNG" : "JPG"}
-                </span>
+                <span className="text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-wide">{formatLabel}</span>
               ) : null}
             </div>
             <DialogDescription className="line-clamp-2 break-all" title={name}>
@@ -162,4 +166,15 @@ export function DocumentFilePreview({
       </DialogContent>
     </Dialog>
   );
+}
+
+function getFormatLabel(contentType: string): string {
+  switch (contentType) {
+    case "application/pdf":
+      return "PDF";
+    case "image/png":
+      return "PNG";
+    default:
+      return "JPG";
+  }
 }

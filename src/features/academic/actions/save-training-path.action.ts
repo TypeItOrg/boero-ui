@@ -58,6 +58,7 @@ export async function saveTrainingPathAction(
   }
 
   const effectiveId = id ?? progress?.trainingPathId;
+
   const resolvedInstitutionId = institutionId ?? form.get("institutionId");
 
   if (institutionId === undefined && !z.uuid().safeParse(resolvedInstitutionId).success) {
@@ -129,6 +130,7 @@ export async function saveTrainingPathAction(
   }
 
   const apiBase = getAcademicApiBase(input.scope, input.institutionId);
+
   const record = await saveTrainingPathRecord(input.scope, apiBase, effectiveId, parsed.data as ParsedFormData, withProgress);
 
   if (!record.success) {

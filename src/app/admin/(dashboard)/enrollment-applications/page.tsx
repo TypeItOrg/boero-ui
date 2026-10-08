@@ -28,6 +28,7 @@ export default async function PlatformEnrollmentApplicationsPage({
   searchParams: Promise<EnrollmentApplicationSearchParams>;
 }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
+
   const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
 
   const dataPromise = fetchPlatformEnrollmentApplications({

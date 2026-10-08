@@ -45,6 +45,8 @@ function EnrollmentPeriodFormView(props: EnrollmentPeriodFormProps): ReactElemen
     changeEndTime,
   } = useEnrollmentPeriodForm(props);
 
+  const actionLabel = isEdit ? "Guardar cambios" : "Crear período";
+
   return (
     <ActionForm ref={formRef} action={formAction} className="flex h-full min-h-0 w-full flex-1 flex-col">
       <input type="hidden" name="institutionId" value={institution?.id ?? ""} />
@@ -98,7 +100,7 @@ function EnrollmentPeriodFormView(props: EnrollmentPeriodFormProps): ReactElemen
           className="flex-1 sm:flex-none"
           disabled={isPending || !institution || !academicYear || !startDate || !startTime || !endDate || !endTime}
         >
-          {isPending ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear período"}
+          {isPending ? "Guardando…" : actionLabel}
         </Button>
       </div>
     </ActionForm>

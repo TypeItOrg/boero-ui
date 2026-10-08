@@ -12,10 +12,15 @@ export function calculateAge(birthDate: string | Date | undefined): number | nul
   }
 
   const parts = BUSINESS_DATE_FORMATTER.formatToParts(new Date());
+
   const year = Number(parts.find((part) => part.type === "year")?.value);
+
   const month = Number(parts.find((part) => part.type === "month")?.value);
+
   const day = Number(parts.find((part) => part.type === "day")?.value);
+
   let age = year - date.getFullYear();
+
   const monthDiff = month - 1 - date.getMonth();
 
   if (monthDiff < 0 || (monthDiff === 0 && day < date.getDate())) {

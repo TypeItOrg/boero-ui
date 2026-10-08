@@ -32,22 +32,25 @@ export function EnrollmentDocumentRequirementHeader({
             ? "Obligatorio antes de aprobar"
             : DOCUMENT_LEVEL_LABELS[requirement.level]}
         </Badge>
-        <Badge
-          size="lg"
-          className={administrativeView ? "w-full @xl/documents:w-fit" : undefined}
-          variant={
-            requirement.active === false
-              ? "secondary"
-              : requirement.status === "ACCEPTED"
-                ? "success"
-                : requirement.status === "OBSERVED"
-                  ? "destructive"
-                  : "outline"
-          }
-        >
+        <Badge size="lg" className={administrativeView ? "w-full @xl/documents:w-fit" : undefined} variant={getStatusVariant(requirement)}>
           {requirement.active === false ? "Requisito retirado" : DOCUMENT_STATUS_LABELS[requirement.status ?? "MISSING"]}
         </Badge>
       </div>
     </header>
   );
+}
+
+function getStatusVariant(requirement: DocumentRequirement): "secondary" | "success" | "destructive" | "outline" {
+  if (requirement.active === false) {
+    return "secondary";
+  }
+
+  switch (requirement.status) {
+    case "ACCEPTED":
+      return "success";
+    case "OBSERVED":
+      return "destructive";
+    default:
+      return "outline";
+  }
 }

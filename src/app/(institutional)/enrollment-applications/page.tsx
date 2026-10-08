@@ -41,6 +41,7 @@ export default async function EnrollmentApplicationsPage({
   }
 
   const resolvedSearchParams = await searchParams;
+
   const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
 
   const dataPromise = fetchEnrollmentApplications(user.institutionId, {

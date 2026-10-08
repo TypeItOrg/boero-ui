@@ -23,9 +23,13 @@ export function CourseFields(props: AcademicFieldsProps): ReactElement {
 
 function CourseFormFields({ institutionField, institutionId, scope, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const editing = Boolean(initialValues.id);
+
   const [selection, setSelection] = useState(() => createCourseFormSelection(initialValues));
+
   const { studyPlanId, studyPlanSpaceId, academicSpaceId, instrumentId, instrumental, spaceLabel, format } = selection;
+
   const [academicYearId, setAcademicYearId] = useState(toOptionalFormString(initialValues.academicYearId));
+
   const [classes, setClasses] = useState<ClassDraft[]>(() => createCourseClassDrafts(initialValues.classes));
 
   const classesLocked = classes.length > 0;

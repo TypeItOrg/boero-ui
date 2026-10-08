@@ -25,6 +25,7 @@ export function PeoplePagination({ page, size, totalItems, totalPages }: PeopleP
   }
 
   const totalLabel = totalItems === 1 ? "usuario registrado." : "usuarios registrados.";
+
   const summaryLabel = `${totalItems} ${totalLabel}`;
 
   return (

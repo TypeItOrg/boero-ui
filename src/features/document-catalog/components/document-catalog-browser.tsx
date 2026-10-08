@@ -41,7 +41,9 @@ export function DocumentCatalogBrowser(props: DocumentCatalogBrowserProps): Reac
 
 function DocumentCatalogView({ scope, institutionId, canManage, breadcrumb, institutionSelect }: DocumentCatalogBrowserProps): ReactElement {
   const { isPending: isNavigationPending, navigate: navigateTable } = useDataTableNavigation();
+
   const pathname = usePathname();
+
   const params = useSearchParams();
 
   const { page, size, search } = parsePaginationQuery(
@@ -77,10 +79,67 @@ function DocumentCatalogView({ scope, institutionId, canManage, breadcrumb, inst
   }
 
   const items = query.data?.items ?? [];
+
   const totalPages = query.data?.totalPages ?? 0;
+
   const hasFilters = search.length > 0 || active === "false" || (scope === "admin" && Boolean(institutionId));
+
   const hasItemsOnOtherPages = (query.data?.totalItems ?? 0) > 0;
+
   const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : FileTextIcon;
+
+  function renderCatalog(): ReactElement | null {
+    if (query.isError) {
+      return (
+        <Alert variant="destructive" className="m-4 w-auto">
+          <CircleAlertIcon />
+          <AlertTitle>No se pudo cargar el catálogo</AlertTitle>
+          <AlertDescription className="flex flex-wrap items-center gap-3">
+            <span>Reintentá la consulta. Los filtros se conservan.</span>
+            <Button type="button" size="lg" variant="outline" onClick={() => void query.refetch()}>
+              Reintentar
+            </Button>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    if (!query.isLoading && items.length === 0) {
+      return (
+        <DocumentCatalogEmptyState
+          EmptyIcon={EmptyIcon}
+          hasItemsOnOtherPages={hasItemsOnOtherPages}
+          hasFilters={hasFilters}
+          canManage={canManage}
+          navigate={navigate}
+        />
+      );
+    }
+
+    return (
+      <Table containerClassName="table-scrollbar" className="min-w-180">
+        <DocumentCatalogTableHeader scope={scope} />
+        <TableBody>
+          {query.isLoading ? (
+            <TableRow aria-hidden="true">
+              <TableCell colSpan={scope === "admin" ? 5 : 4} className="h-16" />
+            </TableRow>
+          ) : (
+            items.map((item) => (
+              <DocumentCatalogTableRow
+                key={item.id}
+                item={item}
+                documentHref={documentHref}
+                canManage={canManage}
+                editHref={editHref}
+                scope={scope}
+              />
+            ))
+          )}
+        </TableBody>
+      </Table>
+    );
+  }
 
   return (
     <DocumentCatalogShell breadcrumb={breadcrumb}>
@@ -120,48 +179,7 @@ function DocumentCatalogView({ scope, institutionId, canManage, breadcrumb, inst
           className={cn("relative h-full min-w-0 overflow-hidden rounded-lg", (query.isLoading || query.isError || items.length > 0) && "border")}
           aria-busy={isTablePending}
         >
-          {query.isError ? (
-            <Alert variant="destructive" className="m-4 w-auto">
-              <CircleAlertIcon />
-              <AlertTitle>No se pudo cargar el catálogo</AlertTitle>
-              <AlertDescription className="flex flex-wrap items-center gap-3">
-                <span>Reintentá la consulta. Los filtros se conservan.</span>
-                <Button type="button" size="lg" variant="outline" onClick={() => void query.refetch()}>
-                  Reintentar
-                </Button>
-              </AlertDescription>
-            </Alert>
-          ) : !query.isLoading && items.length === 0 ? (
-            <DocumentCatalogEmptyState
-              EmptyIcon={EmptyIcon}
-              hasItemsOnOtherPages={hasItemsOnOtherPages}
-              hasFilters={hasFilters}
-              canManage={canManage}
-              navigate={navigate}
-            />
-          ) : (
-            <Table containerClassName="table-scrollbar" className="min-w-180">
-              <DocumentCatalogTableHeader scope={scope} />
-              <TableBody>
-                {query.isLoading ? (
-                  <TableRow aria-hidden="true">
-                    <TableCell colSpan={scope === "admin" ? 5 : 4} className="h-16" />
-                  </TableRow>
-                ) : (
-                  items.map((item) => (
-                    <DocumentCatalogTableRow
-                      key={item.id}
-                      item={item}
-                      documentHref={documentHref}
-                      canManage={canManage}
-                      editHref={editHref}
-                      scope={scope}
-                    />
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          )}
+          {renderCatalog()}
           {isTablePending ? <DataTableLoadingOverlay label="Cargando documentación" /> : null}
         </div>
         {query.isLoading ? (

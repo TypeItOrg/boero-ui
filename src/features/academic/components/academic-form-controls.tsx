@@ -96,10 +96,15 @@ export function FormSelect({
   onValueChange,
 }: FormSelectProps): ReactElement {
   const [internalValue, setInternalValue] = useState<string>(() => String(defaultValue ?? ""));
+
   const value = controlledValue ?? internalValue;
+
   const handleValueChange = onValueChange ?? setInternalValue;
+
   const selectedOption = options.find((option) => option.value === value);
+
   const groups = groupDropdownItems(options, (option) => option.group, groupOrder);
+
   const hasRichOptions = options.some((option) => option.displayLabel !== undefined);
 
   return (

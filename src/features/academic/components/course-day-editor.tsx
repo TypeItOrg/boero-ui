@@ -13,7 +13,7 @@ import { ScheduleRangeEditor } from "@features/academic/components/course-schedu
 import { WEEK_DAY_LABELS } from "@features/academic/constants/course-week-day-labels.constants";
 import { type DayDraft } from "@features/academic/types/course-day-draft.types";
 import { type ScheduleDraft } from "@features/academic/types/course-schedule-draft.types";
-import { getCourseDayError, getCourseScheduleError } from "@features/academic/utils/course-day-validation.util";
+import { getCourseDayError, getCoursePeriodError, getCourseScheduleError } from "@features/academic/utils/course-day-validation.util";
 import { emptySchedule } from "@features/academic/utils/course-form-draft.util";
 
 export function DayEditor({
@@ -29,12 +29,7 @@ export function DayEditor({
 }): ReactElement {
   const hasSubmitted = Boolean(fieldErrors?.classes);
 
-  const periodError =
-    hasSubmitted && individual && (!day.periodDurationMinutes || Number(day.periodDurationMinutes) <= 0)
-      ? Number(day.periodDurationMinutes) <= 0 && day.periodDurationMinutes !== ""
-        ? "La duración del período debe ser mayor a 0."
-        : "Indicá la duración de cada período para los espacios individuales."
-      : undefined;
+  const periodError = getCoursePeriodError(day, individual, hasSubmitted);
 
   const capacityError = hasSubmitted && !individual && day.capacity !== "" && Number(day.capacity) <= 0 ? "El cupo debe ser mayor a 0." : undefined;
 

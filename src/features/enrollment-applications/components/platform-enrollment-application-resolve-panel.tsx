@@ -26,7 +26,9 @@ export function PlatformEnrollmentApplicationResolvePanel({
   status,
 }: PlatformEnrollmentApplicationResolvePanelProps): ReactElement | null {
   const router = useRouter();
+
   const [showApproveDialog, setShowApproveDialog] = useState(false);
+
   const [showRejectDialog, setShowRejectDialog] = useState(false);
 
   function handleResolved(): void {

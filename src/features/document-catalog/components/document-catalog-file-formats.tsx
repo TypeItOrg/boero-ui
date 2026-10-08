@@ -50,13 +50,7 @@ export function DocumentCatalogFileFormats({
             <DropdownMenuCheckboxItem
               key={category.value}
               className="min-h-9 px-2.5 pr-8"
-              checked={
-                category.formats.every((format) => allowedFormats.includes(format))
-                  ? true
-                  : category.formats.some((format) => allowedFormats.includes(format))
-                    ? "indeterminate"
-                    : false
-              }
+              checked={getCategoryCheckState(category.formats, allowedFormats)}
               onSelect={(event) => event.preventDefault()}
               onCheckedChange={(checked) => {
                 setAllowedFormats((current) => [
@@ -73,4 +67,12 @@ export function DocumentCatalogFileFormats({
       </DropdownMenu>
     </FormField>
   );
+}
+
+function getCategoryCheckState(formats: readonly string[], allowedFormats: readonly string[]): boolean | "indeterminate" {
+  if (formats.every((format) => allowedFormats.includes(format))) {
+    return true;
+  }
+
+  return formats.some((format) => allowedFormats.includes(format)) ? "indeterminate" : false;
 }

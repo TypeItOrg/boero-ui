@@ -82,8 +82,11 @@ function DateRangeFieldsView({
   startName,
 }: DateRangeFieldsProps & { range: ControlledDateRange }): ReactElement {
   const { startDate, endDate, onStartDateChange: setStartDate, onEndDateChange: setEndDate } = range;
+
   const hasInvalidRange = startDate !== undefined && endDate !== undefined && endDate < startDate;
+
   const endDateError = hasInvalidRange ? "La fecha final no puede ser anterior a la inicial." : fieldErrors?.[endName];
+
   const effectiveEndMinDate = endMinDate ? (startDate ?? endMinDate) : undefined;
 
   return (
@@ -127,6 +130,7 @@ function DateFormField({
   onChange,
 }: DateFormFieldProps): ReactElement {
   const [draft, setDraft] = useState("");
+
   const submittedValue = date ? formatDateInput(date) : draft;
 
   return (

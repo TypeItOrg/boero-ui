@@ -11,8 +11,11 @@ export function formatStudyPlanVersion(version?: number | null): string | null {
 
 function getStudyPlanNames(plan: StudyPlanLabel) {
   const name = (plan.name ?? plan.studyPlanName ?? "").trim();
+
   const path = plan.trainingPathName?.trim() ?? "";
+
   const suffix = path && name.startsWith(path) ? name.slice(path.length) : "";
+
   const shortName = /^\s*[-–—·:]\s*/.test(suffix) ? suffix.replace(/^\s*[-–—·:]\s*/, "").trim() : name;
 
   return { name, path, shortName };
@@ -32,6 +35,7 @@ export function formatStudyPlanName(plan: StudyPlanLabel): string {
 // Use for standalone labels and selectors, preserving the training path once.
 export function formatStudyPlanLabel(plan: StudyPlanLabel): string {
   const { name, path, shortName } = getStudyPlanNames(plan);
+
   const label = !path || name === path || shortName !== name ? name : `${path} · ${name}`;
 
   return appendVersion(label, plan);

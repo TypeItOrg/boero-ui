@@ -29,8 +29,11 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<ReactEle
   ensureCreateAccess(input.access, input.resource);
 
   const collectionPath = `${input.basePath}/${input.resource}`;
+
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);
+
   const contextualTrainingPath = await getContextualTrainingPath(input);
+
   const config = ACADEMIC_COLLECTION_CONFIG[input.resource];
 
   return (

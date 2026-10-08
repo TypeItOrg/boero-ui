@@ -12,12 +12,16 @@ type HorizontalScrollAreaProps = {
 
 export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): ReactElement {
   const rootRef = useRef<HTMLDivElement>(null);
+
   const viewportRef = useRef<HTMLDivElement>(null);
+
   const [canScrollBackward, setCanScrollBackward] = useState(false);
+
   const [canScrollForward, setCanScrollForward] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
+
     const viewport = viewportRef.current;
 
     if (!root || !viewport) {
@@ -41,6 +45,7 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
       }
 
       const verticalDelta = normalizeWheelDelta(event.deltaY, event.deltaMode, scrollViewport.clientWidth);
+
       const scrollDelta = Math.abs(event.deltaX) >= Math.abs(verticalDelta) ? event.deltaX : verticalDelta;
 
       event.preventDefault();
@@ -54,6 +59,7 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
     }
 
     const resizeObserver = new ResizeObserver(updateScrollState);
+
     const animationFrame = window.requestAnimationFrame(updateScrollState);
 
     root.addEventListener("wheel", handleWheel, { capture: true, passive: false });

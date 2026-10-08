@@ -34,7 +34,9 @@ export async function mutateDocument(
   }
 
   const input = parsed.data;
+
   let path = `/api/v1/enrollment-applications/${input.applicationId}/attachments`;
+
   let options: RequestInit;
 
   if (input.operation === "upload") {
@@ -113,6 +115,7 @@ export async function saveDocumentRequirement(
   }
 
   const input = args.data;
+
   const path = `${getAcademicApiBase(input.scope, input.institutionId)}/training-paths/${input.pathId}/document-requirements${input.id ? `/${input.id}` : ""}`;
 
   const error = await getResponseErrorActionState(

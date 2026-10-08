@@ -26,7 +26,9 @@ type PlatformSidebarUserProps = {
 
 export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): ReactElement {
   const { isMobile } = useSidebar();
+
   const { resolvedTheme, setTheme } = useTheme();
+
   const logout = useLogoutPlatform();
 
   return (

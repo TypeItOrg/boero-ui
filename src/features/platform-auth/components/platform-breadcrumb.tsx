@@ -55,6 +55,7 @@ function getSegments(
   trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const withoutPlatform = pathname.replace(/^\/admin\/?/, "");
+
   const parts = withoutPlatform.split("/").filter(Boolean);
 
   if (parts.length === 0) {
@@ -62,10 +63,13 @@ function getSegments(
   }
 
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/admin" }];
+
   const hiddenSegmentSet = new Set(["academic", ...hiddenSegments]);
+
   const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
 
   let accumulatedPath = "/admin";
+
   let visiblePartIndex = 0;
 
   for (const part of parts) {
@@ -76,6 +80,7 @@ function getSegments(
     }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
+
     const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
 
     segments.push({ label, href: isLast ? undefined : (segmentHrefs[part] ?? accumulatedPath) });
@@ -96,6 +101,7 @@ export function PlatformBreadcrumb({
   trailingLabel,
 }: PlatformBreadcrumbProps): ReactElement {
   const pathname = usePathname();
+
   const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS, segmentHrefs ?? EMPTY_SEGMENT_LABELS, hiddenSegments, trailingLabel);
 
   return (

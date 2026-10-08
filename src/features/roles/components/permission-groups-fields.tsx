@@ -29,10 +29,15 @@ export function PermissionGroupsFields({
   inputIdPrefix = "permission",
 }: PermissionGroupsFieldsProps): ReactElement {
   const visibleGroups = useMemo(() => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)), [groups]);
+
   const permissions = useMemo(() => getPermissionMap(visibleGroups), [visibleGroups]);
+
   const [explicitCodes, setExplicitCodes] = useState<Set<string>>(() => new Set(selectedPermissions));
+
   const selectedCodes = useMemo(() => expandSelectedPermissions(explicitCodes, permissions), [explicitCodes, permissions]);
+
   const protectedCodeSet = useMemo(() => new Set(protectedPermissions), [protectedPermissions]);
+
   const requiredCodeSet = useMemo(() => getRequiredPermissionCodes(selectedCodes, permissions), [permissions, selectedCodes]);
 
   function handlePermissionChange(code: string, checked: boolean): void {
@@ -53,6 +58,7 @@ export function PermissionGroupsFields({
     <div className="flex flex-wrap items-stretch gap-4">
       {visibleGroups.map((group) => {
         const Icon = getPermissionGroupIcon(group.code);
+
         const permissionTree = getPermissionTree(group.permissions, permissions);
 
         return (
@@ -71,8 +77,11 @@ export function PermissionGroupsFields({
 
   function renderPermissionField(permission: InstitutionPermission): ReactElement {
     const selected = selectedCodes.has(permission.code);
+
     const protectedPermission = protectedCodeSet.has(permission.code);
+
     const disabled = !permission.grantable || protectedPermission || requiredCodeSet.has(permission.code);
+
     const inputId = `${inputIdPrefix}-${permission.code}`;
 
     return (

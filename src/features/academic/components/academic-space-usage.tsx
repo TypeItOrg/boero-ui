@@ -18,6 +18,7 @@ type AcademicSpaceUsageProps = {
 
 export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps): ReactElement {
   const { plans, summary } = usage;
+
   const operationalPlans = summary.activePlans + summary.draftPlans;
 
   return (

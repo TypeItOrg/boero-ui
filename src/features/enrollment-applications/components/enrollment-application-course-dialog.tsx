@@ -35,10 +35,15 @@ export function EnrollmentApplicationCourseDialog({
   onResolved,
 }: EnrollmentApplicationCourseDialogProps): ReactElement {
   const [optionsRevision, setOptionsRevision] = useState(0);
+
   const query = useCourseEnrollmentOptions({ courseId: course.courseId, institutionId, scope, enabled: open, revision: optionsRevision });
+
   const hasCapacity = query.options && hasEnrollmentCapacity(query.options);
+
   const options = hasCapacity ? query.options : undefined;
+
   const loadError = query.error ?? (query.options && !hasCapacity ? COURSE_ENROLLMENT_MESSAGES.COURSE_WITHOUT_CAPACITY : undefined);
+
   const isLoadingOptions = query.loading;
 
   const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {

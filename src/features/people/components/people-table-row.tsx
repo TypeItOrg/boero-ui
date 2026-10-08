@@ -35,42 +35,41 @@ export function PeopleTableRow({
   selfPersonId,
 }: PeopleTableRowProps): ReactElement {
   const isSelf = person.id === selfPersonId;
+
   const personHref = getPersonHref(scope, institutionId, person.id, selfPersonId);
+
   const personDetailHref = getPersonHref(scope, institutionId, person.id, selfPersonId, true);
+
   const canEditPerson = canUpdate;
-  const canOpenPerson = true;
+
   const canDeletePerson = canDelete && !isSelf;
+
   const canUpdatePersonStatus = canUpdateStatus && !isSelf;
-  const hasActions = canOpenPerson || canDeletePerson || canUpdatePersonStatus;
+
+  const canEditOrManage = canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf);
+
+  const editLabel = canEditPerson ? "Editar" : "Administrar";
 
   const tableRow = (
     <TableRow className="hover:bg-muted/50 h-11 border-b transition-colors">
       <TableCell className="w-16 pl-4">
-        {hasActions ? (
-          <PersonActionsMenu
-            person={person}
-            institutionId={institutionId}
-            scope={scope}
-            isSelf={isSelf}
-            canEdit={canEditPerson || (PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf)}
-            editLabel={canEditPerson ? "Editar" : "Administrar"}
-            canDelete={canDeletePerson}
-            canUpdateStatus={canUpdatePersonStatus}
-            onDelete={() => onDelete(person)}
-            onUpdateStatus={() => onUpdateStatus(person)}
-          />
-        ) : null}
+        <PersonActionsMenu
+          person={person}
+          institutionId={institutionId}
+          scope={scope}
+          isSelf={isSelf}
+          canEdit={canEditOrManage}
+          editLabel={editLabel}
+          canDelete={canDeletePerson}
+          canUpdateStatus={canUpdatePersonStatus}
+          onDelete={() => onDelete(person)}
+          onUpdateStatus={() => onUpdateStatus(person)}
+        />
       </TableCell>
       <TableCell className="font-medium">
-        {canOpenPerson ? (
-          <PersonNavigationLink className="hover:underline" href={personDetailHref}>
-            {person.lastName}, {person.firstName}
-          </PersonNavigationLink>
-        ) : (
-          <span>
-            {person.lastName}, {person.firstName}
-          </span>
-        )}
+        <PersonNavigationLink className="hover:underline" href={personDetailHref}>
+          {person.lastName}, {person.firstName}
+        </PersonNavigationLink>
       </TableCell>
       <TableCell>{person.documentNumber}</TableCell>
       <TableCell>{person.phoneNumber ? person.phoneNumber : <span className="text-muted-foreground/60">Sin teléfono</span>}</TableCell>
@@ -96,31 +95,19 @@ export function PeopleTableRow({
     </TableRow>
   );
 
-  if (!hasActions) {
-    return tableRow;
-  }
-
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{tableRow}</ContextMenuTrigger>
       <ContextMenuContent className="w-44 p-1.5">
-        {canOpenPerson ? (
-          <ContextMenuItem asChild>
-            <PersonNavigationLink href={personDetailHref} className="px-2.5 py-1.5">
-              Ver detalle
-            </PersonNavigationLink>
-          </ContextMenuItem>
-        ) : null}
-        {canEditPerson ? (
+        <ContextMenuItem asChild>
+          <PersonNavigationLink href={personDetailHref} className="px-2.5 py-1.5">
+            Ver detalle
+          </PersonNavigationLink>
+        </ContextMenuItem>
+        {canEditOrManage ? (
           <ContextMenuItem asChild>
             <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
-              Editar
-            </PersonNavigationLink>
-          </ContextMenuItem>
-        ) : PeopleScope.isInstitutional(scope) && canManageRoles && !isSelf ? (
-          <ContextMenuItem asChild>
-            <PersonNavigationLink href={personHref} className="px-2.5 py-1.5">
-              Administrar
+              {editLabel}
             </PersonNavigationLink>
           </ContextMenuItem>
         ) : null}

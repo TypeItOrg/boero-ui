@@ -25,6 +25,7 @@ export function InstitutionsPagination({
   onPageSizeChange,
 }: PaginationProps): ReactElement {
   const institutionLabel = totalItems === 1 ? "institución registrada." : "instituciones registradas.";
+
   const summaryLabel = `${totalItems} ${institutionLabel}`;
 
   return (

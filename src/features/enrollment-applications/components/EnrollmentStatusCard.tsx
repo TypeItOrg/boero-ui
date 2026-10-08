@@ -49,11 +49,17 @@ export function EnrollmentStatusCard({
   canReadCourseWaitlist = false,
 }: EnrollmentStatusCardProps): ReactElement {
   const data = application.data || {};
+
   const personal = data.personalData || {};
+
   const academic = data.academicBackground || {};
+
   const health = data.healthInclusion || {};
+
   const responsible = data.responsible || {};
+
   const preference = data.preference || {};
+
   const spaces = application.spaces || [];
 
   const canManageApplicationCourses =

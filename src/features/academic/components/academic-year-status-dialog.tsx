@@ -96,6 +96,7 @@ export function AcademicYearStatusDialog({
   );
 
   const config = STATUS_DIALOG_CONFIG[targetStatus];
+
   const Icon = config.icon;
 
   const countQuery = useQuery({
@@ -103,7 +104,9 @@ export function AcademicYearStatusDialog({
     enabled: open && targetStatus === "CLOSED",
     queryFn: async ({ signal }) => {
       const params = new URLSearchParams({ institutionId });
+
       const response = await fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?${params}`, { cache: "no-store", signal });
+
       const data = await parseHttpResponse<{ count: number }>(response, "No se pudieron consultar los cursos asociados.");
 
       if (!Number.isSafeInteger(data?.count) || data.count < 0) {
@@ -138,15 +141,7 @@ export function AcademicYearStatusDialog({
             <AlertDialogTitle>{config.title}</AlertDialogTitle>
             <AlertDialogDescription>{config.description(academicYearLabel)}</AlertDialogDescription>
             {targetStatus === "CLOSED" ? (
-              <p className="text-muted-foreground mt-2 text-sm">
-                {countQuery.isError
-                  ? "No se pudieron consultar los cursos asociados."
-                  : courseCount === undefined
-                    ? "Cargando cursos asociados..."
-                    : courseCount === 0
-                      ? "No hay cursos asociados para cerrar."
-                      : `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`}
-              </p>
+              <p className="text-muted-foreground mt-2 text-sm">{getCourseClosingDescription(courseCount, countQuery.isError)}</p>
             ) : null}
           </AlertDialogHeader>
 
@@ -171,4 +166,20 @@ export function AcademicYearStatusDialog({
       </AlertDialogContent>
     </AlertDialog>
   );
+}
+
+function getCourseClosingDescription(courseCount: number | undefined, hasError: boolean): string {
+  if (hasError) {
+    return "No se pudieron consultar los cursos asociados.";
+  }
+
+  if (courseCount === undefined) {
+    return "Cargando cursos asociados...";
+  }
+
+  if (courseCount === 0) {
+    return "No hay cursos asociados para cerrar.";
+  }
+
+  return `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`;
 }

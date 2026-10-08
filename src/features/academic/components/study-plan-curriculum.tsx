@@ -24,7 +24,9 @@ type StudyPlanCurriculumProps = {
 
 export function StudyPlanCurriculumView({ curriculum, basePath, canEditCurriculum, institutionId, scope }: StudyPlanCurriculumProps): ReactElement {
   const planPath = `${basePath}/study-plans/${curriculum.studyPlan.id}`;
+
   const hasSpaces = curriculum.levels.some((level) => level.spaces.length > 0) || curriculum.unassignedSpaces.length > 0;
+
   const isEmpty = !hasSpaces && curriculum.levels.length === 0;
 
   return (

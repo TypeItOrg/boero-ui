@@ -20,7 +20,9 @@ export function EnrollmentPeriodEmptyState({
   onFirstPage,
 }: EnrollmentPeriodEmptyStateProps): ReactElement {
   const Icon = hasFilters ? SearchIcon : CalendarRangeIcon;
+
   let title = "No hay períodos de inscripción";
+
   let description = "Creá un período de inscripción para definir cuándo se reciben nuevas solicitudes de estudiantes.";
 
   if (hasItemsOnOtherPages) {

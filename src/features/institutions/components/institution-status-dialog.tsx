@@ -39,9 +39,14 @@ export function InstitutionStatusDialog({
   onUpdated,
 }: InstitutionStatusDialogProps): ReactElement {
   const [isPending, startTransition] = useTransition();
+
   const [error, setError] = useState<string>();
+
   const nextActive = !active;
+
   const actionLabel = nextActive ? "Activar institución" : "Desactivar institución";
+
+  const pendingLabel = nextActive ? "Activando…" : "Desactivando…";
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) {
@@ -114,7 +119,7 @@ export function InstitutionStatusDialog({
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction size="lg" variant={nextActive ? "default" : "destructive"} disabled={isPending} onClick={handleConfirm}>
-            {isPending ? (nextActive ? "Activando…" : "Desactivando…") : actionLabel}
+            {isPending ? pendingLabel : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

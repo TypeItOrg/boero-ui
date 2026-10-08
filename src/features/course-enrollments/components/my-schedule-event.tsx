@@ -17,7 +17,10 @@ type MyScheduleEventProps = {
 
 export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: MyScheduleEventProps): ReactElement {
   const time = `${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}`;
+
   const compact = duration < 30;
+
+  const titleClassName = getTitleClassName(duration);
 
   return (
     <Popover>
@@ -35,14 +38,7 @@ export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: M
           }}
         >
           <span className="block shrink-0 truncate text-xs leading-4 font-medium tabular-nums">{time}</span>
-          <span
-            className={cn(
-              "text-[13px] leading-4 font-semibold",
-              compact ? "min-w-0 flex-1 truncate" : duration >= 40 ? "mt-0.5 line-clamp-2 shrink-0" : "mt-0.5 shrink-0 truncate",
-            )}
-          >
-            {item.title}
-          </span>
+          <span className={cn("text-[13px] leading-4 font-semibold", titleClassName)}>{item.title}</span>
           {!compact && duration >= 40 && item.instrumentName ? (
             <span className="mt-0.5 block shrink-0 truncate text-xs leading-4">{item.instrumentName}</span>
           ) : null}
@@ -58,4 +54,16 @@ export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: M
       </PopoverContent>
     </Popover>
   );
+}
+
+function getTitleClassName(duration: number): string {
+  if (duration < 30) {
+    return "min-w-0 flex-1 truncate";
+  }
+
+  if (duration >= 40) {
+    return "mt-0.5 line-clamp-2 shrink-0";
+  }
+
+  return "mt-0.5 shrink-0 truncate";
 }

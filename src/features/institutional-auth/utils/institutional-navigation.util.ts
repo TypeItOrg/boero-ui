@@ -44,8 +44,11 @@ export const INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM = {
 
 export function getInstitutionalNavigationSections(user: InstitutionalUser): InstitutionalNavigationSection[] {
   const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
+
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
+
   const canReadInstitution = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ);
+
   const canReadEnrollmentPeriods = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_READ);
 
   const platformItems: NavigationItem[] = [

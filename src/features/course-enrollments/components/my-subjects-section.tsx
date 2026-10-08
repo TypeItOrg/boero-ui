@@ -9,9 +9,9 @@ import { DataTableFilters } from "@common/components/ui/data-table-filters";
 import type { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { cn } from "@common/utils/cn.util";
+import { getDataTableEmptyContent } from "@common/utils/data-table-empty-content.util";
 
 import { MySubjectCard } from "@features/course-enrollments/components/my-subject-card";
 import { MySubjectsSkeleton } from "@features/course-enrollments/components/my-subjects-skeleton";
@@ -58,6 +58,52 @@ export function MySubjectsSection({
   navigate: ReturnType<typeof useDataTableNavigation>["navigate"];
   page: number;
 }): ReactElement {
+  const emptyContent = getDataTableEmptyContent({
+    hasItemsOnOtherPages,
+    hasFilters,
+    pageTitle: "No hay materias en esta página",
+    filteredTitle: "No se encontraron materias",
+    emptyTitle: isHistory ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT,
+    emptyDescription: isHistory ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY_DESCRIPTION : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT_DESCRIPTION,
+  });
+
+  function renderContent(): ReactElement | null {
+    if (isPending) {
+      return <MySubjectsSkeleton />;
+    }
+
+    if (data.items.length > 0) {
+      return (
+        <div
+          className={cn("grid gap-4", data.items.length > 1 && "@4xl/page-shell:grid-cols-2", data.items.length > 2 && "@7xl/page-shell:grid-cols-3")}
+        >
+          {data.items.map((enrollment) => (
+            <MySubjectCard
+              key={enrollment.id}
+              enrollment={enrollment}
+              canWithdraw={canWithdraw && !isPending}
+              canUpdateAcademicStatus={canUpdateAcademicStatus && !isPending}
+              onMutation={(selected, mode) => setMutation({ enrollment: selected, mode })}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <Empty className="bg-muted/25 min-h-56 flex-1 rounded-lg border border-solid px-4 py-12">
+        <EmptyHeader className="max-w-md">
+          <EmptyMedia variant="icon">
+            <EmptyIcon className="size-5" aria-hidden="true" />
+          </EmptyMedia>
+          <EmptyTitle className="mt-2 text-base">{emptyContent.title}</EmptyTitle>
+          <EmptyDescription>{emptyContent.description}</EmptyDescription>
+        </EmptyHeader>
+        <DataTableEmptyStateActions hasFilters={hasFilters} hasItemsOnOtherPages={hasItemsOnOtherPages} onFirstPage={() => navigate({ page: "0" })} />
+      </Empty>
+    );
+  }
+
   return (
     <section key={view} aria-label={isHistory ? "Historial" : "En curso"} className="flex min-h-0 flex-1 flex-col gap-5" aria-busy={isPending}>
       {isHistory ? (
@@ -84,54 +130,7 @@ export function MySubjectsSection({
           ]}
         />
       ) : null}
-      {isPending ? (
-        <MySubjectsSkeleton />
-      ) : data.items.length > 0 ? (
-        <div
-          className={cn("grid gap-4", data.items.length > 1 && "@4xl/page-shell:grid-cols-2", data.items.length > 2 && "@7xl/page-shell:grid-cols-3")}
-        >
-          {data.items.map((enrollment) => (
-            <MySubjectCard
-              key={enrollment.id}
-              enrollment={enrollment}
-              canWithdraw={canWithdraw && !isPending}
-              canUpdateAcademicStatus={canUpdateAcademicStatus && !isPending}
-              onMutation={(selected, mode) => setMutation({ enrollment: selected, mode })}
-            />
-          ))}
-        </div>
-      ) : (
-        <Empty className="bg-muted/25 min-h-56 flex-1 rounded-lg border border-solid px-4 py-12">
-          <EmptyHeader className="max-w-md">
-            <EmptyMedia variant="icon">
-              <EmptyIcon className="size-5" aria-hidden="true" />
-            </EmptyMedia>
-            <EmptyTitle className="mt-2 text-base">
-              {hasItemsOnOtherPages
-                ? "No hay materias en esta página"
-                : hasFilters
-                  ? "No se encontraron materias"
-                  : isHistory
-                    ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY
-                    : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT}
-            </EmptyTitle>
-            <EmptyDescription>
-              {hasItemsOnOtherPages
-                ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
-                : hasFilters
-                  ? DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION
-                  : isHistory
-                    ? MY_SUBJECTS_MESSAGES.EMPTY_HISTORY_DESCRIPTION
-                    : MY_SUBJECTS_MESSAGES.EMPTY_CURRENT_DESCRIPTION}
-            </EmptyDescription>
-          </EmptyHeader>
-          <DataTableEmptyStateActions
-            hasFilters={hasFilters}
-            hasItemsOnOtherPages={hasItemsOnOtherPages}
-            onFirstPage={() => navigate({ page: "0" })}
-          />
-        </Empty>
-      )}
+      {renderContent()}
       {data.totalPages > 1 || page > 0 || size !== COURSE_ENROLLMENT_PAGE_SIZE_OPTIONS[0] ? (
         <DataTablePagination
           page={page}

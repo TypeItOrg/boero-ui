@@ -55,7 +55,9 @@ export async function saveAcademicResourceAction(
   }
 
   const config = RESOURCE_ACTION_CONFIG[context.data.resource];
+
   const requiredPermission = context.data.id ? config.updatePermission : config.createPermission;
+
   const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, requiredPermission);
 
   if (authError) {

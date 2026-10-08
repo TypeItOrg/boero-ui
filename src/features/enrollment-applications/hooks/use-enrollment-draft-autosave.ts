@@ -3,6 +3,7 @@
 import { startTransition, useActionState, useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
+import { getErrorMessage } from "@common/utils/error-message.util";
 
 import { updateEnrollmentDraftAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
@@ -34,21 +35,22 @@ export function useEnrollmentDraftAutosave({
   );
 
   const draftSaveQueue = useRef<Promise<void>>(Promise.resolve());
+
   const autosaveInitializedRef = useRef(false);
+
   const lastSavedDataRef = useRef<string | null>(null);
+
   const dataSignature = JSON.stringify(structuredData);
+
   const debouncedSignature = useDebouncedValue(dataSignature, 800);
+
   const debouncedDataIsCurrent = debouncedSignature === dataSignature;
 
-  const autosaveTarget =
-    application?.status === ENROLLMENT_APPLICATION_STATUS.DRAFT &&
-    !readOnly &&
-    !isSubmitDialogOpen &&
-    !isCancelDialogOpen &&
-    debouncedDataIsCurrent &&
-    structuredData.careerSelection?.trainingPathId === (selectedTrainingPathId || undefined)
-      ? application.applicationId
-      : null;
+  const canSaveDraft = application?.status === ENROLLMENT_APPLICATION_STATUS.DRAFT && !readOnly && !isSubmitDialogOpen && !isCancelDialogOpen;
+
+  const hasCurrentTrainingPath = structuredData.careerSelection?.trainingPathId === (selectedTrainingPathId || undefined);
+
+  const autosaveTarget = canSaveDraft && debouncedDataIsCurrent && hasCurrentTrainingPath ? application.applicationId : null;
 
   useEffect(() => {
     if (!autosaveTarget) {
@@ -56,6 +58,7 @@ export function useEnrollmentDraftAutosave({
     }
 
     const targetApplicationId = autosaveTarget;
+
     const dataSignature = debouncedSignature;
 
     if (!autosaveInitializedRef.current) {
@@ -103,7 +106,7 @@ export function useEnrollmentDraftAutosave({
       } catch (err: unknown) {
         if (active) {
           return {
-            error: err instanceof Error ? err.message : ENROLLMENT_MESSAGES.DRAFT_SAVE_FAILED,
+            error: getErrorMessage(err, ENROLLMENT_MESSAGES.DRAFT_SAVE_FAILED),
           };
         }
       }

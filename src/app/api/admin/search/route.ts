@@ -5,6 +5,7 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
+
   const parsed = contextualSearchRequestSchema.safeParse(Object.fromEntries(url.searchParams));
 
   if (!parsed.success) {

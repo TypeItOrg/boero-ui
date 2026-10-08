@@ -30,6 +30,7 @@ export const DEFAULT_PLATFORM_ROLES_SORT = {
 } as const satisfies PlatformRoleSort;
 
 const ROLE_TYPES = new Set<PlatformRoleType>([PLATFORM_ROLE_TYPE.SYSTEM, PLATFORM_ROLE_TYPE.CUSTOM]);
+
 const SORT_FIELDS = new Set<PlatformRoleSortField>(PLATFORM_ROLES_SORT_FIELDS);
 
 export function parsePlatformRolesPaginationParams(searchParams: PlatformRolesSearchParams): PlatformRolesPaginationParams {

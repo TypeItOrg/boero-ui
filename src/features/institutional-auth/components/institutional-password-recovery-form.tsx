@@ -24,6 +24,7 @@ const INITIAL_STATE: PasswordRecoveryActionState = {};
 
 export function InstitutionalPasswordRecoveryForm(): ReactElement {
   const [state, formAction, isPending] = useActionState(requestPasswordRecovery, INITIAL_STATE);
+
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
 
   return (

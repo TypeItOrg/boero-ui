@@ -16,6 +16,7 @@ const ACCOUNT_TABS = [
 
 export function InstitutionalAccountTabs(): ReactElement {
   const pathname = usePathname();
+
   const activeUrl = getActiveTabUrl(pathname);
 
   return (

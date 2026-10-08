@@ -30,7 +30,9 @@ export function EnrollmentApplicationResolvePanel({
   canReject,
 }: EnrollmentApplicationResolvePanelProps): ReactElement | null {
   const router = useRouter();
+
   const [showApproveDialog, setShowApproveDialog] = useState(false);
+
   const [showRejectDialog, setShowRejectDialog] = useState(false);
 
   function handleResolved(): void {

@@ -29,7 +29,9 @@ export function AcademicTableEmptyState({
   supportingDescription,
 }: AcademicTableEmptyStateProps): ReactElement {
   const Icon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : GraduationCapIcon;
+
   const copy = getEmptyStateCopy(hasFilters, hasItemsOnOtherPages, showingDeleted, plural);
+
   const description = supportingDescription ?? copy.description;
 
   return (

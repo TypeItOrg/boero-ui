@@ -35,6 +35,7 @@ export function SidebarNavigation({ sections, navigation }: SidebarNavigationPro
                 }
 
                 const isActive = navigation.isActive(item.url, item.exact);
+
                 const Icon = item.icon;
 
                 return (

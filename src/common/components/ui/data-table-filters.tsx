@@ -52,6 +52,7 @@ export function DataTableFilters({
   );
 
   const updateSearch = useCallback((value: string): void => updateQueryParam("search", value), [updateQueryParam]);
+
   const advancedTriggerLabelId = useId();
 
   function renderYearFilters(list: readonly DataTableYearFilter[]): ReactNode {

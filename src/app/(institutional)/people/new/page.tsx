@@ -24,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewPersonPage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/people");
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE)) {

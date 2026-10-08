@@ -39,6 +39,7 @@ export default async function AdminEnrollmentPeriodsPage({ searchParams }: Props
   await requirePlatformAccount();
 
   const query = await searchParams;
+
   const params = parseEnrollmentPeriodPaginationParams(query);
 
   const selectedInstitution = isValidUuid(query.institutionId)

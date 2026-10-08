@@ -53,6 +53,7 @@ export function CourseStatusDialog({
   );
 
   const config = COURSE_STATUS_DIALOG_CONFIG[targetStatus];
+
   const Icon = config.icon;
 
   function handleOpenChange(nextOpen: boolean): void {
@@ -114,6 +115,7 @@ export function CourseDetailStatusActions({
   scope: AcademicScope;
 }): ReactElement | null {
   const [toggleOpen, setToggleOpen] = useState(false);
+
   const [finalizeOpen, setFinalizeOpen] = useState(false);
 
   if (courseStatus === "CLOSED") {
@@ -121,6 +123,7 @@ export function CourseDetailStatusActions({
   }
 
   const toggleTarget: CourseStatus = courseStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
   const toggleConfig = COURSE_STATUS_DIALOG_CONFIG[toggleTarget];
 
   return (

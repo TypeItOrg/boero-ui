@@ -53,6 +53,7 @@ export async function listEnrollmentPeriods(
   }
 
   const queryString = queryParams.toString();
+
   const url = `${getPeriodsPath(institutionId)}${queryString ? `?${queryString}` : ""}`;
 
   const response = await enrollmentApiFetch(scope, url, { method: "GET" });
@@ -78,6 +79,7 @@ export async function fetchEnrollmentPeriod(
 
 export async function fetchAvailableEnrollmentPeriods(params: { page: number; size: number }): Promise<PaginatedResponse<EnrollmentPeriod>> {
   const query = new URLSearchParams({ page: String(params.page), size: String(params.size) });
+
   const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/options/periods?${query}`);
 
   return parseHttpResponse(response, ENROLLMENT_MESSAGES.PERIOD_FETCH_FAILED);

@@ -2,6 +2,7 @@ import type { AcademicSpaceOptionPresentation } from "@features/academic/types/a
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 
 const LEVEL_GROUP_COLLATOR = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
+
 const UNASSIGNED_LEVEL_LABEL = "Sin nivel";
 
 export function getAcademicSpaceOptionGroup(item: AcademicSpaceOptionPresentation): string | undefined {

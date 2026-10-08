@@ -21,7 +21,9 @@ type InstitutionRolePermissionsProps = {
 
 export function InstitutionRolePermissions({ permissionCodes, groups }: InstitutionRolePermissionsProps): ReactElement {
   const assignedPermissionCodes = new Set(permissionCodes);
+
   const visibleGroups = groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code));
+
   const permissionMap = getPermissionMap(visibleGroups);
 
   const assignedGroups = visibleGroups

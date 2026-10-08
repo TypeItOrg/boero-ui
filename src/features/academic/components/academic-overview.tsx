@@ -36,8 +36,11 @@ const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [
 
 export async function AcademicOverview({ access, basePath, breadcrumb, institutionId, scope }: AcademicOverviewProps): Promise<ReactElement> {
   const resources = getReadableAcademicResources(access);
+
   const structureResources = STRUCTURE_RESOURCES.filter((resource) => resources.includes(resource));
+
   const catalogResources = CATALOG_RESOURCES.filter((resource) => resources.includes(resource));
+
   const recentItems = await fetchAcademicRecentItems(scope, institutionId, access);
 
   return (

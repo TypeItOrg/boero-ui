@@ -38,7 +38,9 @@ export function RoleAssignmentScopeFields({
   inactivePermissions,
 }: Props) {
   const scopeId = useId();
+
   const pathsId = useId();
+
   const [selectedNames, setSelectedNames] = useState(names);
 
   const fetchPaths = useCallback(

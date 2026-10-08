@@ -24,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NewRolePage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/roles");
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_CREATE)) {

@@ -14,6 +14,7 @@ type NativeRequestParser = (options: unknown) => PublicKeyCredentialRequestOptio
 
 function nativeRequestParser(): NativeRequestParser | undefined {
   const credential = (globalThis as unknown as Record<string, unknown>).PublicKeyCredential as Record<string, unknown> | undefined;
+
   const parse = credential?.["parseRequestOptionsFromJSON"];
 
   return typeof parse === "function" ? (parse as NativeRequestParser) : undefined;

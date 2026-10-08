@@ -22,9 +22,13 @@ export function usePreviewPdfCanvas({
   onError: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const renderTaskRef = useRef<RenderTask | null>(null);
+
   const [rendered, setRendered] = useState<{ document: PDFDocumentProxy; signature: string; scale: number }>();
+
   const signature = JSON.stringify([pageNumber, expanded, fitWidth, zoom, size]);
+
   const loading = !pdf || !rendered || rendered.document !== pdf || rendered.signature !== signature;
 
   useEffect(() => {
@@ -33,8 +37,11 @@ export function usePreviewPdfCanvas({
     }
 
     const document = pdf;
+
     let active = true;
+
     let renderTask: RenderTask | undefined;
+
     const previousRender = renderTaskRef.current?.promise.catch(() => undefined);
 
     async function render(): Promise<void> {
@@ -47,6 +54,7 @@ export function usePreviewPdfCanvas({
         }
 
         const page = await document.getPage(pageNumber);
+
         const canvas = canvasRef.current;
 
         if (!active || !canvas) {
@@ -54,8 +62,11 @@ export function usePreviewPdfCanvas({
         }
 
         const base = page.getViewport({ scale: 1 });
+
         const widthScale = size.width / base.width;
+
         const pageScale = Math.min(widthScale, size.height / base.height);
+
         const scale = expanded ? (zoom ?? (fitWidth ? widthScale : pageScale)) : pageScale;
 
         const viewport = page.getViewport({

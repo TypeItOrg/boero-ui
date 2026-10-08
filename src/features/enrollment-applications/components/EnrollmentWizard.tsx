@@ -26,11 +26,15 @@ export function EnrollmentWizard(props: EnrollmentWizardProps): ReactElement {
 
 function EnrollmentWizardView(props: EnrollmentWizardProps): ReactElement {
   const model = useEnrollmentWizard(props);
+
   const { application, validationIssues } = model;
 
   if (application.status !== ENROLLMENT_APPLICATION_STATUS.DRAFT) {
     return <EnrollmentStatusCard application={application} />;
   }
+
+  const showWithdrawnDocuments =
+    !model.hasDocumentsStep && application.canReadAttachments && application.documents?.some((requirement) => requirement.active === false);
 
   return (
     <div className="flex flex-col gap-4">
@@ -74,9 +78,7 @@ function EnrollmentWizardView(props: EnrollmentWizardProps): ReactElement {
       ) : null}
 
       <EnrollmentWizardSteps model={model} />
-      {!model.hasDocumentsStep && application.canReadAttachments && application.documents?.some((requirement) => requirement.active === false) ? (
-        <EnrollmentDocuments application={application} title="Historial de documentación retirada" />
-      ) : null}
+      {showWithdrawnDocuments ? <EnrollmentDocuments application={application} title="Historial de documentación retirada" /> : null}
 
       {model.isCancelDialogOpen ? (
         <EnrollmentCancelDialog

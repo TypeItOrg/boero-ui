@@ -28,6 +28,7 @@ export const courseClassDaySchema = z
 
     day.schedules.forEach((schedule, index) => {
       const start = toMinutes(schedule.startTime);
+
       const end = toMinutes(schedule.endTime);
 
       if (start < 0 || end < 0 || start >= end) {

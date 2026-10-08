@@ -33,6 +33,7 @@ export default async function MyTeachingPage({ searchParams }: { searchParams: P
   }
 
   const { page, size } = parseCourseEnrollmentPaginationParams(await searchParams);
+
   const data = await fetchTeacherClasses(user.institutionId, page, size);
 
   return (

@@ -75,6 +75,7 @@ function EnrollmentPeriodsTableContent({
   };
 
   const advancedFilterCount = selectedAcademicYear ? 1 : 0;
+
   const hasFilters = search.length > 0 || status !== undefined || selectedAcademicYear != null;
 
   const { isChangingStatus, handleStatusChange } = useEnrollmentPeriodStatus(institutionId, scope);

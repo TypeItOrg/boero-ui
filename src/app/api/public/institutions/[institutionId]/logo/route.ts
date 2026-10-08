@@ -18,6 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
 
   try {
     const version = new URL(request.url).searchParams.get("v");
+
     const response = await publicApiFetch(`/api/v1/institutions/${institutionId}/logo${version ? `?v=${encodeURIComponent(version)}` : ""}`);
 
     if (!response.ok) {
@@ -25,6 +26,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
     }
 
     const type = response.headers.get("content-type")?.split(";")[0];
+
     const declaredSize = Number(response.headers.get("content-length"));
 
     if (!response.body || !type || !INSTITUTION_LOGO_MIME_TYPES.some((allowed) => allowed === type) || declaredSize > MAX_INSTITUTION_LOGO_BYTES) {
@@ -34,8 +36,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
     }
 
     const reader = response.body.getReader();
+
     const initialChunks: Uint8Array[] = [];
+
     let initialSize = 0;
+
     let complete = false;
 
     while (initialSize < 8 && !complete) {
@@ -56,6 +61,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
     }
 
     const signature = new Uint8Array(Math.min(initialSize, 8));
+
     let offset = 0;
 
     for (const chunk of initialChunks) {

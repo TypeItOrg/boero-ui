@@ -43,6 +43,7 @@ export function PersonEditForm({
   returnTo,
 }: PersonEditFormProps): ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
+
   const [selectedRoleCodes, setSelectedRoleCodes] = useState<string[]>(() => assignedRoles.map((role) => role.roleId));
 
   const [roleScopes, setRoleScopes] = useState<Record<string, RoleAssignment>>(() =>
@@ -59,8 +60,12 @@ export function PersonEditForm({
   );
 
   const assignments = selectedRoleCodes.map((roleId) => roleScopes[roleId] ?? { roleId, accessScope: "INSTITUTION" as const, trainingPathIds: [] });
+
   const [isPending, setIsPending] = useState(false);
+
   const destination = returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);
+
+  const actionLabel = canEdit ? "Guardar cambios" : "Guardar roles";
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4">
@@ -111,7 +116,7 @@ export function PersonEditForm({
         </Button>
         <Button type="submit" form={formId} size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
           {isPending ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : null}
-          {isPending ? "Guardando..." : canEdit ? "Guardar cambios" : "Guardar roles"}
+          {isPending ? "Guardando..." : actionLabel}
         </Button>
       </div>
     </div>

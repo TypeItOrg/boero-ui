@@ -8,24 +8,14 @@ import { InstitutionalAuthStepHeader } from "@features/institutional-auth/compon
 import { useInstitutionalBrand } from "@features/institutional-auth/components/institutional-brand-context";
 import { VerificationRequestForm } from "@features/institutional-auth/components/verification-request-form";
 import type { EmailVerificationContext } from "@features/institutional-auth/types/email-verification-context.types";
+import type { PublicInstitution } from "@features/institutions/types/public-institution.types";
 
 export function EmailVerificationForm({ context }: { context?: EmailVerificationContext }): ReactElement {
   const [mode, setMode] = useState<"resend" | "change">("resend");
+
   const institution = useInstitutionalBrand();
 
-  const initialIdentity = institution
-    ? {
-        institutionId: institution.id,
-        institutionName: institution.name,
-        documentNumber: context?.institutionId === institution.id ? context.documentNumber : "",
-      }
-    : context?.institutionName
-      ? context
-      : context
-        ? { ...context, institutionId: "" }
-        : undefined;
-
-  const [identity, setIdentity] = useState(initialIdentity);
+  const [identity, setIdentity] = useState(() => getInitialIdentity(institution, context));
 
   return (
     <div className="flex h-full flex-col">
@@ -50,4 +40,27 @@ export function EmailVerificationForm({ context }: { context?: EmailVerification
       </footer>
     </div>
   );
+}
+
+function getInitialIdentity(
+  institution: PublicInstitution | undefined,
+  context: EmailVerificationContext | undefined,
+): EmailVerificationContext | undefined {
+  if (institution) {
+    return {
+      institutionId: institution.id,
+      institutionName: institution.name,
+      documentNumber: context?.institutionId === institution.id ? context.documentNumber : "",
+    };
+  }
+
+  if (context?.institutionName) {
+    return context;
+  }
+
+  if (context) {
+    return { ...context, institutionId: "" };
+  }
+
+  return undefined;
 }

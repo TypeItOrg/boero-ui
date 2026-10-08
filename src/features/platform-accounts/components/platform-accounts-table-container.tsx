@@ -6,6 +6,7 @@ import type { PlatformAccountPaginationParams } from "@features/platform-account
 
 export async function PlatformAccountsTableContainer(params: PlatformAccountPaginationParams): Promise<ReactElement> {
   const data = await fetchPlatformAccounts(params);
+
   const { page, size, sort, search, enabled } = params;
 
   return (

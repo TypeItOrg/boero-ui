@@ -107,6 +107,7 @@ function InstitutionUsersCell({ institution }: { institution: InstitutionSummary
   }
 
   const visibleAvatars = Math.min(count, 3);
+
   const overflow = count - visibleAvatars;
 
   return (

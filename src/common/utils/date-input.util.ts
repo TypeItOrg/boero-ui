@@ -10,6 +10,7 @@ export function parseDateInput(value: string | null | undefined): Date | undefin
   }
 
   const date = new Date(year, month - 1, day);
+
   const isValidDate = date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
 
   return isValidDate ? date : undefined;
@@ -21,7 +22,9 @@ export function formatDateInput(date: Date | undefined): string {
   }
 
   const year = date.getFullYear();
+
   const month = String(date.getMonth() + 1).padStart(2, "0");
+
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
@@ -35,6 +38,7 @@ export function formatDisplayDate(value: string | null | undefined, fallback = "
   }
 
   const day = String(date.getDate()).padStart(2, "0");
+
   const month = String(date.getMonth() + 1).padStart(2, "0");
 
   return `${day}/${month}/${date.getFullYear()}`;

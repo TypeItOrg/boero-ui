@@ -50,9 +50,13 @@ export function TrainingPathDocumentFields({
   );
 
   const [editing, setEditing] = useState<TrainingPathDocumentDraft | null | undefined>();
+
   const [creating, setCreating] = useState(false);
+
   const [dialogBusy, setDialogBusy] = useState(false);
+
   const openerRef = useRef<HTMLButtonElement | null>(null);
+
   const orderedDrafts = [...drafts].sort((left, right) => left.displayOrder - right.displayOrder);
 
   return (

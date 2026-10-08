@@ -26,7 +26,9 @@ export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus
     enrollment.status === COURSE_ENROLLMENT_STATUS.WITHDRAWN || enrollment.status === COURSE_ENROLLMENT_STATUS.ADMINISTRATIVELY_WITHDRAWN;
 
   const showWithdraw = canWithdraw && isEnrolled;
+
   const showAcademicAction = canUpdateAcademicStatus && !isWithdrawn;
+
   const days = Object.keys(COURSE_DAY_LABELS);
 
   const schedules = enrollment.schedules

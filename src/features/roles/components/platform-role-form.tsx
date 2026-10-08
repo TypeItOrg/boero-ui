@@ -25,6 +25,7 @@ import type { PlatformRoleFormState } from "@features/roles/types/platform-role-
 import type { PlatformRole } from "@features/roles/types/platform-role.types";
 
 const INITIAL_STATE: PlatformRoleFormState = {};
+
 const INSTITUTION_QUERY_KEY = ["platform", "roles", "form-institutions"] as const;
 
 type PlatformRoleFormProps = {
@@ -35,9 +36,13 @@ type PlatformRoleFormProps = {
 
 export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformRoleFormProps): ReactElement {
   const destination = returnTo ?? (role ? `/admin/roles/${role.id}` : "/admin/roles");
+
   const action = savePlatformRoleAction.bind(null, role?.id, role?.institution.id, destination);
+
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
+
   const formRef = useActionFormErrorFocus(state, pending);
+
   const isEdit = Boolean(role);
 
   return (

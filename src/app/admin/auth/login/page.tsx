@@ -16,6 +16,7 @@ type SearchParams = Promise<{ next?: string }>;
 
 export default async function LoginPage({ searchParams }: { searchParams: SearchParams }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
+
   const safeNext = getSafeNextPath(resolvedSearchParams.next);
 
   return (

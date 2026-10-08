@@ -32,8 +32,11 @@ const initialState: RoleFormState = {};
 
 export function InstitutionRoleForm({ institutionId, role, permissionGroups, returnTo }: InstitutionRoleFormProps): ReactElement {
   const destination = returnTo ?? (role ? `/roles/${role.id}` : "/roles");
+
   const action = saveInstitutionRoleAction.bind(null, institutionId, role?.id, destination);
+
   const [state, formAction, pending] = useActionState(action, initialState);
+
   const formRef = useActionFormErrorFocus(state, pending);
 
   return (

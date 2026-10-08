@@ -21,7 +21,9 @@ export async function fetchPage<T>(
   });
 
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
+
   const base = institutionId ? getAcademicApiBase(scope, institutionId) : "/api/v1/admin";
+
   const response = await academicApiFetch(scope, `${base}/${resource}${query}`);
 
   return parseHttpResponse(response, FETCH_ERROR);
@@ -48,6 +50,7 @@ export async function fetchDetailWithParams<T>(
   });
 
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
+
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
 
   return parseNullableHttpResponse(response, FETCH_ERROR);

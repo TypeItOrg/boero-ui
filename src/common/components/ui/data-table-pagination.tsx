@@ -50,7 +50,9 @@ export function DataTablePagination({
   onPageSizeChange,
 }: DataTablePaginationProps): ReactElement {
   const currentPage = totalPages > 0 ? page + 1 : 0;
+
   const canGoToPreviousPage = page > 0;
+
   const canGoToNextPage = page < totalPages - 1;
 
   return (

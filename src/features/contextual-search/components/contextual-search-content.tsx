@@ -101,7 +101,9 @@ export function ContextualSearchContent({
     <SearchContentWithAccess onNavigate={onNavigate} sections={matchingAccessSections}>
       {groups.map((group, index) => {
         const presentation = CONTEXTUAL_SEARCH_PRESENTATION[group.entityType];
+
         const Icon = presentation.icon;
+
         const viewAllHref = group.hasMore ? getContextualSearchViewAllHref(scope, group.entityType, search) : null;
 
         return (

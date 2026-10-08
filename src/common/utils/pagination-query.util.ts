@@ -5,6 +5,7 @@ import type { QueryParamValue } from "@common/types/query-param.types";
 import { getQueryParamValue } from "@common/utils/query-param.util";
 
 const DEFAULT_PAGE = 0;
+
 const DEFAULT_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const;
 const DEFAULT_ALLOWED_PAGE_SIZES = new Set<number>(PAGE_SIZE_OPTIONS);
@@ -21,7 +22,9 @@ type BuildPaginationSearchParamsInput = PaginationParams & {
 
 export function parsePaginationQuery(searchParams: PaginationSearchParams, options: ParsePaginationQueryOptions = {}): PaginationQuery {
   const allowedPageSizes = options.allowedPageSizes ?? DEFAULT_ALLOWED_PAGE_SIZES;
+
   const defaultPage = options.defaultPage ?? DEFAULT_PAGE;
+
   const defaultSize = options.defaultSize ?? DEFAULT_SIZE;
 
   return {

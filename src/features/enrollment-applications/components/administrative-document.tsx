@@ -36,10 +36,15 @@ export function AdministrativeDocument({
   onActivity: (tab: "deliveries" | "changes", trigger: HTMLButtonElement | null) => void;
 }): ReactElement {
   const [assistedUpload, setAssistedUpload] = useState(false);
+
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
+
   const attachment = requirement.currentAttachment;
+
   const canUpload = requirement.canUpload || requirement.canReplace;
+
   const hasChanges = showRequirementChanges && Boolean(requirement.changes?.length);
+
   const actionsDisabled = disabled || assistedUpload;
 
   const secondaryActions = (

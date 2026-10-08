@@ -23,7 +23,9 @@ type EditEnrollmentPeriodPageProps = {
 
 export default async function EditEnrollmentPeriodPage({ params, searchParams }: EditEnrollmentPeriodPageProps): Promise<ReactElement> {
   const [{ periodId: rawPeriodId }, query] = await Promise.all([params, searchParams]);
+
   const periodId = parseUuidQueryParam(rawPeriodId);
+
   const institutionId = parseUuidQueryParam(query.institutionId);
 
   if (!periodId || !institutionId) {
@@ -40,6 +42,7 @@ export default async function EditEnrollmentPeriodPage({ params, searchParams }:
   }
 
   const collectionPath = `/admin/enrollment-periods?institutionId=${encodeURIComponent(institutionId)}`;
+
   const returnTo = getSafeReturnTo(query.returnTo, collectionPath);
 
   return (

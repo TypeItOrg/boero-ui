@@ -15,6 +15,7 @@ import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-mes
 import { PLATFORM_ROLE_TYPE, type PlatformRoleType } from "@features/roles/types/platform-role-type.types";
 
 const INSTITUTION_FILTER_QUERY_KEY = ["platform", "roles", "institution-filter"] as const;
+
 const ROLE_TYPE_FILTER = "all";
 
 type PlatformRolesTableFiltersProps = {

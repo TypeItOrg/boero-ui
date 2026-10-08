@@ -37,6 +37,7 @@ export function DocumentChanges({ requirement }: { requirement: DocumentRequirem
     <ol className="space-y-6" aria-label="Cambios del requisito">
       {changes.map((change, index) => {
         const event = events[change.action] ?? { title: "Cambio registrado", icon: PencilLineIcon };
+
         const Icon = event.icon;
 
         return (

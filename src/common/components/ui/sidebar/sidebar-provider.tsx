@@ -23,10 +23,13 @@ export function SidebarProvider({
   onOpenChange?: (open: boolean) => void;
 }) {
   const isMobile = useIsMobile();
+
   const [openMobile, setOpenMobile] = useState(false);
+
   const mobileWidth = (style as SidebarStyle | undefined)?.["--sidebar-width-mobile"] ?? SIDEBAR_WIDTH_MOBILE;
 
   const [_open, _setOpen] = useState(defaultOpen);
+
   const open = openProp ?? _open;
 
   const setOpen = useCallback(

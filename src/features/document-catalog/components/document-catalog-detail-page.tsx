@@ -36,6 +36,7 @@ export async function DocumentCatalogDetailPage({
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const [{ documentId: rawId }, query] = await Promise.all([params, searchParams]);
+
   const parsedId = z.uuid().safeParse(rawId);
 
   if (!parsedId.success) {
@@ -43,6 +44,7 @@ export async function DocumentCatalogDetailPage({
   }
 
   let institutionId: string;
+
   let canManage: boolean;
 
   if (scope === "admin") {
@@ -78,9 +80,13 @@ export async function DocumentCatalogDetailPage({
   }
 
   const document: DocumentDefinition = await response.json();
+
   const institution = scope === "admin" ? await fetchInstitution(institutionId) : undefined;
+
   const returnTo = getSafeReturnTo(query.returnTo, getDocumentCatalogPageUrl(scope, institutionId));
+
   const segmentHrefs = { documentation: returnTo };
+
   const segmentLabels = { [parsedId.data]: document.name };
 
   return (

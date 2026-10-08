@@ -13,6 +13,7 @@ const ROLE_CATALOG_PAGE_SIZE = PAGE_SIZE_OPTIONS[PAGE_SIZE_OPTIONS.length - 1];
 export async function fetchSystemRoles(institutionId: string, scope: PeopleScopeType = PeopleScope.ADMIN): Promise<AssignableRole[]> {
   if (PeopleScope.isInstitutional(scope)) {
     const response = await peopleApiFetch(scope, `/api/v1/institutions/${institutionId}/roles?size=${ROLE_CATALOG_PAGE_SIZE}`);
+
     const page = await parseHttpResponse<PaginatedResponse<AssignableRole>>(response, PEOPLE_ERROR_MESSAGES.FETCH_ROLES);
 
     return page.items;

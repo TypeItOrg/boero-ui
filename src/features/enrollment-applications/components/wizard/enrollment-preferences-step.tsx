@@ -45,6 +45,26 @@ export function EnrollmentPreferencesStep({
   isCancelDialogOpen,
   documentsBlocked,
 }: Props): ReactElement {
+  function renderNextAction(): ReactElement | null {
+    if (hasDocumentsStep) {
+      return (
+        <Button type="button" size="lg" onClick={() => handleActiveTabChange("documents")} className="gap-1.5">
+          Siguiente: Documentación
+        </Button>
+      );
+    }
+
+    if (!readOnly) {
+      return (
+        <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen || documentsBlocked}>
+          Enviar inscripción
+        </Button>
+      );
+    }
+
+    return null;
+  }
+
   return (
     <TabsContent value="preferences" className="space-y-6">
       <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
@@ -133,15 +153,7 @@ export function EnrollmentPreferencesStep({
           <Button type="button" variant="outline" size="lg" onClick={() => handleActiveTabChange("spaces")} className="gap-1.5">
             Atrás
           </Button>
-          {hasDocumentsStep ? (
-            <Button type="button" size="lg" onClick={() => handleActiveTabChange("documents")} className="gap-1.5">
-              Siguiente: Documentación
-            </Button>
-          ) : !readOnly ? (
-            <Button type="button" size="lg" onClick={() => setIsSubmitDialogOpen(true)} disabled={saving || isCancelDialogOpen || documentsBlocked}>
-              Enviar inscripción
-            </Button>
-          ) : null}
+          {renderNextAction()}
         </CardFooter>
       </Card>
     </TabsContent>

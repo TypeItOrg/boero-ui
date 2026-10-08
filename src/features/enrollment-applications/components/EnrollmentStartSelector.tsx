@@ -39,6 +39,7 @@ export function formatEnrollmentStartOptionLabel(option: Pick<EnrollmentStartStu
 
 export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting = false, studyPlanPagination }: Props): ReactElement {
   const [selectedId, setSelectedId] = useState(studyPlans[0]?.id ?? "");
+
   const trainingPathId = studyPlans.some((path) => path.id === selectedId) ? selectedId : (studyPlans[0]?.id ?? "");
 
   return (

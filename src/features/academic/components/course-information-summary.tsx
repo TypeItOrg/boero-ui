@@ -11,7 +11,13 @@ import type { Course } from "@features/academic/types/course.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels, courseStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 
+const STATUS_VARIANTS = { ACTIVE: "success", CLOSED: "outline", INACTIVE: "secondary" } as const;
+
 export function CourseInformationSummary({ course }: { course: Course }): ReactElement {
+  const status = course.status ?? (course.active ? "ACTIVE" : "INACTIVE");
+
+  const statusVariant = STATUS_VARIANTS[status] ?? "secondary";
+
   return (
     <section aria-labelledby="course-summary-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
@@ -61,15 +67,7 @@ export function CourseInformationSummary({ course }: { course: Course }): ReactE
         <div>
           <dt className={DETAIL_LABEL_CLASS_NAME}>Estado</dt>
           <dd className="mt-1">
-            <Badge
-              variant={
-                (course.status ?? (course.active ? "ACTIVE" : "INACTIVE")) === "ACTIVE"
-                  ? "success"
-                  : (course.status ?? (course.active ? "ACTIVE" : "INACTIVE")) === "CLOSED"
-                    ? "outline"
-                    : "secondary"
-              }
-            >
+            <Badge variant={statusVariant}>
               {courseStatusLabels[course.status as keyof typeof courseStatusLabels] ?? (course.active ? "Activo" : "Inactivo")}
             </Badge>
           </dd>

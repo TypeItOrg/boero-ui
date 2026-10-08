@@ -1,6 +1,22 @@
 import type { DayDraft } from "@features/academic/types/course-day-draft.types";
 import { toMinutes } from "@features/academic/utils/course-form-draft.util";
 
+export function getCoursePeriodError(day: DayDraft, individual: boolean, hasSubmitted: boolean): string | undefined {
+  if (!hasSubmitted || !individual) {
+    return undefined;
+  }
+
+  if (!day.periodDurationMinutes) {
+    return "Indicá la duración de cada período para los espacios individuales.";
+  }
+
+  if (Number(day.periodDurationMinutes) <= 0) {
+    return "La duración del período debe ser mayor a 0.";
+  }
+
+  return undefined;
+}
+
 export function getCourseScheduleError(day: DayDraft, individual: boolean, hasSubmitted: boolean, scheduleIndex: number): string | undefined {
   if (!hasSubmitted) {
     return undefined;
@@ -13,6 +29,7 @@ export function getCourseScheduleError(day: DayDraft, individual: boolean, hasSu
   }
 
   const start = toMinutes(schedule.startTime);
+
   const end = toMinutes(schedule.endTime);
 
   if (start < 0 || end < 0 || start >= end) {
@@ -26,6 +43,7 @@ export function getCourseScheduleError(day: DayDraft, individual: boolean, hasSu
     }
 
     const candidateStart = toMinutes(candidate.startTime);
+
     const candidateEnd = toMinutes(candidate.endTime);
 
     return candidateStart >= 0 && candidateEnd >= 0 && candidateStart < candidateEnd;
@@ -79,6 +97,7 @@ export function getCourseDayError(day: DayDraft, hasSubmitted: boolean, getSched
     }
 
     const start = toMinutes(schedule.startTime);
+
     const end = toMinutes(schedule.endTime);
 
     return start >= 0 && end >= 0 && start < end;

@@ -19,6 +19,7 @@ export function parseSortQuery<TField extends string>(
   defaultSort: Sort<TField>,
 ): Sort<TField> {
   const field = getQueryParamValue(searchParams.sortField);
+
   const direction = getQueryParamValue(searchParams.sortDirection);
 
   if (!field || !allowedFields.has(field as TField) || !isSortDirection(direction)) {

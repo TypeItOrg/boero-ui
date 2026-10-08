@@ -18,6 +18,7 @@ export async function saveTrainingPathRequirements(
 ): Promise<AcademicActionState | undefined> {
   for (const draft of changedDrafts) {
     const requirementId = draft.id ?? progress.requirementIds[draft.clientId];
+
     let requirementResponse: Response | undefined;
 
     const request = academicApiFetch(scope, `${apiBase}/training-paths/${pathId}/document-requirements${requirementId ? `/${requirementId}` : ""}`, {

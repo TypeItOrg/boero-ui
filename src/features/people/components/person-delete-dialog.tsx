@@ -44,9 +44,13 @@ export function PersonDeleteDialog({
   scope = PeopleScope.ADMIN,
 }: PersonDeleteDialogProps): ReactElement {
   const [isPending, startTransition] = useTransition();
+
   const [isNavigating, startNavigation] = useTransition();
+
   const [error, setError] = useState<string>();
+
   const buttonSize = PeopleScope.isInstitutional(scope) ? "lg" : "default";
+
   const isBusy = isPending || isNavigating;
 
   function handleOpenChange(nextOpen: boolean): void {

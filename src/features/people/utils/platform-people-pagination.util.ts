@@ -25,6 +25,7 @@ export const DEFAULT_PLATFORM_PEOPLE_SORT = {
 } as const satisfies PlatformPeopleSort;
 
 const platformPeopleSortFields = new Set<PlatformPeopleSortField>(PLATFORM_PEOPLE_SORT_FIELDS);
+
 const systemRoleCodes = new Set<string>(SYSTEM_ROLE_CODES);
 
 export type PlatformPeopleSearchParams = PaginationSearchParams &

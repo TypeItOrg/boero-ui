@@ -7,6 +7,7 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 
 export async function GET(request: Request, { params }: { params: Promise<{ applicationId: string; attachmentId: string }> }): Promise<Response> {
   const { applicationId, attachmentId } = await params;
+
   const scope = new URL(request.url).searchParams.get("scope") ?? AcademicScope.INSTITUTIONAL;
 
   if (!isValidUuid(applicationId) || !isValidUuid(attachmentId) || (scope !== AcademicScope.ADMIN && scope !== AcademicScope.INSTITUTIONAL)) {
@@ -48,7 +49,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
     });
 
     const contentType = response.headers.get("content-type");
+
     const contentDisposition = response.headers.get("content-disposition");
+
     const contentLength = response.headers.get("content-length");
 
     if (contentType) {

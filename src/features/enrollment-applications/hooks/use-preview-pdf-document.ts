@@ -11,6 +11,7 @@ export function usePreviewPdfDocument(src: string, onError: DocumentPdfPreviewPr
 
   useEffect(() => {
     let active = true;
+
     let task: PDFDocumentLoadingTask | undefined;
 
     async function load(): Promise<void> {

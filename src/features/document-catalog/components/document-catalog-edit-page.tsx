@@ -34,6 +34,7 @@ export async function DocumentCatalogEditPage({
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
 }): Promise<ReactElement> {
   const [{ documentId: rawId }, query] = await Promise.all([params, searchParams]);
+
   const parsedId = z.uuid().safeParse(rawId);
 
   if (!parsedId.success) {
@@ -72,9 +73,13 @@ export async function DocumentCatalogEditPage({
   }
 
   const document: DocumentDefinition = await response.json();
+
   const institution = scope === "admin" ? await fetchInstitution(institutionId) : undefined;
+
   const returnTo = getSafeReturnTo(query.returnTo, getDocumentCatalogPageUrl(scope, institutionId));
+
   const detailUrl = getDocumentCatalogDetailPageUrl(scope, institutionId, document.id);
+
   const origin = new URL(returnTo, "https://return-to.invalid");
 
   const catalogReturnTo =

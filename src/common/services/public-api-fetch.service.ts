@@ -20,6 +20,7 @@ export async function publicApiFetch(path: string, init: RequestInit = {}, reque
   }
 
   const timeoutSignal = AbortSignal.timeout(15_000);
+
   const signal = init.signal ? AbortSignal.any([init.signal, timeoutSignal]) : timeoutSignal;
 
   return fetch(new URL(path, getApiUrlOrThrow()), {

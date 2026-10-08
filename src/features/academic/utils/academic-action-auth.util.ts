@@ -20,7 +20,9 @@ export async function authorizeAcademicAction(
     }
 
     const user = await requireInstitutionalUser();
+
     const belongsToInstitution = user.institutionId === institutionId;
+
     const hasPermission = hasInstitutionalPermission(user, permission);
 
     if (belongsToInstitution && hasPermission) {

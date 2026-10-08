@@ -10,6 +10,7 @@ import { INSTITUTIONAL_HOST_HEADER } from "@common/services/institutional-host/i
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 
 const inFlightRefreshes = new Map<string, Promise<RefreshAttempt>>();
+
 const AUTH_PROXY_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthProxyPolicy): Promise<NextResponse> {
@@ -36,6 +37,7 @@ export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthPro
   }
 
   const sharedRefresh = await refreshSession(policy.refreshPath, refreshToken);
+
   const refreshAttempt = await validateRefreshedSession(sharedRefresh, request, policy);
 
   if (refreshAttempt.tokens) {
@@ -67,6 +69,7 @@ export async function handleProtectedRoute(request: NextRequest, policy: AuthPro
   }
 
   const sharedRefresh = await refreshSession(policy.refreshPath, refreshToken);
+
   const refreshAttempt = await validateRefreshedSession(sharedRefresh, request, policy);
 
   if (refreshAttempt.tokens) {
@@ -100,6 +103,7 @@ async function getSessionStatus(currentUserPath: string, accessToken: string, re
 
 function refreshSession(refreshPath: string, refreshToken: string): Promise<RefreshAttempt> {
   const requestKey = `${refreshPath}:${refreshToken}`;
+
   const existingRequest = inFlightRefreshes.get(requestKey);
 
   if (existingRequest) {
@@ -134,6 +138,7 @@ async function performRefresh(refreshPath: string, refreshToken: string): Promis
     }
 
     const payload = (await response.json()) as { tokens?: Partial<RefreshedTokens> };
+
     const tokens = payload.tokens;
 
     if (tokens?.accessToken && tokens.refreshToken) {
@@ -157,7 +162,10 @@ function removeInFlightRefresh(requestKey: string, refreshRequest: Promise<Refre
 
 function createUnauthenticatedResponse(request: NextRequest, policy: AuthProxyPolicy, refreshStatus?: number): NextResponse {
   const contextForbidden = refreshStatus === 403;
+
   const refreshUnavailable = request.cookies.has(policy.refreshTokenCookie) && refreshStatus !== 401;
+
+  const authenticationStatus = refreshUnavailable ? 503 : 401;
 
   const response = request.nextUrl.pathname.startsWith("/api/")
     ? NextResponse.json(
@@ -165,7 +173,7 @@ function createUnauthenticatedResponse(request: NextRequest, policy: AuthProxyPo
           message: refreshUnavailable ? COMMON_ERROR_MESSAGES.SESSION_UNAVAILABLE : COMMON_ERROR_MESSAGES.SESSION_REQUIRED,
         },
         {
-          status: contextForbidden ? 403 : refreshUnavailable ? 503 : 401,
+          status: contextForbidden ? 403 : authenticationStatus,
           headers: { "cache-control": "private, no-store" },
         },
       )
@@ -197,6 +205,7 @@ function nextWithRequestHeaders(request: NextRequest): NextResponse {
 
 function createProxyBackendHeaders(request: NextRequest, initial: HeadersInit): Headers {
   const headers = new Headers(initial);
+
   // proxy() has stripped and rebuilt this internal header from the configured frontend Host.
   const host = request.headers.get(INSTITUTIONAL_HOST_HEADER);
 

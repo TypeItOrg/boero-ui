@@ -26,6 +26,7 @@ export function CourseEnrollmentPagination({ page, size, totalItems, totalPages,
   }
 
   const totalLabel = totalItems === 1 ? "cursada." : "cursadas.";
+
   const summaryLabel = `${totalItems} ${itemLabel ?? totalLabel}`;
 
   return (

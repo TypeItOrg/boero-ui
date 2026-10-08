@@ -27,7 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function EnrollmentPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }): Promise<ReactElement> {
   const query = await searchParams;
+
   const plansPage = parsePaginationQuery({ page: query.plansPage }, { defaultSize: 20 });
+
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
 
   if (!canStartEnrollmentApplication(user)) {

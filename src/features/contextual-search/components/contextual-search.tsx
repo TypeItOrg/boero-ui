@@ -46,15 +46,25 @@ const CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS: Record<ContextualSearchScope, read
 
 export function ContextualSearch(props: ContextualSearchProps): ReactElement {
   const { accessSections, scope, className, mobileVariant = "icon", shortcutPlatform = "windows" } = props;
+
   const router = useRouter();
+
   const queryClient = useQueryClient();
+
   const [value, setValue] = useState("");
+
   const [open, setOpen] = useState(false);
+
   const copy = CONTEXTUAL_SEARCH_COPY[scope];
+
   const institutionId = props.scope === "institutional" ? props.institutionId : null;
+
   const debouncedSearch = useDebouncedValue(value.trim(), 300);
+
   const canSearch = debouncedSearch.length >= 2;
+
   const contextualSearchQueryKey = useMemo(() => ["contextual-search", scope, institutionId] as const, [institutionId, scope]);
+
   const visibleAccessSections = omitContextualSearchAccessItems(accessSections, CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope]);
 
   const openSearch = useCallback(() => {

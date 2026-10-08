@@ -33,7 +33,9 @@ type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
 
 export function InstitutionalSidebar({ user, navigationSections, className, ...props }: InstitutionalSidebarProps): ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
+
   const navigation = useMobileSidebarNavigation();
+
   const { isMobile } = useSidebar();
 
   return (

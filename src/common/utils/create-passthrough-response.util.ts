@@ -1,5 +1,6 @@
 export async function createPassthroughResponse(response: Response): Promise<Response> {
   const body = await response.text();
+
   const contentType = response.headers.get("content-type") ?? "application/json";
 
   const headers = new Headers({

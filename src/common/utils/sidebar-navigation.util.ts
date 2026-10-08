@@ -11,8 +11,11 @@ export function groupSidebarNavigationSection(
   },
 ): SidebarNavigationSection[] {
   const { sectionLabel, sourceSectionLabel = sectionLabel, urls, ...group } = configuration;
+
   const groupedUrls = new Set(urls);
+
   const sourceSection = sections.find((section) => section.label === sourceSectionLabel);
+
   const children = sourceSection?.items.filter((item): item is NavigationItem => "url" in item && groupedUrls.has(item.url)) ?? [];
 
   if (children.length === 0) {

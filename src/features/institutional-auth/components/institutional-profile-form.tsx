@@ -45,10 +45,15 @@ function InstitutionalProfileFormView({ person, returnTo = "/account" }: Institu
   );
 
   const fieldErrors = "fieldErrors" in state ? (state.fieldErrors ?? {}) : {};
+
   const error = getFormError("error" in state ? state.error : undefined, "fieldErrors" in state ? state.fieldErrors : undefined);
+
   const [birthDate, setBirthDate] = useState<Date | undefined>(() => parseBirthDateInput(person.birthDate));
+
   const [addressCityId, setAddressCityId] = useState(person.address?.city?.id ?? "");
+
   const [addressStreet, setAddressStreet] = useState(person.address?.street ?? "");
+
   const hasAddress = Boolean(addressCityId || addressStreet.trim());
 
   return (

@@ -75,6 +75,7 @@ export function composeInitialSpaceLabel(initialValues: AcademicFieldsProps["ini
   }
 
   const type = toOptionalFormString(initialValues?.academicSpaceType);
+
   const format = toOptionalFormString(initialValues?.academicSpaceFormat);
 
   const parts = [

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function EmailVerificationPage({ searchParams }: { searchParams: Promise<{ token?: string }> }): Promise<ReactElement> {
   const parsed = confirmEmailSchema.safeParse(await searchParams);
+
   const token = parsed.success ? parsed.data.token : undefined;
 
   return (

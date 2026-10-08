@@ -18,6 +18,7 @@ export const TRAINING_PATH_FILTER_PAGE_SIZE = 20;
 
 export function TrainingPathFilterControl({ filter, size }: TrainingPathFilterControlProps): ReactElement {
   const { navigate } = useDataTableNavigation();
+
   const queryKey = useMemo(() => [...TRAINING_PATH_FILTER_QUERY_KEY, filter.scope, filter.institutionId], [filter.institutionId, filter.scope]);
 
   function updateTrainingPath(value: string | undefined): void {

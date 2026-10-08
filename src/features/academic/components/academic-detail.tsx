@@ -46,6 +46,7 @@ export function AcademicDetail({
   returnTo,
 }: AcademicDetailProps): ReactElement {
   const destination = returnTo ?? `${basePath}/${resource}`;
+
   const detailPath = `${basePath}/${resource}/${item.id}`;
 
   const headerActions = (

@@ -12,6 +12,7 @@ import { TabsContent } from "@common/components/ui/tabs";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import type { EnrollmentApplicationCourse } from "@features/enrollment-applications/types/enrollment-application-course.types";
 import type { EnrollmentWizardModel } from "@features/enrollment-applications/types/enrollment-wizard-model.types";
 import { enrollmentCourseGroupKey } from "@features/enrollment-applications/utils/enrollment-course-group.util";
 
@@ -86,15 +87,13 @@ export function EnrollmentCourseStep({
                 ? `${selected.academicSpaceName}${selected.instrumentName ? ` · ${selected.instrumentName}` : ""}`
                 : "Curso seleccionado";
 
+              const unavailableMessage = getCourseUnavailableMessage(selected);
+
               return (
                 <div key={id} className="mb-3 flex items-center justify-between gap-3 rounded-lg border p-3">
                   <span>
                     {name}
-                    {selected?.periodOpen === false ? (
-                      <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_CLOSED}</span>
-                    ) : selected?.withinPeriodScope === false ? (
-                      <span className="text-destructive mt-1 block text-sm">{ENROLLMENT_MESSAGES.PERIOD_COURSE_EXCLUDED}</span>
-                    ) : null}
+                    {unavailableMessage ? <span className="text-destructive mt-1 block text-sm">{unavailableMessage}</span> : null}
                   </span>
                   <Button
                     type="button"
@@ -169,4 +168,16 @@ export function EnrollmentCourseStep({
       </Card>
     </TabsContent>
   );
+}
+
+function getCourseUnavailableMessage(course: EnrollmentApplicationCourse | undefined): string | undefined {
+  if (course?.periodOpen === false) {
+    return ENROLLMENT_MESSAGES.PERIOD_COURSE_CLOSED;
+  }
+
+  if (course?.withinPeriodScope === false) {
+    return ENROLLMENT_MESSAGES.PERIOD_COURSE_EXCLUDED;
+  }
+
+  return undefined;
 }

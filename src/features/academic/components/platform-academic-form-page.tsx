@@ -18,6 +18,7 @@ export function PlatformAcademicFormPage({
   returnTo?: string | string[];
 }): ReactElement {
   const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
   const collectionPath = `/admin/${resource}`;
 
   return (

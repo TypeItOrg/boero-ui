@@ -20,9 +20,13 @@ export const metadata: Metadata = { title: "Mis horarios" };
 
 export default async function MySchedulesPage({ searchParams }: { searchParams: Promise<{ week?: string | string[] }> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   const referenceDate = new Date().toISOString();
+
   const params = await searchParams;
+
   const week = getScheduleWeek(params.week, referenceDate);
+
   const data = await fetchMyWeeklySchedules(user.institutionId, week);
 
   const items: WeeklyScheduleItem[] = data.enrollments.map((enrollment) => ({

@@ -104,6 +104,7 @@ async function loadRecentItem<T>(
   mapItem: (item: T) => Omit<AcademicRecentItem, "resource" | "section">,
 ): Promise<AcademicRecentItem | null> {
   const page = await fetchPage();
+
   const item = page.items[0];
 
   if (!item) {

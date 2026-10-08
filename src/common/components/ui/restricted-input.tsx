@@ -5,6 +5,7 @@ import { Input } from "@common/components/ui/input";
 type RestrictedInputProps = Omit<ComponentProps<typeof Input>, "inputMode" | "pattern" | "type">;
 
 const NON_DIGIT_PATTERN = /\D/g;
+
 const NON_PHONE_CHARACTER_PATTERN = /[^\d-]/g;
 
 export function NumericInput({ onChange, ...props }: RestrictedInputProps): ReactElement {

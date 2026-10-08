@@ -41,6 +41,7 @@ export async function fetchMyCourseEnrollments(
   params: CourseEnrollmentListParams = {},
 ): Promise<PaginatedResponse<CourseEnrollment>> {
   const searchParams = courseEnrollmentSearchParams(params);
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments/mine?${searchParams}`);
 
   return parseHttpResponse(response, "No se pudieron obtener tus cursadas.");
@@ -51,6 +52,7 @@ export async function fetchInstitutionalCourseEnrollments(
   params: CourseEnrollmentListParams = {},
 ): Promise<PaginatedResponse<CourseEnrollment>> {
   const searchParams = courseEnrollmentSearchParams(params);
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments?${searchParams}`);
 
   return parseHttpResponse(response, "No se pudieron obtener las cursadas.");

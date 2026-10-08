@@ -18,9 +18,13 @@ type InstitutionalRouteLayoutProps = {
 
 export async function InstitutionalRouteLayout({ children }: InstitutionalRouteLayoutProps): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   const [person, cookieStore, requestHeaders] = await Promise.all([fetchInstitutionalPerson(), cookies(), headers()]);
+
   const sidebarOpen = cookieStore.get("institutional-sidebar-open")?.value !== "false";
+
   const sidebarGroupStates = parseSidebarNavigationGroupStates(cookieStore.get(SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES.institutional)?.value);
+
   const shortcutPlatform = getContextualSearchShortcutPlatform(requestHeaders.get("user-agent"));
 
   return (

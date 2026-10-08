@@ -14,7 +14,9 @@ export function classifyInstitutionalHost(
 
   try {
     const authority = new URL(`http://${host}`);
+
     const hostname = authority.hostname.toLowerCase();
+
     const ipv6 = hostname.startsWith("[") && hostname.endsWith("]");
 
     if (!hostname || hostname.length > 253 || (!ipv6 && !hostname.split(".").every((label) => LABEL.test(label)))) {

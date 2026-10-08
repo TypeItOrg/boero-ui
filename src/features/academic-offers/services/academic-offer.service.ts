@@ -24,6 +24,7 @@ export async function fetchAcademicOffers(
   }
 
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/academic-offers${query}`);
 
   return parseHttpResponse(response, FETCH_ERROR);

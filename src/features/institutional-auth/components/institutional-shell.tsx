@@ -24,6 +24,7 @@ type InstitutionalShellProps = {
 
 export function InstitutionalShell({ children, user, institutionName, defaultSidebarOpen, shortcutPlatform }: InstitutionalShellProps): ReactElement {
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
+
   const navigationSections = getInstitutionalNavigationSections(user);
 
   const navigationItems = navigationSections

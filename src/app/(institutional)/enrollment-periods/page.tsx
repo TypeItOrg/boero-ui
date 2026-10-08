@@ -47,8 +47,11 @@ export default async function EnrollmentPeriodsPage({ searchParams }: Props) {
   ]);
 
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_CREATE);
+
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_UPDATE);
+
   const canChangeStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_STATUS_UPDATE);
+
   const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_DELETE);
 
   return (

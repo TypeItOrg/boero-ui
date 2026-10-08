@@ -30,6 +30,7 @@ export function CourseWaitlistTable({
   scope = AcademicScope.INSTITUTIONAL,
 }: CourseWaitlistTableProps): ReactElement {
   const router = useRouter();
+
   const [selected, setSelected] = useState<CourseWaitlistEntry>();
 
   if (entries.length === 0) {
