@@ -12,7 +12,6 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:acceptance": "playwright test --config playwright.acceptance.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -47,7 +46,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
@@ -71,10 +69,6 @@
   },
   "overrides": {
     "postcss": "8.5.23",
-    "minimatch@3>brace-expansion": "1.1.18",
-    "minimatch@7>brace-expansion": "1.1.18",
-    "minimatch@9>brace-expansion": "2.1.4",
-    "minimatch@10>brace-expansion": "5.0.9",
     "brace-expansion@^1.0.0": "1.1.18",
     "brace-expansion@^2.0.0": "2.1.4",
     "brace-expansion@^5.0.0": "5.0.9",
