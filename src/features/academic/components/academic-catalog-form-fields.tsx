@@ -1,3 +1,5 @@
+"use client";
+
 import { toFormControlValue } from "@common/utils/form-value.util";
 import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
 import { ACADEMIC_SPACE_FORMAT } from "@features/academic/types/academic-space-format.types";
@@ -8,6 +10,11 @@ import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/ac
 const ACTIVE_STATUS_OPTIONS = [
   { value: "true", label: "Activo" },
   { value: "false", label: "Inactivo" },
+];
+
+const INSTRUMENTAL_OPTIONS = [
+  { value: "true", label: "Sí" },
+  { value: "false", label: "No" },
 ];
 
 type ActiveStatusFieldProps = {
@@ -57,6 +64,7 @@ export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldE
 export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
+  const instrumentalLocked = Boolean(initialValues.id && initialValues.instrumentalLocked);
 
   return (
     <>
@@ -74,6 +82,17 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
           defaultValue={toFormControlValue(initialValues.format ?? ACADEMIC_SPACE_FORMAT[0])}
           options={ACADEMIC_SPACE_FORMAT.map((format) => ({ value: format, label: academicSpaceFormatLabels[format] }))}
         />
+      </FormField>
+      <FormField label="Espacio instrumental" name="instrumental" error={fieldErrors?.instrumental}>
+        <FormSelect
+          name="instrumental"
+          defaultValue={String(initialValues.instrumental === true)}
+          disabled={instrumentalLocked}
+          options={INSTRUMENTAL_OPTIONS}
+        />
+        {instrumentalLocked ? (
+          <p className="text-muted-foreground text-xs">No se puede modificar porque el espacio ya tiene cursos asociados.</p>
+        ) : null}
       </FormField>
       {hasActiveState ? <ActiveStatusField error={fieldErrors?.active} initialActive={initialActive} /> : null}
       <DescriptionField initialValues={initialValues} error={fieldErrors?.description} />

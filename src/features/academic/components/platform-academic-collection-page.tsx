@@ -27,6 +27,7 @@ export async function PlatformAcademicCollectionPage({
       <AcademicCollectionView
         basePath="/admin"
         canChangeStatus={config.canChangeStatus(FULL_ACADEMIC_ACCESS)}
+        canReadWaitlist
         canCreate={false}
         canCreateVersion={config.canCreate(FULL_ACADEMIC_ACCESS)}
         canDelete={config.canDelete(FULL_ACADEMIC_ACCESS)}

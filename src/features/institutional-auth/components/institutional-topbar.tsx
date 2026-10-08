@@ -19,7 +19,7 @@ export function InstitutionalTopbar({
 }: InstitutionalTopbarProps): React.ReactElement {
   return (
     <header className="topbar-sticky sticky top-0 z-30 h-16 shrink-0">
-      <div className="topbar-surface bg-muted flex h-full w-full items-center justify-between gap-3 rounded-none border border-transparent px-3 transition-[background-color,border-color,box-shadow] duration-300 ease-out motion-reduce:transition-none sm:px-4 md:rounded-xl">
+      <div className="topbar-surface bg-muted flex h-full w-full items-center justify-between gap-2 rounded-none border border-transparent px-3 transition-[background-color,border-color,box-shadow] duration-300 ease-out motion-reduce:transition-none sm:px-4 md:gap-3 md:rounded-xl">
         <SidebarTrigger
           aria-label="Cambiar estado de la barra lateral"
           className="bg-background hover:bg-accent size-9 shrink-0 rounded-lg shadow-xs"
@@ -31,7 +31,7 @@ export function InstitutionalTopbar({
           <span className="text-muted-foreground block text-xs">Portal Institucional</span>
         </div>
         <GuardianWorkspaceBadge />
-        <div className="max-w-lg min-w-0 flex-1">
+        <div className="min-w-0 flex-1 md:max-w-lg">
           <ContextualSearch
             accessSections={accessSections}
             scope="institutional"

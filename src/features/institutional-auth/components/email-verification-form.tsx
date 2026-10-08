@@ -1,4 +1,6 @@
 "use client";
+
+import { ActionForm } from "@common/components/action-form";
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Loader2Icon } from "lucide-react";
@@ -7,7 +9,8 @@ import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
-import { InstitutionPicker } from "@features/institutional-auth/components/institution-picker";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
+import { useInstitutionalBrand } from "@features/institutional-auth/components/institutional-brand-context";
 import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import { EmailVerificationFeedback } from "@features/institutional-auth/components/email-verification-feedback";
 import { changePendingEmail, resendEmailVerification } from "@features/institutional-auth/actions/email-verification.actions";
@@ -16,12 +19,24 @@ import type { EmailVerificationState } from "@features/institutional-auth/types/
 
 export function EmailVerificationForm({ context }: { context?: EmailVerificationContext }): React.ReactElement {
   const [mode, setMode] = useState<"resend" | "change">("resend");
-  const initialIdentity = context?.institutionName ? context : context ? { ...context, institutionId: "" } : undefined;
+  const institution = useInstitutionalBrand();
+  const initialIdentity = institution
+    ? {
+        institutionId: institution.id,
+        institutionName: institution.name,
+        documentNumber: context?.institutionId === institution.id ? context.documentNumber : "",
+      }
+    : context?.institutionName
+      ? context
+      : context
+        ? { ...context, institutionId: "" }
+        : undefined;
   const [identity, setIdentity] = useState(initialIdentity);
   return (
-    <div className="flex flex-col">
-      <div className="flex-1 p-5 sm:p-8">
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 flex-col justify-center p-5 sm:p-8">
         <InstitutionalAuthStepHeader
+          showInstitutionName={false}
           title={mode === "resend" ? "Verificá tu correo electrónico" : "Cambiá tu correo electrónico"}
           description={
             mode === "resend"
@@ -60,7 +75,7 @@ function VerificationRequestForm({
   const [email, setEmail] = useState("");
 
   return (
-    <form action={action} className="mt-6 space-y-5">
+    <ActionForm resetOnSuccess={Boolean(state.success)} action={action} noValidate className="mt-6 space-y-5">
       <EmailVerificationFeedback
         state={state}
         successMessage={
@@ -70,22 +85,15 @@ function VerificationRequestForm({
         }
       />
       <FieldGroup>
-        <Field data-invalid={!!state.fieldErrors?.institutionId}>
-          <FieldLabel htmlFor="verification-institution" required>
-            Institución
-          </FieldLabel>
-          <InstitutionPicker
-            id="verification-institution"
-            disabled={pending}
-            value={identity?.institutionId}
-            selectedLabel={identity?.institutionName}
-            ariaInvalid={!!state.fieldErrors?.institutionId}
-            onValueChange={(value, item) =>
-              onIdentityChange({ institutionId: value ?? "", institutionName: item?.name, documentNumber: identity?.documentNumber ?? "" })
-            }
-          />
-          <FieldError>{state.fieldErrors?.institutionId}</FieldError>
-        </Field>
+        <InstitutionalAuthInstitutionField
+          id="verification-institution"
+          institution={identity ? { id: identity.institutionId, name: identity.institutionName ?? "" } : undefined}
+          disabled={pending}
+          error={state.fieldErrors?.institutionId}
+          onChange={(item) =>
+            onIdentityChange({ institutionId: item?.id ?? "", institutionName: item?.name, documentNumber: identity?.documentNumber ?? "" })
+          }
+        />
         <Field data-invalid={!!state.fieldErrors?.documentNumber}>
           <FieldLabel htmlFor="verification-document" required>
             Documento
@@ -139,7 +147,7 @@ function VerificationRequestForm({
         ) : null}
       </FieldGroup>
       <div className="flex flex-col gap-4">
-        <Button type="submit" size="lg" disabled={pending} aria-busy={pending}>
+        <Button type="submit" size="lg" className="h-auto min-h-9 py-2 whitespace-normal" disabled={pending} aria-busy={pending}>
           {pending ? <Loader2Icon className="animate-spin" /> : null}
           {pending ? "Enviando…" : mode === "resend" ? "Reenviar enlace" : "Cambiar correo electrónico y enviar enlace"}
         </Button>
@@ -156,6 +164,6 @@ function VerificationRequestForm({
           </Button>
         </p>
       </div>
-    </form>
+    </ActionForm>
   );
 }

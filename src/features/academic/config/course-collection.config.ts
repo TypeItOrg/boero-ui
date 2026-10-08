@@ -1,3 +1,4 @@
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { GraduationCapIcon } from "lucide-react";
 
 import { serializeSpringSort } from "@common/utils/sort-query.util";
@@ -18,7 +19,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
   plural: "cursos",
   columns: {
     primaryLabel: "Espacio académico",
-    detailLabels: ["Trayecto formativo", "Plan de estudio", "Ciclo lectivo"],
+    detailLabels: ["Trayecto formativo", "Plan de estudio", "Ciclo lectivo", "Nivel", "Tipo", "Formato", "Instrumento"],
     sortableFields: COURSE_SORT_FIELDS,
   },
   searchPlaceholder: "Buscar por espacio o institución...",
@@ -83,8 +84,16 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
       id: course.id,
       institutionId: course.institutionId,
       institutionName: course.institutionName,
-      primaryValue: `${course.academicSpaceName} · ${academicSpaceTypeLabels[course.academicSpaceType]} · ${academicSpaceFormatLabels[course.academicSpaceFormat]}`,
-      detailValues: [course.trainingPathName, course.studyPlanName, String(course.year)],
+      primaryValue: course.academicSpaceName,
+      detailValues: [
+        course.trainingPathName,
+        formatStudyPlanName(course),
+        String(course.year),
+        course.academicLevelName ?? "Sin nivel",
+        academicSpaceTypeLabels[course.academicSpaceType],
+        academicSpaceFormatLabels[course.academicSpaceFormat],
+        { value: course.instrumentName, fallback: "Sin instrumento" },
+      ],
       status: statusLabel,
       active: isActive,
       statusValue,

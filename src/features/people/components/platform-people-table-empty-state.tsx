@@ -3,6 +3,7 @@ import { SearchIcon, UsersIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 
@@ -32,8 +33,8 @@ export function PlatformPeopleEmptyState({ data, hasFilters, onFirstPage }: Plat
     return (
       <EmptyState
         icon={<SearchIcon className="size-5" />}
-        title="No se encontraron resultados"
-        description="No encontramos usuarios que coincidan con los criterios de búsqueda seleccionados."
+        title="No se encontraron usuarios"
+        description={DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION}
       />
     );
   }

@@ -1,0 +1,15 @@
+export const ROLE_SCOPE_MESSAGES = {
+  INACTIVE: "Permisos que quedarán inactivos",
+  REMOVE: "Quitar",
+  LABEL: "Alcance del rol",
+  INSTITUTION: "Toda la institución",
+  PATHS: "Trayectos seleccionados",
+  EMPTY_SELECTION: "Los trayectos seleccionados se mostrarán aquí.",
+  SEARCH_PLACEHOLDER: "Buscar trayecto…",
+  NO_RESULTS: "No se encontraron trayectos.",
+  SEARCH: "Agregar trayecto…",
+  REQUIRED: "Seleccioná al menos un trayecto.",
+  REQUIRED_ASSIGNMENT: "Seleccioná al menos un trayecto para cada rol cuyo alcance sea Trayectos seleccionados.",
+  LOAD_ERROR: "No se pudieron cargar los trayectos disponibles.",
+  INVALID_OPTIONS: "Los parámetros de consulta no son válidos.",
+} as const;

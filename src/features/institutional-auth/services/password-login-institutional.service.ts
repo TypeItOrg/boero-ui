@@ -1,5 +1,5 @@
 import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
-import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
 import type { InstitutionalLoginResult } from "@features/institutional-auth/types/institutional-login-result.types";
 import type { InstitutionalPasswordLoginInput } from "@features/institutional-auth/types/institutional-password-login-input.types";
@@ -10,7 +10,7 @@ export async function passwordLoginInstitutionalAccount(
   requestHeaders: Pick<Headers, "get">,
 ): Promise<PasswordLoginInstitutionalOutput> {
   try {
-    const response = await fetch(new URL("/api/v1/auth/login/password", getApiUrlOrThrow()), {
+    const response = await publicApiFetch("/api/v1/auth/login/password", {
       body: JSON.stringify(input),
       cache: "no-store",
       headers: createAuthRequestHeaders(requestHeaders),

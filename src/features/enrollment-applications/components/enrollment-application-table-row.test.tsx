@@ -16,6 +16,8 @@ function application(status: EnrollmentApplication["status"], rejectionReason?: 
     applicantDocumentNumber: "12345678",
     studyPlanId: "00000000-0000-4000-8000-000000000004",
     studyPlanName: "Plan Básico",
+    trainingPathId: "00000000-0000-4000-8000-000000000007",
+    trainingPathName: "CAV Básico",
     academicYearId: "00000000-0000-4000-8000-000000000005",
     academicYear: 2027,
     enrollmentPeriodId: "00000000-0000-4000-8000-000000000006",
@@ -63,5 +65,7 @@ describe("EnrollmentApplicationTableRow", () => {
     );
 
     expect(screen.queryByLabelText(/Abrir acciones/)).not.toBeInTheDocument();
+    expect(screen.getByText("CAV Básico")).toBeInTheDocument();
+    expect(screen.queryByText("Plan Básico")).not.toBeInTheDocument();
   });
 });

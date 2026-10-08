@@ -14,4 +14,6 @@ export type Institution = Omit<InstitutionSummary, "city" | "province"> & {
   phoneNumber: string | null;
   email: string | null;
   active: boolean;
+  publicSubdomain: string | null;
+  logoUrl: string | null;
 };

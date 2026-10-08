@@ -1,3 +1,4 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import Link from "next/link";
 import { GitBranchPlusIcon, LibraryBigIcon, PlusIcon } from "lucide-react";
 
@@ -14,6 +15,7 @@ import {
   requirementTypeLabels,
 } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type StudyPlanSpaceDetailProps = {
   space: StudyPlanSpace;
@@ -64,17 +66,12 @@ export function StudyPlanSpaceDetail({
 
       <section aria-labelledby="study-plan-space-configuration-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
         <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <LibraryBigIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="study-plan-space-configuration-title" className="text-base font-semibold">
-                Configuración curricular
-              </h2>
-              <p className="text-muted-foreground text-sm">Consultá la ubicación y las condiciones académicas de este espacio dentro del plan.</p>
-            </div>
-          </div>
+          <SectionHeader
+            icon={LibraryBigIcon}
+            title="Configuración curricular"
+            description="Consultá la ubicación y las condiciones académicas de este espacio dentro del plan."
+            titleId="study-plan-space-configuration-title"
+          />
         </header>
         <dl className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <CurriculumDetailValue label="Carácter" value={requirementTypeLabels[space.requirementType]} />
@@ -85,26 +82,23 @@ export function StudyPlanSpaceDetail({
       </section>
 
       <section aria-labelledby="study-plan-space-prerequisites-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-        <header className="-mx-5 flex flex-col gap-3 border-b px-5 pb-5 sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
-          <div className="flex items-center gap-3.5">
-            <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-              <GitBranchPlusIcon className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="study-plan-space-prerequisites-title" className="text-base font-semibold">
-                Correlatividades
-              </h2>
-              <p className="text-muted-foreground text-sm">Condiciones que deben cumplirse para cursar o aprobar.</p>
-            </div>
-          </div>
-          {canEditCurriculum ? (
-            <Button asChild size="lg">
-              <Link href={`${planPath}/spaces/${space.id}/prerequisites/new`}>
-                <PlusIcon data-icon="inline-start" />
-                Nueva correlatividad
-              </Link>
-            </Button>
-          ) : null}
+        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+          <SectionHeader
+            icon={GitBranchPlusIcon}
+            title="Correlatividades"
+            description="Condiciones que deben cumplirse para cursar o aprobar."
+            titleId="study-plan-space-prerequisites-title"
+            action={
+              canEditCurriculum ? (
+                <Button asChild size="lg">
+                  <Link href={`${planPath}/spaces/${space.id}/prerequisites/new`}>
+                    <PlusIcon data-icon="inline-start" />
+                    Nueva correlatividad
+                  </Link>
+                </Button>
+              ) : null
+            }
+          />
         </header>
         <div className="mt-5 flex flex-col gap-2">
           {prerequisites.length === 0 ? (
@@ -134,7 +128,7 @@ export function StudyPlanSpaceDetail({
 function CurriculumDetailValue({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
     <div className="bg-background rounded-lg border p-4">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</dt>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
       <dd className="mt-1 font-medium">{value}</dd>
     </div>
   );

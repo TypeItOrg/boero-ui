@@ -1,3 +1,6 @@
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
+  requireInstitutionalUser: jest.fn(async () => ({ permissions: [], permissionScopes: {} })),
+}));
 jest.mock("@common/components/ui/data-table-navigation", () => ({
   DataTableNavigationProvider: ({ children }: React.PropsWithChildren): React.ReactElement => <>{children}</>,
 }));

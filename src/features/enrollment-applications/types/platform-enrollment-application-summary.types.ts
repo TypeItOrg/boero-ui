@@ -3,4 +3,6 @@ export type PlatformEnrollmentApplicationSummary = {
   applicationId: string;
   applicantName: string;
   studyPlanName: string;
+  canApproveProvisionally?: boolean;
+  canConfirm?: boolean;
 };

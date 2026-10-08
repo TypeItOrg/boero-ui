@@ -63,6 +63,7 @@ export async function AcademicRouteView({
         <AcademicShell title={config.title} breadcrumb={breadcrumb} actions={<AcademicPageIcon icon={config.createIcon} />}>
           <AcademicCollectionView
             basePath={basePath}
+            canReadWaitlist={access.courseWaitlistRead}
             canCreate={config.canCreate(access)}
             canChangeStatus={config.canChangeStatus(access)}
             canDelete={config.canDelete(access)}

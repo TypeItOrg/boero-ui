@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
+import { requireGenericPlatformHost } from "@common/services/institutional-host/institutional-host.service";
 
 import { platformLoginSchema } from "@features/platform-auth/schemas/platform-login.schema";
 import type { PlatformLoginActionState } from "@features/platform-auth/types/platform-login-action-state.types";
@@ -23,7 +24,10 @@ export async function loginPlatform(_previousState: PlatformLoginActionState, fo
     };
   }
 
-  const output = await loginPlatformAccount(parsed.data, await headers());
+  const requestHeaders = await headers();
+  requireGenericPlatformHost(requestHeaders);
+
+  const output = await loginPlatformAccount(parsed.data, requestHeaders);
 
   if (!output.success) {
     if (output.error.fieldErrors) {

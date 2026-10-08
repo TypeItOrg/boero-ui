@@ -32,6 +32,7 @@ import {
 } from "@features/platform-accounts/utils/platform-account-form.util";
 import { logoutPlatform } from "@features/platform-auth/actions/platform-logout.action";
 import { usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
+import { SectionHeader } from "@common/components/section-header";
 
 const PLATFORM_ACCOUNTS_PATH = "/admin/accounts";
 
@@ -109,15 +110,7 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
 
         <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
           <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-            <div className="flex items-center gap-3.5">
-              <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                <UserRoundCogIcon className="size-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="text-base font-semibold">Identidad y acceso</h2>
-                <p className="text-muted-foreground text-sm">{getSectionDescription(isEdit)}</p>
-              </div>
-            </div>
+            <SectionHeader icon={UserRoundCogIcon} title="Identidad y acceso" description={getSectionDescription(isEdit)} />
           </header>
           <FieldGroup className="mt-5 gap-4">
             <FieldGroup className="grid items-start gap-4 md:grid-cols-2">

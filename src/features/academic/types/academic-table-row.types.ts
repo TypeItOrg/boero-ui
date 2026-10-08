@@ -1,9 +1,10 @@
 export type AcademicTableRow = {
+  scopedActions?: { update: boolean; delete: boolean; restore: boolean; status: boolean; createVersion: boolean; waitlist: boolean };
   id: string;
   institutionId?: string;
   institutionName?: string;
   primaryValue: string;
-  detailValues: readonly string[];
+  detailValues: readonly (string | { value: string | null | undefined; fallback: string })[];
   status: string;
   active: boolean;
   effectiveFrom?: string | null;

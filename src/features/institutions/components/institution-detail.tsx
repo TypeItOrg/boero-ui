@@ -1,7 +1,9 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import type { Institution } from "@features/institutions/types/institution.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionDetailProps = {
   institution: Institution;
@@ -57,23 +59,13 @@ export function InstitutionDetail({ institution }: InstitutionDetailProps): Reac
 }
 
 function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
-  return (
-    <div className="flex items-stretch gap-3.5">
-      <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-        <Icon className="size-5" aria-hidden="true" />
-      </div>
-      <div className="flex min-w-0 flex-col justify-center">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </div>
-    </div>
-  );
+  return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
 function LocationDetail({ label, value }: { label: string; value: string }): React.ReactElement {
   return (
     <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">{label}</dt>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
       <dd className="text-foreground mt-1 text-sm font-medium">{value}</dd>
     </div>
   );
@@ -82,7 +74,7 @@ function LocationDetail({ label, value }: { label: string; value: string }): Rea
 function ContactDetail({ label, value }: { label: string; value: string | null }): React.ReactElement {
   return (
     <div className="min-w-0">
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">{label}</dt>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
       <dd className="text-foreground mt-1 truncate text-sm font-medium">{value?.trim() || "No informado"}</dd>
     </div>
   );

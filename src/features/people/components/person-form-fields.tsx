@@ -10,6 +10,7 @@ import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input
 import type { Person } from "@features/people/types/person.types";
 import type { PersonFormInput } from "@features/people/types/person-form-input.types";
 import { formatBirthDateInput, getLatestAllowedBirthDate, parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type PersonFormFieldsProps = {
   errors: FieldErrors<PersonFormInput>;
@@ -176,15 +177,7 @@ export function PersonCreateFields({ control, errors, register }: PersonCreateFi
 function PersonFormSectionHeading({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
   return (
     <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-      <div className="flex items-center gap-3.5">
-        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <Icon className="size-5" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="text-base font-semibold">{title}</h2>
-          <p className="text-muted-foreground text-sm">{description}</p>
-        </div>
-      </div>
+      <SectionHeader icon={Icon} title={title} description={description} />
     </header>
   );
 }

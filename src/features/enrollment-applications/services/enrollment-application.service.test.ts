@@ -108,57 +108,29 @@ describe("enrollment-application.service administrative queries", () => {
     });
   });
 
-  describe("fetchEnrollmentApplicationTrainingPaths", () => {
-    it("fetches the eligible training paths for the application", async () => {
-      const mockTrainingPaths = [{ id: "tp-1", name: "Guitarra", description: "", active: true, institutionId: "inst-1" }];
-      institutionalApiFetchMock.mockResolvedValue(Response.json(mockTrainingPaths));
-      const { fetchEnrollmentApplicationTrainingPaths } = await importService();
+  describe("fetchEnrollmentApplicationCourses", () => {
+    it("fetches courses directly from the authenticated backend service", async () => {
+      institutionalApiFetchMock.mockResolvedValue(Response.json({ items: [], page: 1, size: 50, totalItems: 0, totalPages: 0 }));
+      const { fetchEnrollmentApplicationCourses } = await importService();
 
-      const result = await fetchEnrollmentApplicationTrainingPaths("app-456");
+      await fetchEnrollmentApplicationCourses("app-456", { page: 1, size: 50, search: "piano" });
 
-      expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications/app-456/training-paths", { method: "GET" });
-      expect(result).toEqual(mockTrainingPaths);
-    });
-
-    it("propagates the error instead of fabricating an empty list on failure", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "No encontrada" }), { status: 404 }));
-      const { fetchEnrollmentApplicationTrainingPaths } = await importService();
-
-      await expect(fetchEnrollmentApplicationTrainingPaths("app-456")).rejects.toThrow("No encontrada");
+      expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications/app-456/courses?page=1&size=50&search=piano", {
+        method: "GET",
+      });
     });
   });
 
-  describe("fetchEnrollmentApplicationStudyPlanSpaces", () => {
-    it("fetches the eligible study plan spaces for the application", async () => {
-      const mockSpaces = [
-        {
-          id: "s-1",
-          studyPlanId: "plan-1",
-          academicSpaceId: "as-1",
-          academicSpaceName: "Práctica de Conjunto",
-          academicLevelId: null,
-          academicLevelName: null,
-          requirementType: "REQUIRED",
-          displayOrder: 1,
-          approvalMode: "PROMOTION",
-          requiresInstrument: false,
-          allowedInstruments: [],
-        },
-      ];
-      institutionalApiFetchMock.mockResolvedValue(Response.json(mockSpaces));
-      const { fetchEnrollmentApplicationStudyPlanSpaces } = await importService();
+  describe("fetchAvailableEnrollmentTrainingPaths", () => {
+    it("fetches only the applicant's available training paths", async () => {
+      institutionalApiFetchMock.mockResolvedValue(Response.json({ items: [], page: 0, size: 20, totalItems: 0, totalPages: 0 }));
+      const { fetchAvailableEnrollmentTrainingPaths } = await importService();
 
-      const result = await fetchEnrollmentApplicationStudyPlanSpaces("app-456");
+      await fetchAvailableEnrollmentTrainingPaths({ page: 0, size: 20 });
 
-      expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications/app-456/study-plan-spaces", { method: "GET" });
-      expect(result).toEqual(mockSpaces);
-    });
-
-    it("propagates the error instead of fabricating an empty list on failure", async () => {
-      institutionalApiFetchMock.mockResolvedValue(new Response(JSON.stringify({ message: "Error del servidor" }), { status: 500 }));
-      const { fetchEnrollmentApplicationStudyPlanSpaces } = await importService();
-
-      await expect(fetchEnrollmentApplicationStudyPlanSpaces("app-456")).rejects.toThrow("Error del servidor");
+      expect(institutionalApiFetchMock).toHaveBeenCalledWith("/api/v1/enrollment-applications/options/training-paths?page=0&size=20", {
+        method: "GET",
+      });
     });
   });
 });

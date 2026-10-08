@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { InstitutionLogoField } from "@features/institutions/components/institution-logo-field";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
+import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
@@ -30,8 +37,8 @@ type InstitutionalInstitutionFormProps = {
 
 export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): React.ReactElement {
   const router = useRouter();
-  const [isPending, startTransition] = React.useTransition();
-  const [formError, setFormError] = React.useState<string>();
+  const destination = getSafeReturnTo(returnTo, "/institution");
+  const [logoChange, setLogoChange] = React.useState<InstitutionLogoChange>({ intent: "keep" });
 
   const initialLocation = React.useMemo(() => getInitialLocation(institution), [institution]);
   const defaultValues = React.useMemo(() => getDefaultValues(institution), [institution]);
@@ -41,37 +48,56 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
     handleSubmit,
     control,
     setError,
+    clearErrors,
     formState: { errors },
   } = useForm<InstitutionalInstitutionFormInput, unknown, InstitutionalInstitutionFormValues>({
     resolver: zodResolver(institutionalInstitutionFormSchema),
     defaultValues,
   });
 
-  function onSubmit(values: InstitutionalInstitutionFormValues): void {
-    setFormError(undefined);
-    const formData = createInstitutionFormData(values);
+  const [state, formAction, isPending] = React.useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
+    const result = await safelyRunAction(
+      updateInstitutionalInstitutionAction(institution.id, formData),
+      INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION,
+    );
 
-    startTransition(async () => {
-      const state = await updateInstitutionalInstitutionAction(institution.id, formData);
-      if (!state.success) {
-        applyServerErrors(state, setError, setFormError);
-        return;
-      }
-      router.push(returnTo);
+    applyServerErrors(result, setError);
+    if (result.logoError) {
+      setError("root.logo", { type: "server", message: result.logoError });
+    }
+
+    if (result.success) {
+      router.push(destination);
+    }
+
+    return result;
+  }, {});
+
+  function onSubmit(values: InstitutionalInstitutionFormValues): void {
+    if (errors.root?.logo?.type === "client") {
+      return;
+    }
+
+    clearErrors();
+    const formData = createInstitutionFormData(values);
+    appendInstitutionLogoChange(formData, logoChange);
+
+    React.startTransition(() => {
+      formAction(formData);
     });
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" noValidate>
-      {formError && (
+      {state.error && (
         <Alert variant="destructive">
           <CircleAlertIcon className="size-4" />
           <AlertTitle>Error al guardar</AlertTitle>
-          <AlertDescription>{formError}</AlertDescription>
+          <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="bg-background flex flex-col gap-6 rounded-xl shadow-xs">
+      <fieldset disabled={isPending} className="bg-background flex min-w-0 flex-col gap-6 rounded-xl shadow-xs">
         <FormCard title="Información general">
           <Field data-invalid={!!errors.name}>
             <FieldContent>
@@ -87,6 +113,20 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
             <FieldError errors={[errors.name]} />
           </Field>
         </FormCard>
+
+        <InstitutionLogoField
+          institutionId={institution.id}
+          institutionName={institution.name}
+          logoUrl={institution.logoUrl}
+          value={logoChange}
+          disabled={isPending}
+          error={errors.root?.logo?.message}
+          onChange={(change) => {
+            clearErrors("root.logo");
+            setLogoChange(change);
+          }}
+          onError={(message) => setError("root.logo", { type: "client", message })}
+        />
 
         <FormCard title="Ubicación">
           <div className="flex flex-col gap-4">
@@ -185,14 +225,27 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
             </Field>
           </FieldGroup>
         </FormCard>
-      </div>
+      </fieldset>
 
       <div className="border-border/40 flex flex-row flex-wrap items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button type="button" variant="outline" size="lg" className="flex-1 sm:flex-none" disabled={isPending} onClick={() => router.push(returnTo)}>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="flex-1 sm:flex-none"
+          disabled={isPending}
+          onClick={() => router.push(destination)}
+        >
           Cancelar
         </Button>
 
-        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          className="flex-1 sm:flex-none"
+          disabled={isPending || errors.root?.logo?.type === "client"}
+          aria-busy={isPending}
+        >
           {isPending ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>

@@ -1,3 +1,5 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { ArrowUpRightIcon, CalendarDaysIcon, CircleAlertIcon, Layers3Icon, LibraryBigIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -10,6 +12,7 @@ import { AcademicSpaceUsagePagination } from "@features/academic/components/acad
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
 import { approvalModeLabels, requirementTypeLabels, studyPlanStatusLabels } from "@features/academic/utils/academic-labels.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type AcademicSpaceUsageProps = {
   basePath: string;
@@ -22,18 +25,13 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
 
   return (
     <section aria-labelledby="academic-space-usage-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-      <header className="border-b pb-5">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-            <LibraryBigIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 id="academic-space-usage-title" className="text-base font-semibold">
-              Uso en planes de estudio
-            </h2>
-            <p className="text-muted-foreground text-sm">Consultá dónde aparece este espacio y qué impacto tiene sobre la estructura curricular.</p>
-          </div>
-        </div>
+      <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
+        <SectionHeader
+          icon={LibraryBigIcon}
+          title="Uso en planes de estudio"
+          description="Consultá dónde aparece este espacio y qué impacto tiene sobre la estructura curricular."
+          titleId="academic-space-usage-title"
+        />
       </header>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -60,7 +58,7 @@ export function AcademicSpaceUsage({ basePath, usage }: AcademicSpaceUsageProps)
             ))}
           </div>
           {plans.totalPages > 1 ? (
-            <div className="mt-5 border-t pt-5">
+            <div className="-mx-5 mt-5 border-t px-5 pt-5 md:-mx-6 md:px-6">
               <AcademicSpaceUsagePagination page={plans.page} size={plans.size} totalItems={plans.totalItems} totalPages={plans.totalPages} />
             </div>
           ) : null}
@@ -86,7 +84,7 @@ export function AcademicSpaceUsageWarning({ blockingPlanCount }: { blockingPlanC
 function UsageMetric({ label, value }: { label: string; value: number }): React.ReactElement {
   return (
     <div className="bg-background rounded-xl border p-4">
-      <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</p>
+      <p className={DETAIL_LABEL_CLASS_NAME}>{label}</p>
       <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
     </div>
   );
@@ -109,14 +107,14 @@ function AcademicSpaceUsagePlanCard({
             <Badge variant={studyPlanStatusVariant(plan.status)}>{studyPlanStatusLabels[plan.status]}</Badge>
             <CardTitle className="mt-2 truncate text-base font-semibold">
               <ReturnToLink href={planHref} className="hover:text-primary transition-colors">
-                {plan.name}
+                {formatStudyPlanName(plan)}
               </ReturnToLink>
             </CardTitle>
             <CardDescription className="mt-1 truncate">{plan.trainingPathName}</CardDescription>
           </div>
           <ReturnToLink
             href={planHref}
-            aria-label={`Ver el plan ${plan.name}`}
+            aria-label={`Ver el plan ${formatStudyPlanLabel(plan)}`}
             className="text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 rounded-lg p-1.5 transition-colors"
           >
             <ArrowUpRightIcon className="size-4" aria-hidden="true" />
@@ -129,10 +127,8 @@ function AcademicSpaceUsagePlanCard({
           <span>{formatPlanValidity(plan.effectiveFrom, plan.effectiveTo)}</span>
         </div>
 
-        <div className="border-t pt-3">
-          <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-            {plan.placements.length === 1 ? "Ubicación curricular" : "Ubicaciones curriculares"}
-          </p>
+        <div className="-mx-(--card-spacing) border-t px-(--card-spacing) pt-3">
+          <p className={`${DETAIL_LABEL_CLASS_NAME} mb-2`}>{plan.placements.length === 1 ? "Ubicación curricular" : "Ubicaciones curriculares"}</p>
           <div className="flex flex-col gap-2">
             {plan.placements.map((placement) => (
               <div key={placement.studyPlanSpaceId} className="bg-muted/40 rounded-lg border p-3">
@@ -162,5 +158,5 @@ function formatPlanValidity(effectiveFrom: string | null, effectiveTo: string | 
   if (!effectiveFrom && !effectiveTo) return "Sin período definido";
   if (effectiveFrom && !effectiveTo) return `Desde ${formatDisplayDate(effectiveFrom)}`;
   if (!effectiveFrom && effectiveTo) return `Hasta ${formatDisplayDate(effectiveTo)}`;
-  return `${formatDisplayDate(effectiveFrom)} — ${formatDisplayDate(effectiveTo)}`;
+  return `Del ${formatDisplayDate(effectiveFrom)} al ${formatDisplayDate(effectiveTo)}`;
 }

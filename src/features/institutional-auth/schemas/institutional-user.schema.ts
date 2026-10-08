@@ -12,6 +12,15 @@ const institutionalUserResponseSchema = z.object({
     institutionId: z.string().min(1),
     roles: z.array(z.string()).default([]),
     permissions: z.array(z.string()).default([]),
+    permissionScopes: z
+      .record(
+        z.string(),
+        z.object({
+          accessScope: z.enum(["INSTITUTION", "TRAINING_PATHS"]),
+          trainingPathIds: z.array(z.string()),
+        }),
+      )
+      .optional(),
   }),
 });
 

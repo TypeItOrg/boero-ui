@@ -46,9 +46,11 @@ describe("logoutInstitutionalAccount", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(new URL("/api/v1/auth/logout", "https://api.example.test"), {
       method: "POST",
-      headers: { Authorization: "Bearer access-token" },
+      headers: expect.any(Headers),
+      signal: expect.any(AbortSignal),
       cache: "no-store",
     });
+    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).get("Authorization")).toBe("Bearer access-token");
   });
 
   it("does not throw when the backend request fails", async () => {

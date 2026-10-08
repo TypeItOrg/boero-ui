@@ -1,27 +1,38 @@
 import type { LucideIcon } from "lucide-react";
 
-import { CardAction, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { SectionHeader } from "@common/components/section-header";
+import { CardHeader } from "@common/components/ui/card";
 
 type EnrollmentStepCardHeaderProps = {
   action?: React.ReactNode;
+  actionClassName?: string;
   description: React.ReactNode;
+  descriptionBreakpoint?: "sm" | "xl";
   icon: LucideIcon;
   title: React.ReactNode;
+  titleId?: string;
 };
 
-export function EnrollmentStepCardHeader({ action, description, icon: Icon, title }: EnrollmentStepCardHeaderProps): React.ReactElement {
+export function EnrollmentStepCardHeader({
+  action,
+  actionClassName,
+  description,
+  descriptionBreakpoint,
+  icon: Icon,
+  title,
+  titleId,
+}: EnrollmentStepCardHeaderProps): React.ReactElement {
   return (
-    <CardHeader className="border-b">
-      <div className="flex items-stretch gap-3.5">
-        <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-          <Icon className="size-5" aria-hidden="true" />
-        </div>
-        <div className="flex min-w-0 flex-col justify-center">
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
-      </div>
-      {action ? <CardAction>{action}</CardAction> : null}
+    <CardHeader className="block border-b">
+      <SectionHeader
+        action={action}
+        actionClassName={actionClassName}
+        description={description}
+        descriptionBreakpoint={descriptionBreakpoint}
+        icon={Icon}
+        title={title}
+        titleId={titleId}
+      />
     </CardHeader>
   );
 }

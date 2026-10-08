@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { ActionForm } from "@common/components/action-form";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { saveTrainingPathAction } from "@features/academic/actions/save-training-path.action";
+import { TrainingPathDocumentFields } from "@features/academic/components/training-path-document-fields";
+import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { getAcademicResourceRoute } from "@features/academic/utils/academic-scope.util";
 import { AcademicFormFields } from "@features/academic/components/academic-form-fields";
 import { PlatformInstitutionFormField } from "@features/academic/components/platform-institution-form-field";
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
@@ -14,6 +22,7 @@ import type { AcademicFormOptions } from "@features/academic/types/academic-form
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type AcademicResourceFormProps = AcademicFormOptions & {
   scope: AcademicScope;
@@ -23,6 +32,9 @@ type AcademicResourceFormProps = AcademicFormOptions & {
   id?: string;
   parentId?: string;
   returnTo: string;
+  documentRequirements?: DocumentRequirement[];
+  canEditDocumentRequirements?: boolean;
+  canManageDocumentCatalog?: boolean;
 };
 
 const initialState: AcademicActionState = {};
@@ -91,24 +103,43 @@ export function AcademicResourceForm({
   id,
   parentId,
   returnTo,
+  documentRequirements,
+  canEditDocumentRequirements = true,
+  canManageDocumentCatalog = false,
   ...options
 }: AcademicResourceFormProps): React.ReactElement {
   const [institution, setInstitution] = useState<InstitutionSummary>();
   const effectiveInstitutionId = institutionId ?? institution?.id;
-  const action = saveAcademicResourceAction.bind(null, scope, institutionId, resource, id, parentId, returnTo);
+  const action =
+    resource === AcademicResource.TRAINING_PATH
+      ? saveTrainingPathAction.bind(null, scope, institutionId, id, returnTo)
+      : saveAcademicResourceAction.bind(null, scope, institutionId, resource, id, parentId, returnTo);
   const [state, formAction, pending] = useActionState(action, initialState);
   const section = FORM_SECTION_COPY[resource];
   const Icon = ACADEMIC_RESOURCE_ICONS[resource];
-  const submitLabel = id ? "Guardar cambios" : CREATE_ACTION_LABELS[resource];
+  const submitLabel = id || state.trainingPathProgress ? "Guardar cambios" : CREATE_ACTION_LABELS[resource];
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
+  const savedTrainingPathHref =
+    state.trainingPathProgress && effectiveInstitutionId
+      ? `${getAcademicResourceRoute(scope, effectiveInstitutionId, AcademicResource.TRAINING_PATH)}/${state.trainingPathProgress.trainingPathId}`
+      : undefined;
+
+  const formRef = useActionFormErrorFocus(state, pending);
 
   return (
-    <form action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
+    <ActionForm ref={formRef} action={formAction} noValidate className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
         {state.error && !hasFieldErrors ? (
           <Alert variant="destructive">
             <AlertTitle>No se pudo guardar</AlertTitle>
-            <AlertDescription>{state.error}</AlertDescription>
+            <AlertDescription>
+              {state.error}
+              {savedTrainingPathHref ? (
+                <ReturnToLink href={savedTrainingPathHref} className="font-medium underline">
+                  Revisar trayecto guardado
+                </ReturnToLink>
+              ) : null}
+            </AlertDescription>
           </Alert>
         ) : null}
 
@@ -127,17 +158,9 @@ export function AcademicResourceForm({
             {...options}
           />
         ) : (
-          <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
-            <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-              <div className="flex items-center gap-3.5">
-                <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-                  <Icon className="size-5" aria-hidden="true" />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold">{section.title}</h2>
-                  <p className="text-muted-foreground text-sm">{section.description}</p>
-                </div>
-              </div>
+          <section className="bg-muted/25 rounded-xl border p-4 sm:p-5 md:p-6">
+            <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5 md:-mx-6 md:px-6">
+              <SectionHeader icon={Icon} title={section.title} description={section.description} />
             </header>
             <div className="mt-5 flex flex-wrap gap-4">
               {allowInstitutionSelection ? (
@@ -154,16 +177,29 @@ export function AcademicResourceForm({
             </div>
           </section>
         )}
+        {resource === AcademicResource.TRAINING_PATH ? (
+          <TrainingPathDocumentFields
+            scope={scope}
+            institutionId={effectiveInstitutionId}
+            pathId={id ?? state.trainingPathProgress?.trainingPathId}
+            canManageCatalog={scope === "admin" || canManageDocumentCatalog}
+            requirements={documentRequirements}
+            canEdit={canEditDocumentRequirements}
+            pending={pending || state.trainingPathSaveUncertain === true}
+            error={state.fieldErrors?.documentRequirements}
+            savedRequirementIds={state.trainingPathProgress?.requirementIds}
+          />
+        ) : null}
       </div>
 
       <div className="bg-background sticky bottom-0 z-10 mt-auto flex flex-row flex-wrap items-center justify-end gap-3">
         <Button asChild type="button" variant="outline" size="lg" className="flex-1 sm:flex-none">
           <Link href={returnTo}>Cancelar</Link>
         </Button>
-        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={pending}>
+        <Button type="submit" size="lg" className="flex-1 sm:flex-none" disabled={pending || state.trainingPathSaveUncertain === true}>
           {pending ? "Guardando…" : submitLabel}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }

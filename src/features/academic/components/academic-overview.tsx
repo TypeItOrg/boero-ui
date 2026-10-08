@@ -8,6 +8,7 @@ import type { AcademicAccess } from "@features/academic/types/academic-access.ty
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { SectionHeader } from "@common/components/section-header";
 
 type AcademicOverviewProps = {
   access: AcademicAccess;
@@ -77,15 +78,7 @@ function AcademicGroup({
   return (
     <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <Icon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold">{title}</h2>
-            <p className="text-muted-foreground text-sm">{description}</p>
-          </div>
-        </div>
+        <SectionHeader icon={Icon} title={title} description={description} />
       </header>
       <div className="mt-5">{children}</div>
     </section>

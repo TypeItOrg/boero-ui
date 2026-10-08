@@ -5,6 +5,7 @@ import type { AsyncDropdownRenderItemState } from "@common/types/async-dropdown-
 
 export type AsyncDropdownProps<TItem> = {
   ariaInvalid?: boolean;
+  "aria-describedby"?: React.AriaAttributes["aria-describedby"];
   "aria-required"?: React.AriaAttributes["aria-required"];
   className?: string;
   contentClassName?: string;
@@ -22,7 +23,12 @@ export type AsyncDropdownProps<TItem> = {
   estimateSize?: number;
   fetchPage: (input: AsyncDropdownFetchPageInput) => Promise<AsyncDropdownPage<TItem>>;
   getItemLabel: (item: TItem) => string;
+  getItemDisplayLabel?: (item: TItem) => string;
+  getItemDescription?: (item: TItem) => string | undefined;
+  getItemGroup?: (item: TItem) => string | undefined;
   getItemValue: (item: TItem) => string;
+  groupOrder?: readonly string[];
+  compareGroups?: (left: string, right: string) => number;
   id?: string;
   listClassName?: string;
   listHeight?: number;

@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { DataTableLoadingOverlay } from "@common/components/ui/data-table-loading-overlay";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
@@ -29,6 +30,7 @@ type AcademicTablePresentationProps = PaginationParams & {
   basePath: string;
   canCreate: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canDelete: boolean;
   canRestore: boolean;
   canChangeStatus: boolean;
@@ -50,6 +52,7 @@ type AcademicTablePresentationProps = PaginationParams & {
 export function AcademicTablePresentation({
   basePath,
   canCreate,
+  canReadWaitlist = false,
   canCreateVersion = false,
   canDelete,
   canRestore,
@@ -94,12 +97,13 @@ export function AcademicTablePresentation({
   }
 
   if (data.items.length === 0) {
-    const isInitialEmptyState = !hasFilters && data.totalItems === 0;
     const allowCreate = !deleted && (canCreate || createAction !== undefined);
+    const isInitialEmptyState = !hasFilters && !deleted && data.totalItems === 0 && allowCreate;
 
     return (
       <div className="relative h-full" aria-busy={isPending}>
         <AcademicTableEmptyState
+          plural={plural}
           hasFilters={hasFilters}
           hasItemsOnOtherPages={data.totalItems > 0}
           showingDeleted={deleted}
@@ -107,9 +111,9 @@ export function AcademicTablePresentation({
           supportingDescription={isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined}
           createAction={
             allowCreate && createAction ? (
-              <div className="mt-6">{createAction}</div>
+              <div>{createAction}</div>
             ) : allowCreate ? (
-              <Button asChild size="lg" className="mt-6">
+              <Button asChild size="lg">
                 <ReturnToLink href={`${basePath}/${resource}/new`}>
                   <PlusIcon data-icon="inline-start" />
                   {`Nuevo ${singular}`}
@@ -118,7 +122,7 @@ export function AcademicTablePresentation({
             ) : null
           }
         />
-        {isPending ? <LoadingOverlay /> : null}
+        {isPending ? <DataTableLoadingOverlay label="Cargando información académica" /> : null}
       </div>
     );
   }
@@ -157,11 +161,12 @@ export function AcademicTablePresentation({
               <AcademicTableRow
                 key={row.id}
                 basePath={global ? `/admin/institutions/${row.institutionId}/academic` : basePath}
-                canChangeStatus={canChangeStatus}
-                canDelete={canDelete}
-                canCreateVersion={canCreateVersion}
-                canRestore={canRestore}
-                canUpdate={canUpdate}
+                canChangeStatus={canChangeStatus && (row.scopedActions?.status ?? true)}
+                canDelete={canDelete && (row.scopedActions?.delete ?? true)}
+                canCreateVersion={canCreateVersion && (row.scopedActions?.createVersion ?? true)}
+                canReadWaitlist={canReadWaitlist && (row.scopedActions?.waitlist ?? true)}
+                canRestore={canRestore && (row.scopedActions?.restore ?? true)}
+                canUpdate={canUpdate && (row.scopedActions?.update ?? true)}
                 columns={columns}
                 global={global}
                 onLifecycleAction={(id, label, kind) => {
@@ -176,7 +181,7 @@ export function AcademicTablePresentation({
             ))}
           </TableBody>
         </Table>
-        {isPending ? <LoadingOverlay /> : null}
+        {isPending ? <DataTableLoadingOverlay label="Cargando información académica" /> : null}
       </div>
       <AcademicTablePagination
         page={page}
@@ -234,12 +239,4 @@ export function AcademicTablePresentation({
 
 function getCurrentPath(pathname: string, queryString: string): string {
   return queryString ? `${pathname}?${queryString}` : pathname;
-}
-
-function LoadingOverlay(): React.ReactElement {
-  return (
-    <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
-      <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando información académica" role="status" />
-    </div>
-  );
 }

@@ -115,7 +115,7 @@ describe("loginPlatform", () => {
     });
   });
 
-  it("sets auth cookies and redirects on success", async () => {
+  it("[A01.platform-flow] sets auth cookies and redirects on success", async () => {
     const tokens = {
       accessToken: "access-token",
       refreshToken: "refresh-token",

@@ -12,6 +12,7 @@ type EnrollmentApplicationStatusBadgeProps = {
 
 const STATUS_CLASSNAMES: Record<EnrollmentApplicationStatus, string> = {
   [ENROLLMENT_APPLICATION_STATUS.DRAFT]: "border-border text-foreground",
+  [ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED]: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
   [ENROLLMENT_APPLICATION_STATUS.SUBMITTED]:
     "bg-amber-500/15 text-amber-700 border-amber-500/20 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30",
   [ENROLLMENT_APPLICATION_STATUS.APPROVED]:

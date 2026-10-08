@@ -2,7 +2,10 @@ import { useState } from "react";
 
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { DropdownOptionContent } from "@common/components/ui/dropdown-option-content";
+import { DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES, DROPDOWN_GROUP_HEADING_CLASS_NAME } from "@common/constants/dropdown-group.constants";
+import { groupDropdownItems } from "@common/utils/dropdown-groups.util";
 import { Textarea } from "@common/components/ui/textarea";
 import type { FormValue } from "@common/types/form-value.types";
 import { cn } from "@common/utils/cn.util";
@@ -26,11 +29,13 @@ type FormFieldProps = React.PropsWithChildren<{
 }>;
 
 type FormSelectProps = {
+  id?: string;
   defaultValue?: string | number;
   disabled?: boolean;
   name: string;
   onValueChange?: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean; group?: string; displayLabel?: string; description?: string }[];
+  groupOrder?: readonly string[];
   placeholder?: string;
   value?: string;
 };
@@ -74,9 +79,11 @@ export function FormField({ label, name, error, className, children, required = 
 
 export function FormSelect({
   name,
+  id,
   defaultValue,
   disabled = false,
   options,
+  groupOrder,
   placeholder,
   value: controlledValue,
   onValueChange,
@@ -85,22 +92,43 @@ export function FormSelect({
   const value = controlledValue ?? internalValue;
   const handleValueChange = onValueChange ?? setInternalValue;
   const selectedOption = options.find((option) => option.value === value);
+  const groups = groupDropdownItems(options, (option) => option.group, groupOrder);
+  const hasRichOptions = options.some((option) => option.displayLabel !== undefined);
 
   return (
     <>
       <input type="hidden" name={name} value={value} />
       <Select disabled={disabled} value={value} onValueChange={handleValueChange}>
-        <SelectTrigger id={name} className="h-9! w-full">
+        <SelectTrigger id={id ?? name} className="w-full">
           <SelectValue placeholder={placeholder}>{selectedOption?.label}</SelectValue>
         </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value} className="px-2.5 py-1.5">
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
+        <SelectContent className={hasRichOptions ? "w-(--radix-select-trigger-width)" : undefined}>
+          {groups.map((group) => (
+            <SelectGroup key={group.label === undefined ? "ungrouped" : `group:${group.label}`} className={group.label ? "px-0" : undefined}>
+              {group.label ? <SelectLabel className={DROPDOWN_GROUP_HEADING_CLASS_NAME}>{group.label}</SelectLabel> : null}
+              {group.items.map((option, index) => (
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  textValue={option.label}
+                  aria-label={option.label}
+                  disabled={option.disabled}
+                  className={cn(
+                    "px-2.5 py-1.5",
+                    option.displayLabel !== undefined && "px-3 *:last:min-w-0",
+                    group.label && index === 0 && DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES.static.first,
+                    group.label && index === group.items.length - 1 && DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES.static.last,
+                  )}
+                >
+                  {option.displayLabel !== undefined ? (
+                    <DropdownOptionContent label={option.displayLabel} description={option.description} />
+                  ) : (
+                    option.label
+                  )}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
         </SelectContent>
       </Select>
     </>

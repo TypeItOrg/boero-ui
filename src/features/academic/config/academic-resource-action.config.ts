@@ -29,6 +29,9 @@ export const ACADEMIC_ACTION_FIELDS = [
   "academicYearId",
   "classes",
   "academicSpaceId",
+  "studyPlanSpaceId",
+  "instrumentId",
+  "format",
   "academicLevelId",
   "requirementType",
   "approvalMode",
@@ -93,6 +96,8 @@ export const RESOURCE_ACTION_CONFIG: Record<AcademicResource, ResourceActionConf
     updatePermission: INSTITUTIONAL_PERMISSION.COURSE_UPDATE,
     updatePath: (base, id) => `${base}/courses/${id}/classes`,
     prepareBody: (data) => ({
+      studyPlanSpaceId: data.studyPlanSpaceId,
+      instrumentId: data.instrumentId,
       studyPlanId: data.studyPlanId,
       academicSpaceId: data.academicSpaceId,
       academicYearId: data.academicYearId,

@@ -1,7 +1,12 @@
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 
 export type EnrollmentApplication = {
+  canApprove?: boolean;
+  canApproveProvisionally?: boolean;
+  canConfirm?: boolean;
+  canReject?: boolean;
   applicationId: string;
   institutionId: string;
   personId: string;
@@ -10,12 +15,17 @@ export type EnrollmentApplication = {
   applicantFirstName: string;
   applicantLastName: string;
   applicantDocumentNumber: string;
-  studyPlanId: string;
-  studyPlanName: string;
+  studyPlanId?: string | null;
+  studyPlanName?: string | null;
+  studyPlanVersion?: number | null;
+  trainingPathId?: string | null;
+  trainingPathName?: string | null;
   data?: Pick<EnrollmentApplicationData, "careerSelection">;
   academicYearId: string;
   academicYear: number;
   enrollmentPeriodId: string;
+  enrollmentPeriod?: EnrollmentPeriod;
+  periodOpen?: boolean;
   status: EnrollmentApplicationStatus;
   isEditable: boolean;
   secondarySchool?: string | null;

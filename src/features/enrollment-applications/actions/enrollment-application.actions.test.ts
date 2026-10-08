@@ -39,8 +39,7 @@ describe("enrollment application mutation actions", () => {
 
     const { startOrGetEnrollmentApplicationAction } = await import("@features/enrollment-applications/actions/enrollment-application.actions");
     const result = await startOrGetEnrollmentApplicationAction({
-      studyPlanId: "00000000-0000-4000-8000-000000000003",
-      academicYearId: "00000000-0000-4000-8000-000000000004",
+      trainingPathId: "00000000-0000-4000-8000-000000000003",
       applicantPersonId: "00000000-0000-4000-8000-000000000005",
     });
 

@@ -9,7 +9,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
   const scope = new URL(request.url).searchParams.get("scope") ?? AcademicScope.INSTITUTIONAL;
 
   if (!isValidUuid(applicationId) || !isValidUuid(attachmentId) || (scope !== AcademicScope.ADMIN && scope !== AcademicScope.INSTITUTIONAL)) {
-    return Response.json({ message: ENROLLMENT_MESSAGES.DOWNLOAD_INPUT_INVALID }, { status: 400 });
+    return Response.json(
+      { message: ENROLLMENT_MESSAGES.DOWNLOAD_INPUT_INVALID },
+      { status: 400, headers: { "cache-control": "private, no-store", "x-content-type-options": "nosniff" } },
+    );
   }
 
   try {
@@ -25,12 +28,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
 
       return new Response(body, {
         status: response.status,
-        headers: { "content-type": response.headers.get("content-type") ?? "application/json" },
+        headers: {
+          "content-type": response.headers.get("content-type") ?? "application/json",
+          "cache-control": "private, no-store",
+          "x-content-type-options": "nosniff",
+        },
       });
     }
 
     const body = await response.arrayBuffer();
-    const headers = new Headers({ "cache-control": "private, no-store" });
+    const headers = new Headers({ "cache-control": "private, no-store", "x-content-type-options": "nosniff" });
     const contentType = response.headers.get("content-type");
     const contentDisposition = response.headers.get("content-disposition");
     const contentLength = response.headers.get("content-length");
@@ -49,6 +56,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
 
     return new Response(body, { status: response.status, headers });
   } catch {
-    return Response.json({ message: ENROLLMENT_MESSAGES.DOWNLOAD_FAILED }, { status: 503 });
+    return Response.json(
+      { message: ENROLLMENT_MESSAGES.DOWNLOAD_FAILED },
+      { status: 503, headers: { "cache-control": "private, no-store", "x-content-type-options": "nosniff" } },
+    );
   }
 }

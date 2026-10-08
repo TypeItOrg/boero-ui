@@ -1,5 +1,6 @@
 "use client";
 
+import { getContextualSearchLabels } from "@features/contextual-search/utils/contextual-search-label.util";
 import * as React from "react";
 import { CircleAlertIcon, SearchIcon, type LucideIcon } from "lucide-react";
 
@@ -124,8 +125,11 @@ export function ContextualSearchContent({
                     <Icon className="size-4" />
                   </span>
                   <span className="grid min-w-0 flex-1 grid-rows-2 gap-0.5">
-                    <span className="truncate font-medium">{item.title}</span>
-                    <ContextualSearchResultMetadata item={item} scope={scope} />
+                    <span className="truncate font-medium">{getContextualSearchLabels(group.entityType, item).title}</span>
+                    <ContextualSearchResultMetadata
+                      item={{ ...item, subtitle: getContextualSearchLabels(group.entityType, item).subtitle }}
+                      scope={scope}
+                    />
                   </span>
                 </CommandItem>
               ))}

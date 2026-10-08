@@ -1,174 +1,126 @@
 "use client";
-
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import * as React from "react";
-import Link from "next/link";
-import { CalendarX2Icon, CheckCircle2Icon, FilePenLineIcon, GraduationCapIcon, Loader2Icon } from "lucide-react";
-import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
+import { CheckIcon, ClipboardPlusIcon, Loader2Icon, RouteIcon } from "lucide-react";
 import { Button } from "@common/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@common/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
+import { Card, CardHeader, CardContent, CardFooter } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { Field, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+import { cn } from "@common/utils/cn.util";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
+import { SectionHeader } from "@common/components/section-header";
 
 export interface EnrollmentStartStudyPlanOption {
   id: string;
   name: string;
   trainingPathName: string;
 }
-
 export interface EnrollmentStartPeriodOption {
   id: string;
   academicYearId: string;
   academicYearNumber: number;
   name: string;
 }
-
-interface EnrollmentStartSelectorProps {
+interface Props {
   studyPlans: EnrollmentStartStudyPlanOption[];
-  periods: EnrollmentStartPeriodOption[];
-  onStart: (selection: { studyPlanId: string; academicYearId: string }) => void;
-  allExcludedByActiveApplication?: boolean;
+  periods?: EnrollmentStartPeriodOption[];
+  onStart: (selection: StartEnrollmentApplicationInput) => void;
   error?: string;
   isStarting?: boolean;
   studyPlanPagination?: React.ReactNode;
-  periodPagination?: React.ReactNode;
+}
+export function formatEnrollmentStartOptionLabel(option: Pick<EnrollmentStartStudyPlanOption, "name" | "trainingPathName">): string {
+  return !option.trainingPathName || option.trainingPathName === option.name ? option.name : `${option.name} · ${option.trainingPathName}`;
 }
 
-export function EnrollmentStartSelector({
-  studyPlans,
-  periods,
-  onStart,
-  allExcludedByActiveApplication = false,
-  error,
-  isStarting = false,
-  studyPlanPagination,
-  periodPagination,
-}: EnrollmentStartSelectorProps): React.ReactElement {
-  const academicYears = [...new Map(periods.map((period) => [period.academicYearId, period])).values()];
-  const [selectedStudyPlan, setSelectedStudyPlan] = React.useState<EnrollmentStartStudyPlanOption | undefined>(studyPlans[0]);
-  const [selectedPeriod, setSelectedPeriod] = React.useState<EnrollmentStartPeriodOption | undefined>(academicYears[0]);
-  const studyPlanId = selectedStudyPlan?.id ?? "";
-  const academicYearId = selectedPeriod?.academicYearId ?? "";
-
-  if (studyPlans.length === 0 && allExcludedByActiveApplication) {
-    return (
-      <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6">
-        <EmptyHeader className="max-w-sm">
-          <EmptyMedia variant="icon">
-            <CheckCircle2Icon className="size-5" aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyTitle className="text-base">Ya tenés una solicitud para todos los trayectos disponibles</EmptyTitle>
-          <EmptyDescription>
-            No podés iniciar otra solicitud para esos trayectos. Podés continuarla o consultar su estado en{" "}
-            <Link href="/my-enrollment-applications">Mis inscripciones</Link>.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
-
-  if ((studyPlans.length === 0 && !studyPlanPagination) || (periods.length === 0 && !periodPagination)) {
-    const hasNoPeriods = periods.length === 0;
-    const Icon = hasNoPeriods ? CalendarX2Icon : GraduationCapIcon;
-
-    return (
-      <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6">
-        <EmptyHeader className="max-w-sm">
-          <EmptyMedia variant="icon">
-            <Icon className="size-5" aria-hidden="true" />
-          </EmptyMedia>
-          <EmptyTitle className="text-base">
-            {hasNoPeriods ? "No hay períodos de inscripción abiertos" : "No hay planes de estudio disponibles"}
-          </EmptyTitle>
-          <EmptyDescription>{hasNoPeriods ? ENROLLMENT_MESSAGES.ENROLLMENT_CLOSED : ENROLLMENT_MESSAGES.NO_ELIGIBLE_PLANS}</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
+export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting = false, studyPlanPagination }: Props): React.ReactElement {
+  const [selectedId, setSelectedId] = React.useState(studyPlans[0]?.id ?? "");
+  const trainingPathId = studyPlans.some((path) => path.id === selectedId) ? selectedId : (studyPlans[0]?.id ?? "");
 
   return (
     <Card className="bg-muted/25">
       <CardHeader className="border-b">
-        <div className="flex items-center gap-3.5">
-          <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-            <FilePenLineIcon className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <CardTitle>Iniciar solicitud de inscripción</CardTitle>
-            <CardDescription>Elegí el plan de estudio y el ciclo lectivo al que querés postularte.</CardDescription>
-          </div>
-        </div>
+        <SectionHeader
+          icon={ClipboardPlusIcon}
+          title="Iniciar solicitud de inscripción"
+          description={
+            <span className="mt-1 text-pretty">
+              Elegí el trayecto formativo al que querés inscribirte. Luego vas a poder consultar los cursos disponibles.
+            </span>
+          }
+        />
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="grid gap-5">
         {error ? (
           <Alert variant="destructive">
             <AlertTitle>No se pudo iniciar la inscripción</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
-        <FieldGroup className="grid gap-4 md:grid-cols-2">
-          <Field className="min-w-0">
-            <FieldLabel htmlFor="startStudyPlan" required>
-              Plan de estudio
-            </FieldLabel>
-            <Select value={studyPlanId} onValueChange={(value) => setSelectedStudyPlan(studyPlans.find((plan) => plan.id === value))}>
-              <SelectTrigger id="startStudyPlan" className="h-9! w-full">
-                <SelectValue placeholder="Seleccioná un plan de estudio">
-                  {selectedStudyPlan ? `${selectedStudyPlan.name} — ${selectedStudyPlan.trainingPathName}` : undefined}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {studyPlans.map((plan) => (
-                    <SelectItem key={plan.id} value={plan.id} className="px-2.5 py-1.5">
-                      {plan.name} — {plan.trainingPathName}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {studyPlans.length === 0 && (
-              <p className="text-muted-foreground text-sm">No hay planes disponibles en esta página. Podés consultar las demás páginas.</p>
-            )}
-            {studyPlanPagination}
-          </Field>
+        {studyPlans.length > 0 ? (
+          <fieldset className="grid gap-4">
+            <legend className="sr-only">Trayectos formativos disponibles</legend>
+            <div className="bg-background divide-y overflow-hidden rounded-lg border">
+              {studyPlans.map((plan) => {
+                const checked = plan.id === trainingPathId;
 
-          <Field className="min-w-0">
-            <FieldLabel htmlFor="startPeriod" required>
-              Ciclo lectivo
-            </FieldLabel>
-            <Select
-              value={academicYearId}
-              onValueChange={(value) => setSelectedPeriod(academicYears.find((period) => period.academicYearId === value))}
-            >
-              <SelectTrigger id="startPeriod" className="h-9! w-full">
-                <SelectValue placeholder="Seleccioná un ciclo lectivo">{selectedPeriod?.academicYearNumber}</SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {academicYears.map((period) => (
-                    <SelectItem key={period.academicYearId} value={period.academicYearId} className="px-2.5 py-1.5">
-                      {period.academicYearNumber}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {periodPagination}
-          </Field>
-        </FieldGroup>
+                return (
+                  <label key={plan.id} className={isStarting ? "block cursor-not-allowed" : "block cursor-pointer"}>
+                    <input
+                      className="peer sr-only"
+                      type="radio"
+                      name="trainingPathId"
+                      value={plan.id}
+                      checked={checked}
+                      disabled={isStarting}
+                      onChange={() => setSelectedId(plan.id)}
+                    />
+                    <span
+                      className={cn(
+                        "peer-focus-visible:ring-ring/50 flex min-h-13 items-center gap-3 px-4 py-3 text-left peer-focus-visible:ring-3 peer-focus-visible:ring-inset",
+                        checked && "bg-muted/60",
+                        isStarting && "opacity-60",
+                      )}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "border-muted-foreground/30 flex size-5 shrink-0 items-center justify-center rounded-full border",
+                          checked && "border-primary bg-primary text-primary-foreground",
+                        )}
+                      >
+                        {checked ? <CheckIcon className="size-3.5" /> : null}
+                      </span>
+                      <span className="min-w-0 flex-1 text-sm font-medium text-pretty">{formatEnrollmentStartOptionLabel(plan)}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            {studyPlanPagination}
+          </fieldset>
+        ) : (
+          <Empty className="bg-background min-h-56 rounded-xl border border-solid p-6">
+            <EmptyHeader className="max-w-md">
+              <EmptyMedia variant="icon">
+                <RouteIcon className="size-5" aria-hidden="true" />
+              </EmptyMedia>
+              <EmptyTitle className="mt-2 text-base">No hay trayectos disponibles</EmptyTitle>
+              <EmptyDescription>No hay trayectos con cursos disponibles para inscribirse en esta página.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
       </CardContent>
-      <CardFooter className="flex justify-end">
+      <CardFooter className="justify-end">
         <Button
+          className="w-full sm:w-auto"
           type="button"
           size="lg"
-          onClick={() => onStart({ studyPlanId, academicYearId })}
-          disabled={isStarting || !studyPlanId || !academicYearId}
+          disabled={isStarting || !trainingPathId}
+          onClick={() => onStart({ trainingPathId })}
         >
           {isStarting ? (
             <>
-              <Loader2Icon data-icon="inline-start" className="animate-spin" />
+              <Loader2Icon className="animate-spin" />
               Iniciando…
             </>
           ) : (

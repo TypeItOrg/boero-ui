@@ -1,4 +1,3 @@
-import { ENROLLMENT_DOCUMENT_TYPE } from "@features/enrollment-applications/types/enrollment-document-type.types";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { z } from "zod";
 import { parseDateInput } from "@common/utils/date-input.util";
@@ -36,8 +35,9 @@ export function calculateAge(birthDate: string | Date | undefined): number | nul
 }
 
 export const startEnrollmentApplicationSchema = z.object({
-  studyPlanId: z.string().uuid(ENROLLMENT_MESSAGES.STUDY_PLAN_ID_INVALID),
-  academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID),
+  enrollmentPeriodId: z.uuid().optional(),
+  trainingPathId: z.string().uuid(ENROLLMENT_MESSAGES.TRAINING_PATH_ID_INVALID),
+  academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID).optional(),
   applicantPersonId: z.string().uuid(ENROLLMENT_MESSAGES.APPLICANT_PERSON_ID_INVALID).optional(),
 });
 
@@ -46,18 +46,52 @@ export const personalDataSchema = z.object({
   firstName: z.string().trim().min(1, ENROLLMENT_MESSAGES.NAME_REQUIRED),
   lastName: z.string().trim().min(1, ENROLLMENT_MESSAGES.LAST_NAME_REQUIRED),
   documentNumber: z.string().trim().min(1, ENROLLMENT_MESSAGES.DOCUMENT_REQUIRED),
-  birthDate: z.string().trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
+  birthDate: z.string({ error: ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED }).trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
   phoneNumber: z.string().trim().nullish(),
   email: z.string().trim().min(1, ENROLLMENT_MESSAGES.EMAIL_REQUIRED).email(ENROLLMENT_MESSAGES.EMAIL_INVALID),
 });
 
-// Paso 2: Escolaridad de Base
-export const academicBackgroundSchema = z.object({
-  secondarySchool: z.string().trim().min(1, ENROLLMENT_MESSAGES.SCHOOL_REQUIRED),
-  currentGradeYear: z.string().trim().optional(),
-  secondaryCompleted: z.boolean().default(false),
-  secondaryDegreeTitle: z.string().trim().optional(),
-});
+const educationLevelSchema = z.enum(["NO_SCHOOLING", "INITIAL", "PRIMARY", "SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"]);
+
+// Paso 2: Escolaridad
+export const academicBackgroundSchema = z
+  .object({
+    secondarySchool: z.string().trim().max(255).nullish(),
+    currentlyStudying: z.boolean().nullable(),
+    educationLevel: educationLevelSchema.nullable(),
+    schoolOrigin: z.string().trim().max(150).nullable(),
+    currentGradeYear: z.string().trim().max(50).nullable(),
+    levelCompleted: z.boolean().nullable(),
+    secondaryCompleted: z.boolean().nullable(),
+    secondaryDegreeTitle: z.string().trim().max(150).nullable(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.currentlyStudying === null) {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.CURRENTLY_STUDYING_REQUIRED, path: ["currentlyStudying"] });
+      return;
+    }
+
+    if (data.educationLevel === null) {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_LEVEL_REQUIRED, path: ["educationLevel"] });
+      return;
+    }
+
+    if (data.currentlyStudying && data.educationLevel === "NO_SCHOOLING") {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.CURRENT_EDUCATION_LEVEL_INVALID, path: ["educationLevel"] });
+    }
+
+    if (data.currentlyStudying && (!data.schoolOrigin || data.schoolOrigin.length === 0)) {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_INSTITUTION_REQUIRED, path: ["schoolOrigin"] });
+    }
+
+    if (!data.currentlyStudying && !["NO_SCHOOLING", "SECONDARY"].includes(data.educationLevel) && data.levelCompleted === null) {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_COMPLETION_REQUIRED, path: ["levelCompleted"] });
+    }
+
+    if (["SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"].includes(data.educationLevel) && data.secondaryCompleted === null) {
+      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.SECONDARY_COMPLETION_REQUIRED, path: ["secondaryCompleted"] });
+    }
+  });
 
 // Paso 3: Salud e Inclusión
 export const healthInclusionSchema = z.object({
@@ -90,24 +124,10 @@ export const careerSelectionSchema = z
   })
   .optional();
 
-// Paso: Espacios Académicos
-export const academicSpaceSelectionSchema = z
-  .object({
-    studyPlanSpaceIds: z.array(z.string().trim()).optional(),
-  })
-  .optional();
-
-// Paso: Instrumentos
-export const instrumentSelectionSchema = z
-  .object({
-    studyPlanSpaceInstrumentIds: z.record(z.string(), z.string()).optional(),
-  })
-  .optional();
-
 // Paso: Adjunto
 export const enrollmentAttachmentSchema = z.object({
   id: z.string(),
-  attachmentType: z.enum(ENROLLMENT_DOCUMENT_TYPE),
+  requirementId: z.string().uuid(),
   originalFileName: z.string(),
   contentType: z.string().optional(),
   size: z.number().optional(),
@@ -115,16 +135,21 @@ export const enrollmentAttachmentSchema = z.object({
   createdAt: z.string().optional(),
 });
 
+const enrollmentCoursesSchema = z.array(z.object({ courseId: z.uuid(), preferredTeacherId: z.uuid().nullable().optional() }));
+
 // Schema para guardar borrador (permite campos incompletos durante el autoguardado)
 export const updateEnrollmentDraftSchema = z.object({
   data: z.object({
     academicBackground: z
       .object({
         secondarySchool: z.string().max(255).optional(),
-        schoolOrigin: z.string().max(255).optional(),
-        currentGradeYear: z.string().max(50).optional(),
-        secondaryCompleted: z.boolean().optional(),
-        secondaryDegreeTitle: z.string().max(255).optional(),
+        currentlyStudying: z.boolean().nullable().optional(),
+        educationLevel: educationLevelSchema.nullable().optional(),
+        schoolOrigin: z.string().max(150).nullable().optional(),
+        currentGradeYear: z.string().max(50).nullable().optional(),
+        levelCompleted: z.boolean().nullable().optional(),
+        secondaryCompleted: z.boolean().nullable().optional(),
+        secondaryDegreeTitle: z.string().max(150).nullable().optional(),
       })
       .optional(),
     healthInclusion: z.object({ receivesReasonableAdjustments: z.boolean().optional(), adjustmentDetails: z.string().optional() }).optional(),
@@ -138,8 +163,7 @@ export const updateEnrollmentDraftSchema = z.object({
       })
       .optional(),
     careerSelection: z.object({ trainingPathId: z.uuid().optional() }).optional(),
-    academicSpaceSelection: z.object({ studyPlanSpaceIds: z.array(z.uuid()).optional() }).optional(),
-    instrumentSelection: z.object({ studyPlanSpaceInstrumentIds: z.record(z.uuid(), z.uuid()).optional() }).optional(),
+    courses: enrollmentCoursesSchema.optional(),
   }),
 });
 
@@ -152,8 +176,7 @@ export const enrollmentApplicationSubmissionSchema = z
     healthInclusion: healthInclusionSchema,
     responsible: responsibleSchema,
     careerSelection: careerSelectionSchema,
-    academicSpaceSelection: academicSpaceSelectionSchema,
-    instrumentSelection: instrumentSelectionSchema,
+    courses: enrollmentCoursesSchema.min(1, ENROLLMENT_MESSAGES.SPACE_REQUIRED),
     preference: preferenceSchema,
     attachments: z.array(enrollmentAttachmentSchema).default([]),
   })

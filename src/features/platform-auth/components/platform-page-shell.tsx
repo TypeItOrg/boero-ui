@@ -33,10 +33,12 @@ export function PlatformPageShell({
           "bg-background flex min-w-0 flex-col gap-4 rounded-xl p-4 shadow-xs @md/page-shell:p-6 @2xl/page-shell:flex-row @2xl/page-shell:items-center @2xl/page-shell:justify-between",
         )}
       >
-        <div className="flex min-w-0 flex-col gap-1">
-          {breadcrumb ? <div>{breadcrumb}</div> : null}
-          <div>
-            <h1 className="text-foreground text-2xl font-semibold tracking-tight @2xl/page-shell:text-3xl">{title}</h1>
+        <div className="flex w-full min-w-0 flex-1 flex-col gap-1">
+          {breadcrumb ? <div className="max-w-full min-w-0">{breadcrumb}</div> : null}
+          <div className="min-w-0">
+            <h1 className="text-foreground text-xl font-semibold tracking-tight break-words @md/page-shell:text-2xl @2xl/page-shell:text-3xl">
+              {title}
+            </h1>
           </div>
         </div>
         {actions ? (

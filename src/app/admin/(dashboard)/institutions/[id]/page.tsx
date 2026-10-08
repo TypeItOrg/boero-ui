@@ -1,3 +1,6 @@
+import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
+import { InstitutionPublicAccessForm } from "@features/institutions/components/institution-public-access-form";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
@@ -84,28 +87,35 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
           <CardContent className="mt-5 p-0">
             <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Estado</dt>
+                <dt className={DETAIL_LABEL_CLASS_NAME}>Estado</dt>
                 <dd className="mt-1.5">
                   <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
                 </dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Slug</dt>
+                <dt className={DETAIL_LABEL_CLASS_NAME}>Slug</dt>
                 <dd className="text-foreground mt-1.5 font-mono text-sm">@{institution.slug}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Ubicación</dt>
+                <dt className={DETAIL_LABEL_CLASS_NAME}>Ubicación</dt>
                 <dd className="text-foreground mt-1.5 text-sm font-medium">
                   {institution.city.name}, {institution.province.name}
                 </dd>
               </div>
               <div>
-                <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">Usuarios</dt>
+                <dt className={DETAIL_LABEL_CLASS_NAME}>Usuarios</dt>
                 <dd className="text-foreground mt-1.5 text-sm font-medium">{userCount}</dd>
               </div>
             </dl>
           </CardContent>
         </Card>
+
+        <InstitutionPublicAccessForm
+          institutionId={id}
+          publicSubdomain={institution.publicSubdomain}
+          baseDomain={process.env.INSTITUTIONAL_BASE_DOMAIN ?? ""}
+        />
+        <InstitutionLogoManager institutionId={id} institutionName={institution.name} logoUrl={institution.logoUrl} scope="platform" canUpdate />
 
         <div
           className={institution.active ? "grid flex-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]" : "flex flex-1 flex-col"}

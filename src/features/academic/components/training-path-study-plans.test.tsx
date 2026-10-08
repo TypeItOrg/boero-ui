@@ -3,7 +3,9 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 jest.mock("@features/academic/components/academic-collection", () => ({
-  AcademicCollectionView: jest.fn(() => <div data-testid="academic-collection-view" />),
+  AcademicCollectionView: jest.fn(({ createAction }: { createAction?: React.ReactNode }) => (
+    <div data-testid="academic-collection-view">{createAction}</div>
+  )),
 }));
 
 import { render, screen } from "@testing-library/react";

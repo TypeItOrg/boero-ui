@@ -5,6 +5,7 @@ import { BuildingIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
+import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 
 type InstitutionsTableEmptyStateProps = {
   active: boolean | undefined;
@@ -37,10 +38,8 @@ export function InstitutionsTableEmptyState({
     );
   } else if (hasFilters) {
     content = (
-      <EmptyState icon={<SearchIcon className="size-5" />} title="No se encontraron resultados">
-        <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">
-          No encontramos ninguna institución que coincida con los criterios de búsqueda seleccionados.
-        </p>
+      <EmptyState icon={<SearchIcon className="size-5" />} title="No se encontraron instituciones">
+        <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">{DATA_TABLE_EMPTY_MESSAGES.FILTERED_DESCRIPTION}</p>
       </EmptyState>
     );
   } else {

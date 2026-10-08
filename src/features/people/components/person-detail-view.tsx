@@ -1,9 +1,12 @@
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { OptionalValue } from "@common/components/optional-value";
 import * as React from "react";
 import { ShieldCheckIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import type { PersonRole } from "@features/people/types/person-role.types";
 import type { Person } from "@features/people/types/person.types";
+import { SectionHeader } from "@common/components/section-header";
 
 type PersonDetailViewProps = {
   person: Person;
@@ -18,12 +21,12 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
           <DetailSectionHeader description="Información principal del usuario institucional." icon={UserRoundIcon} title="Datos personales" />
         </header>
         <dl className="mt-4 grid gap-4 sm:mt-5 sm:grid-cols-2 lg:grid-cols-3">
-          <DetailValue label="Nombre" value={person.firstName} />
-          <DetailValue label="Apellido" value={person.lastName} />
-          <DetailValue label="Documento" value={person.documentNumber} />
-          <DetailValue label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
-          <DetailValue label="Email" value={person.email} />
-          <DetailValue label="Teléfono" value={person.phoneNumber} />
+          <DetailValue fallback="Sin nombre" label="Nombre" value={person.firstName} />
+          <DetailValue fallback="Sin apellido" label="Apellido" value={person.lastName} />
+          <DetailValue fallback="Sin documento" label="Documento" value={person.documentNumber} />
+          <DetailValue fallback="Sin fecha de nacimiento" label="Fecha de nacimiento" value={formatDate(person.birthDate)} />
+          <DetailValue fallback="Sin correo electrónico" label="Email" value={person.email} />
+          <DetailValue fallback="Sin teléfono" label="Teléfono" value={person.phoneNumber} />
         </dl>
       </section>
 
@@ -48,30 +51,24 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
 }
 
 function DetailSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
-  return (
-    <div className="flex items-center gap-3.5">
-      <div className="bg-primary/10 text-primary flex aspect-square min-h-11 min-w-11 shrink-0 items-center justify-center self-stretch rounded-xl">
-        <Icon className="size-5" aria-hidden="true" />
-      </div>
-      <div className="min-w-0">
-        <h2 className="text-base font-semibold">{title}</h2>
-        <p className="text-muted-foreground text-sm">{description}</p>
-      </div>
-    </div>
-  );
+  return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
-function DetailValue({ label, value }: { label: string; value: string | null }): React.ReactElement {
+function DetailValue({ label, value, fallback }: { label: string; value: string | null; fallback: string }): React.ReactElement {
   return (
     <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">{label}</dt>
-      <dd className="mt-1 text-sm font-medium">{value || "—"}</dd>
+      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
+      <dd className="mt-1 text-sm font-medium">
+        <OptionalValue value={value} fallback={fallback} />
+      </dd>
     </div>
   );
 }
 
-function formatDate(value: string | null): string {
-  if (!value) return "—";
+function formatDate(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
 
   const [year, month, day] = value.split("-");
   return year && month && day ? `${day}/${month}/${year}` : value;

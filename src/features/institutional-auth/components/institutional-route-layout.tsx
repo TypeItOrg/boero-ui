@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import { cookies, headers } from "next/headers";
 
+import { SidebarNavigationStateProvider } from "@common/components/navigation/sidebar-navigation-state-provider";
+import { SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES } from "@common/constants/sidebar-navigation.constants";
+import { parseSidebarNavigationGroupStates } from "@common/utils/sidebar-navigation-cookie.util";
 import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
 import { InstitutionalRouteSkeleton } from "@features/institutional-auth/components/institutional-route-skeleton";
 import { filterActiveGuardianDependents } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
@@ -25,20 +28,23 @@ export async function InstitutionalRouteLayout({ children }: InstitutionalRouteL
     canManageDependents(user) ? fetchGuardianDependents(user.institutionId).then(filterActiveGuardianDependents) : Promise.resolve([]),
   ]);
   const sidebarOpen = cookieStore.get("institutional-sidebar-open")?.value !== "false";
+  const sidebarGroupStates = parseSidebarNavigationGroupStates(cookieStore.get(SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES.institutional)?.value);
   const shortcutPlatform = getContextualSearchShortcutPlatform(requestHeaders.get("user-agent"));
   const storedWorkspaceId = await getGuardianWorkspaceId();
   const initialActiveDependentId = resolveGuardianWorkspaceDependent(dependents, storedWorkspaceId)?.dependentPersonId;
 
   return (
-    <InstitutionalShell
-      user={user}
-      institutionName={person?.institutionName}
-      defaultSidebarOpen={sidebarOpen}
-      shortcutPlatform={shortcutPlatform}
-      dependents={dependents}
-      initialActiveDependentId={initialActiveDependentId}
-    >
-      <Suspense fallback={<InstitutionalRouteSkeleton />}>{children}</Suspense>
-    </InstitutionalShell>
+    <SidebarNavigationStateProvider scope="institutional" initialStates={sidebarGroupStates}>
+      <InstitutionalShell
+        user={user}
+        institutionName={person?.institutionName}
+        defaultSidebarOpen={sidebarOpen}
+        shortcutPlatform={shortcutPlatform}
+        dependents={dependents}
+        initialActiveDependentId={initialActiveDependentId}
+      >
+        <Suspense fallback={<InstitutionalRouteSkeleton />}>{children}</Suspense>
+      </InstitutionalShell>
+    </SidebarNavigationStateProvider>
   );
 }

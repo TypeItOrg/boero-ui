@@ -127,7 +127,7 @@ function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitut
           <div className="flex flex-col">
             {institutions.map((institution, index) => (
               <Fragment key={institution.id}>
-                {index > 0 ? <Separator /> : null}
+                {index > 0 ? <Separator className="-mx-5 data-horizontal:w-auto sm:-mx-6" /> : null}
                 <RecentInstitutionRow institution={institution} />
               </Fragment>
             ))}

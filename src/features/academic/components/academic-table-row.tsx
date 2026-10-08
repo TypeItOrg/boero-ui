@@ -1,3 +1,4 @@
+import { OptionalValue } from "@common/components/optional-value";
 import * as React from "react";
 import Link from "next/link";
 
@@ -23,6 +24,7 @@ type AcademicTableRowProps = {
   canChangeStatus: boolean;
   canDelete: boolean;
   canCreateVersion?: boolean;
+  canReadWaitlist?: boolean;
   canRestore: boolean;
   canUpdate: boolean;
   columns: AcademicTableColumns;
@@ -37,6 +39,7 @@ export function AcademicTableRow({
   basePath,
   canChangeStatus,
   canDelete,
+  canReadWaitlist = false,
   canCreateVersion = false,
   canRestore,
   canUpdate,
@@ -49,7 +52,17 @@ export function AcademicTableRow({
 }: AcademicTableRowProps): React.ReactElement {
   const institutionId = row.institutionId ?? "";
   const detailHref = `${basePath}/${resource}/${row.id}`;
-  const actions = getAcademicRowActions(basePath, resource, row, canUpdate, canChangeStatus, canDelete, canRestore, canCreateVersion);
+  const actions = getAcademicRowActions(
+    basePath,
+    resource,
+    row,
+    canUpdate,
+    canChangeStatus,
+    canDelete,
+    canRestore,
+    canCreateVersion,
+    canReadWaitlist,
+  );
 
   function handleStatusAction(action: AcademicStatusAction): void {
     if (action.resource === AcademicResource.ACADEMIC_YEAR) {
@@ -125,7 +138,7 @@ export function AcademicTableRow({
           </TableCell>
           {row.detailValues.map((detail, index) => (
             <TableCell key={`${row.id}-${columns.detailLabels[index]}`} className="text-muted-foreground max-w-96 truncate">
-              {detail}
+              {typeof detail === "string" ? detail : <OptionalValue value={detail.value} fallback={detail.fallback} />}
             </TableCell>
           ))}
           <TableCell>

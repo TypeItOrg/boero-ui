@@ -5,8 +5,6 @@ import Link from "next/link";
 import { AlertCircleIcon, CheckCircle2Icon, ClipboardPlusIcon } from "lucide-react";
 
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { fetchAcademicOffers } from "@features/academic-offers/services/academic-offer.service";
-import { fetchAvailableEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
 import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import { fetchActiveEnrollmentPaths } from "@features/enrollment-applications/services/fetch-active-enrollment-paths.service";
 import { filterActiveGuardianDependents } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
@@ -23,6 +21,7 @@ import { getInstitutionalMetadata } from "@features/institutional-auth/utils/ins
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
+import { fetchAvailableEnrollmentTrainingPaths } from "@features/enrollment-applications/services/enrollment-application.service";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Nueva inscripción");
@@ -35,7 +34,6 @@ export default async function EnrollmentPage({
 }): Promise<React.ReactElement> {
   const query = await searchParams;
   const plansPage = parsePaginationQuery({ page: query.plansPage }, { defaultSize: 20 });
-  const periodsPage = parsePaginationQuery({ page: query.periodsPage }, { defaultSize: 20 });
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);
 
   if (!canStartEnrollmentApplication(user)) {
@@ -86,15 +84,14 @@ export default async function EnrollmentPage({
   }
 
   const applicantPersonId = selectedDependent?.dependentPersonId ?? user.personId ?? undefined;
-  const [plansResponse, periodsResponse, activePaths] = await Promise.all([
-    fetchAcademicOffers(person.institutionId, plansPage),
-    fetchAvailableEnrollmentPeriods(periodsPage),
+  const [plansResponse, activePaths] = await Promise.all([
+    fetchAvailableEnrollmentTrainingPaths(plansPage),
     // Scoped to the applicant: a guardian's list also holds their dependents' applications.
     fetchActiveEnrollmentPaths(person.institutionId, applicantPersonId),
   ]);
 
-  const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.trainingPathId));
-  const hasActiveApplication = activePaths.studyPlanIds.size > 0;
+  const availableStudyPlans = plansResponse.items.filter((plan) => !activePaths.trainingPathIds.has(plan.id));
+  const hasActiveApplication = activePaths.trainingPathIds.size > 0;
   const allExcludedByActiveApplication =
     hasActiveApplication && plansResponse.totalPages <= 1 && plansResponse.items.length > 0 && availableStudyPlans.length === 0;
 
@@ -121,11 +118,10 @@ export default async function EnrollmentPage({
       <EnrollmentStart
         applicantPersonId={selectedDependent?.dependentPersonId}
         studyPlans={availableStudyPlans.map((plan) => ({
-          id: plan.studyPlanId,
-          name: plan.studyPlanName,
-          trainingPathName: plan.trainingPathName,
+          id: plan.id,
+          name: plan.name,
+          trainingPathName: plan.name,
         }))}
-        periods={periodsResponse.items}
         studyPlanPagination={
           plansResponse.totalPages > 1 ? (
             <EnrollmentCatalogPagination
@@ -133,22 +129,10 @@ export default async function EnrollmentPage({
               totalPages={plansResponse.totalPages}
               parameter="plansPage"
               query={query}
-              label="Páginas de planes de estudio"
+              label="Páginas de trayectos formativos"
             />
           ) : undefined
         }
-        periodPagination={
-          periodsResponse.totalPages > 1 ? (
-            <EnrollmentCatalogPagination
-              page={periodsResponse.page}
-              totalPages={periodsResponse.totalPages}
-              parameter="periodsPage"
-              query={query}
-              label="Páginas de ciclos con inscripción abierta"
-            />
-          ) : undefined
-        }
-        allExcludedByActiveApplication={allExcludedByActiveApplication}
       />
     </PlatformPageShell>
   );

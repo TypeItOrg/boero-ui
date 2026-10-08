@@ -1,3 +1,4 @@
+jest.mock("@common/services/institutional-host/institutional-host.service", () => ({ validateRequestInstitutionId: jest.fn(async () => undefined) }));
 jest.mock("@common/services/authenticated-api-fetch.service", () => ({ authenticatedApiFetch: jest.fn() }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(() => {
