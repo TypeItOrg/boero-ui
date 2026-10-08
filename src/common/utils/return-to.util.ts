@@ -12,7 +12,9 @@ export function getSafeReturnTo(value: QueryParamValue, fallback: string): strin
 }
 
 function isInternalPath(value: string): boolean {
-  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return false;
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
+    return false;
+  }
 
   try {
     return new URL(value, "https://return-to.invalid").origin === "https://return-to.invalid";
@@ -23,5 +25,6 @@ function isInternalPath(value: string): boolean {
 
 export function appendReturnTo(path: string, returnTo: string): string {
   const separator = path.includes("?") ? "&" : "?";
+
   return `${path}${separator}returnTo=${encodeURIComponent(returnTo)}`;
 }

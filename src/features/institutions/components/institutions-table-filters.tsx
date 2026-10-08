@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 
 const ACTIVE_FILTER_OPTIONS = [
@@ -14,7 +16,7 @@ type InstitutionsTableFiltersProps = {
   size: number;
 };
 
-export function InstitutionsTableFilters({ active, search, size }: InstitutionsTableFiltersProps): React.ReactElement {
+export function InstitutionsTableFilters({ active, search, size }: InstitutionsTableFiltersProps): ReactElement {
   const activeValue = active === undefined ? "all" : active ? "true" : "false";
   const selectFilters: DataTableSelectFilter<ActiveFilterValue>[] = [
     {

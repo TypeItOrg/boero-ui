@@ -1,10 +1,12 @@
-import * as React from "react";
+import type { ReactElement, ReactNode } from "react";
+
 import { SearchIcon, UsersIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
 import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 
 type PlatformPeopleEmptyStateProps = {
@@ -13,7 +15,7 @@ type PlatformPeopleEmptyStateProps = {
   onFirstPage: () => void;
 };
 
-export function PlatformPeopleEmptyState({ data, hasFilters, onFirstPage }: PlatformPeopleEmptyStateProps): React.ReactElement {
+export function PlatformPeopleEmptyState({ data, hasFilters, onFirstPage }: PlatformPeopleEmptyStateProps): ReactElement {
   if (data.totalItems > 0) {
     return (
       <EmptyState
@@ -48,17 +50,7 @@ export function PlatformPeopleEmptyState({ data, hasFilters, onFirstPage }: Plat
   );
 }
 
-function EmptyState({
-  action,
-  description,
-  icon,
-  title,
-}: {
-  action?: React.ReactNode;
-  description: string;
-  icon: React.ReactNode;
-  title: string;
-}): React.ReactElement {
+function EmptyState({ action, description, icon, title }: { action?: ReactNode; description: string; icon: ReactNode; title: string }): ReactElement {
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
       <EmptyMedia className="mb-4" variant="icon">

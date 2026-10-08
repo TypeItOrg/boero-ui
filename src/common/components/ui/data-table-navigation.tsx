@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { createContext, useCallback, useContext, useTransition, type PropsWithChildren, type ReactElement } from "react";
 
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { useSearchParamNavigation } from "@common/hooks/use-search-param-navigation";
@@ -15,13 +15,13 @@ type DataTableNavigationContextValue = {
   navigate: (updates: Record<string, string | undefined>, options?: NavigateOptions) => void;
 };
 
-const DataTableNavigationContext = React.createContext<DataTableNavigationContextValue | null>(null);
+const DataTableNavigationContext = createContext<DataTableNavigationContextValue | null>(null);
 
-export function DataTableNavigationProvider({ children }: React.PropsWithChildren): React.ReactElement {
+export function DataTableNavigationProvider({ children }: PropsWithChildren): ReactElement {
   const { navigate: navigateToSearchParams } = useSearchParamNavigation();
-  const [isPending, startTransition] = React.useTransition();
+  const [isPending, startTransition] = useTransition();
 
-  const navigate = React.useCallback(
+  const navigate = useCallback(
     (updates: Record<string, string | undefined>, options?: NavigateOptions): void => {
       startTransition(() => navigateToSearchParams(updates, options));
     },
@@ -32,7 +32,7 @@ export function DataTableNavigationProvider({ children }: React.PropsWithChildre
 }
 
 export function useDataTableNavigation(): DataTableNavigationContextValue {
-  const context = React.useContext(DataTableNavigationContext);
+  const context = useContext(DataTableNavigationContext);
 
   if (!context) {
     throw new Error(COMMON_ERROR_MESSAGES.DATA_TABLE_NAVIGATION_CONTEXT);

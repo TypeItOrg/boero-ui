@@ -64,7 +64,9 @@ describe("StudyPlanCurriculumView", () => {
 
     const editAction = screen.getByRole("link", { name: "Editar nivel" });
     const levelHeader = editAction.closest("header");
-    const deleteAction = within(levelHeader as HTMLElement).getByRole("button", { name: "Eliminar" });
+    const deleteAction = within(levelHeader as HTMLElement).getByRole("button", {
+      name: "Eliminar",
+    });
 
     expect(editAction).toHaveAttribute("href", `/study-plans/${STUDY_PLAN_ID}/academic-levels/${LEVEL_ID}/edit`);
     expect(editAction.compareDocumentPosition(deleteAction)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);

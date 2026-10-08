@@ -1,35 +1,29 @@
 "use client";
 
-import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
-import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, useCallback, useEffect, useRef, useState, type ReactElement } from "react";
 
-import { useActionState, useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarRangeIcon, CircleAlertIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
+import { CircleAlertIcon } from "lucide-react";
+
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
-import { DatePicker } from "@common/components/ui/date-picker";
-import { FieldLabel } from "@common/components/ui/field";
-import { Input } from "@common/components/ui/input";
-import { TimeInputWithIcon } from "@common/components/ui/time-input-with-icon";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import { cn } from "@common/utils/cn.util";
-import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
+import { parseDateInput } from "@common/utils/date-input.util";
+
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { createEnrollmentPeriodAction, updateEnrollmentPeriodAction } from "@features/enrollment-periods/actions/enrollment-period.actions";
+import { EnrollmentPeriodDetailsFields } from "@features/enrollment-periods/components/enrollment-period-details-fields";
+import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
 import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
+import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import { getEnrollmentPeriodDateTimeInput } from "@features/enrollment-periods/utils/enrollment-period-date.util";
-import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
-import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
-import { SectionHeader } from "@common/components/section-header";
 
 type EnrollmentPeriodFormProps = {
   initialInstitution?: { id: string; name: string };
@@ -38,7 +32,7 @@ type EnrollmentPeriodFormProps = {
   scope: AcademicScope;
 };
 
-export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, scope }: EnrollmentPeriodFormProps): React.ReactElement {
+export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, scope }: EnrollmentPeriodFormProps): ReactElement {
   const router = useRouter();
   const errorRef = useRef<HTMLDivElement>(null);
   const [offerings, setOfferings] = useState<EnrollmentPeriodOffering[]>(period?.offerings ?? []);
@@ -118,107 +112,25 @@ export function EnrollmentPeriodForm({ initialInstitution, period, returnTo, sco
           </Alert>
         ) : null}
 
-        <section className="bg-muted/25 @container/enrollment-period-form rounded-xl border p-5 @md/enrollment-period-form:p-6">
-          <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-            <SectionHeader
-              icon={CalendarRangeIcon}
-              title="Información del período"
-              description={
-                AcademicScope.isAdmin(scope)
-                  ? "Definí la institución, el ciclo lectivo y las fechas habilitadas para inscribirse."
-                  : "Definí el ciclo lectivo y las fechas habilitadas para inscribirse."
-              }
-            />
-          </header>
-
-          <div className="mt-5 grid gap-5 @2xl/enrollment-period-form:grid-cols-2">
-            {AcademicScope.isAdmin(scope) ? (
-              <div className="grid min-w-0 gap-2">
-                <FieldLabel htmlFor="institutionId" required>
-                  Institución
-                </FieldLabel>
-                <AsyncDropdown<InstitutionSummary>
-                  id="institutionId"
-                  aria-required="true"
-                  value={institution?.id}
-                  selectedLabel={institution?.name}
-                  fetchPage={fetchPlatformInstitutionOptions}
-                  queryKey={["enrollment-period-create-institutions"]}
-                  getItemValue={(item) => item.id}
-                  getItemLabel={(item) => item.name}
-                  onValueChange={(_value, item) => {
-                    setInstitution(item ? { id: item.id, name: item.name } : undefined);
-                    setAcademicYear(undefined);
-                    setOfferings([]);
-                  }}
-                  placeholder="Seleccionar institución"
-                  searchPlaceholder="Buscar institución…"
-                  disabled={isEdit}
-                />
-              </div>
-            ) : null}
-
-            <div className={cn("grid min-w-0 gap-2", !AcademicScope.isAdmin(scope) && "@2xl/enrollment-period-form:col-span-2")}>
-              <FieldLabel htmlFor="academicYearId" required>
-                Ciclo lectivo
-              </FieldLabel>
-              <input type="hidden" name="academicYearId" value={academicYear?.id ?? ""} />
-              <AsyncDropdown<AcademicYear>
-                id="academicYearId"
-                aria-required="true"
-                value={academicYear?.id}
-                selectedLabel={academicYear ? `Ciclo ${academicYear.year}` : undefined}
-                fetchPage={fetchAcademicYears}
-                queryKey={["enrollment-period-create-academic-years", scope, institution?.id]}
-                getItemValue={(item) => item.id}
-                getItemLabel={(item) => `Ciclo ${item.year}`}
-                onValueChange={(_value, item) => setAcademicYear(item ? { id: item.id, year: item.year } : undefined)}
-                placeholder={institution ? "Seleccionar ciclo" : "Seleccioná una institución primero"}
-                searchPlaceholder="Buscar ciclo lectivo…"
-                disabled={!institution || isEdit}
-              />
-            </div>
-
-            <div className="grid gap-2 @2xl/enrollment-period-form:col-span-2">
-              <FieldLabel htmlFor="name" required>
-                Nombre del período
-              </FieldLabel>
-              <Input id="name" name="name" defaultValue={period?.name} placeholder="Ej. Inscripción 2027 · Primer llamado" required />
-            </div>
-
-            <div className="grid min-w-0 gap-2">
-              <FieldLabel htmlFor="startDate" required>
-                Fecha y hora de inicio
-              </FieldLabel>
-              <input type="hidden" name="startDate" value={formatDateInput(startDate)} />
-              <input type="hidden" name="startTime" value={startTime} />
-              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 *:min-w-0">
-                <DatePicker id="startDate" value={startDate} onChange={setStartDate} required autoComplete="off" />
-                <TimeInputWithIcon id="startTime" aria-label="Hora de inicio" value={startTime} onValueChange={setStartTime} required />
-              </div>
-            </div>
-
-            <div className="grid min-w-0 gap-2">
-              <FieldLabel htmlFor="endDate" required>
-                Fecha y hora de fin
-              </FieldLabel>
-              <input type="hidden" name="endDate" value={formatDateInput(endDate)} />
-              <input type="hidden" name="endTime" value={endTime} />
-              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 *:min-w-0">
-                <DatePicker
-                  id="endDate"
-                  value={endDate}
-                  onChange={setEndDate}
-                  required
-                  minDate={startDate}
-                  calendarMinDate={startDate}
-                  autoComplete="off"
-                />
-                <TimeInputWithIcon id="endTime" aria-label="Hora de fin" value={endTime} onValueChange={setEndTime} required />
-              </div>
-            </div>
-          </div>
-        </section>
+        <EnrollmentPeriodDetailsFields
+          scope={scope}
+          institution={institution}
+          setInstitution={setInstitution}
+          setAcademicYear={setAcademicYear}
+          setOfferings={setOfferings}
+          isEdit={isEdit}
+          academicYear={academicYear}
+          fetchAcademicYears={fetchAcademicYears}
+          period={period}
+          startDate={startDate}
+          startTime={startTime}
+          setStartDate={setStartDate}
+          setStartTime={setStartTime}
+          endDate={endDate}
+          endTime={endTime}
+          setEndDate={setEndDate}
+          setEndTime={setEndTime}
+        />
         {institution ? (
           <EnrollmentPeriodOfferings
             operation={isEdit ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE"}

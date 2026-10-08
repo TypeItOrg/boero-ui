@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { SlidersHorizontalIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -12,7 +14,7 @@ type DataTableAdvancedFiltersTriggerProps = {
   labelledBy?: string;
 };
 
-export function DataTableAdvancedFiltersTrigger({ count, label, labelledBy }: DataTableAdvancedFiltersTriggerProps): React.ReactElement {
+export function DataTableAdvancedFiltersTrigger({ count, label, labelledBy }: DataTableAdvancedFiltersTriggerProps): ReactElement {
   return (
     <SheetTrigger asChild>
       <Button type="button" variant="outline" size="lg" className="border-input" aria-labelledby={labelledBy}>

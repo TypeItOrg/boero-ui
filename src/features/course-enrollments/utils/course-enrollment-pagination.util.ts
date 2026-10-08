@@ -1,6 +1,7 @@
 import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
+
 import { ACADEMIC_ENROLLMENT_STATUS, type AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
 

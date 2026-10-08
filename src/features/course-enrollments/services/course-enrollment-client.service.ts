@@ -1,5 +1,6 @@
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
 import { COURSE_ENROLLMENT_MESSAGES, COURSE_ENROLLMENT_OPTIONS_TIMEOUT_MS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 
@@ -9,7 +10,10 @@ export function fetchCourseEnrollmentOptions(courseId: string): Promise<CourseEn
 
 export async function fetchEnrollmentAssignmentOptions(url: string, courseId: string): Promise<CourseEnrollmentAssignmentOptions> {
   try {
-    const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(COURSE_ENROLLMENT_OPTIONS_TIMEOUT_MS) });
+    const response = await fetch(url, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(COURSE_ENROLLMENT_OPTIONS_TIMEOUT_MS),
+    });
 
     if (response.redirected || response.status === 401) {
       throw new Error(COMMON_ERROR_MESSAGES.SESSION_REQUIRED);

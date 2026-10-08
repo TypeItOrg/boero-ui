@@ -37,12 +37,15 @@ export function getRouteAccess(pathname: string, searchParams?: URLSearchParams)
   if (pathname === HEALTH_PROBE_PATH || pathname === `${HEALTH_PROBE_PATH}/`) {
     return RouteAccess.HealthProbe;
   }
+
   if (pathname === PLATFORM_LOGIN_PATH) {
     return RouteAccess.AdminGuestOnly;
   }
+
   if (pathname === INSTITUTIONAL_LOGIN_PATH) {
     return RouteAccess.InstitutionalGuestOnly;
   }
+
   if (INSTITUTIONAL_PUBLIC_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
     return RouteAccess.Public;
   }
@@ -50,9 +53,11 @@ export function getRouteAccess(pathname: string, searchParams?: URLSearchParams)
   if (isPathWithinRoot(pathname, "/api/public") || PUBLIC_API_PATHS.some((pattern) => pattern.test(pathname))) {
     return RouteAccess.Public;
   }
+
   if (ADMIN_SESSION_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
     return RouteAccess.AdminSession;
   }
+
   if (searchParams?.get("scope") === "admin" && LEGACY_SCOPED_API_PATHS.some((pattern) => pattern.test(pathname))) {
     return RouteAccess.AdminSession;
   }

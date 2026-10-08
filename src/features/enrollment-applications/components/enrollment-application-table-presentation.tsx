@@ -1,14 +1,17 @@
 "use client";
 
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { Loader2Icon } from "lucide-react";
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { EnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/enrollment-application-approve-dialog";
 import { EnrollmentApplicationEmptyState } from "@features/enrollment-applications/components/enrollment-application-empty-state";
 import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
@@ -16,8 +19,8 @@ import { EnrollmentApplicationRejectDialog } from "@features/enrollment-applicat
 import { EnrollmentApplicationTableRow } from "@features/enrollment-applications/components/enrollment-application-table-row";
 import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
 import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
 type EnrollmentApplicationTablePresentationProps = {
   data: PaginatedResponse<EnrollmentApplication>;
@@ -39,11 +42,11 @@ export function EnrollmentApplicationTablePresentation({
   canApprove,
   canReject,
   scope,
-}: EnrollmentApplicationTablePresentationProps): React.ReactElement {
+}: EnrollmentApplicationTablePresentationProps): ReactElement {
   const router = useRouter();
   const { isPending: isNavigating } = useDataTableNavigation();
-  const [applicationToApprove, setApplicationToApprove] = React.useState<EnrollmentApplication>();
-  const [applicationToReject, setApplicationToReject] = React.useState<EnrollmentApplication>();
+  const [applicationToApprove, setApplicationToApprove] = useState<EnrollmentApplication>();
+  const [applicationToReject, setApplicationToReject] = useState<EnrollmentApplication>();
 
   function handleApproveDialogOpenChange(open: boolean): void {
     if (!open) {

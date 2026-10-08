@@ -1,26 +1,28 @@
 "use client";
 
-import * as React from "react";
-import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
+import { startTransition, useActionState, type ReactElement, type ReactNode } from "react";
+
 import { useRouter } from "next/navigation";
-import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+
 import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
 import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface EnrollmentStartProps {
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods?: EnrollmentPeriod[];
-  studyPlanPagination?: React.ReactNode;
+  studyPlanPagination?: ReactNode;
 }
 
 type EnrollmentStartState = {
   error?: string;
 };
 
-export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentStartProps): React.ReactElement {
+export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentStartProps): ReactElement {
   const router = useRouter();
-  const [state, startApplication, isStarting] = React.useActionState(
+  const [state, startApplication, isStarting] = useActionState(
     async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
       const result = await startOrGetEnrollmentApplicationAction(input);
 
@@ -36,12 +38,16 @@ export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentS
   );
 
   function handleStart(input: StartEnrollmentApplicationInput): void {
-    React.startTransition(() => startApplication(input));
+    startTransition(() => startApplication(input));
   }
 
   return (
     <EnrollmentStartSelector
-      studyPlans={studyPlans.map((plan) => ({ id: plan.id, name: plan.name, trainingPathName: plan.trainingPathName }))}
+      studyPlans={studyPlans.map((plan) => ({
+        id: plan.id,
+        name: plan.name,
+        trainingPathName: plan.trainingPathName,
+      }))}
       studyPlanPagination={studyPlanPagination}
       error={state.error}
       isStarting={isStarting}

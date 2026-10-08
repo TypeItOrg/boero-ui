@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { InstitutionalSessionsTablePresentation } from "@features/institutional-auth/components/institutional-sessions-table-presentation";
 import type { fetchInstitutionalSessions } from "@features/institutional-auth/services/fetch-institutional-sessions.service";
 
@@ -11,7 +13,7 @@ export async function InstitutionalSessionsTableContainer({
   dataPromise,
   page,
   size,
-}: InstitutionalSessionsTableContainerProps): Promise<React.ReactElement> {
+}: InstitutionalSessionsTableContainerProps): Promise<ReactElement> {
   const data = await dataPromise;
 
   return <InstitutionalSessionsTablePresentation key={`${page}-${size}`} data={data} page={page} size={size} />;

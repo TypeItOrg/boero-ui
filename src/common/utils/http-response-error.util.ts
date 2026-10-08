@@ -11,13 +11,16 @@ export class HttpResponseError extends Error {
 }
 
 export function isHttpResponseError(error: unknown, status?: number): error is HttpResponseError {
-  if (!(error instanceof HttpResponseError)) return false;
+  if (!(error instanceof HttpResponseError)) {
+    return false;
+  }
 
   return status === undefined || error.status === status;
 }
 
 export async function parseHttpResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
   const payload = await parseJson(response);
+
   if (!response.ok) {
     const message = getErrorMessage(payload) ?? fallbackMessage;
     throw new HttpResponseError(message, response.status, response.headers.get("x-request-id") ?? undefined);
@@ -35,9 +38,16 @@ async function parseJson(response: Response): Promise<unknown> {
 }
 
 function getErrorMessage(payload: unknown): string | undefined {
-  if (!payload || typeof payload !== "object" || !("message" in payload)) return undefined;
+  if (!payload || typeof payload !== "object" || !("message" in payload)) {
+    return undefined;
+  }
+
   const message = payload.message;
-  if (typeof message !== "string" || message.length === 0) return undefined;
+
+  if (typeof message !== "string" || message.length === 0) {
+    return undefined;
+  }
+
   return message;
 }
 
@@ -47,7 +57,9 @@ function getErrorMessage(payload: unknown): string | undefined {
  * as null.
  */
 export async function parseNullableHttpResponse<T>(response: Response, fallbackMessage: string): Promise<T | null> {
-  if (response.status === 404) return null;
+  if (response.status === 404) {
+    return null;
+  }
 
   return parseHttpResponse<T>(response, fallbackMessage);
 }

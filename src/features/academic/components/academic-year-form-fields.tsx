@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 
 import { YearSelect } from "@common/components/ui/year-select";
 import { toOptionalFormString } from "@common/utils/form-value.util";
+
 import { DateRangeFields, parseInitialDate } from "@features/academic/components/academic-date-range-fields";
 import { FormField, FormSelect } from "@features/academic/components/academic-form-controls";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { ACADEMIC_YEAR_STATUS } from "@features/academic/types/academic-year-status.types";
 import { academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
-import { getMaxAcademicYear, MIN_ACADEMIC_YEAR } from "@features/academic/utils/academic-year.util";
+import { MIN_ACADEMIC_YEAR, getMaxAcademicYear } from "@features/academic/utils/academic-year.util";
 
 const ACADEMIC_YEAR_STATUS_OPTIONS = ACADEMIC_YEAR_STATUS.filter((status) => status !== "CLOSED").map((status) => ({
   value: status,
   label: academicYearStatusLabels[status],
 }));
 
-export function AcademicYearFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function AcademicYearFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const initialYear = Number(toOptionalFormString(initialValues.year));
   const initialStatus = toOptionalFormString(initialValues.status);
   const [selectedYear, setSelectedYear] = useState<number | undefined>(Number.isInteger(initialYear) ? initialYear : undefined);
@@ -56,7 +57,12 @@ export function AcademicYearFields({ initialValues = {}, fieldErrors }: Academic
         endLabel="Fecha de finalización"
         endName="endDate"
         initialValues={initialValues}
-        controlledRange={{ startDate, endDate, onStartDateChange: setStartDate, onEndDateChange: setEndDate }}
+        controlledRange={{
+          startDate,
+          endDate,
+          onStartDateChange: setStartDate,
+          onEndDateChange: setEndDate,
+        }}
         fieldErrors={fieldErrors}
         disabled={!hasSelectedYear}
         dateFieldsKey={selectedYear}

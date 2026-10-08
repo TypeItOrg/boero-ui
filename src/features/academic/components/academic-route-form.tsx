@@ -1,7 +1,10 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { notFound } from "next/navigation";
 
 import { getQueryParamValue, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
@@ -15,19 +18,20 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 type RouteFormInput = {
   access: AcademicAccess;
   basePath: string;
-  breadcrumb: React.ReactNode;
+  breadcrumb: ReactNode;
   institutionId: string;
   resource: AcademicCollectionResource;
   scope: AcademicScope;
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-export async function renderPrimaryForm(input: RouteFormInput): Promise<React.ReactElement> {
+export async function renderPrimaryForm(input: RouteFormInput): Promise<ReactElement> {
   ensureCreateAccess(input.access, input.resource);
   const collectionPath = `${input.basePath}/${input.resource}`;
   const returnTo = getSafeReturnTo(input.searchParams.returnTo, collectionPath);
   const contextualTrainingPath = await getContextualTrainingPath(input);
   const config = ACADEMIC_COLLECTION_CONFIG[input.resource];
+
   return (
     <AcademicShell
       title={`Nuevo ${config.singular}`}
@@ -39,7 +43,12 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
         scope={input.scope}
         institutionId={input.institutionId}
         initialValues={
-          contextualTrainingPath ? { trainingPathId: contextualTrainingPath.id, trainingPathName: contextualTrainingPath.name } : undefined
+          contextualTrainingPath
+            ? {
+                trainingPathId: contextualTrainingPath.id,
+                trainingPathName: contextualTrainingPath.name,
+              }
+            : undefined
         }
         parentId={contextualTrainingPath?.id}
         resource={input.resource}
@@ -53,20 +62,33 @@ export async function renderPrimaryForm(input: RouteFormInput): Promise<React.Re
 }
 
 async function getContextualTrainingPath(input: RouteFormInput): Promise<Pick<TrainingPath, "id" | "name"> | undefined> {
-  if (input.resource !== AcademicResource.STUDY_PLAN) return undefined;
+  if (input.resource !== AcademicResource.STUDY_PLAN) {
+    return undefined;
+  }
 
   const rawTrainingPathId = getQueryParamValue(input.searchParams.trainingPathId);
-  if (rawTrainingPathId === undefined) return undefined;
+
+  if (rawTrainingPathId === undefined) {
+    return undefined;
+  }
 
   const trainingPathId = parseUuidQueryParam(rawTrainingPathId);
-  if (!trainingPathId) notFound();
+
+  if (!trainingPathId) {
+    notFound();
+  }
 
   const trainingPath = await fetchTrainingPathForStudyPlanCreation(input.scope, input.institutionId, trainingPathId);
-  if (!trainingPath) notFound();
+
+  if (!trainingPath) {
+    notFound();
+  }
 
   return trainingPath;
 }
 
 function ensureCreateAccess(access: AcademicAccess, resource: AcademicCollectionResource): void {
-  if (!ACADEMIC_COLLECTION_CONFIG[resource].canCreate(access)) notFound();
+  if (!ACADEMIC_COLLECTION_CONFIG[resource].canCreate(access)) {
+    notFound();
+  }
 }

@@ -13,6 +13,7 @@ export const AcademicScope = {
 
 export function getAcademicApiBase(scope: AcademicScope, institutionId: string): string {
   const prefix = AcademicScope.isAdmin(scope) ? "/api/v1/admin/institutions" : "/api/v1/institutions";
+
   return `${prefix}/${institutionId}`;
 }
 

@@ -1,12 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+
+import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
+
 jest.mock("@common/components/ui/async-dropdown", () => ({
   AsyncDropdown: jest.fn(() => null),
 }));
-
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
-import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
 
 const mockNavigate = jest.fn();
 
@@ -70,7 +71,12 @@ describe("AcademicTableFilters", () => {
 
     render(
       <AcademicTableFilters
-        academicSpaceFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
+        academicSpaceFilter={{
+          institutionId,
+          scope: "institutional",
+          selectedLabel: undefined,
+          value: undefined,
+        }}
         activeAdvancedCount={0}
         advancedSelectFilters={[
           {
@@ -84,7 +90,12 @@ describe("AcademicTableFilters", () => {
             value: "false",
           },
         ]}
-        cycleFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
+        cycleFilter={{
+          institutionId,
+          scope: "institutional",
+          selectedLabel: undefined,
+          value: undefined,
+        }}
         dateFilters={[]}
         filters={[
           {
@@ -101,7 +112,12 @@ describe("AcademicTableFilters", () => {
         search=""
         searchable
         size={10}
-        studyPlanFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
+        studyPlanFilter={{
+          institutionId,
+          scope: "institutional",
+          selectedLabel: undefined,
+          value: undefined,
+        }}
         yearFilters={[]}
       />,
     );

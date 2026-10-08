@@ -1,8 +1,11 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
+
 import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
 import { InstitutionalProfile } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
@@ -12,9 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Perfil");
 }
 
-export default async function ProfilePage(): Promise<React.ReactElement> {
+export default async function ProfilePage(): Promise<ReactElement> {
   const person = await fetchInstitutionalPerson();
-  if (!person) notFound();
+
+  if (!person) {
+    notFound();
+  }
 
   return (
     <>

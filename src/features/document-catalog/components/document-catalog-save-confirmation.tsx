@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, type RefObject } from "react";
+import { useActionState, type ReactElement, type RefObject } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { CircleAlertIcon, FileTextIcon } from "lucide-react";
 
 import { ActionForm } from "@common/components/action-form";
@@ -16,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
+
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { saveDocumentDefinition } from "@features/document-catalog/actions/save-document-definition.action";
 import type { DocumentCatalogActionState } from "@features/document-catalog/types/document-catalog-action-state.types";
@@ -47,7 +50,7 @@ export function DocumentCatalogSaveConfirmation({
   context?: { id: string; impact: { paths: number; drafts: number } };
   returnTo?: string;
   onResult: (result: DocumentCatalogActionState) => void;
-}): React.ReactElement {
+}): ReactElement {
   const router = useRouter();
   const [state, action, pending] = useActionState(async (previous: DocumentCatalogActionState) => {
     onPendingChange?.(true);

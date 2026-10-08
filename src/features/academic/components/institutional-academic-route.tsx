@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 
 import { AcademicRouteView, type AcademicBreadcrumbOptions } from "@features/academic/components/academic-route-view";
@@ -18,7 +20,7 @@ export function getInstitutionalAcademicMetadata(resource: AcademicCollectionRes
 export async function renderInstitutionalAcademicRoute(
   resource: AcademicCollectionResource,
   { params, searchParams }: InstitutionalAcademicPageProps,
-): Promise<React.ReactElement> {
+): Promise<ReactElement> {
   const [user, resolvedParams, resolvedSearchParams] = await Promise.all([requireInstitutionalUser(), params, searchParams]);
   const segments = [resource, ...(resolvedParams.segments ?? [])];
 

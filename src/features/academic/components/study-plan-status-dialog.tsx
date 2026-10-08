@@ -1,26 +1,26 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, useId, useState, type ReactElement, type ReactNode } from "react";
 
-import * as React from "react";
-import { useActionState, useState } from "react";
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogDescription,
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { cn } from "@common/utils/cn.util";
 import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
+
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -43,7 +43,7 @@ type StudyPlanStatusDialogProps = {
 
 type StatusDialogConfig = {
   actionLabel: string;
-  description: (studyPlanLabel: string) => React.ReactNode;
+  description: (studyPlanLabel: string) => ReactNode;
   icon: typeof CalendarCheckIcon;
   iconClassName: string;
   needsEffectiveTo: boolean;
@@ -96,7 +96,7 @@ export function StudyPlanStatusDialog({
   scope,
   studyPlanLabel,
   targetStatus,
-}: StudyPlanStatusDialogProps): React.ReactElement {
+}: StudyPlanStatusDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     updateAcademicStatusAction.bind(null, scope, institutionId, AcademicResource.STUDY_PLAN, id, returnTo),
     INITIAL_STATE,
@@ -108,10 +108,13 @@ export function StudyPlanStatusDialog({
   const effectiveFromDate = parseDateInput(effectiveFrom);
   const hasInvalidEffectiveTo = effectiveFromDate !== undefined && effectiveTo !== undefined && effectiveTo < effectiveFromDate;
   const effectiveToError = hasInvalidEffectiveTo ? "La fecha final no puede ser anterior al inicio del plan." : state.fieldErrors?.effectiveTo;
-  const effectiveToId = React.useId();
+  const effectiveToId = useId();
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isPending && !nextOpen) {
+      return;
+    }
+
     onOpenChange(nextOpen);
   }
 

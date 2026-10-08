@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { HouseIcon, RefreshCwIcon, ServerCrashIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -23,7 +25,7 @@ export function BlockingError({
   title = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_TITLE,
   description = COMMON_ERROR_MESSAGES.BLOCKING_PAGE_DESCRIPTION,
   homeHref = "/",
-}: BlockingErrorProps): React.ReactElement {
+}: BlockingErrorProps): ReactElement {
   return (
     <main className={cn("bg-muted flex min-h-full flex-1 items-center justify-center p-6", className)}>
       <Card className="bg-background w-full max-w-lg p-6 md:p-8">

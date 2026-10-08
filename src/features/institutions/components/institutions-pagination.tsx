@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { INSTITUTION_PAGE_SIZE_OPTIONS } from "@features/institutions/utils/institution-pagination.util";
 
 type PaginationProps = PaginationParams & {
@@ -20,7 +23,7 @@ export function InstitutionsPagination({
   isPending,
   onPageChange,
   onPageSizeChange,
-}: PaginationProps): React.ReactElement {
+}: PaginationProps): ReactElement {
   const institutionLabel = totalItems === 1 ? "institución registrada." : "instituciones registradas.";
   const summaryLabel = `${totalItems} ${institutionLabel}`;
 

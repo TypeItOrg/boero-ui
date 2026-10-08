@@ -1,6 +1,7 @@
 "use client";
 
-import { SyntheticEvent, useActionState, useTransition } from "react";
+import { SyntheticEvent, useActionState, useTransition, type ReactElement } from "react";
+
 import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
@@ -15,7 +16,7 @@ import type { PlatformLoginActionState } from "@features/platform-auth/types/pla
 
 const INITIAL_STATE: PlatformLoginActionState = {};
 
-export function PlatformLoginForm({ next }: { next?: string }): React.ReactElement {
+export function PlatformLoginForm({ next }: { next?: string }): ReactElement {
   const [state, formAction] = useActionState<PlatformLoginActionState, FormData>(loginPlatform, INITIAL_STATE);
   const [isPending, startTransition] = useTransition();
 

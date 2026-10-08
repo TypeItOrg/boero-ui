@@ -1,12 +1,16 @@
-import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { HTMLAttributes, type ReactElement } from "react";
+
 import Link from "next/link";
+
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import type { Institution } from "@features/institutions/types/institution.types";
 import { SectionHeader } from "@common/components/section-header";
+import { Button } from "@common/components/ui/button";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
+import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
+import type { Institution } from "@features/institutions/types/institution.types";
 
 type InstitutionalInstitutionDetailProps = {
   canUpdate: boolean;
@@ -14,7 +18,7 @@ type InstitutionalInstitutionDetailProps = {
   returnTo: string;
 };
 
-export function InstitutionalInstitutionDetail({ canUpdate, institution, returnTo }: InstitutionalInstitutionDetailProps): React.ReactElement {
+export function InstitutionalInstitutionDetail({ canUpdate, institution, returnTo }: InstitutionalInstitutionDetailProps): ReactElement {
   const address = formatAddress(institution);
 
   return (
@@ -72,7 +76,7 @@ export function InstitutionalInstitutionDetail({ canUpdate, institution, returnT
   );
 }
 
-function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
+function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): ReactElement {
   return (
     <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
       <SectionHeader icon={Icon} title={title} description={description} />
@@ -80,12 +84,12 @@ function InstitutionSectionHeader({ description, icon: Icon, title }: { descript
   );
 }
 
-interface LocationDetailProps extends React.HTMLAttributes<HTMLDivElement> {
+interface LocationDetailProps extends HTMLAttributes<HTMLDivElement> {
   label: string;
   value: string;
 }
 
-function LocationDetail({ label, value, ...props }: LocationDetailProps): React.ReactElement {
+function LocationDetail({ label, value, ...props }: LocationDetailProps): ReactElement {
   return (
     <div {...props}>
       <p className={DETAIL_LABEL_CLASS_NAME}>{label}</p>
@@ -94,7 +98,7 @@ function LocationDetail({ label, value, ...props }: LocationDetailProps): React.
   );
 }
 
-function ContactDetail({ label, value }: { label: string; value: string | null }): React.ReactElement {
+function ContactDetail({ label, value }: { label: string; value: string | null }): ReactElement {
   return (
     <div className="min-w-0">
       <p className={DETAIL_LABEL_CLASS_NAME}>{label}</p>

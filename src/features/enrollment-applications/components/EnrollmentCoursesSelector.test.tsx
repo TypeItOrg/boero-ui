@@ -1,6 +1,6 @@
-import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
+
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
 
@@ -78,6 +78,7 @@ function renderSelector(selectedCourseIds: string[] = [], plainCourse = PLAIN_CO
       />
     </QueryClientProvider>,
   );
+
   return { onToggleCourse, onToggleInstrumentGroup };
 }
 
@@ -99,7 +100,10 @@ describe("EnrollmentCoursesSelector", () => {
   });
 
   it("warns about selected non-instrumental courses without capacity and allows deselection", () => {
-    const { onToggleCourse } = renderSelector(["course-theory"], { ...PLAIN_COURSE, hasCapacity: false });
+    const { onToggleCourse } = renderSelector(["course-theory"], {
+      ...PLAIN_COURSE,
+      hasCapacity: false,
+    });
     expect(screen.getAllByRole("status")).toHaveLength(1);
     fireEvent.click(screen.getByRole("checkbox", { name: /Teoría musical/ }));
     expect(onToggleCourse).toHaveBeenCalledWith("course-theory", false);

@@ -1,5 +1,8 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { FileTextIcon } from "lucide-react";
 import { z } from "zod";
 
@@ -7,6 +10,7 @@ import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { DocumentCatalogReadDetail } from "@features/document-catalog/components/document-catalog-read-detail";
@@ -30,18 +34,21 @@ export async function DocumentCatalogDetailPage({
   scope: AcademicScope;
   params: Promise<{ documentId: string }>;
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const [{ documentId: rawId }, query] = await Promise.all([params, searchParams]);
   const parsedId = z.uuid().safeParse(rawId);
+
   if (!parsedId.success) {
     notFound();
   }
 
   let institutionId: string;
   let canManage: boolean;
+
   if (scope === "admin") {
     await requirePlatformAccount();
     const parsedInstitutionId = z.uuid().safeParse(query.institutionId);
+
     if (!parsedInstitutionId.success) {
       notFound();
     }
@@ -50,6 +57,7 @@ export async function DocumentCatalogDetailPage({
     canManage = true;
   } else {
     const user = await requireInstitutionalUser();
+
     if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)) {
       notFound();
     }
@@ -59,9 +67,11 @@ export async function DocumentCatalogDetailPage({
   }
 
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/document-definitions/${parsedId.data}`);
+
   if (response.status === 404 || response.status === 403) {
     notFound();
   }
+
   if (!response.ok) {
     throw new Error("No se pudo consultar el documento.");
   }

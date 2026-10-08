@@ -1,7 +1,7 @@
-import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { GraduationCapIcon } from "lucide-react";
 
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 import { fetchCourse, fetchCourses } from "@features/academic/services/academic.service";
 import type { AcademicCollectionConfig } from "@features/academic/types/academic-collection-config.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
@@ -9,6 +9,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 import { deletionFilter, toOptions } from "@features/academic/utils/academic-collection-filters.util";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels, courseStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { COURSE_SORT_FIELDS } from "@features/academic/utils/academic-pagination.util";
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 
 export const courseCollectionConfig: AcademicCollectionConfig = {
   resource: AcademicResource.COURSE,
@@ -46,6 +47,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
     deleted,
   }) => {
     const status = courseStatus ?? (active === undefined ? undefined : active ? "ACTIVE" : "INACTIVE");
+
     return fetchCourses(scope, global ? undefined : institutionId, {
       page,
       size,
@@ -64,6 +66,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
   getTitle: (item) => (item as Extract<AcademicCollection, { classes: unknown }>).academicSpaceName,
   filters: ({ active, courseStatus, deleted }) => {
     const status = courseStatus ?? (active === undefined ? undefined : active ? "ACTIVE" : "INACTIVE");
+
     return [
       {
         defaultValue: "all",
@@ -80,6 +83,7 @@ export const courseCollectionConfig: AcademicCollectionConfig = {
     const statusLabel = courseStatusLabels[course.status] ?? (course.active ? "Activo" : "Inactivo");
     const isActive = course.status === "ACTIVE" || (!course.status && course.active);
     const statusValue = course.status ?? (course.active ? "ACTIVE" : "INACTIVE");
+
     return {
       id: course.id,
       institutionId: course.institutionId,

@@ -28,7 +28,10 @@ describe("getSortDirection", () => {
 
 describe("getNextSort", () => {
   it("uses the default direction when sorting a new field", () => {
-    expect(getNextSort({ field: "createdAt", direction: "desc" }, "name")).toEqual({ field: "name", direction: "asc" });
+    expect(getNextSort({ field: "createdAt", direction: "desc" }, "name")).toEqual({
+      field: "name",
+      direction: "asc",
+    });
     expect(getNextSort({ field: "name", direction: "asc" }, "createdAt", "desc")).toEqual({
       field: "createdAt",
       direction: "desc",
@@ -36,8 +39,14 @@ describe("getNextSort", () => {
   });
 
   it("toggles the current field direction", () => {
-    expect(getNextSort({ field: "name", direction: "asc" }, "name")).toEqual({ field: "name", direction: "desc" });
-    expect(getNextSort({ field: "name", direction: "desc" }, "name")).toEqual({ field: "name", direction: "asc" });
+    expect(getNextSort({ field: "name", direction: "asc" }, "name")).toEqual({
+      field: "name",
+      direction: "desc",
+    });
+    expect(getNextSort({ field: "name", direction: "desc" }, "name")).toEqual({
+      field: "name",
+      direction: "asc",
+    });
   });
 });
 

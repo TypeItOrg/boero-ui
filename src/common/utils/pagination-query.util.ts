@@ -66,15 +66,22 @@ function parseSize(value: QueryParamValue, allowedPageSizes: Set<number>, defaul
 
 function parseSearch(value: QueryParamValue): string {
   const rawValue = getQueryParamValue(value);
+
   return rawValue?.trim() ?? "";
 }
 
 function parseInteger(value: QueryParamValue): number | undefined {
   const rawValue = getQueryParamValue(value);
-  if (!rawValue) return undefined;
+
+  if (!rawValue) {
+    return undefined;
+  }
 
   const parsed = Number(rawValue);
-  if (!Number.isInteger(parsed)) return undefined;
+
+  if (!Number.isInteger(parsed)) {
+    return undefined;
+  }
 
   return parsed;
 }

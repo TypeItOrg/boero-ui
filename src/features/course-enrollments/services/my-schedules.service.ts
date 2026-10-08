@@ -1,8 +1,9 @@
 import "server-only";
 
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
 import type { OwnWeeklySchedules } from "@features/course-enrollments/types/own-weekly-schedules.types";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 export async function fetchMyWeeklySchedules(institutionId: string, week: string): Promise<OwnWeeklySchedules> {
   const params = new URLSearchParams({ week });

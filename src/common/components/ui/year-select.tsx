@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
+import type { ComponentProps, ReactElement } from "react";
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { cn } from "@common/utils/cn.util";
 
-type YearSelectProps = Omit<React.ComponentProps<typeof Select>, "children"> & {
+type YearSelectProps = Omit<ComponentProps<typeof Select>, "children"> & {
   allOptionLabel?: string;
   ariaInvalid?: boolean;
   ariaLabelledBy?: string;
@@ -27,7 +27,7 @@ export function YearSelect({
   placeholder = "Seleccionar año",
   value,
   ...props
-}: YearSelectProps): React.ReactElement {
+}: YearSelectProps): ReactElement {
   const years = getDescendingYears(minYear, maxYear);
   const selectedLabel = getSelectedLabel(value, allOptionLabel);
 
@@ -55,11 +55,17 @@ export function YearSelect({
 }
 
 function getSelectedLabel(value: string | undefined, allOptionLabel: string | undefined): string | undefined {
-  if (value === "all") return allOptionLabel;
+  if (value === "all") {
+    return allOptionLabel;
+  }
+
   return value;
 }
 
 function getDescendingYears(minYear: number, maxYear: number): number[] {
-  if (minYear > maxYear) return [];
+  if (minYear > maxYear) {
+    return [];
+  }
+
   return Array.from({ length: maxYear - minYear + 1 }, (_, index) => maxYear - index);
 }

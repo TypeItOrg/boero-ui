@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 
 const ENABLED_FILTER_OPTIONS = [
@@ -14,7 +16,7 @@ type PlatformAccountsTableFiltersProps = {
   size: number;
 };
 
-export function PlatformAccountsTableFilters({ enabled, search, size }: PlatformAccountsTableFiltersProps): React.ReactElement {
+export function PlatformAccountsTableFilters({ enabled, search, size }: PlatformAccountsTableFiltersProps): ReactElement {
   const enabledValue = enabled === undefined ? "all" : enabled ? "true" : "false";
   const selectFilters: DataTableSelectFilter<EnabledFilterValue>[] = [
     {

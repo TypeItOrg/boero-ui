@@ -1,6 +1,5 @@
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
-import type * as ServiceModule from "@features/enrollment-applications/services/enrollment-application.service";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
 const MOCK_APPLICATION: EnrollmentApplicationResponse = {
   applicationId: "app-456",
@@ -138,10 +137,11 @@ describe("enrollment-application.service administrative queries", () => {
 describe("enrollment-application.service institutional queries", () => {
   const enrollmentApplicationApiFetchMock = jest.fn<Promise<Response>, [string, RequestInit?]>();
 
-  async function importInstitutionalService(): Promise<typeof ServiceModule> {
+  async function importInstitutionalService() {
     jest.doMock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
       institutionalApiFetch: enrollmentApplicationApiFetchMock,
     }));
+
     return import("@features/enrollment-applications/services/enrollment-application.service");
   }
 
@@ -196,7 +196,11 @@ describe("enrollment-application.service institutional queries", () => {
     );
 
     const service = await importInstitutionalService();
-    await service.fetchEnrollmentApplications(INSTITUTION_ID, { page: 2, size: 20, status: "SUBMITTED" });
+    await service.fetchEnrollmentApplications(INSTITUTION_ID, {
+      page: 2,
+      size: 20,
+      status: "SUBMITTED",
+    });
 
     const [path] = enrollmentApplicationApiFetchMock.mock.calls[0];
     expect(path).toBe(`/api/v1/institutions/${INSTITUTION_ID}/enrollment-applications?page=2&size=20&sort=createdAt%2Cdesc&status=SUBMITTED`);

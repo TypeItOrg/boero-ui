@@ -1,14 +1,15 @@
 "use client";
 
-import * as React from "react";
+import { forwardRef, useState, type ComponentProps } from "react";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Input } from "@common/components/ui/input";
 import { cn } from "@common/utils/cn.util";
 
-const PasswordInput = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(({ className, ...props }, ref) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+const PasswordInput = forwardRef<HTMLInputElement, ComponentProps<"input">>(({ className, ...props }, ref) => {
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="relative rounded-md">

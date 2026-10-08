@@ -1,8 +1,20 @@
+import type { PropsWithChildren, ReactElement } from "react";
+
+import { render, screen } from "@testing-library/react";
+
+import { AcademicCollectionView } from "@features/academic/components/academic-collection";
+import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
+import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
+import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
+import { fetchCourses, fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
 jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
   requireInstitutionalUser: jest.fn(async () => ({ permissions: [], permissionScopes: {} })),
 }));
 jest.mock("@common/components/ui/data-table-navigation", () => ({
-  DataTableNavigationProvider: ({ children }: React.PropsWithChildren): React.ReactElement => <>{children}</>,
+  DataTableNavigationProvider: ({ children }: PropsWithChildren): ReactElement => <>{children}</>,
 }));
 jest.mock("@features/academic/components/academic-table-filters", () => ({
   AcademicTableFilters: jest.fn(() => <div data-testid="academic-table-filters" />),
@@ -26,16 +38,6 @@ jest.mock("@features/academic/services/academic.service", () => ({
   fetchTrainingPath: jest.fn(),
   fetchTrainingPaths: jest.fn(),
 }));
-
-import { render, screen } from "@testing-library/react";
-
-import { AcademicCollectionView } from "@features/academic/components/academic-collection";
-import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
-import { AcademicTablePresentation } from "@features/academic/components/academic-table-presentation";
-import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
-import { fetchCourses, fetchStudyPlans, fetchTrainingPath } from "@features/academic/services/academic.service";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const STUDY_PLAN_ID = "6f8e2c9a-3b4d-4e5f-a6b7-c8d9e0f1a2b3";
@@ -130,7 +132,9 @@ describe("AcademicCollectionView", () => {
 
     expect(fetchStudyPlans).toHaveBeenCalledWith(AcademicScope.ADMIN, undefined, expect.objectContaining({ institutionId: INSTITUTION_ID }));
     expect(jest.mocked(AcademicTableFilters)).toHaveBeenCalledWith(
-      expect.objectContaining({ institutionFilter: { selectedLabel: "Conservatorio", value: INSTITUTION_ID } }),
+      expect.objectContaining({
+        institutionFilter: { selectedLabel: "Conservatorio", value: INSTITUTION_ID },
+      }),
       undefined,
     );
     expect(jest.mocked(AcademicTablePresentation)).toHaveBeenCalledWith(expect.objectContaining({ createAction, global: true }), undefined);

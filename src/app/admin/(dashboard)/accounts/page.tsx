@@ -1,9 +1,11 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement } from "react";
+
 import { FingerprintIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { PlatformAccountsTableContainer } from "@features/platform-accounts/components/platform-accounts-table-container";
 import { PlatformAccountsTableFilters } from "@features/platform-accounts/components/platform-accounts-table-filters";
 import { PlatformAccountsTableSkeleton } from "@features/platform-accounts/components/platform-accounts-table-skeleton";
@@ -25,7 +27,7 @@ type PlatformAccountsPageProps = {
   searchParams: Promise<PlatformAccountSearchParams>;
 };
 
-export default async function PlatformAccountsPage({ searchParams }: PlatformAccountsPageProps): Promise<React.ReactElement> {
+export default async function PlatformAccountsPage({ searchParams }: PlatformAccountsPageProps): Promise<ReactElement> {
   const { page, size, search, enabled, sort } = parsePlatformAccountPaginationParams(await searchParams);
 
   return (

@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { RouteIcon } from "lucide-react";
 
 import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
@@ -12,7 +14,7 @@ export function DocumentCatalogAssignmentsEmptyState({
   withinReadScope?: boolean;
   hasItemsOnOtherPages?: boolean;
   onFirstPage?: () => void;
-}): React.ReactElement {
+}): ReactElement {
   const title = hasItemsOnOtherPages ? "No hay trayectos en esta página" : "Sin trayectos asignados";
   const description = hasItemsOnOtherPages
     ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION

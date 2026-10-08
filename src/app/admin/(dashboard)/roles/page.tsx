@@ -1,4 +1,5 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement } from "react";
+
 import { PlusIcon, UserLockIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
@@ -6,6 +7,7 @@ import { Button } from "@common/components/ui/button";
 import { DataTableAdvancedFiltersTrigger } from "@common/components/ui/data-table-advanced-filters-trigger";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { Sheet } from "@common/components/ui/sheet";
+
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
@@ -22,7 +24,7 @@ export const metadata = {
   description: "Consultá y administrá los roles de todas las instituciones.",
 };
 
-export default async function PlatformRolesPage({ searchParams }: { searchParams: Promise<PlatformRolesSearchParams> }): Promise<React.ReactElement> {
+export default async function PlatformRolesPage({ searchParams }: { searchParams: Promise<PlatformRolesSearchParams> }): Promise<ReactElement> {
   const params = parsePlatformRolesPaginationParams(await searchParams);
   const rolesPromise = fetchPlatformRoles(params);
   const institutionNamePromise = getInstitutionName(params.institutionId);
@@ -59,7 +61,11 @@ export default async function PlatformRolesPage({ searchParams }: { searchParams
 }
 
 async function getInstitutionName(institutionId: string | undefined): Promise<string | undefined> {
-  if (!institutionId) return undefined;
+  if (!institutionId) {
+    return undefined;
+  }
+
   const institution = await fetchInstitution(institutionId);
+
   return institution?.name;
 }

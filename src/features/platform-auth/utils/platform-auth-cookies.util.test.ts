@@ -1,8 +1,5 @@
-jest.mock("next/headers", () => ({
-  cookies: jest.fn(),
-}));
-
 import { cookies } from "next/headers";
+
 import {
   clearPlatformAuthCookies,
   getPlatformAuthCookieOptions,
@@ -12,6 +9,10 @@ import {
   PLATFORM_REFRESH_TOKEN_MAX_AGE,
   setPlatformAuthCookies,
 } from "@features/platform-auth/utils/platform-auth-cookies.util";
+
+jest.mock("next/headers", () => ({
+  cookies: jest.fn(),
+}));
 
 describe("platform-auth-cookies.util", () => {
   const originalNodeEnv = process.env.NODE_ENV;

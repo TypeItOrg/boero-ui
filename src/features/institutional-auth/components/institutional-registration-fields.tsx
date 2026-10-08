@@ -1,0 +1,139 @@
+"use client";
+
+import type { ReactElement } from "react";
+
+import Link from "next/link";
+
+import { AlertCircleIcon } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { DatePicker } from "@common/components/ui/date-picker";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
+import { Input } from "@common/components/ui/input";
+import { PasswordInput } from "@common/components/ui/password-input";
+import { NumericInput } from "@common/components/ui/restricted-input";
+
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
+import { InstitutionalRegistrationSubmitButton } from "@features/institutional-auth/components/institutional-registration-submit-button";
+import type { InstitutionalRegistrationFieldsProps } from "@features/institutional-auth/types/institutional-registration-fields-props.types";
+import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
+
+export function InstitutionalRegistrationFields({
+  state,
+  institution,
+  setInstitution,
+  isPending,
+  birthDate,
+  setBirthDate,
+}: InstitutionalRegistrationFieldsProps): ReactElement {
+  return (
+    <div className="mt-6 space-y-6">
+      {state.error ? (
+        <Alert variant="destructive">
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>¡Ups! Algo salió mal</AlertTitle>
+          <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <FieldGroup className="gap-6">
+        <InstitutionalAuthInstitutionField
+          id="institution-id"
+          institution={institution}
+          onChange={setInstitution}
+          disabled={isPending}
+          error={state.fieldErrors?.institutionId}
+        />
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Field data-invalid={!!state.fieldErrors?.name}>
+            <FieldLabel htmlFor="register-name" required>
+              Nombre
+            </FieldLabel>
+            <Input aria-invalid={!!state.fieldErrors?.name} autoComplete="given-name" id="register-name" name="name" />
+            <FieldError errors={state.fieldErrors?.name ? [{ message: state.fieldErrors.name }] : undefined} />
+          </Field>
+
+          <Field data-invalid={!!state.fieldErrors?.lastName}>
+            <FieldLabel htmlFor="register-last-name" required>
+              Apellido
+            </FieldLabel>
+            <Input aria-invalid={!!state.fieldErrors?.lastName} autoComplete="family-name" id="register-last-name" name="lastName" />
+            <FieldError errors={state.fieldErrors?.lastName ? [{ message: state.fieldErrors.lastName }] : undefined} />
+          </Field>
+        </div>
+      </FieldGroup>
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Field data-invalid={!!state.fieldErrors?.documentNumber}>
+          <FieldLabel htmlFor="register-document-number" required>
+            Documento
+          </FieldLabel>
+          <NumericInput
+            aria-invalid={!!state.fieldErrors?.documentNumber}
+            autoComplete="username"
+            id="register-document-number"
+            maxLength={8}
+            name="documentNumber"
+          />
+          <FieldError errors={state.fieldErrors?.documentNumber ? [{ message: state.fieldErrors.documentNumber }] : undefined} />
+        </Field>
+
+        <Field data-invalid={!!state.fieldErrors?.birthDate}>
+          <FieldLabel htmlFor="register-birth-date" required>
+            Fecha de nacimiento
+          </FieldLabel>
+          <input name="birthDate" type="hidden" value={formatBirthDateInput(birthDate)} />
+          <DatePicker
+            aria-invalid={!!state.fieldErrors?.birthDate}
+            id="register-birth-date"
+            maxDate={getLatestAllowedBirthDate()}
+            onChange={setBirthDate}
+            value={birthDate}
+          />
+          <FieldError errors={state.fieldErrors?.birthDate ? [{ message: state.fieldErrors.birthDate }] : undefined} />
+        </Field>
+      </div>
+
+      <Field data-invalid={!!state.fieldErrors?.email}>
+        <FieldLabel htmlFor="register-email" required>
+          Email
+        </FieldLabel>
+        <Input aria-invalid={!!state.fieldErrors?.email} autoComplete="email" id="register-email" name="email" type="email" />
+        <FieldError errors={state.fieldErrors?.email ? [{ message: state.fieldErrors.email }] : undefined} />
+      </Field>
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Field data-invalid={!!state.fieldErrors?.password}>
+          <FieldLabel htmlFor="register-password" required>
+            Contraseña
+          </FieldLabel>
+          <PasswordInput aria-invalid={!!state.fieldErrors?.password} autoComplete="new-password" id="register-password" name="password" />
+          <FieldError errors={state.fieldErrors?.password ? [{ message: state.fieldErrors.password }] : undefined} />
+        </Field>
+
+        <Field data-invalid={!!state.fieldErrors?.confirmPassword}>
+          <FieldLabel htmlFor="register-confirm-password" required>
+            Repetir contraseña
+          </FieldLabel>
+          <PasswordInput
+            aria-invalid={!!state.fieldErrors?.confirmPassword}
+            autoComplete="new-password"
+            id="register-confirm-password"
+            name="confirmPassword"
+          />
+          <FieldError errors={state.fieldErrors?.confirmPassword ? [{ message: state.fieldErrors.confirmPassword }] : undefined} />
+        </Field>
+      </div>
+
+      <footer className="mt-6 flex w-full flex-col gap-4">
+        <InstitutionalRegistrationSubmitButton isPending={isPending} />
+        <p className="text-muted-foreground text-center text-sm">
+          ¿Ya tenés una cuenta?{" "}
+          <Link className="text-primary font-medium underline underline-offset-4" href="/auth/login">
+            Iniciar sesión
+          </Link>
+        </p>
+      </footer>
+    </div>
+  );
+}

@@ -23,7 +23,9 @@ describe("institutional home access", () => {
   });
 
   it("keeps creation tasks separate from navigation links", () => {
-    const tasks = getInstitutionalHomeTasks({ permissions: [INSTITUTIONAL_PERMISSION.PERSON_CREATE] });
+    const tasks = getInstitutionalHomeTasks({
+      permissions: [INSTITUTIONAL_PERMISSION.PERSON_CREATE],
+    });
 
     expect(tasks.map(({ href }) => href)).toEqual(["/people/new"]);
   });

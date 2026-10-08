@@ -26,7 +26,10 @@ const institutionalUserResponseSchema = z.object({
 
 export function parseInstitutionalUser(payload: unknown): InstitutionalUser | null {
   const result = institutionalUserResponseSchema.safeParse(payload);
-  if (!result.success) return null;
+
+  if (!result.success) {
+    return null;
+  }
 
   return result.data.user;
 }

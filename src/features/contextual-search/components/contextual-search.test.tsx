@@ -6,6 +6,7 @@ import { ContextualSearch } from "@features/contextual-search/components/context
 import { fetchContextualSearch } from "@features/contextual-search/services/fetch-contextual-search.service";
 import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
 import type { ContextualSearchSummary } from "@features/contextual-search/types/contextual-search-summary.types";
+
 import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 const mockRouter = { push: jest.fn() };

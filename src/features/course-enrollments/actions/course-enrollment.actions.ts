@@ -1,13 +1,17 @@
 "use server";
 
-import { isValidUuid, INVALID_ACTION_ARGUMENTS } from "@common/utils/action-argument.util";
-import { getResponseErrorActionState } from "@common/utils/action-state.util";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
+import { getResponseErrorActionState } from "@common/utils/action-state.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { ACADEMIC_ENROLLMENT_STATUS } from "@features/course-enrollments/types/academic-enrollment-status.types";
+import { type CourseEnrollmentActionResult } from "@features/course-enrollments/types/course-enrollment-action-result.types";
+import { buildAssignmentBody } from "@features/course-enrollments/utils/course-enrollment-assignment-body.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 const allowedAcademicStatuses = new Set<string>([
   ACADEMIC_ENROLLMENT_STATUS.REGULARIZED,
@@ -16,63 +20,13 @@ const allowedAcademicStatuses = new Set<string>([
   ACADEMIC_ENROLLMENT_STATUS.FAILED,
 ]);
 
-type CourseEnrollmentActionResult = { error?: string };
-
-function parseAssignments(value: FormDataEntryValue | null): { classScheduleId: string; individualSlotId: string | null }[] | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(value);
-
-    if (!Array.isArray(parsed)) {
-      return null;
-    }
-
-    if (
-      parsed.some((assignment) => {
-        if (typeof assignment !== "object" || assignment === null) {
-          return true;
-        }
-
-        const classScheduleId = (assignment as { classScheduleId?: unknown }).classScheduleId;
-        const individualSlotId = (assignment as { individualSlotId?: unknown }).individualSlotId;
-
-        return (
-          typeof classScheduleId !== "string" ||
-          !isValidUuid(classScheduleId) ||
-          !(individualSlotId === null || (typeof individualSlotId === "string" && isValidUuid(individualSlotId)))
-        );
-      })
-    ) {
-      return null;
-    }
-
-    return parsed as { classScheduleId: string; individualSlotId: string | null }[];
-  } catch {
-    return null;
-  }
-}
-
-function buildAssignmentBody(
-  formData: FormData,
-): { courseClassId: string; assignments: { classScheduleId: string; individualSlotId: string | null }[] } | null {
-  const courseClassId = formData.get("courseClassId");
-  const assignments = parseAssignments(formData.get("assignments"));
-
-  if (typeof courseClassId !== "string" || !isValidUuid(courseClassId) || !assignments || assignments.length === 0) {
-    return null;
-  }
-
-  return { courseClassId, assignments };
-}
-
 export async function createManualCourseEnrollmentAction(formData: FormData): Promise<CourseEnrollmentActionResult> {
   const rawReturnTo = formData.get("returnTo");
+
   if (rawReturnTo !== null && typeof rawReturnTo !== "string") {
     return { error: INVALID_ACTION_ARGUMENTS };
   }
+
   const returnTo = getSafeReturnTo(rawReturnTo ?? undefined, "/course-enrollments");
   const studentId = formData.get("studentId");
   const courseId = formData.get("courseId");
@@ -133,6 +87,7 @@ export async function enrollApplicationCourseAction(
 
   revalidatePath(`/enrollment-applications/${applicationId}`);
   revalidatePath("/course-enrollments");
+
   return {};
 }
 
@@ -169,6 +124,7 @@ export async function rejectApplicationCourseAction(
   }
 
   revalidatePath(`/enrollment-applications/${applicationId}`);
+
   return {};
 }
 
@@ -202,6 +158,7 @@ export async function withdrawCourseEnrollmentAction(
 
   revalidatePath("/course-enrollments");
   revalidatePath("/my-course-enrollments");
+
   return {};
 }
 
@@ -235,5 +192,6 @@ export async function updateCourseAcademicStatusAction(
 
   revalidatePath("/course-enrollments");
   revalidatePath("/my-course-enrollments");
+
   return {};
 }

@@ -1,27 +1,34 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { Building2Icon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { InstitutionForm } from "@features/institutions/components/institution-form";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 type EditInstitutionPageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
 
-export default async function EditInstitutionPage({ params, searchParams }: EditInstitutionPageProps): Promise<React.ReactElement> {
+export default async function EditInstitutionPage({ params, searchParams }: EditInstitutionPageProps): Promise<ReactElement> {
   const { id } = await params;
   const { returnTo } = await searchParams;
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}`);
   const institution = await fetchInstitution(id);
-  if (!institution) notFound();
+
+  if (!institution) {
+    notFound();
+  }
 
   if (!institution.active) {
     return (
@@ -53,7 +60,7 @@ export default async function EditInstitutionPage({ params, searchParams }: Edit
           <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>
         </Button>
       </div>
-      <InstitutionForm mode="edit" institution={institution} returnTo={destination} />
+      <InstitutionForm mode="edit" institution={institution} returnTo={destination} baseDomain={process.env.INSTITUTIONAL_BASE_DOMAIN ?? ""} />
     </PlatformPageShell>
   );
 }

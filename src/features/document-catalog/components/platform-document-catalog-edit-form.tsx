@@ -1,11 +1,13 @@
 "use client";
 
-import * as React from "react";
+import { useRef, useState, type ReactElement } from "react";
+
 import { Button } from "@common/components/ui/button";
 import { appendReturnTo } from "@common/utils/return-to.util";
+
+import { DocumentCatalogCopyConfirmation } from "@features/document-catalog/components/document-catalog-copy-confirmation";
 import { DocumentCatalogForm } from "@features/document-catalog/components/document-catalog-form";
 import { DocumentCatalogInstitutionField } from "@features/document-catalog/components/document-catalog-institution-field";
-import { DocumentCatalogCopyConfirmation } from "@features/document-catalog/components/document-catalog-copy-confirmation";
 import type { DocumentDefinition } from "@features/document-catalog/types/document-definition.types";
 
 export function PlatformDocumentCatalogEditForm({
@@ -16,11 +18,14 @@ export function PlatformDocumentCatalogEditForm({
   document: DocumentDefinition;
   institutionName: string;
   returnTo: string;
-}): React.ReactElement {
-  const [institution, setInstitution] = React.useState({ id: document.institutionId, name: institutionName });
-  const [pending, setPending] = React.useState(false);
-  const [copyOpen, setCopyOpen] = React.useState(false);
-  const copyButtonRef = React.useRef<HTMLButtonElement>(null);
+}): ReactElement {
+  const [institution, setInstitution] = useState({
+    id: document.institutionId,
+    name: institutionName,
+  });
+  const [pending, setPending] = useState(false);
+  const [copyOpen, setCopyOpen] = useState(false);
+  const copyButtonRef = useRef<HTMLButtonElement>(null);
   const canChangeInstitution = document.canChangeInstitution === true;
   const copyUrl = appendReturnTo(`/admin/documentation/new?copyFrom=${document.id}&sourceInstitutionId=${document.institutionId}`, returnTo);
 

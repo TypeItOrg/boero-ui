@@ -1,17 +1,21 @@
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import type { ReactElement } from "react";
+
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { ClipboardListIcon } from "lucide-react";
-import type { Metadata } from "next";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
-import { fetchPlatformEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
-import { formatEnrollmentApplicationBreadcrumbLabel } from "@features/enrollment-applications/utils/enrollment-application-breadcrumb.util";
+
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { PlatformEnrollmentApplicationResolvePanel } from "@features/enrollment-applications/components/platform-enrollment-application-resolve-panel";
+import { fetchPlatformEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
+import { formatEnrollmentApplicationBreadcrumbLabel } from "@features/enrollment-applications/utils/enrollment-application-breadcrumb.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -26,7 +30,7 @@ type PlatformEnrollmentApplicationDetailPageProps = {
 export default async function PlatformEnrollmentApplicationDetailPage({
   params,
   searchParams,
-}: PlatformEnrollmentApplicationDetailPageProps): Promise<React.ReactElement> {
+}: PlatformEnrollmentApplicationDetailPageProps): Promise<ReactElement> {
   const [{ institutionId, applicationId }, { returnTo }] = await Promise.all([params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/admin/enrollment-applications");
   const application = await fetchPlatformEnrollmentApplicationById(institutionId, applicationId);
@@ -45,7 +49,9 @@ export default async function PlatformEnrollmentApplicationDetailPage({
       breadcrumb={
         <PlatformBreadcrumb
           hiddenSegments={[institutionId]}
-          segmentLabels={{ [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName) }}
+          segmentLabels={{
+            [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName),
+          }}
         />
       }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type ReactElement } from "react";
+
 import { InfoIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -18,7 +19,7 @@ export function TrainingPathDocumentInstructions({
   instructions: string;
   specificInstructions?: string | null;
   className?: string;
-}): React.ReactElement | null {
+}): ReactElement | null {
   const [open, setOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const id = useId();
@@ -36,6 +37,7 @@ export function TrainingPathDocumentInstructions({
 
   function changeOpen(value: boolean): void {
     setOpen(value);
+
     if (value) {
       setTooltipOpen(false);
     }

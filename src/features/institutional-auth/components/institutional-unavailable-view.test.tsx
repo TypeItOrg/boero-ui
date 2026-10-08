@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+
 import { InstitutionalUnavailableView } from "@features/institutional-auth/components/institutional-unavailable-view";
 
 describe("InstitutionalUnavailableView", () => {

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+
 import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 import { platformAccountFormSchema } from "@features/platform-accounts/schemas/platform-account-form.schema";
 import { type PlatformAccountActionState } from "@features/platform-accounts/types/platform-account-action-state.types";
@@ -37,8 +38,12 @@ export async function createPlatformAccountAction(formData: FormData): Promise<P
   });
 
   const errorState = await getResponseErrorActionState(response, PLATFORM_ACCOUNT_FORM_FIELD_NAMES, PLATFORM_ACCOUNT_ERROR_MESSAGES.CREATE_ACCOUNT);
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   revalidatePath(PLATFORM_ACCOUNTS_PATH);
+
   return { success: true };
 }

@@ -1,8 +1,10 @@
+import { Suspense, type ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
+
 import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
 import { InstitutionalSessionsTableContainer } from "@features/institutional-auth/components/institutional-sessions-table-container";
 import { InstitutionalSessionsTableSkeleton } from "@features/institutional-auth/components/institutional-sessions-table-skeleton";
@@ -14,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Sesiones");
 }
 
-export default async function SessionsPage({ searchParams }: { searchParams: Promise<PaginationSearchParams> }): Promise<React.ReactElement> {
+export default async function SessionsPage({ searchParams }: { searchParams: Promise<PaginationSearchParams> }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
   const { page, size } = parseSessionsPaginationParams(resolvedSearchParams);
   const sessionsPromise = fetchInstitutionalSessions({ page, size });

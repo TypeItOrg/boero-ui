@@ -20,6 +20,7 @@ export function getLatestAllowedBirthDate(today = getArgentinaToday()): Date {
 
 export function hasMinimumPersonAge(value: string, today = getArgentinaToday()): boolean {
   const birthDate = parseBirthDateInput(value);
+
   return birthDate !== undefined && birthDate <= getLatestAllowedBirthDate(today);
 }
 

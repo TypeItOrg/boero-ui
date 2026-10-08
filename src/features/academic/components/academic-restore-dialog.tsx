@@ -1,8 +1,10 @@
 "use client";
 
-import { ArchiveRestoreIcon, CircleAlertIcon } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, type ReactElement } from "react";
 
+import { ArchiveRestoreIcon, CircleAlertIcon } from "lucide-react";
+
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,8 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+
 import { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -39,14 +41,17 @@ type AcademicRestoreDialogProps = {
 
 const INITIAL_STATE: AcademicActionState = {};
 
-export function AcademicRestoreDialog(props: AcademicRestoreDialogProps): React.ReactElement {
+export function AcademicRestoreDialog(props: AcademicRestoreDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     restoreAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
   );
 
   function handleOpenChange(open: boolean): void {
-    if (isPending && !open) return;
+    if (isPending && !open) {
+      return;
+    }
+
     props.onOpenChange(open);
   }
 

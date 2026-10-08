@@ -1,18 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { z } from "zod";
 
 import { getFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
+import { passkeyLabelSchema } from "@features/institutional-auth/schemas/passkey-label.schema";
+import { reAuthenticate } from "@features/institutional-auth/services/re-authenticate.service";
 import { renamePasskey } from "@features/institutional-auth/services/rename-passkey.service";
 import { revokePasskey } from "@features/institutional-auth/services/revoke-passkey.service";
-import { reAuthenticate } from "@features/institutional-auth/services/re-authenticate.service";
-import { passkeyLabelSchema } from "@features/institutional-auth/schemas/passkey-label.schema";
+import type { ReAuthenticateState } from "@features/institutional-auth/types/re-authenticate-state.types";
 import type { RenamePasskeyState } from "@features/institutional-auth/types/rename-passkey-state.types";
 import type { RevokePasskeyState } from "@features/institutional-auth/types/revoke-passkey-state.types";
-import type { ReAuthenticateState } from "@features/institutional-auth/types/re-authenticate-state.types";
 
 const LABEL_FIELD_NAMES = ["label"] as const;
 const idSchema = z.object({ id: z.string().min(1) });
@@ -37,6 +39,7 @@ export async function renamePasskeyAction(id: string, _previousState: RenamePass
   }
 
   revalidatePath("/account/passkeys");
+
   return { success: true };
 }
 
@@ -58,6 +61,7 @@ export async function revokePasskeyAction(id: string): Promise<RevokePasskeyStat
   }
 
   revalidatePath("/account/passkeys");
+
   return { success: true };
 }
 
@@ -74,6 +78,7 @@ export async function reAuthenticateAction(_previousState: ReAuthenticateState, 
     if (error instanceof Error && error.message) {
       return { error: error.message };
     }
+
     return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REAUTH_INVALID_PASSWORD };
   }
 

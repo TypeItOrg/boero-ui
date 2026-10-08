@@ -1,4 +1,7 @@
+import type { ReactElement } from "react";
+
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicPageIcon } from "@features/academic/components/academic-shell";
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
@@ -13,7 +16,7 @@ export function PlatformAcademicFormPage({
 }: {
   resource: AcademicCollectionResource;
   returnTo?: string | string[];
-}): React.ReactElement {
+}): ReactElement {
   const config = ACADEMIC_COLLECTION_CONFIG[resource];
   const collectionPath = `/admin/${resource}`;
 

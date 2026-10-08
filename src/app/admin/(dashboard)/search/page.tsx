@@ -1,7 +1,10 @@
+import type { ReactElement } from "react";
+
 import { SearchIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+
 import { ContextualSearchPagination } from "@features/contextual-search/components/contextual-search-pagination";
 import { ContextualSearchResultsTable } from "@features/contextual-search/components/contextual-search-results-table";
 import { CONTEXTUAL_SEARCH_PRESENTATION, isAcademicSearchEntity } from "@features/contextual-search/config/contextual-search.config";
@@ -15,7 +18,7 @@ export default async function AdminSearchPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const rawParams = await searchParams;
   const requestedType = typeof rawParams.type === "string" ? rawParams.type : undefined;
   const entityType = isAcademicSearchEntity(requestedType) ? requestedType : undefined;

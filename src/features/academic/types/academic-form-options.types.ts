@@ -1,10 +1,11 @@
 import type { FormValue } from "@common/types/form-value.types";
+
 import type { AcademicLevel } from "@features/academic/types/academic-level.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
+import type { StudyPlanSpaceInstrumentOption } from "@features/academic/types/study-plan-space-instrument-option.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import type { StudyPlanSpaceInstrumentOption } from "@features/academic/types/study-plan-space-instrument-option.types";
 
 export type AcademicFormOptions = {
   academicSpaces?: AcademicSpace[];

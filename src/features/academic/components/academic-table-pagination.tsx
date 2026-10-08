@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { ACADEMIC_PAGE_SIZE_OPTIONS, getAcademicRegistrationSummary } from "@features/academic/utils/academic-pagination.util";
 
 type AcademicTablePaginationProps = PaginationParams & {
@@ -24,7 +27,7 @@ export function AcademicTablePagination({
   totalPages,
   onPageChange,
   onPageSizeChange,
-}: AcademicTablePaginationProps): React.ReactElement {
+}: AcademicTablePaginationProps): ReactElement {
   return (
     <DataTablePagination
       page={page}

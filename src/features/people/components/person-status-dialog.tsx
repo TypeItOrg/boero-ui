@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, useTransition, type MouseEvent, type ReactElement } from "react";
+
 import { CircleAlertIcon, UserCheckIcon, UserXIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -16,6 +17,7 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { cn } from "@common/utils/cn.util";
 import { safelyRunAction } from "@common/utils/safe-action.util";
+
 import { updatePersonStatusAction } from "@features/people/actions/update-person-status.action";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 
@@ -37,26 +39,34 @@ export function PersonStatusDialog({
   open,
   onOpenChange,
   onUpdated,
-}: PersonStatusDialogProps): React.ReactElement {
-  const [isPending, startTransition] = React.useTransition();
-  const [error, setError] = React.useState<string>();
+}: PersonStatusDialogProps): ReactElement {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string>();
   const nextEnabled = !enabled;
   const actionLabel = nextEnabled ? "Activar usuario" : "Desactivar usuario";
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
-    if (!nextOpen) setError(undefined);
+    if (isPending && !nextOpen) {
+      return;
+    }
+
+    if (!nextOpen) {
+      setError(undefined);
+    }
+
     onOpenChange(nextOpen);
   }
 
-  function handleConfirm(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleConfirm(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
     setError(undefined);
 
     startTransition(async () => {
       const result = await safelyRunAction(updatePersonStatusAction(institutionId, personId, nextEnabled), PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
+
       if (!result.success) {
         setError(result.error ?? PEOPLE_ERROR_MESSAGES.UPDATE_STATUS);
+
         return;
       }
 

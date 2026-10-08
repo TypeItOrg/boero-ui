@@ -1,4 +1,7 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { ChevronRightIcon, type LucideIcon } from "lucide-react";
 
 import { cn } from "@common/utils/cn.util";
@@ -27,7 +30,7 @@ const CARD_CONTENT_CLASS = {
   prominent: "items-stretch gap-4",
 } as const;
 
-export function NavigationCard({ className, description, href, icon: Icon, prominent = false, title }: NavigationCardProps): React.ReactElement {
+export function NavigationCard({ className, description, href, icon: Icon, prominent = false, title }: NavigationCardProps): ReactElement {
   const size = prominent ? "prominent" : "compact";
 
   return (

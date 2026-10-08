@@ -1,9 +1,9 @@
 "use client";
 
-import * as React from "react";
-import { Clock8Icon } from "lucide-react";
+import type { ReactElement } from "react";
 
 import { Time } from "@internationalized/date";
+import { Clock8Icon } from "lucide-react";
 import { DateInput, DateSegment, TimeField } from "react-aria-components";
 
 type TimeInputWithIconProps = {
@@ -24,9 +24,10 @@ export function TimeInputWithIcon({
   required = false,
   value,
   onValueChange,
-}: TimeInputWithIconProps): React.ReactElement {
+}: TimeInputWithIconProps): ReactElement {
   const validTime = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value);
   const time = validTime ? new Time(Number(validTime[1]), Number(validTime[2])) : null;
+
   return (
     <TimeField
       id={id}

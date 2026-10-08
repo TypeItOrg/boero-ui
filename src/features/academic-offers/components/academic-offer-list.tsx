@@ -1,10 +1,13 @@
-import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import type { ReactElement } from "react";
+
 import { ArrowRightIcon, BookOpenIcon, CalendarDaysIcon, RouteIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { formatDisplayDate } from "@common/utils/date-input.util";
+
+import { formatStudyPlanLabel, formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { AcademicOfferPagination } from "@features/academic-offers/components/academic-offer-pagination";
 import type { AcademicOfferSummary } from "@features/academic-offers/types/academic-offer-summary.types";
 
@@ -16,7 +19,7 @@ type AcademicOfferListProps = {
   totalPages: number;
 };
 
-export function AcademicOfferList({ items, page, size, totalItems, totalPages }: AcademicOfferListProps): React.ReactElement {
+export function AcademicOfferList({ items, page, size, totalItems, totalPages }: AcademicOfferListProps): ReactElement {
   if (items.length === 0) {
     return (
       <Empty className="bg-muted/25 min-h-56 rounded-xl border border-solid p-6">
@@ -45,7 +48,7 @@ export function AcademicOfferList({ items, page, size, totalItems, totalPages }:
   );
 }
 
-function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): React.ReactElement {
+function AcademicOfferCard({ offer }: { offer: AcademicOfferSummary }): ReactElement {
   const studyPlanLabel = formatStudyPlanName(offer);
 
   return (

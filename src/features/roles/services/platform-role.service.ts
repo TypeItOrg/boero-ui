@@ -4,6 +4,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
@@ -16,15 +17,23 @@ const ROLES_ERROR = "No se pudieron obtener los roles.";
 export async function fetchPlatformRoles(params: PlatformRolesPaginationParams): Promise<PaginatedResponse<PlatformRoleListItem>> {
   const query = buildPaginationSearchParams(params);
   query.set("sort", serializeSpringSort(params.sort));
-  if (params.institutionId) query.set("institutionId", params.institutionId);
-  if (params.roleType) query.set("system", String(params.roleType === "SYSTEM"));
+
+  if (params.institutionId) {
+    query.set("institutionId", params.institutionId);
+  }
+
+  if (params.roleType) {
+    query.set("system", String(params.roleType === "SYSTEM"));
+  }
 
   const response = await platformApiFetch(`/api/v1/admin/roles?${query.toString()}`);
+
   return parseHttpResponse(response, ROLES_ERROR);
 }
 
 export async function fetchPlatformRole(roleId: string): Promise<PlatformRole | null> {
   const response = await platformApiFetch(`/api/v1/admin/roles/${roleId}`);
+
   return parseNullableHttpResponse(response, ROLES_ERROR);
 }
 
@@ -32,6 +41,7 @@ export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermis
   const response = await platformApiFetch("/api/v1/admin/permissions");
   const catalog = await parseHttpResponse<PlatformPermissionCatalogItem[]>(response, "No se pudo obtener el catálogo de permisos.");
   const groups = new Map<string, MutablePermissionGroup>();
+
   for (const permission of catalog) {
     const group = groups.get(permission.group);
     const item: InstitutionPermission = {
@@ -40,10 +50,12 @@ export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermis
       grantable: permission.configurable,
       requiredPermissions: permission.requiredPermissions,
     };
+
     if (group) {
       group.permissions = [...group.permissions, item];
       continue;
     }
+
     groups.set(permission.group, {
       code: permission.group,
       displayName: permission.groupDisplayName,
@@ -51,6 +63,7 @@ export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermis
       permissions: [item],
     });
   }
+
   return [...groups.values()];
 }
 

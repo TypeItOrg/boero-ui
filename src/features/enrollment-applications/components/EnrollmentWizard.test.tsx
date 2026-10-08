@@ -1,6 +1,13 @@
-import * as React from "react";
+import type { ComponentProps } from "react";
+
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import {
+  updateEnrollmentDraftAction,
+  submitEnrollmentApplicationAction,
+  cancelEnrollmentApplicationAction,
+} from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
@@ -26,12 +33,6 @@ jest.mock("@features/enrollment-applications/actions/enrollment-application.acti
   submitEnrollmentApplicationAction: jest.fn(),
   cancelEnrollmentApplicationAction: jest.fn(),
 }));
-
-import {
-  updateEnrollmentDraftAction,
-  submitEnrollmentApplicationAction,
-  cancelEnrollmentApplicationAction,
-} from "@features/enrollment-applications/actions/enrollment-application.actions";
 
 jest.mock("@features/enrollment-applications/actions/documentation.actions", () => ({
   mutateDocument: jest.fn(),
@@ -96,14 +97,26 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
     responsible: {},
     preference: { preferredShift: "MORNING", allowsImageUse: true, isReenrolling: false },
     attachments: [
-      { id: "a1", requirementId: "00000000-0000-4000-8000-000000000004", originalFileName: "dni-f.png" },
-      { id: "a2", requirementId: "00000000-0000-4000-8000-000000000005", originalFileName: "dni-d.png" },
-      { id: "a3", requirementId: "00000000-0000-4000-8000-000000000006", originalFileName: "foto.png" },
+      {
+        id: "a1",
+        requirementId: "00000000-0000-4000-8000-000000000004",
+        originalFileName: "dni-f.png",
+      },
+      {
+        id: "a2",
+        requirementId: "00000000-0000-4000-8000-000000000005",
+        originalFileName: "dni-d.png",
+      },
+      {
+        id: "a3",
+        requirementId: "00000000-0000-4000-8000-000000000006",
+        originalFileName: "foto.png",
+      },
     ],
   },
 };
 
-function renderWizard(props: Partial<React.ComponentProps<typeof EnrollmentWizard>> = {}): ReturnType<typeof render> {
+function renderWizard(props: Partial<ComponentProps<typeof EnrollmentWizard>> = {}): ReturnType<typeof render> {
   return render(<EnrollmentWizard initialApplication={BASE} initialCourseOptions={[COURSE_OPTION]} {...props} />);
 }
 
@@ -148,6 +161,7 @@ describe("EnrollmentWizard", () => {
     updateAction.mockClear();
 
     jest.useFakeTimers();
+
     try {
       fireEvent.change(schoolInput, { target: { value: "Colegio Nacional" } });
 
@@ -246,11 +260,20 @@ describe("EnrollmentWizard", () => {
     expect(screen.getByRole("tab", { name: /cursos/i })).toBeInTheDocument();
   });
   it("preserves saved courses and teacher preferences outside the loaded catalog page", async () => {
-    const courses = [{ courseId: "00000000-0000-4000-8000-000000000099", preferredTeacherId: "00000000-0000-4000-8000-000000000098" }];
-    renderWizard({ initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } } });
+    const courses = [
+      {
+        courseId: "00000000-0000-4000-8000-000000000099",
+        preferredTeacherId: "00000000-0000-4000-8000-000000000098",
+      },
+    ];
+    renderWizard({
+      initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } },
+    });
     await screen.findByLabelText(/^nombre/i);
     await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Otro colegio" } });
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), {
+      target: { value: "Otro colegio" },
+    });
     await waitFor(() => expect(updateAction).toHaveBeenCalled(), { timeout: 3000 });
     expect(updateAction.mock.calls.at(-1)?.[1].data.courses).toEqual(courses);
   });

@@ -1,12 +1,12 @@
 "use client";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactElement } from "react";
 
 type ActionFormProps = Omit<ComponentProps<"form">, "onResetCapture"> & {
   resetOnSuccess?: boolean;
 };
 
-export function ActionForm({ resetOnSuccess = false, ...props }: ActionFormProps): React.ReactElement {
+export function ActionForm({ resetOnSuccess = false, ...props }: ActionFormProps): ReactElement {
   return (
     <form
       {...props}

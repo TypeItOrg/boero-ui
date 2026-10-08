@@ -1,28 +1,31 @@
 "use client";
 
-import { OptionalValue } from "@common/components/optional-value";
-import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
+import { useRouter } from "next/navigation";
+
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { OptionalValue } from "@common/components/optional-value";
+import { Button } from "@common/components/ui/button";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
-import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
+
 import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
 import { EnrollmentCancelDialog } from "@features/enrollment-applications/components/enrollment-cancel-dialog";
-import { useRouter } from "next/navigation";
+import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
 
 type MyEnrollmentApplicationTableRowProps = {
   application: EnrollmentApplication;
 };
 
-export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApplicationTableRowProps): React.ReactElement {
+export function MyEnrollmentApplicationTableRow({ application }: MyEnrollmentApplicationTableRowProps): ReactElement {
   const router = useRouter();
-  const [isCancelOpen, setIsCancelOpen] = React.useState(false);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
 
   const canCancel = application.status === ENROLLMENT_APPLICATION_STATUS.DRAFT;
   const detailHref = `/my-enrollment-applications/${application.applicationId}`;

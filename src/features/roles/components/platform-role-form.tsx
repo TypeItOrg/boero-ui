@@ -1,27 +1,28 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
-import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+import { useActionState, useState, type ReactElement } from "react";
 
-import * as React from "react";
 import Link from "next/link";
-import { useActionState } from "react";
+
 import { BuildingIcon, CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
+import { SectionHeader } from "@common/components/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+
 import { fetchActivePlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
-import { savePlatformRoleAction } from "@features/roles/actions/save-platform-role.action";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
+import { savePlatformRoleAction } from "@features/roles/actions/save-platform-role.action";
+import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { PlatformRoleFormState } from "@features/roles/types/platform-role-form-state.types";
 import type { PlatformRole } from "@features/roles/types/platform-role.types";
-import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
-import { SectionHeader } from "@common/components/section-header";
 
 const INITIAL_STATE: PlatformRoleFormState = {};
 const INSTITUTION_QUERY_KEY = ["platform", "roles", "form-institutions"] as const;
@@ -32,7 +33,7 @@ type PlatformRoleFormProps = {
   returnTo?: string;
 };
 
-export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformRoleFormProps): React.ReactElement {
+export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformRoleFormProps): ReactElement {
   const destination = returnTo ?? (role ? `/admin/roles/${role.id}` : "/admin/roles");
   const action = savePlatformRoleAction.bind(null, role?.id, role?.institution.id, destination);
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
@@ -113,8 +114,9 @@ export function PlatformRoleForm({ role, permissionGroups, returnTo }: PlatformR
   );
 }
 
-function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }): React.ReactElement {
-  const [institution, setInstitution] = React.useState<InstitutionSummary>();
+function PlatformInstitutionDropdown({ ariaInvalid }: { ariaInvalid: boolean }): ReactElement {
+  const [institution, setInstitution] = useState<InstitutionSummary>();
+
   return (
     <AsyncDropdown<InstitutionSummary>
       ariaInvalid={ariaInvalid}

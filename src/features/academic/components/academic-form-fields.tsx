@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentType } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 import { AcademicSpaceFields, InstrumentFields, ShiftFields, TrainingPathFields } from "@features/academic/components/academic-catalog-form-fields";
 import { AcademicYearFields } from "@features/academic/components/academic-year-form-fields";
@@ -26,7 +26,8 @@ const FIELD_COMPONENTS: Record<AcademicResource, ComponentType<AcademicFieldsPro
   [AcademicResource.SHIFT]: ShiftFields,
 };
 
-export function AcademicFormFields({ resource, ...props }: AcademicFormFieldsProps): React.ReactElement {
+export function AcademicFormFields({ resource, ...props }: AcademicFormFieldsProps): ReactElement {
   const FieldsComponent = FIELD_COMPONENTS[resource];
+
   return <FieldsComponent {...props} />;
 }

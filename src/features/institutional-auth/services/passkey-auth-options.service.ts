@@ -1,5 +1,6 @@
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { PasskeyRequestOptionsJson } from "@features/institutional-auth/types/passkey-request-options-json.types";
 
@@ -11,7 +12,9 @@ export async function requestPasskeyAuthOptions(loginAttemptId: string): Promise
 }
 
 export async function requestDiscoverablePasskeyAuthOptions(institutionId: string): Promise<PasskeyAuthOptionsOutput> {
-  return requestOptions("/api/v1/auth/passkeys/authentication/discoverable/options", { institutionId });
+  return requestOptions("/api/v1/auth/passkeys/authentication/discoverable/options", {
+    institutionId,
+  });
 }
 
 async function requestOptions(path: string, input: { loginAttemptId: string } | { institutionId: string }): Promise<PasskeyAuthOptionsOutput> {
@@ -25,6 +28,7 @@ async function requestOptions(path: string, input: { loginAttemptId: string } | 
 
     if (!response.ok) {
       const error = (await response.json()) as BackendError;
+
       return { success: false, error };
     }
 

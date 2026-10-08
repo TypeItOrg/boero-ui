@@ -8,7 +8,10 @@ export function createAuthRequestHeaders(requestHeaders: Pick<Headers, "get">): 
     headers["X-Forwarded-For"] = clientIp;
     headers["X-Real-IP"] = clientIp;
   }
-  if (userAgent) headers["User-Agent"] = userAgent;
+
+  if (userAgent) {
+    headers["User-Agent"] = userAgent;
+  }
 
   return headers;
 }

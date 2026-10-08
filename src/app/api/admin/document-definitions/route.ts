@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { PAGE_SIZE_OPTIONS } from "@common/utils/pagination-query.util";
 import { createPassthroughResponse } from "@common/utils/create-passthrough-response.util";
+import { PAGE_SIZE_OPTIONS } from "@common/utils/pagination-query.util";
+
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 export async function GET(request: Request): Promise<Response> {
@@ -17,11 +18,13 @@ export async function GET(request: Request): Promise<Response> {
       active: z.enum(["true", "false"]).optional(),
     })
     .safeParse(Object.fromEntries(new URL(request.url).searchParams));
+
   if (!input.success) {
     return Response.json({ message: "Revisá los filtros." }, { status: 400 });
   }
 
   const query = new URLSearchParams();
+
   for (const [key, value] of Object.entries(input.data)) {
     if (value !== undefined) {
       query.set(key, String(value));
@@ -29,7 +32,10 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const response = await platformApiFetch(`/api/v1/admin/document-definitions?${query}`, { signal: request.signal });
+    const response = await platformApiFetch(`/api/v1/admin/document-definitions?${query}`, {
+      signal: request.signal,
+    });
+
     return createPassthroughResponse(response);
   } catch {
     return Response.json({ message: "No se pudo consultar la documentación. Intentá nuevamente." }, { status: 503 });

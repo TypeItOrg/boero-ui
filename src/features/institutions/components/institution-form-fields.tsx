@@ -1,10 +1,12 @@
-import * as React from "react";
+import type { ChangeEventHandler, PropsWithChildren, ReactElement } from "react";
+
 import type { FieldErrors, UseFormRegister, UseFormRegisterReturn } from "react-hook-form";
 
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { PhoneInput } from "@common/components/ui/restricted-input";
 import { Switch } from "@common/components/ui/switch";
+
 import { InstitutionLocationFields } from "@features/institutions/components/institution-location-fields";
 import type { InstitutionFormInput } from "@features/institutions/schemas/institution-form.schema";
 
@@ -18,8 +20,8 @@ type InstitutionFormFieldsProps = {
 
 type InstitutionGeneralFieldsProps = Omit<InstitutionFormFieldsProps, "register"> & {
   nameField: UseFormRegisterReturn<"name">;
-  onNameChange: React.ChangeEventHandler<HTMLInputElement>;
-  onSlugChange: React.ChangeEventHandler<HTMLInputElement>;
+  onNameChange: ChangeEventHandler<HTMLInputElement>;
+  onSlugChange: ChangeEventHandler<HTMLInputElement>;
   slugField: UseFormRegisterReturn<"slug">;
 };
 
@@ -30,7 +32,7 @@ export function InstitutionGeneralFields({
   onNameChange,
   onSlugChange,
   slugField,
-}: InstitutionGeneralFieldsProps): React.ReactElement {
+}: InstitutionGeneralFieldsProps): ReactElement {
   return (
     <InstitutionFormCard>
       <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
@@ -73,7 +75,7 @@ export function InstitutionGeneralFields({
   );
 }
 
-export function InstitutionContactFields({ defaultValues, errors, register }: InstitutionFormFieldsProps): React.ReactElement {
+export function InstitutionContactFields({ defaultValues, errors, register }: InstitutionFormFieldsProps): ReactElement {
   return (
     <InstitutionFormCard>
       <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
@@ -112,13 +114,7 @@ export function InstitutionContactFields({ defaultValues, errors, register }: In
   );
 }
 
-export function InstitutionStatusField({
-  active,
-  onActiveChange,
-}: {
-  active: boolean;
-  onActiveChange: (active: boolean) => void;
-}): React.ReactElement {
+export function InstitutionStatusField({ active, onActiveChange }: { active: boolean; onActiveChange: (active: boolean) => void }): ReactElement {
   return (
     <InstitutionFormCard>
       <FieldGroup>
@@ -134,7 +130,7 @@ export function InstitutionStatusField({
   );
 }
 
-function InstitutionFormCard({ children, className }: React.PropsWithChildren<{ className?: string }>): React.ReactElement {
+function InstitutionFormCard({ children, className }: PropsWithChildren<{ className?: string }>): ReactElement {
   return (
     <div className={className ? `bg-muted/25 rounded-xl border p-5 md:p-6 ${className}` : "bg-muted/25 rounded-xl border p-5 md:p-6"}>{children}</div>
   );

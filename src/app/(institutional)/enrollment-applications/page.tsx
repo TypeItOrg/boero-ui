@@ -1,14 +1,17 @@
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { Suspense, type ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { Suspense } from "react";
+
 import { ClipboardListIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
+import { fetchTrainingPaths } from "@features/academic/services/academic.service";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentApplicationFilters } from "@features/enrollment-applications/components/enrollment-application-filters";
 import { EnrollmentApplicationTableContainer } from "@features/enrollment-applications/components/enrollment-application-table";
 import { EnrollmentApplicationTableSkeleton } from "@features/enrollment-applications/components/enrollment-application-table-skeleton";
 import { fetchEnrollmentApplications } from "@features/enrollment-applications/services/enrollment-application.service";
-import { fetchTrainingPaths } from "@features/academic/services/academic.service";
 import {
   parseEnrollmentApplicationPaginationParams,
   type EnrollmentApplicationSearchParams,
@@ -30,7 +33,7 @@ export default async function EnrollmentApplicationsPage({
   searchParams,
 }: {
   searchParams: Promise<EnrollmentApplicationSearchParams>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)) {
@@ -39,7 +42,14 @@ export default async function EnrollmentApplicationsPage({
 
   const resolvedSearchParams = await searchParams;
   const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
-  const dataPromise = fetchEnrollmentApplications(user.institutionId, { page, size, status, trainingPathId, open, pendingDocuments });
+  const dataPromise = fetchEnrollmentApplications(user.institutionId, {
+    page,
+    size,
+    status,
+    trainingPathId,
+    open,
+    pendingDocuments,
+  });
   const { items: trainingPaths } = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.TRAINING_PATH_READ)
     ? await fetchTrainingPaths(AcademicScope.INSTITUTIONAL, user.institutionId, {
         active: true,

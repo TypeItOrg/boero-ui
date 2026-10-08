@@ -1,18 +1,28 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { InstitutionForm } from "@features/institutions/components/institution-form";
-import { InstitutionalInstitutionForm } from "@features/institutions/components/institutional-institution-form";
+
 import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
 import { updateInstitutionalInstitutionAction } from "@features/institutions/actions/update-institutional-institution.action";
-import type { Institution } from "@features/institutions/types/institution.types";
+import { InstitutionForm } from "@features/institutions/components/institution-form";
+import { InstitutionalInstitutionForm } from "@features/institutions/components/institutional-institution-form";
+import { INSTITUTION_LOGO_INTENT } from "@features/institutions/constants/institution-logo.constants";
 import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import type { Institution } from "@features/institutions/types/institution.types";
 
 const push = jest.fn();
 jest.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
-jest.mock("@features/locations/components/location-picker", () => ({ LocationPicker: () => <div data-testid="location-picker" /> }));
-jest.mock("@features/institutions/actions/update-institution.action", () => ({ updateInstitutionAction: jest.fn() }));
-jest.mock("@features/institutions/actions/update-institutional-institution.action", () => ({ updateInstitutionalInstitutionAction: jest.fn() }));
-jest.mock("@features/institutions/actions/create-institution.action", () => ({ createInstitutionAction: jest.fn() }));
+jest.mock("@features/locations/components/location-picker", () => ({
+  LocationPicker: () => <div data-testid="location-picker" />,
+}));
+jest.mock("@features/institutions/actions/update-institution.action", () => ({
+  updateInstitutionAction: jest.fn(),
+}));
+jest.mock("@features/institutions/actions/update-institutional-institution.action", () => ({
+  updateInstitutionalInstitutionAction: jest.fn(),
+}));
+jest.mock("@features/institutions/actions/create-institution.action", () => ({
+  createInstitutionAction: jest.fn(),
+}));
 
 const institution: Institution = {
   id: "22222222-2222-4222-8222-222222222222",
@@ -37,6 +47,7 @@ function renderForm(scope: "platform" | "institutional") {
   render(
     scope === "platform" ? <InstitutionForm mode="edit" institution={institution} /> : <InstitutionalInstitutionForm institution={institution} />,
   );
+
   return jest.mocked(scope === "platform" ? updateInstitutionAction : updateInstitutionalInstitutionAction);
 }
 
@@ -63,7 +74,7 @@ describe.each(["platform", "institutional"] as const)("%s logo form lifecycle", 
     expect(update).toHaveBeenCalledTimes(1);
     expect(update.mock.calls[0][0]).toBe(institution.id);
     const form = update.mock.calls[0][1];
-    expect(form.get("logoIntent")).toBe("replace");
+    expect(form.get("logoIntent")).toBe(INSTITUTION_LOGO_INTENT.REPLACE);
     expect(form.get("logoFile")).toBe(file);
   });
 
@@ -81,7 +92,7 @@ describe.each(["platform", "institutional"] as const)("%s logo form lifecycle", 
     await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
 
     const form = update.mock.calls[0][1];
-    expect(form.get("logoIntent")).toBe("remove");
+    expect(form.get("logoIntent")).toBe(INSTITUTION_LOGO_INTENT.REMOVE);
     expect(form.get("logoFile")).toBeNull();
   });
 

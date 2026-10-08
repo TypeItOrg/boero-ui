@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentProps, type ReactElement } from "react";
 
 import { Button } from "@common/components/ui/button";
+
 import { AcademicDeleteDialog } from "@features/academic/components/academic-delete-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -14,10 +15,10 @@ type AcademicDeleteButtonProps = {
   id: string;
   destination: string;
   label: string;
-  size?: React.ComponentProps<typeof Button>["size"];
+  size?: ComponentProps<typeof Button>["size"];
 };
 
-export function AcademicDeleteButton(props: AcademicDeleteButtonProps): React.ReactElement {
+export function AcademicDeleteButton(props: AcademicDeleteButtonProps): ReactElement {
   const [open, setOpen] = useState(false);
 
   return (

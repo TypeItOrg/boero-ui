@@ -11,6 +11,9 @@ describe("parseSessionsPaginationParams", () => {
 
   it("falls back to defaults on invalid values", () => {
     expect(parseSessionsPaginationParams({ page: "-1", size: "7" })).toEqual({ page: 0, size: 20 });
-    expect(parseSessionsPaginationParams({ page: "abc", size: "999" })).toEqual({ page: 0, size: 20 });
+    expect(parseSessionsPaginationParams({ page: "abc", size: "999" })).toEqual({
+      page: 0,
+      size: 20,
+    });
   });
 });

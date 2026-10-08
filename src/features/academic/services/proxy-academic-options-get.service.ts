@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createPassthroughResponse } from "@common/utils/create-passthrough-response.util";
+
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 
@@ -67,6 +68,7 @@ export async function proxyAcademicOptionsGet(request: Request, resourceSegment:
   if (parsed.data.published) {
     backendParams.set("published", parsed.data.published);
   }
+
   if (parsed.data.trainingPathId) {
     backendParams.set("trainingPathId", parsed.data.trainingPathId);
   }

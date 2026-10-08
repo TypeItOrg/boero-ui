@@ -1,19 +1,21 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
-import { OptionalValue } from "@common/components/optional-value";
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { ShieldCheckIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
+import { OptionalValue } from "@common/components/optional-value";
+import { SectionHeader } from "@common/components/section-header";
 import { Badge } from "@common/components/ui/badge";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
 import type { PersonRole } from "@features/people/types/person-role.types";
 import type { Person } from "@features/people/types/person.types";
-import { SectionHeader } from "@common/components/section-header";
 
 type PersonDetailViewProps = {
   person: Person;
   assignedRoles: PersonRole[];
 };
 
-export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProps): React.ReactElement {
+export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProps): ReactElement {
   return (
     <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
       <section className="bg-muted/25 rounded-xl border p-4 sm:p-5">
@@ -50,11 +52,11 @@ export function PersonDetailView({ person, assignedRoles }: PersonDetailViewProp
   );
 }
 
-function DetailSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
+function DetailSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): ReactElement {
   return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
-function DetailValue({ label, value, fallback }: { label: string; value: string | null; fallback: string }): React.ReactElement {
+function DetailValue({ label, value, fallback }: { label: string; value: string | null; fallback: string }): ReactElement {
   return (
     <div>
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
@@ -71,5 +73,6 @@ function formatDate(value: string | null): string | null {
   }
 
   const [year, month, day] = value.split("-");
+
   return year && month && day ? `${day}/${month}/${year}` : value;
 }

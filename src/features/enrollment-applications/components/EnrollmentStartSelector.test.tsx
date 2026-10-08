@@ -1,5 +1,5 @@
-import * as React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+
 import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import type {
   EnrollmentStartStudyPlanOption,
@@ -13,8 +13,18 @@ describe("EnrollmentStartSelector", () => {
   ];
 
   const periods: EnrollmentStartPeriodOption[] = [
-    { id: "period-1", academicYearId: "year-1", academicYearNumber: 2026, name: "Inscripción 2026" },
-    { id: "period-2", academicYearId: "year-2", academicYearNumber: 2027, name: "Inscripción 2027" },
+    {
+      id: "period-1",
+      academicYearId: "year-1",
+      academicYearNumber: 2026,
+      name: "Inscripción 2026",
+    },
+    {
+      id: "period-2",
+      academicYearId: "year-2",
+      academicYearNumber: 2027,
+      name: "Inscripción 2027",
+    },
   ];
 
   it("pre-selects the first study plan and starts without an academic year", () => {

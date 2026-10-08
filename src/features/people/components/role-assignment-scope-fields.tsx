@@ -1,17 +1,20 @@
 "use client";
 
 import { useCallback, useId, useState } from "react";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+
 import { XIcon } from "lucide-react";
+
+import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Badge } from "@common/components/ui/badge";
-import { FormSelect } from "@features/academic/components/academic-form-controls";
 import { Button } from "@common/components/ui/button";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
+import { FormSelect } from "@features/academic/components/academic-form-controls";
+import { ROLE_SCOPE_MESSAGES as M } from "@features/people/constants/role-scope.constants";
 import type { RoleAssignment } from "@features/people/types/role-assignment.types";
 import type { TrainingPathScopeOption } from "@features/people/types/training-path-scope-option.types";
 import type { PeopleScope } from "@features/people/utils/people-scope.util";
-import { ROLE_SCOPE_MESSAGES as M } from "@features/people/constants/role-scope.constants";
 
 type Props = {
   institutionId: string;
@@ -39,13 +42,31 @@ export function RoleAssignmentScopeFields({
   const [selectedNames, setSelectedNames] = useState(names);
   const fetchPaths = useCallback(
     async ({ page, search, size, signal }: AsyncDropdownFetchPageInput) => {
-      const params = new URLSearchParams({ institutionId, scope, page: String(page), size: String(size), search });
-      const response = await fetch(`/api/role-training-path-options?${params}`, { signal, cache: "no-store" });
-      const data = await parseHttpResponse<{ items: TrainingPathScopeOption[]; page: number; totalPages: number }>(response, M.LOAD_ERROR);
-      return { items: data.items, nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null };
+      const params = new URLSearchParams({
+        institutionId,
+        scope,
+        page: String(page),
+        size: String(size),
+        search,
+      });
+      const response = await fetch(`/api/role-training-path-options?${params}`, {
+        signal,
+        cache: "no-store",
+      });
+      const data = await parseHttpResponse<{
+        items: TrainingPathScopeOption[];
+        page: number;
+        totalPages: number;
+      }>(response, M.LOAD_ERROR);
+
+      return {
+        items: data.items,
+        nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null,
+      };
     },
     [institutionId, scope],
   );
+
   return (
     <fieldset className="-mx-3 grid min-w-0 gap-3 border-t px-3 pt-3" disabled={disabled}>
       <div className="grid gap-1.5 text-sm">
@@ -82,6 +103,7 @@ export function RoleAssignmentScopeFields({
               {value.trainingPathIds.length === 0 ? <p className="text-muted-foreground text-sm">{M.EMPTY_SELECTION}</p> : null}
               {value.trainingPathIds.map((id) => {
                 const name = selectedNames[id] ?? names[id] ?? id;
+
                 return (
                   <Badge key={id} className="h-auto min-h-7 max-w-full gap-2 px-3" size="lg" variant="secondary">
                     <span className="min-w-0 wrap-anywhere whitespace-normal">{name}</span>
@@ -92,7 +114,12 @@ export function RoleAssignmentScopeFields({
                       size="icon-xs"
                       variant="ghost"
                       disabled={disabled}
-                      onClick={() => onChange({ ...value, trainingPathIds: value.trainingPathIds.filter((path) => path !== id) })}
+                      onClick={() =>
+                        onChange({
+                          ...value,
+                          trainingPathIds: value.trainingPathIds.filter((path) => path !== id),
+                        })
+                      }
                     >
                       <XIcon />
                     </Button>

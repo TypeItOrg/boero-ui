@@ -14,7 +14,12 @@ describe("passkey-authentication", () => {
   it("maps server options to a credential request without allowCredentials", () => {
     clearNativeWebAuthn();
 
-    const options = toPublicKeyRequestOptions({ challenge: CHALLENGE, rpId: "localhost", userVerification: "required", allowCredentials: [] });
+    const options = toPublicKeyRequestOptions({
+      challenge: CHALLENGE,
+      rpId: "localhost",
+      userVerification: "required",
+      allowCredentials: [],
+    });
 
     expect(options.rpId).toBe("localhost");
     expect(options.allowCredentials).toEqual([]);
@@ -24,7 +29,9 @@ describe("passkey-authentication", () => {
   it("uses the native JSON parser when available", () => {
     const sentinel = { native: true };
     const parse = jest.fn().mockReturnValue(sentinel);
-    (globalThis as Record<string, unknown>).PublicKeyCredential = { parseRequestOptionsFromJSON: parse };
+    (globalThis as Record<string, unknown>).PublicKeyCredential = {
+      parseRequestOptionsFromJSON: parse,
+    };
     const raw = { challenge: CHALLENGE, allowCredentials: [] };
 
     expect(toPublicKeyRequestOptions(raw)).toBe(sentinel);
@@ -44,7 +51,10 @@ describe("passkey-authentication", () => {
     ["descriptor with wrong type", { challenge: CHALLENGE, allowCredentials: [{ id: DESCRIPTOR_ID, type: "password" }] }],
     [
       "descriptor with invalid transports",
-      { challenge: CHALLENGE, allowCredentials: [{ id: DESCRIPTOR_ID, type: "public-key", transports: "usb" }] },
+      {
+        challenge: CHALLENGE,
+        allowCredentials: [{ id: DESCRIPTOR_ID, type: "public-key", transports: "usb" }],
+      },
     ],
     ["invalid userVerification", { challenge: CHALLENGE, userVerification: "sometimes" }],
     ["invalid timeout", { challenge: CHALLENGE, timeout: -1 }],
@@ -68,7 +78,10 @@ describe("passkey-authentication", () => {
 
   it("forwards an abort signal to the authenticator", async () => {
     const getMock = jest.fn().mockResolvedValue(null);
-    Object.defineProperty(navigator, "credentials", { value: { get: getMock }, configurable: true });
+    Object.defineProperty(navigator, "credentials", {
+      value: { get: getMock },
+      configurable: true,
+    });
     const controller = new AbortController();
 
     await expect(

@@ -1,9 +1,10 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactElement } from "react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
 import { cn } from "@common/utils/cn.util";
+
 import type { WeeklyScheduleItem } from "@features/course-enrollments/types/weekly-schedule-item.types";
 
 type MyScheduleEventProps = {
@@ -14,7 +15,7 @@ type MyScheduleEventProps = {
   style: CSSProperties;
 };
 
-export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: MyScheduleEventProps): React.ReactElement {
+export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: MyScheduleEventProps): ReactElement {
   const time = `${schedule.startTime.slice(0, 5)}–${schedule.endTime.slice(0, 5)}`;
   const compact = duration < 30;
 
@@ -28,7 +29,10 @@ export function MyScheduleEvent({ item, schedule, dayLabel, duration, style }: M
             "border-primary/25 text-primary focus-visible:ring-ring absolute min-w-0 overflow-hidden rounded-lg border border-l-3 px-2 text-left transition-shadow hover:shadow-sm focus-visible:z-10 focus-visible:ring-2 focus-visible:outline-none",
             compact ? "flex items-center gap-2 py-0" : "flex flex-col items-stretch py-1",
           )}
-          style={{ ...style, backgroundColor: "color-mix(in srgb, var(--primary) 10%, var(--background))" }}
+          style={{
+            ...style,
+            backgroundColor: "color-mix(in srgb, var(--primary) 10%, var(--background))",
+          }}
         >
           <span className="block shrink-0 truncate text-xs leading-4 font-medium tabular-nums">{time}</span>
           <span

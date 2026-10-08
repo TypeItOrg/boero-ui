@@ -1,13 +1,3 @@
-jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
-jest.mock("next/navigation", () => ({ redirect: jest.fn() }));
-jest.mock("@features/academic/services/academic-api-fetch.service", () => ({ academicApiFetch: jest.fn() }));
-jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
-  requireInstitutionalUser: jest.fn(),
-}));
-jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({
-  requirePlatformAccount: jest.fn(),
-}));
-
 import {
   deleteAcademicResourceAction,
   saveAcademicResourceAction,
@@ -15,10 +5,22 @@ import {
 } from "@features/academic/actions/academic-resource.action";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
+
+jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
+jest.mock("next/navigation", () => ({ redirect: jest.fn() }));
+jest.mock("@features/academic/services/academic-api-fetch.service", () => ({
+  academicApiFetch: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
+  requireInstitutionalUser: jest.fn(),
+}));
+jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({
+  requirePlatformAccount: jest.fn(),
+}));
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const RESOURCE_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
@@ -67,7 +69,10 @@ describe("academic resource actions", () => {
     expect(academicApiFetch).toHaveBeenCalledWith(
       AcademicScope.ADMIN,
       `/api/v1/admin/institutions/${INSTITUTION_ID}/instruments`,
-      expect.objectContaining({ body: JSON.stringify({ name: "Piano", description: null }), method: "POST" }),
+      expect.objectContaining({
+        body: JSON.stringify({ name: "Piano", description: null }),
+        method: "POST",
+      }),
     );
   });
 
@@ -165,7 +170,9 @@ describe("academic resource actions", () => {
       1,
       AcademicScope.INSTITUTIONAL,
       `/api/v1/institutions/${INSTITUTION_ID}/training-paths/${RESOURCE_ID}`,
-      expect.objectContaining({ body: JSON.stringify({ name: "CAVI", description: "Formación docente." }) }),
+      expect.objectContaining({
+        body: JSON.stringify({ name: "CAVI", description: "Formación docente." }),
+      }),
     );
     expect(academicApiFetch).toHaveBeenLastCalledWith(
       AcademicScope.INSTITUTIONAL,
@@ -303,7 +310,11 @@ describe("academic resource actions", () => {
   ] as const)("rejects malformed active input for %s without calling the API", async (resource, permission, active) => {
     mockInstitutionalUser(permission);
     const formData = new FormData();
-    if (active !== undefined) formData.set("active", active);
+
+    if (active !== undefined) {
+      formData.set("active", active);
+    }
+
     jest.mocked(academicApiFetch).mockClear();
 
     const result = await updateAcademicStatusAction(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, resource, RESOURCE_ID, `/${resource}`, {}, formData);

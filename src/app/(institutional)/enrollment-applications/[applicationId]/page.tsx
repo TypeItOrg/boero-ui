@@ -1,13 +1,17 @@
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import type { ReactElement } from "react";
+
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { ClipboardListIcon } from "lucide-react";
-import type { Metadata } from "next";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { EnrollmentApplicationResolvePanel } from "@features/enrollment-applications/components/enrollment-application-resolve-panel";
 import { EnrollmentStatusCard } from "@features/enrollment-applications/components/EnrollmentStatusCard";
 import { fetchInstitutionalEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
@@ -30,10 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Detalle de solicitud de inscripción");
 }
 
-export default async function EnrollmentApplicationDetailPage({
-  params,
-  searchParams,
-}: EnrollmentApplicationDetailPageProps): Promise<React.ReactElement> {
+export default async function EnrollmentApplicationDetailPage({ params, searchParams }: EnrollmentApplicationDetailPageProps): Promise<ReactElement> {
   const [{ applicationId }, { returnTo }, user] = await Promise.all([params, searchParams, requireInstitutionalUser()]);
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)) {
@@ -63,7 +64,11 @@ export default async function EnrollmentApplicationDetailPage({
     <PlatformPageShell
       title={applicantName}
       breadcrumb={
-        <InstitutionalBreadcrumb segmentLabels={{ [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName) }} />
+        <InstitutionalBreadcrumb
+          segmentLabels={{
+            [applicationId]: formatEnrollmentApplicationBreadcrumbLabel(application, applicantName),
+          }}
+        />
       }
       actions={<PlatformPageIcon icon={ClipboardListIcon} />}
     >

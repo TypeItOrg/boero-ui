@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { GraduationCapIcon } from "lucide-react";
 
 import { MySubjectsSkeleton } from "@features/course-enrollments/components/my-subjects-skeleton";
@@ -5,7 +7,7 @@ import { InstitutionalBreadcrumb } from "@features/institutional-auth/components
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
-export default function Loading(): React.ReactElement {
+export default function Loading(): ReactElement {
   return (
     <PlatformPageShell
       minViewportHeight

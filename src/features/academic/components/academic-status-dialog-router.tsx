@@ -1,7 +1,7 @@
-import * as React from "react";
+import type { ReactElement } from "react";
 
-import { ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicYearStatusDialog } from "@features/academic/components/academic-year-status-dialog";
+import { ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { CourseStatusDialog } from "@features/academic/components/course-status-dialog";
 import { StudyPlanStatusDialog } from "@features/academic/components/study-plan-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -22,7 +22,7 @@ export function AcademicStatusDialogRouter({
   returnTo,
   scope,
   selection,
-}: AcademicStatusDialogRouterProps): React.ReactElement {
+}: AcademicStatusDialogRouterProps): ReactElement {
   if (selection.resource === AcademicResource.ACADEMIC_YEAR) {
     return (
       <AcademicYearStatusDialog

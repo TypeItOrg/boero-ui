@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
+import { useActionState, type ReactElement } from "react";
+
 import { CircleAlertIcon, UserCheckIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
-import type { EnrollmentApplicationActionState } from "@features/enrollment-applications/types/enrollment-application-action-state.types";
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
@@ -14,10 +13,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
 import { safelyRunAction } from "@common/utils/safe-action.util";
+
 import { approvePlatformEnrollmentApplicationAction } from "@features/enrollment-applications/actions/approve-platform-enrollment-application.action";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import type { EnrollmentApplicationActionState } from "@features/enrollment-applications/types/enrollment-application-action-state.types";
 import type { PlatformEnrollmentApplicationSummary } from "@features/enrollment-applications/types/platform-enrollment-application-summary.types";
 
 type PlatformEnrollmentApplicationApproveDialogProps = {
@@ -32,8 +34,8 @@ export function PlatformEnrollmentApplicationApproveDialog({
   open,
   onOpenChange,
   onApproved,
-}: PlatformEnrollmentApplicationApproveDialogProps): React.ReactElement {
-  const [state, formAction, isPending] = React.useActionState(async (): Promise<EnrollmentApplicationActionState> => {
+}: PlatformEnrollmentApplicationApproveDialogProps): ReactElement {
+  const [state, formAction, isPending] = useActionState(async (): Promise<EnrollmentApplicationActionState> => {
     const result = await safelyRunAction(
       approvePlatformEnrollmentApplicationAction(application.institutionId, application.applicationId, application.canApproveProvisionally === true),
       ENROLLMENT_MESSAGES.APPROVE,

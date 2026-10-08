@@ -18,8 +18,14 @@ describe("institutionalPasswordSchema", () => {
     const result = institutionalPasswordSchema.safeParse(createValidInput({ currentPassword: "" }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["currentPassword"], message: "Ingresá tu contraseña actual." }));
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["currentPassword"],
+          message: "Ingresá tu contraseña actual.",
+        }),
+      );
     }
   });
 
@@ -27,9 +33,13 @@ describe("institutionalPasswordSchema", () => {
     const result = institutionalPasswordSchema.safeParse(createValidInput({ password: "short", confirmPassword: "short" }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
-        expect.objectContaining({ path: ["password"], message: "La contraseña debe tener al menos 8 caracteres." }),
+        expect.objectContaining({
+          path: ["password"],
+          message: "La contraseña debe tener al menos 8 caracteres.",
+        }),
       );
     }
   });
@@ -38,8 +48,14 @@ describe("institutionalPasswordSchema", () => {
     const result = institutionalPasswordSchema.safeParse(createValidInput({ confirmPassword: "" }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["confirmPassword"], message: "Debés confirmar la contraseña." }));
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["confirmPassword"],
+          message: "Debés confirmar la contraseña.",
+        }),
+      );
     }
   });
 
@@ -47,8 +63,14 @@ describe("institutionalPasswordSchema", () => {
     const result = institutionalPasswordSchema.safeParse(createValidInput({ confirmPassword: "differentpassword" }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." }));
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["confirmPassword"],
+          message: "Las contraseñas no coinciden.",
+        }),
+      );
     }
   });
 });

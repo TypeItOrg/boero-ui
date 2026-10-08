@@ -1,4 +1,5 @@
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import type { ApprovalMode } from "@features/academic/types/approval-mode.types";
 import type { RequirementType } from "@features/academic/types/requirement-type.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";

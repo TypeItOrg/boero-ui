@@ -130,9 +130,21 @@ describe("enrollment-application.schema", () => {
         isReenrolling: false,
       },
       attachments: [
-        { id: "1", requirementId: "00000000-0000-4000-8000-000000000001", originalFileName: "dni-frente.jpg" },
-        { id: "2", requirementId: "00000000-0000-4000-8000-000000000002", originalFileName: "dni-dorso.jpg" },
-        { id: "3", requirementId: "00000000-0000-4000-8000-000000000003", originalFileName: "foto.jpg" },
+        {
+          id: "1",
+          requirementId: "00000000-0000-4000-8000-000000000001",
+          originalFileName: "dni-frente.jpg",
+        },
+        {
+          id: "2",
+          requirementId: "00000000-0000-4000-8000-000000000002",
+          originalFileName: "dni-dorso.jpg",
+        },
+        {
+          id: "3",
+          requirementId: "00000000-0000-4000-8000-000000000003",
+          originalFileName: "foto.jpg",
+        },
       ],
     };
 
@@ -153,6 +165,7 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(minorData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
         const issues = result.error.issues;
         const responsibleErrors = issues.filter((i) => i.path[0] === "responsible");
@@ -192,6 +205,7 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(healthSupportData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
         const paths = result.error.issues.map((i) => i.path.join("."));
         expect(paths).toContain("healthInclusion.adjustmentDetails");
@@ -223,6 +237,7 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(reenrollingData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
         const paths = result.error.issues.map((i) => i.path.join("."));
         expect(paths).toContain("preference.previousTeacher");

@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useState, type ReactElement, type ReactNode } from "react";
+
 import Image from "next/image";
+
 import { ExpandIcon, EyeIcon, FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 
-import { DocumentPdfPreview } from "@features/enrollment-applications/components/document-pdf-preview";
 import { Button } from "@common/components/ui/button";
-import { cn } from "@common/utils/cn.util";
 import {
   Dialog,
   DialogClose,
@@ -17,6 +17,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@common/components/ui/dialog";
+import { cn } from "@common/utils/cn.util";
+
+import { DocumentPdfPreview } from "@features/enrollment-applications/components/document-pdf-preview";
 
 export function DocumentFilePreview({
   src,
@@ -32,15 +35,15 @@ export function DocumentFilePreview({
   contentType: string;
   compact?: boolean;
   iconOnly?: boolean;
-  triggerLabel?: React.ReactNode;
+  triggerLabel?: ReactNode;
   className?: string;
-}): React.ReactElement {
-  const [failed, setFailed] = React.useState(false);
-  const onPreviewError = React.useCallback(() => setFailed(true), []);
+}): ReactElement {
+  const [failed, setFailed] = useState(false);
+  const onPreviewError = useCallback(() => setFailed(true), []);
   const isImage = contentType === "image/png" || contentType === "image/jpeg";
   const isPdf = contentType === "application/pdf";
 
-  function content(expanded: boolean): React.ReactNode {
+  function content(expanded: boolean): ReactNode {
     if (failed || (!isImage && !isPdf)) {
       return (
         <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center text-sm">

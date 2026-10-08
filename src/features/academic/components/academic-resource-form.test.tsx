@@ -1,12 +1,14 @@
-jest.mock("@features/academic/components/platform-institution-form-field", () => ({
-  PlatformInstitutionFormField: (): React.ReactElement => <div data-testid="institution-field" />,
-}));
+import type { ReactElement } from "react";
 
 import { render, screen } from "@testing-library/react";
 
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/components/platform-institution-form-field", () => ({
+  PlatformInstitutionFormField: (): ReactElement => <div data-testid="institution-field" />,
+}));
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 

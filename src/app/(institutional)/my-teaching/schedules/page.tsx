@@ -1,7 +1,11 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
+
 import { CalendarRangeIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { MyWeeklySchedule } from "@features/course-enrollments/components/my-weekly-schedule";
 import { fetchTeacherWeeklySchedules } from "@features/course-enrollments/services/teacher-course.service";
 import type { WeeklyScheduleItem } from "@features/course-enrollments/types/weekly-schedule-item.types";
@@ -14,12 +18,9 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 
 export const metadata: Metadata = { title: "Mis horarios" };
 
-export default async function TeacherSchedulesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ week?: string | string[] }>;
-}): Promise<React.ReactElement> {
+export default async function TeacherSchedulesPage({ searchParams }: { searchParams: Promise<{ week?: string | string[] }> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   if (!user.roles.includes("Profesor")) {
     return <InstitutionalAccessDenied description="Esta vista corresponde a profesores con clases asignadas." />;
   }

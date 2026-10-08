@@ -1,5 +1,7 @@
-import { act, renderHook } from "@testing-library/react";
 import { usePathname } from "next/navigation";
+
+import { act, renderHook } from "@testing-library/react";
+
 import { useSidebar } from "@common/components/ui/sidebar";
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 

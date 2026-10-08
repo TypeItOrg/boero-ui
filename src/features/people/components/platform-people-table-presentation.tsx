@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { Loader2Icon } from "lucide-react";
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
@@ -7,8 +9,9 @@ import { DataTableSortableHead } from "@common/components/ui/data-table-sortable
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationParams } from "@common/types/pagination-params.types";
-import { PlatformPeopleEmptyState } from "@features/people/components/platform-people-table-empty-state";
+
 import { PlatformPeoplePagination } from "@features/people/components/platform-people-pagination";
+import { PlatformPeopleEmptyState } from "@features/people/components/platform-people-table-empty-state";
 import { PlatformPeopleTableRow } from "@features/people/components/platform-people-table-row";
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
@@ -32,7 +35,7 @@ export function PlatformPeopleTablePresentation({
   search,
   sort,
   canUpdate = true,
-}: PlatformPeopleTablePresentationProps): React.ReactElement {
+}: PlatformPeopleTablePresentationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function updateSort(nextSort: PlatformPeopleSort): void {

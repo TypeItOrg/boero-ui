@@ -1,5 +1,7 @@
-import * as React from "react";
+import type { PropsWithChildren, ReactElement, ReactNode } from "react";
+
 import Link from "next/link";
+
 import { BuildingIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
@@ -15,15 +17,9 @@ type InstitutionsTableEmptyStateProps = {
   totalItems: number;
 };
 
-export function InstitutionsTableEmptyState({
-  active,
-  isNavigating,
-  search,
-  size,
-  totalItems,
-}: InstitutionsTableEmptyStateProps): React.ReactElement {
+export function InstitutionsTableEmptyState({ active, isNavigating, search, size, totalItems }: InstitutionsTableEmptyStateProps): ReactElement {
   const hasFilters = search.trim() !== "" || active !== undefined;
-  let content: React.ReactNode;
+  let content: ReactNode;
 
   if (totalItems > 0) {
     content = (
@@ -70,7 +66,7 @@ export function InstitutionsTableEmptyState({
   );
 }
 
-function EmptyState({ children, icon, title }: React.PropsWithChildren<{ icon: React.ReactNode; title: string }>): React.ReactElement {
+function EmptyState({ children, icon, title }: PropsWithChildren<{ icon: ReactNode; title: string }>): ReactElement {
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
       <EmptyMedia className="mb-4" variant="icon">

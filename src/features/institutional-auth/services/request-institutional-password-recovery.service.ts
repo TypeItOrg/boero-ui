@@ -1,5 +1,6 @@
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+
 import type { InstitutionalPasswordRecoveryInput } from "@features/institutional-auth/types/institutional-password-recovery-input.types";
 
 export async function requestInstitutionalPasswordRecovery(
@@ -13,10 +14,15 @@ export async function requestInstitutionalPasswordRecovery(
       method: "POST",
     });
 
-    if (!response.ok) return { success: false, error: (await response.json()) as BackendError };
+    if (!response.ok) {
+      return { success: false, error: (await response.json()) as BackendError };
+    }
 
     return { success: true };
   } catch {
-    return { success: false, error: { status: 500, message: "No se pudo conectar con el servidor." } };
+    return {
+      success: false,
+      error: { status: 500, message: "No se pudo conectar con el servidor." },
+    };
   }
 }

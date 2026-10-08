@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import { institutionFormSchema } from "@features/institutions/schemas/institution-form.schema";
 import { type InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import { INSTITUTION_FORM_FIELD_NAMES } from "@features/institutions/types/institution-form-field-name.types";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 export async function createInstitutionAction(formData: FormData): Promise<InstitutionActionState> {
   const payload = {
@@ -23,6 +24,7 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
   };
 
   const parsed = institutionFormSchema.safeParse(payload);
+
   if (!parsed.success) {
     return getValidationActionState(parsed.error.issues, INSTITUTION_FORM_FIELD_NAMES);
   }
@@ -36,8 +38,12 @@ export async function createInstitutionAction(formData: FormData): Promise<Insti
   });
 
   const errorState = await getResponseErrorActionState(response, INSTITUTION_FORM_FIELD_NAMES, INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION);
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   revalidatePath("/admin/institutions");
+
   return { success: true };
 }

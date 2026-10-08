@@ -1,8 +1,12 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { notFound } from "next/navigation";
+
 import { PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
+
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
 import { AcademicOverview } from "@features/academic/components/academic-overview";
 import { renderPrimaryDetail } from "@features/academic/components/academic-route-detail";
@@ -15,16 +19,16 @@ import { canReadAcademic, type AcademicAccess } from "@features/academic/types/a
 import type { AcademicBreadcrumbOptions } from "@features/academic/types/academic-breadcrumb-options.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import { parseAcademicCollectionResource } from "@features/academic/utils/parse-academic-collection-resource.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { getAcademicRouteBase } from "@features/academic/utils/academic-scope.util";
+import { parseAcademicCollectionResource } from "@features/academic/utils/parse-academic-collection-resource.util";
 
 export type { AcademicBreadcrumbOptions };
 
 type AcademicRouteViewProps = {
   access: AcademicAccess;
   institutionId: string;
-  renderBreadcrumb: (options?: AcademicBreadcrumbOptions) => React.ReactNode;
+  renderBreadcrumb: (options?: AcademicBreadcrumbOptions) => ReactNode;
   scope: AcademicScope;
   segments?: string[];
   searchParams: Record<string, string | string[] | undefined>;
@@ -37,19 +41,25 @@ export async function AcademicRouteView({
   scope,
   segments = [],
   searchParams,
-}: AcademicRouteViewProps): Promise<React.ReactElement> {
+}: AcademicRouteViewProps): Promise<ReactElement> {
   const basePath = getAcademicRouteBase(scope, institutionId);
   const breadcrumb = renderBreadcrumb();
+
   if (segments.length === 0) {
-    if (!canReadAcademic(access)) notFound();
+    if (!canReadAcademic(access)) {
+      notFound();
+    }
+
     return <AcademicOverview access={access} basePath={basePath} breadcrumb={breadcrumb} institutionId={institutionId} scope={scope} />;
   }
 
   const [resourceSegment, id, action, nestedId, nestedAction, leaf, leafId] = segments;
   const collectionResource = parseAcademicCollectionResource(resourceSegment);
+
   if (collectionResource) {
     const config = ACADEMIC_COLLECTION_CONFIG[collectionResource];
     ensureReadAccess(access, collectionResource);
+
     if (!id) {
       const createAction = config.canCreate(access) ? (
         <Button asChild size="lg" className="w-full">
@@ -59,6 +69,7 @@ export async function AcademicRouteView({
           </ReturnToLink>
         </Button>
       ) : undefined;
+
       return (
         <AcademicShell title={config.title} breadcrumb={breadcrumb} actions={<AcademicPageIcon icon={config.createIcon} />}>
           <AcademicCollectionView
@@ -78,7 +89,8 @@ export async function AcademicRouteView({
         </AcademicShell>
       );
     }
-    if (id === ACADEMIC_ROUTE_SEGMENT.NEW)
+
+    if (id === ACADEMIC_ROUTE_SEGMENT.NEW) {
       return await renderPrimaryForm({
         access,
         basePath,
@@ -88,8 +100,14 @@ export async function AcademicRouteView({
         scope,
         searchParams,
       });
-    if (action === "status") notFound();
+    }
+
+    if (action === "status") {
+      notFound();
+    }
+
     const isPrimaryDetailAction = action === ACADEMIC_ROUTE_SEGMENT.EDIT;
+
     if (config.hasCurriculum && action && !isPrimaryDetailAction) {
       return StudyPlanRoute({
         access,
@@ -107,9 +125,11 @@ export async function AcademicRouteView({
         scope,
       });
     }
+
     if (collectionResource === AcademicResource.ACADEMIC_YEAR && !action) {
       notFound();
     }
+
     return renderPrimaryDetail({
       access,
       action,
@@ -123,10 +143,14 @@ export async function AcademicRouteView({
       searchParams,
     });
   }
+
   notFound();
 }
 
 function ensureReadAccess(access: AcademicAccess, resource: AcademicCollectionResource): void {
-  if (ACADEMIC_COLLECTION_CONFIG[resource].canRead(access)) return;
+  if (ACADEMIC_COLLECTION_CONFIG[resource].canRead(access)) {
+    return;
+  }
+
   notFound();
 }

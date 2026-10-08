@@ -1,31 +1,31 @@
+import type { ReactElement } from "react";
+
 import "server-only";
 
 import type { Metadata } from "next";
+
 import { AlertCircleIcon, ClipboardPlusIcon } from "lucide-react";
 
-import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
-import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
+import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
-import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+
+import { EnrollmentCatalogPagination } from "@features/enrollment-applications/components/enrollment-catalog-pagination";
+import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
+import { fetchAvailableEnrollmentTrainingPaths } from "@features/enrollment-applications/services/enrollment-application.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
+import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { canStartEnrollmentApplication } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
-import { fetchAvailableEnrollmentTrainingPaths } from "@features/enrollment-applications/services/enrollment-application.service";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Nueva inscripción");
 }
 
-export default async function EnrollmentPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | undefined>>;
-}): Promise<React.ReactElement> {
+export default async function EnrollmentPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }): Promise<ReactElement> {
   const query = await searchParams;
   const plansPage = parsePaginationQuery({ page: query.plansPage }, { defaultSize: 20 });
   const [user, person] = await Promise.all([requireInstitutionalUser(), fetchInstitutionalPerson()]);

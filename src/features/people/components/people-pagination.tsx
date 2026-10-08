@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { PEOPLE_PAGE_SIZE_OPTIONS } from "@features/people/utils/people-pagination.util";
 
 type PeoplePaginationProps = PaginationParams & {
@@ -10,7 +13,7 @@ type PeoplePaginationProps = PaginationParams & {
   totalPages: number;
 };
 
-export function PeoplePagination({ page, size, totalItems, totalPages }: PeoplePaginationProps): React.ReactElement {
+export function PeoplePagination({ page, size, totalItems, totalPages }: PeoplePaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function navigateToPage(newPage: number): void {

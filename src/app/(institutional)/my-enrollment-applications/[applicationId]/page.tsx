@@ -1,11 +1,15 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { ClipboardListIcon, FilePenLineIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import {
   fetchEnrollmentApplicationById,
@@ -34,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MyEnrollmentApplicationDetailPage({
   params,
   searchParams,
-}: MyEnrollmentApplicationDetailPageProps): Promise<React.ReactElement> {
+}: MyEnrollmentApplicationDetailPageProps): Promise<ReactElement> {
   const [{ applicationId }, { returnTo }] = await Promise.all([params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/my-enrollment-applications");
   const application = await fetchEnrollmentApplicationById(applicationId).catch(() => null);

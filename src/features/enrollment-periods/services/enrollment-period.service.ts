@@ -1,16 +1,17 @@
-import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import "server-only";
 
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
-import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
+
+import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
+import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import type { CreateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/create-enrollment-period-request.types";
-import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import type { EnrollmentPeriodStatusRequest } from "@features/enrollment-periods/types/enrollment-period-status-request.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import type { UpdateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/update-enrollment-period-request.types";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const getPeriodsPath = (institutionId: string) => `/api/v1/institutions/${institutionId}/enrollment-periods`;
 
@@ -68,7 +69,9 @@ export async function fetchEnrollmentPeriod(
   periodId: string,
   scope: AcademicScopeType = AcademicScope.INSTITUTIONAL,
 ): Promise<EnrollmentPeriod | null> {
-  const response = await enrollmentApiFetch(scope, `${getPeriodsPath(institutionId)}/${periodId}`, { method: "GET" });
+  const response = await enrollmentApiFetch(scope, `${getPeriodsPath(institutionId)}/${periodId}`, {
+    method: "GET",
+  });
 
   return parseNullableHttpResponse(response, ENROLLMENT_MESSAGES.PERIOD_FETCH_FAILED);
 }

@@ -1,7 +1,7 @@
-import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import {
   fetchAcademicSpaces,
   fetchAcademicYears,
@@ -14,15 +14,16 @@ import {
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import type { Course } from "@features/academic/types/course.types";
-import type { Shift } from "@features/academic/types/shift.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
+import type { Course } from "@features/academic/types/course.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import { academicSpaceTypeLabels, academicYearStatusLabels, studyPlanStatusLabels } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { formatStudyPlanLabel, formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 
 export type AcademicRecentItem = {
   active: boolean;
@@ -50,6 +51,7 @@ export async function fetchAcademicRecentItems(scope: AcademicScope, institution
       ),
     );
   }
+
   if (access.trainingPathRead) {
     requests.push(
       loadRecentItem(
@@ -60,11 +62,13 @@ export async function fetchAcademicRecentItems(scope: AcademicScope, institution
       ),
     );
   }
+
   if (access.studyPlanRead) {
     requests.push(
       loadRecentItem(() => fetchStudyPlans(scope, institutionId, RECENT_QUERY), AcademicResource.STUDY_PLAN, "Planes de estudio", mapStudyPlan),
     );
   }
+
   if (access.academicSpaceRead) {
     requests.push(
       loadRecentItem(
@@ -75,11 +79,13 @@ export async function fetchAcademicRecentItems(scope: AcademicScope, institution
       ),
     );
   }
+
   if (access.instrumentRead) {
     requests.push(
       loadRecentItem(() => fetchInstruments(scope, institutionId, RECENT_QUERY), AcademicResource.INSTRUMENT, "Instrumentos", mapInstrument),
     );
   }
+
   if (access.courseRead) {
     requests.push(loadRecentItem(() => fetchCourses(scope, institutionId, RECENT_QUERY), AcademicResource.COURSE, "Cursos", mapCourse));
   }
@@ -99,7 +105,11 @@ async function loadRecentItem<T>(
 ): Promise<AcademicRecentItem | null> {
   const page = await fetchPage();
   const item = page.items[0];
-  if (!item) return null;
+
+  if (!item) {
+    return null;
+  }
+
   return { ...mapItem(item), resource, section };
 }
 

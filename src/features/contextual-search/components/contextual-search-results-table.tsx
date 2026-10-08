@@ -1,12 +1,15 @@
-import { OptionalValue } from "@common/components/optional-value";
-import { getContextualSearchLabels } from "@features/contextual-search/utils/contextual-search-label.util";
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { Badge } from "@common/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+
 import { CONTEXTUAL_SEARCH_STATUS_LABELS, hasPositiveContextualSearchStatus } from "@features/contextual-search/config/contextual-search.config";
 import type { AcademicContextualSearchEntity } from "@features/contextual-search/types/academic-contextual-search-entity.types";
 import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
+import { getContextualSearchLabels } from "@features/contextual-search/utils/contextual-search-label.util";
 import { getContextualSearchResultHref } from "@features/contextual-search/utils/contextual-search-route.util";
 
 type ContextualSearchResultsTableProps = {
@@ -14,7 +17,7 @@ type ContextualSearchResultsTableProps = {
   items: ContextualSearchResult[];
 };
 
-export function ContextualSearchResultsTable({ entityType, items }: ContextualSearchResultsTableProps): React.ReactElement {
+export function ContextualSearchResultsTable({ entityType, items }: ContextualSearchResultsTableProps): ReactElement {
   if (items.length === 0) {
     return (
       <div className="text-muted-foreground rounded-xl border border-dashed px-5 py-12 text-center text-sm">
@@ -22,6 +25,7 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
       </div>
     );
   }
+
   return (
     <Table>
       <TableHeader>
@@ -35,6 +39,7 @@ export function ContextualSearchResultsTable({ entityType, items }: ContextualSe
         {items.map((item) => {
           const labels = getContextualSearchLabels(entityType, item);
           const resultHref = getContextualSearchResultHref("platform", entityType, item);
+
           return (
             <TableRow key={item.id}>
               <TableCell>

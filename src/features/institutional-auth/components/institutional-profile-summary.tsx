@@ -1,16 +1,18 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
-import { OptionalValue } from "@common/components/optional-value";
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { HomeIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
 
-import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
+import { OptionalValue } from "@common/components/optional-value";
 import { SectionHeader } from "@common/components/section-header";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
+import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 
 type InstitutionalProfileSummaryProps = {
   person: InstitutionalPerson;
 };
 
-export function InstitutionalProfileSummary({ person }: InstitutionalProfileSummaryProps): React.ReactElement {
+export function InstitutionalProfileSummary({ person }: InstitutionalProfileSummaryProps): ReactElement {
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
@@ -45,11 +47,11 @@ export function InstitutionalProfileSummary({ person }: InstitutionalProfileSumm
   );
 }
 
-function ProfileSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
+function ProfileSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): ReactElement {
   return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
-function ProfileValue({ label, value, fallback }: { label: string; value?: string | null; fallback: string }): React.ReactElement {
+function ProfileValue({ label, value, fallback }: { label: string; value?: string | null; fallback: string }): ReactElement {
   return (
     <div>
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
@@ -64,15 +66,19 @@ function formatDate(value: string | null): string | null {
   if (!value) {
     return null;
   }
+
   const [year, month, day] = value.split("-");
+
   return year && month && day ? `${day}/${month}/${year}` : value;
 }
 
 function formatAddress(person: InstitutionalPerson): string | null {
   const address = person.address;
+
   if (!address) {
     return null;
   }
+
   return [
     address.street,
     address.number,

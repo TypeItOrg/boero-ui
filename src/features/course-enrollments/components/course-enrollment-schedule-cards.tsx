@@ -1,6 +1,9 @@
+import type { ReactElement } from "react";
+
 import { CalendarDaysIcon, ClockIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
+
 import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 
@@ -8,7 +11,7 @@ type CourseEnrollmentScheduleCardsProps = {
   schedules: CourseEnrollment["schedules"];
 };
 
-export function CourseEnrollmentScheduleCards({ schedules }: CourseEnrollmentScheduleCardsProps): React.ReactElement {
+export function CourseEnrollmentScheduleCards({ schedules }: CourseEnrollmentScheduleCardsProps): ReactElement {
   const days = [...new Set(schedules.map((schedule) => schedule.dayOfWeek))];
   const dayOrder = Object.keys(COURSE_DAY_LABELS);
   days.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));

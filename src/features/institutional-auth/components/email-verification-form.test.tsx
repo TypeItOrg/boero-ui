@@ -1,5 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { resendEmailVerification, changePendingEmail } from "@features/institutional-auth/actions/email-verification.actions";
+import { EmailVerificationForm } from "@features/institutional-auth/components/email-verification-form";
+
 jest.mock("@features/institutional-auth/actions/email-verification.actions", () => ({
   resendEmailVerification: jest.fn(),
   changePendingEmail: jest.fn(),
@@ -7,9 +11,11 @@ jest.mock("@features/institutional-auth/actions/email-verification.actions", () 
 jest.mock("@features/institutional-auth/components/institution-picker", () => ({
   InstitutionPicker: ({ value }: { value?: string }) => <input name="institutionId" type="hidden" value={value ?? ""} />,
 }));
-import { resendEmailVerification, changePendingEmail } from "@features/institutional-auth/actions/email-verification.actions";
-import { EmailVerificationForm } from "@features/institutional-auth/components/email-verification-form";
-const context = { institutionId: "22222222-2222-4222-8222-222222222222", documentNumber: "12345678", institutionName: "Boero" };
+const context = {
+  institutionId: "22222222-2222-4222-8222-222222222222",
+  documentNumber: "12345678",
+  institutionName: "Boero",
+};
 it("reuses identity and shows a generic resend acknowledgement", async () => {
   jest.mocked(resendEmailVerification).mockResolvedValue({ success: true });
   render(<EmailVerificationForm context={context} />);

@@ -1,6 +1,7 @@
 import { RouteIcon } from "lucide-react";
 
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 import { fetchTrainingPath, fetchTrainingPaths } from "@features/academic/services/academic.service";
 import type { AcademicCollectionConfig } from "@features/academic/types/academic-collection-config.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";

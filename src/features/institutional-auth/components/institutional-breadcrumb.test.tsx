@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
 import { usePathname } from "next/navigation";
+
+import { render, screen } from "@testing-library/react";
 
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 

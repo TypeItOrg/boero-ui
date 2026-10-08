@@ -1,9 +1,12 @@
-jest.mock("@features/academic/services/academic-api-fetch.service", () => ({ academicApiFetch: jest.fn() }));
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 import { GET as getAdminAcademicOptions } from "@app/api/admin/academic/options/[resource]/route";
 import { GET as getInstitutionalAcademicOptions } from "@app/api/institutional/academic/options/[resource]/route";
-import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/services/academic-api-fetch.service", () => ({
+  academicApiFetch: jest.fn(),
+}));
 
 describe("academic options routes", () => {
   const academicApiFetchMock = jest.mocked(academicApiFetch);
@@ -32,14 +35,19 @@ describe("academic options routes", () => {
       `http://localhost${routePath}?institutionId=${institutionId}&page=1&size=20&search=Tecnicatura&scope=${conflictingScope}`,
     );
 
-    const response = await get(request, { params: Promise.resolve({ resource: "training-paths" }) });
+    const response = await get(request, {
+      params: Promise.resolve({ resource: "training-paths" }),
+    });
 
     expect(response.status).toBe(200);
     expect(academicApiFetchMock).toHaveBeenCalledTimes(1);
 
     const call = academicApiFetchMock.mock.calls[0];
     expect(call).toBeDefined();
-    if (!call) return;
+
+    if (!call) {
+      return;
+    }
 
     const [receivedScope, receivedPath, receivedInit] = call;
     const receivedUrl = new URL(receivedPath, "http://localhost");

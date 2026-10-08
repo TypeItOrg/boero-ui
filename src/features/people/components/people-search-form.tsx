@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+
 import type { AssignableRole } from "@features/people/types/assignable-role.types";
 
 const ALL_ROLES = "all";
@@ -12,7 +15,7 @@ type PeopleSearchFormProps = {
   roles?: AssignableRole[];
 };
 
-export function PeopleSearchForm({ search, size, roleId, roles = [] }: PeopleSearchFormProps): React.ReactElement {
+export function PeopleSearchForm({ search, size, roleId, roles = [] }: PeopleSearchFormProps): ReactElement {
   const roleFilter: DataTableSelectFilter = {
     defaultValue: ALL_ROLES,
     label: "Rol",

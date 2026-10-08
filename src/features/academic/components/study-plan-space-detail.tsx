@@ -1,8 +1,13 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { GitBranchPlusIcon, LibraryBigIcon, PlusIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Button } from "@common/components/ui/button";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
@@ -15,7 +20,6 @@ import {
   requirementTypeLabels,
 } from "@features/academic/utils/academic-labels.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type StudyPlanSpaceDetailProps = {
   space: StudyPlanSpace;
@@ -35,12 +39,13 @@ export function StudyPlanSpaceDetail({
   scope,
   institutionId,
   canEditCurriculum,
-}: StudyPlanSpaceDetailProps): React.ReactElement {
+}: StudyPlanSpaceDetailProps): ReactElement {
   const planPath = `${basePath}/study-plans/${space.studyPlanId}`;
   const prerequisites = prerequisite ? [prerequisite] : curriculum.prerequisites.filter((item) => item.targetStudyPlanSpaceId === space.id);
   const names = new Map(
     [...curriculum.levels.flatMap((level) => level.spaces), ...curriculum.unassignedSpaces].map((item) => [item.id, item.academicSpaceName]),
   );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -125,7 +130,7 @@ export function StudyPlanSpaceDetail({
   );
 }
 
-function CurriculumDetailValue({ label, value }: { label: string; value: string }): React.ReactElement {
+function CurriculumDetailValue({ label, value }: { label: string; value: string }): ReactElement {
   return (
     <div className="bg-background rounded-lg border p-4">
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>

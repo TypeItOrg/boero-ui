@@ -1,8 +1,11 @@
+import { Suspense, type ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { Suspense } from "react";
+
 import { ClipboardListIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { EnrollmentApplicationFilters } from "@features/enrollment-applications/components/enrollment-application-filters";
 import { EnrollmentApplicationTableSkeleton } from "@features/enrollment-applications/components/enrollment-application-table-skeleton";
 import { MyEnrollmentApplicationTableContainer } from "@features/enrollment-applications/components/my-enrollment-application-table";
@@ -27,7 +30,7 @@ export default async function MyEnrollmentApplicationsPage({
   searchParams,
 }: {
   searchParams: Promise<EnrollmentApplicationSearchParams>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!canViewOwnEnrollmentApplications(user)) {

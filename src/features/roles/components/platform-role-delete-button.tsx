@@ -1,9 +1,12 @@
 "use client";
 
-import * as React from "react";
+import { useState, useTransition, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+
 import { deletePlatformRoleAction } from "@features/roles/actions/delete-platform-role.action";
 
 export function PlatformRoleDeleteButton({
@@ -27,19 +30,22 @@ export function PlatformRoleDeleteButton({
   roleId: string;
   institutionId: string;
   roleName: string;
-}): React.ReactElement {
+}): ReactElement {
   const router = useRouter();
-  const [isPending, startTransition] = React.useTransition();
-  const [error, setError] = React.useState<string>();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string>();
 
   function handleDelete(): void {
     setError(undefined);
     startTransition(async () => {
       const result = await deletePlatformRoleAction(institutionId, roleId);
+
       if (result.error) {
         setError(result.error);
+
         return;
       }
+
       router.replace("/admin/roles");
     });
   }

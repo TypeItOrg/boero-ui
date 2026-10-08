@@ -1,10 +1,13 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { toFormControlValue } from "@common/utils/form-value.util";
+
 import { DescriptionField, FormField, FormSelect, NameField } from "@features/academic/components/academic-form-controls";
+import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { ACADEMIC_SPACE_FORMAT } from "@features/academic/types/academic-space-format.types";
 import { ACADEMIC_SPACE_TYPE } from "@features/academic/types/academic-space-type.types";
-import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
 
 const ACTIVE_STATUS_OPTIONS = [
@@ -22,7 +25,7 @@ type ActiveStatusFieldProps = {
   initialActive: string;
 };
 
-export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function TrainingPathFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = initialValues.active !== undefined || initialValues.status !== undefined || Boolean(initialValues.id);
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
@@ -35,7 +38,7 @@ export function TrainingPathFields({ initialValues = {}, fieldErrors }: Academic
   );
 }
 
-export function InstrumentFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function InstrumentFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
@@ -48,7 +51,7 @@ export function InstrumentFields({ canChangeStatus = true, initialValues = {}, f
   );
 }
 
-export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
 
@@ -61,7 +64,7 @@ export function ShiftFields({ canChangeStatus = true, initialValues = {}, fieldE
   );
 }
 
-export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const hasActiveState = Boolean(initialValues.id) && canChangeStatus;
   const initialActive = typeof initialValues.active === "boolean" ? String(initialValues.active) : "true";
   const instrumentalLocked = Boolean(initialValues.id && initialValues.instrumentalLocked);
@@ -73,14 +76,20 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
         <FormSelect
           name="type"
           defaultValue={toFormControlValue(initialValues.type ?? ACADEMIC_SPACE_TYPE[0])}
-          options={ACADEMIC_SPACE_TYPE.map((type) => ({ value: type, label: academicSpaceTypeLabels[type] }))}
+          options={ACADEMIC_SPACE_TYPE.map((type) => ({
+            value: type,
+            label: academicSpaceTypeLabels[type],
+          }))}
         />
       </FormField>
       <FormField label="Formato" name="format" error={fieldErrors?.format} required>
         <FormSelect
           name="format"
           defaultValue={toFormControlValue(initialValues.format ?? ACADEMIC_SPACE_FORMAT[0])}
-          options={ACADEMIC_SPACE_FORMAT.map((format) => ({ value: format, label: academicSpaceFormatLabels[format] }))}
+          options={ACADEMIC_SPACE_FORMAT.map((format) => ({
+            value: format,
+            label: academicSpaceFormatLabels[format],
+          }))}
         />
       </FormField>
       <FormField label="Espacio instrumental" name="instrumental" error={fieldErrors?.instrumental}>
@@ -100,7 +109,7 @@ export function AcademicSpaceFields({ canChangeStatus = true, initialValues = {}
   );
 }
 
-function ActiveStatusField({ error, initialActive }: ActiveStatusFieldProps): React.ReactElement {
+function ActiveStatusField({ error, initialActive }: ActiveStatusFieldProps): ReactElement {
   return (
     <>
       <input type="hidden" name="initialActive" value={initialActive} />

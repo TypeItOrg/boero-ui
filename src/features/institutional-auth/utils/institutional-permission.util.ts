@@ -21,6 +21,7 @@ export function hasTrainingPathPermission(
   trainingPathId: string,
 ): boolean {
   const access = user?.permissionScopes?.[permission];
+
   return access?.accessScope === "INSTITUTION" || (access?.trainingPathIds.includes(trainingPathId) ?? false);
 }
 
@@ -30,5 +31,6 @@ export function scopeIncludesTrainingPath(
   trainingPathId: string | null | undefined,
 ): boolean {
   const access = scopes?.[permission];
+
   return access?.accessScope === "INSTITUTION" || (trainingPathId != null && (access?.trainingPathIds.includes(trainingPathId) ?? false));
 }

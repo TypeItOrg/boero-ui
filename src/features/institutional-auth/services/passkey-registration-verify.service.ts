@@ -1,9 +1,8 @@
-import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { readBackendErrorCode } from "@features/institutional-auth/utils/backend-error-code.util";
-
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import type { Passkey } from "@features/institutional-auth/types/passkey.types";
+import { readBackendErrorCode } from "@features/institutional-auth/utils/backend-error-code.util";
 
 export async function verifyPasskeyRegistration(ceremonyId: string, credential: unknown): Promise<Passkey> {
   const response = await institutionalApiFetch("/api/v1/auth/passkeys/registration/verify", {

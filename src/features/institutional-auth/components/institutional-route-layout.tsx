@@ -1,20 +1,22 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement, type ReactNode } from "react";
+
 import { cookies, headers } from "next/headers";
 
 import { SidebarNavigationStateProvider } from "@common/components/navigation/sidebar-navigation-state-provider";
 import { SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES } from "@common/constants/sidebar-navigation.constants";
 import { parseSidebarNavigationGroupStates } from "@common/utils/sidebar-navigation-cookie.util";
-import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
+
+import { getContextualSearchShortcutPlatform } from "@features/contextual-search/utils/contextual-search-shortcut-platform.util";
 import { InstitutionalRouteSkeleton } from "@features/institutional-auth/components/institutional-route-skeleton";
+import { InstitutionalShell } from "@features/institutional-auth/components/institutional-shell";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { getContextualSearchShortcutPlatform } from "@features/contextual-search/utils/contextual-search-shortcut-platform.util";
 
 type InstitutionalRouteLayoutProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export async function InstitutionalRouteLayout({ children }: InstitutionalRouteLayoutProps): Promise<React.ReactElement> {
+export async function InstitutionalRouteLayout({ children }: InstitutionalRouteLayoutProps): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
   const [person, cookieStore, requestHeaders] = await Promise.all([fetchInstitutionalPerson(), cookies(), headers()]);
   const sidebarOpen = cookieStore.get("institutional-sidebar-open")?.value !== "false";

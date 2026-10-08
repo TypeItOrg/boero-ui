@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, type AriaAttributes, type ChangeEvent, type ReactElement } from "react";
+
 import { format, isValid, parse } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, XIcon } from "lucide-react";
@@ -28,8 +29,8 @@ type DatePickerProps = {
   calendarMaxDate?: Date;
   className?: string;
   autoComplete?: string;
-  "aria-invalid"?: React.AriaAttributes["aria-invalid"];
-  "aria-required"?: React.AriaAttributes["aria-required"];
+  "aria-invalid"?: AriaAttributes["aria-invalid"];
+  "aria-required"?: AriaAttributes["aria-required"];
 };
 
 export function DatePicker({
@@ -48,10 +49,10 @@ export function DatePicker({
   autoComplete = "bday",
   "aria-invalid": ariaInvalid,
   "aria-required": ariaRequired,
-}: DatePickerProps): React.ReactElement {
-  const [open, setOpen] = React.useState(false);
-  const [draft, setDraft] = React.useState<string>();
-  const [hasInvalidDraft, setHasInvalidDraft] = React.useState(false);
+}: DatePickerProps): ReactElement {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<string>();
+  const [hasInvalidDraft, setHasInvalidDraft] = useState(false);
   const displayValue = draft ?? (value ? format(value, DISPLAY_DATE_FORMAT) : "");
   const hasValue = displayValue.length > 0;
   const hasOutOfRangeValue = value !== undefined && (value < minDate || (maxDate !== undefined && value > maxDate));
@@ -69,7 +70,7 @@ export function DatePicker({
     commitValue(date, "calendar");
   }
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
     const nextDraft = formatDateDraft(event.target.value);
     setDraft(nextDraft);
     onDraftChange?.(nextDraft);
@@ -77,11 +78,13 @@ export function DatePicker({
     if (nextDraft === "") {
       setHasInvalidDraft(false);
       commitValue(undefined, "input");
+
       return;
     }
 
     if (nextDraft.length !== DISPLAY_DATE_FORMAT.length) {
       setHasInvalidDraft(false);
+
       return;
     }
 
@@ -89,11 +92,16 @@ export function DatePicker({
     const isAllowedDate = date !== undefined && date >= minDate && (!maxDate || date <= maxDate);
 
     setHasInvalidDraft(!isAllowedDate);
-    if (isAllowedDate) commitValue(date, "input");
+
+    if (isAllowedDate) {
+      commitValue(date, "input");
+    }
   }
 
   function handleBlur(): void {
-    if (draft === "") setDraft(undefined);
+    if (draft === "") {
+      setDraft(undefined);
+    }
   }
 
   function handleClear(): void {
@@ -154,22 +162,35 @@ export function DatePicker({
 
 function getDefaultEndMonth(): Date {
   const today = new Date();
+
   return new Date(today.getFullYear() + DEFAULT_FUTURE_YEARS, 11);
 }
 
 function getCalendarEndMonth(calendarMinDate: Date, calendarMaxDate: Date | undefined): Date {
-  if (calendarMaxDate) return calendarMaxDate;
+  if (calendarMaxDate) {
+    return calendarMaxDate;
+  }
 
   const defaultEndMonth = getDefaultEndMonth();
-  if (calendarMinDate <= defaultEndMonth) return defaultEndMonth;
+
+  if (calendarMinDate <= defaultEndMonth) {
+    return defaultEndMonth;
+  }
 
   return new Date(calendarMinDate.getFullYear() + DEFAULT_FUTURE_YEARS, 11);
 }
 
 function getCalendarDefaultMonth(value: Date | undefined, minDate: Date, maxDate: Date | undefined): Date {
   const candidate = value ?? new Date();
-  if (candidate < minDate) return minDate;
-  if (maxDate && candidate > maxDate) return maxDate;
+
+  if (candidate < minDate) {
+    return minDate;
+  }
+
+  if (maxDate && candidate > maxDate) {
+    return maxDate;
+  }
+
   return candidate;
 }
 

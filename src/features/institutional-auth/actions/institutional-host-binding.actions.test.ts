@@ -1,22 +1,32 @@
-jest.mock("next/headers", () => ({ headers: jest.fn(async () => new Headers({ host: "cboero.testing.typeit.com.ar" })) }));
-jest.mock("@common/services/institutional-host/institutional-host.service", () => ({
-  validateRequestInstitutionId: jest.fn(async () => "La institución no corresponde a este acceso."),
-}));
-jest.mock("@features/institutional-auth/services/identify-institutional.service", () => ({ identifyInstitutionalAccount: jest.fn() }));
-jest.mock("@features/institutional-auth/services/register-institutional.service", () => ({ registerInstitutionalAccount: jest.fn() }));
-jest.mock("@features/institutional-auth/services/request-institutional-password-recovery.service", () => ({
-  requestInstitutionalPasswordRecovery: jest.fn(),
-}));
-jest.mock("@common/services/authenticated-api-fetch.service", () => ({ authenticatedApiFetch: jest.fn() }));
-jest.mock("next/navigation", () => ({ redirect: jest.fn() }));
+import { authenticatedApiFetch } from "@common/services/authenticated-api-fetch.service";
+
+import { resendEmailVerification, changePendingEmail } from "@features/institutional-auth/actions/email-verification.actions";
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
 import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
 import { requestPasswordRecovery } from "@features/institutional-auth/actions/request-institutional-password-recovery.action";
-import { resendEmailVerification, changePendingEmail } from "@features/institutional-auth/actions/email-verification.actions";
 import { identifyInstitutionalAccount } from "@features/institutional-auth/services/identify-institutional.service";
 import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
 import { requestInstitutionalPasswordRecovery } from "@features/institutional-auth/services/request-institutional-password-recovery.service";
-import { authenticatedApiFetch } from "@common/services/authenticated-api-fetch.service";
+
+jest.mock("next/headers", () => ({
+  headers: jest.fn(async () => new Headers({ host: "cboero.testing.typeit.com.ar" })),
+}));
+jest.mock("@common/services/institutional-host/institutional-host.service", () => ({
+  validateRequestInstitutionId: jest.fn(async () => "La institución no corresponde a este acceso."),
+}));
+jest.mock("@features/institutional-auth/services/identify-institutional.service", () => ({
+  identifyInstitutionalAccount: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/services/register-institutional.service", () => ({
+  registerInstitutionalAccount: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/services/request-institutional-password-recovery.service", () => ({
+  requestInstitutionalPasswordRecovery: jest.fn(),
+}));
+jest.mock("@common/services/authenticated-api-fetch.service", () => ({
+  authenticatedApiFetch: jest.fn(),
+}));
+jest.mock("next/navigation", () => ({ redirect: jest.fn() }));
 
 function form(): FormData {
   const data = new FormData();
@@ -31,8 +41,10 @@ function form(): FormData {
     confirmPassword: "password123",
   };
   Object.entries(values).forEach(([key, value]) => data.set(key, value));
+
   return data;
 }
+
 it.each([identifyInstitutionalUser, registerInstitutional, requestPasswordRecovery, resendEmailVerification, changePendingEmail])(
   "[A03.payload-context] rejects tampered hidden institutionId before auth transport ($name)",
   async (action) => {

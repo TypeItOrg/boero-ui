@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+
 import { FormField } from "@features/academic/components/academic-form-controls";
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 
@@ -22,7 +25,7 @@ export function DocumentCatalogInstitutionField({
   clearable?: boolean;
   excludedInstitutionId?: string;
   onValueChange?: (id: string | undefined, item: { id: string; name: string } | undefined) => void;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <FormField name={id} label="Institución" required={!readOnly}>
       <AsyncDropdown<{ id: string; name: string }>
@@ -38,6 +41,7 @@ export function DocumentCatalogInstitutionField({
         clearLabel="Limpiar institución"
         fetchPage={async (input) => {
           const page = await fetchPlatformInstitutionOptions(input);
+
           return { ...page, items: page.items.filter((item) => item.id !== excludedInstitutionId) };
         }}
         emptyTitle={excludedInstitutionId ? "No hay otras instituciones" : undefined}

@@ -1,4 +1,7 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { HouseIcon, ShieldXIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -10,7 +13,7 @@ type InstitutionalAccessDeniedProps = {
 
 export function InstitutionalAccessDenied({
   description = "No tenés permisos para acceder a esta sección de la institución.",
-}: InstitutionalAccessDeniedProps): React.ReactElement {
+}: InstitutionalAccessDeniedProps): ReactElement {
   return (
     <Empty className="bg-background m-4 min-h-96 sm:m-6">
       <EmptyHeader>

@@ -1,19 +1,22 @@
-import { Fragment } from "react";
+import { Fragment, type ReactElement } from "react";
+
 import Link from "next/link";
+
 import { ChevronRightIcon, HistoryIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Badge } from "@common/components/ui/badge";
 import { Separator } from "@common/components/ui/separator";
+
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicRecentItem } from "@features/academic/services/academic-recent.service";
-import { SectionHeader } from "@common/components/section-header";
 
 type AcademicRecentItemsProps = {
   basePath: string;
   items: AcademicRecentItem[];
 };
 
-export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProps): React.ReactElement {
+export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProps): ReactElement {
   return (
     <section aria-labelledby="academic-recent-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
@@ -48,8 +51,9 @@ export function AcademicRecentItems({ basePath, items }: AcademicRecentItemsProp
   );
 }
 
-function RecentItemRow({ basePath, item }: { basePath: string; item: AcademicRecentItem }): React.ReactElement {
+function RecentItemRow({ basePath, item }: { basePath: string; item: AcademicRecentItem }): ReactElement {
   const Icon = ACADEMIC_RESOURCE_ICONS[item.resource];
+
   return (
     <Link
       href={`${basePath}/${item.resource}/${item.id}`}

@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 
 import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
@@ -8,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Contraseña");
 }
 
-export default function PasswordPage(): React.ReactElement {
+export default function PasswordPage(): ReactElement {
   return (
     <>
       <InstitutionalAccountHeader />

@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { PLATFORM_ROLES_PAGE_SIZE_OPTIONS } from "@features/roles/utils/platform-role-pagination.util";
 
 type PlatformRolesPaginationProps = PaginationParams & {
@@ -20,7 +23,7 @@ export function PlatformRolesPagination({
   onPageSizeChange,
   totalItems,
   totalPages,
-}: PlatformRolesPaginationProps): React.ReactElement {
+}: PlatformRolesPaginationProps): ReactElement {
   return (
     <DataTablePagination
       page={page}

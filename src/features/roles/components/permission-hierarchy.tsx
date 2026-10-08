@@ -1,15 +1,15 @@
-import * as React from "react";
+import { Fragment, type ReactElement } from "react";
 
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 import type { PermissionTreeNode } from "@features/roles/utils/permission-hierarchy.util";
 
 type PermissionHierarchyProps = {
   nodes: readonly PermissionTreeNode[];
-  renderPermission: (permission: InstitutionPermission) => React.ReactElement;
+  renderPermission: (permission: InstitutionPermission) => ReactElement;
   layout?: "tree" | "columns";
 };
 
-export function PermissionHierarchy({ nodes, renderPermission, layout = "tree" }: PermissionHierarchyProps): React.ReactElement {
+export function PermissionHierarchy({ nodes, renderPermission, layout = "tree" }: PermissionHierarchyProps): ReactElement {
   const renderedNodes = nodes.map((node) => {
     const content = (
       <>
@@ -27,7 +27,7 @@ export function PermissionHierarchy({ nodes, renderPermission, layout = "tree" }
         {content}
       </div>
     ) : (
-      <React.Fragment key={node.permission.code}>{content}</React.Fragment>
+      <Fragment key={node.permission.code}>{content}</Fragment>
     );
   });
 

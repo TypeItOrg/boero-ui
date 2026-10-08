@@ -53,6 +53,7 @@ export async function setInstitutionalEmailVerifiedCookie(): Promise<void> {
 
 export async function hasInstitutionalEmailVerifiedCookie(): Promise<boolean> {
   const cookieStore = await cookies();
+
   return cookieStore.get(INSTITUTIONAL_EMAIL_VERIFIED_COOKIE)?.value === "true";
 }
 
@@ -63,6 +64,7 @@ export async function setInstitutionalPasswordChangedCookie(): Promise<void> {
 
 export async function hasInstitutionalPasswordChangedCookie(): Promise<boolean> {
   const cookieStore = await cookies();
+
   return cookieStore.get(INSTITUTIONAL_PASSWORD_CHANGED_COOKIE)?.value === "true";
 }
 

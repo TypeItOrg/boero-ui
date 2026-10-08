@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { PLATFORM_ACCOUNT_ERROR_MESSAGES } from "@features/platform-accounts/constants/error-messages.constants";
 
 const personNameSchema = z

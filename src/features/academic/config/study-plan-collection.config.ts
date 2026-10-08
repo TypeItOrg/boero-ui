@@ -1,8 +1,8 @@
-import { formatStudyPlanName, formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { BookPlusIcon } from "lucide-react";
 
 import { formatDisplayDate } from "@common/utils/date-input.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 import { fetchStudyPlan, fetchStudyPlans } from "@features/academic/services/academic.service";
 import type { AcademicCollectionConfig } from "@features/academic/types/academic-collection-config.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
@@ -11,6 +11,7 @@ import { STUDY_PLAN_STATUS } from "@features/academic/types/study-plan-status.ty
 import { deletionFilter, toOptions } from "@features/academic/utils/academic-collection-filters.util";
 import { studyPlanStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { STUDY_PLAN_SORT_FIELDS } from "@features/academic/utils/academic-pagination.util";
+import { formatStudyPlanLabel, formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 
 export const studyPlanCollectionConfig: AcademicCollectionConfig = {
   resource: AcademicResource.STUDY_PLAN,

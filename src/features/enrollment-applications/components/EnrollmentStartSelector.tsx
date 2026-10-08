@@ -1,13 +1,17 @@
 "use client";
-import * as React from "react";
+
+import { useState, type ReactElement, type ReactNode } from "react";
+
 import { CheckIcon, ClipboardPlusIcon, Loader2Icon, RouteIcon } from "lucide-react";
+
+import { SectionHeader } from "@common/components/section-header";
+import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Alert, AlertTitle, AlertDescription } from "@common/components/ui/alert";
-import { Card, CardHeader, CardContent, CardFooter } from "@common/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { cn } from "@common/utils/cn.util";
+
 import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
-import { SectionHeader } from "@common/components/section-header";
 
 export interface EnrollmentStartStudyPlanOption {
   id: string;
@@ -26,14 +30,15 @@ interface Props {
   onStart: (selection: StartEnrollmentApplicationInput) => void;
   error?: string;
   isStarting?: boolean;
-  studyPlanPagination?: React.ReactNode;
+  studyPlanPagination?: ReactNode;
 }
+
 export function formatEnrollmentStartOptionLabel(option: Pick<EnrollmentStartStudyPlanOption, "name" | "trainingPathName">): string {
   return !option.trainingPathName || option.trainingPathName === option.name ? option.name : `${option.name} · ${option.trainingPathName}`;
 }
 
-export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting = false, studyPlanPagination }: Props): React.ReactElement {
-  const [selectedId, setSelectedId] = React.useState(studyPlans[0]?.id ?? "");
+export function EnrollmentStartSelector({ studyPlans, onStart, error, isStarting = false, studyPlanPagination }: Props): ReactElement {
+  const [selectedId, setSelectedId] = useState(studyPlans[0]?.id ?? "");
   const trainingPathId = studyPlans.some((path) => path.id === selectedId) ? selectedId : (studyPlans[0]?.id ?? "");
 
   return (

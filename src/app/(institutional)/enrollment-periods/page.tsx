@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
+
+import type { Metadata } from "next";
+
 import { CalendarRangeIcon } from "lucide-react";
 
-import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
-import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
 import { fetchAcademicYear } from "@features/academic/services/academic.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodsTable } from "@features/enrollment-periods/components/EnrollmentPeriodsTable";
+import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
+import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";

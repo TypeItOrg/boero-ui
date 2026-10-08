@@ -1,21 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
+
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+
 import { FingerprintIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { InstitutionalPasskeyPrompt } from "@features/institutional-auth/components/institutional-passkey-prompt";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldLabel } from "@common/components/ui/field";
+
 import { beginInstitutionalPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
-import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
-import type { InstitutionalPasskeyLoginInput } from "@features/institutional-auth/types/institutional-passkey-login-input.types";
-import type { BeginPasskeyLoginState } from "@features/institutional-auth/types/begin-passkey-login-state.types";
 import { finishPasskeyLogin } from "@features/institutional-auth/actions/finish-passkey-login.action";
+import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
+import { InstitutionalPasskeyPrompt } from "@features/institutional-auth/components/institutional-passkey-prompt";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { getPasskeyAssertion, isUserCancelled, toPublicKeyRequestOptions } from "@features/institutional-auth/utils/passkey-authentication.util";
 import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webauthn-support.hook";
+import type { BeginPasskeyLoginState } from "@features/institutional-auth/types/begin-passkey-login-state.types";
+import type { InstitutionalPasskeyLoginInput } from "@features/institutional-auth/types/institutional-passkey-login-input.types";
+import { getPasskeyAssertion, isUserCancelled, toPublicKeyRequestOptions } from "@features/institutional-auth/utils/passkey-authentication.util";
 
 type PasskeyCeremonyState = { phase: "idle" | "requesting" | "verifying" };
 type InstitutionalPasskeyStepProps = {
@@ -38,7 +41,7 @@ export function InstitutionalPasskeyStep({
   onPendingChange,
   onError,
   onUsePassword,
-}: InstitutionalPasskeyStepProps): React.ReactElement {
+}: InstitutionalPasskeyStepProps): ReactElement {
   const [ceremony, setCeremony] = useState<PasskeyCeremonyState>({ phase: "idle" });
   const ceremonyRef = useRef<AbortController | null>(null);
   const verifyingRef = useRef(false);
@@ -103,8 +106,10 @@ export function InstitutionalPasskeyStep({
 
       if (begin.fieldErrors) {
         onFieldErrors(begin.fieldErrors);
+
         return;
       }
+
       if (begin.emailVerificationRequired) {
         // Lock the identity before allowing the existing action to set context and redirect.
         verifyingRef.current = true;
@@ -115,14 +120,17 @@ export function InstitutionalPasskeyStep({
         formData.set("institutionName", input.institutionName ?? "");
         formData.set("documentNumber", input.documentNumber.trim());
         const result = await identifyInstitutionalUser({}, formData);
+
         if (isCurrentCeremony(controller)) {
           onError(result.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED);
         }
+
         return;
       }
 
       if (begin.error || !begin.ceremonyId || !begin.options) {
         onError(begin.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_FAILED);
+
         return;
       }
 
@@ -154,6 +162,7 @@ export function InstitutionalPasskeyStep({
       if (isRedirectError(error)) {
         // Next already navigates from the action response; keep the controls locked until unmount.
         ceremonyRef.current = null;
+
         return;
       }
 

@@ -1,10 +1,12 @@
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { SearchIcon, ShieldCheckIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
 import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import type { PlatformRoleListItem } from "@features/roles/types/platform-role-list-item.types";
 
 type PlatformRolesEmptyStateProps = {
@@ -13,7 +15,7 @@ type PlatformRolesEmptyStateProps = {
   onFirstPage: () => void;
 };
 
-export function PlatformRolesEmptyState({ data, hasFilters, onFirstPage }: PlatformRolesEmptyStateProps): React.ReactElement {
+export function PlatformRolesEmptyState({ data, hasFilters, onFirstPage }: PlatformRolesEmptyStateProps): ReactElement {
   if (data.totalItems > 0) {
     return (
       <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
@@ -28,7 +30,9 @@ export function PlatformRolesEmptyState({ data, hasFilters, onFirstPage }: Platf
       </div>
     );
   }
+
   const Icon = hasFilters ? SearchIcon : ShieldCheckIcon;
+
   return (
     <div className="bg-muted/25 text-muted-foreground flex h-full flex-col items-center justify-center rounded-lg border px-4 py-12 text-center">
       <EmptyMedia className="mb-4" variant="icon">

@@ -1,11 +1,13 @@
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { MapPinIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { FieldGroup } from "@common/components/ui/field";
+
 import { DropdownField, TextField } from "@features/institutional-auth/components/institutional-profile-fields";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { CityDropdown, CountryDropdown } from "@features/locations/components/location-dropdowns";
-import { SectionHeader } from "@common/components/section-header";
 
 type LocationSectionProps = {
   fieldErrors: Record<string, string>;
@@ -21,7 +23,7 @@ export function InstitutionalProfileLocationSection({
   person,
   onAddressCityChange,
   onAddressStreetChange,
-}: LocationSectionProps): React.ReactElement {
+}: LocationSectionProps): ReactElement {
   return (
     <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">
       <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">

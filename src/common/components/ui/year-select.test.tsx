@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { renderToStaticMarkup } from "react-dom/server";
 import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { YearSelect } from "@common/components/ui/year-select";
 

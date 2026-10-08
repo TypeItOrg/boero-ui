@@ -1,11 +1,13 @@
+import type { ComponentProps } from "react";
+
 import type { UseFormSetError } from "react-hook-form";
 
-import type { LocationPicker } from "@features/locations/components/location-picker";
 import type { InstitutionalInstitutionFormInput } from "@features/institutions/schemas/institutional-institution-form.schema";
 import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import type { Institution } from "@features/institutions/types/institution.types";
+import type { LocationPicker } from "@features/locations/components/location-picker";
 
-export type InitialLocation = React.ComponentProps<typeof LocationPicker>["initialLocation"];
+export type InitialLocation = ComponentProps<typeof LocationPicker>["initialLocation"];
 
 export function getDefaultValues(institution: Institution): InstitutionalInstitutionFormInput {
   return {

@@ -2,6 +2,7 @@ import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
+
 import type { PersonSummary } from "@features/people/types/person-summary.types";
 
 export const DEFAULT_PEOPLE_PAGE_SIZE = 10;
@@ -11,7 +12,10 @@ export const PEOPLE_SORT_FIELDS = ["lastName", "firstName", "documentNumber"] as
 export type PeopleSortField = (typeof PEOPLE_SORT_FIELDS)[number];
 export type PeopleSort = Sort<PeopleSortField>;
 
-export const DEFAULT_PEOPLE_SORT = { field: "lastName", direction: "asc" } as const satisfies PeopleSort;
+export const DEFAULT_PEOPLE_SORT = {
+  field: "lastName",
+  direction: "asc",
+} as const satisfies PeopleSort;
 
 const peopleSortFields = new Set<PeopleSortField>(PEOPLE_SORT_FIELDS);
 

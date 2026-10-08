@@ -1,14 +1,16 @@
+import type { ReactElement } from "react";
+
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
-  updateAcademicStatusAction: jest.fn(),
-}));
 
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
 import { ActiveAcademicStatusButton, ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/actions/academic-resource.action", () => ({
+  updateAcademicStatusAction: jest.fn(),
+}));
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 const RESOURCE_ID = "019f9c3a-f891-7bc5-a98d-e65332998126";
@@ -117,7 +119,7 @@ function StatusDialog({
 }: {
   resource: AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT;
   resourceLabel: string;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <ActiveAcademicStatusDialog
       id={RESOURCE_ID}

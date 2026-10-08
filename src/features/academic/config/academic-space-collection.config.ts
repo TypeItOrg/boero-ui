@@ -54,6 +54,7 @@ export const academicSpaceCollectionConfig: AcademicCollectionConfig = {
   ],
   toRow: (item) => {
     const space = item as Extract<AcademicCollection, { type: string }>;
+
     return {
       id: space.id,
       institutionId: space.institutionId,

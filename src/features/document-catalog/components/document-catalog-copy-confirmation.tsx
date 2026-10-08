@@ -1,7 +1,9 @@
 "use client";
 
-import type { RefObject } from "react";
+import type { ReactElement, RefObject } from "react";
+
 import Link from "next/link";
+
 import { CopyIcon } from "lucide-react";
 
 import {
@@ -23,7 +25,7 @@ export function DocumentCatalogCopyConfirmation({
   href: string;
   onClose: () => void;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <AlertDialog
       open

@@ -1,23 +1,26 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement } from "react";
+
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { PlusIcon, UsersIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
+
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
-import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
-import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PeopleSearchForm } from "@features/people/components/people-search-form";
 import { PeopleTableContainer } from "@features/people/components/people-table-container";
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
+import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
 import { PeopleScope } from "@features/people/utils/people-scope.util";
+import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
+import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 type PeoplePageProps = {
   params: Promise<{ id: string }>;
@@ -28,13 +31,16 @@ export const metadata: Metadata = {
   title: "Lista de usuarios",
 };
 
-export default async function InstitutionPeoplePage({ params, searchParams }: PeoplePageProps): Promise<React.ReactElement> {
+export default async function InstitutionPeoplePage({ params, searchParams }: PeoplePageProps): Promise<ReactElement> {
   const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
   const rolesPromise = fetchSystemRoles(id, PeopleScope.ADMIN);
   const peoplePromise = fetchPeople(id, { page, size, search, sort, roleId });
   const [institution, roles] = await Promise.all([fetchInstitution(id), rolesPromise]);
-  if (!institution) notFound();
+
+  if (!institution) {
+    notFound();
+  }
 
   return (
     <PlatformPageShell

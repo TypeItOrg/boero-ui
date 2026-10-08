@@ -1,11 +1,13 @@
 "use client";
 
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { CheckCircle2Icon, RouteIcon } from "lucide-react";
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import { FieldError, FieldGroup } from "@common/components/ui/field";
 import { cn } from "@common/utils/cn.util";
+
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 
 interface EnrollmentTrainingPathSelectorProps {
@@ -22,7 +24,7 @@ export function EnrollmentTrainingPathSelector({
   onSelectTrainingPath,
   disabled = false,
   error,
-}: EnrollmentTrainingPathSelectorProps): React.ReactElement {
+}: EnrollmentTrainingPathSelectorProps): ReactElement {
   if (trainingPaths.length === 0) {
     return (
       <Card className="border-dashed">

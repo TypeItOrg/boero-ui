@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+
 import { CourseWaitlistTable } from "@features/course-enrollments/components/course-waitlist-table";
 import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
 

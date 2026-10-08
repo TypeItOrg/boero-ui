@@ -1,3 +1,11 @@
+import { changeInstitutionalPasswordAction } from "@features/institutional-auth/actions/change-institutional-password.action";
+import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
+import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
+import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -21,14 +29,6 @@ jest.mock("@features/institutional-auth/utils/institutional-auth-cookies.util", 
 jest.mock("@features/institutional-auth/actions/institutional-logout.action", () => ({
   logoutInstitutional: jest.fn(),
 }));
-
-import { changeInstitutionalPasswordAction } from "@features/institutional-auth/actions/change-institutional-password.action";
-import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
-import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const PERSON: InstitutionalPerson = {
   personId: "person-1",
@@ -74,7 +74,9 @@ describe("changeInstitutionalPasswordAction", () => {
     institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
     fetchInstitutionalPersonMock.mockResolvedValue(PERSON);
 
-    await expect(changeInstitutionalPasswordAction({}, createFormData())).resolves.toEqual({ success: true });
+    await expect(changeInstitutionalPasswordAction({}, createFormData())).resolves.toEqual({
+      success: true,
+    });
 
     expect(JSON.parse(institutionalApiFetchMock.mock.calls[0][1]?.body as string)).toMatchObject({
       firstName: "Ana",
@@ -135,5 +137,6 @@ function createFormData(overrides: Partial<Record<"currentPassword" | "password"
 
   const formData = new FormData();
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
+
   return formData;
 }

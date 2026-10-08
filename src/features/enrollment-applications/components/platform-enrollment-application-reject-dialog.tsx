@@ -1,11 +1,10 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, useEffect, type ReactElement } from "react";
 
-import * as React from "react";
-import { useActionState } from "react";
 import { CircleAlertIcon, CircleXIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
@@ -20,6 +19,7 @@ import { Button } from "@common/components/ui/button";
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Textarea } from "@common/components/ui/textarea";
 import { cn } from "@common/utils/cn.util";
+
 import { rejectPlatformEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-platform-enrollment-application.action";
 import type { EnrollmentApplicationRejectActionState } from "@features/enrollment-applications/types/enrollment-application-reject-action-state.types";
 import type { PlatformEnrollmentApplicationSummary } from "@features/enrollment-applications/types/platform-enrollment-application-summary.types";
@@ -38,14 +38,14 @@ export function PlatformEnrollmentApplicationRejectDialog({
   open,
   onOpenChange,
   onRejected,
-}: PlatformEnrollmentApplicationRejectDialogProps): React.ReactElement {
+}: PlatformEnrollmentApplicationRejectDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     rejectPlatformEnrollmentApplicationAction.bind(null, application.institutionId, application.applicationId),
     INITIAL_STATE,
   );
   const hasRejectionReasonError = Boolean(state.fieldErrors?.rejectionReason);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (state.success) {
       onRejected();
     }

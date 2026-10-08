@@ -1,6 +1,9 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 
 import { Card, CardContent } from "@common/components/ui/card";
+
 import { PlatformLoginForm } from "@features/platform-auth/components/platform-login-form";
 import { getSafeNextPath } from "@features/platform-auth/utils/platform-auth-paths.util";
 
@@ -11,7 +14,7 @@ export const metadata: Metadata = {
 
 type SearchParams = Promise<{ next?: string }>;
 
-export default async function LoginPage({ searchParams }: { searchParams: SearchParams }): Promise<React.ReactElement> {
+export default async function LoginPage({ searchParams }: { searchParams: SearchParams }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
   const safeNext = getSafeNextPath(resolvedSearchParams.next);
 

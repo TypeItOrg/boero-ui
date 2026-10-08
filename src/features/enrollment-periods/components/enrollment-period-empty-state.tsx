@@ -1,3 +1,5 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { CalendarRangeIcon, SearchIcon } from "lucide-react";
 
 import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
@@ -5,7 +7,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@c
 import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 
 type EnrollmentPeriodEmptyStateProps = {
-  createAction?: React.ReactNode;
+  createAction?: ReactNode;
   hasFilters: boolean;
   hasItemsOnOtherPages: boolean;
   onFirstPage: () => void;
@@ -16,7 +18,7 @@ export function EnrollmentPeriodEmptyState({
   hasFilters,
   hasItemsOnOtherPages,
   onFirstPage,
-}: EnrollmentPeriodEmptyStateProps): React.ReactElement {
+}: EnrollmentPeriodEmptyStateProps): ReactElement {
   const Icon = hasFilters ? SearchIcon : CalendarRangeIcon;
   let title = "No hay períodos de inscripción";
   let description = "Creá un período de inscripción para definir cuándo se reciben nuevas solicitudes de estudiantes.";

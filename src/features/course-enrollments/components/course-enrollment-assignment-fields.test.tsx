@@ -1,5 +1,5 @@
-import * as React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 
@@ -27,7 +27,14 @@ const OPTIONS: CourseEnrollmentAssignmentOptions = {
               id: "00000000-0000-4000-8000-000000000003",
               startTime: "10:00:00",
               endTime: "11:00:00",
-              individualSlots: [{ id: "00000000-0000-4000-8000-000000000004", startTime: "10:00:00", endTime: "11:00:00", available: true }],
+              individualSlots: [
+                {
+                  id: "00000000-0000-4000-8000-000000000004",
+                  startTime: "10:00:00",
+                  endTime: "11:00:00",
+                  available: true,
+                },
+              ],
             },
           ],
         },

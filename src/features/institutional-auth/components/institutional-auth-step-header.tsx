@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
+
 import { InstitutionalBrandIdentity } from "@features/institutional-auth/components/institutional-brand-identity";
 
 type InstitutionalAuthStepHeaderProps = {
@@ -7,11 +8,7 @@ type InstitutionalAuthStepHeaderProps = {
   showInstitutionName?: boolean;
 };
 
-export function InstitutionalAuthStepHeader({
-  title,
-  description,
-  showInstitutionName = false,
-}: InstitutionalAuthStepHeaderProps): React.ReactElement {
+export function InstitutionalAuthStepHeader({ title, description, showInstitutionName = false }: InstitutionalAuthStepHeaderProps): ReactElement {
   return (
     <header className="flex flex-col items-center space-y-1 text-center">
       <InstitutionalBrandIdentity

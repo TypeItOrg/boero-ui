@@ -1,11 +1,14 @@
+import type { ReactElement } from "react";
+
 import { CalendarRangeIcon } from "lucide-react";
 
 import { Skeleton } from "@common/components/ui/skeleton";
-import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 
-export default function Loading(): React.ReactElement {
+import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+
+export default function Loading(): ReactElement {
   return (
     <PlatformPageShell
       minViewportHeight

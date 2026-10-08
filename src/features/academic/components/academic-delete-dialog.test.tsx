@@ -1,15 +1,15 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
-  deleteAcademicResourceAction: jest.fn(),
-}));
-
 import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicDeleteDialog } from "@features/academic/components/academic-delete-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/actions/academic-resource.action", () => ({
+  deleteAcademicResourceAction: jest.fn(),
+}));
 
 const PROPS = {
   destination: "/study-plans?page=1",

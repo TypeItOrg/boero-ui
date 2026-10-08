@@ -1,11 +1,14 @@
-import * as React from "react";
+import { forwardRef, Fragment, type ComponentProps, type ReactElement, type ReactNode } from "react";
+
 import Link from "next/link";
+
 import { EllipsisVerticalIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { ContextMenuItem, ContextMenuSeparator } from "@common/components/ui/context-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+
 import { ACADEMIC_LIFECYCLE_ACTION_KIND, type AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicRowAction } from "@features/academic/types/academic-row-action.types";
@@ -19,7 +22,7 @@ type AcademicActionProps = {
   onStatusAction: (action: AcademicStatusAction) => void;
 };
 
-export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): React.ReactNode {
+export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): ReactNode {
   const orderedActions = orderAcademicActions(actions);
   const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
 
@@ -28,18 +31,18 @@ export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatu
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.NAVIGATE) {
       return (
-        <React.Fragment key={action.href}>
+        <Fragment key={action.href}>
           {separator}
           <ContextMenuItem asChild>
             <AcademicActionLink action={action} className="px-2.5 py-1.5" />
           </ContextMenuItem>
-        </React.Fragment>
+        </Fragment>
       );
     }
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.STATUS) {
       return (
-        <React.Fragment key={action.label}>
+        <Fragment key={action.label}>
           {separator}
           <ContextMenuItem
             variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
@@ -48,12 +51,12 @@ export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatu
           >
             {action.label}
           </ContextMenuItem>
-        </React.Fragment>
+        </Fragment>
       );
     }
 
     return (
-      <React.Fragment key={action.label}>
+      <Fragment key={action.label}>
         {separator}
         <ContextMenuItem
           className={
@@ -63,18 +66,15 @@ export function AcademicContextMenuActions({ actions, onLifecycleAction, onStatu
         >
           {action.label}
         </ContextMenuItem>
-      </React.Fragment>
+      </Fragment>
     );
   });
 }
 
-export function AcademicRowActions({
-  actions,
-  label,
-  onLifecycleAction,
-  onStatusAction,
-}: AcademicActionProps & { label: string }): React.ReactElement {
-  if (actions.length === 0) return <div className="h-9" />;
+export function AcademicRowActions({ actions, label, onLifecycleAction, onStatusAction }: AcademicActionProps & { label: string }): ReactElement {
+  if (actions.length === 0) {
+    return <div className="h-9" />;
+  }
 
   return (
     <div className="flex justify-start">
@@ -92,7 +92,7 @@ export function AcademicRowActions({
   );
 }
 
-export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): React.ReactNode {
+export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAction }: AcademicActionProps): ReactNode {
   const orderedActions = orderAcademicActions(actions);
   const sensitiveActionIndex = orderedActions.findIndex(isSensitiveAcademicAction);
 
@@ -101,18 +101,18 @@ export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAc
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.NAVIGATE) {
       return (
-        <React.Fragment key={action.href}>
+        <Fragment key={action.href}>
           {separator}
           <DropdownMenuItem asChild>
             <AcademicActionLink action={action} className="px-2.5 py-1.5" />
           </DropdownMenuItem>
-        </React.Fragment>
+        </Fragment>
       );
     }
 
     if (action.kind === ACADEMIC_ROW_ACTION_KIND.STATUS) {
       return (
-        <React.Fragment key={action.label}>
+        <Fragment key={action.label}>
           {separator}
           <DropdownMenuItem
             variant={isDestructiveStatusAction(action) ? "destructive" : "default"}
@@ -121,12 +121,12 @@ export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAc
           >
             {action.label}
           </DropdownMenuItem>
-        </React.Fragment>
+        </Fragment>
       );
     }
 
     return (
-      <React.Fragment key={action.label}>
+      <Fragment key={action.label}>
         {separator}
         <DropdownMenuItem
           className={
@@ -136,7 +136,7 @@ export function AcademicDropdownActions({ actions, onLifecycleAction, onStatusAc
         >
           {action.label}
         </DropdownMenuItem>
-      </React.Fragment>
+      </Fragment>
     );
   });
 }
@@ -151,14 +151,14 @@ function isSensitiveAcademicAction(action: AcademicRowAction): boolean {
   );
 }
 
-type AcademicActionLinkProps = Omit<React.ComponentProps<typeof Link>, "href"> & {
+type AcademicActionLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   action: Extract<AcademicRowAction, { kind: typeof ACADEMIC_ROW_ACTION_KIND.NAVIGATE }>;
 };
 
-export const AcademicActionLink = React.forwardRef<HTMLAnchorElement, AcademicActionLinkProps>(function AcademicActionLink(
+export const AcademicActionLink = forwardRef<HTMLAnchorElement, AcademicActionLinkProps>(function AcademicActionLink(
   { action, ...props },
   ref,
-): React.ReactElement {
+): ReactElement {
   if (action.preserveReturnTo) {
     return (
       <ReturnToLink ref={ref} href={action.href} {...props}>

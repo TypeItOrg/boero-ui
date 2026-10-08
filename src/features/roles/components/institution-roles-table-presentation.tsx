@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { KeyRoundIcon, Loader2Icon, SearchIcon, UserLockIcon, UsersIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
@@ -11,6 +14,7 @@ import { useDataTableNavigation } from "@common/components/ui/data-table-navigat
 import { EmptyMedia } from "@common/components/ui/empty";
 import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import { InstitutionRolesPagination } from "@features/roles/components/institution-roles-pagination";
 import type { InstitutionRole } from "@features/roles/types/institution-role.types";
 
@@ -20,7 +24,7 @@ type InstitutionRolesTablePresentationProps = {
   canUpdate: boolean;
 };
 
-export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: InstitutionRolesTablePresentationProps): React.ReactElement {
+export function InstitutionRolesTablePresentation({ roles, search, canUpdate }: InstitutionRolesTablePresentationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
   const hasFilters = search.trim() !== "";
   const hasItemsOnOtherPages = roles.totalItems > 0;

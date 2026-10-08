@@ -1,15 +1,17 @@
+import type { ReactElement, ReactNode } from "react";
+
 import type { LucideIcon } from "lucide-react";
 
 import { SectionHeader } from "@common/components/section-header";
 import { CardHeader } from "@common/components/ui/card";
 
 type EnrollmentStepCardHeaderProps = {
-  action?: React.ReactNode;
+  action?: ReactNode;
   actionClassName?: string;
-  description: React.ReactNode;
+  description: ReactNode;
   descriptionBreakpoint?: "sm" | "xl";
   icon: LucideIcon;
-  title: React.ReactNode;
+  title: ReactNode;
   titleId?: string;
 };
 
@@ -21,7 +23,7 @@ export function EnrollmentStepCardHeader({
   icon: Icon,
   title,
   titleId,
-}: EnrollmentStepCardHeaderProps): React.ReactElement {
+}: EnrollmentStepCardHeaderProps): ReactElement {
   return (
     <CardHeader className="block border-b">
       <SectionHeader

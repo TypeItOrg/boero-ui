@@ -1,8 +1,8 @@
-import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
-import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
-import type { EnrollmentApplicationSpaceResponse } from "@features/enrollment-applications/types/enrollment-application-space-response.types";
-import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
 import type { EnrollmentApplicationCourse } from "@features/enrollment-applications/types/enrollment-application-course.types";
+import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
+import type { EnrollmentApplicationSpaceResponse } from "@features/enrollment-applications/types/enrollment-application-space-response.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 export interface EnrollmentApplicationResponse {
   applicationId: string;
@@ -20,7 +20,13 @@ export interface EnrollmentApplicationResponse {
   documents?: import("@features/enrollment-applications/types/document-requirement.types").DocumentRequirement[];
   canApproveProvisionally?: boolean;
   canConfirm?: boolean;
-  admissionHistory?: Array<{ id: string; status: string; occurredAt: string; actorId: string | null; accountType: string }>;
+  admissionHistory?: Array<{
+    id: string;
+    status: string;
+    occurredAt: string;
+    actorId: string | null;
+    accountType: string;
+  }>;
   studyPlanName?: string;
   studyPlanVersion?: number | null;
   trainingPathName?: string | null;

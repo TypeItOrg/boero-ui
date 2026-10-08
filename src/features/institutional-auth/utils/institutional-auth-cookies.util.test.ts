@@ -1,7 +1,3 @@
-jest.mock("next/headers", () => ({
-  cookies: jest.fn(),
-}));
-
 import { cookies } from "next/headers";
 
 import {
@@ -19,6 +15,10 @@ import {
   setInstitutionalPasswordChangedCookie,
   setInstitutionalAuthCookies,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+
+jest.mock("next/headers", () => ({
+  cookies: jest.fn(),
+}));
 
 describe("institutional auth cookies", () => {
   const cookieStore = {

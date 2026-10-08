@@ -3,11 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { institutionalPasswordSchema } from "@features/institutional-auth/schemas/institutional-password.schema";
+
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { institutionalPasswordSchema } from "@features/institutional-auth/schemas/institutional-password.schema";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import type { InstitutionalPasswordActionState } from "@features/institutional-auth/types/institutional-password-state.types";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { setInstitutionalPasswordChangedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
@@ -25,13 +26,23 @@ export async function changeInstitutionalPasswordAction(
     confirmPassword: formData.get("confirmPassword") ?? "",
   });
 
-  if (!parsed.success) return getValidationActionState(parsed.error.issues, PASSWORD_FIELDS);
+  if (!parsed.success) {
+    return getValidationActionState(parsed.error.issues, PASSWORD_FIELDS);
+  }
 
   await requireInstitutionalUser();
 
   const person = await fetchInstitutionalPerson();
-  if (!person) return { error: "No se pudieron obtener tus datos personales." };
-  if (!person.birthDate) return { error: "Tu perfil no tiene fecha de nacimiento; completala antes de cambiar la contraseña." };
+
+  if (!person) {
+    return { error: "No se pudieron obtener tus datos personales." };
+  }
+
+  if (!person.birthDate) {
+    return {
+      error: "Tu perfil no tiene fecha de nacimiento; completala antes de cambiar la contraseña.",
+    };
+  }
 
   const response = institutionalApiFetch("/api/v1/person/me", {
     method: "PUT",
@@ -39,12 +50,16 @@ export async function changeInstitutionalPasswordAction(
     body: JSON.stringify(buildRequestBody(person, parsed.data)),
   });
   const errorState = await getResponseErrorActionState(response, PASSWORD_FIELDS, FALLBACK_ERROR);
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   await setInstitutionalPasswordChangedCookie();
 
   revalidatePath("/account");
   await logoutInstitutional();
+
   return { success: true };
 }
 

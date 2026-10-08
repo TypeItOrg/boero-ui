@@ -1,15 +1,17 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useState, type ReactElement } from "react";
+
 import { LibraryBigIcon, RouteIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import { ACADEMIC_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { ACADEMIC_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 
 type AcademicOptionDropdownProps = {
   ariaInvalid: boolean;
@@ -21,10 +23,10 @@ type AcademicOptionDropdownProps = {
   selectedLabel?: string;
 };
 
-export function TrainingPathDropdown(props: AcademicOptionDropdownProps): React.ReactElement {
-  const [value, setValue] = React.useState(props.initialValue);
-  const [selectedLabel, setSelectedLabel] = React.useState(props.selectedLabel);
-  const fetchPage = React.useCallback(
+export function TrainingPathDropdown(props: AcademicOptionDropdownProps): ReactElement {
+  const [value, setValue] = useState(props.initialValue);
+  const [selectedLabel, setSelectedLabel] = useState(props.selectedLabel);
+  const fetchPage = useCallback(
     (input: AsyncDropdownFetchPageInput) =>
       fetchAcademicOptionPage<TrainingPath>("training-paths", props.scope, props.institutionId, input, { operation: "STUDY_PLAN_CREATE" }),
     [props.institutionId, props.scope],
@@ -57,10 +59,10 @@ export function TrainingPathDropdown(props: AcademicOptionDropdownProps): React.
   );
 }
 
-export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React.ReactElement {
-  const [value, setValue] = React.useState(props.initialValue);
-  const [selectedLabel, setSelectedLabel] = React.useState(props.selectedLabel);
-  const fetchPage = React.useCallback(
+export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): ReactElement {
+  const [value, setValue] = useState(props.initialValue);
+  const [selectedLabel, setSelectedLabel] = useState(props.selectedLabel);
+  const fetchPage = useCallback(
     (input: AsyncDropdownFetchPageInput) =>
       fetchAcademicOptionPage<AcademicSpace>("academic-spaces", props.scope, props.institutionId, input, {
         operation: "STUDY_PLAN_CURRICULUM_UPDATE",

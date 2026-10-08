@@ -4,7 +4,11 @@ import type { NavigationItem } from "@common/utils/navigation.util";
 
 export function groupSidebarNavigationSection(
   sections: readonly SidebarNavigationSection[],
-  configuration: Omit<SidebarNavigationGroup, "items"> & { sectionLabel: string; sourceSectionLabel?: string; urls: readonly string[] },
+  configuration: Omit<SidebarNavigationGroup, "items"> & {
+    sectionLabel: string;
+    sourceSectionLabel?: string;
+    urls: readonly string[];
+  },
 ): SidebarNavigationSection[] {
   const { sectionLabel, sourceSectionLabel = sectionLabel, urls, ...group } = configuration;
   const groupedUrls = new Set(urls);

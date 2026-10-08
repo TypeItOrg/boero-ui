@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 
 import { Badge } from "@common/components/ui/badge";
 import { formatDisplayDate } from "@common/utils/date-input.util";
+
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { academicSpaceFormatLabels, academicSpaceTypeLabels, academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { hasActiveAcademicStatus } from "@features/academic/utils/has-active-academic-status.util";
 
@@ -24,7 +25,10 @@ export function getAcademicDetailInfo(
 ): AcademicDetailInfo {
   switch (resource) {
     case AcademicResource.ACADEMIC_YEAR: {
-      if (!isAcademicYear(item)) return unsupportedDetailResource(resource);
+      if (!isAcademicYear(item)) {
+        return unsupportedDetailResource(resource);
+      }
+
       return {
         status: academicYearStatusLabels[item.status],
         active: item.status === "ACTIVE",
@@ -44,8 +48,12 @@ export function getAcademicDetailInfo(
         ],
       };
     }
+
     case AcademicResource.ACADEMIC_SPACE: {
-      if (!isAcademicSpace(item)) return unsupportedDetailResource(resource);
+      if (!isAcademicSpace(item)) {
+        return unsupportedDetailResource(resource);
+      }
+
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
@@ -70,8 +78,12 @@ export function getAcademicDetailInfo(
         ],
       };
     }
+
     case AcademicResource.TRAINING_PATH: {
-      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) {
+        return unsupportedDetailResource(resource);
+      }
+
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
@@ -90,8 +102,12 @@ export function getAcademicDetailInfo(
         ],
       };
     }
+
     case AcademicResource.INSTRUMENT: {
-      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) {
+        return unsupportedDetailResource(resource);
+      }
+
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,
@@ -110,8 +126,12 @@ export function getAcademicDetailInfo(
         ],
       };
     }
+
     case AcademicResource.SHIFT: {
-      if (!hasActiveAcademicStatus(item) || !("description" in item)) return unsupportedDetailResource(resource);
+      if (!hasActiveAcademicStatus(item) || !("description" in item)) {
+        return unsupportedDetailResource(resource);
+      }
+
       return {
         status: item.active ? "Activo" : "Inactivo",
         active: item.active,

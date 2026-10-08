@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
+
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 import { PeopleScope } from "@features/people/utils/people-scope.util";
@@ -27,9 +28,13 @@ export async function updatePersonStatusAction(institutionId: string, personId: 
     [],
     PEOPLE_ERROR_MESSAGES.UPDATE_STATUS,
   );
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   revalidatePath("/people");
   revalidatePath(`/people/${personId}`);
+
   return { success: true };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactElement, type ReactNode } from "react";
 
 import { SIDEBAR_NAVIGATION_GROUPS_COOKIE_MAX_AGE, SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES } from "@common/constants/sidebar-navigation.constants";
 import type { SidebarNavigationGroupStates } from "@common/types/sidebar-navigation-group-states.types";
@@ -11,14 +11,14 @@ type SidebarNavigationState = {
 };
 
 type SidebarNavigationStateProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   scope: keyof typeof SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES;
   initialStates: SidebarNavigationGroupStates;
 };
 
 const SidebarNavigationStateContext = createContext<SidebarNavigationState | null>(null);
 
-export function SidebarNavigationStateProvider({ children, scope, initialStates }: SidebarNavigationStateProviderProps): React.ReactElement {
+export function SidebarNavigationStateProvider({ children, scope, initialStates }: SidebarNavigationStateProviderProps): ReactElement {
   const [groupStates, setGroupStates] = useState(initialStates);
   const cookieName = SIDEBAR_NAVIGATION_GROUPS_COOKIE_NAMES[scope];
   const setGroupOpen = useCallback((id: string, open: boolean) => {

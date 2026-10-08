@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { Fragment, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -60,7 +61,7 @@ export function InstitutionalBreadcrumb({
   segmentHrefs = EMPTY_SEGMENT_LABELS,
   segmentLabels = EMPTY_SEGMENT_LABELS,
   trailingLabel,
-}: InstitutionalBreadcrumbProps): React.ReactElement {
+}: InstitutionalBreadcrumbProps): ReactElement {
   const pathname = usePathname();
   const segments = getSegments(pathname, segmentLabels, segmentHrefs, hiddenSegments, trailingLabel);
 
@@ -71,7 +72,7 @@ export function InstitutionalBreadcrumb({
           const isLast = index === segments.length - 1;
 
           return (
-            <React.Fragment key={index}>
+            <Fragment key={index}>
               <BreadcrumbItem className="shrink-0">
                 {isLast ? (
                   <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
@@ -82,7 +83,7 @@ export function InstitutionalBreadcrumb({
                 )}
               </BreadcrumbItem>
               {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>

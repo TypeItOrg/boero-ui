@@ -1,10 +1,13 @@
+import { Suspense, type ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { Suspense } from "react";
+
 import { PlusIcon, UsersIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -16,17 +19,17 @@ import { PeopleTableContainer } from "@features/people/components/people-table-c
 import { PeopleTableSkeleton } from "@features/people/components/people-table-skeleton";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
-import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { parsePeoplePaginationParams, type PeopleSearchParams } from "@features/people/utils/people-pagination.util";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
+import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { PlatformCollectionActions } from "@features/platform-auth/components/platform-collection-actions";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Usuarios");
 }
 
-export default async function PeoplePage({ searchParams }: { searchParams: Promise<PeopleSearchParams> }): Promise<React.ReactElement> {
+export default async function PeoplePage({ searchParams }: { searchParams: Promise<PeopleSearchParams> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY)) {

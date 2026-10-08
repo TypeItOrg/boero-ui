@@ -21,6 +21,7 @@ export function getPermissionTree(
 
   for (const permission of groupPermissions) {
     const parentCode = getVisibleParentCode(permission, groupPermissionCodes, allPermissions);
+
     if (!parentCode) {
       rootPermissions.push(permission);
       continue;

@@ -15,29 +15,38 @@ type NativeRequestParser = (options: unknown) => PublicKeyCredentialRequestOptio
 function nativeRequestParser(): NativeRequestParser | undefined {
   const credential = (globalThis as unknown as Record<string, unknown>).PublicKeyCredential as Record<string, unknown> | undefined;
   const parse = credential?.["parseRequestOptionsFromJSON"];
+
   return typeof parse === "function" ? (parse as NativeRequestParser) : undefined;
 }
 
 function toDescriptor(descriptor: unknown): PublicKeyCredentialDescriptor {
   const source = requireRecord(descriptor);
+
   if (source.type !== "public-key") {
     throw new Error("Invalid WebAuthn options");
   }
+
   const result: PublicKeyCredentialDescriptor = {
     id: requireBytes(source.id),
     type: "public-key",
   };
+
   if (source.transports !== undefined && source.transports !== null) {
     result.transports = requireStringArray(source.transports) as AuthenticatorTransport[];
   }
+
   return result;
 }
 
 function toDescriptors(value: unknown): PublicKeyCredentialDescriptor[] {
-  if (value === undefined || value === null) return [];
+  if (value === undefined || value === null) {
+    return [];
+  }
+
   if (!Array.isArray(value)) {
     throw new Error("Invalid WebAuthn options");
   }
+
   return (value as unknown[]).map(toDescriptor);
 }
 
@@ -48,19 +57,33 @@ function toFallbackRequestOptions(options: unknown): PublicKeyCredentialRequestO
     allowCredentials: toDescriptors(source.allowCredentials),
   };
   const rpId = optionalString(source.rpId);
-  if (rpId !== undefined) result.rpId = rpId;
+
+  if (rpId !== undefined) {
+    result.rpId = rpId;
+  }
+
   const timeout = optionalTimeout(source.timeout);
-  if (timeout !== undefined) result.timeout = timeout;
+
+  if (timeout !== undefined) {
+    result.timeout = timeout;
+  }
+
   const userVerification = optionalEnum(source.userVerification, USER_VERIFICATION_VALUES);
-  if (userVerification !== undefined) result.userVerification = userVerification;
+
+  if (userVerification !== undefined) {
+    result.userVerification = userVerification;
+  }
+
   return result;
 }
 
 export function toPublicKeyRequestOptions(options: unknown): PublicKeyCredentialRequestOptions {
   const parse = nativeRequestParser();
+
   if (parse) {
     return parse(options);
   }
+
   return toFallbackRequestOptions(options);
 }
 
@@ -79,6 +102,7 @@ export async function getPasskeyAssertion(requestOptions: PublicKeyCredentialReq
   }
 
   const response = credential.response as AuthenticatorAssertionResponse;
+
   return {
     id: credential.id,
     rawId: bytesToBase64Url(credential.rawId),

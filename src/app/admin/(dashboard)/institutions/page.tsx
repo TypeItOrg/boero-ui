@@ -1,11 +1,13 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement } from "react";
+
 import { BuildingIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { InstitutionsTableFilters } from "@features/institutions/components/institutions-table-filters";
+
 import { InstitutionsTableContainer } from "@features/institutions/components/institutions-table-container";
+import { InstitutionsTableFilters } from "@features/institutions/components/institutions-table-filters";
 import { InstitutionsTableSkeleton } from "@features/institutions/components/institutions-table-skeleton";
 import { parseInstitutionPaginationParams, type InstitutionSearchParams } from "@features/institutions/utils/institution-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
@@ -22,7 +24,7 @@ type PageProps = {
   searchParams: Promise<InstitutionSearchParams>;
 };
 
-export default async function InstitutionsPage({ searchParams }: PageProps): Promise<React.ReactElement> {
+export default async function InstitutionsPage({ searchParams }: PageProps): Promise<ReactElement> {
   const { page, size, search, active, sort } = parseInstitutionPaginationParams(await searchParams);
 
   return (

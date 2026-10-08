@@ -1,21 +1,23 @@
 "use client";
 
 import { useActionState } from "react";
+
 import { BanIcon, CircleAlertIcon } from "lucide-react";
 
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
-import { safelyRunAction } from "@common/utils/safe-action.util";
 import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
 import {
   AlertDialog,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Button } from "@common/components/ui/button";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+
 import { cancelEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import type { ChangeEnrollmentCareerResult } from "@features/enrollment-applications/types/change-enrollment-career-result.types";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 

@@ -2,13 +2,14 @@ import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
+
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
+import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
-import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 export type CourseEnrollmentListParams = {
   page?: number;

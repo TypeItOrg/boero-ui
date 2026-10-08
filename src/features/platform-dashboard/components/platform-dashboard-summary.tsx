@@ -1,6 +1,9 @@
+import type { ReactElement } from "react";
+
 import { Building2Icon, BuildingIcon, KeyRoundIcon, UsersIcon, type LucideIcon } from "lucide-react";
 
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
+
 import type { PlatformDashboardSummary as PlatformDashboardSummaryData } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
 
 const numberFormatter = new Intl.NumberFormat("es-AR");
@@ -12,7 +15,7 @@ type SummaryCardProps = {
   icon: LucideIcon;
 };
 
-function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps): React.ReactElement {
+function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps): ReactElement {
   return (
     <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="p-0">
@@ -29,7 +32,7 @@ function SummaryCard({ label, value, description, icon: Icon }: SummaryCardProps
   );
 }
 
-export function PlatformDashboardSummary({ summary }: { summary: PlatformDashboardSummaryData }): React.ReactElement {
+export function PlatformDashboardSummary({ summary }: { summary: PlatformDashboardSummaryData }): ReactElement {
   const cards: SummaryCardProps[] = [
     {
       label: "Instituciones",

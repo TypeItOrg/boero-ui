@@ -1,6 +1,7 @@
-import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
+
 import type { IdentifyInstitutionalOutput } from "@features/institutional-auth/types/identify-institutional-output.types";
 import type { InstitutionalIdentifyInput } from "@features/institutional-auth/types/institutional-identify-input.types";
 import type { InstitutionalIdentifyResult } from "@features/institutional-auth/types/institutional-identify-result.types";
@@ -19,6 +20,7 @@ export async function identifyInstitutionalAccount(
 
     if (!response.ok) {
       const error = (await response.json()) as BackendError;
+
       return { success: false, error };
     }
 

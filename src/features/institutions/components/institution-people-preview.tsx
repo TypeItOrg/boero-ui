@@ -1,23 +1,27 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { UsersIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { SectionHeader } from "@common/components/section-header";
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Skeleton } from "@common/components/ui/skeleton";
+
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { fetchPeople } from "@features/people/services/fetch-people.service";
 import { DEFAULT_PEOPLE_SORT } from "@features/people/utils/people-pagination.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionPeoplePreviewProps = {
   institutionId: string;
 };
 
-export async function InstitutionPeoplePreview({ institutionId }: InstitutionPeoplePreviewProps): Promise<React.ReactElement> {
+export async function InstitutionPeoplePreview({ institutionId }: InstitutionPeoplePreviewProps): Promise<ReactElement> {
   const people = await fetchPeople(institutionId, {
     page: 0,
     size: 5,
@@ -89,7 +93,7 @@ export async function InstitutionPeoplePreview({ institutionId }: InstitutionPeo
   );
 }
 
-export function InstitutionPeoplePreviewSkeleton(): React.ReactElement {
+export function InstitutionPeoplePreviewSkeleton(): ReactElement {
   return (
     <Card className="bg-muted/25 gap-0 p-5 sm:p-6">
       <CardHeader className="-mx-5 border-b px-5 pb-5 sm:-mx-6 sm:px-6">
@@ -112,7 +116,7 @@ export function InstitutionPeoplePreviewSkeleton(): React.ReactElement {
   );
 }
 
-function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React.ReactElement {
+function EmptyPeoplePreview({ institutionId }: { institutionId: string }): ReactElement {
   return (
     <Card className="bg-muted/25 gap-0 p-5 sm:p-6">
       <CardHeader className="-mx-5 border-b px-5 pb-5 sm:-mx-6 sm:px-6">
@@ -138,7 +142,7 @@ function EmptyPeoplePreview({ institutionId }: { institutionId: string }): React
   );
 }
 
-function UsersPreviewHeader(): React.ReactElement {
+function UsersPreviewHeader(): ReactElement {
   return (
     <div className="flex items-stretch justify-between gap-4">
       <SectionHeader icon={UsersIcon} title="Usuarios" description="Personas con acceso a la institución." />
@@ -146,7 +150,7 @@ function UsersPreviewHeader(): React.ReactElement {
   );
 }
 
-function UsersPreviewHeaderSkeleton(): React.ReactElement {
+function UsersPreviewHeaderSkeleton(): ReactElement {
   return (
     <div className="flex items-stretch justify-between gap-4">
       <div className="flex items-stretch gap-3.5">

@@ -1,13 +1,14 @@
+import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
+import { proxyLocationGet } from "@features/locations/services/proxy-location-get.service";
+
+import { GET as getCities } from "@app/api/cities/route";
+import { GET as getCountryProvinces } from "@app/api/countries/[countryId]/provinces/route";
+import { GET as getCountries } from "@app/api/countries/route";
+import { GET as getProvinceCities } from "@app/api/provinces/[provinceId]/cities/route";
+
 jest.mock("@features/locations/services/proxy-location-get.service", () => ({
   proxyLocationGet: jest.fn(),
 }));
-
-import { GET as getCities } from "@app/api/cities/route";
-import { GET as getCountries } from "@app/api/countries/route";
-import { GET as getCountryProvinces } from "@app/api/countries/[countryId]/provinces/route";
-import { GET as getProvinceCities } from "@app/api/provinces/[provinceId]/cities/route";
-import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
-import { proxyLocationGet } from "@features/locations/services/proxy-location-get.service";
 
 const LOCATION_ID = "019e18e4-c93b-7583-90a6-0e9410ce3ad3";
 
@@ -50,7 +51,9 @@ describe("location API routes", () => {
     const response = await callRoute();
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toEqual({ message: LOCATION_ERROR_MESSAGES.INVALID_LOCATION_ID });
+    await expect(response.json()).resolves.toEqual({
+      message: LOCATION_ERROR_MESSAGES.INVALID_LOCATION_ID,
+    });
     expect(proxyLocationGetMock).not.toHaveBeenCalled();
   });
 });

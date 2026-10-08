@@ -1,13 +1,16 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from "react";
+
+import { useRouter } from "next/navigation";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import * as React from "react";
 
 import { Command, CommandDialog, CommandInput, CommandList } from "@common/components/ui/command";
 import { useDebouncedValue } from "@common/hooks/use-debounced-value";
 import { cn } from "@common/utils/cn.util";
+
 import { ContextualSearchContent } from "@features/contextual-search/components/contextual-search-content";
 import { ContextualSearchShortcut } from "@features/contextual-search/components/contextual-search-shortcut";
 import { fetchContextualSearch } from "@features/contextual-search/services/fetch-contextual-search.service";
@@ -41,19 +44,19 @@ const CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS: Record<ContextualSearchScope, read
   institutional: ["/", "/account"],
 };
 
-export function ContextualSearch(props: ContextualSearchProps): React.ReactElement {
+export function ContextualSearch(props: ContextualSearchProps): ReactElement {
   const { accessSections, scope, className, mobileVariant = "icon", shortcutPlatform = "windows" } = props;
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [value, setValue] = React.useState("");
-  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = useState("");
+  const [open, setOpen] = useState(false);
   const copy = CONTEXTUAL_SEARCH_COPY[scope];
   const institutionId = props.scope === "institutional" ? props.institutionId : null;
   const debouncedSearch = useDebouncedValue(value.trim(), 300);
   const canSearch = debouncedSearch.length >= 2;
-  const contextualSearchQueryKey = React.useMemo(() => ["contextual-search", scope, institutionId] as const, [institutionId, scope]);
+  const contextualSearchQueryKey = useMemo(() => ["contextual-search", scope, institutionId] as const, [institutionId, scope]);
   const visibleAccessSections = omitContextualSearchAccessItems(accessSections, CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope]);
-  const openSearch = React.useCallback(() => {
+  const openSearch = useCallback(() => {
     queryClient.removeQueries({ queryKey: contextualSearchQueryKey });
     setOpen(true);
   }, [contextualSearchQueryKey, queryClient]);
@@ -71,22 +74,29 @@ export function ContextualSearch(props: ContextualSearchProps): React.ReactEleme
     retry: false,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     function handleShortcut(event: KeyboardEvent): void {
       if (!event.defaultPrevented && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        if (!open) openSearch();
+
+        if (!open) {
+          openSearch();
+        }
       }
     }
+
     window.addEventListener("keydown", handleShortcut);
+
     return () => window.removeEventListener("keydown", handleShortcut);
   }, [open, openSearch]);
 
   function handleOpenChange(nextOpen: boolean): void {
     if (nextOpen && !open) {
       openSearch();
+
       return;
     }
+
     setOpen(nextOpen);
   }
 

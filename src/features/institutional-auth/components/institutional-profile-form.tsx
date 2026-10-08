@@ -1,46 +1,52 @@
 "use client";
 
-import * as React from "react";
+import { useState, useTransition, type FormEvent, type ReactElement } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { CircleAlertIcon, UserRoundIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { FieldGroup } from "@common/components/ui/field";
+
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
 import { DateField, TextField } from "@features/institutional-auth/components/institutional-profile-fields";
 import { InstitutionalProfileLocationSection } from "@features/institutional-auth/components/institutional-profile-location-section";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionalProfileFormProps = {
   person: InstitutionalPerson;
   returnTo?: string;
 };
 
-export function InstitutionalProfileForm({ person, returnTo = "/account" }: InstitutionalProfileFormProps): React.ReactElement {
+export function InstitutionalProfileForm({ person, returnTo = "/account" }: InstitutionalProfileFormProps): ReactElement {
   const router = useRouter();
-  const [isPending, startTransition] = React.useTransition();
-  const [error, setError] = React.useState<string>();
-  const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
-  const [birthDate, setBirthDate] = React.useState<Date | undefined>(() => parseBirthDateInput(person.birthDate));
-  const [addressCityId, setAddressCityId] = React.useState(person.address?.city?.id ?? "");
-  const [addressStreet, setAddressStreet] = React.useState(person.address?.street ?? "");
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string>();
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [birthDate, setBirthDate] = useState<Date | undefined>(() => parseBirthDateInput(person.birthDate));
+  const [addressCityId, setAddressCityId] = useState(person.address?.city?.id ?? "");
+  const [addressStreet, setAddressStreet] = useState(person.address?.street ?? "");
   const hasAddress = Boolean(addressCityId || addressStreet.trim());
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     setError(undefined);
     setFieldErrors({});
     const formData = new FormData(event.currentTarget);
     startTransition(async () => {
       const result = await updateInstitutionalProfileAction(formData);
+
       if (result.success) {
         router.replace(returnTo);
+
         return;
       }
+
       const nextFieldErrors = "fieldErrors" in result ? result.fieldErrors : undefined;
       setFieldErrors(nextFieldErrors ?? {});
       setError(getFormError(result.error, nextFieldErrors));
@@ -120,7 +126,13 @@ export function InstitutionalProfileForm({ person, returnTo = "/account" }: Inst
 }
 
 function getFormError(error: string | undefined, fieldErrors: Record<string, string> | undefined): string | undefined {
-  if (fieldErrors && Object.keys(fieldErrors).length > 0) return undefined;
-  if (error) return error;
+  if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+    return undefined;
+  }
+
+  if (error) {
+    return error;
+  }
+
   return "Revisá los datos ingresados.";
 }

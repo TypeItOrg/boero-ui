@@ -1,6 +1,7 @@
 "use client";
 
-import type * as React from "react";
+import type { ReactElement, ReactNode } from "react";
+
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -12,7 +13,7 @@ type DataTablePaginationProps = PaginationParams & {
   pageSizeCompactLabel?: string;
   pageSizeLabel?: string;
   pageSizeOptions: readonly number[];
-  summaryLabel: React.ReactNode;
+  summaryLabel: ReactNode;
   totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: string) => void;
@@ -47,7 +48,7 @@ export function DataTablePagination({
   pageSizeLabel = "Filas por página",
   onPageChange,
   onPageSizeChange,
-}: DataTablePaginationProps): React.ReactElement {
+}: DataTablePaginationProps): ReactElement {
   const currentPage = totalPages > 0 ? page + 1 : 0;
   const canGoToPreviousPage = page > 0;
   const canGoToNextPage = page < totalPages - 1;
@@ -87,7 +88,7 @@ export function DataTablePagination({
   );
 }
 
-function PageSizeSelect({ compactLabel, disabled, label, options, size, onSizeChange }: PageSizeSelectProps): React.ReactElement {
+function PageSizeSelect({ compactLabel, disabled, label, options, size, onSizeChange }: PageSizeSelectProps): ReactElement {
   return (
     <div className="flex min-w-0 items-center gap-2">
       <p className="text-foreground text-sm font-medium whitespace-nowrap">
@@ -112,14 +113,7 @@ function PageSizeSelect({ compactLabel, disabled, label, options, size, onSizeCh
   );
 }
 
-function PageNavigation({
-  canGoToNextPage,
-  canGoToPreviousPage,
-  isPending,
-  page,
-  totalPages,
-  onPageChange,
-}: PageNavigationProps): React.ReactElement {
+function PageNavigation({ canGoToNextPage, canGoToPreviousPage, isPending, page, totalPages, onPageChange }: PageNavigationProps): ReactElement {
   return (
     <div className="flex gap-2">
       <Button

@@ -1,3 +1,4 @@
+import { fetchAcademicRecentItems } from "@features/academic/services/academic-recent.service";
 import {
   fetchAcademicSpaces,
   fetchAcademicYears,
@@ -5,7 +6,6 @@ import {
   fetchStudyPlans,
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
-import { fetchAcademicRecentItems } from "@features/academic/services/academic-recent.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -80,9 +80,17 @@ describe("fetchAcademicRecentItems", () => {
       ]),
     );
     jest.mocked(fetchAcademicSpaces).mockResolvedValue(page([]));
-    jest
-      .mocked(fetchInstruments)
-      .mockResolvedValue(page([{ id: "instrument-id", institutionId: INSTITUTION_ID, name: "Piano", description: null, active: true }]));
+    jest.mocked(fetchInstruments).mockResolvedValue(
+      page([
+        {
+          id: "instrument-id",
+          institutionId: INSTITUTION_ID,
+          name: "Piano",
+          description: null,
+          active: true,
+        },
+      ]),
+    );
 
     const items = await fetchAcademicRecentItems(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, ACCESS);
 
@@ -101,5 +109,11 @@ describe("fetchAcademicRecentItems", () => {
 });
 
 function page<T>(items: T[]) {
-  return { items, page: 0, size: 1, totalItems: items.length, totalPages: items.length > 0 ? 1 : 0 };
+  return {
+    items,
+    page: 0,
+    size: 1,
+    totalItems: items.length,
+    totalPages: items.length > 0 ? 1 : 0,
+  };
 }

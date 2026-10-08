@@ -1,8 +1,8 @@
-import * as React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
-import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
+
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
+import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
+import { EnrollmentStart } from "@features/enrollment-applications/components/EnrollmentStart";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 const mockPush = jest.fn();

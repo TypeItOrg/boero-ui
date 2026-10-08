@@ -1,3 +1,7 @@
+import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -9,10 +13,6 @@ jest.mock("@features/institutional-auth/services/institutional-api-fetch.service
 jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
   requireInstitutionalUser: jest.fn(),
 }));
-
-import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
 describe("updateInstitutionalProfileAction", () => {
   const institutionalApiFetchMock = jest.mocked(institutionalApiFetch);
@@ -26,7 +26,9 @@ describe("updateInstitutionalProfileAction", () => {
   it("updates personal data without password fields", async () => {
     institutionalApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    await expect(updateInstitutionalProfileAction(createFormData())).resolves.toEqual({ success: true });
+    await expect(updateInstitutionalProfileAction(createFormData())).resolves.toEqual({
+      success: true,
+    });
 
     expect(JSON.parse(institutionalApiFetchMock.mock.calls[0][1]?.body as string)).not.toHaveProperty("password");
     expect(requireInstitutionalUserMock).toHaveBeenCalled();
@@ -54,5 +56,6 @@ function createFormData(overrides: Partial<Record<"firstName" | "lastName" | "bi
 
   const formData = new FormData();
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
+
   return formData;
 }

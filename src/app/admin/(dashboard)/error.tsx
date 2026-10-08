@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { BlockingError } from "@common/components/blocking-error";
 
 type PlatformErrorProps = {
@@ -7,6 +9,6 @@ type PlatformErrorProps = {
   retry: () => void;
 };
 
-export default function PlatformError({ error, retry }: PlatformErrorProps): React.ReactElement {
+export default function PlatformError({ error, retry }: PlatformErrorProps): ReactElement {
   return <BlockingError error={error} retry={retry} homeHref="/admin" />;
 }

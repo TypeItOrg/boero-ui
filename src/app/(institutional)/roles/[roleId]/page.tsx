@@ -1,26 +1,29 @@
-import { notFound } from "next/navigation";
+import type { ReactElement, ReactNode } from "react";
+
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import { KeyRoundIcon, ShieldCheckIcon, UserLockIcon, UsersIcon, type LucideIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { InstitutionRoleDeleteButton } from "@features/roles/components/institution-role-delete-button";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
 import { fetchInstitutionPermissionGroups, fetchInstitutionRole } from "@features/roles/services/institution-role.service";
-
-import type { Metadata } from "next";
-import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Detalle del rol");
@@ -32,10 +35,11 @@ export default async function RoleDetailPage({
 }: {
   params: Promise<{ roleId: string }>;
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const [{ roleId }, { returnTo }] = await Promise.all([params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/roles");
   const user = await requireInstitutionalUser();
+
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ)) {
     return <InstitutionalAccessDenied />;
   }
@@ -44,7 +48,10 @@ export default async function RoleDetailPage({
     fetchInstitutionRole(user.institutionId, roleId),
     fetchInstitutionPermissionGroups(user.institutionId),
   ]);
-  if (!role) notFound();
+
+  if (!role) {
+    notFound();
+  }
 
   const canUpdate = role.editable && hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
   const canDelete = role.deletable && hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_DELETE);
@@ -109,10 +116,10 @@ export default async function RoleDetailPage({
 type RoleSummaryCardProps = {
   icon: LucideIcon;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
 };
 
-function RoleSummaryCard({ icon: Icon, label, value }: RoleSummaryCardProps): React.ReactElement {
+function RoleSummaryCard({ icon: Icon, label, value }: RoleSummaryCardProps): ReactElement {
   return (
     <Card className="bg-muted/25">
       <CardHeader className="flex-row items-center gap-3">

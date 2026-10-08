@@ -6,5 +6,6 @@ export function toFormControlValue(input: FormValue): string | number {
 
 export function toOptionalFormString(input: FormValue): string | undefined {
   const value = toFormControlValue(input);
+
   return value === "" ? undefined : String(value);
 }

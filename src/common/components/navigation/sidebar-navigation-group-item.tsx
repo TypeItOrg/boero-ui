@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+
 import { ChevronRightIcon } from "lucide-react";
 
 import { useSidebarNavigationState } from "@common/components/navigation/sidebar-navigation-state-provider";
@@ -32,7 +34,7 @@ type SidebarNavigationGroupItemProps = {
   navigation: MobileSidebarNavigation;
 };
 
-export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigationGroupItemProps): React.ReactElement | null {
+export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigationGroupItemProps): ReactElement | null {
   const pathname = usePathname();
   const { isMobile, state: sidebarState } = useSidebar();
   const { groupStates, setGroupOpen } = useSidebarNavigationState();

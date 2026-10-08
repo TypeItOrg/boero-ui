@@ -1,12 +1,4 @@
-jest.mock("next/navigation", () => ({
-  usePathname: () => "/training-paths/2d9ec931-453c-4778-86a9-dc40a06d0247",
-  useSearchParams: () => new URLSearchParams(),
-}));
-jest.mock("@features/academic/components/academic-collection", () => ({
-  AcademicCollectionView: jest.fn(({ createAction }: { createAction?: React.ReactNode }) => (
-    <div data-testid="academic-collection-view">{createAction}</div>
-  )),
-}));
+import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
 
@@ -14,6 +6,16 @@ import { AcademicCollectionView } from "@features/academic/components/academic-c
 import { TrainingPathStudyPlans } from "@features/academic/components/training-path-study-plans";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/training-paths/2d9ec931-453c-4778-86a9-dc40a06d0247",
+  useSearchParams: () => new URLSearchParams(),
+}));
+jest.mock("@features/academic/components/academic-collection", () => ({
+  AcademicCollectionView: jest.fn(({ createAction }: { createAction?: ReactNode }) => (
+    <div data-testid="academic-collection-view">{createAction}</div>
+  )),
+}));
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const TRAINING_PATH_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";

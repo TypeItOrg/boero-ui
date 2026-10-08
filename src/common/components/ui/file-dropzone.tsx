@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useRef, useState, type DragEvent, type Ref } from "react";
+import { useId, useRef, useState, type DragEvent, type ReactElement, type Ref } from "react";
+
 import { UploadIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -37,7 +38,7 @@ export function FileDropzone({
   disabled?: boolean;
   buttonRef?: Ref<HTMLButtonElement>;
   onSelectFiles: (files: File[], silent?: boolean) => void;
-}): React.ReactElement {
+}): ReactElement {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);

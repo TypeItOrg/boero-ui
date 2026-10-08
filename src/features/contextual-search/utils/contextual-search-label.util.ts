@@ -5,7 +5,11 @@ import type { ContextualSearchResult } from "@features/contextual-search/types/c
 export function getContextualSearchLabels(entityType: ContextualSearchEntity, item: ContextualSearchResult) {
   if (entityType === "study-plan") {
     return {
-      title: formatStudyPlanName({ name: item.title, trainingPathName: item.subtitle, studyPlanVersion: item.studyPlanVersion }),
+      title: formatStudyPlanName({
+        name: item.title,
+        trainingPathName: item.subtitle,
+        studyPlanVersion: item.studyPlanVersion,
+      }),
       subtitle: item.subtitle,
     };
   }

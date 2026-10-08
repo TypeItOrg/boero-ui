@@ -1,6 +1,6 @@
-import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
-import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import type { EnrollmentApplicationData } from "@features/enrollment-applications/types/enrollment-application-data.types";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 export type EnrollmentApplication = {
   canApprove?: boolean;

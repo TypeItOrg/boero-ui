@@ -1,15 +1,16 @@
 import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { parseOptionalBooleanQueryParam, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
+import { parseOptionalBooleanQueryParam, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
+
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { ACADEMIC_SPACE_FORMAT, type AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import { ACADEMIC_SPACE_TYPE, type AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
-import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { ACADEMIC_YEAR_STATUS, type AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
+import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { COURSE_STATUS, type CourseStatus } from "@features/academic/types/course-status.types";
 import { STUDY_PLAN_STATUS, type StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
@@ -125,12 +126,15 @@ function parseAcademicSort(searchParams: AcademicSearchParams, resource: Academi
   if (resource === AcademicResource.TRAINING_PATH) {
     return parseSortQuery(searchParams, trainingPathSortFields, DEFAULT_TRAINING_PATH_SORT);
   }
+
   if (resource === AcademicResource.STUDY_PLAN) {
     return parseSortQuery(searchParams, studyPlanSortFields, DEFAULT_STUDY_PLAN_SORT);
   }
+
   if (resource === AcademicResource.COURSE) {
     return parseSortQuery(searchParams, courseSortFields, DEFAULT_COURSE_SORT);
   }
+
   return parseSortQuery(searchParams, academicYearSortFields, DEFAULT_ACADEMIC_YEAR_SORT);
 }
 
@@ -142,6 +146,9 @@ export function getAcademicRegistrationSummary(totalItems: number, singular: str
 }
 
 function parseEnum<T extends string>(value: QueryParamValue, allowedValues: readonly T[]): T | undefined {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
   return allowedValues.find((allowedValue) => allowedValue === value);
 }

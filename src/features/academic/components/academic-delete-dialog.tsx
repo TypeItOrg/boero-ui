@@ -1,8 +1,10 @@
 "use client";
 
-import { CircleAlertIcon, Trash2Icon } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, type ReactElement } from "react";
 
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
+
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,8 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+
 import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -42,7 +44,7 @@ export type AcademicDeleteDialogProps = {
 
 const INITIAL_STATE: AcademicActionState = {};
 
-export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.ReactElement {
+export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     deleteAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
@@ -58,7 +60,10 @@ export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.Re
     : "Esta acción no se puede deshacer. Las relaciones protegidas impedirán la eliminación.";
 
   function handleOpenChange(open: boolean): void {
-    if (isPending && !open) return;
+    if (isPending && !open) {
+      return;
+    }
+
     props.onOpenChange(open);
   }
 

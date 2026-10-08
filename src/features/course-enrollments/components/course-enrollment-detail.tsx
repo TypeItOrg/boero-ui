@@ -1,31 +1,25 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
-import { OptionalValue } from "@common/components/optional-value";
-import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
-import { CalendarDaysIcon, HistoryIcon, ScrollTextIcon, type LucideIcon } from "lucide-react";
+import type { ReactElement } from "react";
 
+import { CalendarDaysIcon, ScrollTextIcon } from "lucide-react";
+
+import { OptionalValue } from "@common/components/optional-value";
 import { Badge } from "@common/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
+import { Detail, SectionHeader } from "@features/course-enrollments/components/course-enrollment-detail-items";
+import { CourseEnrollmentHistorySection } from "@features/course-enrollments/components/course-enrollment-history";
 import { CourseEnrollmentScheduleCards } from "@features/course-enrollments/components/course-enrollment-schedule-cards";
-import {
-  ACADEMIC_ENROLLMENT_STATUS_LABELS,
-  COURSE_ENROLLMENT_STATUS_LABELS,
-  COURSE_ENROLLMENT_OPERATION_LABELS,
-} from "@features/course-enrollments/constants/course-enrollment.constants";
-import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
-import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
-import {
-  formatEnrollmentApplicationDate,
-  formatEnrollmentApplicationDateTime,
-} from "@features/enrollment-applications/utils/enrollment-application-date.util";
-import { SectionHeader as SharedSectionHeader } from "@common/components/section-header";
+import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
+import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
 
 type CourseEnrollmentDetailProps = {
   enrollment: CourseEnrollment;
   history: CourseEnrollmentHistory[];
 };
 
-export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollmentDetailProps): React.ReactElement {
+export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollmentDetailProps): ReactElement {
   const activeSchedules = enrollment.schedules.filter((schedule) => !schedule.releasedAt);
   const releasedSchedules = enrollment.schedules.filter((schedule) => schedule.releasedAt);
 
@@ -84,122 +78,7 @@ export function CourseEnrollmentDetail({ enrollment, history }: CourseEnrollment
         </div>
       </section>
 
-      <section aria-labelledby="enrollment-history-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
-        <SectionHeader
-          id="enrollment-history-title"
-          icon={HistoryIcon}
-          title="Historial"
-          description="Registro de operaciones, cambios de estado y resultados académicos."
-        />
-        <div className="mt-5">
-          {history.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No hay movimientos históricos.</p>
-          ) : (
-            <div className="bg-background overflow-hidden rounded-lg border">
-              <Table containerClassName="table-scrollbar" className="min-w-180">
-                <TableHeader className="bg-muted">
-                  <TableRow className="h-11">
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Operación</TableHead>
-                    <TableHead>Cursada</TableHead>
-                    <TableHead>Resultado</TableHead>
-                    <TableHead>Motivo</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {history.map((item) => (
-                    <TableRow key={item.id} className="h-12">
-                      <TableCell className="tabular-nums">
-                        <time dateTime={item.changedAt}>{formatEnrollmentApplicationDateTime(item.changedAt)}</time>
-                      </TableCell>
-                      <TableCell>{COURSE_ENROLLMENT_OPERATION_LABELS[item.operation] ?? "Actualización de cursada"}</TableCell>
-                      <TableCell>
-                        <HistoryStatus
-                          previous={item.previousStatus ? COURSE_ENROLLMENT_STATUS_LABELS[item.previousStatus] : null}
-                          current={item.newStatus ? COURSE_ENROLLMENT_STATUS_LABELS[item.newStatus] : null}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <HistoryStatus
-                          previous={item.previousAcademicStatus ? ACADEMIC_ENROLLMENT_STATUS_LABELS[item.previousAcademicStatus] : null}
-                          current={item.newAcademicStatus ? ACADEMIC_ENROLLMENT_STATUS_LABELS[item.newAcademicStatus] : null}
-                        />
-                      </TableCell>
-                      <TableCell className="max-w-80 min-w-40 break-words whitespace-pre-wrap">
-                        <OptionalValue value={item.reason} fallback="Sin motivo informado" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-      </section>
+      <CourseEnrollmentHistorySection history={history} />
     </div>
-  );
-}
-
-function SectionHeader({
-  id,
-  icon: Icon,
-  title,
-  description,
-}: {
-  id: string;
-  icon: LucideIcon;
-  title: string;
-  description: string;
-}): React.ReactElement {
-  return (
-    <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-      <SharedSectionHeader icon={Icon} title={title} description={description} titleId={id} />
-    </header>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: React.ReactNode }): React.ReactElement {
-  return (
-    <div className="min-w-0">
-      <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
-      <dd className="mt-1 font-semibold break-words">{value}</dd>
-    </div>
-  );
-}
-
-function HistoryStatus({ previous, current }: { previous: string | null; current: string | null }): React.ReactElement {
-  if (!current) {
-    return <span className="text-muted-foreground">Sin registro</span>;
-  }
-
-  if (!previous) {
-    return (
-      <div className="space-y-1 py-1">
-        <p className={DETAIL_LABEL_CLASS_NAME}>Estado inicial</p>
-        <Badge variant="outline">{current}</Badge>
-      </div>
-    );
-  }
-
-  if (previous === current) {
-    return (
-      <div className="space-y-1 py-1">
-        <p className="text-muted-foreground text-xs">Sin cambios</p>
-        <Badge variant="outline">{current}</Badge>
-      </div>
-    );
-  }
-
-  return (
-    <dl className="space-y-1 py-1 text-sm">
-      <div className="flex gap-2">
-        <dt className={DETAIL_LABEL_CLASS_NAME}>Antes:</dt>
-        <dd>{previous}</dd>
-      </div>
-      <div className="flex gap-2">
-        <dt className={DETAIL_LABEL_CLASS_NAME}>Después:</dt>
-        <dd className="font-medium">{current}</dd>
-      </div>
-    </dl>
   );
 }

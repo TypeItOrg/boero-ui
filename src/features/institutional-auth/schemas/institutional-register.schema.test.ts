@@ -1,5 +1,5 @@
-import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
+import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 function createValidInput(overrides: Record<string, string> = {}) {
   return {
@@ -19,8 +19,14 @@ describe("institutional register schema", () => {
     const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate: "" }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La fecha de nacimiento es requerida." }));
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["birthDate"],
+          message: "La fecha de nacimiento es requerida.",
+        }),
+      );
     }
   });
 
@@ -36,8 +42,14 @@ describe("institutional register schema", () => {
     const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate }));
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La persona debe tener al menos 3 años." }));
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["birthDate"],
+          message: "La persona debe tener al menos 3 años.",
+        }),
+      );
     }
   });
 });

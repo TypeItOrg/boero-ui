@@ -1,4 +1,5 @@
 import type { DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+
 import type { AcademicCollectionConfig } from "@features/academic/types/academic-collection-config.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
 
@@ -42,6 +43,7 @@ export function activeResource(config: Omit<AcademicCollectionConfig, "filters" 
     filters: ({ active, deleted }) => [activeFilter(active), deletionFilter(deleted)],
     toRow: (item) => {
       const activeItem = item as Extract<AcademicCollection, { description: string | null; name: string }>;
+
       return {
         id: activeItem.id,
         institutionId: activeItem.institutionId,

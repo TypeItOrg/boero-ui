@@ -1,16 +1,18 @@
 "use client";
 
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { Loader2Icon } from "lucide-react";
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
+import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
 import { MyEnrollmentApplicationEmptyState } from "@features/enrollment-applications/components/my-enrollment-application-empty-state";
 import { MyEnrollmentApplicationTableRow } from "@features/enrollment-applications/components/my-enrollment-application-table-row";
-import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
 type MyEnrollmentApplicationTablePresentationProps = {
   data: PaginatedResponse<EnrollmentApplication>;
@@ -19,12 +21,7 @@ type MyEnrollmentApplicationTablePresentationProps = {
   status?: EnrollmentApplicationStatus;
 };
 
-export function MyEnrollmentApplicationTablePresentation({
-  data,
-  page,
-  size,
-  status,
-}: MyEnrollmentApplicationTablePresentationProps): React.ReactElement {
+export function MyEnrollmentApplicationTablePresentation({ data, page, size, status }: MyEnrollmentApplicationTablePresentationProps): ReactElement {
   const { isPending: isNavigating } = useDataTableNavigation();
 
   if (data.items.length === 0) {

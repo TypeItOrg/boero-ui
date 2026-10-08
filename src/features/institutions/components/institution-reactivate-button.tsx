@@ -1,20 +1,22 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, type ReactElement } from "react";
+
 import { Loader2Icon, RotateCcwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@common/components/ui/button";
 import { safelyRunAction } from "@common/utils/safe-action.util";
-import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+
 import { updateInstitutionStatusAction } from "@features/institutions/actions/update-institution-status.action";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
 type InstitutionReactivateButtonProps = {
   institutionId: string;
   institutionName: string;
 };
 
-export function InstitutionReactivateButton({ institutionId, institutionName }: InstitutionReactivateButtonProps): React.ReactElement {
+export function InstitutionReactivateButton({ institutionId, institutionName }: InstitutionReactivateButtonProps): ReactElement {
   const [isPending, startTransition] = useTransition();
 
   function reactivateInstitution(): void {
@@ -23,6 +25,7 @@ export function InstitutionReactivateButton({ institutionId, institutionName }: 
 
       if (result.error) {
         toast.error(result.error);
+
         return;
       }
 

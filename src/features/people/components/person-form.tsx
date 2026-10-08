@@ -1,23 +1,26 @@
 "use client";
 
-import type { RoleAssignment } from "@features/people/types/role-assignment.types";
+import { useEffect, useMemo, useState, useTransition, type ReactElement } from "react";
 
-import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+
 import { CircleAlertIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
-import { ROLE_SCOPE_MESSAGES } from "@features/people/constants/role-scope.constants";
+import { FORM_MODE } from "@common/types/form-mode.types";
+
 import { createInstitutionalPersonAction, createPlatformPersonAction } from "@features/people/actions/create-person.action";
 import { updateInstitutionalPersonAction, updatePlatformPersonAction } from "@features/people/actions/update-person.action";
 import { PersonCreateFields, PersonDetailsFields, PersonPasswordFields } from "@features/people/components/person-form-fields";
-import type { Person } from "@features/people/types/person.types";
+import { ROLE_SCOPE_MESSAGES } from "@features/people/constants/role-scope.constants";
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
 import type { PersonFormInput } from "@features/people/types/person-form-input.types";
-import { FORM_MODE } from "@common/types/form-mode.types";
+import type { Person } from "@features/people/types/person.types";
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
+import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 import {
   getDefaultValues,
   getErrorTitle,
@@ -26,7 +29,6 @@ import {
   getSubmitLabel,
   setActionFieldErrors,
 } from "@features/people/utils/person-form.util";
-import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonFormCommonProps = {
   institutionId: string;
@@ -64,11 +66,11 @@ export function PersonForm({
   canEdit = true,
   scope = PeopleScope.ADMIN,
   returnTo,
-}: PersonFormProps): React.ReactElement {
+}: PersonFormProps): ReactElement {
   const router = useRouter();
   const isEdit = mode === FORM_MODE.EDIT;
-  const [isPending, startTransition] = React.useTransition();
-  const [formError, setFormError] = React.useState<string>();
+  const [isPending, startTransition] = useTransition();
+  const [formError, setFormError] = useState<string>();
   const listPath = PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`;
   const destination = returnTo ?? listPath;
   const resolver = getPersonFormResolver(isEdit);
@@ -83,16 +85,17 @@ export function PersonForm({
     resolver,
     defaultValues: getDefaultValues(person),
   });
-  const errorState = React.useMemo(() => ({ error: formError, fieldErrors: errors }), [formError, errors]);
+  const errorState = useMemo(() => ({ error: formError, fieldErrors: errors }), [formError, errors]);
   const formRef = useActionFormErrorFocus(errorState, isPending);
 
-  React.useEffect(() => {
+  useEffect(() => {
     onPendingChange?.(isPending);
   }, [isPending, onPendingChange]);
 
   function onSubmit(values: PersonFormInput): void {
     if (assignments?.some((assignment) => assignment.accessScope === "TRAINING_PATHS" && assignment.trainingPathIds.length === 0)) {
       setFormError(ROLE_SCOPE_MESSAGES.REQUIRED_ASSIGNMENT);
+
       return;
     }
 

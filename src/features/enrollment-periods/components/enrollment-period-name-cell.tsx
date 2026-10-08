@@ -1,7 +1,7 @@
 import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
 import { ENROLLMENT_PERIOD_MESSAGES } from "@features/enrollment-periods/constants/enrollment-period.messages";
-import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 function getPlanLabel(offering: EnrollmentPeriodOffering) {
   const name = formatStudyPlanName(offering);

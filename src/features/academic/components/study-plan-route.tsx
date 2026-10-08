@@ -1,49 +1,30 @@
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import type { ReactElement } from "react";
+
 import { notFound } from "next/navigation";
-import { GitBranchPlusIcon, LibraryBigIcon } from "lucide-react";
+
+import { GitBranchPlusIcon } from "lucide-react";
 
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicAccessDenied, AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
+import { EditLevel, NewLevel } from "@features/academic/components/study-plan-route-forms";
+import { StudyPlanSpaceRoute } from "@features/academic/components/study-plan-space-route";
 import { StudyPlanVersionForm } from "@features/academic/components/study-plan-version-form";
-import { StudyPlanSpaceDetail } from "@features/academic/components/study-plan-space-detail";
-import {
-  EditLevel,
-  EditPlanSpace,
-  EditPrerequisite,
-  NewLevel,
-  NewPlanSpace,
-  NewPrerequisite,
-} from "@features/academic/components/study-plan-route-forms";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
-import { fetchStudyPlanCurriculum, fetchStudyPlanSpace } from "@features/academic/services/academic.service";
-import type { AcademicAccess } from "@features/academic/types/academic-access.types";
-import type { AcademicBreadcrumbOptions } from "@features/academic/types/academic-breadcrumb-options.types";
+import { fetchStudyPlanCurriculum } from "@features/academic/services/academic.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { type StudyPlanRouteProps } from "@features/academic/types/study-plan-route-props.types";
+import { getAcademicAccess } from "@features/academic/utils/academic-access.util";
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 
-type StudyPlanRouteProps = {
-  access: AcademicAccess;
-  action: string;
-  basePath: string;
-  breadcrumb: React.ReactNode;
-  id: string;
-  institutionId: string;
-  leaf?: string;
-  leafId?: string;
-  nestedAction?: string;
-  nestedId?: string;
-  renderBreadcrumb: (options?: AcademicBreadcrumbOptions) => React.ReactNode;
-  searchParams?: Record<string, string | string[] | undefined>;
-  scope: AcademicScope;
-};
-
-export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.ReactElement> {
+export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<ReactElement> {
   const curriculum = await fetchStudyPlanCurriculum(props.scope, props.institutionId, props.id);
+
   if (!curriculum) {
     notFound();
   }
+
   const access =
     props.scope === "institutional" ? getAcademicAccess(await requireInstitutionalUser(), curriculum.studyPlan.trainingPathId) : props.access;
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
@@ -51,10 +32,14 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   const levels = curriculum.levels.map(({ level }) => level);
 
   if (props.action === ACADEMIC_ROUTE_SEGMENT.VERSIONS) {
-    if (props.nestedId !== ACADEMIC_ROUTE_SEGMENT.NEW) notFound();
+    if (props.nestedId !== ACADEMIC_ROUTE_SEGMENT.NEW) {
+      notFound();
+    }
+
     if (!access.studyPlanCreate || curriculum.studyPlan.status === "DRAFT") {
       return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
     }
+
     const breadcrumb = props.renderBreadcrumb({
       hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.VERSIONS],
       segmentLabels: {
@@ -63,6 +48,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
       },
     });
     const returnTo = getSafeReturnTo(props.searchParams?.returnTo, planPath);
+
     return (
       <AcademicShell
         title="Nueva versión"
@@ -78,17 +64,26 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   }
 
   if (props.action === AcademicResource.ACADEMIC_LEVEL) {
-    if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
+    if (!canEditCurriculum) {
+      return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
+    }
+
     if (props.nestedId === ACADEMIC_ROUTE_SEGMENT.NEW) {
       const breadcrumb = props.renderBreadcrumb({
         hiddenSegments: [AcademicResource.ACADEMIC_LEVEL],
         segmentLabels: { [props.id]: formatStudyPlanLabel(curriculum.studyPlan) },
       });
+
       return <NewLevel breadcrumb={breadcrumb} id={props.id} institutionId={props.institutionId} planPath={planPath} scope={props.scope} />;
     }
+
     if (props.nestedId && props.nestedAction === ACADEMIC_ROUTE_SEGMENT.EDIT) {
       const level = levels.find((item) => item.id === props.nestedId);
-      if (!level) notFound();
+
+      if (!level) {
+        notFound();
+      }
+
       const breadcrumb = props.renderBreadcrumb({
         hiddenSegments: [AcademicResource.ACADEMIC_LEVEL, level.id],
         segmentLabels: {
@@ -96,6 +91,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
           [ACADEMIC_ROUTE_SEGMENT.EDIT]: `Editar ${level.name}`,
         },
       });
+
       return (
         <EditLevel breadcrumb={breadcrumb} id={props.id} institutionId={props.institutionId} level={level} planPath={planPath} scope={props.scope} />
       );
@@ -103,121 +99,8 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<React.
   }
 
   if (props.action === ACADEMIC_ROUTE_SEGMENT.SPACES) {
-    if (props.nestedId === ACADEMIC_ROUTE_SEGMENT.NEW) {
-      if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
-      const breadcrumb = props.renderBreadcrumb({
-        hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
-        segmentLabels: { [props.id]: formatStudyPlanLabel(curriculum.studyPlan) },
-      });
-      return (
-        <NewPlanSpace
-          breadcrumb={breadcrumb}
-          id={props.id}
-          institutionId={props.institutionId}
-          levels={levels}
-          planPath={planPath}
-          scope={props.scope}
-        />
-      );
-    }
-    if (!props.nestedId) notFound();
-    const space = await fetchStudyPlanSpace(props.scope, props.institutionId, props.nestedId);
-    if (!space || space.studyPlanId !== props.id) notFound();
-    const spacePath = `${planPath}/spaces/${space.id}`;
-    const spaceBreadcrumbLabels = {
-      [props.id]: formatStudyPlanLabel(curriculum.studyPlan),
-      [space.id]: space.academicSpaceName,
-    };
-    const spaceBreadcrumb = props.renderBreadcrumb({
-      hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
-      segmentLabels: spaceBreadcrumbLabels,
-    });
-    const editSpaceBreadcrumb = props.renderBreadcrumb({
-      hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
-      segmentLabels: {
-        ...spaceBreadcrumbLabels,
-        [ACADEMIC_ROUTE_SEGMENT.EDIT]: "Editar espacio",
-      },
-    });
-
-    if (!props.nestedAction) {
-      return (
-        <AcademicShell
-          title={space.academicSpaceName}
-          breadcrumb={spaceBreadcrumb}
-          headerClassName="flex-row items-center justify-between"
-          actionsClassName="self-stretch"
-          actions={<AcademicPageIcon icon={LibraryBigIcon} />}
-        >
-          <StudyPlanSpaceDetail
-            space={space}
-            curriculum={curriculum}
-            basePath={props.basePath}
-            scope={props.scope}
-            institutionId={props.institutionId}
-            canEditCurriculum={canEditCurriculum}
-          />
-        </AcademicShell>
-      );
-    }
-    if (!canEditCurriculum) return <AcademicAccessDenied breadcrumb={props.breadcrumb} />;
-    if (props.nestedAction === ACADEMIC_ROUTE_SEGMENT.EDIT)
-      return (
-        <EditPlanSpace
-          breadcrumb={editSpaceBreadcrumb}
-          id={props.id}
-          institutionId={props.institutionId}
-          levels={levels}
-          planPath={planPath}
-          scope={props.scope}
-          space={space}
-          spacePath={spacePath}
-        />
-      );
-    if (props.nestedAction === AcademicResource.PREREQUISITE) {
-      const planSpaces = [...curriculum.levels.flatMap((level) => level.spaces), ...curriculum.unassignedSpaces];
-      if (props.leaf === ACADEMIC_ROUTE_SEGMENT.NEW) {
-        const breadcrumb = props.renderBreadcrumb({
-          hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES, AcademicResource.PREREQUISITE],
-          segmentLabels: {
-            ...spaceBreadcrumbLabels,
-            [ACADEMIC_ROUTE_SEGMENT.NEW]: "Nueva correlatividad",
-          },
-        });
-        return (
-          <NewPrerequisite
-            breadcrumb={breadcrumb}
-            id={props.id}
-            institutionId={props.institutionId}
-            planSpaces={planSpaces}
-            planPath={planPath}
-            scope={props.scope}
-            spaceId={space.id}
-            spacePath={spacePath}
-          />
-        );
-      }
-      if (props.leaf && props.leafId === ACADEMIC_ROUTE_SEGMENT.EDIT) {
-        const breadcrumb = props.renderBreadcrumb({
-          hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES, AcademicResource.PREREQUISITE, props.leaf],
-          segmentLabels: {
-            ...spaceBreadcrumbLabels,
-            [ACADEMIC_ROUTE_SEGMENT.EDIT]: "Editar correlatividad",
-          },
-        });
-        return await EditPrerequisite({
-          breadcrumb,
-          id: props.id,
-          institutionId: props.institutionId,
-          planPath,
-          planSpaces,
-          prerequisiteId: props.leaf,
-          scope: props.scope,
-          spaceId: space.id,
-          spacePath,
-        });
-      }
-    }
+    return StudyPlanSpaceRoute({ props, curriculum, planPath, canEditCurriculum, levels });
   }
+
   notFound();
 }

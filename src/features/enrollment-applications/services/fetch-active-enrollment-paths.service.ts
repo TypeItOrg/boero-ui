@@ -1,7 +1,6 @@
 import "server-only";
 
 import { ACTIVE_ENROLLMENT_APPLICATION_STATUSES } from "@features/enrollment-applications/constants/enrollment-application.constants";
-
 import { fetchMyEnrollmentApplications } from "@features/enrollment-applications/services/enrollment-application.service";
 
 export async function fetchActiveEnrollmentPaths(institutionId: string) {
@@ -14,7 +13,11 @@ export async function fetchActiveEnrollmentPaths(institutionId: string) {
       let page = 0;
 
       while (true) {
-        const applications = await fetchMyEnrollmentApplications(institutionId, { page, size: 50, status });
+        const applications = await fetchMyEnrollmentApplications(institutionId, {
+          page,
+          size: 50,
+          status,
+        });
 
         for (const application of applications.items) {
           const trainingPathId = application.trainingPathId ?? application.data?.careerSelection?.trainingPathId;

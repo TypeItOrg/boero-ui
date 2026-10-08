@@ -1,8 +1,9 @@
-import * as React from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 import { DatePicker } from "@common/components/ui/date-picker";
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+
 import { formatBirthDateInput, getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
 export function TextField({
@@ -13,7 +14,11 @@ export function TextField({
   error,
   className,
   ...props
-}: React.ComponentProps<typeof Input> & { label: string; description?: string; error?: string }): React.ReactElement {
+}: ComponentProps<typeof Input> & {
+  label: string;
+  description?: string;
+  error?: string;
+}): ReactElement {
   return (
     <Field className={className ?? "flex-[1_0_min(240px,100%)]"} data-disabled={props.disabled} data-invalid={Boolean(error)}>
       <FieldContent>
@@ -39,8 +44,8 @@ export function DropdownField({
   label: string;
   error?: string;
   required?: boolean;
-  children: React.ReactNode;
-}): React.ReactElement {
+  children: ReactNode;
+}): ReactElement {
   return (
     <Field className="flex-[1_0_min(240px,100%)]" data-invalid={Boolean(error)}>
       <FieldContent>
@@ -70,7 +75,7 @@ export function DateField({
   error?: string;
   required?: boolean;
   value?: Date;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <Field className="flex-[1_0_min(240px,100%)]" data-invalid={Boolean(error)}>
       <FieldContent>

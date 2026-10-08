@@ -1,33 +1,37 @@
 "use client";
 
-import * as React from "react";
+import { startTransition, useActionState, useMemo, useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
-import { safelyRunAction } from "@common/utils/safe-action.util";
-import { getSafeReturnTo } from "@common/utils/return-to.util";
-import { InstitutionLogoField } from "@features/institutions/components/institution-logo-field";
-import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
-import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
-import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
-import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
+import { useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Input } from "@common/components/ui/input";
-import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
-import { Textarea } from "@common/components/ui/textarea";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { LocationPicker } from "@features/locations/components/location-picker";
+import { Input } from "@common/components/ui/input";
+import { PhoneInput } from "@common/components/ui/restricted-input";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+
+import { updateInstitutionalInstitutionAction } from "@features/institutions/actions/update-institutional-institution.action";
+import { FormCard } from "@features/institutions/components/institution-form-card";
+import { InstitutionLogoField } from "@features/institutions/components/institution-logo-field";
+import { InstitutionalInstitutionLocationFields } from "@features/institutions/components/institutional-institution-location-fields";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+import { INSTITUTION_LOGO_INTENT } from "@features/institutions/constants/institution-logo.constants";
 import {
   institutionalInstitutionFormSchema,
   type InstitutionalInstitutionFormInput,
   type InstitutionalInstitutionFormValues,
 } from "@features/institutions/schemas/institutional-institution-form.schema";
-import { updateInstitutionalInstitutionAction } from "@features/institutions/actions/update-institutional-institution.action";
+import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
 import type { Institution } from "@features/institutions/types/institution.types";
 import { createInstitutionFormData } from "@features/institutions/utils/institution-form-data.util";
+import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
 import { applyServerErrors, getDefaultValues, getInitialLocation } from "@features/institutions/utils/institutional-institution-form.util";
 
 type InstitutionalInstitutionFormProps = {
@@ -35,13 +39,15 @@ type InstitutionalInstitutionFormProps = {
   returnTo?: string;
 };
 
-export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): React.ReactElement {
+export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): ReactElement {
   const router = useRouter();
   const destination = getSafeReturnTo(returnTo, "/institution");
-  const [logoChange, setLogoChange] = React.useState<InstitutionLogoChange>({ intent: "keep" });
+  const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
+    intent: INSTITUTION_LOGO_INTENT.KEEP,
+  });
 
-  const initialLocation = React.useMemo(() => getInitialLocation(institution), [institution]);
-  const defaultValues = React.useMemo(() => getDefaultValues(institution), [institution]);
+  const initialLocation = useMemo(() => getInitialLocation(institution), [institution]);
+  const defaultValues = useMemo(() => getDefaultValues(institution), [institution]);
 
   const {
     register,
@@ -55,13 +61,14 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
     defaultValues,
   });
 
-  const [state, formAction, isPending] = React.useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
+  const [state, formAction, isPending] = useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
     const result = await safelyRunAction(
       updateInstitutionalInstitutionAction(institution.id, formData),
       INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION,
     );
 
     applyServerErrors(result, setError);
+
     if (result.logoError) {
       setError("root.logo", { type: "server", message: result.logoError });
     }
@@ -82,7 +89,7 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
     const formData = createInstitutionFormData(values);
     appendInstitutionLogoChange(formData, logoChange);
 
-    React.startTransition(() => {
+    startTransition(() => {
       formAction(formData);
     });
   }
@@ -128,68 +135,13 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
           onError={(message) => setError("root.logo", { type: "client", message })}
         />
 
-        <FormCard title="Ubicación">
-          <div className="flex flex-col gap-4">
-            <Controller
-              control={control}
-              name="cityId"
-              render={({ field, fieldState }) => (
-                <LocationPicker error={fieldState.error?.message} initialLocation={initialLocation} onValueChange={field.onChange} />
-              )}
-            />
-
-            <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
-              <Field data-invalid={!!errors.street} className="flex-[1_0_min(250px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-street">Calle</FieldLabel>
-                </FieldContent>
-                <Input
-                  id="institution-street"
-                  defaultValue={defaultValues.street}
-                  placeholder="Bv. España"
-                  aria-invalid={!!errors.street}
-                  {...register("street")}
-                />
-                <FieldError errors={[errors.street]} />
-              </Field>
-
-              <Field data-invalid={!!errors.number} className="flex-[1_0_min(120px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-number">Altura</FieldLabel>
-                </FieldContent>
-                <NumericInput
-                  id="institution-number"
-                  defaultValue={defaultValues.number}
-                  maxLength={50}
-                  placeholder="1174"
-                  aria-invalid={!!errors.number}
-                  {...register("number")}
-                />
-                <FieldError errors={[errors.number]} />
-              </Field>
-
-              <Field className="flex-[1_0_min(180px,100%)]">
-                <FieldContent>
-                  <FieldLabel htmlFor="institution-neighborhood">Barrio</FieldLabel>
-                </FieldContent>
-                <Input id="institution-neighborhood" defaultValue={defaultValues.neighborhood} placeholder="Centro" {...register("neighborhood")} />
-              </Field>
-            </FieldGroup>
-
-            <Field className="flex w-full grow flex-col">
-              <FieldContent className="grow-0">
-                <FieldLabel htmlFor="institution-additional-info">Información adicional</FieldLabel>
-              </FieldContent>
-              <Textarea
-                id="institution-additional-info"
-                className="bg-background grow resize-none"
-                defaultValue={defaultValues.additionalInfo}
-                placeholder="Piso, oficina o indicaciones para llegar..."
-                {...register("additionalInfo")}
-              />
-            </Field>
-          </div>
-        </FormCard>
+        <InstitutionalInstitutionLocationFields
+          control={control}
+          initialLocation={initialLocation}
+          errors={errors}
+          defaultValues={defaultValues}
+          register={register}
+        />
 
         <FormCard title="Contacto">
           <FieldGroup className="flex flex-row flex-wrap items-start gap-4">
@@ -250,14 +202,5 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
         </Button>
       </div>
     </form>
-  );
-}
-
-function FormCard({ title, children }: { title: string; children: React.ReactNode }): React.ReactElement {
-  return (
-    <div className="bg-muted/25 flex flex-col gap-4 rounded-xl border p-5">
-      <h2 className="text-foreground font-semibold">{title}</h2>
-      {children}
-    </div>
   );
 }

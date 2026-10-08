@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, type Key, type ReactElement } from "react";
 
 import { DatePicker } from "@common/components/ui/date-picker";
 import type { FormValue } from "@common/types/form-value.types";
 import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
+
 import { FormField } from "@features/academic/components/academic-form-controls";
 
 type ControlledDateRange = {
@@ -14,7 +15,7 @@ type ControlledDateRange = {
 
 type DateRangeFieldsProps = {
   controlledRange?: ControlledDateRange;
-  dateFieldsKey?: React.Key;
+  dateFieldsKey?: Key;
   disabled?: boolean;
   endLabel: string;
   endMaxDate?: Date;
@@ -54,7 +55,7 @@ export function DateRangeFields({
   startMaxDate,
   startMinDate,
   startName,
-}: DateRangeFieldsProps): React.ReactElement {
+}: DateRangeFieldsProps): ReactElement {
   const [internalStartDate, setInternalStartDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, startName));
   const [internalEndDate, setInternalEndDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, endName));
   const isControlled = controlledRange !== undefined;
@@ -105,7 +106,7 @@ function DateFormField({
   minDate,
   name,
   onChange,
-}: DateFormFieldProps): React.ReactElement {
+}: DateFormFieldProps): ReactElement {
   const [draft, setDraft] = useState("");
   const submittedValue = date ? formatDateInput(date) : draft;
 

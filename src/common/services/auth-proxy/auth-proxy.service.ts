@@ -1,47 +1,56 @@
-import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { INSTITUTIONAL_HOST_HEADER } from "@common/services/institutional-host/institutional-host.service";
-import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import type { AuthProxyPolicy } from "@common/services/auth-proxy/auth-proxy-policy.types";
 import type { RefreshAttempt } from "@common/services/auth-proxy/refresh-attempt.types";
 import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
 import { SessionStatus } from "@common/services/auth-proxy/session-status.types";
+import { INSTITUTIONAL_HOST_HEADER } from "@common/services/institutional-host/institutional-host.service";
+import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 
 const inFlightRefreshes = new Map<string, Promise<RefreshAttempt>>();
 const AUTH_PROXY_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthProxyPolicy): Promise<NextResponse> {
   const accessToken = request.cookies.get(policy.accessTokenCookie)?.value;
+
   if (accessToken) {
     const sessionStatus = await getSessionStatus(policy.currentUserPath, accessToken, request);
+
     if (sessionStatus === SessionStatus.VALID) {
       return NextResponse.redirect(policy.getAuthenticatedRedirect(request));
     }
   }
 
   const refreshToken = request.cookies.get(policy.refreshTokenCookie)?.value;
+
   if (!refreshToken) {
     const response = nextWithRequestHeaders(request);
+
     if (accessToken) {
       policy.clearCookies(response);
     }
+
     return response;
   }
 
   const sharedRefresh = await refreshSession(policy.refreshPath, refreshToken);
   const refreshAttempt = await validateRefreshedSession(sharedRefresh, request, policy);
+
   if (refreshAttempt.tokens) {
     const response = NextResponse.redirect(policy.getAuthenticatedRedirect(request));
     policy.setRefreshedCookies(response, refreshAttempt.tokens);
+
     return response;
   }
 
   const response = nextWithRequestHeaders(request);
+
   if (refreshAttempt.status === 401) {
     policy.clearCookies(response);
   }
+
   return response;
 }
 
@@ -51,12 +60,14 @@ export async function handleProtectedRoute(request: NextRequest, policy: AuthPro
   }
 
   const refreshToken = request.cookies.get(policy.refreshTokenCookie)?.value;
+
   if (!refreshToken) {
     return createUnauthenticatedResponse(request, policy);
   }
 
   const sharedRefresh = await refreshSession(policy.refreshPath, refreshToken);
   const refreshAttempt = await validateRefreshedSession(sharedRefresh, request, policy);
+
   if (refreshAttempt.tokens) {
     return createRefreshedSessionResponse(request, policy, refreshAttempt.tokens);
   }
@@ -75,9 +86,11 @@ async function getSessionStatus(currentUserPath: string, accessToken: string, re
     if (response.ok) {
       return SessionStatus.VALID;
     }
+
     if (response.status === 401) {
       return SessionStatus.INVALID;
     }
+
     return SessionStatus.UNAVAILABLE;
   } catch {
     return SessionStatus.UNAVAILABLE;
@@ -87,6 +100,7 @@ async function getSessionStatus(currentUserPath: string, accessToken: string, re
 function refreshSession(refreshPath: string, refreshToken: string): Promise<RefreshAttempt> {
   const requestKey = `${refreshPath}:${refreshToken}`;
   const existingRequest = inFlightRefreshes.get(requestKey);
+
   if (existingRequest) {
     return existingRequest;
   }
@@ -119,6 +133,7 @@ async function performRefresh(refreshPath: string, refreshToken: string): Promis
 
     const payload = (await response.json()) as { tokens?: Partial<RefreshedTokens> };
     const tokens = payload.tokens;
+
     if (tokens?.accessToken && tokens.refreshToken) {
       return {
         status: response.status,
@@ -144,8 +159,13 @@ function createUnauthenticatedResponse(request: NextRequest, policy: AuthProxyPo
 
   const response = request.nextUrl.pathname.startsWith("/api/")
     ? NextResponse.json(
-        { message: refreshUnavailable ? COMMON_ERROR_MESSAGES.SESSION_UNAVAILABLE : COMMON_ERROR_MESSAGES.SESSION_REQUIRED },
-        { status: contextForbidden ? 403 : refreshUnavailable ? 503 : 401, headers: { "cache-control": "private, no-store" } },
+        {
+          message: refreshUnavailable ? COMMON_ERROR_MESSAGES.SESSION_UNAVAILABLE : COMMON_ERROR_MESSAGES.SESSION_REQUIRED,
+        },
+        {
+          status: contextForbidden ? 403 : refreshUnavailable ? 503 : 401,
+          headers: { "cache-control": "private, no-store" },
+        },
       )
     : NextResponse.redirect(policy.getLoginRedirect(request));
 
@@ -164,6 +184,7 @@ function createRefreshedSessionResponse(request: NextRequest, policy: AuthProxyP
     request: { headers: new Headers(request.headers) },
   });
   policy.setRefreshedCookies(response, tokens);
+
   return response;
 }
 
@@ -175,9 +196,11 @@ function createProxyBackendHeaders(request: NextRequest, initial: HeadersInit): 
   const headers = new Headers(initial);
   // proxy() has stripped and rebuilt this internal header from the configured frontend Host.
   const host = request.headers.get(INSTITUTIONAL_HOST_HEADER);
+
   if (host) {
     headers.set(INSTITUTIONAL_HOST_HEADER, host);
   }
+
   return headers;
 }
 
@@ -188,10 +211,13 @@ async function validateRefreshedSession(attempt: RefreshAttempt, request: NextRe
 
   try {
     const response = await fetch(new URL(policy.currentUserPath, getApiUrlOrThrow()), {
-      headers: createProxyBackendHeaders(request, { Authorization: `Bearer ${attempt.tokens.accessToken}` }),
+      headers: createProxyBackendHeaders(request, {
+        Authorization: `Bearer ${attempt.tokens.accessToken}`,
+      }),
       cache: "no-store",
       signal: AbortSignal.timeout(AUTH_PROXY_REQUEST_TIMEOUT_MS),
     });
+
     // Only a definitive refresh 401 may clear cookies. A context/session check cannot do so.
     return response.ok ? attempt : { status: response.status === 403 ? 403 : 503 };
   } catch {

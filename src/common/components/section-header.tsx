@@ -1,5 +1,6 @@
+import type { ReactElement, ReactNode } from "react";
+
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
 
 import { cn } from "@common/utils/cn.util";
 
@@ -27,7 +28,7 @@ export function SectionHeader({
   title,
   titleClassName,
   titleId,
-}: SectionHeaderProps): React.ReactElement {
+}: SectionHeaderProps): ReactElement {
   return (
     <div data-slot="section-header" className="@container/section-header w-full min-w-0">
       <div

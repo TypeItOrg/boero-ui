@@ -1,44 +1,35 @@
 "use client";
 
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, useEffect, useRef, useState, type ReactElement } from "react";
 
 import Link from "next/link";
-import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
-import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
-import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
-import * as React from "react";
-import { CircleAlertIcon, UserRoundCheckIcon } from "lucide-react";
 
+import { CircleAlertIcon } from "lucide-react";
+
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { Field, FieldLabel } from "@common/components/ui/field";
 import { Skeleton } from "@common/components/ui/skeleton";
-import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
-import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
+
 import { createManualCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
+import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
+import { CourseManualEnrollmentStudentFields } from "@features/course-enrollments/components/course-manual-enrollment-student-fields";
 import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/services/course-enrollment-client.service";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
-import type { StudentSummary } from "@features/course-enrollments/types/student-summary.types";
-import type { Course } from "@features/academic/types/course.types";
-import { SectionHeader } from "@common/components/section-header";
+import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 
 type CourseManualEnrollmentFormProps = {
   returnTo: string;
 };
 
-export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): React.ReactElement {
-  const errorRef = React.useRef<HTMLDivElement>(null);
-  const [studentId, setStudentId] = React.useState<string>();
-  const [courseId, setCourseId] = React.useState("");
-  const [options, setOptions] = React.useState<CourseEnrollmentAssignmentOptions | null>(null);
-  const [optionsError, setOptionsError] = React.useState<string | null>(null);
-  const [loadingOptions, setLoadingOptions] = React.useState(false);
-  const [state, formAction, isPending] = React.useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
+export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): ReactElement {
+  const errorRef = useRef<HTMLDivElement>(null);
+  const [studentId, setStudentId] = useState<string>();
+  const [courseId, setCourseId] = useState("");
+  const [options, setOptions] = useState<CourseEnrollmentAssignmentOptions | null>(null);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
     if (options) {
       const validation = validateEnrollmentAssignment(formData, options);
 
@@ -57,7 +48,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
     setLoadingOptions(Boolean(nextCourseId));
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!courseId) {
       return;
     }
@@ -87,7 +78,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
     };
   }, [courseId]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (state.error && !isPending) {
       errorRef.current?.scrollIntoView({ block: "center" });
       errorRef.current?.focus({ preventScroll: true });
@@ -105,79 +96,13 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
         </Alert>
       ) : null}
 
-      <section aria-labelledby="manual-enrollment-student-title" className="bg-muted/25 min-w-0 rounded-xl border p-5 md:p-6">
-        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <SectionHeader
-            icon={UserRoundCheckIcon}
-            title="Estudiante y curso"
-            description="Seleccioná quién realizará la cursada y el curso al que se incorporará."
-            titleId="manual-enrollment-student-title"
-          />
-        </header>
-
-        <div className="mt-5 grid min-w-0 gap-5 sm:grid-cols-2">
-          <Field className="min-w-0">
-            <FieldLabel htmlFor="studentId" required>
-              Estudiante
-            </FieldLabel>
-            <AsyncDropdown<StudentSummary>
-              id="studentId"
-              name="studentId"
-              value={studentId}
-              onValueChange={(id) => {
-                setStudentId(id);
-              }}
-              disabled={isPending}
-              queryKey={["manual-enrollment-students"]}
-              fetchPage={(input) => fetchCatalog<StudentSummary>("students", input)}
-              getItemValue={(student) => student.studentId}
-              getItemLabel={(student) => `${student.lastName}, ${student.firstName} · ${student.documentNumber}`}
-              placeholder="Seleccionar estudiante"
-            />
-          </Field>
-
-          <Field className="min-w-0">
-            <FieldLabel htmlFor="courseId" required>
-              Curso
-            </FieldLabel>
-            <AsyncDropdown<Course>
-              id="courseId"
-              name="courseId"
-              value={courseId}
-              onValueChange={(value) => handleCourseChange(value ?? "")}
-              disabled={isPending}
-              queryKey={["manual-enrollment-courses"]}
-              fetchPage={(input) => fetchCatalog<Course>("course-enrollment-options", input)}
-              getItemValue={(course) => course.id}
-              getItemLabel={(course) =>
-                [
-                  course.academicSpaceName,
-                  course.instrumentName,
-                  course.trainingPathName,
-                  course.studyPlanName,
-                  course.academicLevelName ?? "Sin nivel",
-                  course.year,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")
-              }
-              estimateSize={96}
-              renderItem={(course) => (
-                <div className="grid min-w-0 gap-1 text-left">
-                  <span className="line-clamp-2 font-medium">{course.academicSpaceName}</span>
-                  <span className="text-primary text-xs">
-                    {[course.academicLevelName ?? "Sin nivel", course.instrumentName, course.year].filter(Boolean).join(" · ")}
-                  </span>
-                  <span className="text-muted-foreground truncate text-xs" title={formatStudyPlanLabel(course)}>
-                    {formatStudyPlanLabel(course)}
-                  </span>
-                </div>
-              )}
-              placeholder="Seleccionar curso"
-            />
-          </Field>
-        </div>
-      </section>
+      <CourseManualEnrollmentStudentFields
+        studentId={studentId}
+        setStudentId={setStudentId}
+        isPending={isPending}
+        courseId={courseId}
+        handleCourseChange={handleCourseChange}
+      />
 
       {loadingOptions ? <CourseEnrollmentAssignmentSkeleton /> : null}
       {optionsError ? (
@@ -202,7 +127,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
   );
 }
 
-function CourseEnrollmentAssignmentSkeleton(): React.ReactElement {
+function CourseEnrollmentAssignmentSkeleton(): ReactElement {
   return (
     <div className="grid min-w-0 gap-5" role="status" aria-label="Cargando clases y horarios">
       <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
@@ -238,10 +163,4 @@ function CourseEnrollmentAssignmentSkeleton(): React.ReactElement {
       </section>
     </div>
   );
-}
-
-async function fetchCatalog<T>(resource: string, input: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<T>> {
-  const params = new URLSearchParams({ page: String(input.page), size: String(input.size), search: input.search ?? "" });
-  const response = await fetch(`/api/${resource}?${params}`, { cache: "no-store", signal: input.signal });
-  return toAsyncDropdownPage(await parseHttpResponse<PaginatedResponse<T>>(response, COURSE_ENROLLMENT_MESSAGES.CATALOG_FAILED));
 }

@@ -1,14 +1,19 @@
 "use client";
-import { useActionState } from "react";
+
+import { useActionState, type ReactElement } from "react";
+
 import Link from "next/link";
+
 import { Loader2Icon } from "lucide-react";
+
 import { Button } from "@common/components/ui/button";
-import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
-import { EmailVerificationFeedback } from "@features/institutional-auth/components/email-verification-feedback";
+
 import { confirmEmailVerification } from "@features/institutional-auth/actions/email-verification.actions";
+import { EmailVerificationFeedback } from "@features/institutional-auth/components/email-verification-feedback";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import type { EmailVerificationState } from "@features/institutional-auth/types/email-verification-state.types";
 
-export function ConfirmEmailVerificationForm({ token }: { token?: string }): React.ReactElement {
+export function ConfirmEmailVerificationForm({ token }: { token?: string }): ReactElement {
   const [state, action, pending] = useActionState<EmailVerificationState, FormData>(confirmEmailVerification, {});
 
   return (

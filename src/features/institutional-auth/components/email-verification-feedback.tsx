@@ -1,5 +1,9 @@
+import type { ReactElement } from "react";
+
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
+
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+
 import type { EmailVerificationState } from "@features/institutional-auth/types/email-verification-state.types";
 
 export function EmailVerificationFeedback({
@@ -8,8 +12,11 @@ export function EmailVerificationFeedback({
 }: {
   state: EmailVerificationState;
   successMessage?: string;
-}): React.ReactElement | null {
-  if (!state.error && !state.success) return null;
+}): ReactElement | null {
+  if (!state.error && !state.success) {
+    return null;
+  }
+
   return (
     <Alert variant={state.error ? "destructive" : "success"} aria-live="polite">
       {state.error ? <AlertCircleIcon /> : <CheckCircle2Icon />}

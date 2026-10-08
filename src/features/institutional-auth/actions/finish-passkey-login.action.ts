@@ -2,12 +2,13 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
 import { z } from "zod";
 
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { verifyPasskeyAuth, verifyDiscoverablePasskeyAuth } from "@features/institutional-auth/services/passkey-auth-verify.service";
-import { setInstitutionalAuthCookies } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+import { verifyDiscoverablePasskeyAuth, verifyPasskeyAuth } from "@features/institutional-auth/services/passkey-auth-verify.service";
 import type { FinishPasskeyLoginState } from "@features/institutional-auth/types/finish-passkey-login-state.types";
+import { setInstitutionalAuthCookies } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const finishPasskeyLoginSchema = z.object({
   loginAttemptId: z.string().min(1).optional(),

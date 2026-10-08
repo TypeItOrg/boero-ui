@@ -36,6 +36,14 @@ Local development belongs here; shared staging/production configuration and oper
 - `returnTo` is restricted to internal paths (`/…`, never `//…` or absolute URLs); pages validate it before passing it to client forms, and Server Actions validate it again before redirecting.
 - Sensitive account changes still force logout, and deletion flows keep their fixed list destinations instead of using `returnTo`.
 
+## React and import organization
+
+- Never use wildcard imports (`import * as …`). React uses named imports, never a default import.
+- Import React functions, hooks and types explicitly; never reference them through `React.…`.
+- When present, React imports are the first import block, immediately after directives such as `"use client";`, with a blank line between the directive and imports.
+- Separate import groups with blank lines: React, Node built-ins, Next.js, other external libraries, shared `@common` modules, feature modules, and app modules. Keep imports alphabetized by module within each context.
+- Keep type-only dependencies as `import type` or named `type` specifiers.
+
 ## Type organization
 
 - Define frontend API types manually from the payloads consumed by each feature; do not generate or synchronize TypeScript from OpenAPI.

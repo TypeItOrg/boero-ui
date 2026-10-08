@@ -1,8 +1,11 @@
+import type { ReactElement } from "react";
+
 import { CalendarRangeIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { parseUuidQueryParam } from "@common/utils/query-param.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodForm } from "@features/enrollment-periods/components/enrollment-period-form";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
@@ -19,7 +22,7 @@ export default async function NewEnrollmentPeriodPage({
   searchParams,
 }: {
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const query = await searchParams;
   const institutionId = parseUuidQueryParam(query.institutionId);
   const institution = institutionId ? await fetchInstitution(institutionId) : null;

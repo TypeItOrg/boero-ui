@@ -2,8 +2,8 @@
 
 import type { ReactNode } from "react";
 
-import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 import { PlatformAccountScope, usePlatformAccount } from "@features/platform-auth/hooks/use-platform-account.hook";
+import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 
 type PlatformAccountProviderProps = {
   initialAccount: PlatformAccount | null;

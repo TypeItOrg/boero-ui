@@ -1,10 +1,12 @@
-import * as React from "react";
-import { act, render, screen, waitFor } from "@testing-library/react";
+import type { ComponentProps } from "react";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+
 import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@tanstack/react-virtual", () => ({
@@ -32,7 +34,7 @@ const baseItems: Item[] = [
   { id: "uy", name: "Uruguay" },
 ];
 
-function renderDropdown(overrides: Partial<React.ComponentProps<typeof AsyncDropdown<Item>>> = {}): RenderDropdownResult {
+function renderDropdown(overrides: Partial<ComponentProps<typeof AsyncDropdown<Item>>> = {}): RenderDropdownResult {
   const fetchPage = jest.fn<Promise<FetchPageResult>, [AsyncDropdownFetchPageInput]>();
   const onValueChange = jest.fn();
 

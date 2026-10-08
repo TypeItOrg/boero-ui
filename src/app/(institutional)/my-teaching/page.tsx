@@ -1,30 +1,37 @@
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { CalendarDaysIcon, Clock3Icon, GraduationCapIcon } from "lucide-react";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
-import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
-import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { fetchTeacherClasses } from "@features/course-enrollments/services/teacher-course.service";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
+
+import { courseWeekDayLabels } from "@features/academic/utils/academic-labels.util";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
+import { fetchTeacherClasses } from "@features/course-enrollments/services/teacher-course.service";
 import {
   COURSE_ENROLLMENT_PAGE_SIZE_OPTIONS,
   parseCourseEnrollmentPaginationParams,
   type CourseEnrollmentSearchParams,
 } from "@features/course-enrollments/utils/course-enrollment-pagination.util";
-import { courseWeekDayLabels } from "@features/academic/utils/academic-labels.util";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
+import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = { title: "Mis clases" };
 
-export default async function MyTeachingPage({ searchParams }: { searchParams: Promise<CourseEnrollmentSearchParams> }): Promise<React.ReactElement> {
+export default async function MyTeachingPage({ searchParams }: { searchParams: Promise<CourseEnrollmentSearchParams> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   if (!user.roles.includes("Profesor")) {
     return <InstitutionalAccessDenied description="Esta vista corresponde a profesores con clases asignadas." />;
   }
+
   const { page, size } = parseCourseEnrollmentPaginationParams(await searchParams);
   const data = await fetchTeacherClasses(user.institutionId, page, size);
 

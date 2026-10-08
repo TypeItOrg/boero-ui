@@ -1,17 +1,18 @@
 "use server";
 
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { revalidatePath } from "next/cache";
-import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { rejectionReasonSchema } from "@features/enrollment-applications/schemas/rejection-reason.schema";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
+import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import { rejectionReasonSchema } from "@features/enrollment-applications/schemas/rejection-reason.schema";
 import type { EnrollmentApplicationRejectActionState } from "@features/enrollment-applications/types/enrollment-application-reject-action-state.types";
 import type { EnrollmentApplicationRejectField } from "@features/enrollment-applications/types/enrollment-application-reject-field.types";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const REJECT_FIELDS: readonly EnrollmentApplicationRejectField[] = ["rejectionReason"];
 
@@ -27,7 +28,9 @@ export async function rejectPlatformEnrollmentApplicationAction(
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
-  const parsed = rejectionReasonSchema.safeParse({ rejectionReason: formData.get("rejectionReason") });
+  const parsed = rejectionReasonSchema.safeParse({
+    rejectionReason: formData.get("rejectionReason"),
+  });
 
   if (!parsed.success) {
     return getValidationActionState(parsed.error.issues, REJECT_FIELDS);

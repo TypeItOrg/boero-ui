@@ -1,3 +1,8 @@
+import { revalidatePath } from "next/cache";
+
+import { updatePlatformPersonAction } from "@features/people/actions/update-person.action";
+import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -13,11 +18,6 @@ jest.mock("@features/people/services/fetch-person-roles.service", () => ({
 jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({
   requirePlatformAccount: jest.fn().mockResolvedValue({ platformAccountId: "account-1" }),
 }));
-
-import { revalidatePath } from "next/cache";
-
-import { updatePlatformPersonAction } from "@features/people/actions/update-person.action";
-import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const PERSON_ID = "00000000-0000-4000-8000-000000000002";
@@ -96,5 +96,6 @@ function createFormData(
 
   const formData = new FormData();
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
+
   return formData;
 }

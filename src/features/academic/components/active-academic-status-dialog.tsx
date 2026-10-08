@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { useActionState } from "react";
-import { CircleAlertIcon, ClockIcon, GraduationCapIcon, LibraryBigIcon, Music2Icon, RouteIcon } from "lucide-react";
+import { useActionState, useState, type ReactElement } from "react";
+
+import { CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
@@ -16,13 +16,13 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
+
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { ACTIVE_STATUS_DIALOG_CONFIG } from "@features/academic/config/active-status-dialog.config";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import { type ActiveStatus } from "@features/academic/types/active-academic-status.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-
-type ActiveStatus = "ACTIVE" | "INACTIVE";
 
 type ActiveAcademicStatusDialogProps = {
   id: string;
@@ -41,167 +41,7 @@ type ActiveAcademicStatusButtonProps = Omit<ActiveAcademicStatusDialogProps, "on
   disabled?: boolean;
 };
 
-type ActiveStatusDialogConfig = {
-  actionLabel: string;
-  description: (resourceLabel: string) => React.ReactNode;
-  icon: React.ComponentType<{ className?: string }>;
-  iconClassName: string;
-  pendingLabel: string;
-  title: string;
-  variant: "default" | "destructive";
-};
-
 const INITIAL_STATE: AcademicActionState = {};
-
-const ACTIVE_STATUS_DIALOG_CONFIG: Record<ActiveAcademicStatusResource, Record<ActiveStatus, ActiveStatusDialogConfig>> = {
-  [AcademicResource.TRAINING_PATH]: {
-    ACTIVE: {
-      actionLabel: "Activar trayecto formativo",
-      description: (resourceLabel) => (
-        <>
-          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
-          configuraciones.
-        </>
-      ),
-      icon: RouteIcon,
-      iconClassName: "bg-primary/10 text-primary",
-      pendingLabel: "Activando…",
-      title: "Activar trayecto formativo",
-      variant: "default",
-    },
-    INACTIVE: {
-      actionLabel: "Desactivar trayecto formativo",
-      description: (resourceLabel) => (
-        <>
-          El trayecto formativo <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
-          configuraciones.
-        </>
-      ),
-      icon: RouteIcon,
-      iconClassName: "bg-destructive/10 text-destructive",
-      pendingLabel: "Desactivando…",
-      title: "Desactivar trayecto formativo",
-      variant: "destructive",
-    },
-  },
-  [AcademicResource.ACADEMIC_SPACE]: {
-    ACTIVE: {
-      actionLabel: "Activar espacio académico",
-      description: (resourceLabel) => (
-        <>
-          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
-          configuraciones curriculares.
-        </>
-      ),
-      icon: LibraryBigIcon,
-      iconClassName: "bg-primary/10 text-primary",
-      pendingLabel: "Activando…",
-      title: "Activar espacio académico",
-      variant: "default",
-    },
-    INACTIVE: {
-      actionLabel: "Desactivar espacio académico",
-      description: (resourceLabel) => (
-        <>
-          El espacio académico <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
-          configuraciones curriculares. No se podrá desactivar si está utilizado en un plan de estudio borrador o activo.
-        </>
-      ),
-      icon: LibraryBigIcon,
-      iconClassName: "bg-destructive/10 text-destructive",
-      pendingLabel: "Desactivando…",
-      title: "Desactivar espacio académico",
-      variant: "destructive",
-    },
-  },
-  [AcademicResource.INSTRUMENT]: {
-    ACTIVE: {
-      actionLabel: "Activar instrumento",
-      description: (resourceLabel) => (
-        <>
-          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas
-          configuraciones.
-        </>
-      ),
-      icon: Music2Icon,
-      iconClassName: "bg-primary/10 text-primary",
-      pendingLabel: "Activando…",
-      title: "Activar instrumento",
-      variant: "default",
-    },
-    INACTIVE: {
-      actionLabel: "Desactivar instrumento",
-      description: (resourceLabel) => (
-        <>
-          El instrumento <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas
-          configuraciones.
-        </>
-      ),
-      icon: Music2Icon,
-      iconClassName: "bg-destructive/10 text-destructive",
-      pendingLabel: "Desactivando…",
-      title: "Desactivar instrumento",
-      variant: "destructive",
-    },
-  },
-  [AcademicResource.COURSE]: {
-    ACTIVE: {
-      actionLabel: "Activar curso",
-      description: (resourceLabel) => (
-        <>
-          El curso <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar activo para la institución.
-        </>
-      ),
-      icon: GraduationCapIcon,
-      iconClassName: "bg-primary/10 text-primary",
-      pendingLabel: "Activando…",
-      title: "Activar curso",
-      variant: "default",
-    },
-    INACTIVE: {
-      actionLabel: "Desactivar curso",
-      description: (resourceLabel) => (
-        <>
-          El curso <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar activo. Los planes de estudio asociados no
-          podrán desactivarse mientras tenga cursos activos.
-        </>
-      ),
-      icon: GraduationCapIcon,
-      iconClassName: "bg-destructive/10 text-destructive",
-      pendingLabel: "Desactivando…",
-      title: "Desactivar curso",
-      variant: "destructive",
-    },
-  },
-  [AcademicResource.SHIFT]: {
-    ACTIVE: {
-      actionLabel: "Activar turno",
-      description: (resourceLabel) => (
-        <>
-          El turno <span className="text-foreground font-semibold">{resourceLabel}</span> volverá a estar disponible para nuevas configuraciones.
-        </>
-      ),
-      icon: ClockIcon,
-      iconClassName: "bg-primary/10 text-primary",
-      pendingLabel: "Activando…",
-      title: "Activar turno",
-      variant: "default",
-    },
-    INACTIVE: {
-      actionLabel: "Desactivar turno",
-      description: (resourceLabel) => (
-        <>
-          El turno <span className="text-foreground font-semibold">{resourceLabel}</span> dejará de estar disponible para nuevas configuraciones.
-        </>
-      ),
-      icon: ClockIcon,
-      iconClassName: "bg-destructive/10 text-destructive",
-      pendingLabel: "Desactivando…",
-      title: "Desactivar turno",
-      variant: "destructive",
-    },
-  },
-};
 
 export function ActiveAcademicStatusDialog({
   id,
@@ -213,7 +53,7 @@ export function ActiveAcademicStatusDialog({
   returnTo,
   scope,
   targetStatus,
-}: ActiveAcademicStatusDialogProps): React.ReactElement {
+}: ActiveAcademicStatusDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     updateAcademicStatusAction.bind(null, scope, institutionId, resource, id, returnTo),
     INITIAL_STATE,
@@ -222,7 +62,10 @@ export function ActiveAcademicStatusDialog({
   const Icon = config.icon;
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isPending && !nextOpen) {
+      return;
+    }
+
     onOpenChange(nextOpen);
   }
 
@@ -261,8 +104,8 @@ export function ActiveAcademicStatusDialog({
   );
 }
 
-export function ActiveAcademicStatusButton({ active, disabled = false, ...props }: ActiveAcademicStatusButtonProps): React.ReactElement {
-  const [open, setOpen] = React.useState(false);
+export function ActiveAcademicStatusButton({ active, disabled = false, ...props }: ActiveAcademicStatusButtonProps): ReactElement {
+  const [open, setOpen] = useState(false);
   const targetStatus = active ? "INACTIVE" : "ACTIVE";
 
   return (

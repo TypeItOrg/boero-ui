@@ -1,15 +1,18 @@
+import type { ReactElement } from "react";
+
 import { BookMarkedIcon, PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { SectionHeader } from "@common/components/section-header";
 import { Button } from "@common/components/ui/button";
+
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
 import type { AcademicTableColumns } from "@features/academic/config/academic-collection.config";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
 import type { AcademicSearchParams } from "@features/academic/utils/academic-pagination.util";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type TrainingPathStudyPlansProps = {
   access: AcademicAccess;
@@ -33,7 +36,7 @@ export async function TrainingPathStudyPlans({
   scope,
   searchParams,
   trainingPath,
-}: TrainingPathStudyPlansProps): Promise<React.ReactElement> {
+}: TrainingPathStudyPlansProps): Promise<ReactElement> {
   const createHref = `${basePath}/${AcademicResource.STUDY_PLAN}/new?trainingPathId=${encodeURIComponent(trainingPath.id)}`;
 
   return (

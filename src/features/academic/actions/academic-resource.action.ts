@@ -2,35 +2,28 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
 import { z } from "zod";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { appendReturnTo, getSafeReturnTo } from "@common/utils/return-to.util";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import {
   ACADEMIC_ACTION_FIELDS,
-  actionContextSchema,
-  deletableResourceSchema,
-  DELETE_PERMISSIONS,
-  getStatusRequestBody,
-  invalidActionState,
-  type ParsedFormData,
-  resolveCatalogStatusChange,
   RESOURCE_ACTION_CONFIG,
-  RESTORE_PERMISSIONS,
-  restorableResourceSchema,
-  STATUS_INPUT_BUILDERS,
   STATUS_PERMISSIONS,
-  statusResourceSchema,
+  actionContextSchema,
+  invalidActionState,
+  resolveCatalogStatusChange,
+  type ParsedFormData,
 } from "@features/academic/config/academic-resource-action.config";
-import { academicStatusSchema, parseAcademicForm, parseStudyPlanVersionForm } from "@features/academic/schemas/academic-form.schema";
+import { parseAcademicForm } from "@features/academic/schemas/academic-form.schema";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import type { LifecycleResource } from "@features/academic/types/lifecycle-resource.types";
-import type { StatusResource } from "@features/academic/types/status-resource.types";
 import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
 import { getAcademicApiBase, getAcademicResourceRoute, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 
 export async function saveAcademicResourceAction(
   scope: AcademicScopeType,
@@ -43,6 +36,7 @@ export async function saveAcademicResourceAction(
   formData: FormData,
 ): Promise<AcademicActionState> {
   const resolvedInstitutionId = institutionId ?? formData.get("institutionId");
+
   if (institutionId === undefined && !z.uuid().safeParse(resolvedInstitutionId).success) {
     return { fieldErrors: { institutionId: "Seleccioná una institución." } };
   }
@@ -55,15 +49,24 @@ export async function saveAcademicResourceAction(
     parentId,
     returnTo,
   });
-  if (!context.success) return invalidActionState();
+
+  if (!context.success) {
+    return invalidActionState();
+  }
 
   const config = RESOURCE_ACTION_CONFIG[context.data.resource];
   const requiredPermission = context.data.id ? config.updatePermission : config.createPermission;
   const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, requiredPermission);
-  if (authError) return authError;
+
+  if (authError) {
+    return authError;
+  }
 
   const catalogStatus = resolveCatalogStatusChange(context.data.resource, context.data.id, formData);
-  if (catalogStatus.error) return catalogStatus.error;
+
+  if (catalogStatus.error) {
+    return catalogStatus.error;
+  }
 
   if (catalogStatus.nextActiveStatus !== null && catalogStatus.formStatusResource) {
     const statusAuthError = await authorizeAcademicAction(
@@ -71,20 +74,30 @@ export async function saveAcademicResourceAction(
       context.data.institutionId,
       STATUS_PERMISSIONS[catalogStatus.formStatusResource],
     );
-    if (statusAuthError) return statusAuthError;
+
+    if (statusAuthError) {
+      return statusAuthError;
+    }
   }
 
   const parsed = parseAcademicForm(context.data.resource, formData);
-  if (!parsed.success) return getValidationActionState(parsed.error.issues, ACADEMIC_ACTION_FIELDS);
+
+  if (!parsed.success) {
+    return getValidationActionState(parsed.error.issues, ACADEMIC_ACTION_FIELDS);
+  }
 
   const data = parsed.data as ParsedFormData;
+
   if (context.data.resource === AcademicResource.STUDY_PLAN && context.data.id && data.status) {
     const statusAuthError = await authorizeAcademicAction(
       context.data.scope,
       context.data.institutionId,
       STATUS_PERMISSIONS[AcademicResource.STUDY_PLAN],
     );
-    if (statusAuthError) return statusAuthError;
+
+    if (statusAuthError) {
+      return statusAuthError;
+    }
   }
 
   const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
@@ -101,7 +114,10 @@ export async function saveAcademicResourceAction(
     ACADEMIC_ACTION_FIELDS,
     "No se pudo guardar la configuración académica.",
   );
-  if (error) return error;
+
+  if (error) {
+    return error;
+  }
 
   if (catalogStatus.nextActiveStatus !== null && catalogStatus.formStatusResource && context.data.id) {
     const statusFormData = new FormData();
@@ -115,7 +131,10 @@ export async function saveAcademicResourceAction(
       {},
       statusFormData,
     );
-    if (statusState) return statusState;
+
+    if (statusState) {
+      return statusState;
+    }
   }
 
   if (context.data.resource === AcademicResource.STUDY_PLAN && context.data.id && data.status) {
@@ -128,7 +147,10 @@ export async function saveAcademicResourceAction(
       {},
       formData,
     );
-    if (statusState) return statusState;
+
+    if (statusState) {
+      return statusState;
+    }
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
@@ -136,176 +158,10 @@ export async function saveAcademicResourceAction(
   redirect(getSafeReturnTo(context.data.returnTo, fallback));
 }
 
-export async function createStudyPlanVersionAction(
-  scope: AcademicScopeType,
-  institutionId: string,
-  sourceId: string,
-  returnTo: string | undefined,
-  _state: AcademicActionState,
-  formData: FormData,
-): Promise<AcademicActionState> {
-  const context = actionContextSchema.extend({ sourceId: z.uuid() }).safeParse({
-    scope,
-    institutionId,
-    resource: AcademicResource.STUDY_PLAN,
-    sourceId,
-    returnTo,
-  });
-  if (!context.success) return invalidActionState();
+export { createStudyPlanVersionAction } from "@features/academic/actions/create-study-plan-version.action";
 
-  const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, INSTITUTIONAL_PERMISSION.STUDY_PLAN_CREATE);
-  if (authError) return authError;
+export { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 
-  const parsed = parseStudyPlanVersionForm(formData);
-  if (!parsed.success) return getValidationActionState(parsed.error.issues, ACADEMIC_ACTION_FIELDS);
+export { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 
-  const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
-  const request = academicApiFetch(context.data.scope, `${apiBase}/study-plans/${context.data.sourceId}/versions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(parsed.data),
-  });
-  const error = await getResponseErrorActionState(request, ACADEMIC_ACTION_FIELDS, "No se pudo crear la nueva versión.");
-  if (error) return error;
-
-  let createdId: string;
-  try {
-    const response = await request;
-    const created = (await response.json()) as { id?: unknown };
-    const parsedId = z.uuid().safeParse(created.id);
-    if (!parsedId.success) return { error: "La API devolvió una versión inválida." };
-    createdId = parsedId.data;
-  } catch {
-    return { error: "La API no devolvió la nueva versión." };
-  }
-
-  const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, AcademicResource.STUDY_PLAN);
-  revalidatePath(fallback);
-  const origin = getSafeReturnTo(context.data.returnTo, fallback);
-  redirect(appendReturnTo(`${fallback}/${createdId}`, origin));
-}
-
-export async function updateAcademicStatusAction(
-  scope: AcademicScopeType,
-  institutionId: string,
-  resource: StatusResource,
-  id: string,
-  returnTo: string | undefined,
-  _state: AcademicActionState,
-  formData: FormData,
-): Promise<AcademicActionState> {
-  const context = actionContextSchema.extend({ resource: statusResourceSchema, id: z.uuid() }).safeParse({
-    scope,
-    institutionId,
-    resource,
-    id,
-    returnTo,
-  });
-  if (!context.success) return invalidActionState();
-
-  const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, STATUS_PERMISSIONS[context.data.resource]);
-  if (authError) return authError;
-
-  const raw = STATUS_INPUT_BUILDERS[context.data.resource](formData);
-  const parsed = academicStatusSchema.safeParse(raw);
-  if (!parsed.success) return getValidationActionState(parsed.error.issues, ACADEMIC_ACTION_FIELDS);
-
-  const body = getStatusRequestBody(parsed.data);
-  const path = `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}/status`;
-  const error = await getResponseErrorActionState(
-    academicApiFetch(context.data.scope, path, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }),
-    ACADEMIC_ACTION_FIELDS,
-    "No se pudo actualizar el estado.",
-  );
-  if (error) return error;
-
-  const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
-  revalidatePath(fallback);
-  redirect(getSafeReturnTo(context.data.returnTo, fallback));
-}
-
-export async function deleteAcademicResourceAction(
-  scope: AcademicScopeType,
-  institutionId: string,
-  resource:
-    | AcademicResource.ACADEMIC_YEAR
-    | AcademicResource.TRAINING_PATH
-    | AcademicResource.STUDY_PLAN
-    | AcademicResource.ACADEMIC_SPACE
-    | AcademicResource.INSTRUMENT
-    | AcademicResource.COURSE
-    | AcademicResource.SHIFT
-    | AcademicResource.ACADEMIC_LEVEL
-    | AcademicResource.STUDY_PLAN_SPACE
-    | AcademicResource.PREREQUISITE,
-  id: string,
-  destination: string,
-  _state: AcademicActionState,
-  _formData: FormData,
-): Promise<AcademicActionState> {
-  void _state;
-  void _formData;
-  const context = actionContextSchema
-    .extend({ resource: deletableResourceSchema, id: z.uuid(), destination: z.string() })
-    .safeParse({ scope, institutionId, resource, id, destination });
-  if (!context.success) return invalidActionState();
-
-  const permission = restorableResourceSchema.safeParse(context.data.resource).success
-    ? DELETE_PERMISSIONS[context.data.resource as LifecycleResource]
-    : INSTITUTIONAL_PERMISSION.STUDY_PLAN_CURRICULUM_UPDATE;
-  const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, permission);
-  if (authError) return authError;
-
-  const error = await getResponseErrorActionState(
-    academicApiFetch(
-      context.data.scope,
-      `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}`,
-      { method: "DELETE" },
-    ),
-    ACADEMIC_ACTION_FIELDS,
-    "No se pudo eliminar el elemento.",
-  );
-  if (error) return error;
-
-  const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
-  revalidatePath(fallback);
-  redirect(getSafeReturnTo(context.data.destination, fallback));
-}
-
-export async function restoreAcademicResourceAction(
-  scope: AcademicScopeType,
-  institutionId: string,
-  resource: LifecycleResource,
-  id: string,
-  destination: string,
-  _state: AcademicActionState,
-  _formData: FormData,
-): Promise<AcademicActionState> {
-  void _state;
-  void _formData;
-  const context = actionContextSchema
-    .extend({ resource: restorableResourceSchema, id: z.uuid(), destination: z.string() })
-    .safeParse({ scope, institutionId, resource, id, destination });
-  if (!context.success) return invalidActionState();
-
-  const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, RESTORE_PERMISSIONS[context.data.resource]);
-  if (authError) return authError;
-
-  const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
-  const error = await getResponseErrorActionState(
-    academicApiFetch(context.data.scope, `${apiBase}/${context.data.resource}/${context.data.id}/restore`, {
-      method: "POST",
-    }),
-    ACADEMIC_ACTION_FIELDS,
-    "No se pudo restaurar el elemento.",
-  );
-  if (error) return error;
-
-  const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
-  revalidatePath(fallback);
-  redirect(getSafeReturnTo(context.data.destination, fallback));
-}
+export { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";

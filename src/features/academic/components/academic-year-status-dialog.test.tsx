@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
-  updateAcademicStatusAction: jest.fn().mockResolvedValue({}),
-}));
-
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
 import { AcademicYearStatusDialog } from "@features/academic/components/academic-year-status-dialog";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/actions/academic-resource.action", () => ({
+  updateAcademicStatusAction: jest.fn().mockResolvedValue({}),
+}));
 
 describe("AcademicYearStatusDialog", () => {
   it("submits the finalization without closing before the action completes", async () => {

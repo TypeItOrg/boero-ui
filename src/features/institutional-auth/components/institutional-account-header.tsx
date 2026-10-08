@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import { InstitutionalAccountTabs } from "@features/institutional-auth/components/institutional-account-tabs";
 
@@ -6,7 +6,7 @@ type InstitutionalAccountHeaderProps = {
   actions?: ReactNode;
 };
 
-export function InstitutionalAccountHeader({ actions }: InstitutionalAccountHeaderProps): React.ReactElement {
+export function InstitutionalAccountHeader({ actions }: InstitutionalAccountHeaderProps): ReactElement {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <InstitutionalAccountTabs />

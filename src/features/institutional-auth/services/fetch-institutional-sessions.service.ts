@@ -1,8 +1,9 @@
 import "server-only";
 
-import { parseHttpResponse } from "@common/utils/http-response-error.util";
-import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+import type { PaginationParams } from "@common/types/pagination-params.types";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import type { ActiveSession } from "@features/institutional-auth/types/active-session.types";
 

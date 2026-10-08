@@ -1,7 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { renamePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
+import { requestPasskeyRegistration, verifyPasskeyRegistrationAction } from "@features/institutional-auth/actions/passkey-registration.actions";
 import { PasskeyManager } from "@features/institutional-auth/components/passkey-manager";
+import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
+import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: jest.fn() }),
@@ -17,11 +21,6 @@ jest.mock("@features/institutional-auth/actions/passkey-management.actions", () 
   revokePasskeyAction: jest.fn(),
   reAuthenticateAction: jest.fn(),
 }));
-
-import { requestPasskeyRegistration, verifyPasskeyRegistrationAction } from "@features/institutional-auth/actions/passkey-registration.actions";
-import { renamePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
-import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 
 const requestMock = jest.mocked(requestPasskeyRegistration);
 const verifyMock = jest.mocked(verifyPasskeyRegistrationAction);
@@ -42,8 +41,14 @@ describe("PasskeyManager", () => {
     requestMock.mockResolvedValue({ ceremonyId: "ceremony-1", options: validOptions });
     verifyMock.mockResolvedValue({});
     renameMock.mockResolvedValue({ success: true });
-    Object.defineProperty(window, "PublicKeyCredential", { value: function () {}, configurable: true });
-    Object.defineProperty(navigator, "credentials", { value: { create: createMock, get: jest.fn() }, configurable: true });
+    Object.defineProperty(window, "PublicKeyCredential", {
+      value: function () {},
+      configurable: true,
+    });
+    Object.defineProperty(navigator, "credentials", {
+      value: { create: createMock, get: jest.fn() },
+      configurable: true,
+    });
   });
 
   function renderManager(passkeys: Passkey[] = []): void {

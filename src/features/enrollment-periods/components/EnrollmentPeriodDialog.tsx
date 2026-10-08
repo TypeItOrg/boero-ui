@@ -1,27 +1,27 @@
 "use client";
 
-import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
-import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
-import { ActionForm } from "@common/components/action-form";
-
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { useActionState, useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@common/components/ui/button";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@common/components/ui/dialog";
-import { Input } from "@common/components/ui/input";
-import { Label } from "@common/components/ui/label";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
-import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
-import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
-import { format, isValid } from "date-fns";
-import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
-import type { AcademicYear } from "@features/academic/types/academic-year.types";
-import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
-import { createEnrollmentPeriodAction, updateEnrollmentPeriodAction } from "@features/enrollment-periods/actions/enrollment-period.actions";
 
+import { useRouter } from "next/navigation";
+
+import { format, isValid } from "date-fns";
+
+import { ActionForm } from "@common/components/action-form";
+import { Alert, AlertDescription } from "@common/components/ui/alert";
+import { Button } from "@common/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@common/components/ui/dialog";
+import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
+
+import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
+import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { AcademicScope, type AcademicScope as AcademicScopeType } from "@features/academic/utils/academic-scope.util";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import { createEnrollmentPeriodAction, updateEnrollmentPeriodAction } from "@features/enrollment-periods/actions/enrollment-period.actions";
+import { EnrollmentPeriodDialogFields } from "@features/enrollment-periods/components/enrollment-period-dialog-fields";
+import { EnrollmentPeriodOfferings } from "@features/enrollment-periods/components/enrollment-period-offerings";
+import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
+import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
+import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface Props {
   institutionId: string;
@@ -104,55 +104,21 @@ export function EnrollmentPeriodDialog({ institutionId, period, open, onOpenChan
             </Alert>
           )}
 
-          <div className="grid gap-4 py-4">
-            {!period && (
-              <div className="grid gap-2">
-                <Label htmlFor="academicYear">Ciclo Lectivo</Label>
-                <input type="hidden" name="academicYearId" value={academicYearId} />
-                <AsyncDropdown<AcademicYear>
-                  id="academicYear"
-                  value={academicYearId}
-                  onValueChange={(value) => setAcademicYearId(value ?? "")}
-                  fetchPage={fetchAcademicYears}
-                  queryKey={["enrollment-period-academic-years", scope, institutionId]}
-                  getItemValue={(year) => year.id}
-                  getItemLabel={(year) => `Ciclo Lectivo ${year.year}`}
-                  placeholder="Seleccioná un ciclo"
-                  searchPlaceholder="Buscar ciclo lectivo…"
-                  disabled={loading}
-                />
-              </div>
-            )}
-
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nombre del Período</Label>
-              <Input
-                name="name"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ej. Inscripción 2026 - Primer Llamado"
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="startDate">Fecha y Hora de Inicio</Label>
-              <Input
-                name="startDate"
-                id="startDate"
-                type="datetime-local"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="endDate">Fecha y Hora de Fin</Label>
-              <Input name="endDate" id="endDate" type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
-            </div>
-          </div>
+          <EnrollmentPeriodDialogFields
+            period={period}
+            academicYearId={academicYearId}
+            setAcademicYearId={setAcademicYearId}
+            fetchAcademicYears={fetchAcademicYears}
+            scope={scope}
+            institutionId={institutionId}
+            loading={loading}
+            name={name}
+            setName={setName}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+          />
 
           <EnrollmentPeriodOfferings
             operation={period ? "ENROLLMENT_PERIOD_UPDATE" : "ENROLLMENT_PERIOD_CREATE"}

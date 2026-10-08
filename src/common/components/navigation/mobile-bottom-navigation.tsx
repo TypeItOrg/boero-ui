@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,7 +18,7 @@ type OrderedNavigationItem = {
   isPrimary: boolean;
 };
 
-export function MobileBottomNavigation({ items, primaryItem }: MobileBottomNavigationProps): React.ReactElement {
+export function MobileBottomNavigation({ items, primaryItem }: MobileBottomNavigationProps): ReactElement {
   const pathname = usePathname();
   const primaryIsActive = primaryItem ? isNavigationItemActive(pathname, primaryItem.url, primaryItem.exact) : false;
   const primaryIndex = Math.ceil(items.length / 2);

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { Label, Pie, PieChart } from "recharts";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@common/components/ui/chart";
@@ -20,7 +22,7 @@ type InstitutionStatusChartProps = {
   inactive: number;
 };
 
-export function InstitutionStatusChart({ active, inactive }: InstitutionStatusChartProps): React.ReactElement {
+export function InstitutionStatusChart({ active, inactive }: InstitutionStatusChartProps): ReactElement {
   const total = active + inactive;
   const activePercentage = Math.round((active / total) * 100);
   const chartData = [

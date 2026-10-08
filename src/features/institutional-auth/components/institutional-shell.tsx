@@ -1,34 +1,29 @@
 "use client";
 
-import * as React from "react";
+import { useState, type CSSProperties, type ReactElement, type ReactNode } from "react";
 
 import { MobileBottomNavigation } from "@common/components/navigation/mobile-bottom-navigation";
 import { SidebarInset, SidebarProvider } from "@common/components/ui/sidebar";
+
+import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
 import { InstitutionalSidebar } from "@features/institutional-auth/components/institutional-sidebar";
 import { InstitutionalTopbar } from "@features/institutional-auth/components/institutional-topbar";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
-import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
 import {
   INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM,
   getInstitutionalNavigationSections,
 } from "@features/institutional-auth/utils/institutional-navigation.util";
 
 type InstitutionalShellProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   user: InstitutionalUser;
   institutionName?: string;
   defaultSidebarOpen: boolean;
   shortcutPlatform: ContextualSearchShortcutPlatform;
 };
 
-export function InstitutionalShell({
-  children,
-  user,
-  institutionName,
-  defaultSidebarOpen,
-  shortcutPlatform,
-}: InstitutionalShellProps): React.ReactElement {
-  const [sidebarOpen, setSidebarOpen] = React.useState(defaultSidebarOpen);
+export function InstitutionalShell({ children, user, institutionName, defaultSidebarOpen, shortcutPlatform }: InstitutionalShellProps): ReactElement {
+  const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
   const navigationSections = getInstitutionalNavigationSections(user);
   const navigationItems = navigationSections
     .flatMap((section) => section.items)
@@ -49,7 +44,7 @@ export function InstitutionalShell({
           "--sidebar-width": "16rem",
           "--sidebar-width-mobile": "18rem",
           "--sidebar-width-icon": "4.5rem",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <InstitutionalSidebar user={user} navigationSections={navigationSections} />

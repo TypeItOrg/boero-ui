@@ -1,11 +1,10 @@
 "use client";
 
-import * as React from "react";
+import { useActionState, useEffect, useState, type ReactElement, type ReactNode } from "react";
+
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
-import { useActionState } from "react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -15,7 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
+
 import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
@@ -37,7 +38,7 @@ type AcademicYearStatusDialogProps = {
 
 type StatusDialogConfig = {
   actionLabel: string;
-  description: (academicYearLabel: string) => React.ReactNode;
+  description: (academicYearLabel: string) => ReactNode;
   icon: typeof CalendarCheckIcon;
   iconClassName: string;
   pendingLabel: string;
@@ -86,39 +87,49 @@ export function AcademicYearStatusDialog({
   returnTo,
   scope,
   targetStatus,
-}: AcademicYearStatusDialogProps): React.ReactElement {
+}: AcademicYearStatusDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     updateAcademicStatusAction.bind(null, scope, institutionId, AcademicResource.ACADEMIC_YEAR, id, returnTo),
     INITIAL_STATE,
   );
   const config = STATUS_DIALOG_CONFIG[targetStatus];
   const Icon = config.icon;
-  const [courseCount, setCourseCount] = React.useState<number | null>(null);
+  const [courseCount, setCourseCount] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open || targetStatus !== "CLOSED") {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset transient count when dialog closes
       setCourseCount(null);
+
       return;
     }
+
     let cancelled = false;
     fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?institutionId=${institutionId}`, {
       cache: "no-store",
     })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
-        if (!cancelled && data && typeof data.count === "number") setCourseCount(data.count);
+        if (!cancelled && data && typeof data.count === "number") {
+          setCourseCount(data.count);
+        }
       })
       .catch(() => {
-        if (!cancelled) setCourseCount(null);
+        if (!cancelled) {
+          setCourseCount(null);
+        }
       });
+
     return () => {
       cancelled = true;
     };
   }, [open, targetStatus, scope, institutionId, id]);
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isPending && !nextOpen) {
+      return;
+    }
+
     onOpenChange(nextOpen);
   }
 

@@ -1,7 +1,9 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { Loader2Icon } from "lucide-react";
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
@@ -9,14 +11,15 @@ import { DataTableSortableHead } from "@common/components/ui/data-table-sortable
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationQuery } from "@common/types/pagination-query.types";
+
+import { PeoplePagination } from "@features/people/components/people-pagination";
 import { PeopleTableEmptyState } from "@features/people/components/people-table-empty-state";
 import { PeopleTableRow } from "@features/people/components/people-table-row";
+import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
+import { PersonStatusDialog } from "@features/people/components/person-status-dialog";
 import type { PersonSummary } from "@features/people/types/person-summary.types";
 import type { PeopleSort, PeopleSortField } from "@features/people/utils/people-pagination.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
-import { PeoplePagination } from "@features/people/components/people-pagination";
-import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
-import { PersonStatusDialog } from "@features/people/components/person-status-dialog";
 
 type PeopleTablePresentationProps = PaginationQuery & {
   data: PaginatedResponse<PersonSummary>;
@@ -45,14 +48,16 @@ export function PeopleTablePresentation({
   canManageRoles = false,
   canDelete = true,
   canUpdateStatus = false,
-}: PeopleTablePresentationProps): React.ReactElement {
+}: PeopleTablePresentationProps): ReactElement {
   const router = useRouter();
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
-  const [personToDelete, setPersonToDelete] = React.useState<PersonSummary>();
-  const [personToUpdateStatus, setPersonToUpdateStatus] = React.useState<PersonSummary>();
+  const [personToDelete, setPersonToDelete] = useState<PersonSummary>();
+  const [personToUpdateStatus, setPersonToUpdateStatus] = useState<PersonSummary>();
 
   function handleDeleteDialogOpenChange(open: boolean): void {
-    if (!open) setPersonToDelete(undefined);
+    if (!open) {
+      setPersonToDelete(undefined);
+    }
   }
 
   function handlePersonDeleted(): void {
@@ -61,7 +66,9 @@ export function PeopleTablePresentation({
   }
 
   function handleStatusDialogOpenChange(open: boolean): void {
-    if (!open) setPersonToUpdateStatus(undefined);
+    if (!open) {
+      setPersonToUpdateStatus(undefined);
+    }
   }
 
   function handleStatusUpdated(): void {

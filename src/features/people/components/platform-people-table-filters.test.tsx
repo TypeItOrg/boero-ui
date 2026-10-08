@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
+
 jest.mock("@common/components/ui/async-dropdown", () => ({
   AsyncDropdown: jest.fn(() => null),
 }));
-
-import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
 
 const mockNavigate = jest.fn();
 

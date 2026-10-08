@@ -1,17 +1,17 @@
 "use server";
 
-import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
-
 import { redirect } from "next/navigation";
 
+import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
 import { emailVerificationContextSchema } from "@features/institutional-auth/schemas/email-verification.schema";
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
-import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
-import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
+import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
 import { INSTITUTIONAL_REGISTER_FIELD_NAMES } from "@features/institutional-auth/types/institutional-register-field-name.types";
+import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 
 export async function registerInstitutional(
   _previousState: InstitutionalRegisterActionState,
@@ -33,6 +33,7 @@ export async function registerInstitutional(
   }
 
   const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+
   if (contextError) {
     return { error: contextError };
   }
@@ -50,7 +51,9 @@ export async function registerInstitutional(
 
   if (!output.success) {
     if (output.error.fieldErrors) {
-      return { fieldErrors: pickFieldErrors(output.error.fieldErrors, INSTITUTIONAL_REGISTER_FIELD_NAMES) };
+      return {
+        fieldErrors: pickFieldErrors(output.error.fieldErrors, INSTITUTIONAL_REGISTER_FIELD_NAMES),
+      };
     }
 
     return { error: output.error.message || INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_FORM };

@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
-import { institutionalCredentialsLogin } from "@features/institutional-auth/actions/institutional-credentials-login.action";
 import { beginInstitutionalPasskeyLogin } from "@features/institutional-auth/actions/begin-passkey-login.action";
+import { institutionalCredentialsLogin } from "@features/institutional-auth/actions/institutional-credentials-login.action";
+import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
 
 jest.mock("@features/institutional-auth/components/institution-picker", () => ({
   InstitutionPicker: () => <input name="institutionId" defaultValue="inst-1" aria-label="Institución" />,

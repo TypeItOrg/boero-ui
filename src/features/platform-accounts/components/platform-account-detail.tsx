@@ -1,9 +1,13 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import type { ReactElement, ReactNode } from "react";
+
+import { ShieldCheckIcon, UserRoundIcon } from "lucide-react";
+
+import { SectionHeader } from "@common/components/section-header";
 import { Badge } from "@common/components/ui/badge";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
 import { PlatformAccountStatusControl } from "@features/platform-accounts/components/platform-account-status-control";
 import type { PlatformAccountAdmin } from "@features/platform-accounts/types/platform-account-admin.types";
-import { ShieldCheckIcon, UserRoundIcon } from "lucide-react";
-import { SectionHeader } from "@common/components/section-header";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "long",
@@ -14,7 +18,7 @@ type PlatformAccountDetailProps = {
   account: PlatformAccountAdmin;
 };
 
-export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): React.ReactElement {
+export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): ReactElement {
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-muted/25 col-span-12 flex flex-col gap-4 rounded-xl border p-5 md:p-6 lg:col-span-8">
@@ -63,7 +67,7 @@ export function PlatformAccountDetail({ account }: PlatformAccountDetailProps): 
   );
 }
 
-function DetailItem({ label, value }: { label: string; value: React.ReactNode }): React.ReactElement {
+function DetailItem({ label, value }: { label: string; value: ReactNode }): ReactElement {
   return (
     <div className="min-w-0">
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>

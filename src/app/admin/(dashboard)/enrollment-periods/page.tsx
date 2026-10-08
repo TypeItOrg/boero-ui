@@ -1,19 +1,23 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
-import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
-import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
-import { fetchInstitutions } from "@features/institutions/services/fetch-institutions.service";
-import { parseInstitutionPaginationParams } from "@features/institutions/utils/institution-pagination.util";
+
+import type { Metadata } from "next";
+
+import { CalendarRangeIcon } from "lucide-react";
+
 import { isValidUuid } from "@common/utils/action-argument.util";
-import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
-import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
+
 import { fetchAcademicYear } from "@features/academic/services/academic.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodsTable } from "@features/enrollment-periods/components/EnrollmentPeriodsTable";
+import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
+import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
+import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
+import { fetchInstitutions } from "@features/institutions/services/fetch-institutions.service";
+import { parseInstitutionPaginationParams } from "@features/institutions/utils/institution-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
-import { CalendarRangeIcon } from "lucide-react";
+import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 
 export const metadata: Metadata = {
   title: "Períodos de Inscripción - Admin",

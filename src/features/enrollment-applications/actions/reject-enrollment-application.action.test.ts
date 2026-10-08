@@ -1,3 +1,8 @@
+import { revalidatePath } from "next/cache";
+
+import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -10,17 +15,13 @@ jest.mock("@features/academic/utils/academic-action-auth.util", () => ({
   authorizeAcademicAction: jest.fn().mockResolvedValue(undefined),
 }));
 
-import { revalidatePath } from "next/cache";
-
-import { rejectEnrollmentApplicationAction } from "@features/enrollment-applications/actions/reject-enrollment-application.action";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const APPLICATION_ID = "00000000-0000-4000-8000-000000000002";
 
 function createFormData(rejectionReason: string): FormData {
   const formData = new FormData();
   formData.set("rejectionReason", rejectionReason);
+
   return formData;
 }
 
@@ -47,7 +48,9 @@ describe("rejectEnrollmentApplicationAction", () => {
     const [path, request] = institutionalApiFetchMock.mock.calls[0];
     expect(path).toBe(`/api/v1/institutions/${INSTITUTION_ID}/enrollment-applications/${APPLICATION_ID}/reject`);
     expect(request?.method).toBe("POST");
-    expect(JSON.parse(request?.body as string)).toEqual({ rejectionReason: "Documentación incompleta" });
+    expect(JSON.parse(request?.body as string)).toEqual({
+      rejectionReason: "Documentación incompleta",
+    });
     expect(revalidatePathMock).toHaveBeenCalledWith("/enrollment-applications");
   });
 

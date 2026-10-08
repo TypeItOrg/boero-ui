@@ -243,7 +243,13 @@ describe("DataTableFilters", () => {
     await user.click(clearButton);
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      { academicSpaceId: undefined, deleted: undefined, page: "0", size: "20", studyPlanId: undefined },
+      {
+        academicSpaceId: undefined,
+        deleted: undefined,
+        page: "0",
+        size: "20",
+        studyPlanId: undefined,
+      },
       { replace: true },
     );
   });

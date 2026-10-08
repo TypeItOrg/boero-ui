@@ -1,11 +1,15 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { RouteIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicOfferDetail } from "@features/academic-offers/components/academic-offer-detail";
 import { fetchAcademicOffer } from "@features/academic-offers/services/academic-offer.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
@@ -26,7 +30,7 @@ export function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Detalle de la oferta académica");
 }
 
-export default async function AcademicOfferDetailPage({ params, searchParams }: AcademicOfferDetailPageProps): Promise<React.ReactElement> {
+export default async function AcademicOfferDetailPage({ params, searchParams }: AcademicOfferDetailPageProps): Promise<ReactElement> {
   const [user, { studyPlanId }, { returnTo }] = await Promise.all([requireInstitutionalUser(), params, searchParams]);
   const destination = getSafeReturnTo(returnTo, "/academic-offers");
 
@@ -35,7 +39,10 @@ export default async function AcademicOfferDetailPage({ params, searchParams }: 
   }
 
   const detail = await fetchAcademicOffer(user.institutionId, studyPlanId);
-  if (!detail) notFound();
+
+  if (!detail) {
+    notFound();
+  }
 
   return (
     <PlatformPageShell

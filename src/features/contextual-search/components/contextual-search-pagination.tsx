@@ -1,7 +1,9 @@
 "use client";
 
-import { DataTablePagination } from "@common/components/ui/data-table-pagination";
+import type { ReactElement } from "react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import { PAGE_SIZE_OPTIONS } from "@common/utils/pagination-query.util";
 
 type ContextualSearchPaginationProps = {
@@ -11,8 +13,9 @@ type ContextualSearchPaginationProps = {
   totalPages: number;
 };
 
-export function ContextualSearchPagination({ page, size, totalItems, totalPages }: ContextualSearchPaginationProps): React.ReactElement {
+export function ContextualSearchPagination({ page, size, totalItems, totalPages }: ContextualSearchPaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
+
   return (
     <DataTablePagination
       page={page}

@@ -1,12 +1,14 @@
-import { waitFor } from "@testing-library/react";
-import { NextRequest, type NextResponse } from "next/server";
 import { unstable_doesMiddlewareMatch } from "next/experimental/testing/server";
+import { NextRequest, type NextResponse } from "next/server";
 
-import { PLATFORM_ACCESS_TOKEN_COOKIE, PLATFORM_REFRESH_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
+import { waitFor } from "@testing-library/react";
+
 import {
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
+import { PLATFORM_ACCESS_TOKEN_COOKIE, PLATFORM_REFRESH_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
+
 import { config, proxy } from "@/proxy";
 
 describe("proxy", () => {

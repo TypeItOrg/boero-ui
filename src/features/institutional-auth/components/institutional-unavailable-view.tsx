@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { Building2Icon, HouseIcon, RefreshCwIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -16,15 +18,17 @@ export function InstitutionalUnavailableView({
   message = "Verificá que el enlace o subdominio ingresado sea correcto, o comunicate con la institución para acceder al portal correspondiente.",
   homeHref = "/",
   onRetry,
-}: InstitutionalUnavailableViewProps): React.ReactElement {
+}: InstitutionalUnavailableViewProps): ReactElement {
   const handleRetry = (): void => {
     if (onRetry) {
       onRetry();
+
       return;
     }
 
     window.location.reload();
   };
+
   return (
     <main className="bg-muted flex min-h-dvh flex-1 items-center justify-center p-6">
       <Card className="bg-background w-full max-w-lg p-6 md:p-8">

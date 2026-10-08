@@ -1,17 +1,28 @@
-jest.mock("@common/services/institutional-host/institutional-host.service", () => ({ validateRequestInstitutionId: jest.fn(async () => undefined) }));
+import { redirect } from "next/navigation";
+
+import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
+import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
+
+jest.mock("@common/services/institutional-host/institutional-host.service", () => ({
+  validateRequestInstitutionId: jest.fn(async () => undefined),
+}));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(() => {
     throw new Error("NEXT_REDIRECT");
   }),
 }));
-jest.mock("@features/institutional-auth/services/register-institutional.service", () => ({ registerInstitutionalAccount: jest.fn() }));
-jest.mock("@features/institutional-auth/utils/email-verification-context.util", () => ({ setEmailVerificationContext: jest.fn() }));
-import { redirect } from "next/navigation";
-import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
-import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
-import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
+jest.mock("@features/institutional-auth/services/register-institutional.service", () => ({
+  registerInstitutionalAccount: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/utils/email-verification-context.util", () => ({
+  setEmailVerificationContext: jest.fn(),
+}));
 it("redirects successful registrations to verification without authentication cookies", async () => {
-  const identity = { institutionId: "22222222-2222-4222-8222-222222222222", documentNumber: "12345678" };
+  const identity = {
+    institutionId: "22222222-2222-4222-8222-222222222222",
+    documentNumber: "12345678",
+  };
   const data = {
     ...identity,
     name: "Ana",
@@ -23,9 +34,10 @@ it("redirects successful registrations to verification without authentication co
   };
   const form = new FormData();
   Object.entries(data).forEach(([key, value]) => form.set(key, value));
-  jest
-    .mocked(registerInstitutionalAccount)
-    .mockResolvedValue({ success: true, data: { ...identity, userId: "id", emailVerificationRequired: true } });
+  jest.mocked(registerInstitutionalAccount).mockResolvedValue({
+    success: true,
+    data: { ...identity, userId: "id", emailVerificationRequired: true },
+  });
   await expect(registerInstitutional({}, form)).rejects.toThrow("NEXT_REDIRECT");
   expect(setEmailVerificationContext).toHaveBeenCalledWith(identity);
   expect(redirect).toHaveBeenCalledWith("/auth/email-verification");

@@ -1,15 +1,17 @@
 "use client";
 
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import { BuildingIcon, XIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { DataTableFilters, type DataTableSelectFilter, type DataTableTriggerPosition } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
-import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
+import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import { PLATFORM_ROLE_TYPE, type PlatformRoleType } from "@features/roles/types/platform-role-type.types";
 
 const INSTITUTION_FILTER_QUERY_KEY = ["platform", "roles", "institution-filter"] as const;
@@ -31,7 +33,7 @@ export function PlatformRolesTableFilters({
   search,
   size,
   triggerPosition,
-}: PlatformRolesTableFiltersProps): React.ReactElement {
+}: PlatformRolesTableFiltersProps): ReactElement {
   const { navigate } = useDataTableNavigation();
   const roleTypeFilter: DataTableSelectFilter = {
     defaultValue: ROLE_TYPE_FILTER,

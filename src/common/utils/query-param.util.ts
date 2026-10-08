@@ -8,13 +8,19 @@ export function getQueryParamValue(value: QueryParamValue): string | undefined {
 export function parseOptionalBooleanQueryParam(value: QueryParamValue): boolean | undefined {
   const rawValue = getQueryParamValue(value);
 
-  if (rawValue === "true") return true;
-  if (rawValue === "false") return false;
+  if (rawValue === "true") {
+    return true;
+  }
+
+  if (rawValue === "false") {
+    return false;
+  }
 
   return undefined;
 }
 
 export function parseUuidQueryParam(value: QueryParamValue): string | undefined {
   const parsed = getQueryParamValue(value);
+
   return isValidUuid(parsed) ? parsed : undefined;
 }

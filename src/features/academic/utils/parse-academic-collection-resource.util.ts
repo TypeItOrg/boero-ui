@@ -3,6 +3,9 @@ import { ACADEMIC_COLLECTION_RESOURCES, type AcademicCollectionResource } from "
 const academicCollectionResourceSet = new Set<string>(ACADEMIC_COLLECTION_RESOURCES);
 
 export function parseAcademicCollectionResource(value: string | undefined): AcademicCollectionResource | undefined {
-  if (!value || !academicCollectionResourceSet.has(value)) return undefined;
+  if (!value || !academicCollectionResourceSet.has(value)) {
+    return undefined;
+  }
+
   return value as AcademicCollectionResource;
 }

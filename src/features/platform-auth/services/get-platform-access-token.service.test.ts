@@ -1,10 +1,11 @@
+import { cookies } from "next/headers";
+
+import { getPlatformAccessToken } from "@features/platform-auth/services/get-platform-access-token.service";
+import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
+
 jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
-
-import { cookies } from "next/headers";
-import { getPlatformAccessToken } from "@features/platform-auth/services/get-platform-access-token.service";
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 describe("getPlatformAccessToken", () => {
   const cookiesMock = jest.mocked(cookies);

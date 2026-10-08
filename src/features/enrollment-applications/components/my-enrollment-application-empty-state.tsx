@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement, ReactNode } from "react";
+
 import Link from "next/link";
+
 import { ClipboardListIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -19,8 +22,8 @@ export function MyEnrollmentApplicationEmptyState({
   isNavigating,
   size,
   totalItems,
-}: MyEnrollmentApplicationEmptyStateProps): React.ReactElement {
-  let content: React.ReactNode;
+}: MyEnrollmentApplicationEmptyStateProps): ReactElement {
+  let content: ReactNode;
 
   if (totalItems > 0) {
     content = (

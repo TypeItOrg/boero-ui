@@ -1,104 +1,37 @@
 "use client";
 
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import type { StudyPlan } from "@features/academic/types/study-plan.types";
+import { useState, type ReactElement } from "react";
 
-import * as React from "react";
-import { CalendarDaysIcon, GraduationCapIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
+import { GraduationCapIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
-import { Badge } from "@common/components/ui/badge";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { Input } from "@common/components/ui/input";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
-import { NumericInput } from "@common/components/ui/restricted-input";
-import { TimeInputWithIcon } from "@common/components/ui/time-input-with-icon";
-import { ToggleGroup, ToggleGroupItem } from "@common/components/ui/toggle-group";
-import { cn } from "@common/utils/cn.util";
-import { toOptionalFormString } from "@common/utils/form-value.util";
-import { FormField } from "@features/academic/components/academic-form-controls";
-import {
-  fetchCourseSpaceOptions,
-  fetchCourseTeacherOptions,
-  type CourseSpaceOption,
-  type CourseTeacherOption,
-} from "@features/academic/services/course-options.service";
-import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
-import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
-import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
-import { COURSE_WEEK_DAY } from "@features/academic/types/course-week-day.types";
-import { academicSpaceFormatLabels, academicSpaceTypeLabels } from "@features/academic/utils/academic-labels.util";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import { STUDY_PLAN_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } from "@features/academic/utils/academic-space-option.util";
 import { SectionHeader } from "@common/components/section-header";
+import { toOptionalFormString } from "@common/utils/form-value.util";
 
-const WEEK_DAY_LABELS: Record<CourseWeekDay, string> = {
-  MONDAY: "Lunes",
-  TUESDAY: "Martes",
-  WEDNESDAY: "Miércoles",
-  THURSDAY: "Jueves",
-  FRIDAY: "Viernes",
-};
+import { CourseAcademicSpaceField } from "@features/academic/components/course-academic-space-field";
+import { CourseAcademicYearField } from "@features/academic/components/course-academic-year-field";
+import { CourseClassesSection } from "@features/academic/components/course-classes-section";
+import { CourseInstrumentField } from "@features/academic/components/course-instrument-field";
+import { CourseStudyPlanField } from "@features/academic/components/course-study-plan-field";
+import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
+import { type ClassDraft } from "@features/academic/types/course-class-draft.types";
+import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
+import { individualFormat, parseInitialClasses, parseNullableInt } from "@features/academic/utils/course-form-draft.util";
 
-type ScheduleDraft = { startTime: string; endTime: string };
-
-type DayDraft = {
-  dayOfWeek: CourseWeekDay;
-  capacity: string;
-  periodDurationMinutes: string;
-  schedules: ScheduleDraft[];
-};
-
-type ClassDraft = {
-  teachers: { personId: string; fullName: string }[];
-  days: DayDraft[];
-};
-
-function emptySchedule(): ScheduleDraft {
-  return { startTime: "", endTime: "" };
-}
-
-function emptyDay(dayOfWeek: CourseWeekDay): DayDraft {
-  return { dayOfWeek, capacity: "", periodDurationMinutes: "", schedules: [emptySchedule()] };
-}
-
-function toMinutes(time: string): number {
-  const match = /^(\d{1,2}):(\d{2})$/.exec(time);
-  if (!match) return -1;
-  return Number(match[1]) * 60 + Number(match[2]);
-}
-
-function parseInitialClasses(value: unknown): unknown[] {
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value) as unknown;
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return Array.isArray(value) ? value : [];
-}
-
-export function CourseFields({ institutionField, institutionId, scope, initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
+export function CourseFields({ institutionField, institutionId, scope, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const editing = Boolean(initialValues.id);
   const initialClasses = parseInitialClasses(initialValues.classes);
   const initialFormat = toOptionalFormString(initialValues.academicSpaceFormat);
 
-  const [studyPlanId, setStudyPlanId] = React.useState(toOptionalFormString(initialValues.studyPlanId));
-  const [spaceId, setSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
-  const [academicSpaceId, setAcademicSpaceId] = React.useState(toOptionalFormString(initialValues.academicSpaceId));
-  const [studyPlanSpaceId, setStudyPlanSpaceId] = React.useState(toOptionalFormString(initialValues.studyPlanSpaceId));
-  const [instrumentId, setInstrumentId] = React.useState(toOptionalFormString(initialValues.instrumentId));
-  const [instrumental, setInstrumental] = React.useState(Boolean(initialValues.academicSpaceInstrumental));
-  const [spaceLabel, setSpaceLabel] = React.useState<string | undefined>(undefined);
-  const [academicYearId, setAcademicYearId] = React.useState(toOptionalFormString(initialValues.academicYearId));
-  const [format, setFormat] = React.useState<string | undefined>(
-    initialFormat === "INDIVIDUAL" || initialFormat === "GRUPAL" ? initialFormat : undefined,
-  );
-  const [classes, setClasses] = React.useState<ClassDraft[]>(() =>
+  const [studyPlanId, setStudyPlanId] = useState(toOptionalFormString(initialValues.studyPlanId));
+  const [spaceId, setSpaceId] = useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [academicSpaceId, setAcademicSpaceId] = useState(toOptionalFormString(initialValues.academicSpaceId));
+  const [studyPlanSpaceId, setStudyPlanSpaceId] = useState(toOptionalFormString(initialValues.studyPlanSpaceId));
+  const [instrumentId, setInstrumentId] = useState(toOptionalFormString(initialValues.instrumentId));
+  const [instrumental, setInstrumental] = useState(Boolean(initialValues.academicSpaceInstrumental));
+  const [spaceLabel, setSpaceLabel] = useState<string | undefined>(undefined);
+  const [academicYearId, setAcademicYearId] = useState(toOptionalFormString(initialValues.academicYearId));
+  const [format, setFormat] = useState<string | undefined>(initialFormat === "INDIVIDUAL" || initialFormat === "GRUPAL" ? initialFormat : undefined);
+  const [classes, setClasses] = useState<ClassDraft[]>(() =>
     initialClasses.map((entry) => {
       const courseClass = entry as {
         teachers?: { personId: string; fullName: string }[];
@@ -109,6 +42,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
           schedules?: { startTime: string; endTime: string }[];
         }[];
       };
+
       return {
         teachers: courseClass.teachers ?? [],
         days: (courseClass.days ?? []).map((day) => ({
@@ -163,698 +97,78 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
         </header>
         <div className="mt-5 flex flex-wrap gap-4">
           {institutionField}
-          <FormField label="Plan de estudio" name="studyPlanId" error={fieldErrors?.studyPlanId} className="flex-[1_0_min(300px,100%)]" required>
-            {institutionId && scope ? (
-              <AsyncDropdown<StudyPlan>
-                ariaInvalid={Boolean(fieldErrors?.studyPlanId)}
-                disabled={editing || classesLocked}
-                emptyMessage="No se encontraron planes activos."
-                errorMessage="No se pudieron cargar los planes de estudio."
-                fetchPage={(input) =>
-                  fetchAcademicOptionPage<StudyPlan>("study-plans", scope, institutionId, input, {
-                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
-                    active: "all",
-                    status: "ACTIVE",
-                  })
-                }
-                getItemLabel={formatStudyPlanLabel}
-                getItemValue={(item) => item.id}
-                id="studyPlanId"
-                key={`plan-${institutionId}`}
-                name="studyPlanDisplay"
-                onValueChange={(value) => {
-                  setStudyPlanId(value);
-                  setSpaceId(undefined);
-                  setAcademicSpaceId(undefined);
-                  setStudyPlanSpaceId(undefined);
-                  setInstrumentId(undefined);
-                  setInstrumental(false);
-                  setSpaceLabel(undefined);
-                  setFormat(undefined);
-                }}
-                placeholder={classesLocked ? "Definido por el curso" : "Seleccionar plan"}
-                queryKey={["courses", "active-study-plans", scope, institutionId]}
-                searchPlaceholder="Buscar plan…"
-                selectedLabel={
-                  initialValues.studyPlanName
-                    ? formatStudyPlanLabel({
-                        studyPlanName: toOptionalFormString(initialValues.studyPlanName),
-                        trainingPathName: toOptionalFormString(initialValues.trainingPathName),
-                        studyPlanVersion: Number(initialValues.studyPlanVersion) || undefined,
-                      })
-                    : undefined
-                }
-                value={studyPlanId}
-              />
-            ) : (
-              <Input disabled placeholder="Seleccioná una institución primero" type="text" />
-            )}
-          </FormField>
+          <CourseStudyPlanField
+            fieldErrors={fieldErrors}
+            institutionId={institutionId}
+            scope={scope}
+            editing={editing}
+            classesLocked={classesLocked}
+            setStudyPlanId={setStudyPlanId}
+            setSpaceId={setSpaceId}
+            setAcademicSpaceId={setAcademicSpaceId}
+            setStudyPlanSpaceId={setStudyPlanSpaceId}
+            setInstrumentId={setInstrumentId}
+            setInstrumental={setInstrumental}
+            setSpaceLabel={setSpaceLabel}
+            setFormat={setFormat}
+            initialValues={initialValues}
+            studyPlanId={studyPlanId}
+          />
 
-          <FormField
-            label="Espacio académico"
-            name="academicSpaceId"
-            error={fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format}
-            className="flex-[1_0_min(300px,100%)]"
-            required
-          >
-            {institutionId && scope ? (
-              studyPlanId ? (
-                <AsyncDropdown<CourseSpaceOption>
-                  {...STUDY_PLAN_SPACE_OPTION_PRESENTATION}
-                  ariaInvalid={Boolean(fieldErrors?.academicSpaceId ?? fieldErrors?.studyPlanSpaceId ?? fieldErrors?.format)}
-                  disabled={editing || classesLocked}
-                  emptyDescription="Incorporá espacios al plan para poder instanciarlos."
-                  emptyIcon={GraduationCapIcon}
-                  emptyMessage="No se encontraron espacios en este plan."
-                  emptyTitle="No hay espacios"
-                  errorMessage="No se pudieron cargar los espacios del plan."
-                  fetchPage={(input) => fetchCourseSpaceOptions(scope, institutionId, studyPlanId, input)}
-                  getItemLabel={getAcademicSpaceOptionLabel}
-                  getItemValue={(item) => item.studyPlanSpaceId ?? item.id}
-                  id="academicSpaceId"
-                  key={`space-${institutionId}-${studyPlanId}`}
-                  name="academicSpaceDisplay"
-                  onValueChange={(value, item) => {
-                    setSpaceId(value);
-                    setStudyPlanSpaceId(item?.studyPlanSpaceId ?? value);
-                    setAcademicSpaceId(item?.id);
-                    setInstrumentId(undefined);
-                    setInstrumental(Boolean(item?.instrumental));
-                    if (item) {
-                      setSpaceLabel(getAcademicSpaceOptionLabel(item));
-                      setFormat(item.format);
-                    }
-                  }}
-                  placeholder={classesLocked ? "Definido por el curso" : "Seleccionar espacio"}
-                  queryKey={["courses", "spaces", scope, institutionId, studyPlanId]}
-                  searchPlaceholder="Buscar espacio…"
-                  selectedLabel={spaceLabel ?? composeInitialSpaceLabel(initialValues)}
-                  value={spaceId}
-                />
-              ) : (
-                <Input disabled placeholder="Primero seleccioná un plan de estudio" type="text" />
-              )
-            ) : (
-              <Input disabled placeholder="Seleccioná una institución primero" type="text" />
-            )}
-          </FormField>
+          <CourseAcademicSpaceField
+            fieldErrors={fieldErrors}
+            institutionId={institutionId}
+            scope={scope}
+            studyPlanId={studyPlanId}
+            editing={editing}
+            classesLocked={classesLocked}
+            setSpaceId={setSpaceId}
+            setStudyPlanSpaceId={setStudyPlanSpaceId}
+            setAcademicSpaceId={setAcademicSpaceId}
+            setInstrumentId={setInstrumentId}
+            setInstrumental={setInstrumental}
+            setSpaceLabel={setSpaceLabel}
+            setFormat={setFormat}
+            spaceLabel={spaceLabel}
+            initialValues={initialValues}
+            spaceId={spaceId}
+          />
 
           {instrumental ? (
-            <FormField label="Instrumento" name="instrumentId" error={fieldErrors?.instrumentId} className="flex-[1_0_min(300px,100%)]" required>
-              {institutionId && scope ? (
-                <AsyncDropdown<{ id: string; name: string }>
-                  ariaInvalid={Boolean(fieldErrors?.instrumentId)}
-                  disabled={editing}
-                  emptyMessage="No hay instrumentos activos."
-                  errorMessage="No se pudieron cargar los instrumentos."
-                  fetchPage={(input) =>
-                    fetchAcademicOptionPage<{ id: string; name: string }>("instruments", scope, institutionId, input, {
-                      operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
-                      active: true,
-                    })
-                  }
-                  getItemLabel={(item) => item.name}
-                  getItemValue={(item) => item.id}
-                  id="instrumentId"
-                  key={`instrument-${institutionId}-${studyPlanSpaceId ?? "none"}`}
-                  name="instrumentDisplay"
-                  onValueChange={(value) => setInstrumentId(value)}
-                  placeholder="Seleccionar instrumento"
-                  queryKey={["courses", "instruments", scope, institutionId]}
-                  searchPlaceholder="Buscar instrumento…"
-                  selectedLabel={toOptionalFormString(initialValues.instrumentName)}
-                  value={instrumentId}
-                />
-              ) : (
-                <Input disabled placeholder="Seleccioná una institución primero" type="text" />
-              )}
-            </FormField>
-          ) : null}
-
-          <FormField label="Ciclo lectivo" name="academicYearId" error={fieldErrors?.academicYearId} className="w-full flex-[1_0_100%]" required>
-            {institutionId && scope ? (
-              <AsyncDropdown<{ id: string; year: number }>
-                ariaInvalid={Boolean(fieldErrors?.academicYearId)}
-                disabled={editing}
-                emptyMessage="No se encontraron ciclos lectivos."
-                errorMessage="No se pudieron cargar los ciclos lectivos."
-                fetchPage={(input) =>
-                  fetchAcademicOptionPage<{ id: string; year: number }>("academic-years", scope, institutionId, input, {
-                    operation: editing ? "COURSE_UPDATE" : "COURSE_CREATE",
-                    active: "all",
-                    status: "ACTIVE",
-                  })
-                }
-                getItemLabel={(item) => String(item.year)}
-                getItemValue={(item) => item.id}
-                id="academicYearId"
-                key={`year-${institutionId}`}
-                name="academicYearDisplay"
-                onValueChange={(value) => setAcademicYearId(value)}
-                placeholder={editing ? "Definido por el curso" : "Seleccionar ciclo lectivo"}
-                queryKey={["courses", "academic-years", scope, institutionId]}
-                searchPlaceholder="Buscar año…"
-                selectedLabel={initialValues.year !== undefined ? String(initialValues.year) : undefined}
-                value={academicYearId}
-              />
-            ) : (
-              <Input disabled placeholder="Seleccioná una institución primero" type="text" />
-            )}
-          </FormField>
-        </div>
-      </section>
-
-      <section aria-labelledby="course-form-classes-title" className="bg-muted/25 rounded-xl border p-5 md:p-6">
-        <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
-          <SectionHeader
-            icon={CalendarDaysIcon}
-            title="Clases del curso"
-            description="Organizá docentes, días y franjas horarias para cada grupo."
-            titleId="course-form-classes-title"
-            action={
-              classes.length > 0 ? (
-                <Button
-                  disabled={!spaceId}
-                  onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])}
-                  size="lg"
-                  type="button"
-                  variant="outline"
-                >
-                  <PlusIcon data-icon="inline-start" /> Agregar clase
-                </Button>
-              ) : null
-            }
-          />
-        </header>
-
-        {fieldErrors?.classes ? <FieldError className="mt-4" errors={[{ message: fieldErrors.classes }]} /> : null}
-
-        {classes.length === 0 ? (
-          <Empty className="mt-5 min-h-56 border-0 bg-transparent">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <GraduationCapIcon className="size-5" />
-              </EmptyMedia>
-              <EmptyTitle className="mt-2 text-base">Creá la primera clase del curso</EmptyTitle>
-              <EmptyDescription>
-                {spaceId
-                  ? "Definí quiénes enseñan, qué días se cursa y cómo se distribuyen sus horarios."
-                  : "Seleccioná un plan y un espacio académico para habilitar la organización de clases."}
-              </EmptyDescription>
-            </EmptyHeader>
-            {spaceId ? (
-              <EmptyContent>
-                <Button onClick={() => setClasses((current) => [...current, { teachers: [], days: [] }])} size="lg" type="button">
-                  <PlusIcon data-icon="inline-start" /> Agregar primera clase
-                </Button>
-              </EmptyContent>
-            ) : null}
-          </Empty>
-        ) : (
-          <div className="mt-6 flex flex-col gap-6">
-            {classes.map((courseClass, classIndex) => (
-              <ClassCard
-                fieldErrors={fieldErrors}
-                format={format}
-                institutionId={institutionId}
-                key={classIndex}
-                onRemove={() => setClasses((current) => current.filter((_, index) => index !== classIndex))}
-                onUpdate={(updater) => updateClass(classIndex, updater)}
-                scope={scope}
-                title={`Clase ${classIndex + 1}`}
-                courseClass={courseClass}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-    </>
-  );
-}
-
-function individualFormat(format: string | undefined): boolean {
-  return format === "INDIVIDUAL";
-}
-
-function parseNullableInt(value: string): number | null {
-  if (value === "") return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function parsePositiveInt(value: string): number | null {
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-}
-
-function formatCount(count: number, singular: string, plural: string): string {
-  if (count === 0) return `Sin ${plural}`;
-  return `${count} ${count === 1 ? singular : plural}`;
-}
-
-function composeInitialSpaceLabel(initialValues: AcademicFieldsProps["initialValues"]): string | undefined {
-  const name = toOptionalFormString(initialValues?.academicSpaceName);
-  if (!name) return undefined;
-  const type = toOptionalFormString(initialValues?.academicSpaceType);
-  const format = toOptionalFormString(initialValues?.academicSpaceFormat);
-  const parts = [
-    name,
-    type ? academicSpaceTypeLabels[type as keyof typeof academicSpaceTypeLabels] : undefined,
-    format ? academicSpaceFormatLabels[format as keyof typeof academicSpaceFormatLabels] : undefined,
-  ].filter(Boolean);
-  return parts.join(" · ");
-}
-
-type ClassCardProps = {
-  courseClass: ClassDraft;
-  fieldErrors?: Record<string, string>;
-  format: string | undefined;
-  institutionId: string | undefined;
-  onRemove: () => void;
-  onUpdate: (updater: (draft: ClassDraft) => ClassDraft) => void;
-  scope: AcademicScope | undefined;
-  title: string;
-};
-
-function ClassCard({ courseClass, fieldErrors, format, institutionId, onRemove, onUpdate, scope, title }: ClassCardProps): React.ReactElement {
-  const teachersFieldId = React.useId();
-  const classSummary = [formatCount(courseClass.teachers.length, "docente", "docentes"), formatCount(courseClass.days.length, "día", "días")].join(
-    " · ",
-  );
-
-  function updateDays(values: string[]): void {
-    const selectedDays = new Set(values.filter((value): value is CourseWeekDay => COURSE_WEEK_DAY.includes(value as CourseWeekDay)));
-    onUpdate((draft) => ({
-      ...draft,
-      days: COURSE_WEEK_DAY.filter((day) => selectedDays.has(day)).map(
-        (day) => draft.days.find((candidate) => candidate.dayOfWeek === day) ?? emptyDay(day),
-      ),
-    }));
-  }
-
-  return (
-    <Card className="bg-background gap-0 py-0 shadow-xs">
-      <CardHeader className="gap-0 border-b px-5 py-3.5 sm:px-6">
-        <CardTitle className="text-base font-semibold">{title}</CardTitle>
-        <CardDescription className="text-muted-foreground text-sm">{classSummary}</CardDescription>
-        <CardAction className="self-center">
-          <Button
-            aria-label={`Eliminar ${title.toLowerCase()}`}
-            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-8"
-            onClick={onRemove}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
-            <Trash2Icon />
-            <span className="sr-only">Eliminar clase</span>
-          </Button>
-        </CardAction>
-      </CardHeader>
-
-      <CardContent className="flex flex-col gap-6 p-5 sm:p-6">
-        {(() => {
-          const teacherError = fieldErrors?.classes && courseClass.teachers.length === 0 ? "Seleccioná al menos un docente." : undefined;
-          return (
-            <FormField label="Docentes" name={teachersFieldId} error={teacherError} required>
-              <div className="mt-1 flex flex-col gap-3">
-                <div className="bg-muted/20 flex min-h-12 flex-wrap items-center gap-2 rounded-xl border px-3 py-2.5">
-                  {courseClass.teachers.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Los docentes seleccionados se mostrarán aquí.</p>
-                  ) : null}
-                  {courseClass.teachers.map((teacher) => (
-                    <Badge className="h-7 gap-2 px-3" key={teacher.personId} size="lg" variant="secondary">
-                      <span className="max-w-full truncate">{teacher.fullName}</span>
-                      <Button
-                        aria-label={`Quitar a ${teacher.fullName}`}
-                        className="text-muted-foreground hover:text-foreground -mr-1"
-                        onClick={() =>
-                          onUpdate((draft) => ({
-                            ...draft,
-                            teachers: draft.teachers.filter((candidate) => candidate.personId !== teacher.personId),
-                          }))
-                        }
-                        size="icon-xs"
-                        type="button"
-                        variant="ghost"
-                      >
-                        <XIcon />
-                      </Button>
-                    </Badge>
-                  ))}
-                </div>
-                {institutionId && scope ? (
-                  <AsyncDropdown<CourseTeacherOption>
-                    ariaInvalid={Boolean(teacherError)}
-                    closeOnSelect={false}
-                    emptyMessage="No se encontraron docentes."
-                    errorMessage="No se pudieron cargar los docentes."
-                    fetchPage={(input) => fetchCourseTeacherOptions(scope, institutionId, input)}
-                    getItemLabel={(item) => item.fullName}
-                    getItemValue={(item) => item.id}
-                    id={teachersFieldId}
-                    onValueChange={(value, item) => {
-                      if (!value || !item) return;
-                      onUpdate((draft) => {
-                        const isSelected = draft.teachers.some((teacher) => teacher.personId === value);
-                        return {
-                          ...draft,
-                          teachers: isSelected
-                            ? draft.teachers.filter((teacher) => teacher.personId !== value)
-                            : [...draft.teachers, { personId: item.id, fullName: item.fullName }],
-                        };
-                      });
-                    }}
-                    placeholder="Agregar docente…"
-                    queryKey={["courses", "teachers", scope, institutionId]}
-                    searchPlaceholder="Buscar docente…"
-                    selectedValues={courseClass.teachers.map((teacher) => teacher.personId)}
-                  />
-                ) : null}
-              </div>
-            </FormField>
-          );
-        })()}
-
-        {(() => {
-          const daysError = fieldErrors?.classes && courseClass.days.length === 0 ? "Seleccioná al menos un día con sus horarios." : undefined;
-          return (
-            <FormField label="Días de cursado" name={`days-${title}`} error={daysError} required>
-              <ToggleGroup
-                aria-label="Días de cursado"
-                className="mt-1 flex w-full flex-wrap gap-2"
-                onValueChange={updateDays}
-                size="default"
-                spacing={2}
-                type="multiple"
-                value={courseClass.days.map((day) => day.dayOfWeek)}
-                variant="default"
-              >
-                {COURSE_WEEK_DAY.map((day) => (
-                  <ToggleGroupItem
-                    className="bg-primary/5 text-primary/80 hover:bg-primary/10 hover:text-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground h-9 min-w-[4.5rem] flex-1 rounded-lg border-0 px-2 text-sm font-medium transition-colors"
-                    key={day}
-                    value={day}
-                  >
-                    {WEEK_DAY_LABELS[day]}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </FormField>
-          );
-        })()}
-
-        {courseClass.days.length > 0 ? (
-          <div className="flex flex-col gap-4 pt-1">
-            {courseClass.days.map((day) => (
-              <DayEditor
-                day={day}
-                fieldErrors={fieldErrors}
-                individual={individualFormat(format)}
-                key={day.dayOfWeek}
-                onUpdate={(updater) =>
-                  onUpdate((draft) => ({
-                    ...draft,
-                    days: draft.days.map((candidate) => (candidate.dayOfWeek === day.dayOfWeek ? updater(candidate) : candidate)),
-                  }))
-                }
-              />
-            ))}
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
-  );
-}
-
-function DayEditor({
-  day,
-  fieldErrors,
-  individual,
-  onUpdate,
-}: {
-  day: DayDraft;
-  fieldErrors?: Record<string, string>;
-  individual: boolean;
-  onUpdate: (updater: (draft: DayDraft) => DayDraft) => void;
-}): React.ReactElement {
-  const hasSubmitted = Boolean(fieldErrors?.classes);
-  const periodError =
-    hasSubmitted && individual && (!day.periodDurationMinutes || Number(day.periodDurationMinutes) <= 0)
-      ? Number(day.periodDurationMinutes) <= 0 && day.periodDurationMinutes !== ""
-        ? "La duración del período debe ser mayor a 0."
-        : "Indicá la duración de cada período para los espacios individuales."
-      : undefined;
-  const capacityError = hasSubmitted && !individual && day.capacity !== "" && Number(day.capacity) <= 0 ? "El cupo debe ser mayor a 0." : undefined;
-
-  // Per-schedule validation helpers
-  function getScheduleError(scheduleIndex: number): string | undefined {
-    if (!hasSubmitted) return undefined;
-    const schedule = day.schedules[scheduleIndex];
-    if (!schedule.startTime || !schedule.endTime) return "Completá todos los horarios.";
-    const start = toMinutes(schedule.startTime);
-    const end = toMinutes(schedule.endTime);
-    if (start < 0 || end < 0 || start >= end) return "El horario que se quiere asignar es inválido.";
-    // Only check overlap/divisibility if every schedule in this day is individually valid
-    const allValid = day.schedules.every((candidate) => {
-      if (!candidate.startTime || !candidate.endTime) return false;
-      const candidateStart = toMinutes(candidate.startTime);
-      const candidateEnd = toMinutes(candidate.endTime);
-      return candidateStart >= 0 && candidateEnd >= 0 && candidateStart < candidateEnd;
-    });
-    if (!allValid) return undefined;
-    const slots = day.schedules.map((candidate, candidateIndex) => ({
-      index: candidateIndex,
-      start: toMinutes(candidate.startTime),
-      end: toMinutes(candidate.endTime),
-    }));
-    for (let otherIndex = 0; otherIndex < slots.length; otherIndex += 1) {
-      if (otherIndex === scheduleIndex) continue;
-      const other = slots[otherIndex];
-      if (start < other.end && other.start < end) return "Los horarios del mismo día no pueden superponerse.";
-    }
-    if (individual && day.periodDurationMinutes) {
-      const period = Number(day.periodDurationMinutes);
-      if (period > 0) {
-        const duration = end - start;
-        if (duration % period !== 0) return "La duración total de los horarios debe ser divisible por la duración del período.";
-      }
-    }
-    return undefined;
-  }
-
-  const dayLevelError = (() => {
-    if (!hasSubmitted) return undefined;
-    const validSchedules = day.schedules.filter((schedule) => {
-      if (!schedule.startTime || !schedule.endTime) return false;
-      const start = toMinutes(schedule.startTime);
-      const end = toMinutes(schedule.endTime);
-      return start >= 0 && end >= 0 && start < end;
-    });
-    if (validSchedules.length === 0) return undefined;
-    const hasInvalidSchedules = day.schedules.some((_, index) => Boolean(getScheduleError(index)));
-    if (hasInvalidSchedules) return undefined;
-    const computedTotal = validSchedules.reduce((total, schedule) => total + (toMinutes(schedule.endTime) - toMinutes(schedule.startTime)), 0);
-    if (computedTotal <= 0) return "Los horarios deben tener una duración mayor a 0.";
-    return undefined;
-  })();
-
-  function updateSchedule(scheduleIndex: number, field: keyof ScheduleDraft, value: string): void {
-    onUpdate((draft) => ({
-      ...draft,
-      schedules: draft.schedules.map((candidate, index) => (index === scheduleIndex ? { ...candidate, [field]: value } : candidate)),
-    }));
-  }
-
-  return (
-    <section className="bg-muted/10 overflow-hidden rounded-xl border">
-      <header className="bg-muted/25 border-b p-4 sm:p-5">
-        <div className="flex items-center gap-3.5">
-          <span className="bg-background text-primary flex size-10 items-center justify-center rounded-xl border shadow-xs">
-            <CalendarDaysIcon className="size-5" />
-          </span>
-          <div>
-            <h5 className="text-base font-semibold">{WEEK_DAY_LABELS[day.dayOfWeek]}</h5>
-            <p className="text-muted-foreground text-sm">
-              {day.schedules.length} {day.schedules.length === 1 ? "franja horaria" : "franjas horarias"}
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-col gap-6 p-4 sm:p-5">
-        {individual ? (
-          <FormField
-            label="Duración del período"
-            name={`period-${day.dayOfWeek}`}
-            error={periodError}
-            className="w-full flex-none self-stretch"
-            required
-          >
-            <div
-              className={cn(
-                "border-input bg-background focus-within:border-ring focus-within:ring-ring/50 flex h-9 w-full items-center overflow-hidden rounded-lg border shadow-2xs transition focus-within:ring-3",
-                periodError && "border-destructive ring-destructive/20",
-              )}
-            >
-              <NumericInput
-                aria-invalid={Boolean(periodError)}
-                aria-label={`Duración del período en minutos para ${WEEK_DAY_LABELS[day.dayOfWeek]}`}
-                className="h-full min-w-0 flex-1 border-0 bg-transparent px-3 text-sm tabular-nums shadow-none focus-visible:ring-0"
-                id={`period-${day.dayOfWeek}`}
-                maxLength={4}
-                onChange={(event) => {
-                  const nextValue = event.currentTarget.value;
-                  onUpdate((draft) => ({ ...draft, periodDurationMinutes: nextValue }));
-                }}
-                value={day.periodDurationMinutes}
-              />
-              <span className="bg-muted/40 text-muted-foreground flex h-full shrink-0 items-center border-l px-3 text-xs font-medium select-none">
-                minutos
-              </span>
-            </div>
-          </FormField>
-        ) : (
-          <FormField className="w-full flex-[1_0_100%]" label="Cupo (opcional)" name={`capacity-${day.dayOfWeek}`} error={capacityError}>
-            <NumericInput
-              aria-invalid={Boolean(capacityError)}
-              className="bg-background h-9 w-full"
-              id={`capacity-${day.dayOfWeek}`}
-              maxLength={5}
-              onChange={(event) => {
-                const nextValue = event.currentTarget.value;
-                onUpdate((draft) => ({ ...draft, capacity: nextValue }));
-              }}
-              placeholder="Sin límite"
-              value={day.capacity}
+            <CourseInstrumentField
+              fieldErrors={fieldErrors}
+              institutionId={institutionId}
+              scope={scope}
+              editing={editing}
+              studyPlanSpaceId={studyPlanSpaceId}
+              setInstrumentId={setInstrumentId}
+              initialValues={initialValues}
+              instrumentId={instrumentId}
             />
-          </FormField>
-        )}
-        <FormField label="Franjas horarias" name={`schedules-${day.dayOfWeek}`} error={dayLevelError} required className="w-full">
-          <div className="flex flex-col gap-3.5 pt-1">
-            {day.schedules.map((schedule, index) => {
-              const scheduleError = getScheduleError(index);
-              return (
-                <ScheduleRangeEditor
-                  canRemove={day.schedules.length > 1}
-                  dayLabel={WEEK_DAY_LABELS[day.dayOfWeek]}
-                  index={index}
-                  individual={individual}
-                  key={index}
-                  onEndTimeChange={(value) => updateSchedule(index, "endTime", value)}
-                  onRemove={() =>
-                    onUpdate((draft) => ({
-                      ...draft,
-                      schedules: draft.schedules.filter((_, scheduleIndex) => scheduleIndex !== index),
-                    }))
-                  }
-                  onStartTimeChange={(value) => updateSchedule(index, "startTime", value)}
-                  periodDurationMinutes={day.periodDurationMinutes}
-                  schedule={schedule}
-                  scheduleError={scheduleError}
-                />
-              );
-            })}
-            <Button
-              className="bg-primary/5 text-primary/80 hover:bg-primary/10 hover:text-primary h-10 w-full rounded-lg border-0 font-medium transition-colors"
-              onClick={() => onUpdate((draft) => ({ ...draft, schedules: [...draft.schedules, emptySchedule()] }))}
-              type="button"
-              variant="ghost"
-            >
-              <PlusIcon data-icon="inline-start" /> Agregar otra franja horaria
-            </Button>
-          </div>
-        </FormField>
-      </div>
-    </section>
-  );
-}
-
-type ScheduleRangeEditorProps = {
-  canRemove: boolean;
-  dayLabel: string;
-  index: number;
-  individual: boolean;
-  onEndTimeChange: (value: string) => void;
-  onRemove: () => void;
-  onStartTimeChange: (value: string) => void;
-  periodDurationMinutes: string;
-  schedule: ScheduleDraft;
-  scheduleError: string | undefined;
-};
-
-function ScheduleRangeEditor({
-  canRemove,
-  dayLabel,
-  index,
-  individual,
-  onEndTimeChange,
-  onRemove,
-  onStartTimeChange,
-  periodDurationMinutes,
-  schedule,
-  scheduleError,
-}: ScheduleRangeEditorProps): React.ReactElement {
-  const start = toMinutes(schedule.startTime);
-  const end = toMinutes(schedule.endTime);
-  const isEmpty = !schedule.startTime && !schedule.endTime;
-  const isIncomplete = !schedule.startTime || !schedule.endTime;
-  const isValid = !isIncomplete && start >= 0 && end >= 0 && start < end;
-  const duration = isValid ? end - start : 0;
-  const period = parsePositiveInt(periodDurationMinutes);
-  const isDivisible = Boolean(period && duration % period === 0);
-
-  return (
-    <div className="bg-background rounded-xl border p-4 shadow-2xs">
-      <div className="mb-3.5 flex min-h-8 flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-base font-semibold">Franja {index + 1}</span>
-          {!isEmpty && !isValid ? <Badge variant="destructive">{isIncomplete ? "Incompleta" : "Inválida"}</Badge> : null}
-          {isValid ? <Badge variant="outline">{duration} min</Badge> : null}
-          {individual && isValid && period ? (
-            <Badge variant={isDivisible ? "success" : "destructive"}>
-              {isDivisible ? `${duration / period} ${duration === period ? "cupo" : "cupos"}` : "No divisible"}
-            </Badge>
           ) : null}
-        </div>
-        {canRemove ? (
-          <Button
-            aria-label={`Quitar franja ${index + 1} de ${dayLabel}`}
-            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-8"
-            onClick={onRemove}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
-            <Trash2Icon />
-          </Button>
-        ) : null}
-      </div>
 
-      <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field className="min-w-0" data-invalid={Boolean(scheduleError)}>
-          <FieldLabel htmlFor={`schedule-${dayLabel}-${index}-start`}>Hora de inicio</FieldLabel>
-          <TimeInputWithIcon
-            aria-invalid={Boolean(scheduleError)}
-            aria-label={`Inicio ${dayLabel} ${index + 1}`}
-            id={`schedule-${dayLabel}-${index}-start`}
-            onValueChange={onStartTimeChange}
-            value={schedule.startTime}
+          <CourseAcademicYearField
+            fieldErrors={fieldErrors}
+            institutionId={institutionId}
+            scope={scope}
+            editing={editing}
+            setAcademicYearId={setAcademicYearId}
+            initialValues={initialValues}
+            academicYearId={academicYearId}
           />
-        </Field>
-        <Field className="min-w-0" data-invalid={Boolean(scheduleError)}>
-          <FieldLabel htmlFor={`schedule-${dayLabel}-${index}-end`}>Hora de fin</FieldLabel>
-          <TimeInputWithIcon
-            aria-invalid={Boolean(scheduleError)}
-            aria-label={`Fin ${dayLabel} ${index + 1}`}
-            id={`schedule-${dayLabel}-${index}-end`}
-            onValueChange={onEndTimeChange}
-            value={schedule.endTime}
-          />
-        </Field>
-      </FieldGroup>
-      {scheduleError ? <p className="text-destructive mt-2 text-xs">{scheduleError}</p> : null}
-    </div>
+        </div>
+      </section>
+
+      <CourseClassesSection
+        classes={classes}
+        spaceId={spaceId}
+        setClasses={setClasses}
+        fieldErrors={fieldErrors}
+        format={format}
+        institutionId={institutionId}
+        updateClass={updateClass}
+        scope={scope}
+      />
+    </>
   );
 }
