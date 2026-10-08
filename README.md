@@ -23,35 +23,3 @@
 _Centraliza información, reduce errores y ofrece una experiencia consistente para docentes, estudiantes y equipos administrativos._
 
 </div>
-
-## Desarrollo local
-
-Con la API local configurada y en ejecución:
-
-```bash
-test -f .env.dev || cp .env.example .env.dev
-make dev
-```
-
-Make utiliza `.env.dev` también para la interpolación de Compose cuando el archivo
-existe. Mantener `FRONTEND_PUBLIC_URL` e `INSTITUTIONAL_BASE_DOMAIN` alineados con la API:
-
-```dotenv
-FRONTEND_PUBLIC_URL=http://localhost:3000
-INSTITUTIONAL_BASE_DOMAIN=localhost
-```
-
-- Acceso general: `http://localhost:3000`, con selector de institución.
-- Acceso institucional: `http://cboero.localhost:3000`, con nombre público `cboero`
-  configurado y sin selector.
-- Administración de plataforma: sólo desde el acceso general. Sus rutas en un
-  subdominio institucional redirigen al login institucional.
-
-No hay cambio ni redirección del hostname local. La API usa `WEBAUTHN_RP_ID=localhost`
-y `WEBAUTHN_ALLOWED_ORIGINS=http://localhost:3000` para el acceso general. En los
-subdominios institucionales locales resuelve un RP ID propio desde el origen validado.
-
-Una passkey registrada en `localhost` no se usa en `cboero.localhost` y viceversa.
-Ingresar con contraseña en el acceso institucional y registrar allí una llave nueva,
-sin eliminar las existentes ni los datos locales. Esta separación por hostname es
-local: los ambientes públicos conservan su RP ID común configurado.
