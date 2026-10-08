@@ -1,47 +1,24 @@
 import { cookies } from "next/headers";
 
 import { getPlatformAccessToken } from "@features/platform-auth/services/get-platform-access-token.service";
-import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/platform-auth-cookies.util";
 
 jest.mock("next/headers", () => ({
   cookies: jest.fn(),
 }));
 
 describe("getPlatformAccessToken", () => {
-  const cookiesMock = jest.mocked(cookies);
-  const createCookieStore = (get: jest.Mock): Awaited<ReturnType<typeof cookies>> =>
-    ({
-      [Symbol.iterator]: function* iterator() {},
-      get,
-      getAll: jest.fn(),
-      has: jest.fn(),
-      size: 0,
-    }) as unknown as Awaited<ReturnType<typeof cookies>>;
+  it.each([
+    ["present", { platform_access_token: "platform-token", institutional_access_token: "institutional-token" }, "platform-token"],
+    ["missing", { institutional_access_token: "institutional-token" }, undefined],
+  ] as const)("returns the platform cookie when %s without borrowing the institutional session", async (_case, values, expected) => {
+    jest.mocked(cookies).mockResolvedValue({
+      get: (name: string) => {
+        const value = (values as Record<string, string>)[name];
 
-  afterEach(() => {
-    cookiesMock.mockReset();
-  });
+        return value === undefined ? undefined : { name, value };
+      },
+    } as Awaited<ReturnType<typeof cookies>>);
 
-  it("returns the platform access token cookie value", async () => {
-    cookiesMock.mockResolvedValue(createCookieStore(jest.fn().mockReturnValue({ value: "access-token" })));
-
-    await expect(getPlatformAccessToken()).resolves.toBe("access-token");
-  });
-
-  it("returns undefined when the cookie is missing", async () => {
-    cookiesMock.mockResolvedValue(createCookieStore(jest.fn().mockReturnValue(undefined)));
-
-    await expect(getPlatformAccessToken()).resolves.toBeUndefined();
-    expect(cookiesMock).toHaveBeenCalled();
-  });
-
-  it("reads the expected cookie name", async () => {
-    const get = jest.fn().mockReturnValue({ value: "access-token" });
-
-    cookiesMock.mockResolvedValue(createCookieStore(get));
-
-    await getPlatformAccessToken();
-
-    expect(get).toHaveBeenCalledWith(PLATFORM_ACCESS_TOKEN_COOKIE);
+    await expect(getPlatformAccessToken()).resolves.toBe(expected);
   });
 });

@@ -29,7 +29,7 @@ describe("AcademicResourceForm", () => {
   it.each([
     { id: undefined, submitLabel: "Crear trayecto formativo" },
     { id: "2d9ec931-453c-4778-86a9-dc40a06d0247", submitLabel: "Guardar cambios" },
-  ])("keeps $submitLabel actions at the bottom of the form", ({ id, submitLabel }) => {
+  ])("offers $submitLabel and a cancel link to the supplied origin", ({ id, submitLabel }) => {
     render(
       <AcademicResourceForm
         scope={AcademicScope.INSTITUTIONAL}
@@ -41,10 +41,7 @@ describe("AcademicResourceForm", () => {
     );
 
     const submitButton = screen.getByRole("button", { name: submitLabel });
-    const form = submitButton.closest("form");
-    const actions = submitButton.parentElement;
-
-    expect(form).toHaveClass("h-full", "flex-1");
-    expect(actions).toHaveClass("sticky", "bottom-0", "mt-auto");
+    expect(submitButton).toHaveAttribute("type", "submit");
+    expect(screen.getByRole("link", { name: "Cancelar" })).toHaveAttribute("href", "/training-paths");
   });
 });

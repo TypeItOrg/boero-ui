@@ -1,4 +1,4 @@
-import { DEFAULT_PLATFORM_ROLES_SORT, parsePlatformRolesPaginationParams } from "@features/roles/utils/platform-role-pagination.util";
+import { parsePlatformRolesPaginationParams } from "@features/roles/utils/platform-role-pagination.util";
 
 describe("parsePlatformRolesPaginationParams", () => {
   it("parses valid filters and sort", () => {
@@ -38,7 +38,7 @@ describe("parsePlatformRolesPaginationParams", () => {
       roleType: undefined,
       search: "",
       size: 10,
-      sort: DEFAULT_PLATFORM_ROLES_SORT,
+      sort: { field: "name", direction: "asc" },
     });
   });
 });

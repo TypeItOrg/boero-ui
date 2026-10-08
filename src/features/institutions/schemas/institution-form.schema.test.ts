@@ -33,7 +33,7 @@ describe("institutionFormSchema", () => {
       email: "",
     });
 
-    expect(result.success).toBe(false);
+    expect(result).toMatchObject({ success: false, error: { issues: expect.arrayContaining([expect.objectContaining({ path: [field] })]) } });
   });
 
   it.each([
@@ -51,6 +51,6 @@ describe("institutionFormSchema", () => {
       [field]: value,
     });
 
-    expect(result.success).toBe(false);
+    expect(result).toMatchObject({ success: false, error: { issues: expect.arrayContaining([expect.objectContaining({ path: [field] })]) } });
   });
 });

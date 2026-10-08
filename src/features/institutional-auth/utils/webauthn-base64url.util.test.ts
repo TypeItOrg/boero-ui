@@ -1,16 +1,22 @@
 import { base64UrlToBytes, bytesToBase64Url } from "@features/institutional-auth/utils/webauthn-base64url.util";
 
 describe("webauthn-base64url", () => {
-  it("round-trips bytes through base64url", () => {
-    const original = new Uint8Array([0, 1, 2, 250, 255]);
+  it.each([
+    [[], ""],
+    [[0], "AA"],
+    [[0, 1], "AAE"],
+    [[0, 1, 2, 250, 255], "AAEC-v8"],
+    [[251, 255, 190], "-_--"],
+  ])("encodes and decodes known bytes %j", (bytes, encoded) => {
+    const value = new Uint8Array(bytes);
 
-    expect(base64UrlToBytes(bytesToBase64Url(original))).toEqual(original);
+    expect(bytesToBase64Url(value)).toBe(encoded);
+    expect(bytesToBase64Url(value.buffer)).toBe(encoded);
+    expect(base64UrlToBytes(encoded)).toEqual(value);
   });
 
-  it("produces url-safe output without padding", () => {
-    const encoded = bytesToBase64Url(new Uint8Array([251, 255, 190]));
-
-    expect(encoded).not.toMatch(/[+/=]/);
+  it("encodes only the selected view of a buffer", () => {
+    expect(bytesToBase64Url(new Uint8Array([255, 0, 1, 255]).subarray(1, 3))).toBe("AAE");
   });
 
   it("rejects values outside the base64url alphabet", () => {

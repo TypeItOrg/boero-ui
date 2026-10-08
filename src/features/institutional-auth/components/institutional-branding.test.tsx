@@ -39,12 +39,17 @@ const institution = {
   publicSubdomain: "cboero",
   logoUrl: `/api/v1/institutions/22222222-2222-4222-8222-222222222222/logo?v=opaque`,
 };
-const forms = [InstitutionalLoginForm, InstitutionalRegisterForm, InstitutionalPasswordRecoveryForm, EmailVerificationForm];
-it.each(forms)("[A01.generic-flows] existing $name keeps the institution selector", (Form) => {
+const forms = [
+  { formName: "login", Form: InstitutionalLoginForm },
+  { formName: "registration", Form: InstitutionalRegisterForm },
+  { formName: "password recovery", Form: InstitutionalPasswordRecoveryForm },
+  { formName: "email verification", Form: EmailVerificationForm },
+];
+it.each(forms)("[A01.generic-flows] existing $formName keeps the institution selector", ({ Form }) => {
   render(<Form />);
   expect(screen.getByLabelText("Institución")).toBeInTheDocument();
 });
-it.each(forms)("[A02.branded-mobile] $name fixes institution and exposes mobile identity without a selector", (Form) => {
+it.each(forms)("[A02.branded-mobile] $formName fixes institution and exposes mobile identity without a selector", ({ Form }) => {
   const { container } = render(
     <InstitutionalBrandProvider institution={institution}>
       <Form />

@@ -1,8 +1,10 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import { EnrollmentCoursesSelector } from "@features/enrollment-applications/components/EnrollmentCoursesSelector";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+
+import { createTestQueryClient } from "@/../test/utils/render-with-query-client";
 
 const INSTRUMENTAL_COURSES: EnrollmentCourseOption[] = [
   {
@@ -62,7 +64,7 @@ const PLAIN_COURSE: EnrollmentCourseOption = {
 function renderSelector(selectedCourseIds: string[] = [], plainCourse = PLAIN_COURSE) {
   const onToggleCourse = jest.fn();
   const onToggleInstrumentGroup = jest.fn();
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const queryClient = createTestQueryClient();
   render(
     <QueryClientProvider client={queryClient}>
       <EnrollmentCoursesSelector

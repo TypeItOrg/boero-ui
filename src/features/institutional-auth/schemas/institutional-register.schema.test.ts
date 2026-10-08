@@ -1,55 +1,52 @@
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
-import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 
-function createValidInput(overrides: Record<string, string> = {}) {
-  return {
-    institutionId: "institution-id",
-    name: "Ana",
-    lastName: "Garcia",
-    birthDate: "2010-01-01",
-    documentNumber: "12345678",
-    password: "password123",
-    confirmPassword: "password123",
-    ...overrides,
-  };
-}
+const validRegistration = {
+  institutionId: "019e6d85-d070-7000-8000-000000000001",
+  name: "Ana",
+  lastName: "Garcia",
+  email: "ana@example.com",
+  birthDate: "2010-01-01",
+  documentNumber: "12345678",
+  password: "password123",
+  confirmPassword: "password123",
+};
 
 describe("institutional register schema", () => {
-  it("requires a birth date", () => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate: "" }));
-
-    expect(result.success).toBe(false);
-
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({
-          path: ["birthDate"],
-          message: "La fecha de nacimiento es requerida.",
-        }),
-      );
-    }
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-09-14T15:00:00Z"));
   });
 
-  it("rejects a birth date younger than the minimum age", () => {
-    const tooRecentBirthDate = getLatestAllowedBirthDate();
-    tooRecentBirthDate.setDate(tooRecentBirthDate.getDate() + 1);
-    const birthDate = [
-      tooRecentBirthDate.getFullYear(),
-      String(tooRecentBirthDate.getMonth() + 1).padStart(2, "0"),
-      String(tooRecentBirthDate.getDate()).padStart(2, "0"),
-    ].join("-");
+  afterEach(() => jest.useRealTimers());
 
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate }));
+  it("accepts a complete registration and normalizes identity fields", () => {
+    expect(
+      institutionalRegisterSchema.parse({
+        ...validRegistration,
+        name: " Ana ",
+        lastName: " Garcia ",
+        email: " ana@example.com ",
+      }),
+    ).toEqual(validRegistration);
+  });
 
-    expect(result.success).toBe(false);
+  it.each([
+    ["birthDate", "", "La fecha de nacimiento es requerida."],
+    ["birthDate", "2023-09-15", "La persona debe tener al menos 3 años."],
+    ["documentNumber", "1234A678", "El número de documento debe tener exactamente 8 dígitos."],
+    ["email", "", "El correo electrónico es requerido."],
+    ["email", "not-an-email", "El correo electrónico debe tener un formato válido."],
+    ["confirmPassword", "different-password", "Las contraseñas no coinciden."],
+  ])("rejects invalid %s (%s) independently", (field, value, message) => {
+    expect(institutionalRegisterSchema.safeParse({ ...validRegistration, [field]: value })).toMatchObject({
+      success: false,
+      error: { issues: [expect.objectContaining({ path: [field], message })] },
+    });
+  });
 
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({
-          path: ["birthDate"],
-          message: "La persona debe tener al menos 3 años.",
-        }),
-      );
-    }
+  it("accepts the exact third birthday", () => {
+    expect(institutionalRegisterSchema.parse({ ...validRegistration, birthDate: "2023-09-14" })).toMatchObject({
+      birthDate: "2023-09-14",
+    });
   });
 });

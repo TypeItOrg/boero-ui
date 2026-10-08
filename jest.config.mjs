@@ -28,10 +28,43 @@ const buildJestConfig = createJestConfig(customJestConfig);
 
 async function buildFinalJestConfig() {
   const config = await buildJestConfig();
+  const { maxWorkers, ...projectConfig } = config;
+  const browserTests = [
+    "<rootDir>/src/proxy.test.ts",
+    "<rootDir>/src/proxy-institutional-host.test.ts",
+    "<rootDir>/src/common/hooks/**/*.test.ts",
+    "<rootDir>/src/features/institutional-auth/utils/webauthn-capability.util.test.ts",
+    "<rootDir>/src/features/institutional-auth/utils/passkey-authentication.util.test.ts",
+  ];
+  const sharedConfig = {
+    ...projectConfig,
+    transformIgnorePatterns: ["^.+\\.module\\.(css|sass|scss)$"],
+  };
 
   return {
-    ...config,
-    transformIgnorePatterns: ["^.+\\.module\\.(css|sass|scss)$"],
+    maxWorkers,
+    projects: [
+      {
+        ...sharedConfig,
+        displayName: "node",
+        testEnvironment: "node",
+        setupFiles: [],
+        setupFilesAfterEnv: [],
+        testMatch: ["<rootDir>/**/__tests__/**/*.?([mc])[jt]s", "<rootDir>/**/?(*.)+(spec|test).?([mc])[jt]s"],
+        testPathIgnorePatterns: [
+          ...config.testPathIgnorePatterns,
+          "<rootDir>/src/proxy.*test.ts",
+          "<rootDir>/src/common/hooks/",
+          "<rootDir>/src/features/institutional-auth/utils/webauthn-capability.util.test.ts",
+          "<rootDir>/src/features/institutional-auth/utils/passkey-authentication.util.test.ts",
+        ],
+      },
+      {
+        ...sharedConfig,
+        displayName: "browser",
+        testMatch: ["<rootDir>/**/__tests__/**/*.?([mc])[jt]sx", "<rootDir>/**/?(*.)+(spec|test).?([mc])[jt]sx", ...browserTests],
+      },
+    ],
   };
 }
 

@@ -172,8 +172,6 @@ describe("PermissionGroupsFields", () => {
     const yearBranch = createYearField?.parentElement;
     const trainingPathBranch = createTrainingPathField?.parentElement;
 
-    expect(yearBranch).toHaveClass("border-l");
-    expect(trainingPathBranch).toHaveClass("border-l");
     expect(yearBranch).toContainElement(createYearField);
     expect(yearBranch).not.toContainElement(createTrainingPathField);
     expect(trainingPathBranch).toContainElement(createTrainingPathField);

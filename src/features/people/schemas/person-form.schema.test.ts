@@ -1,143 +1,74 @@
 import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
-import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
+
+const validPerson = {
+  firstName: "Ana",
+  lastName: "Pérez",
+  documentNumber: "12345678",
+  email: "ana@example.com",
+  phoneNumber: "",
+  birthDate: "2000-01-01",
+  password: "contraseña-segura",
+  confirmPassword: "contraseña-segura",
+};
 
 describe("person form schemas", () => {
-  it("accepts phone numbers with digits and hyphens", () => {
-    const result = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@example.com",
-      phoneNumber: "353-4619146",
-    });
-
-    expect(result.success).toBe(true);
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-09-14T15:00:00Z"));
   });
 
-  it("rejects unsupported phone characters", () => {
-    const result = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@example.com",
-      phoneNumber: "+54 353 4619146",
-    });
+  afterEach(() => jest.useRealTimers());
 
-    expect(result.success).toBe(false);
+  it.each(["", "353-4619146"])("accepts a supported phone number %s", (phoneNumber) => {
+    expect(updatePersonFormSchema.parse({ ...validPerson, phoneNumber })).toMatchObject({ phoneNumber });
   });
 
-  it("rejects non-numeric document numbers", () => {
-    const result = createPersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      documentNumber: "1234A678",
-      email: "ana@example.com",
-      phoneNumber: "",
-      birthDate: "",
-      password: "contraseña-segura",
-      confirmPassword: "contraseña-segura",
-    });
+  it.each([
+    ["phoneNumber", "+54 353 4619146", "El teléfono solo admite números y guiones."],
+    ["documentNumber", "1234A678", "El documento debe tener exactamente 8 dígitos."],
+    ["birthDate", "", "La fecha de nacimiento es requerida."],
+    ["birthDate", "2023-09-15", "La persona debe tener al menos 3 años."],
+    ["confirmPassword", "diferente-contraseña", "Las contraseñas no coinciden."],
+  ])("rejects invalid %s (%s) for its own validation rule", (field, value, message) => {
+    const result = createPersonFormSchema.safeParse({ ...validPerson, [field]: value });
 
-    expect(result.success).toBe(false);
+    expect(result).toMatchObject({
+      success: false,
+      error: { issues: [expect.objectContaining({ path: [field], message })] },
+    });
   });
 
-  it("rejects birth dates for people younger than three", () => {
-    const tomorrowThreeYearsAgo = getLatestAllowedBirthDate();
-    tomorrowThreeYearsAgo.setDate(tomorrowThreeYearsAgo.getDate() + 1);
-    const birthDate = [
-      tomorrowThreeYearsAgo.getFullYear(),
-      String(tomorrowThreeYearsAgo.getMonth() + 1).padStart(2, "0"),
-      String(tomorrowThreeYearsAgo.getDate()).padStart(2, "0"),
-    ].join("-");
-
-    const result = createPersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      documentNumber: "12345678",
-      email: "ana@example.com",
-      phoneNumber: "",
-      birthDate,
-      password: "contraseña-segura",
-      confirmPassword: "contraseña-segura",
+  it("accepts the exact third birthday", () => {
+    expect(createPersonFormSchema.parse({ ...validPerson, birthDate: "2023-09-14" })).toEqual({
+      ...validPerson,
+      birthDate: "2023-09-14",
     });
-
-    expect(result.success).toBe(false);
   });
 
-  it("requires a birth date when creating a person", () => {
-    const result = createPersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      documentNumber: "12345678",
-      email: "ana@example.com",
-      phoneNumber: "",
-      birthDate: "",
-      password: "contraseña-segura",
-      confirmPassword: "contraseña-segura",
-    });
-
-    expect(result.success).toBe(false);
-  });
-
-  it("requires password confirmation when creating a person", () => {
-    const result = createPersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      documentNumber: "12345678",
-      email: "ana@example.com",
-      phoneNumber: "",
-      birthDate: "2000-01-01",
-      password: "contraseña-segura",
-      confirmPassword: "diferente-contraseña",
-    });
-
-    expect(result.success).toBe(false);
-
-    if (!result.success) {
-      expect(result.error.issues[0].message).toBe("Las contraseñas no coinciden.");
-    }
-  });
-
-  it("allows empty password fields when updating a person", () => {
-    const result = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@boero.edu.ar",
-      phoneNumber: "",
+  it.each([
+    ["empty", { password: "", confirmPassword: "" }],
+    ["omitted", { password: undefined, confirmPassword: undefined }],
+  ])("keeps %s update credentials empty", (_case, credentials) => {
+    expect(updatePersonFormSchema.parse({ ...validPerson, ...credentials })).toMatchObject({
       password: "",
       confirmPassword: "",
     });
-
-    expect(result.success).toBe(true);
   });
 
-  it("validates new password when updating a person", () => {
-    const shortPasswordResult = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@example.com",
-      phoneNumber: "",
-      password: "123",
-      confirmPassword: "123",
+  it.each([
+    ["phoneNumber", { phoneNumber: "+54 353 4619146" }, "El teléfono solo admite números y guiones."],
+    ["password", { password: "123", confirmPassword: "123" }, "La contraseña debe tener al menos 8 caracteres."],
+    ["confirmPassword", { password: "contraseña-nueva", confirmPassword: "otra-contraseña" }, "Las contraseñas no coinciden."],
+  ])("rejects invalid update %s", (field, credentials, message) => {
+    expect(updatePersonFormSchema.safeParse({ ...validPerson, ...credentials })).toMatchObject({
+      success: false,
+      error: { issues: [expect.objectContaining({ path: [field], message })] },
     });
-    expect(shortPasswordResult.success).toBe(false);
+  });
 
-    const mismatchResult = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@example.com",
-      phoneNumber: "",
-      password: "contraseña-nueva",
-      confirmPassword: "otra-contraseña",
-    });
-    expect(mismatchResult.success).toBe(false);
+  it("accepts matching new credentials", () => {
+    const credentials = { password: "contraseña-nueva", confirmPassword: "contraseña-nueva" };
 
-    const validResult = updatePersonFormSchema.safeParse({
-      firstName: "Ana",
-      lastName: "Pérez",
-      email: "ana@example.com",
-      phoneNumber: "",
-      password: "contraseña-nueva",
-      confirmPassword: "contraseña-nueva",
-    });
-    expect(validResult.success).toBe(true);
+    expect(updatePersonFormSchema.parse({ ...validPerson, ...credentials })).toMatchObject(credentials);
   });
 });
