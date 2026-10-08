@@ -22,6 +22,7 @@ export default async function PlatformCourseWaitlistPage({
   searchParams: Promise<{ institutionId?: string }>;
 }): Promise<ReactElement> {
   await requirePlatformAccount();
+
   const [{ courseId }, { institutionId }] = await Promise.all([params, searchParams]);
 
   if (!institutionId) {

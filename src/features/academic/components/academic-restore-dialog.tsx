@@ -16,7 +16,7 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
 
-import { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";

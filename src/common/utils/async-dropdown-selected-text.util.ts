@@ -12,7 +12,7 @@ export function getSelectedText<TItem>({
     return getItemLabel(selectedItem);
   }
 
-  if (selectedLabel) {
+  if (value !== undefined && selectedLabel) {
     return selectedLabel;
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { fetchDocumentCatalog } from "@features/document-catalog/services/document-catalog-client.service";
@@ -12,31 +12,25 @@ export function useDocumentCatalogImpact(
   currentId: string | undefined,
   savedDocument: DocumentDefinition | undefined,
 ) {
-  const [impact, setImpact] = useState<{ paths: number; drafts: number }>();
-  const [impactError, setImpactError] = useState("");
-  useEffect(() => {
-    if (!institutionId || !currentId) {
-      return;
-    }
+  const query = useQuery({
+    queryKey: ["document-catalog-impact", scope, institutionId, currentId, savedDocument?.revision],
+    enabled: Boolean(institutionId && currentId),
+    queryFn: async ({ signal }) => {
+      const data = await fetchDocumentCatalog<DocumentDefinition>(scope, institutionId!, `/${currentId}`, signal);
 
-    const controller = new AbortController();
-    void fetchDocumentCatalog<DocumentDefinition>(scope, institutionId, `/${currentId}`, controller.signal)
-      .then((data) => {
-        if (typeof data.affectedTrainingPaths !== "number" || typeof data.affectedDrafts !== "number") {
-          throw new Error();
-        }
+      if (typeof data.affectedTrainingPaths !== "number" || typeof data.affectedDrafts !== "number") {
+        throw new Error("No se pudo confirmar el alcance. Recargá antes de guardar.");
+      }
 
-        setImpact({ paths: data.affectedTrainingPaths, drafts: data.affectedDrafts });
-        setImpactError("");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setImpactError("No se pudo confirmar el alcance. Recargá antes de guardar.");
-        }
-      });
+      return { paths: data.affectedTrainingPaths, drafts: data.affectedDrafts };
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
 
-    return () => controller.abort();
-  }, [scope, institutionId, currentId, savedDocument]);
-
-  return { impact, impactError };
+  return {
+    impact: query.data,
+    impactError: query.isError ? "No se pudo confirmar el alcance. Recargá antes de guardar." : "",
+  };
 }

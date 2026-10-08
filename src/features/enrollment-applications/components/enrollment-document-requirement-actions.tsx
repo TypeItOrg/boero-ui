@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, RefObject, SetStateAction } from "react";
+import type { ReactElement, RefObject } from "react";
 
 import { HistoryIcon, PencilLineIcon } from "lucide-react";
 
@@ -20,12 +20,7 @@ export function EnrollmentDocumentRequirementActions({
   editDocument: (value: { requirement: DocumentRequirement; operation: "review" | "withdraw" } | null) => void;
   showDeliveryHistory: boolean;
   activityTriggerRef: RefObject<HTMLButtonElement | null>;
-  setActivity: Dispatch<
-    SetStateAction<{
-      requirement: DocumentRequirement;
-      initialTab: "deliveries" | "changes";
-    } | null>
-  >;
+  setActivity: (value: { requirement: DocumentRequirement; initialTab: "deliveries" | "changes" } | null) => void;
   showRequirementChanges: boolean;
 }): ReactElement {
   return (

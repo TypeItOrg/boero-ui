@@ -49,16 +49,19 @@ export function AcademicTablePresentation({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isPending, navigate } = useDataTableNavigation();
+
   const [statusAction, setStatusAction] = useState<{
     institutionId: string;
     selection: AcademicStatusSelection;
   }>();
+
   const [lifecycleAction, setLifecycleAction] = useState<{
     id: string;
     kind: AcademicLifecycleActionKind;
     label: string;
     institutionId: string;
   }>();
+
   const returnTo = getCurrentPath(pathname, searchParams.toString());
   const lifecycleRow = lifecycleAction ? data.items.find((row) => row.id === lifecycleAction.id) : undefined;
   const showDeleteDialog = lifecycleAction?.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE && lifecycleRow?.deletedAt == null;

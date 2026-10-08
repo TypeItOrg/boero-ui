@@ -85,7 +85,6 @@ export function DocumentCatalogForm(props: DocumentCatalogFormProps): ReactEleme
             page={model.page}
             associations={model.associations}
             totalItems={model.totalItems}
-            setAssociationsLoading={model.setAssociationsLoading}
             setPage={model.setPage}
             currentId={model.currentId}
             totalPages={model.totalPages}

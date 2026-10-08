@@ -47,6 +47,7 @@ export async function DocumentCatalogDetailPage({
 
   if (scope === "admin") {
     await requirePlatformAccount();
+
     const parsedInstitutionId = z.uuid().safeParse(query.institutionId);
 
     if (!parsedInstitutionId.success) {

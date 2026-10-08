@@ -9,6 +9,7 @@ const LOCATION_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function proxyLocationGet(request: Request, backendPath: string): Promise<Response> {
   const backendUrl = new URL(backendPath, getApiUrlOrThrow());
+
   backendUrl.search = new URL(request.url).search;
 
   try {

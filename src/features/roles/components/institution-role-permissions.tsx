@@ -23,6 +23,7 @@ export function InstitutionRolePermissions({ permissionCodes, groups }: Institut
   const assignedPermissionCodes = new Set(permissionCodes);
   const visibleGroups = groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code));
   const permissionMap = getPermissionMap(visibleGroups);
+
   const assignedGroups = visibleGroups
     .map((group) => ({
       ...group,

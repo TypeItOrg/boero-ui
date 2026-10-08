@@ -47,6 +47,7 @@ export function DropdownEmptyState({
     iconElement = Icon;
   } else if (typeof Icon === "function") {
     const IconComponent = Icon;
+
     iconElement = <IconComponent className="size-4.5" aria-hidden="true" />;
   } else {
     iconElement = <SearchIcon className="size-4.5" aria-hidden="true" />;

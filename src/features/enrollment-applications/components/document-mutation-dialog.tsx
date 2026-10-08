@@ -44,6 +44,7 @@ export function DocumentMutation({
   const attachment = requirement.currentAttachment;
   const title = withdrawing ? "Retirar entrega" : "Revisar documento";
   const MutationIcon = withdrawing ? ArchiveIcon : FileTextIcon;
+
   const [state, action, pending] = useActionState(async (previous: DocumentActionState, form: FormData): Promise<DocumentActionState> => {
     try {
       const result = await mutateDocument(scope, applicationId, operation, attachment!.id, previous, form);

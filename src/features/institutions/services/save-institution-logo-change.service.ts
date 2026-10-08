@@ -21,6 +21,7 @@ export async function saveInstitutionLogoChange(institutionId: string, change: I
 
   const fallback =
     change.intent === INSTITUTION_LOGO_INTENT.REPLACE ? INSTITUTION_ERROR_MESSAGES.LOGO_UPDATE : INSTITUTION_ERROR_MESSAGES.LOGO_REMOVE;
+
   const result = await safelyRunAction(
     change.intent === INSTITUTION_LOGO_INTENT.REPLACE
       ? uploadInstitutionalInstitutionLogo(institutionId, {}, formData)

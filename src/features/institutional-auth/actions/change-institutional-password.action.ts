@@ -49,6 +49,7 @@ export async function changeInstitutionalPasswordAction(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildRequestBody(person, parsed.data)),
   });
+
   const errorState = await getResponseErrorActionState(response, PASSWORD_FIELDS, FALLBACK_ERROR);
 
   if (errorState) {

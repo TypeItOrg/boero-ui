@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Input } from "@common/components/ui/input";
@@ -12,21 +12,21 @@ import { fetchAcademicOptionPage } from "@features/academic/services/academic-op
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 export function CourseInstrumentField({
+  onValueChange,
   fieldErrors,
   institutionId,
   scope,
   editing,
   studyPlanSpaceId,
-  setInstrumentId,
   initialValues,
   instrumentId,
 }: {
+  onValueChange: (value: string | undefined) => void;
   fieldErrors: Record<string, string> | undefined;
   institutionId: string | undefined;
   scope: AcademicScope | undefined;
   editing: boolean;
   studyPlanSpaceId: string | undefined;
-  setInstrumentId: Dispatch<SetStateAction<string | undefined>>;
   initialValues: Record<string, FormValue>;
   instrumentId: string | undefined;
 }): ReactElement {
@@ -49,7 +49,7 @@ export function CourseInstrumentField({
           id="instrumentId"
           key={`instrument-${institutionId}-${studyPlanSpaceId ?? "none"}`}
           name="instrumentDisplay"
-          onValueChange={(value) => setInstrumentId(value)}
+          onValueChange={onValueChange}
           placeholder="Seleccionar instrumento"
           queryKey={["courses", "instruments", scope, institutionId]}
           searchPlaceholder="Buscar instrumento…"

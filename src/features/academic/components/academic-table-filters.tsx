@@ -60,7 +60,9 @@ export function AcademicTableFilters({
 }: AcademicTableFiltersProps): ReactElement {
   const useAdvancedLayout =
     triggerPosition === "external" || advancedSelectFilters.length > 0 || advancedDateFilters.length > 0 || advancedYearFilters.length > 0;
+
   const institutionNode = institutionFilter ? <InstitutionFilterControl filter={institutionFilter} size={size} /> : null;
+
   const studyPlanNode = studyPlanFilter ? (
     <CourseDropdownFilterControl
       emptyIcon={RouteIcon}
@@ -72,6 +74,7 @@ export function AcademicTableFilters({
       size={size}
     />
   ) : null;
+
   const academicSpaceNode = academicSpaceFilter ? (
     <CourseDropdownFilterControl
       emptyIcon={LibraryBigIcon}

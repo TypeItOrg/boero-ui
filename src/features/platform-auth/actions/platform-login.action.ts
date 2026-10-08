@@ -25,6 +25,7 @@ export async function loginPlatform(_previousState: PlatformLoginActionState, fo
   }
 
   const requestHeaders = await headers();
+
   requireGenericPlatformHost(requestHeaders);
 
   const output = await loginPlatformAccount(parsed.data, requestHeaders);

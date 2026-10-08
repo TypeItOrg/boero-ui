@@ -7,6 +7,7 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 
 export async function GET(request: NextRequest, context: { params: Promise<{ courseId: string }> }): Promise<Response> {
   await requirePlatformAccount();
+
   const { courseId } = await context.params;
   const institutionId = request.nextUrl.searchParams.get("institutionId");
   const response = await platformApiFetch(`/api/v1/institutions/${institutionId}/courses/${courseId}/waitlist`);

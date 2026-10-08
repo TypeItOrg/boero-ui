@@ -32,11 +32,14 @@ export function PersonRolesManager({
   const selectedRoleCodeSet = useMemo(() => new Set(selectedRoleCodes), [selectedRoleCodes]);
   const assignedRolesByCode = useMemo(() => new Map(assignedRoles.map((role) => [role.roleId, role])), [assignedRoles]);
   const rolesByCode = useMemo(() => new Map(roles.map((role) => [role.id, role])), [roles]);
+
   const selectedRoles = useMemo(
     () => getSelectedRoles(selectedRoleCodeSet, rolesByCode, assignedRolesByCode),
     [assignedRolesByCode, rolesByCode, selectedRoleCodeSet],
   );
+
   const availableRoles = roles.filter((role) => !selectedRoleCodeSet.has(role.id));
+
   const protectedRoleIds = useMemo(
     () =>
       PeopleScope.isInstitutional(scope)
@@ -44,6 +47,7 @@ export function PersonRolesManager({
         : new Set<string>(),
     [assignedRoles, scope],
   );
+
   const applicantRoleId = roles.find((role) => role.technicalCode === SystemRoleCode.APPLICANT)?.id;
 
   function selectRole(roleId: string): void {
@@ -93,8 +97,10 @@ export function PersonRolesManager({
     roleIds: string[];
   } {
     const candidate = rolesByCode.get(roleId);
+
     const replacesSelectedRoles =
       candidate?.technicalCode === SystemRoleCode.APPLICANT || (applicantRoleId !== undefined && selectedRoleCodeSet.has(applicantRoleId));
+
     const roleIds = replacesSelectedRoles ? [roleId] : [...selectedRoleCodes, roleId];
 
     return { roleIds };

@@ -28,6 +28,7 @@ export function requireGenericPlatformHost(requestHeaders: Pick<Headers, "get">)
 
 export function rebuildInstitutionalHostHeader(outgoing: Headers, requestHeaders: Pick<Headers, "get">): void {
   outgoing.delete(INSTITUTIONAL_HOST_HEADER);
+
   const context = classifyInstitutionalHost(requestHeaders.get("host"));
 
   if (context.kind === InstitutionalHostKind.INVALID) {

@@ -45,6 +45,7 @@ export function InstrumentalCourseCard({
   const missingInstrument = checked && selected.length !== 1;
   const invalid = missingInstrument && showError;
   const selectedOption = variants.find((variant) => variant.courseId === selectedCourse?.courseId);
+
   const fetchInstruments = useCallback(
     async (input: AsyncDropdownFetchPageInput) => {
       const page = await fetchEnrollmentCourses(applicationId, {

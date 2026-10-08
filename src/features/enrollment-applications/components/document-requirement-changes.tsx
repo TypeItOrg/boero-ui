@@ -11,6 +11,7 @@ import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applic
 
 export function DocumentChanges({ requirement }: { requirement: DocumentRequirement }): ReactElement {
   const changes = [...(requirement.changes ?? [])].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+
   const events: Record<string, { title: string; icon: typeof PlusIcon }> = {
     ADDED: { title: "Requisito agregado", icon: PlusIcon },
     UPDATED: { title: "Requisito actualizado", icon: PencilLineIcon },

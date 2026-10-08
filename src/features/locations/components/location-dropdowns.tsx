@@ -109,7 +109,9 @@ async function fetchLocationPage<TItem>(
   { page, search, signal, size }: AsyncDropdownFetchPageInput,
 ): Promise<AsyncDropdownPage<TItem>> {
   const url = new URL(path, window.location.origin);
+
   url.search = buildPaginationSearchParams({ page, size, search }).toString();
+
   const response = await fetch(url, { signal });
   const data = await parseHttpResponse<PaginatedResponse<TItem>>(response, LOCATION_ERROR_MESSAGES.FETCH_LOCATION_PAGE);
 

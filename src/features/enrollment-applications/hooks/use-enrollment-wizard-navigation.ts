@@ -21,11 +21,13 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
   const tabTriggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const hasCenteredInitialTabRef = useRef(false);
   const [pendingFocusFieldId, setPendingFocusFieldId] = useState<string | null>(null);
+
   const [activeTab, setActiveTab] = useState<string>(() => {
     const requestedTab = searchParams.get("tab");
 
     return requestedTab === "training-path" ? "spaces" : requestedTab || "personal";
   });
+
   const hydrated = useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerHydrationSnapshot);
 
   const visibleTabs = useMemo(() => {
@@ -45,13 +47,7 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     }));
   }, [isMinor, hasDocumentsStep]);
 
-  const effectiveActiveTab = visibleTabs.some((tab) => tab.id === activeTab)
-    ? activeTab
-    : activeTab === "responsible"
-      ? "spaces"
-      : activeTab === "documents"
-        ? "preferences"
-        : "personal";
+  const effectiveActiveTab = getEffectiveActiveTab(activeTab, visibleTabs);
 
   useLayoutEffect(() => {
     if (!hydrated) {
@@ -93,7 +89,9 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     setActiveTab(nextTab);
 
     const params = new URLSearchParams(window.location.search);
+
     params.set("tab", nextTab);
+
     const queryString = params.toString();
     const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}${window.location.hash}`;
 
@@ -108,6 +106,7 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     }
 
     const fieldId = pendingFocusFieldId;
+
     // The newly active TabsContent panel mounts through Radix's own Presence
     // state machine, which settles a render pass after this effect runs, so
     // the field isn't in the DOM yet here — defer the lookup a tick.
@@ -127,4 +126,19 @@ export function useEnrollmentWizardNavigation(isMinor: boolean, hasDocumentsStep
     handleActiveTabChange,
     setPendingFocusFieldId,
   };
+}
+
+function getEffectiveActiveTab(activeTab: string, visibleTabs: readonly { id: string }[]): string {
+  if (visibleTabs.some((tab) => tab.id === activeTab)) {
+    return activeTab;
+  }
+
+  switch (activeTab) {
+    case "responsible":
+      return "spaces";
+    case "documents":
+      return "preferences";
+    default:
+      return "personal";
+  }
 }

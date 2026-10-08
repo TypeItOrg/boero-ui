@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { CircleAlertIcon } from "lucide-react";
 
@@ -21,9 +21,7 @@ export function ApplicationCourseAssignmentForm({
   options,
   optionsRevision,
   isPending,
-  setOptions,
-  setLoadError,
-  setOptionsRevision,
+  onRefreshOptions,
   onOpenChange,
 }: {
   formAction: (payload: FormData) => void;
@@ -33,9 +31,7 @@ export function ApplicationCourseAssignmentForm({
   options: CourseEnrollmentAssignmentOptions | undefined;
   optionsRevision: number;
   isPending: boolean;
-  setOptions: Dispatch<SetStateAction<CourseEnrollmentAssignmentOptions | undefined>>;
-  setLoadError: Dispatch<SetStateAction<string | undefined>>;
-  setOptionsRevision: Dispatch<SetStateAction<number>>;
+  onRefreshOptions: () => void;
   onOpenChange: (open: boolean) => void;
 }): ReactElement {
   return (
@@ -65,17 +61,7 @@ export function ApplicationCourseAssignmentForm({
         ) : null}
       </div>
       <AlertDialogFooter className="mx-0 mb-0 shrink-0 sm:flex-wrap">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          disabled={isPending || isLoadingOptions}
-          onClick={() => {
-            setOptions(undefined);
-            setLoadError(undefined);
-            setOptionsRevision((value) => value + 1);
-          }}
-        >
+        <Button type="button" variant="outline" size="lg" disabled={isPending || isLoadingOptions} onClick={onRefreshOptions}>
           Actualizar horarios
         </Button>
         <Button type="button" variant="outline" size="lg" disabled={isPending} onClick={() => onOpenChange(false)}>

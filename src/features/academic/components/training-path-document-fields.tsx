@@ -48,6 +48,7 @@ export function TrainingPathDocumentFields({
       dirty: false,
     })),
   );
+
   const [editing, setEditing] = useState<TrainingPathDocumentDraft | null | undefined>();
   const [creating, setCreating] = useState(false);
   const [dialogBusy, setDialogBusy] = useState(false);

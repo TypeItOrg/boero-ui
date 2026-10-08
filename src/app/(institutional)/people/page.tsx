@@ -40,6 +40,7 @@ export default async function PeoplePage({ searchParams }: { searchParams: Promi
   const { page, size, search, sort, roleId } = parsePeoplePaginationParams(resolvedSearchParams);
   const rolesPromise = fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL);
   const peoplePromise = fetchPeople(user.institutionId, { page, size, search, sort, roleId }, PeopleScope.INSTITUTIONAL);
+
   const [roles, canCreate, canUpdate, canManageRoles] = await Promise.all([
     rolesPromise,
     hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_CREATE),

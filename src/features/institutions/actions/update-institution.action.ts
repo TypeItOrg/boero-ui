@@ -61,6 +61,7 @@ export async function updateInstitutionAction(id: string, formData: FormData): P
   };
 
   const body = new FormData();
+
   body.set("data", new Blob([JSON.stringify(data)], { type: "application/json" }));
 
   if (logoChange.intent === INSTITUTION_LOGO_INTENT.REPLACE) {

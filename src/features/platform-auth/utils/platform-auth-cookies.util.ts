@@ -51,6 +51,7 @@ export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens
 
 export async function clearPlatformAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
+
   cookieStore.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
   cookieStore.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
 }

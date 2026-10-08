@@ -38,6 +38,7 @@ export function RejectEnrollmentApplicationCourseDialog({
   const [state, formAction, isPending] = useActionState(async (_previous: { error?: string }, formData: FormData) => {
     const reason = formData.get("reason");
     const normalizedReason = typeof reason === "string" ? reason : "";
+
     const result = await safelyRunAction(
       scope === AcademicScope.ADMIN && institutionId
         ? rejectPlatformApplicationCourseAction(institutionId, applicationId, course.applicationCourseId, course.version, normalizedReason)

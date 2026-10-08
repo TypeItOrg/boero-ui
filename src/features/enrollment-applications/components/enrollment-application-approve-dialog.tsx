@@ -48,6 +48,7 @@ export function EnrollmentApplicationApproveDialog({
 
     return result;
   }, {});
+
   const error = state.error;
 
   function handleOpenChange(nextOpen: boolean): void {

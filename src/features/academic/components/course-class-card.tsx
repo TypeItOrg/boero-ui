@@ -20,12 +20,14 @@ import { emptyDay, formatCount, individualFormat } from "@features/academic/util
 
 export function ClassCard({ courseClass, fieldErrors, format, institutionId, onRemove, onUpdate, scope, title }: ClassCardProps): ReactElement {
   const teachersFieldId = useId();
+
   const classSummary = [formatCount(courseClass.teachers.length, "docente", "docentes"), formatCount(courseClass.days.length, "día", "días")].join(
     " · ",
   );
 
   function updateDays(values: string[]): void {
     const selectedDays = new Set(values.filter((value): value is CourseWeekDay => COURSE_WEEK_DAY.includes(value as CourseWeekDay)));
+
     onUpdate((draft) => ({
       ...draft,
       days: COURSE_WEEK_DAY.filter((day) => selectedDays.has(day)).map(

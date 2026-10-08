@@ -20,15 +20,19 @@ export function useEnrollmentWizard(props: EnrollmentWizardProps) {
   const [application, setApplication] = useState(initialApplication);
   const [documentsBlocked, setDocumentsBlocked] = useState(false);
   const blockedDocumentsRef = useRef(new Set<string>());
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
-  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState<"cancel" | "submit" | null>(null);
+  const isCancelDialogOpen = confirmation === "cancel";
+  const isSubmitDialogOpen = confirmation === "submit";
   const [validationIssues, setValidationIssues] = useState<z.ZodIssue[]>([]);
 
   const courses = useEnrollmentWizardCourses(props, setValidationIssues);
   const form = useEnrollmentWizardForm(initialApplication.data, initialShifts, readOnly, courses.selectedCourseIds);
+
   const hasDocumentsStep =
     Boolean(application.canReadAttachments) && (application.documents?.some((requirement) => requirement.active !== false) ?? false);
+
   const navigation = useEnrollmentWizardNavigation(form.isMinor, hasDocumentsStep, isSubmitDialogOpen);
+
   const autosave = useEnrollmentDraftAutosave({
     application,
     readOnly,
@@ -38,6 +42,26 @@ export function useEnrollmentWizard(props: EnrollmentWizardProps) {
     selectedTrainingPathId: form.selectedTrainingPathId,
     setApplication,
   });
+
+  function setIsCancelDialogOpen(open: boolean): void {
+    if (open) {
+      setConfirmation("cancel");
+
+      return;
+    }
+
+    setConfirmation((current) => (current === "cancel" ? null : current));
+  }
+
+  function setIsSubmitDialogOpen(open: boolean): void {
+    if (open) {
+      setConfirmation("submit");
+
+      return;
+    }
+
+    setConfirmation((current) => (current === "submit" ? null : current));
+  }
 
   function changeDocumentBlocked(id: string, blocked: boolean): void {
     if (blocked) {

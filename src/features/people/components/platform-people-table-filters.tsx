@@ -40,6 +40,7 @@ export function PlatformPeopleTableFilters({
   size,
 }: PlatformPeopleTableFiltersProps): ReactElement {
   const { navigate } = useDataTableNavigation();
+
   const roleFilter: DataTableSelectFilter<RoleFilterValue> = {
     defaultValue: ALL_ROLES,
     label: "Rol",

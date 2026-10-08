@@ -49,6 +49,7 @@ export function FileDropzone({
     }
 
     event.preventDefault();
+
     const items = Array.from(event.dataTransfer.items).filter((item) => item.kind === "file");
     // Some browsers expose the MIME type only after the file has been dropped.
     const canDrop = !disabled && (items.length === 0 || (items.length === 1 && (!items[0].type || accept.includes(items[0].type))));

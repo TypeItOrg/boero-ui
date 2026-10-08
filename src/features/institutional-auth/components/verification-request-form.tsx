@@ -32,6 +32,7 @@ export function VerificationRequestForm({
     mode === "resend" ? resendEmailVerification : changePendingEmail,
     {},
   );
+
   const [email, setEmail] = useState("");
 
   return (

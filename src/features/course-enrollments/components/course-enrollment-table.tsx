@@ -49,10 +49,12 @@ export function CourseEnrollmentTable({
 }: CourseEnrollmentTableProps): ReactElement {
   const router = useRouter();
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
+
   const [mutation, setMutation] = useState<{
     enrollment: CourseEnrollment;
     mode: "withdraw" | "academic";
   }>();
+
   const hasFilters = status !== undefined || academicStatus !== undefined;
   const hasItemsOnOtherPages = data.totalItems > 0;
   const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : ScrollTextIcon;

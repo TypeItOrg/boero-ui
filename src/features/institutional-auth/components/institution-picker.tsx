@@ -67,10 +67,12 @@ async function fetchInstitutionPage({
   size,
 }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionalInstitution>> {
   const searchParams = buildPaginationSearchParams({ page, search, size });
+
   searchParams.set("active", "true");
   searchParams.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
 
   const response = await fetch(`/api/institutions?${searchParams.toString()}`, { signal });
+
   const data = await parseHttpResponse<{
     items: InstitutionalInstitution[];
     page: number;

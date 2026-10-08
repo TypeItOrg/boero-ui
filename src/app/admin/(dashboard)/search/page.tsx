@@ -23,10 +23,12 @@ export default async function AdminSearchPage({
   const requestedType = typeof rawParams.type === "string" ? rawParams.type : undefined;
   const entityType = isAcademicSearchEntity(requestedType) ? requestedType : undefined;
   const pagination = parsePaginationQuery(rawParams);
+
   const data =
     entityType && pagination.search.length >= 2
       ? await fetchContextualSearchPage(entityType, pagination.search, pagination.page, pagination.size)
       : null;
+
   const title = entityType ? CONTEXTUAL_SEARCH_PRESENTATION[entityType].plural : "Resultados de búsqueda";
   const hasInvalidType = requestedType !== undefined && entityType === undefined;
 

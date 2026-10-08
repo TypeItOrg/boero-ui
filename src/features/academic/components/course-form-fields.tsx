@@ -14,49 +14,19 @@ import { CourseInstrumentField } from "@features/academic/components/course-inst
 import { CourseStudyPlanField } from "@features/academic/components/course-study-plan-field";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { type ClassDraft } from "@features/academic/types/course-class-draft.types";
-import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
-import { individualFormat, parseInitialClasses, parseNullableInt } from "@features/academic/utils/course-form-draft.util";
+import { createCourseClassDrafts, serializeCourseClasses } from "@features/academic/utils/course-form-draft.util";
+import { changeCourseAcademicSpace, changeCourseStudyPlan, createCourseFormSelection } from "@features/academic/utils/course-form-selection.util";
 
-export function CourseFields({ institutionField, institutionId, scope, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
+export function CourseFields(props: AcademicFieldsProps): ReactElement {
+  return <CourseFormFields key={`${props.scope}:${props.institutionId}:${props.initialValues?.id ?? "new"}`} {...props} />;
+}
+
+function CourseFormFields({ institutionField, institutionId, scope, initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const editing = Boolean(initialValues.id);
-  const initialClasses = parseInitialClasses(initialValues.classes);
-  const initialFormat = toOptionalFormString(initialValues.academicSpaceFormat);
-
-  const [studyPlanId, setStudyPlanId] = useState(toOptionalFormString(initialValues.studyPlanId));
-  const [spaceId, setSpaceId] = useState(toOptionalFormString(initialValues.studyPlanSpaceId));
-  const [academicSpaceId, setAcademicSpaceId] = useState(toOptionalFormString(initialValues.academicSpaceId));
-  const [studyPlanSpaceId, setStudyPlanSpaceId] = useState(toOptionalFormString(initialValues.studyPlanSpaceId));
-  const [instrumentId, setInstrumentId] = useState(toOptionalFormString(initialValues.instrumentId));
-  const [instrumental, setInstrumental] = useState(Boolean(initialValues.academicSpaceInstrumental));
-  const [spaceLabel, setSpaceLabel] = useState<string | undefined>(undefined);
+  const [selection, setSelection] = useState(() => createCourseFormSelection(initialValues));
+  const { studyPlanId, studyPlanSpaceId, academicSpaceId, instrumentId, instrumental, spaceLabel, format } = selection;
   const [academicYearId, setAcademicYearId] = useState(toOptionalFormString(initialValues.academicYearId));
-  const [format, setFormat] = useState<string | undefined>(initialFormat === "INDIVIDUAL" || initialFormat === "GRUPAL" ? initialFormat : undefined);
-  const [classes, setClasses] = useState<ClassDraft[]>(() =>
-    initialClasses.map((entry) => {
-      const courseClass = entry as {
-        teachers?: { personId: string; fullName: string }[];
-        days?: {
-          dayOfWeek: CourseWeekDay;
-          capacity: number | null;
-          periodDurationMinutes: number | null;
-          schedules?: { startTime: string; endTime: string }[];
-        }[];
-      };
-
-      return {
-        teachers: courseClass.teachers ?? [],
-        days: (courseClass.days ?? []).map((day) => ({
-          dayOfWeek: day.dayOfWeek,
-          capacity: day.capacity != null ? String(day.capacity) : "",
-          periodDurationMinutes: day.periodDurationMinutes != null ? String(day.periodDurationMinutes) : "",
-          schedules: (day.schedules ?? []).map((schedule) => ({
-            startTime: schedule.startTime.slice(0, 5),
-            endTime: schedule.endTime.slice(0, 5),
-          })),
-        })),
-      };
-    }),
-  );
+  const [classes, setClasses] = useState<ClassDraft[]>(() => createCourseClassDrafts(initialValues.classes));
 
   const classesLocked = classes.length > 0;
 
@@ -64,17 +34,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
     setClasses((current) => current.map((draft, classIndex) => (classIndex === index ? updater(draft) : draft)));
   }
 
-  const serializedClasses = JSON.stringify(
-    classes.map((courseClass) => ({
-      teacherIds: courseClass.teachers.map((teacher) => teacher.personId),
-      days: courseClass.days.map((day) => ({
-        dayOfWeek: day.dayOfWeek,
-        capacity: individualFormat(format) ? null : parseNullableInt(day.capacity),
-        periodDurationMinutes: individualFormat(format) ? parseNullableInt(day.periodDurationMinutes) : null,
-        schedules: day.schedules,
-      })),
-    })),
-  );
+  const serializedClasses = serializeCourseClasses(classes, format);
 
   return (
     <>
@@ -103,16 +63,9 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
             scope={scope}
             editing={editing}
             classesLocked={classesLocked}
-            setStudyPlanId={setStudyPlanId}
-            setSpaceId={setSpaceId}
-            setAcademicSpaceId={setAcademicSpaceId}
-            setStudyPlanSpaceId={setStudyPlanSpaceId}
-            setInstrumentId={setInstrumentId}
-            setInstrumental={setInstrumental}
-            setSpaceLabel={setSpaceLabel}
-            setFormat={setFormat}
             initialValues={initialValues}
             studyPlanId={studyPlanId}
+            onValueChange={(value) => setSelection((current) => changeCourseStudyPlan(current, value))}
           />
 
           <CourseAcademicSpaceField
@@ -122,16 +75,10 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
             studyPlanId={studyPlanId}
             editing={editing}
             classesLocked={classesLocked}
-            setSpaceId={setSpaceId}
-            setStudyPlanSpaceId={setStudyPlanSpaceId}
-            setAcademicSpaceId={setAcademicSpaceId}
-            setInstrumentId={setInstrumentId}
-            setInstrumental={setInstrumental}
-            setSpaceLabel={setSpaceLabel}
-            setFormat={setFormat}
             spaceLabel={spaceLabel}
             initialValues={initialValues}
-            spaceId={spaceId}
+            spaceId={studyPlanSpaceId}
+            onValueChange={(value, item) => setSelection((current) => changeCourseAcademicSpace(current, value, item))}
           />
 
           {instrumental ? (
@@ -141,9 +88,9 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
               scope={scope}
               editing={editing}
               studyPlanSpaceId={studyPlanSpaceId}
-              setInstrumentId={setInstrumentId}
               initialValues={initialValues}
               instrumentId={instrumentId}
+              onValueChange={(value) => setSelection((current) => ({ ...current, instrumentId: value }))}
             />
           ) : null}
 
@@ -161,7 +108,7 @@ export function CourseFields({ institutionField, institutionId, scope, initialVa
 
       <CourseClassesSection
         classes={classes}
-        spaceId={spaceId}
+        spaceId={studyPlanSpaceId}
         setClasses={setClasses}
         fieldErrors={fieldErrors}
         format={format}

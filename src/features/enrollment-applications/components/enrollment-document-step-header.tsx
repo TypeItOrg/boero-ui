@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { FileTextIcon, PlusIcon, RefreshCwIcon } from "lucide-react";
 
@@ -13,18 +13,14 @@ export function EnrollmentDocumentStepHeader({
   title,
   application,
   requestUncertain,
-  setRequesting,
-  refresh,
-  setRequestUncertain,
-  setError,
+  onRequest,
+  onReload,
 }: {
   title: string;
   application: EnrollmentApplicationResponse;
   requestUncertain: boolean;
-  setRequesting: Dispatch<SetStateAction<boolean>>;
-  refresh: () => Promise<void>;
-  setRequestUncertain: Dispatch<SetStateAction<boolean>>;
-  setError: Dispatch<SetStateAction<string>>;
+  onRequest: () => void;
+  onReload: () => Promise<void>;
 }): ReactElement {
   return (
     <EnrollmentStepCardHeader
@@ -42,22 +38,13 @@ export function EnrollmentDocumentStepHeader({
               aria-label="Solicitar documentación"
               title="Solicitar documentación"
               disabled={requestUncertain}
-              onClick={() => setRequesting(true)}
+              onClick={onRequest}
             >
               <PlusIcon aria-hidden="true" />
               <span className="@xl/section-header:hidden">Solicitar documentación</span>
             </Button>
             {requestUncertain ? (
-              <Button
-                size="lg"
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  void refresh()
-                    .then(() => setRequestUncertain(false))
-                    .catch(() => setError("No se pudo recargar el detalle. Intentá nuevamente."))
-                }
-              >
+              <Button size="lg" type="button" variant="outline" onClick={() => void onReload()}>
                 <RefreshCwIcon />
                 Recargar detalle antes de reintentar
               </Button>

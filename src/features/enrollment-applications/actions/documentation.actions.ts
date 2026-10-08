@@ -50,6 +50,7 @@ export async function mutateDocument(
     }
 
     const body = new FormData();
+
     body.set("file", file);
     body.set("requirementId", input.targetId);
     options = { method: "POST", body };
@@ -104,6 +105,7 @@ export async function saveDocumentRequirement(
       id: z.string().uuid().nullable(),
     })
     .safeParse({ scope, institutionId, pathId, id });
+
   const request = parseDocumentRequirementForm(form);
 
   if (!args.success || !request.success) {
@@ -112,6 +114,7 @@ export async function saveDocumentRequirement(
 
   const input = args.data;
   const path = `${getAcademicApiBase(input.scope, input.institutionId)}/training-paths/${input.pathId}/document-requirements${input.id ? `/${input.id}` : ""}`;
+
   const error = await getResponseErrorActionState(
     academicApiFetch(input.scope, path, {
       method: input.id ? "PUT" : "POST",

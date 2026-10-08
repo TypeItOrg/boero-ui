@@ -43,6 +43,7 @@ export async function fetchAvailableEnrollmentTrainingPaths(params: { page?: num
     page: String(params.page ?? 0),
     size: String(params.size ?? 20),
   });
+
   const response = await institutionalApiFetch(`${ENROLLMENT_APPLICATIONS_API_PATH}/options/training-paths?${searchParams.toString()}`, {
     method: "GET",
   });

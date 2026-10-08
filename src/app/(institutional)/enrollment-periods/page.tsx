@@ -40,6 +40,7 @@ export default async function EnrollmentPeriodsPage({ searchParams }: Props) {
   }
 
   const params = parseEnrollmentPeriodPaginationParams(await searchParams);
+
   const [periodsData, selectedAcademicYear] = await Promise.all([
     listEnrollmentPeriods(user.institutionId, params),
     params.academicYearId ? fetchAcademicYear(AcademicScope.INSTITUTIONAL, user.institutionId, params.academicYearId) : null,

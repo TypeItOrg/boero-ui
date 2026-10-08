@@ -33,6 +33,7 @@ export function DocumentCatalogReadDetail({
 }): ReactElement {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
+
   const [sort, setSort] = useState<Sort<DocumentAssignmentSortField>>({
     field: "displayOrder",
     direction: "asc",

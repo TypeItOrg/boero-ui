@@ -32,7 +32,6 @@ export function DocumentCatalogAssignmentSection({
   page,
   associations,
   totalItems,
-  setAssociationsLoading,
   setPage,
   currentId,
   totalPages,
@@ -51,7 +50,6 @@ export function DocumentCatalogAssignmentSection({
   page: number;
   associations: PaginatedResponse<DocumentAssignment> | undefined;
   totalItems: number;
-  setAssociationsLoading: Dispatch<SetStateAction<boolean>>;
   setPage: Dispatch<SetStateAction<number>>;
   currentId: string | undefined;
   totalPages: number;
@@ -131,7 +129,6 @@ export function DocumentCatalogAssignmentSection({
         <DocumentCatalogAssignmentsEmptyState
           hasItemsOnOtherPages
           onFirstPage={() => {
-            setAssociationsLoading(true);
             setPage(0);
           }}
         />
@@ -146,13 +143,10 @@ export function DocumentCatalogAssignmentSection({
             pageSizeOptions={PAGE_SIZE_OPTIONS}
             isPending={disabled || associationsLoading}
             onPageChange={(value) => {
-              setAssociationsLoading(true);
               setPage(value);
             }}
             onPageSizeChange={(value) => {
-              setAssociationsLoading(true);
               setPageSize(Number(value));
-              setPage(0);
             }}
           />
         </div>

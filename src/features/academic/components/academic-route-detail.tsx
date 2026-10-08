@@ -32,14 +32,17 @@ import { requireInstitutionalUser } from "@features/institutional-auth/services/
 
 export async function renderPrimaryDetail(input: RouteDetailInput): Promise<ReactElement> {
   const config = ACADEMIC_COLLECTION_CONFIG[input.resource];
+
   const curriculumPromise =
     input.resource === AcademicResource.STUDY_PLAN && !input.action
       ? fetchStudyPlanCurriculum(input.scope, input.institutionId, input.id)
       : Promise.resolve(null);
+
   const itemPromise =
     input.resource === AcademicResource.STUDY_PLAN && !input.action
       ? Promise.resolve(null)
       : config.fetchDetail(input.scope, input.institutionId, input.id);
+
   const usagePagination =
     input.resource === AcademicResource.ACADEMIC_SPACE && !input.action && input.access.studyPlanRead
       ? parsePaginationQuery({
@@ -47,12 +50,14 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           size: input.searchParams.usageSize,
         })
       : null;
+
   const academicSpaceUsagePromise = usagePagination
     ? fetchAcademicSpaceUsage(input.scope, input.institutionId, input.id, {
         page: usagePagination.page,
         size: usagePagination.size,
       })
     : Promise.resolve(null);
+
   const [curriculum, fetchedItem, academicSpaceUsage] = await Promise.all([curriculumPromise, itemPromise, academicSpaceUsagePromise]);
   const item = curriculum?.studyPlan ?? fetchedItem;
 
@@ -75,11 +80,13 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
   const isNoDetailResource = input.resource === AcademicResource.ACADEMIC_YEAR;
   const canEdit = config.canUpdate(input.access) && canEditAcademicResource(input.resource, item);
   const canEditCurriculum = input.access.studyPlanCurriculumUpdate && curriculum !== null && curriculum.studyPlan.status === "DRAFT";
+
   const canCreateVersion =
     input.resource === AcademicResource.STUDY_PLAN &&
     input.access.studyPlanCreate &&
     (item as StudyPlan).status !== "DRAFT" &&
     item.deletedAt == null;
+
   const statusAction = getAcademicDetailStatusAction({
     input,
     config,
@@ -101,10 +108,12 @@ export async function renderPrimaryDetail(input: RouteDetailInput): Promise<Reac
           trainingPath: item as TrainingPath,
         })
       : null;
+
   const breadcrumb = input.renderBreadcrumb({
     segmentHrefs: isNoDetailResource ? { [input.id]: collectionPath } : undefined,
     segmentLabels: { [input.id]: config.getTitle(item) },
   });
+
   const versionAction = canCreateVersion ? (
     <Button asChild size="lg" variant="outline">
       <ReturnToLink href={`${detailPath}/versions/new`} returnTo={versionReturnTo}>

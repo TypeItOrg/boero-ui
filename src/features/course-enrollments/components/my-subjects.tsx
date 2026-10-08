@@ -30,10 +30,12 @@ type MySubjectsProps = {
 export function MySubjects({ data, page, size, status, academicStatus, canWithdraw, canUpdateAcademicStatus }: MySubjectsProps): ReactElement {
   const router = useRouter();
   const { isPending, navigate } = useDataTableNavigation();
+
   const [mutation, setMutation] = useState<{
     enrollment: CourseEnrollment;
     mode: "withdraw" | "academic";
   }>();
+
   const isHistory = status !== COURSE_ENROLLMENT_STATUS.ENROLLED;
   const hasFilters = isHistory && (status !== COURSE_ENROLLMENT_STATUS.COMPLETED || academicStatus !== undefined);
   const hasItemsOnOtherPages = data.totalItems > 0;

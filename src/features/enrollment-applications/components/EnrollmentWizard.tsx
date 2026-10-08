@@ -21,6 +21,10 @@ import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications
 import type { EnrollmentWizardProps } from "@features/enrollment-applications/types/enrollment-wizard-props.types";
 
 export function EnrollmentWizard(props: EnrollmentWizardProps): ReactElement {
+  return <EnrollmentWizardView key={props.initialApplication.applicationId} {...props} />;
+}
+
+function EnrollmentWizardView(props: EnrollmentWizardProps): ReactElement {
   const model = useEnrollmentWizard(props);
   const { application, validationIssues } = model;
 

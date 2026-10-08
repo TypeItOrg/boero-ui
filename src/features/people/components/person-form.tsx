@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition, type ReactElement } from "react";
+import { startTransition, useActionState, useMemo, type ReactElement } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -55,7 +55,11 @@ type EditMode = PersonFormCommonProps & {
 
 type PersonFormProps = CreateMode | EditMode;
 
-export function PersonForm({
+export function PersonForm(props: PersonFormProps): ReactElement {
+  return <PersonFormView key={`${props.scope ?? PeopleScope.ADMIN}:${props.institutionId}:${props.person?.personId ?? "new"}`} {...props} />;
+}
+
+function PersonFormView({
   mode,
   institutionId,
   person,
@@ -69,8 +73,6 @@ export function PersonForm({
 }: PersonFormProps): ReactElement {
   const router = useRouter();
   const isEdit = mode === FORM_MODE.EDIT;
-  const [isPending, startTransition] = useTransition();
-  const [formError, setFormError] = useState<string>();
   const listPath = PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`;
   const destination = returnTo ?? listPath;
   const resolver = getPersonFormResolver(isEdit);
@@ -85,33 +87,38 @@ export function PersonForm({
     resolver,
     defaultValues: getDefaultValues(person),
   });
+
+  const [actionState, formAction, isPending] = useActionState(
+    async (_previous: PersonActionState, values: PersonFormInput): Promise<PersonActionState> => {
+      if (assignments?.some((assignment) => assignment.accessScope === "TRAINING_PATHS" && assignment.trainingPathIds.length === 0)) {
+        return { error: ROLE_SCOPE_MESSAGES.REQUIRED_ASSIGNMENT };
+      }
+
+      onPendingChange?.(true);
+
+      try {
+        const formData = getFormData(values, isEdit, canEdit, assignments);
+        const result = await submitPerson(formData);
+        const hasFieldErrors = setActionFieldErrors(result, setError);
+
+        if (result.success) {
+          router.push(destination);
+        }
+
+        return { ...result, error: hasFieldErrors ? undefined : result.error };
+      } finally {
+        onPendingChange?.(false);
+      }
+    },
+    {},
+  );
+
+  const formError = actionState.error;
   const errorState = useMemo(() => ({ error: formError, fieldErrors: errors }), [formError, errors]);
   const formRef = useActionFormErrorFocus(errorState, isPending);
 
-  useEffect(() => {
-    onPendingChange?.(isPending);
-  }, [isPending, onPendingChange]);
-
   function onSubmit(values: PersonFormInput): void {
-    if (assignments?.some((assignment) => assignment.accessScope === "TRAINING_PATHS" && assignment.trainingPathIds.length === 0)) {
-      setFormError(ROLE_SCOPE_MESSAGES.REQUIRED_ASSIGNMENT);
-
-      return;
-    }
-
-    setFormError(undefined);
-
-    startTransition(async () => {
-      const formData = getFormData(values, isEdit, canEdit, assignments);
-      const result = await submitPerson(formData);
-
-      const hasFieldErrors = setActionFieldErrors(result, setError);
-      setFormError(hasFieldErrors ? undefined : result.error);
-
-      if (result.success) {
-        router.push(destination);
-      }
-    });
+    startTransition(() => formAction(values));
   }
 
   async function submitPerson(formData: FormData): Promise<PersonActionState> {

@@ -44,6 +44,7 @@ export function PersonEditForm({
 }: PersonEditFormProps): ReactElement {
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const [selectedRoleCodes, setSelectedRoleCodes] = useState<string[]>(() => assignedRoles.map((role) => role.roleId));
+
   const [roleScopes, setRoleScopes] = useState<Record<string, RoleAssignment>>(() =>
     Object.fromEntries(
       assignedRoles.map((role) => [
@@ -56,6 +57,7 @@ export function PersonEditForm({
       ]),
     ),
   );
+
   const assignments = selectedRoleCodes.map((roleId) => roleScopes[roleId] ?? { roleId, accessScope: "INSTITUTION" as const, trainingPathIds: [] });
   const [isPending, setIsPending] = useState(false);
   const destination = returnTo ?? (PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);

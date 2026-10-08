@@ -40,19 +40,23 @@ export async function AcademicCollectionView({
   const parsedParams = parseAcademicPaginationParams(searchParams, resource);
   const params = isTrainingPathFixed ? { ...parsedParams, trainingPathId: fixedTrainingPathId } : parsedParams;
   const effectiveInstitutionId = global ? params.institutionId : institutionId;
+
   const data = await config.fetchPage({
     ...params,
     global,
     institutionId: effectiveInstitutionId,
     scope,
   });
+
   const selectedTrainingPath = data.items.find((item) => "trainingPathId" in item && item.trainingPathId === params.trainingPathId);
   const selectedStudyPlan = data.items.find((item) => "studyPlanId" in item && item.studyPlanId === params.studyPlanId);
   const selectedAcademicSpace = data.items.find((item) => "academicSpaceId" in item && item.academicSpaceId === params.academicSpaceId);
   const user = scope === "institutional" ? await requireInstitutionalUser() : null;
+
   const rows = data.items
     .map((item) => {
       const row = config.toRow(item);
+
       const permissionResource =
         resource === "training-paths" ? "training-path" : resource === "study-plans" ? "study-plan" : resource === "courses" ? "course" : null;
 
@@ -61,6 +65,7 @@ export async function AcademicCollectionView({
       }
 
       const pathId = resource === "training-paths" ? item.id : "trainingPathId" in item ? String(item.trainingPathId) : "";
+
       const permits = (action: string) =>
         scopeIncludesTrainingPath(user.permissionScopes, `institution:${permissionResource}:${action}` as InstitutionalPermission, pathId);
 
@@ -83,6 +88,7 @@ export async function AcademicCollectionView({
 
       return { ...row, detailValues: row.detailValues.slice(1) };
     });
+
   const filterState = getAcademicCollectionFilters({
     config,
     params,

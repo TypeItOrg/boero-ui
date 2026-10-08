@@ -28,6 +28,7 @@ export function getPermissionTree(
     }
 
     const children = childrenByParentCode.get(parentCode) ?? [];
+
     children.push(permission);
     childrenByParentCode.set(parentCode, children);
   }
@@ -37,6 +38,7 @@ export function getPermissionTree(
 
   function buildTree(permission: InstitutionPermission, ancestorCodes: ReadonlySet<string> = new Set()): PermissionTreeNode {
     const nextAncestorCodes = new Set(ancestorCodes).add(permission.code);
+
     const children = (childrenByParentCode.get(permission.code) ?? [])
       .filter((child) => !nextAncestorCodes.has(child.code))
       .sort(sortByOriginalOrder)

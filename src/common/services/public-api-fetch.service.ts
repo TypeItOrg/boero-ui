@@ -7,6 +7,7 @@ import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 
 export async function publicApiFetch(path: string, init: RequestInit = {}, requestHeaders?: Pick<Headers, "get">): Promise<Response> {
   const outgoing = new Headers(init.headers);
+
   outgoing.delete(INSTITUTIONAL_HOST_HEADER);
 
   if (!outgoing.has("Accept")) {

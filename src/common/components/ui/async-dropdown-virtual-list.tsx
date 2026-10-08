@@ -76,6 +76,7 @@ export function VirtualizedDropdownItems<TItem>({
       <div className="relative w-full" style={{ height: virtualContentHeight }}>
         {virtualItems.map((virtualItem) => {
           const row = rows[virtualItem.index];
+
           const rowStyle = {
             height: measureRows ? undefined : virtualItem.size,
             transform: `translateY(${virtualItem.start}px)`,

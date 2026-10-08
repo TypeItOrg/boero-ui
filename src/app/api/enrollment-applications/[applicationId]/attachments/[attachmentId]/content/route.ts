@@ -41,10 +41,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
     }
 
     const body = await response.arrayBuffer();
+
     const headers = new Headers({
       "cache-control": "private, no-store",
       "x-content-type-options": "nosniff",
     });
+
     const contentType = response.headers.get("content-type");
     const contentDisposition = response.headers.get("content-disposition");
     const contentLength = response.headers.get("content-length");

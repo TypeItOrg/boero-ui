@@ -15,6 +15,7 @@ export function PrerequisiteFields({ excludedPlanSpaceId, initialValues = {}, fi
       value: space.id,
       label: [space.academicLevelName, space.academicSpaceName].filter(Boolean).join(" · "),
     }));
+
   const hasAvailableSpaces = options.length > 0;
 
   return (

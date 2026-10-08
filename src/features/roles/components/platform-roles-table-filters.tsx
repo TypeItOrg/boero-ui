@@ -35,6 +35,7 @@ export function PlatformRolesTableFilters({
   triggerPosition,
 }: PlatformRolesTableFiltersProps): ReactElement {
   const { navigate } = useDataTableNavigation();
+
   const roleTypeFilter: DataTableSelectFilter = {
     defaultValue: ROLE_TYPE_FILTER,
     label: "Tipo",

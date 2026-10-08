@@ -47,11 +47,13 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
   const canReadInstitution = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ);
   const canReadEnrollmentPeriods = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_READ);
+
   const platformItems: NavigationItem[] = [
     ...(canReadInstitution ? [{ title: "Institución", url: "/institution", icon: Building2Icon }] : []),
     ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
     ...(canReadRoles ? [{ title: "Roles y permisos", url: "/roles", icon: UserLockIcon }] : []),
   ];
+
   const academicItems: NavigationItem[] = [
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)
       ? [{ title: "Documentación", url: "/documentation", icon: FileTextIcon }]

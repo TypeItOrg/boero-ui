@@ -43,6 +43,7 @@ export async function DocumentCatalogNewPage({
 
   if (scope === "admin") {
     await requirePlatformAccount();
+
     const parsed = z.uuid().safeParse(params.institutionId);
 
     if (params.institutionId !== undefined && !parsed.success) {
@@ -90,6 +91,7 @@ export async function DocumentCatalogNewPage({
     }
 
     const source: DocumentDefinition = await response.json();
+
     defaults = {
       name: source.name,
       instructions: source.instructions,

@@ -107,6 +107,7 @@ export function InstitutionsTablePresentation({ data, page, size, sort, search, 
           }}
           onUpdated={() => {
             const nextActive = !statusTargetInstitution.active;
+
             toast.success(`${statusTargetInstitution.name} fue ${nextActive ? "activada" : "desactivada"}.`);
             setStatusTargetInstitution(undefined);
             router.refresh();

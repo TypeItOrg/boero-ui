@@ -39,6 +39,7 @@ export function PasskeyReauthDialog({ onClose, onVerified }: PasskeyReauthDialog
     }
 
     const formData = new FormData(event.currentTarget);
+
     startTransition(() => action(formData));
   }
 

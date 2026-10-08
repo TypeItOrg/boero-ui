@@ -55,7 +55,7 @@ export function useAsyncDropdown<TItem>({
   const debouncedSearch = useDebouncedValue(search, debounceMs);
   const virtualListKey = `${listRenderVersion}-${debouncedSearch}`;
 
-  const asyncQueryKey = useMemo(() => [...queryKey, { search: debouncedSearch, size: pageSize }], [debouncedSearch, pageSize, queryKey]);
+  const asyncQueryKey = [...queryKey, { search: debouncedSearch, size: pageSize }];
 
   const query = useInfiniteQuery({
     queryKey: asyncQueryKey,
@@ -69,7 +69,8 @@ export function useAsyncDropdown<TItem>({
 
   const { data } = query;
   const items = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
-  const selectedItem = useMemo(() => items.find((item) => getItemValue(item) === value), [getItemValue, items, value]);
+  const selectedItem = items.find((item) => getItemValue(item) === value);
+
   const selectedText = getSelectedText({
     defaultOption,
     getItemLabel,
@@ -78,7 +79,12 @@ export function useAsyncDropdown<TItem>({
     selectedLabel,
     value,
   });
-  const isSelected = selectedItem !== undefined || selectedLabel !== undefined || (defaultOption !== undefined && value === defaultOption.value);
+
+  const isSelected =
+    selectedItem !== undefined ||
+    (value !== undefined && selectedLabel !== undefined) ||
+    (defaultOption !== undefined && value === defaultOption.value);
+
   const isPlaceholder = !isSelected;
   const canClear = clearable && value !== undefined;
 

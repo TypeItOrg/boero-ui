@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, type SetStateAction } from "react";
+
+import { useQuery } from "@tanstack/react-query";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 
@@ -14,7 +16,6 @@ export function useDocumentAssignmentPage({
   institutionId,
   targetInstitutionId,
   currentId,
-  initial,
   allowAssignments,
   savedDocument,
 }: {
@@ -22,54 +23,50 @@ export function useDocumentAssignmentPage({
   institutionId?: string;
   targetInstitutionId?: string;
   currentId?: string;
-  initial?: DocumentDefinition;
   allowAssignments: boolean;
   savedDocument?: DocumentDefinition;
 }) {
   const assignmentInstitutionId = targetInstitutionId ?? institutionId;
-  const [associations, setAssociations] = useState<PaginatedResponse<DocumentAssignment>>();
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
-  const [associationsLoading, setAssociationsLoading] = useState(Boolean(initial && allowAssignments));
-  const [readError, setReadError] = useState("");
-  useEffect(() => {
-    if (!institutionId || !currentId || !allowAssignments || assignmentInstitutionId !== institutionId) {
-      return;
-    }
+  const identity = JSON.stringify([scope, institutionId, assignmentInstitutionId, currentId]);
+  const [pagination, setPagination] = useState({ identity, page: 0, size: 20 });
 
-    const controller = new AbortController();
-    void fetchDocumentCatalog<PaginatedResponse<DocumentAssignment>>(
-      scope,
-      institutionId,
-      `/${currentId}/training-paths?page=${page}&size=${pageSize}&active=true`,
-      controller.signal,
-    )
-      .then((data) => {
-        setAssociations(data);
-        setAssociationsLoading(false);
+  if (pagination.identity !== identity) {
+    setPagination({ identity, page: 0, size: pagination.size });
+  }
 
-        setReadError("");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setReadError("No se pudieron consultar los trayectos. Reintentá la consulta.");
-          setAssociationsLoading(false);
-        }
-      });
+  const page = pagination.identity === identity ? pagination.page : 0;
+  const enabled = Boolean(institutionId && currentId && allowAssignments && assignmentInstitutionId === institutionId);
 
-    return () => controller.abort();
-  }, [scope, institutionId, assignmentInstitutionId, currentId, page, pageSize, allowAssignments, savedDocument]);
+  const query = useQuery({
+    queryKey: ["document-catalog-assignments", scope, institutionId, currentId, savedDocument?.revision, page, pagination.size],
+    enabled,
+    queryFn: ({ signal }) =>
+      fetchDocumentCatalog<PaginatedResponse<DocumentAssignment>>(
+        scope,
+        institutionId!,
+        `/${currentId}/training-paths?page=${page}&size=${pagination.size}&active=true`,
+        signal,
+      ),
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  function setPage(value: SetStateAction<number>): void {
+    setPagination((previous) => ({ ...previous, page: typeof value === "function" ? value(previous.page) : value }));
+  }
+
+  function setPageSize(value: SetStateAction<number>): void {
+    setPagination((previous) => ({ ...previous, page: 0, size: typeof value === "function" ? value(previous.size) : value }));
+  }
 
   return {
-    associations,
-    setAssociations,
+    associations: enabled ? query.data : undefined,
     page,
     setPage,
-    pageSize,
+    pageSize: pagination.size,
     setPageSize,
-    associationsLoading,
-    setAssociationsLoading,
-    readError,
-    setReadError,
+    associationsLoading: enabled && query.isFetching,
+    readError: enabled && query.isError ? "No se pudieron consultar los trayectos. Reintentá la consulta." : "",
   };
 }

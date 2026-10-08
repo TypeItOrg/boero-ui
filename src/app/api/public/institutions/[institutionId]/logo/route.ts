@@ -40,6 +40,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
 
     while (initialSize < 8 && !complete) {
       const chunk = await reader.read();
+
       complete = chunk.done;
 
       if (chunk.value) {
@@ -59,6 +60,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
 
     for (const chunk of initialChunks) {
       const prefix = chunk.subarray(0, signature.byteLength - offset);
+
       signature.set(prefix, offset);
       offset += prefix.byteLength;
 
@@ -79,6 +81,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
     }
 
     let total = initialSize;
+
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
         for (const chunk of initialChunks) {

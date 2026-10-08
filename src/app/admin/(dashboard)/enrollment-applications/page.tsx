@@ -29,6 +29,7 @@ export default async function PlatformEnrollmentApplicationsPage({
 }): Promise<ReactElement> {
   const resolvedSearchParams = await searchParams;
   const { page, size, status, trainingPathId, open, pendingDocuments } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
+
   const dataPromise = fetchPlatformEnrollmentApplications({
     page,
     size,
@@ -37,6 +38,7 @@ export default async function PlatformEnrollmentApplicationsPage({
     open,
     pendingDocuments,
   });
+
   const { items: trainingPaths } = await fetchTrainingPaths(AcademicScope.ADMIN, undefined, {
     active: true,
     size: 100,

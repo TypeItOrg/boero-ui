@@ -73,6 +73,7 @@ export function EnrollmentCoursesSelector({
         for (const [key, variants] of groups) {
           const levelName = variants[0].academicLevelName ?? "Sin nivel";
           const level = levels.get(levelName) ?? new Map<string, EnrollmentCourseOption[]>();
+
           level.set(key, variants);
           levels.set(levelName, level);
         }

@@ -11,6 +11,7 @@ const COOKIE = "institutional_email_verification_context";
 // Navigation context only: every mutation validates identity and credentials again in the API.
 export async function setEmailVerificationContext(context: EmailVerificationContext): Promise<void> {
   const parsed = emailVerificationContextSchema.parse(context);
+
   (await cookies()).set(COOKIE, JSON.stringify(parsed), getInstitutionalAuthCookieOptions(15 * 60));
 }
 

@@ -37,13 +37,16 @@ export function useDocumentCatalogForm({
 }: DocumentCatalogFormProps) {
   const router = useRouter();
   const [name, setName] = useState(initial?.name ?? defaults?.name ?? "");
+
   const [allowedFormats, setAllowedFormats] = useState<string[]>(
     () => initial?.allowedFormats ?? defaults?.allowedFormats ?? DOCUMENT_FILE_CATEGORIES.flatMap((category) => [...category.formats]),
   );
+
   const [confirmationData, setConfirmationData] = useState<FormData>();
   const [confirmationState, setConfirmationState] = useState<DocumentCatalogActionState>();
   const [saveUncertainError, setSaveUncertainError] = useState("");
   const saveButtonRef = useRef<HTMLButtonElement>(null);
+
   const [directState, action, pending] = useActionState(async (previous: DocumentCatalogActionState, form: FormData) => {
     onPendingChange?.(true);
 
@@ -62,8 +65,10 @@ export function useDocumentCatalogForm({
       onPendingChange?.(false);
     }
   }, {});
+
   const state = confirmationState ?? directState;
   const currentId = state.document?.id ?? initial?.id;
+
   const {
     changes,
     setChanges,
@@ -81,7 +86,6 @@ export function useDocumentCatalogForm({
     removePath,
     setPage,
     setPageSize,
-    setAssociationsLoading,
   } = useDocumentCatalogAssignments({
     scope,
     institutionId,
@@ -91,6 +95,7 @@ export function useDocumentCatalogForm({
     allowAssignments,
     savedDocument: state.document,
   });
+
   const { impact, impactError } = useDocumentCatalogImpact(scope, institutionId, currentId, state.document);
   const disabled = pending || state.uncertain === true || Boolean(saveUncertainError);
   const hasValidRequiredFields = Boolean(institutionId) && requiredDocumentFieldsSchema.safeParse({ name, allowedFormats }).success;
@@ -136,7 +141,6 @@ export function useDocumentCatalogForm({
     page,
     associations,
     totalItems,
-    setAssociationsLoading,
     setPage,
     totalPages,
     pageSize,

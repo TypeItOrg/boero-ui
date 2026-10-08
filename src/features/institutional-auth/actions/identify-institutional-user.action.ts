@@ -48,6 +48,7 @@ export async function identifyInstitutionalUser(
       ...parsed.data,
       institutionName: formData.get("institutionName") || undefined,
     });
+
     await setEmailVerificationContext(context.success ? context.data : parsed.data);
     redirect("/auth/email-verification");
   }

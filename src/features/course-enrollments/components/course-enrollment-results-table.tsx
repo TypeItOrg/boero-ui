@@ -41,11 +41,13 @@ export function CourseEnrollmentResultsTable({
             canWithdraw &&
             scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_WITHDRAW, enrollment.trainingPathId) &&
             enrollment.status === "ENROLLED";
+
           const canUpdateResult =
             canUpdateAcademicStatus &&
             scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE, enrollment.trainingPathId) &&
             enrollment.status !== "WITHDRAWN" &&
             enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN";
+
           const canViewWaitlist = canReadWaitlist && scopeIncludesTrainingPath(permissionScopes, P.COURSE_WAITLIST_READ, enrollment.trainingPathId);
           const hasActions = Boolean(detailBasePath) || canViewWaitlist || canWithdrawEnrollment || canUpdateResult;
 

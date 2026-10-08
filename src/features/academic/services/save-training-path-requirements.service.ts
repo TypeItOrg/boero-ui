@@ -19,6 +19,7 @@ export async function saveTrainingPathRequirements(
   for (const draft of changedDrafts) {
     const requirementId = draft.id ?? progress.requirementIds[draft.clientId];
     let requirementResponse: Response | undefined;
+
     const request = academicApiFetch(scope, `${apiBase}/training-paths/${pathId}/document-requirements${requirementId ? `/${requirementId}` : ""}`, {
       method: requirementId ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,6 +32,7 @@ export async function saveTrainingPathRequirements(
 
       return response;
     });
+
     const error = await getResponseErrorActionState(request, [], "No se pudo guardar el requisito documental.");
 
     if (error) {

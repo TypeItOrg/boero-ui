@@ -36,6 +36,7 @@ export function RequestDocumentsDialog({
 }): ReactElement {
   const [selected, setSelected] = useState<Array<{ document: DocumentDefinition; level: DocumentRequirement["level"] }>>([]);
   const [selectionError, setSelectionError] = useState("");
+
   const [state, action, pending] = useActionState(async (previous: DocumentRequestActionState, form: FormData) => {
     const result = await requestDocuments(scope, application.institutionId, application.applicationId, previous, form);
 

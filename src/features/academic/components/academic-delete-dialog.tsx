@@ -16,7 +16,7 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
 
-import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -49,12 +49,14 @@ export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): ReactEle
     deleteAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
   );
+
   const isRootResource =
     props.resource === AcademicResource.ACADEMIC_YEAR ||
     props.resource === AcademicResource.TRAINING_PATH ||
     props.resource === AcademicResource.STUDY_PLAN ||
     props.resource === AcademicResource.ACADEMIC_SPACE ||
     props.resource === AcademicResource.INSTRUMENT;
+
   const description = isRootResource
     ? "El registro dejará de estar disponible en la operación habitual, pero conservará su historial y podrá restaurarse."
     : "Esta acción no se puede deshacer. Las relaciones protegidas impedirán la eliminación.";

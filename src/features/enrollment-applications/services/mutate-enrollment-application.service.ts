@@ -20,6 +20,7 @@ export async function mutateEnrollmentApplication(
     headers: { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+
   const failure = await getResponseErrorActionState(response, ENROLLMENT_SUBMISSION_ERROR_FIELDS, fallbackMessage);
 
   if (failure) {

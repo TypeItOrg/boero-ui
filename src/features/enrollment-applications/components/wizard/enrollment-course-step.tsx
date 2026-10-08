@@ -81,6 +81,7 @@ export function EnrollmentCourseStep({
             })
             .map((id) => {
               const selected = initialApplication.courses?.find((course) => course.courseId === id);
+
               const name = selected
                 ? `${selected.academicSpaceName}${selected.instrumentName ? ` · ${selected.instrumentName}` : ""}`
                 : "Curso seleccionado";

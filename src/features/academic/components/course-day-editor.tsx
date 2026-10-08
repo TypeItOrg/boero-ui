@@ -28,12 +28,14 @@ export function DayEditor({
   onUpdate: (updater: (draft: DayDraft) => DayDraft) => void;
 }): ReactElement {
   const hasSubmitted = Boolean(fieldErrors?.classes);
+
   const periodError =
     hasSubmitted && individual && (!day.periodDurationMinutes || Number(day.periodDurationMinutes) <= 0)
       ? Number(day.periodDurationMinutes) <= 0 && day.periodDurationMinutes !== ""
         ? "La duración del período debe ser mayor a 0."
         : "Indicá la duración de cada período para los espacios individuales."
       : undefined;
+
   const capacityError = hasSubmitted && !individual && day.capacity !== "" && Number(day.capacity) <= 0 ? "El cupo debe ser mayor a 0." : undefined;
 
   // Per-schedule validation helpers
@@ -89,6 +91,7 @@ export function DayEditor({
                 maxLength={4}
                 onChange={(event) => {
                   const nextValue = event.currentTarget.value;
+
                   onUpdate((draft) => ({ ...draft, periodDurationMinutes: nextValue }));
                 }}
                 value={day.periodDurationMinutes}
@@ -107,6 +110,7 @@ export function DayEditor({
               maxLength={5}
               onChange={(event) => {
                 const nextValue = event.currentTarget.value;
+
                 onUpdate((draft) => ({ ...draft, capacity: nextValue }));
               }}
               placeholder="Sin límite"

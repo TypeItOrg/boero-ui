@@ -44,6 +44,7 @@ export async function DocumentCatalogEditPage({
 
   if (scope === "admin") {
     await requirePlatformAccount();
+
     const parsedInstitutionId = z.uuid().safeParse(query.institutionId);
 
     if (!parsedInstitutionId.success) {
@@ -75,14 +76,17 @@ export async function DocumentCatalogEditPage({
   const returnTo = getSafeReturnTo(query.returnTo, getDocumentCatalogPageUrl(scope, institutionId));
   const detailUrl = getDocumentCatalogDetailPageUrl(scope, institutionId, document.id);
   const origin = new URL(returnTo, "https://return-to.invalid");
+
   const catalogReturnTo =
     origin.pathname === detailUrl.split("?")[0]
       ? getSafeReturnTo(origin.searchParams.get("returnTo") ?? undefined, getDocumentCatalogPageUrl(scope, institutionId))
       : returnTo;
+
   const segmentHrefs = {
     documentation: catalogReturnTo,
     [document.id]: appendReturnTo(detailUrl, catalogReturnTo),
   };
+
   const segmentLabels = { [document.id]: document.name };
 
   return (

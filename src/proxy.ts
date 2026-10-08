@@ -29,6 +29,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   try {
     rebuildInstitutionalHostHeader(request.headers, request.headers);
+
     const institution = await resolveRequestInstitution(request.headers);
 
     if (institution && (routeAccess === RouteAccess.AdminGuestOnly || routeAccess === RouteAccess.AdminSession)) {
@@ -46,6 +47,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     }
 
     const destination = new URL(INSTITUTIONAL_UNAVAILABLE_PATH, request.url);
+
     destination.searchParams.set("status", String(status));
     destination.searchParams.set("message", message);
 

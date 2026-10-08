@@ -42,9 +42,11 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
   const isEdit = mode === FORM_MODE.EDIT;
   const defaultDestination = isEdit ? `${INSTITUTIONS_PATH}/${institution.id}` : INSTITUTIONS_PATH;
   const destination = getSafeReturnTo(returnTo, defaultDestination);
+
   const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
     intent: INSTITUTION_LOGO_INTENT.KEEP,
   });
+
   const [publicSubdomain, setPublicSubdomain] = useState(institution?.publicSubdomain ?? "");
   const [isSlugTouched, setIsSlugTouched] = useState(false);
   const [active, setActive] = useState(() => institution?.active ?? true);
@@ -70,6 +72,7 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
 
   const [state, formAction, isPending] = useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
     const request = isEdit ? updateInstitutionAction(institution.id, formData) : createInstitutionAction(formData);
+
     const result = await safelyRunAction(
       request,
       isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION : INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION,
@@ -114,6 +117,7 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
     }
 
     clearErrors();
+
     const formData = createInstitutionFormData(values, active);
 
     if (isEdit) {

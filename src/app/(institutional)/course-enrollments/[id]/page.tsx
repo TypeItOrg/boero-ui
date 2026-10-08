@@ -35,6 +35,7 @@ export default async function CourseEnrollmentDetailPage({
 
   const { id } = await params;
   const returnTo = getSafeReturnTo((await searchParams).returnTo, "/course-enrollments");
+
   const [enrollment, history] = await Promise.all([
     fetchCourseEnrollment(user.institutionId, id),
     fetchCourseEnrollmentHistory(user.institutionId, id),

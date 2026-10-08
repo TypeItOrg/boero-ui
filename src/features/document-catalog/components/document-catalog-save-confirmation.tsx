@@ -52,6 +52,7 @@ export function DocumentCatalogSaveConfirmation({
   onResult: (result: DocumentCatalogActionState) => void;
 }): ReactElement {
   const router = useRouter();
+
   const [state, action, pending] = useActionState(async (previous: DocumentCatalogActionState) => {
     onPendingChange?.(true);
 
@@ -74,6 +75,7 @@ export function DocumentCatalogSaveConfirmation({
       onPendingChange?.(false);
     }
   }, {});
+
   const errors = [state.error, ...Object.values(state.fieldErrors ?? {})].filter(Boolean);
 
   return (

@@ -21,7 +21,7 @@ import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/
 import { cn } from "@common/utils/cn.util";
 import { formatDateInput, parseDateInput } from "@common/utils/date-input.util";
 
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
@@ -101,6 +101,7 @@ export function StudyPlanStatusDialog({
     updateAcademicStatusAction.bind(null, scope, institutionId, AcademicResource.STUDY_PLAN, id, returnTo),
     INITIAL_STATE,
   );
+
   const config = STATUS_DIALOG_CONFIG[targetStatus];
   const Icon = config.icon;
   const [effectiveTo, setEffectiveTo] = useState<Date>();

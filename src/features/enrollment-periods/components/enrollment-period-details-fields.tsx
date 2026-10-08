@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { CalendarRangeIcon } from "lucide-react";
 
@@ -17,7 +17,6 @@ import { formatDateInput } from "@common/utils/date-input.util";
 
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import type { EnrollmentPeriodOffering } from "@features/enrollment-periods/types/enrollment-period-offering.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
@@ -25,39 +24,37 @@ import type { InstitutionSummary } from "@features/institutions/types/institutio
 export function EnrollmentPeriodDetailsFields({
   scope,
   institution,
-  setInstitution,
-  setAcademicYear,
-  setOfferings,
+  onInstitutionChange,
+  onAcademicYearChange,
   isEdit,
   academicYear,
   fetchAcademicYears,
   period,
   startDate,
   startTime,
-  setStartDate,
-  setStartTime,
+  onStartDateChange,
+  onStartTimeChange,
   endDate,
   endTime,
-  setEndDate,
-  setEndTime,
+  onEndDateChange,
+  onEndTimeChange,
 }: {
   scope: AcademicScope;
   institution: { id: string; name: string } | undefined;
-  setInstitution: Dispatch<SetStateAction<{ id: string; name: string } | undefined>>;
-  setAcademicYear: Dispatch<SetStateAction<{ id: string; year: number } | undefined>>;
-  setOfferings: Dispatch<SetStateAction<EnrollmentPeriodOffering[]>>;
+  onInstitutionChange: (value: { id: string; name: string } | undefined) => void;
+  onAcademicYearChange: (value: { id: string; year: number } | undefined) => void;
   isEdit: boolean;
   academicYear: { id: string; year: number } | undefined;
   fetchAcademicYears: (input: AsyncDropdownFetchPageInput) => Promise<AsyncDropdownPage<AcademicYear>>;
   period: EnrollmentPeriod | undefined;
   startDate: Date | undefined;
   startTime: string;
-  setStartDate: Dispatch<SetStateAction<Date | undefined>>;
-  setStartTime: Dispatch<SetStateAction<string>>;
+  onStartDateChange: (value: Date | undefined) => void;
+  onStartTimeChange: (value: string) => void;
   endDate: Date | undefined;
   endTime: string;
-  setEndDate: Dispatch<SetStateAction<Date | undefined>>;
-  setEndTime: Dispatch<SetStateAction<string>>;
+  onEndDateChange: (value: Date | undefined) => void;
+  onEndTimeChange: (value: string) => void;
 }): ReactElement {
   return (
     <section className="bg-muted/25 @container/enrollment-period-form rounded-xl border p-5 @md/enrollment-period-form:p-6">
@@ -89,9 +86,7 @@ export function EnrollmentPeriodDetailsFields({
               getItemValue={(item) => item.id}
               getItemLabel={(item) => item.name}
               onValueChange={(_value, item) => {
-                setInstitution(item ? { id: item.id, name: item.name } : undefined);
-                setAcademicYear(undefined);
-                setOfferings([]);
+                onInstitutionChange(item ? { id: item.id, name: item.name } : undefined);
               }}
               placeholder="Seleccionar institución"
               searchPlaceholder="Buscar institución…"
@@ -114,7 +109,7 @@ export function EnrollmentPeriodDetailsFields({
             queryKey={["enrollment-period-create-academic-years", scope, institution?.id]}
             getItemValue={(item) => item.id}
             getItemLabel={(item) => `Ciclo ${item.year}`}
-            onValueChange={(_value, item) => setAcademicYear(item ? { id: item.id, year: item.year } : undefined)}
+            onValueChange={(_value, item) => onAcademicYearChange(item ? { id: item.id, year: item.year } : undefined)}
             placeholder={institution ? "Seleccionar ciclo" : "Seleccioná una institución primero"}
             searchPlaceholder="Buscar ciclo lectivo…"
             disabled={!institution || isEdit}
@@ -135,8 +130,8 @@ export function EnrollmentPeriodDetailsFields({
           <input type="hidden" name="startDate" value={formatDateInput(startDate)} />
           <input type="hidden" name="startTime" value={startTime} />
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 *:min-w-0">
-            <DatePicker id="startDate" value={startDate} onChange={setStartDate} required autoComplete="off" />
-            <TimeInputWithIcon id="startTime" aria-label="Hora de inicio" value={startTime} onValueChange={setStartTime} required />
+            <DatePicker id="startDate" value={startDate} onChange={onStartDateChange} required autoComplete="off" />
+            <TimeInputWithIcon id="startTime" aria-label="Hora de inicio" value={startTime} onValueChange={onStartTimeChange} required />
           </div>
         </div>
 
@@ -150,13 +145,13 @@ export function EnrollmentPeriodDetailsFields({
             <DatePicker
               id="endDate"
               value={endDate}
-              onChange={setEndDate}
+              onChange={onEndDateChange}
               required
               minDate={startDate}
               calendarMinDate={startDate}
               autoComplete="off"
             />
-            <TimeInputWithIcon id="endTime" aria-label="Hora de fin" value={endTime} onValueChange={setEndTime} required />
+            <TimeInputWithIcon id="endTime" aria-label="Hora de fin" value={endTime} onValueChange={onEndTimeChange} required />
           </div>
         </div>
       </div>

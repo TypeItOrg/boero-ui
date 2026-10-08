@@ -50,11 +50,13 @@ export async function createStudyPlanVersionAction(
   }
 
   const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
+
   const request = academicApiFetch(context.data.scope, `${apiBase}/study-plans/${context.data.sourceId}/versions`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed.data),
   });
+
   const error = await getResponseErrorActionState(request, ACADEMIC_ACTION_FIELDS, "No se pudo crear la nueva versión.");
 
   if (error) {
@@ -78,7 +80,10 @@ export async function createStudyPlanVersionAction(
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, AcademicResource.STUDY_PLAN);
+
   revalidatePath(fallback);
+
   const origin = getSafeReturnTo(context.data.returnTo, fallback);
+
   redirect(appendReturnTo(`${fallback}/${createdId}`, origin));
 }

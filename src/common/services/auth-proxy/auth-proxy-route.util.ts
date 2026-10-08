@@ -5,12 +5,14 @@ export const HEALTH_PROBE_PATH = "/api/health";
 export const INSTITUTIONAL_UNAVAILABLE_PATH = "/institutional-unavailable";
 
 const ADMIN_SESSION_ROOT_PATHS = ["/admin", "/api/admin"] as const;
+
 const INSTITUTIONAL_PUBLIC_ROOT_PATHS = [
   "/auth/register",
   "/auth/password-recovery",
   "/auth/email-verification",
   INSTITUTIONAL_UNAVAILABLE_PATH,
 ] as const;
+
 const PUBLIC_API_PATHS = [
   /^\/api\/(?:institutions|countries|cities)\/?$/,
   /^\/api\/countries\/[^/]+\/provinces\/?$/,

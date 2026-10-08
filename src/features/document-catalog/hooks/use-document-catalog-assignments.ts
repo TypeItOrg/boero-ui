@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SetStateAction } from "react";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { useDocumentAssignmentPage } from "@features/document-catalog/hooks/use-document-assignment-page";
 import { fetchDocumentCatalog } from "@features/document-catalog/services/document-catalog-client.service";
+import type { DocumentAssignmentDraft } from "@features/document-catalog/types/document-assignment-draft.types";
 import type { DocumentAssignment } from "@features/document-catalog/types/document-assignment.types";
 import type { DocumentDefinition } from "@features/document-catalog/types/document-definition.types";
 
@@ -27,39 +28,43 @@ export function useDocumentCatalogAssignments({
   allowAssignments: boolean;
   savedDocument?: DocumentDefinition;
 }) {
-  const [changes, setChanges] = useState<Record<string, DocumentAssignment>>({});
-  const [removedAssignments, setRemovedAssignments] = useState<Record<string, DocumentAssignment>>({});
+  const assignmentInstitutionId = targetInstitutionId ?? institutionId;
+  const identity = JSON.stringify([scope, currentId, assignmentInstitutionId]);
+  const [draft, setDraft] = useState<DocumentAssignmentDraft>({ identity, generation: 0, changes: {}, removed: {}, error: "" });
+
+  if (draft.identity !== identity) {
+    setDraft({ identity, generation: draft.generation + 1, changes: {}, removed: {}, error: "" });
+  }
+
+  const { changes, generation, removed: removedAssignments } = draft;
+
   const {
     associations,
-    setAssociations,
     page,
     setPage,
     pageSize,
     setPageSize,
     associationsLoading,
-    setAssociationsLoading,
-    readError,
-    setReadError,
+    readError: pageError,
   } = useDocumentAssignmentPage({
     scope,
     institutionId,
     targetInstitutionId,
     currentId,
-    initial,
     allowAssignments,
     savedDocument,
   });
-  const assignmentInstitutionId = targetInstitutionId ?? institutionId;
-  const [previousAssignmentInstitutionId, setPreviousAssignmentInstitutionId] = useState(assignmentInstitutionId);
 
-  if (previousAssignmentInstitutionId !== assignmentInstitutionId) {
-    setPreviousAssignmentInstitutionId(assignmentInstitutionId);
-    setChanges({});
-    setRemovedAssignments({});
-    setAssociations(undefined);
-    setAssociationsLoading(Boolean(currentId && allowAssignments && assignmentInstitutionId === institutionId));
-    setPage(0);
-    setReadError("");
+  function setChanges(value: SetStateAction<Record<string, DocumentAssignment>>): void {
+    setDraft((previous) => ({ ...previous, changes: typeof value === "function" ? value(previous.changes) : value }));
+  }
+
+  function setRemovedAssignments(value: SetStateAction<Record<string, DocumentAssignment>>): void {
+    setDraft((previous) => ({ ...previous, removed: typeof value === "function" ? value(previous.removed) : value }));
+  }
+
+  function setReadError(error: string): void {
+    setDraft((previous) => (previous.identity === identity && previous.generation === generation ? { ...previous, error } : previous));
   }
 
   const selectPath = async (item: { id: string; name: string }): Promise<void> => {
@@ -73,6 +78,7 @@ export function useDocumentCatalogAssignments({
       setChanges((previous) => ({ ...previous, [item.id]: { ...removed, active: true } }));
       setRemovedAssignments((previous) => {
         const next = { ...previous };
+
         delete next[item.id];
 
         return next;
@@ -91,29 +97,35 @@ export function useDocumentCatalogAssignments({
           institutionId,
           `/${currentId}/training-paths?trainingPathId=${item.id}&size=20`,
         );
+
         existing = data.items[0];
       }
 
-      setChanges((previous) => {
-        if (previous[item.id]) {
-          return { ...previous, [item.id]: { ...previous[item.id], active: true } };
+      setDraft((previous) => {
+        if (previous.identity !== identity || previous.generation !== generation) {
+          return previous;
         }
+
+        const assignment = previous.changes[item.id] ?? existing;
 
         return {
           ...previous,
-          [item.id]: existing
-            ? { ...existing, active: true }
-            : {
-                trainingPathId: item.id,
-                trainingPathName: item.name,
-                level: "AT_SUBMISSION",
-                displayOrder: 0,
-                active: true,
-                specificInstructions: null,
-              },
+          error: "",
+          changes: {
+            ...previous.changes,
+            [item.id]: assignment
+              ? { ...assignment, active: true }
+              : {
+                  trainingPathId: item.id,
+                  trainingPathName: item.name,
+                  level: "AT_SUBMISSION",
+                  displayOrder: 0,
+                  active: true,
+                  specificInstructions: null,
+                },
+          },
         };
       });
-      setReadError("");
     } catch {
       setReadError("No se pudo confirmar la asignación. Volvé a seleccionar el trayecto.");
     }
@@ -127,6 +139,7 @@ export function useDocumentCatalogAssignments({
       }
 
       const next = { ...previous };
+
       delete next[item.trainingPathId];
 
       return next;
@@ -136,6 +149,7 @@ export function useDocumentCatalogAssignments({
   const associated = assignmentInstitutionId === institutionId ? (associations?.items ?? []) : [];
   const totalPages = assignmentInstitutionId === institutionId ? (associations?.totalPages ?? 0) : 0;
   const totalItems = assignmentInstitutionId === institutionId ? (associations?.totalItems ?? 0) : 0;
+
   const rows = [...associated.filter((item) => !changes[item.trainingPathId]), ...Object.values(changes)].filter(
     (item) => !removedAssignments[item.trainingPathId] && item.active,
   );
@@ -149,7 +163,7 @@ export function useDocumentCatalogAssignments({
     page,
     pageSize,
     associationsLoading,
-    readError,
+    readError: draft.error || pageError,
     rows,
     totalItems,
     totalPages,
@@ -157,6 +171,5 @@ export function useDocumentCatalogAssignments({
     removePath,
     setPage,
     setPageSize,
-    setAssociationsLoading,
   };
 }

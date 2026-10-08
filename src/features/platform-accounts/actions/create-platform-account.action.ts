@@ -31,6 +31,7 @@ export async function createPlatformAccountAction(formData: FormData): Promise<P
     email: parsed.data.email,
     password: parsed.data.password,
   };
+
   const response = platformApiFetch("/api/v1/admin/accounts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

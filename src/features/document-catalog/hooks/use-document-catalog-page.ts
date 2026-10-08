@@ -58,6 +58,7 @@ export function useDocumentCatalogPage({
     },
     gcTime: 0,
   });
+
   const [hasSettledInitialQuery, setHasSettledInitialQuery] = useState(false);
 
   if (!hasSettledInitialQuery && !query.isPending) {

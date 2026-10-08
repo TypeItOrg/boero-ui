@@ -1,8 +1,7 @@
-"use client";
-
 import { toOptionalFormString } from "@common/utils/form-value.util";
 
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
+import type { ClassDraft } from "@features/academic/types/course-class-draft.types";
 import { type DayDraft } from "@features/academic/types/course-day-draft.types";
 import { type ScheduleDraft } from "@features/academic/types/course-schedule-draft.types";
 import type { CourseWeekDay } from "@features/academic/types/course-week-day.types";
@@ -77,6 +76,7 @@ export function composeInitialSpaceLabel(initialValues: AcademicFieldsProps["ini
 
   const type = toOptionalFormString(initialValues?.academicSpaceType);
   const format = toOptionalFormString(initialValues?.academicSpaceFormat);
+
   const parts = [
     name,
     type ? academicSpaceTypeLabels[type as keyof typeof academicSpaceTypeLabels] : undefined,
@@ -84,4 +84,45 @@ export function composeInitialSpaceLabel(initialValues: AcademicFieldsProps["ini
   ].filter(Boolean);
 
   return parts.join(" · ");
+}
+
+export function createCourseClassDrafts(value: unknown): ClassDraft[] {
+  return parseInitialClasses(value).map((entry) => {
+    const courseClass = entry as {
+      teachers?: { personId: string; fullName: string }[];
+      days?: {
+        dayOfWeek: CourseWeekDay;
+        capacity: number | null;
+        periodDurationMinutes: number | null;
+        schedules?: { startTime: string; endTime: string }[];
+      }[];
+    };
+
+    return {
+      teachers: courseClass.teachers ?? [],
+      days: (courseClass.days ?? []).map((day) => ({
+        dayOfWeek: day.dayOfWeek,
+        capacity: day.capacity != null ? String(day.capacity) : "",
+        periodDurationMinutes: day.periodDurationMinutes != null ? String(day.periodDurationMinutes) : "",
+        schedules: (day.schedules ?? []).map((schedule) => ({
+          startTime: schedule.startTime.slice(0, 5),
+          endTime: schedule.endTime.slice(0, 5),
+        })),
+      })),
+    };
+  });
+}
+
+export function serializeCourseClasses(classes: readonly ClassDraft[], format: string | undefined): string {
+  return JSON.stringify(
+    classes.map((courseClass) => ({
+      teacherIds: courseClass.teachers.map((teacher) => teacher.personId),
+      days: courseClass.days.map((day) => ({
+        dayOfWeek: day.dayOfWeek,
+        capacity: individualFormat(format) ? null : parseNullableInt(day.capacity),
+        periodDurationMinutes: individualFormat(format) ? parseNullableInt(day.periodDurationMinutes) : null,
+        schedules: day.schedules,
+      })),
+    })),
+  );
 }

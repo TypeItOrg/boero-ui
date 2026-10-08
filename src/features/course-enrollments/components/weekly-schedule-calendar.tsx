@@ -72,7 +72,9 @@ export function WeeklyScheduleCalendar({
           const lessons = schedules
             .filter(({ schedule }) => schedule.dayOfWeek === day)
             .sort((a, b) => a.schedule.startTime.localeCompare(b.schedule.startTime) || a.schedule.endTime.localeCompare(b.schedule.endTime));
+
           const laneEnds: number[] = [];
+
           const positionedLessons = lessons.map((lesson) => {
             const start = toMinutes(lesson.schedule.startTime);
             const end = toMinutes(lesson.schedule.endTime);
@@ -86,6 +88,7 @@ export function WeeklyScheduleCalendar({
 
             return { ...lesson, start, end, lane };
           });
+
           const laneCount = Math.max(1, laneEnds.length);
 
           return (

@@ -16,6 +16,7 @@ export async function fetchInstitutions({
   sort,
 }: InstitutionPaginationParams): Promise<PaginatedResponse<InstitutionSummary>> {
   const searchParams = buildPaginationSearchParams({ page, size, search });
+
   searchParams.set("sort", serializeSpringSort(sort));
 
   if (active !== undefined) {

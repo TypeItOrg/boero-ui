@@ -50,6 +50,7 @@ function EnrollmentPeriodsTableContent({
   scope = AcademicScope.INSTITUTIONAL,
 }: EnrollmentPeriodsTableProps) {
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
+
   const fetchAcademicYears = useCallback(
     (input: AsyncDropdownFetchPageInput) =>
       fetchAcademicOptionPage<AcademicYear>("academic-years", scope, institutionId, input, {
@@ -72,6 +73,7 @@ function EnrollmentPeriodsTableContent({
     ],
     value: status ?? "all",
   };
+
   const advancedFilterCount = selectedAcademicYear ? 1 : 0;
   const hasFilters = search.length > 0 || status !== undefined || selectedAcademicYear != null;
 

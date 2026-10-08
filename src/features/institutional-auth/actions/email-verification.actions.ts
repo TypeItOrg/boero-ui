@@ -17,6 +17,7 @@ import { clearEmailVerificationContext } from "@features/institutional-auth/util
 import { setInstitutionalEmailVerifiedCookie } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const FIELDS = ["institutionId", "documentNumber", "email", "password", "token"] as const;
+
 const EMAIL_VERIFICATION_ENDPOINTS = {
   CHANGE_EMAIL: "/api/v1/auth/email-verification/change-email",
   CONFIRM: "/api/v1/auth/email-verification/confirm",

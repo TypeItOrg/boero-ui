@@ -51,6 +51,7 @@ export default async function EnrollmentApplicationDetailPage({ params, searchPa
   const personalData = application.data?.personalData;
   const personalDataName = `${personalData?.firstName || ""} ${personalData?.lastName || ""}`.trim();
   const applicantName = application.applicantName || personalDataName || "Solicitante";
+
   const reviewSummary = {
     institutionId: user.institutionId,
     applicationId,

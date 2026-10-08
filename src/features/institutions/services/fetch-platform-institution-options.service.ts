@@ -20,6 +20,7 @@ export async function fetchPlatformInstitutionOptions(
   }
 
   params.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
+
   const response = await fetch(`/api/admin/institutions?${params.toString()}`, { signal });
   const data = await parseHttpResponse<PaginatedResponse<InstitutionSummary>>(response, INSTITUTION_ERROR_MESSAGES.FETCH_INSTITUTIONS);
 

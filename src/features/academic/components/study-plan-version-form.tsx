@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert
 import { Button } from "@common/components/ui/button";
 import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
 
-import { createStudyPlanVersionAction } from "@features/academic/actions/academic-resource.action";
+import { createStudyPlanVersionAction } from "@features/academic/actions/create-study-plan-version.action";
 import { DateRangeFields } from "@features/academic/components/academic-date-range-fields";
 import { NameField } from "@features/academic/components/academic-form-controls";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
@@ -29,11 +29,13 @@ export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }:
   const action = createStudyPlanVersionAction.bind(null, scope, institutionId, source.id, returnTo);
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
   const formRef = useActionFormErrorFocus(state, pending);
+
   const initialValues = {
     name: source.name,
     effectiveFrom: "",
     effectiveTo: "",
   };
+
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (

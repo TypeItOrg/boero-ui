@@ -17,42 +17,9 @@ import { EnrollmentStepCardHeader } from "@features/enrollment-applications/comp
 import { EDUCATION_LEVEL_OPTIONS } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import type { EnrollmentWizardModel } from "@features/enrollment-applications/types/enrollment-wizard-model.types";
 
-type Props = Pick<
-  EnrollmentWizardModel,
-  | "getFieldError"
-  | "isMinor"
-  | "responsibleFullName"
-  | "setResponsibleFullName"
-  | "responsibleDocumentNumber"
-  | "setResponsibleDocumentNumber"
-  | "responsiblePhoneNumber"
-  | "setResponsiblePhoneNumber"
-  | "responsibleEmail"
-  | "setResponsibleEmail"
-  | "responsibleOccupation"
-  | "setResponsibleOccupation"
-  | "responsibleEducationLevel"
-  | "setResponsibleEducationLevel"
-  | "handleActiveTabChange"
->;
+type Props = Pick<EnrollmentWizardModel, "responsible" | "updateResponsible" | "getFieldError" | "isMinor" | "handleActiveTabChange">;
 
-export function EnrollmentResponsibleStep({
-  getFieldError,
-  isMinor,
-  responsibleFullName,
-  setResponsibleFullName,
-  responsibleDocumentNumber,
-  setResponsibleDocumentNumber,
-  responsiblePhoneNumber,
-  setResponsiblePhoneNumber,
-  responsibleEmail,
-  setResponsibleEmail,
-  responsibleOccupation,
-  setResponsibleOccupation,
-  responsibleEducationLevel,
-  setResponsibleEducationLevel,
-  handleActiveTabChange,
-}: Props): ReactElement {
+export function EnrollmentResponsibleStep({ responsible, updateResponsible, getFieldError, isMinor, handleActiveTabChange }: Props): ReactElement {
   return (
     <TabsContent value="responsible" className="space-y-6">
       <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
@@ -69,8 +36,8 @@ export function EnrollmentResponsibleStep({
             </FieldLabel>
             <Input
               id="responsibleFullName"
-              value={responsibleFullName}
-              onChange={(e) => setResponsibleFullName(e.target.value)}
+              value={responsible.fullName}
+              onChange={(e) => updateResponsible("fullName", e.target.value)}
               placeholder="María Rodríguez"
               autoComplete="name"
               aria-invalid={!!getFieldError(["responsible", "fullName"])}
@@ -86,8 +53,8 @@ export function EnrollmentResponsibleStep({
               <NumericInput
                 id="responsibleDocumentNumber"
                 maxLength={8}
-                value={responsibleDocumentNumber}
-                onChange={(e) => setResponsibleDocumentNumber(e.target.value)}
+                value={responsible.documentNumber}
+                onChange={(e) => updateResponsible("documentNumber", e.target.value)}
                 placeholder="20123456"
                 aria-invalid={!!getFieldError(["responsible", "documentNumber"])}
               />
@@ -100,8 +67,8 @@ export function EnrollmentResponsibleStep({
               </FieldLabel>
               <PhoneInput
                 id="responsiblePhoneNumber"
-                value={responsiblePhoneNumber}
-                onChange={(e) => setResponsiblePhoneNumber(e.target.value)}
+                value={responsible.phoneNumber}
+                onChange={(e) => updateResponsible("phoneNumber", e.target.value)}
                 placeholder="3534987654"
                 autoComplete="tel"
                 aria-invalid={!!getFieldError(["responsible", "phoneNumber"])}
@@ -118,8 +85,8 @@ export function EnrollmentResponsibleStep({
               <Input
                 id="responsibleEmail"
                 type="email"
-                value={responsibleEmail}
-                onChange={(e) => setResponsibleEmail(e.target.value)}
+                value={responsible.email}
+                onChange={(e) => updateResponsible("email", e.target.value)}
                 placeholder="tutor@ejemplo.com"
                 autoComplete="email"
                 spellCheck={false}
@@ -134,8 +101,8 @@ export function EnrollmentResponsibleStep({
               </FieldLabel>
               <Input
                 id="responsibleOccupation"
-                value={responsibleOccupation}
-                onChange={(e) => setResponsibleOccupation(e.target.value)}
+                value={responsible.occupation}
+                onChange={(e) => updateResponsible("occupation", e.target.value)}
                 placeholder="Empleado / Docente / Comercio"
                 aria-invalid={!!getFieldError(["responsible", "occupation"])}
               />
@@ -147,7 +114,7 @@ export function EnrollmentResponsibleStep({
             <FieldLabel htmlFor="responsibleEducationLevel" required={isMinor}>
               Nivel de Instrucción
             </FieldLabel>
-            <Select value={responsibleEducationLevel} onValueChange={setResponsibleEducationLevel}>
+            <Select value={responsible.educationLevel} onValueChange={(value) => updateResponsible("educationLevel", value)}>
               <SelectTrigger className="w-full" aria-invalid={!!getFieldError(["responsible", "educationLevel"])}>
                 <SelectValue placeholder="Seleccioná el máximo nivel alcanzado" />
               </SelectTrigger>

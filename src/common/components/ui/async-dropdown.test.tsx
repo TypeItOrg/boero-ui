@@ -139,9 +139,9 @@ describe("AsyncDropdown", () => {
     expect(screen.queryByPlaceholderText("Buscar...")).not.toBeInTheDocument();
   });
 
-  it("clears the selected value from the trigger", async () => {
+  it("clears the value and its fallback label when the parent accepts deselection", async () => {
     const user = userEvent.setup();
-    const { onValueChange } = renderDropdown({
+    const { onValueChange, fetchPage, rerender } = renderDropdown({
       clearable: true,
       value: "ar",
       selectedLabel: "Argentina",
@@ -151,6 +151,25 @@ describe("AsyncDropdown", () => {
 
     expect(onValueChange).toHaveBeenCalledWith(undefined, undefined);
     expect(screen.queryByPlaceholderText("Buscar...")).not.toBeInTheDocument();
+
+    rerender(
+      <AsyncDropdown<Item>
+        clearable
+        fetchPage={fetchPage}
+        getItemLabel={(item) => item.name}
+        getItemValue={(item) => item.id}
+        name="country"
+        onValueChange={onValueChange}
+        placeholder="Seleccionar"
+        queryKey={["countries"]}
+        selectedLabel="Argentina"
+        value={undefined}
+      />,
+    );
+
+    expect(getTrigger()).toHaveTextContent("Seleccionar");
+    expect(document.querySelector('input[name="country"]')).toHaveValue("");
+    expect(screen.queryByRole("button", { name: "Limpiar selección" })).not.toBeInTheDocument();
   });
 
   it("renders the empty state with title", async () => {

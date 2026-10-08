@@ -78,6 +78,42 @@ describe("DataTableFilters", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
+  it("replaces an edited search with the URL value and cancels its queued navigation", async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = render(<DataTableFilters search="piano" searchPlaceholder="Buscar..." />);
+    const input = screen.getByRole("textbox");
+
+    await user.clear(input);
+    await user.type(input, "búsqueda pendiente");
+    rerender(<DataTableFilters search="violín" searchPlaceholder="Buscar..." />);
+
+    expect(screen.getByRole("textbox")).toBe(input);
+    expect(input).toHaveValue("violín");
+    act(() => jest.advanceTimersByTime(350));
+    expect(mockNavigate).not.toHaveBeenCalled();
+    rerender(<DataTableFilters search="piano" searchPlaceholder="Buscar..." />);
+    expect(input).toHaveValue("piano");
+  });
+
+  it("replaces an edited date with the URL value without resurrecting an old draft on back navigation", async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = render(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2035-01-01" }]} />);
+    const input = screen.getByRole("textbox");
+
+    await user.clear(input);
+    await user.type(input, "02022036");
+    rerender(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2036-03-03" }]} />);
+
+    expect(screen.getByRole("textbox")).toBe(input);
+    expect(input).toHaveValue("03/03/2036");
+    act(() => jest.advanceTimersByTime(350));
+    expect(mockNavigate).not.toHaveBeenCalled();
+    rerender(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2035-01-01" }]} />);
+    expect(input).toHaveValue("01/01/2035");
+  });
+
   it("opens secondary filters and closes them when viewing results", async () => {
     const user = userEvent.setup();
     render(

@@ -4,6 +4,7 @@ export const MIN_ACADEMIC_YEAR = 2000;
 
 const ARGENTINA_TIME_ZONE = "America/Argentina/Buenos_Aires";
 const MAX_YEAR_OFFSET = 1;
+
 const ACADEMIC_YEAR_FORMATTER = new Intl.DateTimeFormat("en-US", {
   timeZone: ARGENTINA_TIME_ZONE,
   year: "numeric",

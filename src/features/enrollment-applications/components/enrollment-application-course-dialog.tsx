@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, type ReactElement } from "react";
+import { useActionState, useState, type ReactElement } from "react";
 
 import { CircleAlertIcon, LoaderCircleIcon } from "lucide-react";
 
@@ -19,10 +19,9 @@ import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { enrollApplicationCourseAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import { enrollPlatformApplicationCourseAction } from "@features/course-enrollments/actions/platform-course-enrollment.actions";
 import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
-import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/services/course-enrollment-client.service";
-import { fetchPlatformCourseEnrollmentOptions } from "@features/course-enrollments/services/platform-course-enrollment-client.service";
-import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
+import { useCourseEnrollmentOptions } from "@features/course-enrollments/hooks/use-course-enrollment-options";
 import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
+import { hasEnrollmentCapacity } from "@features/course-enrollments/utils/course-enrollment-capacity.util";
 import { ApplicationCourseAssignmentForm } from "@features/enrollment-applications/components/application-course-assignment-form";
 import { type EnrollmentApplicationCourseDialogProps } from "@features/enrollment-applications/types/enrollment-application-course-dialog-props.types";
 
@@ -35,10 +34,13 @@ export function EnrollmentApplicationCourseDialog({
   onOpenChange,
   onResolved,
 }: EnrollmentApplicationCourseDialogProps): ReactElement {
-  const [options, setOptions] = useState<CourseEnrollmentAssignmentOptions>();
-  const [loadError, setLoadError] = useState<string>();
   const [optionsRevision, setOptionsRevision] = useState(0);
-  const isLoadingOptions = !options && !loadError;
+  const query = useCourseEnrollmentOptions({ courseId: course.courseId, institutionId, scope, enabled: open, revision: optionsRevision });
+  const hasCapacity = query.options && hasEnrollmentCapacity(query.options);
+  const options = hasCapacity ? query.options : undefined;
+  const loadError = query.error ?? (query.options && !hasCapacity ? COURSE_ENROLLMENT_MESSAGES.COURSE_WITHOUT_CAPACITY : undefined);
+  const isLoadingOptions = query.loading;
+
   const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
     if (!options) {
       return { error: loadError ?? COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS };
@@ -64,41 +66,6 @@ export function EnrollmentApplicationCourseDialog({
 
     return result;
   }, {});
-
-  useEffect(() => {
-    let active = true;
-    const pending =
-      scope === AcademicScope.ADMIN && institutionId
-        ? fetchPlatformCourseEnrollmentOptions(institutionId, course.courseId)
-        : fetchCourseEnrollmentOptions(course.courseId);
-    pending
-      .then((value) => {
-        if (active) {
-          const hasCapacity = value.classes.some((courseClass) =>
-            courseClass.days.some(
-              (day) =>
-                day.availableCapacity !== 0 &&
-                day.schedules.some((schedule) => value.format === "GRUPAL" || schedule.individualSlots.some((slot) => slot.available)),
-            ),
-          );
-
-          if (hasCapacity) {
-            setOptions(value);
-          } else {
-            setLoadError(COURSE_ENROLLMENT_MESSAGES.COURSE_WITHOUT_CAPACITY);
-          }
-        }
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          setLoadError(error instanceof Error ? error.message : "No se pudieron cargar los horarios.");
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [course.courseId, institutionId, scope, optionsRevision]);
 
   if (!options) {
     return (
@@ -134,9 +101,7 @@ export function EnrollmentApplicationCourseDialog({
           options={options}
           optionsRevision={optionsRevision}
           isPending={isPending}
-          setOptions={setOptions}
-          setLoadError={setLoadError}
-          setOptionsRevision={setOptionsRevision}
+          onRefreshOptions={() => setOptionsRevision((value) => value + 1)}
           onOpenChange={onOpenChange}
         />
       </AlertDialogContent>

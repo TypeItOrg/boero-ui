@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Input } from "@common/components/ui/input";
@@ -14,35 +14,21 @@ import type { AcademicScope } from "@features/academic/utils/academic-scope.util
 import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 
 export function CourseStudyPlanField({
+  onValueChange,
   fieldErrors,
   institutionId,
   scope,
   editing,
   classesLocked,
-  setStudyPlanId,
-  setSpaceId,
-  setAcademicSpaceId,
-  setStudyPlanSpaceId,
-  setInstrumentId,
-  setInstrumental,
-  setSpaceLabel,
-  setFormat,
   initialValues,
   studyPlanId,
 }: {
+  onValueChange: (value: string | undefined) => void;
   fieldErrors: Record<string, string> | undefined;
   institutionId: string | undefined;
   scope: AcademicScope | undefined;
   editing: boolean;
   classesLocked: boolean;
-  setStudyPlanId: Dispatch<SetStateAction<string | undefined>>;
-  setSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setAcademicSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setStudyPlanSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setInstrumentId: Dispatch<SetStateAction<string | undefined>>;
-  setInstrumental: Dispatch<SetStateAction<boolean>>;
-  setSpaceLabel: Dispatch<SetStateAction<string | undefined>>;
-  setFormat: Dispatch<SetStateAction<string | undefined>>;
   initialValues: Record<string, FormValue>;
   studyPlanId: string | undefined;
 }): ReactElement {
@@ -66,16 +52,7 @@ export function CourseStudyPlanField({
           id="studyPlanId"
           key={`plan-${institutionId}`}
           name="studyPlanDisplay"
-          onValueChange={(value) => {
-            setStudyPlanId(value);
-            setSpaceId(undefined);
-            setAcademicSpaceId(undefined);
-            setStudyPlanSpaceId(undefined);
-            setInstrumentId(undefined);
-            setInstrumental(false);
-            setSpaceLabel(undefined);
-            setFormat(undefined);
-          }}
+          onValueChange={onValueChange}
           placeholder={classesLocked ? "Definido por el curso" : "Seleccionar plan"}
           queryKey={["courses", "active-study-plans", scope, institutionId]}
           searchPlaceholder="Buscar plan…"

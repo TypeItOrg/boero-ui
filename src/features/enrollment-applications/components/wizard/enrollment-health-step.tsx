@@ -15,26 +15,9 @@ import { Textarea } from "@common/components/ui/textarea";
 import { EnrollmentStepCardHeader } from "@features/enrollment-applications/components/enrollment-step-card-header";
 import type { EnrollmentWizardModel } from "@features/enrollment-applications/types/enrollment-wizard-model.types";
 
-type Props = Pick<
-  EnrollmentWizardModel,
-  | "receivesReasonableAdjustments"
-  | "setReceivesReasonableAdjustments"
-  | "getFieldError"
-  | "adjustmentDetails"
-  | "setAdjustmentDetails"
-  | "handleActiveTabChange"
-  | "isMinor"
->;
+type Props = Pick<EnrollmentWizardModel, "healthInclusion" | "updateHealthInclusion" | "getFieldError" | "handleActiveTabChange" | "isMinor">;
 
-export function EnrollmentHealthStep({
-  receivesReasonableAdjustments,
-  setReceivesReasonableAdjustments,
-  getFieldError,
-  adjustmentDetails,
-  setAdjustmentDetails,
-  handleActiveTabChange,
-  isMinor,
-}: Props): ReactElement {
+export function EnrollmentHealthStep({ healthInclusion, updateHealthInclusion, getFieldError, handleActiveTabChange, isMinor }: Props): ReactElement {
   return (
     <TabsContent value="health" className="space-y-6">
       <Card className="bg-muted/25 @container sm:[--card-spacing:--spacing(6)]">
@@ -54,12 +37,12 @@ export function EnrollmentHealthStep({
             <Switch
               id="receivesReasonableAdjustments"
               size="lg"
-              checked={receivesReasonableAdjustments}
-              onCheckedChange={setReceivesReasonableAdjustments}
+              checked={healthInclusion.receivesReasonableAdjustments}
+              onCheckedChange={(value) => updateHealthInclusion("receivesReasonableAdjustments", value)}
             />
           </div>
 
-          {receivesReasonableAdjustments && (
+          {healthInclusion.receivesReasonableAdjustments && (
             <div className="space-y-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
               <Alert className="border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200">
                 <AlertTriangleIcon className="size-4 text-amber-600 dark:text-amber-400" />
@@ -76,8 +59,8 @@ export function EnrollmentHealthStep({
                 </FieldLabel>
                 <Textarea
                   id="adjustmentDetails"
-                  value={adjustmentDetails}
-                  onChange={(e) => setAdjustmentDetails(e.target.value)}
+                  value={healthInclusion.adjustmentDetails}
+                  onChange={(e) => updateHealthInclusion("adjustmentDetails", e.target.value)}
                   placeholder="Describí brevemente los apoyos que necesitás para tu cursada…"
                   rows={3}
                   aria-invalid={!!getFieldError(["healthInclusion", "adjustmentDetails"])}

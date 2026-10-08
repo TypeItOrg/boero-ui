@@ -111,6 +111,7 @@ export async function saveDocumentDefinition(
   const active = z.enum(["true", "false"]).safeParse(form.get("active"));
   const rawRevision = form.get("revision");
   const revision = rawRevision === "" || rawRevision === null ? undefined : z.string().regex(/^\d+$/).transform(Number).safeParse(rawRevision);
+
   const input = documentDefinitionSchema.safeParse({
     name: form.get("name"),
     instructions: form.get("instructions"),
@@ -132,6 +133,7 @@ export async function saveDocumentDefinition(
 
   const effectiveId = id ?? progress.data.document?.id;
   let response: Response | undefined;
+
   const pending = academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/document-definitions${effectiveId ? "/" + effectiveId : ""}`, {
     method: effectiveId ? "PUT" : "POST",
     headers: { "Content-Type": "application/json" },
@@ -144,6 +146,7 @@ export async function saveDocumentDefinition(
 
     return value;
   });
+
   const error = await getResponseErrorActionState(
     pending,
     DOCUMENT_FIELDS,
@@ -165,6 +168,7 @@ export async function saveDocumentDefinition(
   }
 
   const catalogPath = scope === "admin" ? "/admin/documentation" : "/documentation";
+
   revalidatePath(catalogPath);
   revalidatePath(`${catalogPath}/${result.document.id}`);
   revalidatePath(`${catalogPath}/${result.document.id}/edit`);

@@ -55,6 +55,7 @@ export function EnrollmentStatusCard({
   const responsible = data.responsible || {};
   const preference = data.preference || {};
   const spaces = application.spaces || [];
+
   const canManageApplicationCourses =
     canManageCourses &&
     (application.status === ENROLLMENT_APPLICATION_STATUS.APPROVED || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED);

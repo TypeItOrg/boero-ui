@@ -7,6 +7,7 @@ const headers = { "cache-control": "private, no-store", "x-content-type-options"
 
 export async function GET(request: Request, { params }: { params: Promise<{ applicationId: string }> }): Promise<Response> {
   const query = new URL(request.url).searchParams;
+
   const parsed = z
     .object({
       applicationId: z.string().uuid(),
@@ -28,6 +29,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ appl
   }
 
   const value = parsed.data;
+
   const suffix = value.requirementId
     ? `history?requirementId=${value.requirementId}&page=${value.page}&size=${value.size}&sort=createdAt,desc&sort=id,desc`
     : "requirements";

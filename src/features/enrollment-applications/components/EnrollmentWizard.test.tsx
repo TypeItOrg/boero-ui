@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import {
@@ -11,6 +11,8 @@ import {
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+
+import { renderWithQueryClient as render } from "@/../test/utils/render-with-query-client";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -279,5 +281,67 @@ describe("EnrollmentWizard", () => {
     expect(updateAction.mock.calls[0][1].data.courses).toEqual(courses);
     expect(updateAction.mock.calls[0][1].data.academicBackground?.schoolOrigin).toBe("Otro colegio");
     expect(await screen.findByText("Borrador guardado")).toBeInTheDocument();
+  });
+
+  it("keeps the autosave deadline across unrelated renders and does not resave an unchanged draft", async () => {
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    renderWizard({ initialApplication: COMPLETE_DRAFT });
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Colegio corregido" } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(updateAction).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("tab", { name: /salud/i }));
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(updateAction).toHaveBeenCalledTimes(1);
+    expect(updateAction.mock.calls[0][1].data.academicBackground?.schoolOrigin).toBe("Colegio corregido");
+    expect(updateAction.mock.calls[0][1].data.personalData?.birthDate).toBe("1990-04-10");
+
+    await act(async () => {
+      jest.advanceTimersByTime(2400);
+    });
+
+    expect(updateAction).toHaveBeenCalledTimes(1);
+  });
+
+  it("discards the previous applicant's draft and queued autosave when changing applications", async () => {
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = renderWizard({ initialApplication: COMPLETE_DRAFT });
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Edición sin guardar" } });
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    rerender(
+      <EnrollmentWizard
+        initialApplication={{
+          ...COMPLETE_DRAFT,
+          applicationId: "app-2",
+          data: {
+            ...COMPLETE_DRAFT.data,
+            personalData: { ...COMPLETE_DRAFT.data.personalData, firstName: "Ana" },
+            academicBackground: { ...COMPLETE_DRAFT.data.academicBackground, schoolOrigin: "Escuela de Ana" },
+          },
+        }}
+        initialCourseOptions={[COURSE_OPTION]}
+      />,
+    );
+
+    expect(screen.getByLabelText(/^nombre/i)).toHaveValue("Ana");
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    expect(screen.getByLabelText(/última institución educativa/i)).toHaveValue("Escuela de Ana");
+    await act(async () => {
+      jest.advanceTimersByTime(1600);
+    });
+
+    expect(updateAction).not.toHaveBeenCalled();
   });
 });

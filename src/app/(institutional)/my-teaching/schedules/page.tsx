@@ -29,6 +29,7 @@ export default async function TeacherSchedulesPage({ searchParams }: { searchPar
   const params = await searchParams;
   const week = getScheduleWeek(params.week, referenceDate);
   const data = await fetchTeacherWeeklySchedules(user.institutionId, week);
+
   const items: WeeklyScheduleItem[] = data.classes.map((assignedClass) => ({
     id: assignedClass.courseClass.id,
     title: assignedClass.academicSpaceName,

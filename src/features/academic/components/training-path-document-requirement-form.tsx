@@ -37,6 +37,7 @@ export function RequirementForm({
 }: TrainingPathRequirementFormProps): ReactElement {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [document, setDocument] = useState<DocumentDefinition | undefined>(
     initial?.documentId
       ? {
@@ -50,6 +51,7 @@ export function RequirementForm({
         }
       : undefined,
   );
+
   const selectDocument = useCallback(
     (value: DocumentDefinition) => {
       setDocument(value);
@@ -57,6 +59,7 @@ export function RequirementForm({
     },
     [onCreatingChange],
   );
+
   const [state, action, pending] = useActionState(async (_previous: { error?: string }, form: FormData): Promise<{ error?: string }> => {
     const parsed = documentRequirementFormSchema.safeParse({
       documentId: document?.id,

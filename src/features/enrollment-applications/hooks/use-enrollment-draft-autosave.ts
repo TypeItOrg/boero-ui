@@ -32,29 +32,31 @@ export function useEnrollmentDraftAutosave({
     async (_previous: { error?: string }, save: () => Promise<{ error?: string }>) => save(),
     {},
   );
+
   const draftSaveQueue = useRef<Promise<void>>(Promise.resolve());
   const autosaveInitializedRef = useRef(false);
   const lastSavedDataRef = useRef<string | null>(null);
-  const debouncedData = useDebouncedValue(structuredData, 800);
-  const debouncedDataIsCurrent = JSON.stringify(debouncedData) === JSON.stringify(structuredData);
+  const dataSignature = JSON.stringify(structuredData);
+  const debouncedSignature = useDebouncedValue(dataSignature, 800);
+  const debouncedDataIsCurrent = debouncedSignature === dataSignature;
+
   const autosaveTarget =
     application?.status === ENROLLMENT_APPLICATION_STATUS.DRAFT &&
     !readOnly &&
     !isSubmitDialogOpen &&
     !isCancelDialogOpen &&
     debouncedDataIsCurrent &&
-    debouncedData.careerSelection?.trainingPathId === (selectedTrainingPathId || undefined)
+    structuredData.careerSelection?.trainingPathId === (selectedTrainingPathId || undefined)
       ? application.applicationId
       : null;
 
-  // Auto-save logic
   useEffect(() => {
     if (!autosaveTarget) {
       return;
     }
 
     const targetApplicationId = autosaveTarget;
-    const dataSignature = JSON.stringify(debouncedData);
+    const dataSignature = debouncedSignature;
 
     if (!autosaveInitializedRef.current) {
       autosaveInitializedRef.current = true;
@@ -82,12 +84,16 @@ export function useEnrollmentDraftAutosave({
             return null;
           }
 
-          return updateEnrollmentDraftAction(targetApplicationId, { data: debouncedData }).then(unwrapEnrollmentResult);
+          return updateEnrollmentDraftAction(targetApplicationId, { data: JSON.parse(dataSignature) as EnrollmentApplicationData }).then(
+            unwrapEnrollmentResult,
+          );
         });
+
         draftSaveQueue.current = request.then(
           () => undefined,
           () => undefined,
         );
+
         const updated = await request;
 
         if (active && updated) {
@@ -110,7 +116,7 @@ export function useEnrollmentDraftAutosave({
     return () => {
       active = false;
     };
-  }, [autosaveTarget, debouncedData, saveDraft, setApplication]);
+  }, [autosaveTarget, debouncedSignature, saveDraft, setApplication]);
 
   return { saving, saveError: autosaveState.error, draftSaveQueue };
 }

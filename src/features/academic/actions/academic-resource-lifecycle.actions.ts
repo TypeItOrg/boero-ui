@@ -46,6 +46,7 @@ export async function deleteAcademicResourceAction(
 ): Promise<AcademicActionState> {
   void _state;
   void _formData;
+
   const context = actionContextSchema
     .extend({ resource: deletableResourceSchema, id: z.uuid(), destination: z.string() })
     .safeParse({ scope, institutionId, resource, id, destination });
@@ -57,6 +58,7 @@ export async function deleteAcademicResourceAction(
   const permission = restorableResourceSchema.safeParse(context.data.resource).success
     ? DELETE_PERMISSIONS[context.data.resource as LifecycleResource]
     : INSTITUTIONAL_PERMISSION.STUDY_PLAN_CURRICULUM_UPDATE;
+
   const authError = await authorizeAcademicAction(context.data.scope, context.data.institutionId, permission);
 
   if (authError) {
@@ -78,6 +80,7 @@ export async function deleteAcademicResourceAction(
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
+
   revalidatePath(fallback);
   redirect(getSafeReturnTo(context.data.destination, fallback));
 }
@@ -93,6 +96,7 @@ export async function restoreAcademicResourceAction(
 ): Promise<AcademicActionState> {
   void _state;
   void _formData;
+
   const context = actionContextSchema
     .extend({ resource: restorableResourceSchema, id: z.uuid(), destination: z.string() })
     .safeParse({ scope, institutionId, resource, id, destination });
@@ -108,6 +112,7 @@ export async function restoreAcademicResourceAction(
   }
 
   const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
+
   const error = await getResponseErrorActionState(
     academicApiFetch(context.data.scope, `${apiBase}/${context.data.resource}/${context.data.id}/restore`, {
       method: "POST",
@@ -121,6 +126,7 @@ export async function restoreAcademicResourceAction(
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
+
   revalidatePath(fallback);
   redirect(getSafeReturnTo(context.data.destination, fallback));
 }

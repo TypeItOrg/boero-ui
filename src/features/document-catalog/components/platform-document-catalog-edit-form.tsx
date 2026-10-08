@@ -23,6 +23,7 @@ export function PlatformDocumentCatalogEditForm({
     id: document.institutionId,
     name: institutionName,
   });
+
   const [pending, setPending] = useState(false);
   const [copyOpen, setCopyOpen] = useState(false);
   const copyButtonRef = useRef<HTMLButtonElement>(null);

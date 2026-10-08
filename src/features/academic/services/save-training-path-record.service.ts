@@ -16,6 +16,7 @@ export async function saveTrainingPathRecord(
   withProgress: (state: AcademicActionState) => AcademicActionState,
 ): Promise<TrainingPathRecordSaveResult> {
   let pathResponse: Response | undefined;
+
   const pathRequest = academicApiFetch(scope, `${apiBase}/training-paths${effectiveId ? `/${effectiveId}` : ""}`, {
     method: effectiveId ? "PUT" : "POST",
     headers: { "Content-Type": "application/json" },
@@ -25,6 +26,7 @@ export async function saveTrainingPathRecord(
 
     return response;
   });
+
   const pathError = await getResponseErrorActionState(pathRequest, ACADEMIC_ACTION_FIELDS, "No se pudo guardar el trayecto formativo.");
 
   if (pathError) {

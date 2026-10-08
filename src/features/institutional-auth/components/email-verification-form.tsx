@@ -12,6 +12,7 @@ import type { EmailVerificationContext } from "@features/institutional-auth/type
 export function EmailVerificationForm({ context }: { context?: EmailVerificationContext }): ReactElement {
   const [mode, setMode] = useState<"resend" | "change">("resend");
   const institution = useInstitutionalBrand();
+
   const initialIdentity = institution
     ? {
         institutionId: institution.id,
@@ -23,6 +24,7 @@ export function EmailVerificationForm({ context }: { context?: EmailVerification
       : context
         ? { ...context, institutionId: "" }
         : undefined;
+
   const [identity, setIdentity] = useState(initialIdentity);
 
   return (

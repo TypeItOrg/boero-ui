@@ -42,7 +42,9 @@ export async function finishPasskeyLogin(input: {
     credential,
     rememberMe: parsed.data.rememberMe,
   };
+
   const requestHeaders = await headers();
+
   const output = parsed.data.loginAttemptId
     ? await verifyPasskeyAuth({ ...verification, loginAttemptId: parsed.data.loginAttemptId }, requestHeaders)
     : await verifyDiscoverablePasskeyAuth(verification, requestHeaders);

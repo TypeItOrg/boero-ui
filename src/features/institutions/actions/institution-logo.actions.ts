@@ -49,6 +49,7 @@ async function saveLogo(institutionId: string, formData?: FormData): Promise<Ins
     method: upload ? "PUT" : "DELETE",
     body: upload,
   });
+
   const fallback = upload ? INSTITUTION_ERROR_MESSAGES.LOGO_UPDATE : INSTITUTION_ERROR_MESSAGES.LOGO_REMOVE;
   const error = await getResponseErrorActionState(responsePromise, ["file"], fallback);
 
@@ -61,6 +62,7 @@ async function saveLogo(institutionId: string, formData?: FormData): Promise<Ins
   if (upload) {
     try {
       const institution = (await (await responsePromise).json()) as Institution;
+
       logoUrl = institution.logoUrl;
 
       if (typeof logoUrl !== "string" || !getInstitutionLogoUrl(institutionId, logoUrl)) {

@@ -112,6 +112,7 @@ export function TrainingPathDocumentRequirementDialog({
               id: editing?.id ?? null,
               dirty: true,
             };
+
             setDrafts((previous) =>
               editing
                 ? previous.map((item) => (item.clientId === editing.clientId ? draft : item))

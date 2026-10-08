@@ -25,6 +25,15 @@ const explicitImportRestrictions = [
   },
 ];
 
+const statementPaddingRules = [
+  { blankLine: "always", prev: "*", next: ["block-like", "function", "class"] },
+  { blankLine: "always", prev: ["block-like", "function", "class"], next: "*" },
+  { blankLine: "always", prev: "*", next: "return" },
+  { blankLine: "always", prev: "directive", next: "import" },
+  { blankLine: "always", prev: "import", next: "*" },
+  { blankLine: "any", prev: "import", next: "import" },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -52,15 +61,28 @@ const eslintConfig = defineConfig([
         },
       ],
       "no-restricted-syntax": ["error", ...explicitImportRestrictions],
+      "padding-line-between-statements": ["error", ...statementPaddingRules],
+    },
+  },
+  {
+    files: ["src/**/*.{ts,tsx,mts}"],
+    ignores: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
       "padding-line-between-statements": [
         "error",
-        { blankLine: "always", prev: "*", next: ["block-like", "function", "class"] },
-        { blankLine: "always", prev: ["block-like", "function", "class"], next: "*" },
-        { blankLine: "always", prev: "*", next: "return" },
-        { blankLine: "always", prev: "directive", next: "import" },
-        { blankLine: "always", prev: "import", next: "*" },
-        { blankLine: "any", prev: "import", next: "import" },
+        ...statementPaddingRules,
+        { blankLine: "always", prev: "*", next: ["multiline-const", "multiline-let", "multiline-var"] },
+        { blankLine: "always", prev: ["multiline-const", "multiline-let", "multiline-var"], next: "*" },
+        { blankLine: "always", prev: ["const", "let", "var"], next: ["expression", "if", "switch", "for", "while", "try"] },
+        { blankLine: "always", prev: "expression", next: ["const", "let", "var"] },
       ],
+    },
+  },
+  {
+    files: ["src/common/hooks/**/*.{ts,tsx}", "src/features/*/hooks/**/*.{ts,tsx}"],
+    ignores: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "no-nested-ternary": "error",
     },
   },
   {

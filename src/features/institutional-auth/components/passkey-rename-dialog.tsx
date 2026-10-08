@@ -37,6 +37,7 @@ export function PasskeyRenameDialog({ passkey, onClose, onSuccess }: PasskeyRena
     }
 
     const formData = new FormData(event.currentTarget);
+
     startTransition(() => action(formData));
   }
 

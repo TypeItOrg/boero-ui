@@ -18,6 +18,7 @@ export function getAcademicRowActions(
   canReadWaitlist = false,
 ): readonly AcademicRowAction[] {
   const detailHref = `${basePath}/${resource}/${row.id}`;
+
   const lifecycle = getAcademicLifecycleCapabilities(resource, row, {
     delete: canDelete,
     restore: canRestore,
@@ -116,6 +117,7 @@ export function getAcademicRowActions(
 
   if (resource === AcademicResource.COURSE) {
     const waitlistInstitutionId = row.institutionId ?? basePath.split("/")[3];
+
     const waitlistActions: AcademicRowAction[] =
       canReadWaitlist && (!basePath.startsWith("/admin") || waitlistInstitutionId)
         ? [
@@ -128,6 +130,7 @@ export function getAcademicRowActions(
             },
           ]
         : [];
+
     const status = (row.statusValue as string) ?? (row.active ? "ACTIVE" : "INACTIVE");
 
     if (status === "CLOSED") {
@@ -135,6 +138,7 @@ export function getAcademicRowActions(
     }
 
     const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
+
     actions.push(...waitlistActions);
 
     if (canUpdate) {

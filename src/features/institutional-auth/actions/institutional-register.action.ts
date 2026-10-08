@@ -47,6 +47,7 @@ export async function registerInstitutional(
     email: parsed.data.email,
     password: parsed.data.password,
   };
+
   const output = await registerInstitutionalAccount(input);
 
   if (!output.success) {
@@ -60,10 +61,12 @@ export async function registerInstitutional(
   }
 
   const identity = { institutionId: input.institutionId, documentNumber: input.documentNumber };
+
   const context = emailVerificationContextSchema.safeParse({
     ...identity,
     institutionName: formData.get("institutionName") || undefined,
   });
+
   await setEmailVerificationContext(context.success ? context.data : identity);
   redirect("/auth/email-verification");
 }

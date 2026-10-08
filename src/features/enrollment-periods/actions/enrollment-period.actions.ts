@@ -62,6 +62,7 @@ async function mutate(
   }
 
   const path = `/api/v1/institutions/${institutionId}/enrollment-periods${periodId ? "/" + periodId : ""}${suffix}`;
+
   const error = await getResponseErrorActionState(
     academicApiFetch(scope, path, {
       method,

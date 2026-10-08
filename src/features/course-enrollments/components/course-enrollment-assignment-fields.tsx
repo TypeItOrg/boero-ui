@@ -29,6 +29,7 @@ export function CourseEnrollmentAssignmentFields({
   const [daySelections, setDaySelections] = useState<Record<string, DaySelection>>({});
   const selectedClass = options.classes.find((courseClass) => courseClass.id === courseClassId);
   const invalidDaySet = useMemo(() => new Set(invalidDayIds), [invalidDayIds]);
+
   const assignments = checkedDays.map((dayId) => ({
     dayId,
     ...(daySelections[dayId] ?? { classScheduleId: "", individualSlotId: null }),
@@ -48,6 +49,7 @@ export function CourseEnrollmentAssignmentFields({
       }
 
       const next = { ...previous };
+
       delete next[dayId];
 
       return next;

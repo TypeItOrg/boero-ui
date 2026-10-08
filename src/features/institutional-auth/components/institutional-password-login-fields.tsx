@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import Link from "next/link";
 
@@ -15,13 +15,13 @@ export function InstitutionalPasswordLoginFields({
   fieldErrors,
   status,
   rememberMe,
-  setRememberMe,
+  onRememberMeChange,
   changeMethod,
 }: {
   fieldErrors: Partial<Record<"institutionId" | "documentNumber" | "password", string>> | undefined;
   status: { pending: boolean; error: string | null };
   rememberMe: boolean;
-  setRememberMe: Dispatch<SetStateAction<boolean>>;
+  onRememberMeChange: (value: boolean) => void;
   changeMethod: (value: "PASSWORD" | "PASSKEY") => void;
 }): ReactElement {
   return (
@@ -51,7 +51,7 @@ export function InstitutionalPasswordLoginFields({
           className="mt-px"
           checked={rememberMe}
           disabled={status.pending}
-          onCheckedChange={(checked) => setRememberMe(checked === true)}
+          onCheckedChange={(checked) => onRememberMeChange(checked === true)}
         />
         <FieldLabel htmlFor="remember-me" className="font-normal">
           Recordarme

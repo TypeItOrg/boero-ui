@@ -8,7 +8,8 @@ import { z } from "zod";
 import { getValidationActionState } from "@common/utils/action-state.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
 
-import { saveAcademicResourceAction, updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import {
   ACADEMIC_ACTION_FIELDS,
   actionContextSchema,
@@ -43,6 +44,7 @@ export async function saveTrainingPathAction(
   }
 
   let progress: TrainingPathSaveProgress | undefined = parsedProgress.data;
+
   const withProgress = (state: AcademicActionState): AcademicActionState => ({
     ...state,
     trainingPathProgress: progress,
@@ -89,6 +91,7 @@ export async function saveTrainingPathAction(
   }
 
   const input = context.data;
+
   const pathAuthError = await authorizeAcademicAction(
     input.scope,
     input.institutionId,
@@ -139,7 +142,9 @@ export async function saveTrainingPathAction(
     requirementIds: { ...progress?.requirementIds },
     requirementRevisions: { ...progress?.requirementRevisions },
   };
+
   const fallback = getAcademicResourceRoute(input.scope, input.institutionId, AcademicResource.TRAINING_PATH);
+
   revalidatePath(fallback);
   revalidatePath(`${fallback}/${pathId}`);
 

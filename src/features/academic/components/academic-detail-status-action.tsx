@@ -23,12 +23,15 @@ export function getAcademicDetailStatusAction({
   deactivationBlocked: boolean;
 }): ReactNode {
   const currentResource = input.resource;
+
   const academicSpaceStatusBlocked =
     currentResource === AcademicResource.ACADEMIC_SPACE && hasActiveAcademicStatus(item) && item.active && deactivationBlocked;
+
   let statusAction: ReactNode;
 
   if (currentResource === AcademicResource.COURSE) {
     const course = item as import("@features/academic/types/course.types").Course;
+
     const courseStatus = (course.status ??
       (course.active ? "ACTIVE" : "INACTIVE")) as import("@features/academic/types/course-status.types").CourseStatus;
 

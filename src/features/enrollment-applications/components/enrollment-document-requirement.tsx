@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, RefObject, SetStateAction } from "react";
+import type { ReactElement, RefObject } from "react";
 
 import { CircleAlertIcon } from "lucide-react";
 
@@ -41,12 +41,7 @@ export function EnrollmentDocumentRequirement({
   refresh: () => Promise<void>;
   editDocument: (value: { requirement: DocumentRequirement; operation: "review" | "withdraw" } | null) => void;
   activityTriggerRef: RefObject<HTMLButtonElement | null>;
-  setActivity: Dispatch<
-    SetStateAction<{
-      requirement: DocumentRequirement;
-      initialTab: "deliveries" | "changes";
-    } | null>
-  >;
+  setActivity: (value: { requirement: DocumentRequirement; initialTab: "deliveries" | "changes" } | null) => void;
   autoSave: boolean;
   onUploadBlockedChange: ((id: string, blocked: boolean) => void) | undefined;
 }): ReactElement {

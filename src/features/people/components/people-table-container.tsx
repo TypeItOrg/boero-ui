@@ -33,6 +33,7 @@ export async function PeopleTableContainer(props: PeopleTableContainerProps): Pr
     canDelete = true,
     canUpdateStatus = false,
   } = props;
+
   const data = await dataPromise;
 
   return (

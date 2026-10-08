@@ -24,8 +24,8 @@ type AcademicOptionDropdownProps = {
 };
 
 export function TrainingPathDropdown(props: AcademicOptionDropdownProps): ReactElement {
-  const [value, setValue] = useState(props.initialValue);
-  const [selectedLabel, setSelectedLabel] = useState(props.selectedLabel);
+  const [selection, setSelection] = useState({ value: props.initialValue, label: props.selectedLabel });
+
   const fetchPage = useCallback(
     (input: AsyncDropdownFetchPageInput) =>
       fetchAcademicOptionPage<TrainingPath>("training-paths", props.scope, props.institutionId, input, { operation: "STUDY_PLAN_CREATE" }),
@@ -47,21 +47,20 @@ export function TrainingPathDropdown(props: AcademicOptionDropdownProps): ReactE
       id={props.name}
       name={props.name}
       onValueChange={(nextValue, item) => {
-        setValue(nextValue);
-        setSelectedLabel(item?.name);
+        setSelection({ value: nextValue, label: item?.name });
       }}
       placeholder="Seleccionar trayecto"
       queryKey={["academic-options", "training-paths", props.scope, props.institutionId]}
       searchPlaceholder="Buscar trayecto..."
-      selectedLabel={selectedLabel}
-      value={value}
+      selectedLabel={selection.label}
+      value={selection.value}
     />
   );
 }
 
 export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): ReactElement {
-  const [value, setValue] = useState(props.initialValue);
-  const [selectedLabel, setSelectedLabel] = useState(props.selectedLabel);
+  const [selection, setSelection] = useState({ value: props.initialValue, label: props.selectedLabel });
+
   const fetchPage = useCallback(
     (input: AsyncDropdownFetchPageInput) =>
       fetchAcademicOptionPage<AcademicSpace>("academic-spaces", props.scope, props.institutionId, input, {
@@ -86,14 +85,13 @@ export function AcademicSpaceDropdown(props: AcademicOptionDropdownProps): React
       id={props.name}
       name={props.name}
       onValueChange={(nextValue, item) => {
-        setValue(nextValue);
-        setSelectedLabel(item ? getAcademicSpaceOptionLabel(item) : undefined);
+        setSelection({ value: nextValue, label: item ? getAcademicSpaceOptionLabel(item) : undefined });
       }}
       placeholder="Seleccionar espacio"
       queryKey={["academic-options", "academic-spaces", props.scope, props.institutionId]}
       searchPlaceholder="Buscar espacio..."
-      selectedLabel={selectedLabel}
-      value={value}
+      selectedLabel={selection.label}
+      value={selection.value}
     />
   );
 }

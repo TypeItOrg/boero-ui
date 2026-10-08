@@ -40,6 +40,7 @@ export function RoleAssignmentScopeFields({
   const scopeId = useId();
   const pathsId = useId();
   const [selectedNames, setSelectedNames] = useState(names);
+
   const fetchPaths = useCallback(
     async ({ page, search, size, signal }: AsyncDropdownFetchPageInput) => {
       const params = new URLSearchParams({
@@ -49,10 +50,12 @@ export function RoleAssignmentScopeFields({
         size: String(size),
         search,
       });
+
       const response = await fetch(`/api/role-training-path-options?${params}`, {
         signal,
         cache: "no-store",
       });
+
       const data = await parseHttpResponse<{
         items: TrainingPathScopeOption[];
         page: number;
@@ -146,7 +149,9 @@ export function RoleAssignmentScopeFields({
                 }
 
                 setSelectedNames((current) => ({ ...current, [path.id]: path.name }));
+
                 const isSelected = value.trainingPathIds.includes(path.id);
+
                 onChange({
                   ...value,
                   trainingPathIds: isSelected ? value.trainingPathIds.filter((id) => id !== path.id) : [...value.trainingPathIds, path.id],

@@ -22,6 +22,7 @@ export function PlatformLoginForm({ next }: { next?: string }): ReactElement {
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const formData = new FormData(event.currentTarget);
 
     startTransition(() => formAction(formData));

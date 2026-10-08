@@ -38,8 +38,9 @@ export function DocumentFilePreview({
   triggerLabel?: ReactNode;
   className?: string;
 }): ReactElement {
-  const [failed, setFailed] = useState(false);
-  const onPreviewError = useCallback(() => setFailed(true), []);
+  const [failedSource, setFailedSource] = useState<string>();
+  const failed = failedSource === src;
+  const onPreviewError = useCallback(() => setFailedSource(src), [src]);
   const isImage = contentType === "image/png" || contentType === "image/jpeg";
   const isPdf = contentType === "application/pdf";
 
@@ -49,7 +50,7 @@ export function DocumentFilePreview({
         <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center text-sm">
           <p className="text-muted-foreground">No se pudo mostrar la vista previa.</p>
           {failed ? (
-            <Button type="button" variant="outline" onClick={() => setFailed(false)}>
+            <Button type="button" variant="outline" onClick={() => setFailedSource(undefined)}>
               Reintentar
             </Button>
           ) : null}
@@ -71,7 +72,7 @@ export function DocumentFilePreview({
       );
     }
 
-    return <DocumentPdfPreview key={src} src={src} name={name} expanded={expanded} onError={onPreviewError} />;
+    return <DocumentPdfPreview src={src} name={name} expanded={expanded} onError={onPreviewError} />;
   }
 
   return (

@@ -33,7 +33,9 @@ export async function DocumentCatalogPage({
 
   if (scope === "admin") {
     await requirePlatformAccount();
+
     const parsed = z.uuid().safeParse(params.institutionId);
+
     institutionId = parsed.success ? parsed.data : undefined;
     canManage = true;
   } else {

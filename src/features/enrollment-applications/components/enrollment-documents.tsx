@@ -1,8 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactElement } from "react";
-
-import { useRouter } from "next/navigation";
+import type { ReactElement } from "react";
 
 import { CircleAlertIcon, FileTextIcon } from "lucide-react";
 
@@ -15,12 +13,15 @@ import { DocumentMutation } from "@features/enrollment-applications/components/d
 import { EnrollmentDocumentRequirement } from "@features/enrollment-applications/components/enrollment-document-requirement";
 import { EnrollmentDocumentStepHeader } from "@features/enrollment-applications/components/enrollment-document-step-header";
 import { RequestDocumentsDialog } from "@features/enrollment-applications/components/request-documents-dialog";
-import { DOCUMENT_MESSAGES } from "@features/enrollment-applications/constants/documentation.constants";
-import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+import { useEnrollmentDocuments } from "@features/enrollment-applications/hooks/use-enrollment-documents";
 import type { EnrollmentDocumentsProps } from "@features/enrollment-applications/types/enrollment-documents-props.types";
 import { formatEnrollmentApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application-date.util";
 
-export function EnrollmentDocuments({
+export function EnrollmentDocuments(props: EnrollmentDocumentsProps): ReactElement | null {
+  return <EnrollmentDocumentsView key={`${props.scope ?? "institutional"}:${props.application.applicationId}`} {...props} />;
+}
+
+function EnrollmentDocumentsView({
   application,
   scope = "institutional",
   title = "Documentación",
@@ -32,60 +33,21 @@ export function EnrollmentDocuments({
   disabled = false,
   onUploadBlockedChange,
 }: EnrollmentDocumentsProps): ReactElement | null {
-  const router = useRouter();
-  const [documentSnapshot, setDocumentSnapshot] = useState({
-    applicationId: application.applicationId,
-    scope,
-    source: application.documents,
-    documents: application.documents ?? [],
-  });
-  // Draft autosaves replace the application object without changing its document data.
-  const documents =
-    documentSnapshot.applicationId === application.applicationId &&
-    documentSnapshot.scope === scope &&
-    documentSnapshot.source === application.documents
-      ? documentSnapshot.documents
-      : (application.documents ?? []);
-  const [requesting, setRequesting] = useState(false);
-  const [requestUncertain, setRequestUncertain] = useState(false);
-  const [error, setError] = useState("");
-  const [editing, setEditing] = useState<{
-    requirement: DocumentRequirement;
-    operation: "review" | "withdraw";
-  } | null>(null);
-
-  function editDocument(value: typeof editing): void {
-    if (disabled && value) {
-      return;
-    }
-
-    onUploadBlockedChange?.("document-dialog", value !== null);
-    setEditing(value);
-  }
-
-  const activityTriggerRef = useRef<HTMLButtonElement>(null);
-  const [activity, setActivity] = useState<{
-    requirement: DocumentRequirement;
-    initialTab: "deliveries" | "changes";
-  } | null>(null);
-  const url = `/api/enrollment-applications/${application.applicationId}/documents?scope=${scope}`;
-
-  async function refresh(): Promise<void> {
-    const response = await fetch(url, { cache: "no-store" });
-
-    if (!response.ok) {
-      throw new Error(DOCUMENT_MESSAGES.readFailed);
-    }
-
-    setDocumentSnapshot({
-      applicationId: application.applicationId,
-      scope,
-      source: application.documents,
-      documents: await response.json(),
-    });
-    setActivity(null);
-    router.refresh();
-  }
+  const {
+    documents,
+    requesting,
+    requestUncertain,
+    error,
+    editing,
+    activity,
+    activityTriggerRef,
+    editDocument,
+    setActivity,
+    setRequesting,
+    markRequestUncertain,
+    reload,
+    refresh,
+  } = useEnrollmentDocuments({ application, scope, disabled, onUploadBlockedChange });
 
   if (!application.canReadAttachments) {
     return null;
@@ -97,10 +59,8 @@ export function EnrollmentDocuments({
         title={title}
         application={application}
         requestUncertain={requestUncertain}
-        setRequesting={setRequesting}
-        refresh={refresh}
-        setRequestUncertain={setRequestUncertain}
-        setError={setError}
+        onRequest={() => setRequesting(true)}
+        onReload={reload}
       />
       <CardContent className="space-y-4">
         {application.documentRequests?.map((request) => (
@@ -118,7 +78,7 @@ export function EnrollmentDocuments({
             scope={scope}
             onClose={() => setRequesting(false)}
             onSaved={refresh}
-            onUncertain={() => setRequestUncertain(true)}
+            onUncertain={markRequestUncertain}
           />
         ) : null}
         {error ? (

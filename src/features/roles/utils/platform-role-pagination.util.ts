@@ -37,6 +37,7 @@ export function parsePlatformRolesPaginationParams(searchParams: PlatformRolesSe
     allowedPageSizes: new Set<number>(PLATFORM_ROLES_PAGE_SIZE_OPTIONS),
     defaultSize: DEFAULT_PLATFORM_ROLES_PAGE_SIZE,
   });
+
   const roleType = getQueryParamValue(searchParams.roleType);
 
   return {

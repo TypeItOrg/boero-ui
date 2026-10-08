@@ -53,6 +53,7 @@ export default async function PersonPage({
   const canRevokeRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_REVOKE);
   const canManageRoles = canAssignRoles || canRevokeRoles;
   const personPromise = fetchPerson(user.institutionId, personId, PeopleScope.INSTITUTIONAL);
+
   const rolesPromise: Promise<[PersonRole[], AssignableRole[]]> = isDetailView
     ? fetchPersonRoles(user.institutionId, personId, PeopleScope.INSTITUTIONAL).then((assignedRoles) => [assignedRoles, []])
     : canManageRoles
@@ -61,6 +62,7 @@ export default async function PersonPage({
           canAssignRoles ? fetchSystemRoles(user.institutionId, PeopleScope.INSTITUTIONAL) : Promise.resolve([]),
         ])
       : Promise.resolve([[], []]);
+
   const [person, [assignedRoles, systemRoles]] = await Promise.all([personPromise, rolesPromise]);
 
   if (!person) {

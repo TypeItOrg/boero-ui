@@ -49,12 +49,15 @@ export function EnrollmentPeriodResultsTable({
       <TableBody>
         {data.items.map((period) => {
           const statusInfo = statusBadges[period.status];
+
           const editHref = AcademicScope.isAdmin(scope)
             ? `/admin/enrollment-periods/${period.id}/edit?institutionId=${encodeURIComponent(institutionId)}`
             : `/enrollment-periods/${period.id}/edit`;
+
           const canClosePeriod = canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.CLOSED;
           const canDeletePeriod = canDelete && period.canDelete;
           const hasSensitiveActions = canClosePeriod || canDeletePeriod;
+
           const hasRegularActions =
             (canUpdate && period.canUpdate) || (canChangeStatus && period.canChangeStatus && period.status !== ENROLLMENT_PERIOD_STATUS.OPEN);
 

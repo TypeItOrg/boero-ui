@@ -1,8 +1,6 @@
-import {
-  deleteAcademicResourceAction,
-  saveAcademicResourceAction,
-  updateAcademicStatusAction,
-} from "@features/academic/actions/academic-resource.action";
+import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
+import { saveAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";

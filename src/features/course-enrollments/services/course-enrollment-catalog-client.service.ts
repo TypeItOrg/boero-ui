@@ -12,6 +12,7 @@ export async function fetchCatalog<T>(resource: string, input: AsyncDropdownFetc
     size: String(input.size),
     search: input.search ?? "",
   });
+
   const response = await fetch(`/api/${resource}?${params}`, {
     cache: "no-store",
     signal: input.signal,

@@ -42,11 +42,13 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
   const activeItem = group.items.find((item) => navigation.isActive(item.url, item.exact));
   const activeUrl = activeItem?.url;
   const navigationKey = `${pathname}:${activeUrl ?? ""}`;
+
   const [expansion, setExpansion] = useState({
     navigationKey,
     open: groupStates[group.id] ?? Boolean(activeUrl),
     animate: false,
   });
+
   const Icon = group.icon;
 
   // Reopen on navigation into this group, not on unrelated renders or a manual close.

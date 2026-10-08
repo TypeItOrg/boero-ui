@@ -86,6 +86,7 @@ export function AcademicDetail({
   }
 
   const detail = getAcademicDetailInfo(resource, item);
+
   const academicSpaceWarning =
     resource === AcademicResource.ACADEMIC_SPACE && academicSpaceUsage?.summary.deactivationBlocked ? (
       <AcademicSpaceUsageWarning blockingPlanCount={academicSpaceUsage.summary.activePlans + academicSpaceUsage.summary.draftPlans} />

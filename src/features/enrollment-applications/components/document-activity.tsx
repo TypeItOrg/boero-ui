@@ -26,11 +26,7 @@ export function DocumentActivity({
   onClose,
   onReturnFocus,
 }: DocumentActivityProps): ReactElement {
-  const { page, loading, error, history, setError, setLoading, setRetry, changePage } = useDocumentDeliveryHistory(
-    applicationId,
-    scope,
-    requirement.id,
-  );
+  const { page, loading, error, history, retry, changePage } = useDocumentDeliveryHistory(applicationId, scope, requirement.id);
 
   const deliveries = (
     <>
@@ -51,16 +47,7 @@ export function DocumentActivity({
           <AlertTitle>No se pudo cargar el historial</AlertTitle>
           <AlertDescription>
             {error}
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-3 min-h-11 w-fit"
-              onClick={() => {
-                setError("");
-                setLoading(true);
-                setRetry((value) => value + 1);
-              }}
-            >
+            <Button type="button" variant="outline" className="mt-3 min-h-11 w-fit" onClick={retry}>
               Reintentar
             </Button>
           </AlertDescription>

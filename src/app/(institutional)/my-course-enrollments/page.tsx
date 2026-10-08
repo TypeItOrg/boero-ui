@@ -33,12 +33,14 @@ export default async function MyCourseEnrollmentsPage({
   const { page, size } = parsed;
   const status = parsed.status ?? COURSE_ENROLLMENT_STATUS.ENROLLED;
   const academicStatus = status === COURSE_ENROLLMENT_STATUS.ENROLLED ? undefined : parsed.academicStatus;
+
   const data = await fetchMyCourseEnrollments(user.institutionId, {
     page,
     size,
     status,
     academicStatus,
   });
+
   const canWithdraw = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_WITHDRAW);
   const canUpdateAcademicStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_ACADEMIC_STATUS_UPDATE);
 

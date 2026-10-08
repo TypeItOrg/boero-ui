@@ -34,10 +34,13 @@ export function EnrollmentApplicationTableRow({
   detailHref,
 }: EnrollmentApplicationTableRowProps): ReactElement {
   const isPendingEvaluation = application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED;
+
   const canResolve =
     (isPendingEvaluation || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) && (canApprove || canReject);
+
   const showApprove = canResolve && canApprove && Boolean(application.canConfirm || application.canApproveProvisionally);
   const hasActions = Boolean(detailHref) || canResolve;
+
   const row = (
     <TableRow className="h-12">
       <TableCell className="w-16 pl-4">

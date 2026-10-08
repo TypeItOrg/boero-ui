@@ -1,24 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useCallback, useRef, useState, type ReactElement } from "react";
 
 import { SearchIcon, XIcon } from "lucide-react";
 
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
-import { useDebouncedValue } from "@common/hooks/use-debounced-value";
+import { useDebouncedCallback } from "@common/hooks/use-debounced-callback";
 
 export function DataTableSearchFilter({ initialValue, onValueChange, placeholder }: DataTableSearchFilterProps): ReactElement {
-  const [value, setValue] = useState(initialValue);
+  const [draft, setDraft] = useState({ source: initialValue, value: initialValue });
+  const value = draft.source === initialValue ? draft.value : initialValue;
+
+  if (draft.source !== initialValue) {
+    setDraft({ source: initialValue, value: initialValue });
+  }
+
   const inputRef = useRef<HTMLInputElement>(null);
-  const debouncedValue = useDebouncedValue(value, SEARCH_DEBOUNCE_MS);
 
-  useEffect(() => {
-    const normalizedValue = debouncedValue.trim();
+  const commitChange = useCallback(
+    (nextValue: string) => {
+      const normalizedValue = nextValue.trim();
 
-    if (normalizedValue !== initialValue) {
-      onValueChange(normalizedValue);
-    }
-  }, [debouncedValue, initialValue, onValueChange]);
+      if (normalizedValue !== initialValue) {
+        onValueChange(normalizedValue);
+      }
+    },
+    [initialValue, onValueChange],
+  );
+
+  const { schedule } = useDebouncedCallback(commitChange, SEARCH_DEBOUNCE_MS);
+
+  function changeValue(nextValue: string): void {
+    setDraft({ source: initialValue, value: nextValue });
+    schedule(nextValue);
+  }
 
   return (
     <label className="flex min-w-0 !flex-[2_1_min(300px,100%)] flex-col gap-1.5">
@@ -32,7 +47,7 @@ export function DataTableSearchFilter({ initialValue, onValueChange, placeholder
           name="search"
           autoComplete="off"
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => changeValue(event.target.value)}
           maxLength={100}
           placeholder={placeholder}
         />
@@ -41,7 +56,7 @@ export function DataTableSearchFilter({ initialValue, onValueChange, placeholder
             <InputGroupButton
               aria-label="Limpiar búsqueda"
               onClick={() => {
-                setValue("");
+                changeValue("");
                 inputRef.current?.focus();
               }}
               size="icon-sm"

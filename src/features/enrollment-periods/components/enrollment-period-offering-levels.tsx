@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, type ReactElement } from "react";
+import type { ReactElement } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -34,34 +35,21 @@ export function OfferingLevels({
   onChange: (value: EnrollmentPeriodOffering) => void;
   onRemove: () => void;
 }): ReactElement {
-  const [levels, setLevels] = useState<AcademicLevel[] | null>(null);
-  const [error, setError] = useState<string>();
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    const params = new URLSearchParams({
-      institutionId,
-      scope,
-      studyPlanId: offering.studyPlanId,
-      operation,
-    });
-    fetch(`/api/enrollment-period-curriculum?${params}`, {
-      signal: controller.signal,
-      cache: "no-store",
-    })
-      .then((response) => parseHttpResponse<AcademicLevel[]>(response, ENROLLMENT_MESSAGES.PERIOD_SCOPE_LOAD_FAILED))
-      .then((result) => {
-        setLevels(result);
-        setError(undefined);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setError(ENROLLMENT_MESSAGES.PERIOD_SCOPE_LOAD_FAILED);
-        }
-      });
+  const query = useQuery({
+    queryKey: ["enrollment-period-levels", scope, institutionId, offering.studyPlanId, operation],
+    queryFn: async ({ signal }) => {
+      const params = new URLSearchParams({ institutionId, scope, studyPlanId: offering.studyPlanId, operation });
+      const response = await fetch(`/api/enrollment-period-curriculum?${params}`, { signal, cache: "no-store" });
 
-    return () => controller.abort();
-  }, [institutionId, scope, offering.studyPlanId, operation, attempt]);
+      return parseHttpResponse<AcademicLevel[]>(response, ENROLLMENT_MESSAGES.PERIOD_SCOPE_LOAD_FAILED);
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  const levels = query.data;
+  const error = query.isError && !query.isFetching ? ENROLLMENT_MESSAGES.PERIOD_SCOPE_LOAD_FAILED : undefined;
 
   return (
     <article className="bg-background overflow-hidden rounded-xl border shadow-xs">
@@ -89,13 +77,13 @@ export function OfferingLevels({
           <Alert variant="destructive">
             <AlertDescription>
               {error}{" "}
-              <Button type="button" variant="link" onClick={() => setAttempt(attempt + 1)}>
+              <Button type="button" variant="link" onClick={() => void query.refetch()}>
                 Reintentar
               </Button>
             </AlertDescription>
           </Alert>
         </div>
-      ) : !levels ? (
+      ) : query.isFetching || !levels ? (
         <div role="status" className="grid gap-3 p-4">
           <Skeleton className="h-4 w-32" aria-hidden="true" />
           <Skeleton className="h-10 w-full" aria-hidden="true" />

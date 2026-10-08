@@ -37,11 +37,14 @@ interface Props {
 
 export default async function AdminEnrollmentPeriodsPage({ searchParams }: Props) {
   await requirePlatformAccount();
+
   const query = await searchParams;
   const params = parseEnrollmentPeriodPaginationParams(query);
+
   const selectedInstitution = isValidUuid(query.institutionId)
     ? await fetchInstitution(query.institutionId!)
     : (await fetchInstitutions(parseInstitutionPaginationParams({}))).items[0];
+
   const targetInstitutionId = selectedInstitution?.id;
 
   const [periodsData, selectedAcademicYear] = targetInstitutionId

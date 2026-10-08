@@ -16,6 +16,7 @@ export async function fetchPlatformAccounts({
   sort,
 }: PlatformAccountPaginationParams): Promise<PaginatedResponse<PlatformAccountAdmin>> {
   const searchParams = buildPaginationSearchParams({ page, size, search });
+
   searchParams.set("sort", serializeSpringSort(sort));
 
   if (enabled !== undefined) {

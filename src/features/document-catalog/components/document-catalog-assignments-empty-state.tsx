@@ -16,6 +16,7 @@ export function DocumentCatalogAssignmentsEmptyState({
   onFirstPage?: () => void;
 }): ReactElement {
   const title = hasItemsOnOtherPages ? "No hay trayectos en esta página" : "Sin trayectos asignados";
+
   const description = hasItemsOnOtherPages
     ? DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION
     : `No hay trayectos asignados a este documento${withinReadScope ? " dentro de tu alcance de lectura" : ""}.`;

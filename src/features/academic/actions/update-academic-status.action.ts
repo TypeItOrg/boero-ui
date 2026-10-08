@@ -60,6 +60,7 @@ export async function updateAcademicStatusAction(
 
   const body = getStatusRequestBody(parsed.data);
   const path = `${getAcademicApiBase(context.data.scope, context.data.institutionId)}/${context.data.resource}/${context.data.id}/status`;
+
   const error = await getResponseErrorActionState(
     academicApiFetch(context.data.scope, path, {
       method: "PATCH",
@@ -75,6 +76,7 @@ export async function updateAcademicStatusAction(
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
+
   revalidatePath(fallback);
   redirect(getSafeReturnTo(context.data.returnTo, fallback));
 }

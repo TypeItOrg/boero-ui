@@ -18,6 +18,7 @@ const courseOptionsRequestSchema = z.object({
 
 export async function proxyCourseOptionsGet(request: Request, resourceSegment: string, scope: AcademicScope): Promise<Response> {
   const { searchParams } = new URL(request.url);
+
   const parsed = courseOptionsRequestSchema.safeParse({
     resource: resourceSegment,
     ...Object.fromEntries(searchParams),

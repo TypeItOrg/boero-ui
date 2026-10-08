@@ -13,10 +13,12 @@ import { institutionalApiFetch } from "@features/institutional-auth/services/ins
 import type { RoleFormState } from "@features/roles/types/role-form-state.types";
 
 const fields = ["name"] as const;
+
 const schema = z.object({
   name: z.string().trim().min(1, "Ingresá un nombre.").max(100, "El nombre no puede superar los 100 caracteres."),
   permissions: z.array(z.string()),
 });
+
 const actionContextSchema = z.object({
   institutionId: z.string().uuid(),
   roleId: z.string().uuid().optional(),
@@ -45,6 +47,7 @@ export async function saveInstitutionRoleAction(
   }
 
   const path = `/api/v1/institutions/${context.data.institutionId}/roles${context.data.roleId ? `/${context.data.roleId}` : ""}`;
+
   const error = await getResponseErrorActionState(
     institutionalApiFetch(path, {
       method: context.data.roleId ? "PUT" : "POST",
@@ -60,6 +63,7 @@ export async function saveInstitutionRoleAction(
   }
 
   const destination = getSafeReturnTo(returnTo, context.data.roleId ? `/roles/${context.data.roleId}` : "/roles");
+
   revalidatePath("/roles");
   redirect(destination);
 }

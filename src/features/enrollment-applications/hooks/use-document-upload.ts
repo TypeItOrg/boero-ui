@@ -22,6 +22,7 @@ export function useDocumentUpload({
   const [fileError, setFileError] = useState<string>();
   const [preview, setPreview] = useState<string>();
   const selectRef = useRef<HTMLButtonElement>(null);
+
   const [state, action, pending] = useActionState(async (previous: DocumentActionState, form: FormData): Promise<DocumentActionState> => {
     const file = form.get("file");
 
@@ -59,12 +60,15 @@ export function useDocumentUpload({
 
     return { success: true };
   }, {});
+
   const showActionError = submittedFile !== null && (selectedFile === null || submittedFile === selectedFile);
   const error = fileError ?? (!pending && showActionError ? state.error : undefined);
   const disabled = pending || externallyDisabled;
   const errorId = `document-upload-error-${requirement.id}`;
-  const uploadLabel = autoSave ? "Reintentar" : requirement.canReplace ? "Reemplazar archivo" : "Adjuntar archivo";
-  const submitLabel = pending ? "Guardando…" : committed ? "Actualizar detalle" : uploadLabel;
+  const fileUploadLabel = requirement.canReplace ? "Reemplazar archivo" : "Adjuntar archivo";
+  const uploadLabel = autoSave ? "Reintentar" : fileUploadLabel;
+  const savedFileLabel = committed ? "Actualizar detalle" : uploadLabel;
+  const submitLabel = pending ? "Guardando…" : savedFileLabel;
 
   useEffect(() => {
     return () => {
@@ -76,6 +80,7 @@ export function useDocumentUpload({
 
   function uploadFile(file: File): void {
     const form = new FormData();
+
     form.set("file", file);
     startTransition(() => action(form));
   }

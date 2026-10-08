@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useState, type ReactElement, type ReactNode } from "react";
+import { useActionState, type ReactElement, type ReactNode } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -16,8 +17,9 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
@@ -92,38 +94,30 @@ export function AcademicYearStatusDialog({
     updateAcademicStatusAction.bind(null, scope, institutionId, AcademicResource.ACADEMIC_YEAR, id, returnTo),
     INITIAL_STATE,
   );
+
   const config = STATUS_DIALOG_CONFIG[targetStatus];
   const Icon = config.icon;
-  const [courseCount, setCourseCount] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!open || targetStatus !== "CLOSED") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset transient count when dialog closes
-      setCourseCount(null);
+  const countQuery = useQuery({
+    queryKey: ["academic-year-course-count", scope, institutionId, id],
+    enabled: open && targetStatus === "CLOSED",
+    queryFn: async ({ signal }) => {
+      const params = new URLSearchParams({ institutionId });
+      const response = await fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?${params}`, { cache: "no-store", signal });
+      const data = await parseHttpResponse<{ count: number }>(response, "No se pudieron consultar los cursos asociados.");
 
-      return;
-    }
+      if (!Number.isSafeInteger(data?.count) || data.count < 0) {
+        throw new Error("No se pudieron consultar los cursos asociados.");
+      }
 
-    let cancelled = false;
-    fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?institutionId=${institutionId}`, {
-      cache: "no-store",
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (!cancelled && data && typeof data.count === "number") {
-          setCourseCount(data.count);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setCourseCount(null);
-        }
-      });
+      return data.count;
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [open, targetStatus, scope, institutionId, id]);
+  const courseCount = countQuery.data;
 
   function handleOpenChange(nextOpen: boolean): void {
     if (isPending && !nextOpen) {
@@ -145,11 +139,13 @@ export function AcademicYearStatusDialog({
             <AlertDialogDescription>{config.description(academicYearLabel)}</AlertDialogDescription>
             {targetStatus === "CLOSED" ? (
               <p className="text-muted-foreground mt-2 text-sm">
-                {courseCount === null
-                  ? "Cargando cursos asociados..."
-                  : courseCount === 0
-                    ? "No hay cursos asociados para cerrar."
-                    : `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`}
+                {countQuery.isError
+                  ? "No se pudieron consultar los cursos asociados."
+                  : courseCount === undefined
+                    ? "Cargando cursos asociados..."
+                    : courseCount === 0
+                      ? "No hay cursos asociados para cerrar."
+                      : `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`}
               </p>
             ) : null}
           </AlertDialogHeader>

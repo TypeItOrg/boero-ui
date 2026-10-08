@@ -22,7 +22,9 @@ export function PlatformDocumentCatalogNewForm({
   const [institution, setInstitution] = useState<{ id: string; name?: string } | undefined>(
     institutionId ? { id: institutionId, name: institutionName } : undefined,
   );
+
   const [pending, setPending] = useState(false);
+
   const institutionField = (
     <DocumentCatalogInstitutionField
       id="new-document-institution"

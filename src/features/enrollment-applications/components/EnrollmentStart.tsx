@@ -22,6 +22,7 @@ type EnrollmentStartState = {
 
 export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentStartProps): ReactElement {
   const router = useRouter();
+
   const [state, startApplication, isStarting] = useActionState(
     async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
       const result = await startOrGetEnrollmentApplicationAction(input);

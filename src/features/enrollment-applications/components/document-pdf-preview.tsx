@@ -12,7 +12,11 @@ import { cn } from "@common/utils/cn.util";
 import { useDocumentPdfPreview } from "@features/enrollment-applications/hooks/use-document-pdf-preview";
 import type { DocumentPdfPreviewProps } from "@features/enrollment-applications/types/document-pdf-preview-props.types";
 
-export function DocumentPdfPreview({ src, name, expanded, onError }: DocumentPdfPreviewProps): ReactElement {
+export function DocumentPdfPreview(props: DocumentPdfPreviewProps): ReactElement {
+  return <DocumentPdfPreviewView key={props.src} {...props} />;
+}
+
+function DocumentPdfPreviewView({ src, name, expanded, onError }: DocumentPdfPreviewProps): ReactElement {
   const {
     previewId,
     containerRef,

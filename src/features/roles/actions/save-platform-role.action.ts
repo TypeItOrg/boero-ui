@@ -13,11 +13,13 @@ import { platformApiFetch } from "@features/platform-auth/services/platform-api-
 import type { PlatformRoleFormState } from "@features/roles/types/platform-role-form-state.types";
 
 const FIELDS = ["institutionId", "name"] as const;
+
 const SCHEMA = z.object({
   institutionId: z.string().uuid("Seleccioná una institución."),
   name: z.string().trim().min(1, "Ingresá un nombre.").max(100, "El nombre no puede superar los 100 caracteres."),
   permissions: z.array(z.string()),
 });
+
 const ACTION_CONTEXT_SCHEMA = z.object({
   roleId: z.string().uuid().optional(),
   fixedInstitutionId: z.string().uuid().optional(),
@@ -37,6 +39,7 @@ export async function savePlatformRoleAction(
   }
 
   const institutionId = context.data.fixedInstitutionId ?? String(formData.get("institutionId") ?? "");
+
   const parsed = SCHEMA.safeParse({
     institutionId,
     name: formData.get("name"),
@@ -48,6 +51,7 @@ export async function savePlatformRoleAction(
   }
 
   const path = `/api/v1/admin/institutions/${parsed.data.institutionId}/roles${context.data.roleId ? `/${context.data.roleId}` : ""}`;
+
   const error = await getResponseErrorActionState(
     platformApiFetch(path, {
       method: context.data.roleId ? "PUT" : "POST",
@@ -63,6 +67,7 @@ export async function savePlatformRoleAction(
   }
 
   const destination = getSafeReturnTo(returnTo, context.data.roleId ? `/admin/roles/${context.data.roleId}` : "/admin/roles");
+
   revalidatePath("/admin/roles");
   redirect(destination);
 }

@@ -91,10 +91,12 @@ export function InstitutionalPasskeyStep({
     }
 
     const controller = new AbortController();
+
     ceremonyRef.current = controller;
     setCeremony({ phase: "requesting" });
     onError(null);
     onFieldErrors({});
+
     const remembered = rememberMe;
 
     try {
@@ -115,10 +117,13 @@ export function InstitutionalPasskeyStep({
         verifyingRef.current = true;
         setCeremony({ phase: "verifying" });
         onPendingChange(true);
+
         const formData = new FormData();
+
         formData.set("institutionId", input.institutionId);
         formData.set("institutionName", input.institutionName ?? "");
         formData.set("documentNumber", input.documentNumber.trim());
+
         const result = await identifyInstitutionalUser({}, formData);
 
         if (isCurrentCeremony(controller)) {
@@ -144,6 +149,7 @@ export function InstitutionalPasskeyStep({
       verifyingRef.current = true;
       setCeremony({ phase: "verifying" });
       onPendingChange(true);
+
       const finish = await finishPasskeyLogin({
         loginAttemptId: begin.loginAttemptId,
         ceremonyId: begin.ceremonyId,

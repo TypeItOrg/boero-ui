@@ -41,8 +41,34 @@ type DateFormFieldProps = {
   onChange: (date: Date | undefined) => void;
 };
 
-export function DateRangeFields({
-  controlledRange,
+export function DateRangeFields(props: DateRangeFieldsProps): ReactElement {
+  if (props.controlledRange) {
+    return <DateRangeFieldsView {...props} range={props.controlledRange} />;
+  }
+
+  return <UncontrolledDateRangeFields {...props} />;
+}
+
+function UncontrolledDateRangeFields(props: DateRangeFieldsProps): ReactElement {
+  const [range, setRange] = useState(() => ({
+    startDate: parseInitialDate(props.initialValues, props.startName),
+    endDate: parseInitialDate(props.initialValues, props.endName),
+  }));
+
+  return (
+    <DateRangeFieldsView
+      {...props}
+      range={{
+        ...range,
+        onStartDateChange: (date) => setRange((previous) => ({ ...previous, startDate: date })),
+        onEndDateChange: (date) => setRange((previous) => ({ ...previous, endDate: date })),
+      }}
+    />
+  );
+}
+
+function DateRangeFieldsView({
+  range,
   dateFieldsKey,
   disabled = false,
   endLabel,
@@ -50,19 +76,12 @@ export function DateRangeFields({
   endMinDate,
   endName,
   fieldErrors,
-  initialValues,
   startLabel,
   startMaxDate,
   startMinDate,
   startName,
-}: DateRangeFieldsProps): ReactElement {
-  const [internalStartDate, setInternalStartDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, startName));
-  const [internalEndDate, setInternalEndDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, endName));
-  const isControlled = controlledRange !== undefined;
-  const startDate = isControlled ? controlledRange.startDate : internalStartDate;
-  const endDate = isControlled ? controlledRange.endDate : internalEndDate;
-  const setStartDate = controlledRange?.onStartDateChange ?? setInternalStartDate;
-  const setEndDate = controlledRange?.onEndDateChange ?? setInternalEndDate;
+}: DateRangeFieldsProps & { range: ControlledDateRange }): ReactElement {
+  const { startDate, endDate, onStartDateChange: setStartDate, onEndDateChange: setEndDate } = range;
   const hasInvalidRange = startDate !== undefined && endDate !== undefined && endDate < startDate;
   const endDateError = hasInvalidRange ? "La fecha final no puede ser anterior a la inicial." : fieldErrors?.[endName];
   const effectiveEndMinDate = endMinDate ? (startDate ?? endMinDate) : undefined;

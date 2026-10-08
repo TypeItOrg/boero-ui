@@ -16,6 +16,7 @@ const ROLES_ERROR = "No se pudieron obtener los roles.";
 
 export async function fetchPlatformRoles(params: PlatformRolesPaginationParams): Promise<PaginatedResponse<PlatformRoleListItem>> {
   const query = buildPaginationSearchParams(params);
+
   query.set("sort", serializeSpringSort(params.sort));
 
   if (params.institutionId) {
@@ -44,6 +45,7 @@ export async function fetchPlatformPermissionGroups(): Promise<InstitutionPermis
 
   for (const permission of catalog) {
     const group = groups.get(permission.group);
+
     const item: InstitutionPermission = {
       code: permission.code,
       description: permission.description,

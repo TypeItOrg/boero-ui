@@ -34,6 +34,7 @@ export default async function EditPersonPage({ params, searchParams }: EditPerso
   const { returnTo, view } = await searchParams;
   const isDetailView = view === "detail";
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
+
   const [person, assignedRoles, systemRoles] = await Promise.all([
     fetchPerson(id, personId),
     fetchPersonRoles(id, personId),

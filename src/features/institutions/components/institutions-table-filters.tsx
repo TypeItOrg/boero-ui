@@ -18,6 +18,7 @@ type InstitutionsTableFiltersProps = {
 
 export function InstitutionsTableFilters({ active, search, size }: InstitutionsTableFiltersProps): ReactElement {
   const activeValue = active === undefined ? "all" : active ? "true" : "false";
+
   const selectFilters: DataTableSelectFilter<ActiveFilterValue>[] = [
     {
       defaultValue: "all",

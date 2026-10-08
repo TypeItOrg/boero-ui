@@ -42,6 +42,7 @@ type InstitutionalInstitutionFormProps = {
 export function InstitutionalInstitutionForm({ institution, returnTo = "/institution" }: InstitutionalInstitutionFormProps): ReactElement {
   const router = useRouter();
   const destination = getSafeReturnTo(returnTo, "/institution");
+
   const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
     intent: INSTITUTION_LOGO_INTENT.KEEP,
   });
@@ -86,7 +87,9 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
     }
 
     clearErrors();
+
     const formData = createInstitutionFormData(values);
+
     appendInstitutionLogoChange(formData, logoChange);
 
     startTransition(() => {

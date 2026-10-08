@@ -28,6 +28,7 @@ export function CourseEnrollmentDetailActions({
 }: CourseEnrollmentDetailActionsProps): ReactElement {
   const router = useRouter();
   const [mode, setMode] = useState<"withdraw" | "academic">();
+
   const canUpdateResult =
     canUpdateAcademicStatus &&
     enrollment.status !== COURSE_ENROLLMENT_STATUS.WITHDRAWN &&

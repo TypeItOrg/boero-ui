@@ -38,7 +38,7 @@ export async function submitEnrollmentWizard({
   application: EnrollmentApplicationResponse;
   isCancelDialogOpen: boolean;
   setValidationIssues: Dispatch<SetStateAction<z.ZodIssue[]>>;
-  setInvalidInstrumentGroups: Dispatch<SetStateAction<string[]>>;
+  setInvalidInstrumentGroups: (groups: string[]) => void;
   pendingInstrumentGroups: string[];
   structuredData: EnrollmentApplicationData;
   selectedTrainingPathId: string;
@@ -91,6 +91,7 @@ export async function submitEnrollmentWizard({
 
   if (issues.length > 0) {
     setValidationIssues(issues);
+
     // Auto-navigate to the first invalid step and focus its field
     const firstIssue = issues[0];
 
@@ -123,9 +124,11 @@ export async function submitEnrollmentWizard({
 
   try {
     await draftSaveQueue.current;
+
     const savedApplication = await updateEnrollmentDraftAction(application.applicationId, {
       data: structuredData,
     }).then(unwrapEnrollmentResult);
+
     setApplication(savedApplication);
 
     setApplication(await submitEnrollmentApplicationAction(application.applicationId).then(unwrapEnrollmentResult));

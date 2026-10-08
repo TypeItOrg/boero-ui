@@ -27,6 +27,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<ReactE
 
   const access =
     props.scope === "institutional" ? getAcademicAccess(await requireInstitutionalUser(), curriculum.studyPlan.trainingPathId) : props.access;
+
   const planPath = `${props.basePath}/${AcademicResource.STUDY_PLAN}/${props.id}`;
   const canEditCurriculum = access.studyPlanCurriculumUpdate && curriculum.studyPlan.status === "DRAFT";
   const levels = curriculum.levels.map(({ level }) => level);
@@ -47,6 +48,7 @@ export async function StudyPlanRoute(props: StudyPlanRouteProps): Promise<ReactE
         [ACADEMIC_ROUTE_SEGMENT.NEW]: "Nueva versión",
       },
     });
+
     const returnTo = getSafeReturnTo(props.searchParams?.returnTo, planPath);
 
     return (

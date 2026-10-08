@@ -17,7 +17,7 @@ import {
 import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
 
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import { ACTIVE_STATUS_DIALOG_CONFIG } from "@features/academic/config/active-status-dialog.config";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
@@ -58,6 +58,7 @@ export function ActiveAcademicStatusDialog({
     updateAcademicStatusAction.bind(null, scope, institutionId, resource, id, returnTo),
     INITIAL_STATE,
   );
+
   const config = ACTIVE_STATUS_DIALOG_CONFIG[resource][targetStatus];
   const Icon = config.icon;
 

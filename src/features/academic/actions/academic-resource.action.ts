@@ -101,10 +101,13 @@ export async function saveAcademicResourceAction(
   }
 
   const apiBase = getAcademicApiBase(context.data.scope, context.data.institutionId);
+
   const path = context.data.id
     ? (config.updatePath?.(apiBase, context.data.id) ?? `${apiBase}/${context.data.resource}/${context.data.id}`)
     : config.createPath(apiBase, context.data.parentId, data);
+
   const body = config.prepareBody?.(data) ?? data;
+
   const error = await getResponseErrorActionState(
     academicApiFetch(context.data.scope, path, {
       method: context.data.id ? "PUT" : "POST",
@@ -121,7 +124,9 @@ export async function saveAcademicResourceAction(
 
   if (catalogStatus.nextActiveStatus !== null && catalogStatus.formStatusResource && context.data.id) {
     const statusFormData = new FormData();
+
     statusFormData.set("active", catalogStatus.nextActiveStatus);
+
     const statusState = await updateAcademicStatusAction(
       context.data.scope,
       context.data.institutionId,
@@ -154,14 +159,7 @@ export async function saveAcademicResourceAction(
   }
 
   const fallback = getAcademicResourceRoute(context.data.scope, context.data.institutionId, context.data.resource);
+
   revalidatePath(fallback);
   redirect(getSafeReturnTo(context.data.returnTo, fallback));
 }
-
-export { createStudyPlanVersionAction } from "@features/academic/actions/create-study-plan-version.action";
-
-export { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
-
-export { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
-
-export { restoreAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";

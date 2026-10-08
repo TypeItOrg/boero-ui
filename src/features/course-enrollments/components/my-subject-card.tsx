@@ -21,14 +21,18 @@ type MySubjectCardProps = {
 
 export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus, onMutation }: MySubjectCardProps): ReactElement {
   const isEnrolled = enrollment.status === COURSE_ENROLLMENT_STATUS.ENROLLED;
+
   const isWithdrawn =
     enrollment.status === COURSE_ENROLLMENT_STATUS.WITHDRAWN || enrollment.status === COURSE_ENROLLMENT_STATUS.ADMINISTRATIVELY_WITHDRAWN;
+
   const showWithdraw = canWithdraw && isEnrolled;
   const showAcademicAction = canUpdateAcademicStatus && !isWithdrawn;
   const days = Object.keys(COURSE_DAY_LABELS);
+
   const schedules = enrollment.schedules
     .filter((schedule) => !isEnrolled || !schedule.releasedAt)
     .toSorted((a, b) => days.indexOf(a.dayOfWeek) - days.indexOf(b.dayOfWeek) || a.startTime.localeCompare(b.startTime));
+
   const context = [formatStudyPlanLabel(enrollment), enrollment.academicLevelName].filter(Boolean).join(" · ");
 
   return (

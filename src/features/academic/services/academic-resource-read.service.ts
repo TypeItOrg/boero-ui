@@ -13,11 +13,13 @@ export async function fetchPage<T>(
   params: Record<string, string | number | boolean | undefined>,
 ): Promise<PaginatedResponse<T>> {
   const searchParams = new URLSearchParams();
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== "") {
       searchParams.set(key, String(value));
     }
   });
+
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
   const base = institutionId ? getAcademicApiBase(scope, institutionId) : "/api/v1/admin";
   const response = await academicApiFetch(scope, `${base}/${resource}${query}`);
@@ -38,11 +40,13 @@ export async function fetchDetailWithParams<T>(
   params: Record<string, string | number | undefined>,
 ): Promise<T | null> {
   const searchParams = new URLSearchParams();
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== "") {
       searchParams.set(key, String(value));
     }
   });
+
   const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
 

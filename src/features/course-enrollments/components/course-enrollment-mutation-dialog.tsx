@@ -72,6 +72,7 @@ export function CourseEnrollmentMutationDialog({
   }
 
   const availableAcademicStatusOptions = ACADEMIC_STATUS_OPTIONS;
+
   const defaultAcademicStatus = availableAcademicStatusOptions.some((option) => option.value === enrollment.academicStatus)
     ? enrollment.academicStatus
     : undefined;

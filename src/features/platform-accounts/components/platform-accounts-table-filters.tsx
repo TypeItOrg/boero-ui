@@ -18,6 +18,7 @@ type PlatformAccountsTableFiltersProps = {
 
 export function PlatformAccountsTableFilters({ enabled, search, size }: PlatformAccountsTableFiltersProps): ReactElement {
   const enabledValue = enabled === undefined ? "all" : enabled ? "true" : "false";
+
   const selectFilters: DataTableSelectFilter<EnabledFilterValue>[] = [
     {
       defaultValue: "all",

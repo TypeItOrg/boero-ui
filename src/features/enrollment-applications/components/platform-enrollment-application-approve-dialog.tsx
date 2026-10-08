@@ -48,6 +48,7 @@ export function PlatformEnrollmentApplicationApproveDialog({
 
     return result;
   }, {});
+
   const error = state.error;
 
   function handleOpenChange(nextOpen: boolean): void {

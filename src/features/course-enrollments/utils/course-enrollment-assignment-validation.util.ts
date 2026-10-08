@@ -63,6 +63,7 @@ export function validateEnrollmentAssignment(formData: FormData, options: Course
     const day = assignment.dayId
       ? selectedClass.days.find((candidate) => candidate.id === assignment.dayId)
       : selectedClass.days.find((candidate) => candidate.schedules.some((schedule) => schedule.id === assignment.classScheduleId));
+
     const label = day ? dayLabel(day.dayOfWeek) : "el día";
 
     if (typeof assignment.classScheduleId !== "string" || !isValidUuid(assignment.classScheduleId)) {

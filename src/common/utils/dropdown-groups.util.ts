@@ -13,6 +13,7 @@ export function groupDropdownItems<TItem>(
   for (const item of items) {
     const label = getItemGroup(item);
     const group = groups.get(label) ?? [];
+
     group.push(item);
     groups.set(label, group);
   }

@@ -34,6 +34,7 @@ export function EnrollmentPeriodDeleteDialog({
   onClose: () => void;
 }) {
   const router = useRouter();
+
   const [state, action, pending] = useActionState(async (): Promise<EnrollmentPeriodActionState> => {
     const result = await deleteEnrollmentPeriodAction(institutionId, periodId, scope);
 

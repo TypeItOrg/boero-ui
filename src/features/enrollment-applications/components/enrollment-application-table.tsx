@@ -32,6 +32,7 @@ export async function EnrollmentApplicationTableContainer({
 }: EnrollmentApplicationTableContainerProps): Promise<ReactElement> {
   const fetched = await dataPromise;
   const user = scope === AcademicScope.ADMIN ? null : await requireInstitutionalUser();
+
   const data = {
     ...fetched,
     items: fetched.items.map((item) => ({

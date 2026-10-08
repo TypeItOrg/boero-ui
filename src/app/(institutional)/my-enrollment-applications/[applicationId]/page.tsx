@@ -52,6 +52,7 @@ export default async function MyEnrollmentApplicationDetailPage({
   const detailContext = [application.trainingPathName, application.academicYearName].filter(Boolean).join(" ");
   const breadcrumbLabel = detailContext ? `${detailLabel} · ${detailContext}` : detailLabel;
   const PageIcon = isEditable ? FilePenLineIcon : ClipboardListIcon;
+
   const [shifts, courses] = await Promise.all([
     isEditable ? fetchEnrollmentApplicationShifts(applicationId) : Promise.resolve([]),
     isEditable ? fetchEnrollmentApplicationCourses(applicationId) : Promise.resolve({ items: [], page: 0, size: 0, totalItems: 0, totalPages: 0 }),

@@ -61,14 +61,17 @@ export async function StudyPlanSpaceRoute({
   }
 
   const spacePath = `${planPath}/spaces/${space.id}`;
+
   const spaceBreadcrumbLabels = {
     [props.id]: formatStudyPlanLabel(curriculum.studyPlan),
     [space.id]: space.academicSpaceName,
   };
+
   const spaceBreadcrumb = props.renderBreadcrumb({
     hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
     segmentLabels: spaceBreadcrumbLabels,
   });
+
   const editSpaceBreadcrumb = props.renderBreadcrumb({
     hiddenSegments: [ACADEMIC_ROUTE_SEGMENT.SPACES],
     segmentLabels: {

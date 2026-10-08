@@ -50,6 +50,7 @@ export function DataTableFilters({
     },
     [navigate, size],
   );
+
   const updateSearch = useCallback((value: string): void => updateQueryParam("search", value), [updateQueryParam]);
   const advancedTriggerLabelId = useId();
 

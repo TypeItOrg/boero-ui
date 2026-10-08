@@ -37,6 +37,7 @@ const DEFAULT_SORT_BY_RESOURCE: Record<"training-paths" | "academic-spaces" | "s
 
 export async function proxyAcademicOptionsGet(request: Request, resourceSegment: string, scope: AcademicScope): Promise<Response> {
   const { searchParams } = new URL(request.url);
+
   const parsed = academicOptionsRequestSchema.safeParse({
     resource: resourceSegment,
     ...Object.fromEntries(searchParams),

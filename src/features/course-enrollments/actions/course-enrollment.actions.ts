@@ -37,11 +37,13 @@ export async function createManualCourseEnrollmentAction(formData: FormData): Pr
   }
 
   const user = await requireInstitutionalUser();
+
   const response = institutionalApiFetch(`/api/v1/institutions/${user.institutionId}/course-enrollments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ studentId, courseId, ...assignmentBody }),
   });
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo registrar la inscripción manual.");
 
   if (failure) {
@@ -71,6 +73,7 @@ export async function enrollApplicationCourseAction(
   }
 
   const user = await requireInstitutionalUser();
+
   const response = institutionalApiFetch(
     `/api/v1/institutions/${user.institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/enroll`,
     {
@@ -79,6 +82,7 @@ export async function enrollApplicationCourseAction(
       body: JSON.stringify({ ...assignmentBody, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo inscribir la solicitud de cursada.");
 
   if (failure) {
@@ -109,6 +113,7 @@ export async function rejectApplicationCourseAction(
   }
 
   const user = await requireInstitutionalUser();
+
   const response = institutionalApiFetch(
     `/api/v1/institutions/${user.institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/reject`,
     {
@@ -117,6 +122,7 @@ export async function rejectApplicationCourseAction(
       body: JSON.stringify({ reason, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo rechazar la solicitud de cursada.");
 
   if (failure) {
@@ -145,11 +151,13 @@ export async function withdrawCourseEnrollmentAction(
   }
 
   const user = await requireInstitutionalUser();
+
   const response = institutionalApiFetch(`/api/v1/institutions/${user.institutionId}/course-enrollments/${enrollmentId}/withdraw`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ type, reason, expectedVersion }),
   });
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo registrar la baja.");
 
   if (failure) {
@@ -179,11 +187,13 @@ export async function updateCourseAcademicStatusAction(
   }
 
   const user = await requireInstitutionalUser();
+
   const response = institutionalApiFetch(`/api/v1/institutions/${user.institutionId}/course-enrollments/${enrollmentId}/academic-status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, reason, expectedVersion }),
   });
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo actualizar el resultado.");
 
   if (failure) {

@@ -1,13 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import { AcademicYearStatusDialog } from "@features/academic/components/academic-year-status-dialog";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
+import { renderWithQueryClient as render } from "@/../test/utils/render-with-query-client";
+
+jest.mock("@features/academic/actions/update-academic-status.action", () => ({
   updateAcademicStatusAction: jest.fn(),
 }));
 
@@ -43,7 +45,7 @@ describe("AcademicYearStatusDialog", () => {
     expect(await screen.findByText(/cursos asociados \(2 cursos\)/)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/institutional/academic/academic-years/" + YEAR_ID + "/courses/count?institutionId=" + INSTITUTION_ID,
-      { cache: "no-store" },
+      { cache: "no-store", signal: expect.any(AbortSignal) },
     );
 
     await user.click(screen.getByRole("button", { name: "Finalizar ciclo lectivo" }));

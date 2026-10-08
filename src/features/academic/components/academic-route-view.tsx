@@ -58,6 +58,7 @@ export async function AcademicRouteView({
 
   if (collectionResource) {
     const config = ACADEMIC_COLLECTION_CONFIG[collectionResource];
+
     ensureReadAccess(access, collectionResource);
 
     if (!id) {

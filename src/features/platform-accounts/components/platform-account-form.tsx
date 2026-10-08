@@ -62,6 +62,7 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string>();
   const defaultValues = getDefaultValues(account);
+
   const {
     register,
     handleSubmit,
@@ -79,7 +80,9 @@ export function PlatformAccountForm({ mode, account, returnTo }: PlatformAccount
       const result = isEdit
         ? await updatePlatformAccountAction(account.platformAccountId, createFormData(values))
         : await createPlatformAccountAction(createFormData(values));
+
       const hasFieldErrors = setActionFieldErrors(result, setError);
+
       setFormError(hasFieldErrors ? undefined : result.error);
 
       if (result.success) {

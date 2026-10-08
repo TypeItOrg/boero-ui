@@ -52,10 +52,12 @@ function toDescriptors(value: unknown): PublicKeyCredentialDescriptor[] {
 
 function toFallbackRequestOptions(options: unknown): PublicKeyCredentialRequestOptions {
   const source = requireRecord(options);
+
   const result: PublicKeyCredentialRequestOptions = {
     challenge: requireBytes(source.challenge),
     allowCredentials: toDescriptors(source.allowCredentials),
   };
+
   const rpId = optionalString(source.rpId);
 
   if (rpId !== undefined) {

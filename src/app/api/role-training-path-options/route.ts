@@ -22,6 +22,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const { institutionId, scope, page, size, search } = parsed.data;
+
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),

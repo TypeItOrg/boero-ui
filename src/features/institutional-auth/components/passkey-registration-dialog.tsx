@@ -46,6 +46,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
     }
 
     const controller = new AbortController();
+
     ceremonyRef.current = controller;
 
     try {
@@ -78,6 +79,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
       }
 
       setVerifying(true);
+
       const result = await verifyPasskeyRegistrationAction(options.ceremonyId, credential);
 
       if (controller.signal.aborted) {
@@ -119,6 +121,7 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
     }
 
     const formData = new FormData(event.currentTarget);
+
     startTransition(() => action(formData));
   }
 

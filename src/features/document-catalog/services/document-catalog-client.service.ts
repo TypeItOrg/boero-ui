@@ -28,6 +28,7 @@ export async function fetchPlatformDocumentCatalog(
     cache: "no-store",
     signal,
   });
+
   const payload = await parseHttpResponse<PaginatedResponse<PlatformDocumentDefinition>>(
     response,
     "No se pudo consultar la documentación. Reintentá la consulta.",

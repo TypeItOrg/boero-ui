@@ -70,10 +70,12 @@ export async function requestDocuments(
   }
 
   let response: Response | undefined;
+
   const path =
     scope === "admin"
       ? `/api/v1/admin/enrollment-applications/${institutionId}/${applicationId}/document-requests`
       : `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/document-requests`;
+
   const pending = academicApiFetch(scope, path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -83,6 +85,7 @@ export async function requestDocuments(
 
     return result;
   });
+
   const error = await getResponseErrorActionState(pending, [], ENROLLMENT_MESSAGES.requestReadFailed);
 
   if (error) {

@@ -81,13 +81,16 @@ export function PersonAssignedRoleCard({
           names={assignedRolesByCode.get(role.roleId)?.trainingPathNames ?? {}}
           onChange={(next) => {
             const original = assignedRolesByCode.get(role.roleId);
+
             const previous: Pick<RoleAssignment, "accessScope" | "trainingPathIds"> = original ?? {
               accessScope: "TRAINING_PATHS",
               trainingPathIds: [],
             };
+
             const expands =
               previous.accessScope !== "INSTITUTION" &&
               (next.accessScope === "INSTITUTION" || next.trainingPathIds.some((id) => !previous.trainingPathIds.includes(id)));
+
             const reduces =
               next.accessScope !== "INSTITUTION" &&
               (previous.accessScope === "INSTITUTION" || previous.trainingPathIds.some((id) => !next.trainingPathIds.includes(id)));

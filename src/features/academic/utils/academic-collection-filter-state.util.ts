@@ -50,12 +50,14 @@ export function getAcademicCollectionFilters({
   const dateFilters = config.dateFilters?.(params) ?? [];
   const advancedYearFilters = isAcademicYear ? yearFilters : [];
   const advancedDateFilters = isAcademicYear || isStudyPlan ? dateFilters : [];
+
   const advancedBadgeCount = countActiveAdvancedFilters({
     activeAdvancedCount,
     advancedDateFilters,
     advancedSelectFilters,
     advancedYearFilters,
   });
+
   const hasFilters =
     params.search.length > 0 ||
     params.institutionId !== undefined ||

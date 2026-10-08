@@ -42,23 +42,28 @@ export function MyWeeklySchedule({
   const calendarHeight = hours.length * 120;
   const totalMinutes = hours.length * 60;
   const monday = new Date(`${weekStart}T00:00:00Z`);
+
   const dates = Object.keys(COURSE_DAY_LABELS).map((_, index) => {
     const date = new Date(monday);
+
     date.setUTCDate(date.getUTCDate() + index);
 
     return date;
   });
+
   const monthFormatter = new Intl.DateTimeFormat("es-AR", {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
   });
+
   const firstMonth = monthFormatter.format(dates[0]);
   const lastMonth = monthFormatter.format(dates[6]);
   const monthLabel = firstMonth === lastMonth ? firstMonth : `${firstMonth} – ${lastMonth}`;
   const shortDateFormatter = new Intl.DateTimeFormat("es-AR", { month: "long", timeZone: "UTC" });
   const startMonth = shortDateFormatter.format(dates[0]);
   const endMonth = shortDateFormatter.format(dates[6]);
+
   const weekLabel =
     startMonth === endMonth
       ? `${dates[0].getUTCDate()} – ${dates[6].getUTCDate()} de ${endMonth}`

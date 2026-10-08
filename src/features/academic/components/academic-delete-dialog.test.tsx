@@ -1,12 +1,12 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
+jest.mock("@features/academic/actions/academic-resource-lifecycle.actions", () => ({
   deleteAcademicResourceAction: jest.fn(),
 }));
 

@@ -14,6 +14,7 @@ import { type EnrollmentPeriodStatus } from "@features/enrollment-periods/types/
 
 export function useEnrollmentPeriodStatus(institutionId: string, scope: AcademicScope) {
   const router = useRouter();
+
   const [, changeStatus, isChangingStatus] = useActionState(
     async (_previous: EnrollmentPeriodActionState, input: { periodId: string; status: EnrollmentPeriodStatus }) => {
       const result = await updateEnrollmentPeriodStatusAction(institutionId, input.periodId, { status: input.status }, scope);

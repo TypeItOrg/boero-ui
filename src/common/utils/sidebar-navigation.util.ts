@@ -20,6 +20,7 @@ export function groupSidebarNavigationSection(
   }
 
   const navigationGroup = { ...group, items: children };
+
   const groupedSections = sections.map((section) => {
     if (section.label !== sectionLabel && section.label !== sourceSectionLabel) {
       return section;

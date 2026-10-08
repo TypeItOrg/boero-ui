@@ -17,17 +17,11 @@ import type { EnrollmentWizardModel } from "@features/enrollment-applications/ty
 
 type Props = Pick<
   EnrollmentWizardModel,
+  | "preference"
+  | "updatePreference"
   | "isMinor"
   | "getFieldError"
-  | "preferredShift"
-  | "setPreferredShift"
   | "shiftOptions"
-  | "allowsImageUse"
-  | "setAllowsImageUse"
-  | "isReenrolling"
-  | "setIsReenrolling"
-  | "previousTeacher"
-  | "setPreviousTeacher"
   | "handleActiveTabChange"
   | "hasDocumentsStep"
   | "readOnly"
@@ -38,17 +32,11 @@ type Props = Pick<
 >;
 
 export function EnrollmentPreferencesStep({
+  preference,
+  updatePreference,
   isMinor,
   getFieldError,
-  preferredShift,
-  setPreferredShift,
   shiftOptions,
-  allowsImageUse,
-  setAllowsImageUse,
-  isReenrolling,
-  setIsReenrolling,
-  previousTeacher,
-  setPreviousTeacher,
   handleActiveTabChange,
   hasDocumentsStep,
   readOnly,
@@ -70,7 +58,7 @@ export function EnrollmentPreferencesStep({
             <FieldLabel htmlFor="preferredShift" required>
               Turno de preferencia
             </FieldLabel>
-            <Select value={preferredShift} onValueChange={setPreferredShift}>
+            <Select value={preference.preferredShift} onValueChange={(value) => updatePreference("preferredShift", value)}>
               <SelectTrigger id="preferredShift" className="h-9! w-full" aria-invalid={!!getFieldError(["preference", "preferredShift"])}>
                 <SelectValue placeholder="Seleccioná un turno" />
               </SelectTrigger>
@@ -102,7 +90,12 @@ export function EnrollmentPreferencesStep({
                 Autorizo a la institución a registrar y publicar fotografías y videos con fines pedagógicos y difusión cultural.
               </FieldDescription>
             </div>
-            <Switch id="allowsImageUse" size="lg" checked={allowsImageUse} onCheckedChange={setAllowsImageUse} />
+            <Switch
+              id="allowsImageUse"
+              size="lg"
+              checked={preference.allowsImageUse}
+              onCheckedChange={(value) => updatePreference("allowsImageUse", value)}
+            />
           </div>
 
           <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
@@ -112,18 +105,23 @@ export function EnrollmentPreferencesStep({
               </FieldLabel>
               <FieldDescription>Indicá si cursaste materias en este conservatorio o instituto en ciclos anteriores.</FieldDescription>
             </div>
-            <Switch id="isReenrolling" size="lg" checked={isReenrolling} onCheckedChange={setIsReenrolling} />
+            <Switch
+              id="isReenrolling"
+              size="lg"
+              checked={preference.isReenrolling}
+              onCheckedChange={(value) => updatePreference("isReenrolling", value)}
+            />
           </div>
 
-          {isReenrolling && (
+          {preference.isReenrolling && (
             <Field data-invalid={!!getFieldError(["preference", "previousTeacher"])}>
               <FieldLabel htmlFor="previousTeacher" required>
                 Docente con quien cursaste previamente
               </FieldLabel>
               <Input
                 id="previousTeacher"
-                value={previousTeacher}
-                onChange={(e) => setPreviousTeacher(e.target.value)}
+                value={preference.previousTeacher}
+                onChange={(e) => updatePreference("previousTeacher", e.target.value)}
                 placeholder="Profesor/a de instrumento o cátedra"
                 aria-invalid={!!getFieldError(["preference", "previousTeacher"])}
               />

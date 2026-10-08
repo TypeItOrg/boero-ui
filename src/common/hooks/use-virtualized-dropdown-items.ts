@@ -30,6 +30,7 @@ export function useVirtualizedDropdownItems<TItem>({
   const parentRef = useRef<HTMLDivElement | null>(null);
   const hasDefault = defaultOption !== undefined && showDefaultOption;
   const selectedValueSet = useMemo(() => new Set(selectedValues ?? (value ? [value] : [])), [selectedValues, value]);
+
   const rows = useMemo(() => {
     const result: AsyncDropdownRow<TItem>[] = [];
 
@@ -59,9 +60,11 @@ export function useVirtualizedDropdownItems<TItem>({
 
     return result;
   }, [compareGroups, getItemGroup, getItemValue, groupOrder, hasDefault, hasNextPage, items]);
+
   const measureRows = getItemGroup !== undefined || getItemDisplayLabel !== undefined || getItemDescription !== undefined;
   const scrollAnchor = useRef<{ key: string; offset: number } | null>(null);
   const virtualCount = rows.length;
+
   const viewportHeight = getViewportHeight({
     itemCount: virtualCount,
     itemSize: estimateSize,

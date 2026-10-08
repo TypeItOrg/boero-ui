@@ -1,12 +1,12 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import { ActiveAcademicStatusButton, ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
+jest.mock("@features/academic/actions/update-academic-status.action", () => ({
   updateAcademicStatusAction: jest.fn(),
 }));
 

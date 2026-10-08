@@ -17,6 +17,7 @@ export async function fetchPlatformPeople({
   sort,
 }: PlatformPeoplePaginationParams): Promise<PaginatedResponse<PlatformPersonSummary>> {
   const searchParams = buildPaginationSearchParams({ page, size, search });
+
   searchParams.set("sort", serializeSpringSort(sort));
 
   if (institutionId) {

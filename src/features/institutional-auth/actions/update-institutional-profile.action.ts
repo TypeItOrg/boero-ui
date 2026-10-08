@@ -33,6 +33,7 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed.data),
   });
+
   const errorState = await getResponseErrorActionState(response, PROFILE_FIELDS, "No se pudieron actualizar tus datos.");
 
   if (errorState) {

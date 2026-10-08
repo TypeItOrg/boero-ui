@@ -49,6 +49,7 @@ export function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPendi
 
 export function createFormData(values: PlatformAccountFormValues): FormData {
   const formData = new FormData();
+
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
 
   return formData;

@@ -51,11 +51,26 @@ export function DatePicker({
   "aria-required": ariaRequired,
 }: DatePickerProps): ReactElement {
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<string>();
-  const [hasInvalidDraft, setHasInvalidDraft] = useState(false);
-  const displayValue = draft ?? (value ? format(value, DISPLAY_DATE_FORMAT) : "");
+  const canonicalValue = value ? format(value, DISPLAY_DATE_FORMAT) : "";
+  const [draftState, setDraftState] = useState<{ source: string; value?: string }>(() => ({ source: canonicalValue }));
+  const draft = draftState.source === canonicalValue ? draftState.value : undefined;
+
+  if (draftState.source !== canonicalValue) {
+    setDraftState({ source: canonicalValue });
+  }
+
+  const parsedDraft = draft?.length === DISPLAY_DATE_FORMAT.length ? parseDate(draft) : undefined;
+
+  const hasInvalidDraft =
+    draft?.length === DISPLAY_DATE_FORMAT.length && (!parsedDraft || parsedDraft < minDate || (maxDate !== undefined && parsedDraft > maxDate));
+
+  const displayValue = draft ?? canonicalValue;
   const hasValue = displayValue.length > 0;
   const hasOutOfRangeValue = value !== undefined && (value < minDate || (maxDate !== undefined && value > maxDate));
+
+  function setDraft(nextValue: string | undefined): void {
+    setDraftState({ source: canonicalValue, value: nextValue });
+  }
 
   function commitValue(date: Date | undefined, source: "calendar" | "clear" | "input"): void {
     onChange?.(date);
@@ -64,7 +79,6 @@ export function DatePicker({
 
   function handleSelect(date: Date | undefined): void {
     setDraft(undefined);
-    setHasInvalidDraft(false);
     onDraftChange?.("");
     setOpen(false);
     commitValue(date, "calendar");
@@ -72,26 +86,22 @@ export function DatePicker({
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
     const nextDraft = formatDateDraft(event.target.value);
+
     setDraft(nextDraft);
     onDraftChange?.(nextDraft);
 
     if (nextDraft === "") {
-      setHasInvalidDraft(false);
       commitValue(undefined, "input");
 
       return;
     }
 
     if (nextDraft.length !== DISPLAY_DATE_FORMAT.length) {
-      setHasInvalidDraft(false);
-
       return;
     }
 
     const date = parseDate(nextDraft);
     const isAllowedDate = date !== undefined && date >= minDate && (!maxDate || date <= maxDate);
-
-    setHasInvalidDraft(!isAllowedDate);
 
     if (isAllowedDate) {
       commitValue(date, "input");
@@ -106,7 +116,6 @@ export function DatePicker({
 
   function handleClear(): void {
     setDraft(undefined);
-    setHasInvalidDraft(false);
     onDraftChange?.("");
     setOpen(false);
     commitValue(undefined, "clear");

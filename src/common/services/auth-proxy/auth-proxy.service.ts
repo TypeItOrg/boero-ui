@@ -40,6 +40,7 @@ export async function handleGuestOnlyRoute(request: NextRequest, policy: AuthPro
 
   if (refreshAttempt.tokens) {
     const response = NextResponse.redirect(policy.getAuthenticatedRedirect(request));
+
     policy.setRefreshedCookies(response, refreshAttempt.tokens);
 
     return response;
@@ -106,6 +107,7 @@ function refreshSession(refreshPath: string, refreshToken: string): Promise<Refr
   }
 
   const refreshRequest = performRefresh(refreshPath, refreshToken);
+
   inFlightRefreshes.set(requestKey, refreshRequest);
 
   void refreshRequest.then(
@@ -183,6 +185,7 @@ function createRefreshedSessionResponse(request: NextRequest, policy: AuthProxyP
   const response = NextResponse.next({
     request: { headers: new Headers(request.headers) },
   });
+
   policy.setRefreshedCookies(response, tokens);
 
   return response;

@@ -54,6 +54,7 @@ export function AcademicTableRow({
 }: AcademicTableRowProps): ReactElement {
   const institutionId = row.institutionId ?? "";
   const detailHref = `${basePath}/${resource}/${row.id}`;
+
   const actions = getAcademicRowActions(
     basePath,
     resource,

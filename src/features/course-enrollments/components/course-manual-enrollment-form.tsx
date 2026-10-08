@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, type ReactElement } from "react";
+import { useActionState, useState, type ReactElement } from "react";
 
 import Link from "next/link";
 
@@ -10,12 +10,13 @@ import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Skeleton } from "@common/components/ui/skeleton";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
 
 import { createManualCourseEnrollmentAction } from "@features/course-enrollments/actions/course-enrollment.actions";
 import { CourseEnrollmentAssignmentFields } from "@features/course-enrollments/components/course-enrollment-assignment-fields";
 import { CourseManualEnrollmentStudentFields } from "@features/course-enrollments/components/course-manual-enrollment-student-fields";
-import { fetchCourseEnrollmentOptions } from "@features/course-enrollments/services/course-enrollment-client.service";
-import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
+import { COURSE_ENROLLMENT_MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
+import { useCourseEnrollmentOptions } from "@features/course-enrollments/hooks/use-course-enrollment-options";
 import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 
 type CourseManualEnrollmentFormProps = {
@@ -23,73 +24,31 @@ type CourseManualEnrollmentFormProps = {
 };
 
 export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentFormProps): ReactElement {
-  const errorRef = useRef<HTMLDivElement>(null);
   const [studentId, setStudentId] = useState<string>();
   const [courseId, setCourseId] = useState("");
-  const [options, setOptions] = useState<CourseEnrollmentAssignmentOptions | null>(null);
-  const [optionsError, setOptionsError] = useState<string | null>(null);
-  const [loadingOptions, setLoadingOptions] = useState(false);
-  const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
-    if (options) {
-      const validation = validateEnrollmentAssignment(formData, options);
+  const { options, error: optionsError, loading: loadingOptions } = useCourseEnrollmentOptions({ courseId });
 
-      if (!validation.ok) {
-        return { error: validation.message, invalidDayIds: validation.invalidDayIds };
-      }
+  const [state, formAction, isPending] = useActionState<{ error?: string; invalidDayIds?: string[] }, FormData>(async (_previous, formData) => {
+    if (!options || loadingOptions) {
+      return { error: optionsError ?? COURSE_ENROLLMENT_MESSAGES.LOADING_ASSIGNMENTS };
+    }
+
+    const validation = validateEnrollmentAssignment(formData, options);
+
+    if (!validation.ok) {
+      return { error: validation.message, invalidDayIds: validation.invalidDayIds };
     }
 
     return createManualCourseEnrollmentAction(formData);
   }, {});
 
-  function handleCourseChange(nextCourseId: string): void {
-    setCourseId(nextCourseId);
-    setOptions(null);
-    setOptionsError(null);
-    setLoadingOptions(Boolean(nextCourseId));
-  }
-
-  useEffect(() => {
-    if (!courseId) {
-      return;
-    }
-
-    let active = true;
-
-    fetchCourseEnrollmentOptions(courseId)
-      .then((nextOptions) => {
-        if (active) {
-          setOptions(nextOptions);
-        }
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          setOptions(null);
-          setOptionsError(error instanceof Error ? error.message : "No se pudieron cargar los horarios.");
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoadingOptions(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [courseId]);
-
-  useEffect(() => {
-    if (state.error && !isPending) {
-      errorRef.current?.scrollIntoView({ block: "center" });
-      errorRef.current?.focus({ preventScroll: true });
-    }
-  }, [state, isPending]);
+  const formRef = useActionFormErrorFocus(state, isPending);
 
   return (
-    <ActionForm action={formAction} className="flex min-w-0 flex-col gap-5">
+    <ActionForm ref={formRef} action={formAction} className="flex min-w-0 flex-col gap-5">
       <input type="hidden" name="returnTo" value={returnTo} />
       {state.error ? (
-        <Alert ref={errorRef} tabIndex={-1} variant="destructive">
+        <Alert variant="destructive">
           <CircleAlertIcon />
           <AlertTitle>No se pudo registrar la cursada</AlertTitle>
           <AlertDescription>{state.error}</AlertDescription>
@@ -101,7 +60,7 @@ export function CourseManualEnrollmentForm({ returnTo }: CourseManualEnrollmentF
         setStudentId={setStudentId}
         isPending={isPending}
         courseId={courseId}
-        handleCourseChange={handleCourseChange}
+        handleCourseChange={setCourseId}
       />
 
       {loadingOptions ? <CourseEnrollmentAssignmentSkeleton /> : null}

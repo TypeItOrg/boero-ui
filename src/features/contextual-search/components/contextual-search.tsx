@@ -56,10 +56,12 @@ export function ContextualSearch(props: ContextualSearchProps): ReactElement {
   const canSearch = debouncedSearch.length >= 2;
   const contextualSearchQueryKey = useMemo(() => ["contextual-search", scope, institutionId] as const, [institutionId, scope]);
   const visibleAccessSections = omitContextualSearchAccessItems(accessSections, CONTEXTUAL_SEARCH_EXCLUDED_ACCESS_URLS[scope]);
+
   const openSearch = useCallback(() => {
     queryClient.removeQueries({ queryKey: contextualSearchQueryKey });
     setOpen(true);
   }, [contextualSearchQueryKey, queryClient]);
+
   const query = useQuery({
     queryKey: [...contextualSearchQueryKey, debouncedSearch],
     queryFn: ({ signal }) =>

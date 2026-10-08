@@ -55,6 +55,7 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     cache: "no-store",
     signal,
   });
+
   const data = await parseHttpResponse<{ items: TItem[]; page: number; totalPages: number }>(
     response,
     "No se pudieron cargar las opciones académicas.",

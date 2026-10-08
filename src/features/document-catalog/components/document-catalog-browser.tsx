@@ -43,6 +43,7 @@ function DocumentCatalogView({ scope, institutionId, canManage, breadcrumb, inst
   const { isPending: isNavigationPending, navigate: navigateTable } = useDataTableNavigation();
   const pathname = usePathname();
   const params = useSearchParams();
+
   const { page, size, search } = parsePaginationQuery(
     {
       page: params.get("page") ?? undefined,
@@ -51,6 +52,7 @@ function DocumentCatalogView({ scope, institutionId, canManage, breadcrumb, inst
     },
     { defaultSize: 20 },
   );
+
   const active = DOCUMENT_CATALOG_STATE_FILTER_OPTIONS.find((option) => option.value === params.get("active"))?.value ?? "true";
 
   const { query, hasSettledInitialQuery } = useDocumentCatalogPage({

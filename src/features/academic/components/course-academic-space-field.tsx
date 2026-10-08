@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { ReactElement } from "react";
 
 import { GraduationCapIcon } from "lucide-react";
 
@@ -15,36 +15,24 @@ import { STUDY_PLAN_SPACE_OPTION_PRESENTATION, getAcademicSpaceOptionLabel } fro
 import { composeInitialSpaceLabel } from "@features/academic/utils/course-form-draft.util";
 
 export function CourseAcademicSpaceField({
+  onValueChange,
   fieldErrors,
   institutionId,
   scope,
   studyPlanId,
   editing,
   classesLocked,
-  setSpaceId,
-  setStudyPlanSpaceId,
-  setAcademicSpaceId,
-  setInstrumentId,
-  setInstrumental,
-  setSpaceLabel,
-  setFormat,
   spaceLabel,
   initialValues,
   spaceId,
 }: {
+  onValueChange: (value: string | undefined, item?: CourseSpaceOption) => void;
   fieldErrors: Record<string, string> | undefined;
   institutionId: string | undefined;
   scope: AcademicScope | undefined;
   studyPlanId: string | undefined;
   editing: boolean;
   classesLocked: boolean;
-  setSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setStudyPlanSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setAcademicSpaceId: Dispatch<SetStateAction<string | undefined>>;
-  setInstrumentId: Dispatch<SetStateAction<string | undefined>>;
-  setInstrumental: Dispatch<SetStateAction<boolean>>;
-  setSpaceLabel: Dispatch<SetStateAction<string | undefined>>;
-  setFormat: Dispatch<SetStateAction<string | undefined>>;
   spaceLabel: string | undefined;
   initialValues: Record<string, FormValue>;
   spaceId: string | undefined;
@@ -74,18 +62,7 @@ export function CourseAcademicSpaceField({
             id="academicSpaceId"
             key={`space-${institutionId}-${studyPlanId}`}
             name="academicSpaceDisplay"
-            onValueChange={(value, item) => {
-              setSpaceId(value);
-              setStudyPlanSpaceId(item?.studyPlanSpaceId ?? value);
-              setAcademicSpaceId(item?.id);
-              setInstrumentId(undefined);
-              setInstrumental(Boolean(item?.instrumental));
-
-              if (item) {
-                setSpaceLabel(getAcademicSpaceOptionLabel(item));
-                setFormat(item.format);
-              }
-            }}
+            onValueChange={onValueChange}
             placeholder={classesLocked ? "Definido por el curso" : "Seleccionar espacio"}
             queryKey={["courses", "spaces", scope, institutionId, studyPlanId]}
             searchPlaceholder="Buscar espacio…"

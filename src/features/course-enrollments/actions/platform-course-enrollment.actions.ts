@@ -82,6 +82,7 @@ export async function enrollPlatformApplicationCourseAction(
   }
 
   await requirePlatformAccount();
+
   const response = platformApiFetch(
     `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/enroll`,
     {
@@ -90,6 +91,7 @@ export async function enrollPlatformApplicationCourseAction(
       body: JSON.stringify({ ...assignmentBody, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo inscribir la solicitud de cursada.");
 
   if (failure) {
@@ -121,6 +123,7 @@ export async function rejectPlatformApplicationCourseAction(
   }
 
   await requirePlatformAccount();
+
   const response = platformApiFetch(
     `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/reject`,
     {
@@ -129,6 +132,7 @@ export async function rejectPlatformApplicationCourseAction(
       body: JSON.stringify({ reason, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo rechazar la solicitud de cursada.");
 
   if (failure) {

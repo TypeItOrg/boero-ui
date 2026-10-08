@@ -42,6 +42,7 @@ export function StudyPlanSpaceDetail({
 }: StudyPlanSpaceDetailProps): ReactElement {
   const planPath = `${basePath}/study-plans/${space.studyPlanId}`;
   const prerequisites = prerequisite ? [prerequisite] : curriculum.prerequisites.filter((item) => item.targetStudyPlanSpaceId === space.id);
+
   const names = new Map(
     [...curriculum.levels.flatMap((level) => level.spaces), ...curriculum.unassignedSpaces].map((item) => [item.id, item.academicSpaceName]),
   );

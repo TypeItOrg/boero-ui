@@ -1,59 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
 
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { DOCUMENT_MESSAGES } from "@features/enrollment-applications/constants/documentation.constants";
 import type { DocumentDelivery } from "@features/enrollment-applications/types/document-delivery.types";
 
 export function useDocumentDeliveryHistory(applicationId: string, scope: AcademicScope, requirementId: string) {
-  const [page, setPage] = useState(0);
-  const [retry, setRetry] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [history, setHistory] = useState<{ items: DocumentDelivery[]; totalPages: number }>({
-    items: [],
-    totalPages: 0,
-  });
-  const url = `/api/enrollment-applications/${applicationId}/documents?scope=${scope}&requirementId=${requirementId}&page=${page}`;
+  const [pagination, setPagination] = useState({ applicationId, requirementId, scope, page: 0 });
+  const identityChanged = pagination.applicationId !== applicationId || pagination.requirementId !== requirementId || pagination.scope !== scope;
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadHistory(): Promise<void> {
-      try {
-        const response = await fetch(url, { cache: "no-store", signal: controller.signal });
-
-        if (!response.ok) {
-          throw new Error(DOCUMENT_MESSAGES.readFailed);
-        }
-
-        const value = (await response.json()) as { items: DocumentDelivery[]; totalPages: number };
-
-        if (!controller.signal.aborted) {
-          setHistory(value);
-        }
-      } catch {
-        if (!controller.signal.aborted) {
-          setError(DOCUMENT_MESSAGES.readFailed);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    void loadHistory();
-
-    return () => controller.abort();
-  }, [url, retry]);
-
-  function changePage(nextPage: number): void {
-    setLoading(true);
-    setError("");
-    setPage(nextPage);
+  if (identityChanged) {
+    setPagination({ applicationId, requirementId, scope, page: 0 });
   }
 
-  return { page, loading, error, history, setError, setLoading, setRetry, changePage };
+  const page = identityChanged ? 0 : pagination.page;
+
+  const query = useQuery({
+    queryKey: ["document-delivery-history", scope, applicationId, requirementId, page],
+    queryFn: async ({ signal }) => {
+      const params = new URLSearchParams({ scope, requirementId, page: String(page) });
+      const response = await fetch(`/api/enrollment-applications/${applicationId}/documents?${params}`, { cache: "no-store", signal });
+
+      return parseHttpResponse<{ items: DocumentDelivery[]; totalPages: number }>(response, DOCUMENT_MESSAGES.readFailed);
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  return {
+    page,
+    loading: query.isFetching,
+    error: query.isError && !query.isFetching ? DOCUMENT_MESSAGES.readFailed : "",
+    history: query.data ?? { items: [], totalPages: 0 },
+    retry: () => void query.refetch(),
+    changePage: (nextPage: number) => setPagination((previous) => ({ ...previous, page: nextPage })),
+  };
 }

@@ -23,7 +23,9 @@ export function getScheduleWeek(value: unknown, referenceDate: string): string {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date(referenceDate));
+
   const date = new Date(`${isScheduleDate(value) ? value : today}T00:00:00Z`);
+
   date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
 
   return date.toISOString().slice(0, 10);
@@ -31,6 +33,7 @@ export function getScheduleWeek(value: unknown, referenceDate: string): string {
 
 export function shiftScheduleWeek(weekStart: string, offset: number): string {
   const date = new Date(`${weekStart}T00:00:00Z`);
+
   date.setUTCDate(date.getUTCDate() + offset * 7);
 
   return date.toISOString().slice(0, 10);

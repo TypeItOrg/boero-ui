@@ -25,6 +25,7 @@ export function CourseDropdownFilterControl({
 }: CourseDropdownFilterControlProps): ReactElement {
   const { navigate } = useDataTableNavigation();
   const defaultLabel = resource === "study-plans" ? "Todos los planes de estudio" : "Todos los espacios académicos";
+
   const queryKey = useMemo(
     () => ["academic", "course-filter", resource, filter.scope, filter.institutionId],
     [filter.institutionId, filter.scope, resource],
