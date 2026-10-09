@@ -23,5 +23,3 @@ overrides:
   sharp: "^0.35.5"
   # NYC uses js-yaml.load, supported in v4; v3 pulls in unpatched sprintf-js.
   "@istanbuljs/load-nyc-config>js-yaml": "4.3.2"
-patchedDependencies:
-  braces@3.0.3: patches/braces@3.0.3.patch

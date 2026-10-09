@@ -54,37 +54,6 @@ jobs:
       - name: Build application
         run: pnpm build
 
-  dependency-graph:
-    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
-    needs: verify
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          run_install: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - name: Generate complete dependency inventory
-        run: |
-          pnpm sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --sbom-type application --lockfile-only --out "$RUNNER_TEMP/dependencies-full.json"
-          pnpm sbom --sbom-format cyclonedx --sbom-spec-version 1.6 --sbom-type application --lockfile-only --prod --out "$RUNNER_TEMP/dependencies-production.json"
-          node scripts/dependency-snapshot.mjs "$RUNNER_TEMP/dependencies-full.json" "$RUNNER_TEMP/dependencies-production.json" "$RUNNER_TEMP/dependency-snapshot.json"
-
-      - name: Submit dependencies to GitHub
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api "repos/$GITHUB_REPOSITORY/dependency-graph/snapshots" --method POST --input "$RUNNER_TEMP/dependency-snapshot.json"
-
   publish-image:
     if: >-
       github.event_name == 'push' &&

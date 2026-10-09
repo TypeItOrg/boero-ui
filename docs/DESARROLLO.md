@@ -154,21 +154,3 @@ Si existe algún error de linting que no pueda corregirse de forma automática, 
   ```bash
   docker compose down -v
   ```
-
----
-
-## 7. Parches de Seguridad de Dependencias
-
-Los overrides y parches de pnpm se mantienen en `pnpm-workspace.yaml`, junto con sus resoluciones en `pnpm-lock.yaml`. El Dockerfile copia `patches/` antes de instalar para aplicar las mismas correcciones en CI y contenedores.
-
-`braces@3.0.3` no tiene una versión oficial corregida para [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). El parche `patches/braces@3.0.3.patch` limita el anidamiento a 128 niveles durante el parseo y los recorridos de AST. Las entradas excesivas generan un `SyntaxError` controlado antes de agotar la pila. Sus tests reproducen el problema con una pila limitada y verifican alternancias, rangos y serialización de patrones habituales:
-
-```bash
-pnpm test --runInBand --runTestsByPath test/security/braces.test.ts
-```
-
-`pnpm audit` seguirá reportando esa versión de `braces`, aunque el parche local esté aplicado. La alerta se mantiene visible, sin exclusiones. Reemplazá el parche por una versión oficial corregida cuando esté disponible, conservando los tests de regresión.
-
-El override de `@istanbuljs/load-nyc-config>js-yaml` utiliza `js-yaml` 4, cuya API `load` es compatible con ese consumidor. Esto elimina la cadena obsoleta de `argparse` 1 y `sprintf-js`, que tampoco dispone de un parche publicado para su aviso de seguridad.
-
-El lockfile de pnpm 12 contiene documentos separados para el gestor de paquetes y la aplicación. El análisis automático de GitHub puede leer solo el primero y omitir las dependencias del frontend. Por eso, el job `dependency-graph` del CI genera inventarios completos con `pnpm sbom`, conserva dependencias directas y transitivas y distingue el alcance de producción del de desarrollo. Después de aprobar los controles de calidad, los envía al grafo de GitHub únicamente desde la rama principal. El conversor rechaza inventarios incompletos para evitar que se pierdan dependencias en silencio.
