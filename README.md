@@ -1,4 +1,3 @@
-
 <!-- Banner -->
 <p align="center">
   <img
