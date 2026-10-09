@@ -58,6 +58,8 @@ services:
           path: ./pnpm-lock.yaml
         - action: rebuild
           path: ./pnpm-workspace.yaml
+        - action: rebuild
+          path: ./patches
 
 volumes:
   next-dev-cache:
