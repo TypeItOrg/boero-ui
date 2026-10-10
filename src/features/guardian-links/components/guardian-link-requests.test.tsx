@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { formatApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application.util";
 import { resolveGuardianLinkAction } from "@features/guardian-links/actions/resolve-guardian-link.action";
 import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";
 import type { GuardianLinkRequest } from "@features/guardian-links/types/guardian-link-request.types";
@@ -45,9 +46,10 @@ describe("GuardianLinkRequests", () => {
   });
 
   it("shows the request date with time", () => {
-    render(<GuardianLinkRequests institutionId={INSTITUTION_ID} requests={[buildRequest()]} />);
+    const request = buildRequest();
+    render(<GuardianLinkRequests institutionId={INSTITUTION_ID} requests={[request]} />);
 
-    expect(screen.getByText("24/09/2026 09:00")).toBeInTheDocument();
+    expect(screen.getByText(formatApplicationDateTime(request.createdAt))).toBeInTheDocument();
   });
 
   it("shows pending, accepted and rejected requests in the default view", () => {
