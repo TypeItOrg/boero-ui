@@ -6,9 +6,9 @@ import { ClipboardPlusIcon, PhoneCallIcon, PlusIcon, SearchIcon, UserMinusIcon, 
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@common/components/ui/card";
 import { EmptyMedia } from "@common/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
 import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
@@ -70,18 +70,32 @@ export function GuardianDependentsList({ dependents, institutionId, initialSearc
             <AddButton onClick={() => setIsDialogOpen(true)} />
           </div>
           {visibleDependents.length > 0 ? (
-            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {visibleDependents.map((dependent) => (
-                <li key={dependent.personGuardianId}>
-                  <DependentCard
-                    dependent={dependent}
-                    isSelectingWorkspace={isSelectingWorkspace}
-                    onEnroll={() => handleEnrollment(dependent.dependentPersonId)}
-                    onUnlink={() => setDependentToUnlink(dependent)}
-                  />
-                </li>
-              ))}
-            </ul>
+            <div className="relative h-full overflow-hidden rounded-lg border">
+              <Table containerClassName="table-scrollbar" className="min-w-220">
+                <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
+                  <TableRow className="hover:bg-muted/50 data-[state=selected]:bg-muted h-11 border-b transition-colors">
+                    <TableHead>Persona</TableHead>
+                    <TableHead>DNI</TableHead>
+                    <TableHead>Edad</TableHead>
+                    <TableHead>Tu vínculo</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Inscripciones</TableHead>
+                    <TableHead className="w-52 text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visibleDependents.map((dependent) => (
+                    <DependentRow
+                      dependent={dependent}
+                      isSelectingWorkspace={isSelectingWorkspace}
+                      key={dependent.personGuardianId}
+                      onEnroll={() => handleEnrollment(dependent.dependentPersonId)}
+                      onUnlink={() => setDependentToUnlink(dependent)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p className="text-muted-foreground bg-muted/25 rounded-lg border px-4 py-10 text-center text-sm">
               No encontramos personas a cargo que coincidan con tu búsqueda.
@@ -151,16 +165,7 @@ function AddButton({ onClick }: { onClick: () => void }): React.ReactElement {
   );
 }
 
-function DependentField({ label, value }: { label: string; value: string }): React.ReactElement {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="text-foreground text-sm font-medium">{value}</dd>
-    </div>
-  );
-}
-
-function DependentCard({
+function DependentRow({
   dependent,
   isSelectingWorkspace,
   onEnroll,
@@ -177,51 +182,60 @@ function DependentCard({
   const canUnlink = isActive || dependent.status === GUARDIAN_LINK_STATUS.PENDING;
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <Badge className="w-fit" variant={STATUS_BADGE_VARIANT[dependent.status]}>
-          {GUARDIAN_LINK_STATUS_LABELS[dependent.status]}
-        </Badge>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4 text-sm">
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <DependentField label="DNI" value={dependent.documentNumber} />
-          <DependentField label="Edad" value={age === null || age === undefined ? "—" : `${age} años`} />
-          <DependentField label="Tu vínculo" value={GUARDIAN_RELATIONSHIP_LABELS[dependent.relationship]} />
-        </dl>
-        {dependent.isPrimaryContact ? (
-          <p className="text-primary flex items-center gap-1.5 text-xs font-medium">
-            <PhoneCallIcon aria-hidden="true" className="size-3.5" />
-            Sos su contacto principal
-          </p>
-        ) : null}
-        {isActive ? (
-          <p className={dependent.activeApplicationsCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}>
-            {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
-          </p>
-        ) : (
-          <p className="text-muted-foreground">
-            {dependent.status === GUARDIAN_LINK_STATUS.PENDING
-              ? "La institución todavía tiene que validar la vinculación. Hasta entonces no podés gestionar a esta persona."
-              : "La institución rechazó la vinculación. No podés gestionar a esta persona."}
-          </p>
-        )}
-      </CardContent>
-      {canUnlink ? (
-        <CardFooter className="justify-end gap-2">
-          {isActive ? (
-            <Button aria-label={`Inscribir a ${name}`} disabled={isSelectingWorkspace} onClick={onEnroll} size="sm" type="button">
-              <ClipboardPlusIcon aria-hidden="true" />
-              Inscribir
-            </Button>
+    <TableRow className="h-12">
+      <TableCell className="font-medium">
+        <div className="flex min-w-44 flex-col gap-1">
+          <span>{name}</span>
+          {dependent.isPrimaryContact ? (
+            <span className="text-primary flex items-center gap-1.5 text-xs font-medium">
+              <PhoneCallIcon aria-hidden="true" className="size-3.5" />
+              Sos su contacto principal
+            </span>
           ) : null}
-          <Button aria-label={`Quitar a ${name}`} onClick={onUnlink} size="sm" type="button" variant="outline">
-            <UserMinusIcon aria-hidden="true" />
-            {dependent.status === GUARDIAN_LINK_STATUS.PENDING ? "Cancelar solicitud" : "Quitar"}
-          </Button>
-        </CardFooter>
-      ) : null}
-    </Card>
+        </div>
+      </TableCell>
+      <TableCell>{dependent.documentNumber}</TableCell>
+      <TableCell>{age === null || age === undefined ? "—" : `${age} años`}</TableCell>
+      <TableCell>{GUARDIAN_RELATIONSHIP_LABELS[dependent.relationship]}</TableCell>
+      <TableCell>
+        <div className="flex max-w-64 flex-col items-start gap-1.5">
+          <Badge variant={STATUS_BADGE_VARIANT[dependent.status]}>{GUARDIAN_LINK_STATUS_LABELS[dependent.status]}</Badge>
+          {!isActive ? (
+            <span className="text-muted-foreground text-xs whitespace-normal">
+              {dependent.status === GUARDIAN_LINK_STATUS.PENDING
+                ? "La institución todavía tiene que validar la vinculación. Hasta entonces no podés gestionar a esta persona."
+                : "La institución rechazó la vinculación. No podés gestionar a esta persona."}
+            </span>
+          ) : null}
+        </div>
+      </TableCell>
+      <TableCell>
+        {isActive ? (
+          <span className={dependent.activeApplicationsCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"}>
+            {dependent.activeApplicationsCount} {dependent.activeApplicationsCount === 1 ? "inscripción activa" : "inscripciones activas"}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </TableCell>
+      <TableCell className="w-52 text-right">
+        {canUnlink ? (
+          <div className="flex justify-end gap-2">
+            {isActive ? (
+              <Button aria-label={`Inscribir a ${name}`} disabled={isSelectingWorkspace} onClick={onEnroll} size="sm" type="button">
+                <ClipboardPlusIcon aria-hidden="true" />
+                Inscribir
+              </Button>
+            ) : null}
+            <Button aria-label={`Quitar a ${name}`} onClick={onUnlink} size="sm" type="button" variant="outline">
+              <UserMinusIcon aria-hidden="true" />
+              {dependent.status === GUARDIAN_LINK_STATUS.PENDING ? "Cancelar solicitud" : "Quitar"}
+            </Button>
+          </div>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </TableCell>
+    </TableRow>
   );
 }

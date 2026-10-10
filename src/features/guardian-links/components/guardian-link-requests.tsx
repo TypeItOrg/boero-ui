@@ -17,10 +17,19 @@ import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/cons
 import { GUARDIAN_LINK_STATUS, type GuardianLinkStatus } from "@features/guardian-dependents/types/guardian-link-status.types";
 import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { resolveGuardianLinkAction } from "@features/guardian-links/actions/resolve-guardian-link.action";
-import { getGuardianLinkAttachmentContentPath } from "@features/guardian-links/constants/guardian-link.constants";
+import {
+  getGuardianLinkAttachmentContentPath,
+  getPlatformGuardianLinkAttachmentContentPath,
+} from "@features/guardian-links/constants/guardian-link.constants";
 import type { GuardianLinkDecision, GuardianLinkPerson, GuardianLinkRequest } from "@features/guardian-links/types/guardian-link-request.types";
 
-type GuardianLinkRequestsProps = { requests: GuardianLinkRequest[]; institutionId: string };
+type GuardianLinkRequestsProps = {
+  requests: GuardianLinkRequest[];
+  institutionId?: string;
+  onResolve?: (institutionId: string, linkId: string, decision: GuardianLinkDecision) => Promise<{ error?: string }>;
+  attachmentPathMode?: "institutional" | "platform";
+  showInstitution?: boolean;
+};
 type StatusFilter = "ALL" | GuardianLinkStatus;
 
 const STATUS_LABELS: Record<StatusFilter, string> = {
@@ -31,7 +40,13 @@ const STATUS_LABELS: Record<StatusFilter, string> = {
   ENDED: "Finalizadas",
 };
 
-export function GuardianLinkRequests({ requests, institutionId }: GuardianLinkRequestsProps): React.ReactElement {
+export function GuardianLinkRequests({
+  requests,
+  institutionId,
+  onResolve = resolveGuardianLinkAction,
+  attachmentPathMode = "institutional",
+  showInstitution = false,
+}: GuardianLinkRequestsProps): React.ReactElement {
   const [rows, setRows] = useState(requests);
   const [search, setSearch] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
@@ -74,6 +89,7 @@ export function GuardianLinkRequests({ requests, institutionId }: GuardianLinkRe
           <Table containerClassName="table-scrollbar" className="min-w-240">
             <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
               <TableRow>
+                {showInstitution ? <TableHead>Institución</TableHead> : null}
                 <TableHead>Tutor</TableHead>
                 <TableHead>Estudiante</TableHead>
                 <TableHead>Vínculo</TableHead>
@@ -85,7 +101,15 @@ export function GuardianLinkRequests({ requests, institutionId }: GuardianLinkRe
             </TableHeader>
             <TableBody>
               {filteredRows.map((request) => (
-                <RequestRow key={request.personGuardianId} institutionId={institutionId} onResolved={updateRow} request={request} />
+                <RequestRow
+                  attachmentPathMode={attachmentPathMode}
+                  institutionId={institutionId}
+                  key={request.personGuardianId}
+                  onResolve={onResolve}
+                  onResolved={updateRow}
+                  request={request}
+                  showInstitution={showInstitution}
+                />
               ))}
             </TableBody>
           </Table>
@@ -145,20 +169,37 @@ function GuardianLinkFilters({
 function RequestRow({
   request,
   institutionId,
+  onResolve,
   onResolved,
+  attachmentPathMode,
+  showInstitution,
 }: {
   request: GuardianLinkRequest;
-  institutionId: string;
+  institutionId?: string;
+  onResolve: (institutionId: string, linkId: string, decision: GuardianLinkDecision) => Promise<{ error?: string }>;
   onResolved: (requestId: string, status: GuardianLinkStatus) => void;
+  attachmentPathMode: "institutional" | "platform";
+  showInstitution: boolean;
 }): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const getAttachmentPath =
+    attachmentPathMode === "platform"
+      ? getPlatformGuardianLinkAttachmentContentPath
+      : (_institutionId: string, linkId: string, attachmentId: string) => getGuardianLinkAttachmentContentPath(linkId, attachmentId);
 
   function resolve(decision: GuardianLinkDecision): void {
+    const requestInstitutionId = institutionId ?? request.institution?.institutionId;
+
+    if (!requestInstitutionId) {
+      setError("La solicitud no tiene una institución asociada.");
+      return;
+    }
+
     setError(null);
     startTransition(async () => {
       try {
-        const result = await resolveGuardianLinkAction(institutionId, request.personGuardianId, decision);
+        const result = await onResolve(requestInstitutionId, request.personGuardianId, decision);
 
         if (result.error) {
           setError(result.error);
@@ -174,6 +215,7 @@ function RequestRow({
 
   return (
     <TableRow>
+      {showInstitution ? <TableCell>{request.institution?.name ?? "Sin institución"}</TableCell> : null}
       <TableCell>
         <PersonCell person={request.tutor} />
       </TableCell>
@@ -192,7 +234,7 @@ function RequestRow({
             {request.attachments.map((attachment) => (
               <a
                 className="text-primary inline-flex items-center gap-1.5 truncate hover:underline"
-                href={getGuardianLinkAttachmentContentPath(request.personGuardianId, attachment.id)}
+                href={getAttachmentPath(request.institution?.institutionId ?? institutionId ?? "", request.personGuardianId, attachment.id)}
                 key={attachment.id}
                 rel="noreferrer"
                 target="_blank"

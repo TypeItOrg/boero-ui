@@ -17,7 +17,7 @@ describe("platform navigation", () => {
 
     expect(
       PLATFORM_NAVIGATION_SECTIONS.find((section) => "label" in section && section.label === "Inscripciones")?.items.map((item) => item.url),
-    ).toEqual(["/admin/enrollment-periods", "/admin/enrollment-applications"]);
+    ).toEqual(["/admin/enrollment-periods", "/admin/enrollment-applications", "/admin/guardian-links"]);
   });
 
   it("keeps the compact mobile navigation unchanged", () => {

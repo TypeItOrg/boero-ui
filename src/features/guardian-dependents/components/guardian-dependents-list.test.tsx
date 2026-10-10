@@ -99,7 +99,7 @@ describe("GuardianDependentsList", () => {
   it("shows a dash when the birth date is unknown", () => {
     render(<GuardianDependentsList dependents={[buildDependent({ birthDate: null })]} institutionId={INSTITUTION_ID} />);
 
-    expect(screen.getByText("Edad").nextElementSibling).toHaveTextContent("—");
+    expect(screen.getByRole("cell", { name: "—" })).toBeInTheDocument();
   });
 
   it("renders the empty state when there are no dependents", () => {

@@ -64,6 +64,25 @@ describe("institutional home access", () => {
     expect(links.map(({ href }) => href)).toEqual(["/enrollment-applications"]);
   });
 
+  it("shows guardian link review separately from dependent management", () => {
+    const user = {
+      institutionId: "inst-1",
+      personId: "p-1",
+      roles: ["Administrador Institucional"],
+      permissions: [INSTITUTIONAL_PERMISSION.GUARDIAN_LINK_REVIEW],
+    } as unknown as InstitutionalUser;
+
+    const links = getInstitutionalEnrollmentHomeLinks(user);
+
+    expect(links).toEqual([
+      expect.objectContaining({
+        href: "/guardian-links",
+        title: "Solicitudes de vinculación",
+        description: "Validá las solicitudes de tutores para vincular personas a cargo.",
+      }),
+    ]);
+  });
+
   it("exposes the academic offer independently from management links", () => {
     const user = { permissions: [INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ] };
 

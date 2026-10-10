@@ -21,6 +21,10 @@ export type GuardianLinkRequest = {
   personGuardianId: string;
   status: GuardianLinkStatus;
   relationship: GuardianRelationship;
+  institution?: {
+    institutionId: string;
+    name: string;
+  };
   tutor: GuardianLinkPerson;
   dependent: GuardianLinkPerson;
   createdAt: string;

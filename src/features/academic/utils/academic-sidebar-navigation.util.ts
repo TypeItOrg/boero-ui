@@ -13,9 +13,9 @@ export function getAcademicSidebarNavigationSections(
     sectionLabel: "Académico",
     sourceSectionLabel: "Inscripciones",
     id: "academic-enrollments",
-    title: "Inscripciones",
+    title: "Inscripciones y vinculaciones",
     icon: ClipboardListIcon,
-    urls: ["/enrollment-periods", "/enrollment-applications"].map((url) => `${prefix}${url}`),
+    urls: ["/enrollment-periods", "/enrollment-applications", "/guardian-links"].map((url) => `${prefix}${url}`),
   });
 
   return groupSidebarNavigationSection(enrollmentSections, {
