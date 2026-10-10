@@ -101,7 +101,7 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" noValidate>
-      {state.error && (
+      {state.error && logoChange.intent !== INSTITUTION_LOGO_INTENT.KEEP && (
         <Alert variant="destructive">
           <CircleAlertIcon className="size-4" />
           <AlertTitle>Error al guardar</AlertTitle>
@@ -137,7 +137,7 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
             clearErrors("root.logo");
             setLogoChange(change);
           }}
-          onError={(message) => setError("root.logo", { type: "client", message })}
+          onError={(message) => (message ? setError("root.logo", { type: "client", message }) : clearErrors("root.logo"))}
         />
 
         <InstitutionalInstitutionLocationFields

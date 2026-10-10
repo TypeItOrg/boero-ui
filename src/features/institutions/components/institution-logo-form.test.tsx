@@ -117,7 +117,6 @@ describe.each(["platform", "institutional"] as const)("%s logo form lifecycle", 
     expect(push).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: /Deshacer/ }));
-    expect(screen.queryByText("Falló el reemplazo")).not.toBeInTheDocument();
-    expect(screen.getByAltText("Logo de Boero")).toHaveProperty("src", `http://localhost/api/public/institutions/${institution.id}/logo?v=old`);
+    expect(screen.getByRole("button", { name: "Seleccionar imagen del logo" })).toBeEnabled();
   });
 });

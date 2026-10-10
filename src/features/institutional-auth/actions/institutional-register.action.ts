@@ -24,6 +24,7 @@ export async function registerInstitutional(
     birthDate: formData.get("birthDate") ?? "",
     documentNumber: formData.get("documentNumber") ?? "",
     email: formData.get("email") ?? "",
+    isGuardian: formData.get("isGuardian") ?? "",
     password: formData.get("password") ?? "",
     confirmPassword: formData.get("confirmPassword") ?? "",
   });
@@ -45,6 +46,7 @@ export async function registerInstitutional(
     birthDate: parsed.data.birthDate,
     documentNumber: parsed.data.documentNumber,
     email: parsed.data.email,
+    isGuardian: parsed.data.isGuardian,
     password: parsed.data.password,
   };
 

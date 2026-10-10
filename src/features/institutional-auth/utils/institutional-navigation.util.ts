@@ -1,13 +1,12 @@
 import {
-  BookCopyIcon,
-  BookMarkedIcon,
+  FileTextIcon,
   BookOpenIcon,
+  BookMarkedIcon,
   Building2Icon,
   CalendarRangeIcon,
-  ClipboardListIcon,
   ClockIcon,
   FilePenLineIcon,
-  FileTextIcon,
+  ClipboardListIcon,
   GraduationCapIcon,
   HouseIcon,
   LibraryBigIcon,
@@ -22,9 +21,14 @@ import {
 
 import type { NavigationItem } from "@common/utils/navigation.util";
 
+import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import { GUARDIAN_LINKS_PAGE_PATH } from "@features/guardian-links/constants/guardian-link.constants";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
+  canViewAcademicNavigation,
+  canManageDependents,
+  canReviewGuardianLinks,
   canStartEnrollmentApplication,
   canViewOwnEnrollmentApplications,
 } from "@features/institutional-auth/utils/institutional-applicant-role.util";
@@ -57,60 +61,49 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
     ...(canReadRoles ? [{ title: "Roles y permisos", url: "/roles", icon: UserLockIcon }] : []),
   ];
 
-  const academicItems: NavigationItem[] = [
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)
-      ? [{ title: "Documentación", url: "/documentation", icon: FileTextIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
-      ? [{ title: "Oferta académica", url: "/academic-offers", icon: BookCopyIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
-      ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.TRAINING_PATH_READ)
-      ? [{ title: "Trayectos formativos", url: "/training-paths", icon: RouteIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.STUDY_PLAN_READ)
-      ? [{ title: "Planes de estudio", url: "/study-plans", icon: BookMarkedIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_READ)
-      ? [{ title: "Espacios académicos", url: "/academic-spaces", icon: LibraryBigIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_READ)
-      ? [{ title: "Instrumentos", url: "/instruments", icon: Music2Icon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
-      ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
-      : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
-      ? [{ title: "Cursadas", url: "/course-enrollments", icon: ScrollTextIcon }]
-      : []),
-    ...(user.roles.includes("Profesor") ? [{ title: "Mis clases", url: "/my-teaching", icon: GraduationCapIcon }] : []),
-    ...(user.roles.includes("Profesor") ? [{ title: "Mis horarios", url: "/my-teaching/schedules", icon: CalendarRangeIcon }] : []),
-    ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
-  ];
+  const academicItems: NavigationItem[] = canViewAcademicNavigation(user)
+    ? [
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)
+          ? [{ title: "Documentación", url: "/documentation", icon: FileTextIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)
+          ? [{ title: "Oferta académica", url: "/academic-offers", icon: GraduationCapIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_YEAR_READ)
+          ? [{ title: "Ciclos lectivos", url: "/academic-years", icon: CalendarRangeIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.TRAINING_PATH_READ)
+          ? [{ title: "Trayectos formativos", url: "/training-paths", icon: RouteIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.STUDY_PLAN_READ)
+          ? [{ title: "Planes de estudio", url: "/study-plans", icon: BookMarkedIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_SPACE_READ)
+          ? [{ title: "Espacios académicos", url: "/academic-spaces", icon: LibraryBigIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTRUMENT_READ)
+          ? [{ title: "Instrumentos", url: "/instruments", icon: Music2Icon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_READ)
+          ? [{ title: "Cursos", url: "/courses", icon: GraduationCapIcon }]
+          : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)
+          ? [{ title: "Cursadas", url: "/course-enrollments", icon: ScrollTextIcon }]
+          : []),
+        ...(user.roles.includes("Profesor") ? [{ title: "Mis clases", url: "/my-teaching", icon: GraduationCapIcon }] : []),
+        ...(user.roles.includes("Profesor") ? [{ title: "Mis horarios", url: "/my-teaching/schedules", icon: CalendarRangeIcon }] : []),
+        ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.SHIFT_READ) ? [{ title: "Turnos", url: "/shifts", icon: ClockIcon }] : []),
+      ]
+    : [];
 
   const enrollmentItems: NavigationItem[] = [
     ...(canReadEnrollmentPeriods ? [{ title: "Períodos de inscripción", url: "/enrollment-periods", icon: CalendarRangeIcon }] : []),
     ...(canStartEnrollmentApplication(user) ? [{ title: "Nueva inscripción", url: "/enrollment", icon: FilePenLineIcon }] : []),
-    ...(canViewOwnEnrollmentApplications(user)
-      ? [
-          {
-            title: "Mis inscripciones",
-            url: "/my-enrollment-applications",
-            icon: UserRoundCheckIcon,
-          },
-        ]
-      : []),
+    ...(canViewOwnEnrollmentApplications(user) ? [{ title: "Mis inscripciones", url: "/my-enrollment-applications", icon: UserRoundCheckIcon }] : []),
     ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_APPLICATION_READ)
-      ? [
-          {
-            title: "Solicitudes de inscripción",
-            url: "/enrollment-applications",
-            icon: ClipboardListIcon,
-          },
-        ]
+      ? [{ title: "Solicitudes de inscripción", url: "/enrollment-applications", icon: ClipboardListIcon }]
       : []),
+    ...(canReviewGuardianLinks(user) ? [{ title: "Solicitudes de vinculación", url: GUARDIAN_LINKS_PAGE_PATH, icon: UsersIcon }] : []),
   ];
 
   return [
@@ -133,7 +126,10 @@ export function getInstitutionalNavigationSections(user: InstitutionalUser): Ins
       : []),
     {
       label: "Personal",
-      items: [{ title: "Cuenta", url: "/account", icon: UserRoundIcon }],
+      items: [
+        { title: "Cuenta", url: "/account", icon: UserRoundIcon },
+        ...(canManageDependents(user) ? [{ title: "Mis personas a cargo", url: GUARDIAN_DEPENDENTS_PAGE_PATH, icon: UsersIcon }] : []),
+      ],
     },
   ];
 }

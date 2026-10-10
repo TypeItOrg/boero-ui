@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
+import { hasMinimumPersonAge, isMinorBirthDate } from "@features/people/utils/person-birth-date.util";
 
 export const institutionalRegisterSchema = z
   .object({
@@ -28,6 +28,8 @@ export const institutionalRegisterSchema = z
       .string()
       .min(1, { message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_DOCUMENT, abort: true })
       .regex(/^\d{8}$/, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_DOCUMENT),
+    // Raw form value: it must be explicit, a missing value is invalid rather than an implicit false.
+    isGuardian: z.enum(["true", "false"], INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_GUARDIAN_OPTION).transform((value) => value === "true"),
     email: z
       .string()
       .trim()
@@ -40,6 +42,10 @@ export const institutionalRegisterSchema = z
       .min(8, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_PASSWORD)
       .max(255, INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_PASSWORD),
     confirmPassword: z.string().min(1, INSTITUTIONAL_AUTH_ERROR_MESSAGES.REQUIRED_PASSWORD),
+  })
+  .refine((data) => !data.isGuardian || !isMinorBirthDate(data.birthDate), {
+    message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.GUARDIAN_MUST_BE_ADULT,
+    path: ["birthDate"],
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: INSTITUTIONAL_AUTH_ERROR_MESSAGES.INVALID_PASSWORD_CONFIRMATION,

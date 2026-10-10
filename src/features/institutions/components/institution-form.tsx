@@ -141,13 +141,14 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
     router.push(destination);
   }
 
-  const errorAlert = state.error ? (
-    <Alert variant="destructive">
-      <CircleAlertIcon />
-      <AlertTitle>{isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE}</AlertTitle>
-      <AlertDescription>{state.error}</AlertDescription>
-    </Alert>
-  ) : null;
+  const errorAlert =
+    state.error && logoChange.intent !== INSTITUTION_LOGO_INTENT.KEEP ? (
+      <Alert variant="destructive">
+        <CircleAlertIcon />
+        <AlertTitle>{isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE}</AlertTitle>
+        <AlertDescription>{state.error}</AlertDescription>
+      </Alert>
+    ) : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
@@ -185,7 +186,7 @@ export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }
                 clearErrors("root.logo");
                 setLogoChange(change);
               }}
-              onError={(message) => setError("root.logo", { type: "client", message })}
+              onError={(message) => (message ? setError("root.logo", { type: "client", message }) : clearErrors("root.logo"))}
             />
           </>
         ) : null}

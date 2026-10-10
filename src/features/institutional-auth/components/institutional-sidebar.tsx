@@ -1,6 +1,8 @@
 "use client";
 
-import type { ComponentProps, ReactElement } from "react";
+/* eslint-disable no-restricted-syntax */
+
+import type { ComponentProps } from "react";
 
 import Link from "next/link";
 
@@ -21,6 +23,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton,
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { cn } from "@common/utils/cn.util";
 
+import { GuardianWorkspaceMenuItems } from "@features/guardian-workspace/components/guardian-workspace-selector";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
@@ -31,7 +34,7 @@ type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
   navigationSections: readonly InstitutionalNavigationSection[];
 };
 
-export function InstitutionalSidebar({ user, navigationSections, className, ...props }: InstitutionalSidebarProps): ReactElement {
+export function InstitutionalSidebar({ user, navigationSections, className, ...props }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
 
   const navigation = useMobileSidebarNavigation();
@@ -88,6 +91,8 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <GuardianWorkspaceMenuItems />
+                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/account" onClick={() => navigation.handleNavigation("/account")}>
@@ -118,7 +123,7 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
   );
 }
 
-function InstitutionalUserAvatar({ user }: { user: InstitutionalUser }): ReactElement {
+function InstitutionalUserAvatar({ user }: { user: InstitutionalUser }): React.ReactElement {
   return (
     <Avatar className="size-[34px] rounded-md group-data-[collapsible=icon]:size-8!">
       <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">{getInitials(user.name, user.lastName)}</AvatarFallback>

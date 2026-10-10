@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 
 import Link from "next/link";
 
-import { AlertCircleIcon, AlertTriangleIcon, BanIcon } from "lucide-react";
+import { AlertCircleIcon, AlertTriangleIcon, BanIcon, UserRoundIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
@@ -74,6 +74,15 @@ function EnrollmentWizardView(props: EnrollmentWizardProps): ReactElement {
               ))}
             </ul>
           </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {application.submittedByPersonId && application.submittedByPersonId !== application.personId ? (
+        <Alert>
+          <UserRoundIcon />
+          <AlertTitle>
+            Inscribiendo a: {model.firstName} {model.lastName}
+          </AlertTitle>
         </Alert>
       ) : null}
 

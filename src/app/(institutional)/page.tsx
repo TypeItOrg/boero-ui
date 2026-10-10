@@ -128,12 +128,12 @@ async function InstitutionalHomeContent(): Promise<ReactElement> {
         {enrollmentLinks.length > 0 && academicResources.length === 0 ? (
           <HomeSubsection
             id="enrollment-management-title"
-            title="Cursadas e inscripciones"
-            description="Accedé a tus clases y gestioná las cursadas y solicitudes de inscripción."
+            title="Inscripciones y vinculaciones"
+            description="Gestioná tus inscripciones, cursadas y solicitudes de vinculación."
             icon={ClipboardListIcon}
             imageSrc={!hasInstitutionalAccess ? "/images/institutional-management.webp" : undefined}
           >
-            <nav aria-label="Cursadas e inscripciones" className="[&>a]:bg-background grid gap-4">
+            <nav aria-label="Inscripciones y vinculaciones" className="[&>a]:bg-background grid gap-4">
               {enrollmentLinks.map((link) => (
                 <HomeAccessRow key={link.href} link={link} />
               ))}

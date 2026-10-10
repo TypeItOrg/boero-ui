@@ -44,15 +44,25 @@ export function InstitutionLogoField({
 
   const [preview, setPreview] = useState<string>();
 
+  const [errorDismissed, setErrorDismissed] = useState(false);
+
+  const [undoRequested, setUndoRequested] = useState(false);
+
   const currentUrl = getInstitutionLogoUrl(institutionId, logoUrl);
 
   const selectedFile = value.intent === INSTITUTION_LOGO_INTENT.REPLACE ? value.file : undefined;
 
   const keptLogoUrl = value.intent === INSTITUTION_LOGO_INTENT.KEEP ? currentUrl : undefined;
 
-  const displayUrl = selectedFile ? preview : keptLogoUrl;
+  let displayUrl = keptLogoUrl;
 
-  const hasLogo = Boolean(selectedFile || (value.intent === INSTITUTION_LOGO_INTENT.KEEP && currentUrl));
+  if (undoRequested) {
+    displayUrl = currentUrl ?? logoUrl ?? undefined;
+  } else if (selectedFile) {
+    displayUrl = preview;
+  }
+
+  const hasLogo = Boolean(displayUrl);
 
   useEffect(() => {
     return () => {
@@ -88,6 +98,8 @@ export function InstitutionLogoField({
     }
 
     setPreview(URL.createObjectURL(file));
+    setErrorDismissed(false);
+    setUndoRequested(false);
     onChange({ intent: INSTITUTION_LOGO_INTENT.REPLACE, file });
   }
 
@@ -101,6 +113,9 @@ export function InstitutionLogoField({
 
   function undoChange(): void {
     setPreview(undefined);
+    setErrorDismissed(true);
+    setUndoRequested(true);
+    onError("");
     onChange({ intent: INSTITUTION_LOGO_INTENT.KEEP });
     selectRef.current?.focus();
   }
@@ -123,6 +138,7 @@ export function InstitutionLogoField({
 
       <div className="mt-5 space-y-3">
         <FileDropzone
+          key={value.intent}
           accept={INSTITUTION_LOGO_MIME_TYPES}
           inputLabel="Imagen del logo"
           selectLabel="Seleccionar imagen del logo"
@@ -131,12 +147,12 @@ export function InstitutionLogoField({
           description="Arrastrá tu logo acá o hacé clic para seleccionar una imagen."
           buttonRef={selectRef}
           disabled={disabled}
-          error={error}
+          error={selectedFile && !errorDismissed && !undoRequested ? error : undefined}
           errorId={`${id}-error`}
           onSelectFiles={selectFiles}
         />
 
-        <FieldError id={`${id}-error`}>{error}</FieldError>
+        {selectedFile && !errorDismissed && !undoRequested ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
 
         {hasLogo ? (
           <FileUploadSelection
@@ -150,7 +166,7 @@ export function InstitutionLogoField({
               displayUrl ? (
                 <InstitutionLogoImage
                   src={displayUrl}
-                  alt={selectedFile ? "Vista previa del nuevo logo" : `Logo de ${institutionName}`}
+                  alt={selectedFile && !undoRequested ? "Vista previa del nuevo logo" : `Logo de ${institutionName}`}
                   className="h-full w-full object-contain"
                   compact
                 />

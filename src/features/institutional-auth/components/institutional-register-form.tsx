@@ -9,6 +9,7 @@ import { type InstitutionalInstitution } from "@features/institutional-auth/comp
 import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import { InstitutionalRegistrationFields } from "@features/institutional-auth/components/institutional-registration-fields";
 import type { InstitutionalRegisterActionState } from "@features/institutional-auth/types/institutional-register-state.types";
+import { getLatestAdultBirthDate } from "@features/people/utils/person-birth-date.util";
 
 const INITIAL_STATE: InstitutionalRegisterActionState = {};
 
@@ -18,6 +19,16 @@ export function InstitutionalRegisterForm(): ReactElement {
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
 
   const [birthDate, setBirthDate] = useState<Date>();
+
+  const [isGuardian, setIsGuardian] = useState(false);
+
+  function handleGuardianChange(checked: boolean): void {
+    setIsGuardian(checked);
+
+    if (checked && birthDate && birthDate > getLatestAdultBirthDate()) {
+      setBirthDate(undefined);
+    }
+  }
 
   return (
     <ActionForm action={formAction} className="flex flex-col justify-center p-5 sm:p-8">
@@ -34,6 +45,8 @@ export function InstitutionalRegisterForm(): ReactElement {
         isPending={isPending}
         birthDate={birthDate}
         setBirthDate={setBirthDate}
+        isGuardian={isGuardian}
+        onGuardianChange={handleGuardianChange}
       />
     </ActionForm>
   );

@@ -15,9 +15,12 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import { GUARDIAN_LINKS_PAGE_PATH } from "@features/guardian-links/constants/guardian-link.constants";
 import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
+  canManageDependents,
   canStartEnrollmentApplication,
   canViewOwnEnrollmentApplications,
 } from "@features/institutional-auth/utils/institutional-applicant-role.util";
@@ -98,6 +101,15 @@ export function getInstitutionalHomeTasks(user: Pick<InstitutionalUser, "permiss
 export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): InstitutionalHomeLink[] {
   const links: InstitutionalHomeLink[] = [];
 
+  if (canManageDependents(user)) {
+    links.push({
+      href: GUARDIAN_DEPENDENTS_PAGE_PATH,
+      title: "Mis personas a cargo",
+      description: "Registrá y gestioná a los menores a tu cargo para inscribirlos.",
+      icon: UsersIcon,
+    });
+  }
+
   if (hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)) {
     links.push({
       href: "/course-enrollments",
@@ -146,6 +158,15 @@ export function getInstitutionalEnrollmentHomeLinks(user: InstitutionalUser): In
       title: "Solicitudes de inscripción",
       description: "Revisá y gestioná las solicitudes de inscripción recibidas.",
       icon: ClipboardListIcon,
+    });
+  }
+
+  if (hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.GUARDIAN_LINK_REVIEW)) {
+    links.push({
+      href: GUARDIAN_LINKS_PAGE_PATH,
+      title: "Solicitudes de vinculación",
+      description: "Validá las solicitudes de tutores para vincular personas a cargo.",
+      icon: UsersIcon,
     });
   }
 

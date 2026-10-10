@@ -19,9 +19,18 @@ type MyEnrollmentApplicationTablePresentationProps = {
   page: number;
   size: number;
   status?: EnrollmentApplicationStatus;
+  currentPersonId?: string;
+  showApplicant?: boolean;
 };
 
-export function MyEnrollmentApplicationTablePresentation({ data, page, size, status }: MyEnrollmentApplicationTablePresentationProps): ReactElement {
+export function MyEnrollmentApplicationTablePresentation({
+  data,
+  page,
+  size,
+  status,
+  currentPersonId,
+  showApplicant = false,
+}: MyEnrollmentApplicationTablePresentationProps): ReactElement {
   const { isPending: isNavigating } = useDataTableNavigation();
 
   if (data.items.length === 0) {
@@ -37,6 +46,7 @@ export function MyEnrollmentApplicationTablePresentation({ data, page, size, sta
               <TableHead className="w-16 pl-4">
                 <span className="sr-only">Acciones</span>
               </TableHead>
+              {showApplicant ? <TableHead>Postulante</TableHead> : null}
               <TableHead>Trayecto formativo</TableHead>
               <TableHead>Ciclo lectivo</TableHead>
               <TableHead>Fecha de solicitud</TableHead>
@@ -46,7 +56,12 @@ export function MyEnrollmentApplicationTablePresentation({ data, page, size, sta
           </TableHeader>
           <TableBody>
             {data.items.map((application) => (
-              <MyEnrollmentApplicationTableRow key={application.applicationId} application={application} />
+              <MyEnrollmentApplicationTableRow
+                key={application.applicationId}
+                application={application}
+                currentPersonId={currentPersonId}
+                showApplicant={showApplicant}
+              />
             ))}
           </TableBody>
         </Table>

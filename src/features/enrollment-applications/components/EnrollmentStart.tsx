@@ -5,12 +5,14 @@ import { startTransition, useActionState, type ReactElement, type ReactNode } fr
 import { useRouter } from "next/navigation";
 
 import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
-import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface EnrollmentStartProps {
+  /** Dependent the application is for; omit to enroll the signed-in user. */
+  applicantPersonId?: string;
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods?: EnrollmentPeriod[];
   studyPlanPagination?: ReactNode;
@@ -20,12 +22,12 @@ type EnrollmentStartState = {
   error?: string;
 };
 
-export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentStartProps): ReactElement {
+export function EnrollmentStart({ applicantPersonId, studyPlans, studyPlanPagination }: EnrollmentStartProps): ReactElement {
   const router = useRouter();
 
   const [state, startApplication, isStarting] = useActionState(
     async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
-      const result = await startOrGetEnrollmentApplicationAction(input);
+      const result = await startOrGetEnrollmentApplicationAction(applicantPersonId ? { ...input, applicantPersonId } : input);
 
       if ("error" in result) {
         return { error: result.error };
@@ -44,11 +46,7 @@ export function EnrollmentStart({ studyPlans, studyPlanPagination }: EnrollmentS
 
   return (
     <EnrollmentStartSelector
-      studyPlans={studyPlans.map((plan) => ({
-        id: plan.id,
-        name: plan.name,
-        trainingPathName: plan.trainingPathName,
-      }))}
+      studyPlans={studyPlans.map((plan) => ({ id: plan.id, name: plan.name, trainingPathName: plan.trainingPathName }))}
       studyPlanPagination={studyPlanPagination}
       error={state.error}
       isStarting={isStarting}
