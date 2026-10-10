@@ -19,6 +19,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -38,6 +39,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([expect.objectContaining({ path: ["startDate"], message: "Ingresá una fecha válida." })]),
@@ -51,6 +53,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["year"] })]));
     }
@@ -63,6 +66,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -90,6 +94,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -109,6 +114,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_YEAR, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -129,7 +135,10 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.INSTRUMENT, formData);
 
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data).toEqual({ name: "Piano", description: null });
+
+    if (result.success) {
+      expect(result.data).toEqual({ name: "Piano", description: null });
+    }
   });
 
   it("parses a shift with a required name and optional description", () => {
@@ -140,7 +149,10 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.SHIFT, formData);
 
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data).toEqual({ name: "Turno mañana", description: "De 8 a 12." });
+
+    if (result.success) {
+      expect(result.data).toEqual({ name: "Turno mañana", description: "De 8 a 12." });
+    }
   });
 
   it("accepts an open-ended study-plan validity", () => {
@@ -153,6 +165,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.STUDY_PLAN, formData);
 
     expect(result.success).toBe(true);
+
     if (result.success) {
       expect(result.data).toEqual({
         name: "Plan 2027",
@@ -169,6 +182,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
 
     expect(result.success).toBe(true);
+
     if (result.success) {
       expect(result.data).toEqual({
         name: "Armonía",
@@ -183,11 +197,14 @@ describe("academic form schemas", () => {
   it.each([undefined, "", "on", "yes"])("rejects missing or unknown instrumental value %s", (value) => {
     const formData = academicSpaceFormData("Armonía", "SUBJECT", "GRUPAL");
     formData.delete("instrumental");
+
     if (value !== undefined) {
       formData.set("instrumental", value);
     }
+
     const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["instrumental"] })]));
     }
@@ -198,6 +215,7 @@ describe("academic form schemas", () => {
     formData.set("instrumental", value);
     const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
     expect(result.success).toBe(true);
+
     if (result.success) {
       expect(result.data).toMatchObject({ instrumental: value === "true" });
     }
@@ -209,6 +227,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.ACADEMIC_SPACE, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(expect.arrayContaining([expect.objectContaining({ path: ["format"] })]));
     }
@@ -224,6 +243,7 @@ describe("academic form schemas", () => {
     const result = parseAcademicForm(AcademicResource.STUDY_PLAN, formData);
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -254,9 +274,15 @@ describe("academic form schemas", () => {
     });
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([expect.objectContaining({ path: ["effectiveTo"], message: "Ingresá la fecha de finalización." })]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            path: ["effectiveTo"],
+            message: "Ingresá la fecha de finalización.",
+          }),
+        ]),
       );
     }
   });
@@ -270,6 +296,7 @@ describe("academic form schemas", () => {
     });
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([
@@ -288,6 +315,7 @@ function academicYearFormData(year: number, startDate: string, endDate: string):
   formData.set("year", String(year));
   formData.set("startDate", startDate);
   formData.set("endDate", endDate);
+
   return formData;
 }
 
@@ -298,5 +326,6 @@ function academicSpaceFormData(name: string, type: string, format: string): Form
   formData.set("type", type);
   formData.set("format", format);
   formData.set("instrumental", "false");
+
   return formData;
 }

@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { InstitutionalRegisterForm } from "@features/institutional-auth/components/institutional-register-form";
+
 jest.mock("next/image", () => ({ __esModule: true, default: () => null }));
 jest.mock("@features/institutional-auth/actions/institutional-register.action", () => ({ registerInstitutional: jest.fn() }));
 jest.mock("@features/institutional-auth/components/institution-picker", () => ({ InstitutionPicker: () => null }));
-
-import { InstitutionalRegisterForm } from "@features/institutional-auth/components/institutional-register-form";
 
 function getBirthDateValue(container: HTMLElement): string {
   return container.querySelector<HTMLInputElement>('input[name="birthDate"]')!.value;

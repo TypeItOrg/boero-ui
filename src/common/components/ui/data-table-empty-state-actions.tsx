@@ -1,8 +1,10 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { Button } from "@common/components/ui/button";
 import { EmptyContent } from "@common/components/ui/empty";
 
 type DataTableEmptyStateActionsProps = {
-  createAction?: React.ReactNode;
+  createAction?: ReactNode;
   hasFilters: boolean;
   hasItemsOnOtherPages: boolean;
   onFirstPage?: () => void;
@@ -13,7 +15,7 @@ export function DataTableEmptyStateActions({
   hasFilters,
   hasItemsOnOtherPages,
   onFirstPage,
-}: DataTableEmptyStateActionsProps): React.ReactElement | null {
+}: DataTableEmptyStateActionsProps): ReactElement | null {
   if (hasItemsOnOtherPages) {
     if (!onFirstPage) {
       return null;

@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { Fragment, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -62,8 +63,9 @@ export function InstitutionalBreadcrumb({
   segmentHrefs = EMPTY_SEGMENT_LABELS,
   segmentLabels = EMPTY_SEGMENT_LABELS,
   trailingLabel,
-}: InstitutionalBreadcrumbProps): React.ReactElement {
+}: InstitutionalBreadcrumbProps): ReactElement {
   const pathname = usePathname();
+
   const segments = getSegments(pathname, segmentLabels, segmentHrefs, hiddenSegments, trailingLabel);
 
   return (
@@ -73,7 +75,7 @@ export function InstitutionalBreadcrumb({
           const isLast = index === segments.length - 1;
 
           return (
-            <React.Fragment key={index}>
+            <Fragment key={index}>
               <BreadcrumbItem className="shrink-0">
                 {isLast ? (
                   <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
@@ -84,7 +86,7 @@ export function InstitutionalBreadcrumb({
                 )}
               </BreadcrumbItem>
               {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>
@@ -100,10 +102,15 @@ function getSegments(
   trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const parts = pathname.split("/").filter(Boolean);
+
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/" }];
+
   const hiddenSegmentSet = new Set(hiddenSegments);
+
   const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
+
   let accumulatedPath = "";
+
   let visiblePartIndex = 0;
 
   for (const part of parts) {
@@ -114,6 +121,7 @@ function getSegments(
     }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
+
     const label = customSegmentLabels[part] ?? SEGMENT_LABELS[part] ?? "Editar";
 
     segments.push({

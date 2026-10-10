@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
+
 import { InstitutionPicker, type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
 import { useInstitutionalBrand } from "@features/institutional-auth/components/institutional-brand-context";
 
@@ -16,8 +19,9 @@ export function InstitutionalAuthInstitutionField({
   onChange: (institution: InstitutionalInstitution | undefined) => void;
   disabled?: boolean;
   error?: string;
-}): React.ReactElement {
+}): ReactElement {
   const fixedInstitution = useInstitutionalBrand();
+
   if (fixedInstitution) {
     return (
       <>

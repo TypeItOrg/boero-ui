@@ -1,16 +1,21 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { HouseIcon, SearchXIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { Card } from "@common/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 
-export function NotFoundContent(): React.ReactElement {
+export function NotFoundContent(): ReactElement {
   const pathname = usePathname();
+
   const isPlatformAdmin = pathname.startsWith("/admin");
+
   const homeHref = isPlatformAdmin ? "/admin" : "/";
 
   return (

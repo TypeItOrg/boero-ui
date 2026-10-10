@@ -1,4 +1,4 @@
-export type EnrollmentEducationLevel = "NO_SCHOOLING" | "INITIAL" | "PRIMARY" | "SECONDARY" | "NON_UNIVERSITY_HIGHER" | "UNIVERSITY";
+import { type EnrollmentEducationLevel } from "@features/enrollment-applications/types/enrollment-education-level.types";
 
 export interface EnrollmentAcademicBackground {
   secondarySchool?: string | null;
@@ -10,3 +10,5 @@ export interface EnrollmentAcademicBackground {
   secondaryCompleted?: boolean | null;
   secondaryDegreeTitle?: string | null;
 }
+
+export type { EnrollmentEducationLevel } from "@features/enrollment-applications/types/enrollment-education-level.types";

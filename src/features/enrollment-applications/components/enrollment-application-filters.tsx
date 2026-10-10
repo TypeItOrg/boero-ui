@@ -1,12 +1,15 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import {
   ENROLLMENT_APPLICATION_FILTER_MESSAGES,
   ENROLLMENT_APPLICATION_STATUS_OPTIONS,
 } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
 const ALL_STATUSES = "all";
 
@@ -34,7 +37,7 @@ export function EnrollmentApplicationFilters({
   pendingDocuments,
   canFilterDocuments = false,
   trainingPaths,
-}: EnrollmentApplicationFiltersProps): React.ReactElement {
+}: EnrollmentApplicationFiltersProps): ReactElement {
   const statusFilter: DataTableSelectFilter = {
     defaultValue: ALL_STATUSES,
     label: "Estado",
@@ -57,6 +60,7 @@ export function EnrollmentApplicationFilters({
       value: pendingDocuments ? "true" : "all",
     });
   }
+
   if (trainingPaths) {
     selectFilters.push({
       defaultValue: ALL_TRAINING_PATHS,
@@ -64,9 +68,17 @@ export function EnrollmentApplicationFilters({
       name: "trainingPathId",
       options: [
         { label: "Todos los trayectos", value: ALL_TRAINING_PATHS },
-        ...trainingPaths.map((trainingPath) => ({ label: trainingPath.name, value: trainingPath.id })),
+        ...trainingPaths.map((trainingPath) => ({
+          label: trainingPath.name,
+          value: trainingPath.id,
+        })),
         ...(trainingPathId && !trainingPaths.some((trainingPath) => trainingPath.id === trainingPathId)
-          ? [{ label: ENROLLMENT_APPLICATION_FILTER_MESSAGES.UNAVAILABLE_TRAINING_PATH, value: trainingPathId }]
+          ? [
+              {
+                label: ENROLLMENT_APPLICATION_FILTER_MESSAGES.UNAVAILABLE_TRAINING_PATH,
+                value: trainingPathId,
+              },
+            ]
           : []),
       ],
       value: trainingPathId ?? ALL_TRAINING_PATHS,

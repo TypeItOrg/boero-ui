@@ -1,9 +1,10 @@
-import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import type { InstitutionalLoginResult } from "@features/institutional-auth/types/institutional-login-result.types";
 import type { DiscoverablePasskeyVerifyInput } from "@features/institutional-auth/types/discoverable-passkey-verify-input.types";
+import type { InstitutionalLoginResult } from "@features/institutional-auth/types/institutional-login-result.types";
 
 export type PasskeyAuthVerifyInput = {
   loginAttemptId: string;
@@ -40,6 +41,7 @@ async function verify(
 
     if (!response.ok) {
       const error = (await response.json()) as BackendError;
+
       return { success: false, error };
     }
 

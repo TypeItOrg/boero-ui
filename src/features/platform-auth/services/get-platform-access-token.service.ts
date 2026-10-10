@@ -6,5 +6,6 @@ import { PLATFORM_ACCESS_TOKEN_COOKIE } from "@features/platform-auth/utils/plat
 
 export async function getPlatformAccessToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
+
   return cookieStore.get(PLATFORM_ACCESS_TOKEN_COOKIE)?.value;
 }

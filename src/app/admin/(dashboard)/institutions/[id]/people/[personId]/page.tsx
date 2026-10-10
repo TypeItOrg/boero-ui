@@ -1,20 +1,24 @@
+import type { ReactElement } from "react";
+
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
+
 import { UserRoundPenIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { appendReturnTo, getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { PersonDeleteButton } from "@features/people/components/person-delete-button";
 import { PersonDetailView } from "@features/people/components/person-detail-view";
 import { PersonEditForm } from "@features/people/components/person-edit-form";
-import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchPersonRoles } from "@features/people/services/fetch-person-roles.service";
+import { fetchPerson } from "@features/people/services/fetch-person.service";
 import { fetchSystemRoles } from "@features/people/services/fetch-system-roles.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 type EditPersonPageProps = {
   params: Promise<{ id: string; personId: string }>;
@@ -25,17 +29,25 @@ export const metadata: Metadata = {
   title: "Editar usuario",
 };
 
-export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<React.ReactElement> {
+export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<ReactElement> {
   const { id, personId } = await params;
+
   const { returnTo, view } = await searchParams;
+
   const isDetailView = view === "detail";
+
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
+
   const [person, assignedRoles, systemRoles] = await Promise.all([
     fetchPerson(id, personId),
     fetchPersonRoles(id, personId),
     isDetailView ? Promise.resolve([]) : fetchSystemRoles(id),
   ]);
-  if (!person) notFound();
+
+  if (!person) {
+    notFound();
+  }
+
   const personName = `${person.firstName} ${person.lastName}`;
 
   return (
@@ -44,7 +56,9 @@ export default async function EditPersonPage({ params, searchParams }: EditPerso
       minViewportHeight
       breadcrumb={
         <PlatformBreadcrumb
-          segmentHrefs={{ [personId]: appendReturnTo(`/admin/institutions/${id}/people/${personId}?view=detail`, destination) }}
+          segmentHrefs={{
+            [personId]: appendReturnTo(`/admin/institutions/${id}/people/${personId}?view=detail`, destination),
+          }}
           segmentLabels={{ [id]: person.institutionName, [personId]: personName }}
           trailingLabel={isDetailView ? undefined : "Editar"}
         />

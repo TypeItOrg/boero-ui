@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type NavigateOptions = {
@@ -14,7 +15,9 @@ type UseSearchParamNavigation = {
 
 export function useSearchParamNavigation(): UseSearchParamNavigation {
   const router = useRouter();
+
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
 
   const navigate = useCallback(

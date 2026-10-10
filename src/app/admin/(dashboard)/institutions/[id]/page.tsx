@@ -1,24 +1,27 @@
-import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
-import { InstitutionPublicAccessForm } from "@features/institutions/components/institution-public-access-form";
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import { Suspense, type ReactElement } from "react";
+
+import { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
+
 import { Building2Icon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { InstitutionDetail } from "@features/institutions/components/institution-detail";
+import { InstitutionLogoManager } from "@features/institutions/components/institution-logo-manager";
 import { InstitutionPeoplePreview, InstitutionPeoplePreviewSkeleton } from "@features/institutions/components/institution-people-preview";
+import { InstitutionPublicAccessDetail } from "@features/institutions/components/institution-public-access-detail";
 import { InstitutionReactivateButton } from "@features/institutions/components/institution-reactivate-button";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
-import { Metadata } from "next";
 
 type InstitutionDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -29,11 +32,17 @@ export const metadata: Metadata = {
   title: "Detalle de institución",
 };
 
-export default async function InstitutionDetailPage({ params, searchParams }: InstitutionDetailPageProps): Promise<React.ReactElement> {
+export default async function InstitutionDetailPage({ params, searchParams }: InstitutionDetailPageProps): Promise<ReactElement> {
   const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/institutions");
+
   const institution = await fetchInstitution(id);
-  if (!institution) notFound();
+
+  if (!institution) {
+    notFound();
+  }
+
   const userCount = Number.isFinite(institution.userCount) ? institution.userCount : 0;
 
   return (
@@ -110,11 +119,7 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
           </CardContent>
         </Card>
 
-        <InstitutionPublicAccessForm
-          institutionId={id}
-          publicSubdomain={institution.publicSubdomain}
-          baseDomain={process.env.INSTITUTIONAL_BASE_DOMAIN ?? ""}
-        />
+        <InstitutionPublicAccessDetail publicSubdomain={institution.publicSubdomain} baseDomain={process.env.INSTITUTIONAL_BASE_DOMAIN ?? ""} />
         <InstitutionLogoManager institutionId={id} institutionName={institution.name} logoUrl={institution.logoUrl} scope="platform" canUpdate />
 
         <div

@@ -1,4 +1,4 @@
-import { DEFAULT_PLATFORM_PEOPLE_SORT, parsePlatformPeoplePaginationParams } from "@features/people/utils/platform-people-pagination.util";
+import { parsePlatformPeoplePaginationParams } from "@features/people/utils/platform-people-pagination.util";
 
 describe("parsePlatformPeoplePaginationParams", () => {
   it("parses valid filters and sort", () => {
@@ -38,7 +38,7 @@ describe("parsePlatformPeoplePaginationParams", () => {
       roleCode: undefined,
       search: "",
       size: 10,
-      sort: DEFAULT_PLATFORM_PEOPLE_SORT,
+      sort: { field: "lastName", direction: "asc" },
     });
   });
 });

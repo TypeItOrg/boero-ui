@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+
 import {
   GUARDIAN_ATTACHMENT_ACCEPT,
   GUARDIAN_ATTACHMENT_MAX_BYTES,
@@ -13,8 +14,8 @@ import {
   getGuardianDependentsApiPath,
 } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import { createGuardianDependentSchema } from "@features/guardian-dependents/schemas/create-guardian-dependent.schema";
-import { GUARDIAN_DEPENDENT_FIELD_NAMES } from "@features/guardian-dependents/types/guardian-dependent-field-name.types";
 import type { GuardianDependentActionState } from "@features/guardian-dependents/types/guardian-dependent-action-state.types";
+import { GUARDIAN_DEPENDENT_FIELD_NAMES } from "@features/guardian-dependents/types/guardian-dependent-field-name.types";
 import { authorizeGuardianAction } from "@features/guardian-dependents/utils/authorize-guardian-action.util";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
@@ -51,7 +52,9 @@ async function uploadDocuments(institutionId: string, response: Response, docume
 
     for (const document of documents) {
       const body = new FormData();
+
       body.set("file", document);
+
       const upload = await institutionalApiFetch(`${getGuardianDependentsApiPath(institutionId)}/${personGuardianId}/attachments`, {
         method: "POST",
         body,
@@ -91,6 +94,7 @@ export async function createGuardianDependentAction(
   }
 
   const documents = getDocuments(formData);
+
   const documentsError = validateDocuments(documents);
 
   if (documentsError) {

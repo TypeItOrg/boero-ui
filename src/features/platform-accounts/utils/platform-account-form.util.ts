@@ -20,7 +20,9 @@ export function getSectionDescription(isEdit: boolean): string {
 }
 
 export function getDefaultValues(account: PlatformAccountAdmin | undefined): PlatformAccountFormInput {
-  if (!account) return EMPTY_FORM_VALUES;
+  if (!account) {
+    return EMPTY_FORM_VALUES;
+  }
 
   return {
     name: account.name,
@@ -33,24 +35,33 @@ export function getDefaultValues(account: PlatformAccountAdmin | undefined): Pla
 
 export function hasSensitiveChanges(values: PlatformAccountFormValues, account: PlatformAccountAdmin): boolean {
   const emailChanged = values.email.toLowerCase() !== account.email.toLowerCase();
+
   return emailChanged || values.password !== "";
 }
 
 export function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPending: boolean }): string {
-  if (isPending) return isEdit ? "Guardando..." : "Creando...";
+  if (isPending) {
+    return isEdit ? "Guardando..." : "Creando...";
+  }
+
   return isEdit ? "Guardar cambios" : "Crear administrador";
 }
 
 export function createFormData(values: PlatformAccountFormValues): FormData {
   const formData = new FormData();
+
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
+
   return formData;
 }
 
 export function setActionFieldErrors(result: PlatformAccountActionState, setError: UseFormSetError<PlatformAccountFormInput>): boolean {
-  if (!result.fieldErrors) return false;
+  if (!result.fieldErrors) {
+    return false;
+  }
 
   let hasFieldErrors = false;
+
   for (const [field, message] of Object.entries(result.fieldErrors)) {
     if (message) {
       setError(field as PlatformAccountFormFieldName, { message });

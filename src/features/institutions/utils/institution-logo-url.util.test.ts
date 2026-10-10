@@ -1,4 +1,5 @@
 import { getInstitutionLogoUrl } from "@features/institutions/utils/institution-logo-url.util";
+
 const id = "22222222-2222-4222-8222-222222222222";
 it("[L03.logo-cache-fallback] maps opaque logo version to safe same-host public BFF", () => {
   expect(getInstitutionLogoUrl(id, `/api/v1/institutions/${id}/logo?v=opaque%2Bversion`)).toBe(

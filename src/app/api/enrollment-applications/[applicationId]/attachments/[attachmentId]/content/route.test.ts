@@ -1,9 +1,10 @@
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
+import { GET } from "@app/api/enrollment-applications/[applicationId]/attachments/[attachmentId]/content/route";
+
 jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
   institutionalApiFetch: jest.fn(),
 }));
-
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { GET } from "@app/api/enrollment-applications/[applicationId]/attachments/[attachmentId]/content/route";
 
 describe("GET /api/enrollment-applications/[applicationId]/attachments/[attachmentId]/content", () => {
   const institutionalApiFetchMock = jest.mocked(institutionalApiFetch);

@@ -1,15 +1,18 @@
+import type { ReactElement } from "react";
+
 import { FileTextIcon } from "lucide-react";
 
-import { TrainingPathDocumentInstructions } from "@features/academic/components/training-path-document-instructions";
 import { SectionHeader } from "@common/components/section-header";
 import { Badge } from "@common/components/ui/badge";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
-import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
+
+import { TrainingPathDocumentInstructions } from "@features/academic/components/training-path-document-instructions";
 import { DOCUMENT_LEVEL_LABELS } from "@features/enrollment-applications/constants/documentation.constants";
+import type { DocumentRequirement } from "@features/enrollment-applications/types/document-requirement.types";
 import { formatDocumentFileCategories } from "@features/enrollment-applications/utils/document-file-category.util";
 
-export function TrainingPathDocuments({ requirements }: { requirements: DocumentRequirement[] }): React.ReactElement {
+export function TrainingPathDocuments({ requirements }: { requirements: DocumentRequirement[] }): ReactElement {
   return (
     <section aria-labelledby="training-path-documents-title" className="bg-muted/25 flex min-w-0 flex-col gap-5 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
@@ -75,7 +78,7 @@ export function TrainingPathDocuments({ requirements }: { requirements: Document
   );
 }
 
-function RequirementName({ item }: { item: DocumentRequirement }): React.ReactElement {
+function RequirementName({ item }: { item: DocumentRequirement }): ReactElement {
   return (
     <div className="space-y-1">
       <div className="flex min-w-0 items-center gap-1">
@@ -87,6 +90,6 @@ function RequirementName({ item }: { item: DocumentRequirement }): React.ReactEl
   );
 }
 
-function RequirementStatus({ item }: { item: DocumentRequirement }): React.ReactElement {
+function RequirementStatus({ item }: { item: DocumentRequirement }): ReactElement {
   return <Badge variant={item.active === false ? "secondary" : "success"}>{item.active === false ? "Inactiva" : "Activa"}</Badge>;
 }

@@ -1,9 +1,12 @@
+import { Suspense, type ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { Suspense } from "react";
+
 import { ClipboardListIcon } from "lucide-react";
 
-import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
+import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { EnrollmentApplicationFilters } from "@features/enrollment-applications/components/enrollment-application-filters";
 import { EnrollmentApplicationTableSkeleton } from "@features/enrollment-applications/components/enrollment-application-table-skeleton";
 import { MyEnrollmentApplicationTableContainer } from "@features/enrollment-applications/components/my-enrollment-application-table";
@@ -13,12 +16,12 @@ import {
   type EnrollmentApplicationSearchParams,
 } from "@features/enrollment-applications/utils/enrollment-application-pagination.util";
 import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
+import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+import { resolveGuardianWorkspaceDependent } from "@features/guardian-workspace/utils/resolve-guardian-workspace-dependent.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { canViewOwnEnrollmentApplications, isGuardian } from "@features/institutional-auth/utils/institutional-applicant-role.util";
-import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
-import { resolveGuardianWorkspaceDependent } from "@features/guardian-workspace/utils/resolve-guardian-workspace-dependent.util";
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
@@ -31,7 +34,7 @@ export default async function MyEnrollmentApplicationsPage({
   searchParams,
 }: {
   searchParams: Promise<EnrollmentApplicationSearchParams>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!canViewOwnEnrollmentApplications(user)) {
@@ -39,10 +42,15 @@ export default async function MyEnrollmentApplicationsPage({
   }
 
   const resolvedSearchParams = await searchParams;
+
   const { page, size, status } = parseEnrollmentApplicationPaginationParams(resolvedSearchParams);
+
   const guardianOnly = isGuardian(user);
+
   const dependents = guardianOnly ? await fetchGuardianDependents(user.institutionId) : [];
+
   const workspaceId = guardianOnly ? await getGuardianWorkspaceId() : undefined;
+
   const selectedDependent = resolveGuardianWorkspaceDependent(dependents, workspaceId);
 
   if (guardianOnly && dependents.length === 0) {

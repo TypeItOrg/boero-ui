@@ -1,4 +1,5 @@
 import { isValidUuid } from "@common/utils/action-argument.util";
+
 import { GUARDIAN_LINK_MESSAGES, getGuardianLinksApiPath } from "@features/guardian-links/constants/guardian-link.constants";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
@@ -13,6 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ link
 
   try {
     const user = await requireInstitutionalUser();
+
     const response = await institutionalApiFetch(`${getGuardianLinksApiPath(user.institutionId)}/${linkId}/attachments/${attachmentId}/content`, {
       signal: request.signal,
     });

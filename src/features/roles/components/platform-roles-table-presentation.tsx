@@ -1,18 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { EllipsisVerticalIcon, KeyRoundIcon, Loader2Icon } from "lucide-react";
+import type { ReactElement } from "react";
 
-import { Badge } from "@common/components/ui/badge";
-import { Button } from "@common/components/ui/button";
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
-import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@common/components/ui/context-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
+import { Loader2Icon } from "lucide-react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
+import { PlatformRoleTableRow } from "@features/roles/components/platform-role-table-row";
 import { PlatformRolesEmptyState } from "@features/roles/components/platform-roles-empty-state";
 import { PlatformRolesPagination } from "@features/roles/components/platform-roles-pagination";
 import type { PlatformRoleListItem } from "@features/roles/types/platform-role-list-item.types";
@@ -34,7 +32,7 @@ export function PlatformRolesTablePresentation({
   roleType,
   search,
   sort,
-}: PlatformRolesTablePresentationProps): React.ReactElement {
+}: PlatformRolesTablePresentationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function updateSort(nextSort: PlatformRoleSort): void {
@@ -42,6 +40,7 @@ export function PlatformRolesTablePresentation({
   }
 
   const hasFilters = search.trim() !== "" || institutionId !== undefined || roleType !== undefined;
+
   if (data.items.length === 0) {
     return (
       <div className="relative h-full" aria-busy={isPending}>
@@ -69,60 +68,7 @@ export function PlatformRolesTablePresentation({
           </TableHeader>
           <TableBody>
             {data.items.map((role) => (
-              <ContextMenu key={role.id}>
-                <ContextMenuTrigger asChild>
-                  <TableRow>
-                    <TableCell className="w-16 pl-4">
-                      <PlatformRoleActions role={role} />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <Link href={`/admin/roles/${role.id}`} className="hover:underline">
-                        {role.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/admin/institutions/${role.institution.id}`} className="text-muted-foreground font-medium hover:underline">
-                        {role.institution.name}
-                      </Link>
-                      {!role.institution.active ? (
-                        <Badge variant="outline" className="ml-2">
-                          Inactiva
-                        </Badge>
-                      ) : null}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={role.technicalCode ? "secondary" : "outline"}>{role.technicalCode ? "Sistema" : "Personalizado"}</Badge>
-                    </TableCell>
-                    <TableCell>{role.assignmentCount}</TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center gap-1.5">
-                        <KeyRoundIcon className="text-muted-foreground size-4" />
-                        {role.permissionCount}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                </ContextMenuTrigger>
-                <ContextMenuContent className="w-48 p-1.5">
-                  <ContextMenuGroup>
-                    <ContextMenuItem asChild>
-                      <Link href={`/admin/roles/${role.id}`} className="px-2.5 py-1.5">
-                        Ver detalle
-                      </Link>
-                    </ContextMenuItem>
-                    {role.editable ? (
-                      <ContextMenuItem asChild>
-                        <ReturnToLink href={`/admin/roles/${role.id}/edit`} className="px-2.5 py-1.5">
-                          Editar rol
-                        </ReturnToLink>
-                      </ContextMenuItem>
-                    ) : (
-                      <ContextMenuItem disabled className="px-2.5 py-1.5">
-                        Editar rol
-                      </ContextMenuItem>
-                    )}
-                  </ContextMenuGroup>
-                </ContextMenuContent>
-              </ContextMenu>
+              <PlatformRoleTableRow key={role.id} role={role} />
             ))}
           </TableBody>
         </Table>
@@ -141,41 +87,7 @@ export function PlatformRolesTablePresentation({
   );
 }
 
-function PlatformRoleActions({ role }: { role: PlatformRoleListItem }): React.ReactElement {
-  return (
-    <div className="flex justify-start">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label={`Abrir acciones de ${role.name}`}>
-            <EllipsisVerticalIcon />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48 p-1.5">
-          <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/roles/${role.id}`} className="px-2.5 py-1.5">
-                Ver detalle
-              </Link>
-            </DropdownMenuItem>
-            {role.editable ? (
-              <DropdownMenuItem asChild>
-                <ReturnToLink href={`/admin/roles/${role.id}/edit`} className="px-2.5 py-1.5">
-                  Editar rol
-                </ReturnToLink>
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem disabled className="px-2.5 py-1.5">
-                Editar rol
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
-}
-
-function LoadingOverlay(): React.ReactElement {
+function LoadingOverlay(): ReactElement {
   return (
     <div className="bg-background/55 absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[1px]">
       <Loader2Icon className="text-muted-foreground size-5 animate-spin" aria-label="Cargando roles" role="status" />

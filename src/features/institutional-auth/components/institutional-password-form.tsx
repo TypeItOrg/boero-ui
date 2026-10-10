@@ -1,21 +1,22 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, type ReactElement } from "react";
 
-import { useActionState } from "react";
 import { CircleAlertIcon, KeyRoundIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
+import { SectionHeader } from "@common/components/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { PasswordInput } from "@common/components/ui/password-input";
+
 import { changeInstitutionalPasswordAction } from "@features/institutional-auth/actions/change-institutional-password.action";
 import type { InstitutionalPasswordActionState } from "@features/institutional-auth/types/institutional-password-state.types";
-import { SectionHeader } from "@common/components/section-header";
 
 const INITIAL_STATE: InstitutionalPasswordActionState = {};
 
-export function InstitutionalPasswordForm(): React.ReactElement {
+export function InstitutionalPasswordForm(): ReactElement {
   const [state, formAction, isPending] = useActionState(changeInstitutionalPasswordAction, INITIAL_STATE);
 
   return (

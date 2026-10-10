@@ -4,11 +4,18 @@ import type { NavigationItem } from "@common/utils/navigation.util";
 
 export function groupSidebarNavigationSection(
   sections: readonly SidebarNavigationSection[],
-  configuration: Omit<SidebarNavigationGroup, "items"> & { sectionLabel: string; sourceSectionLabel?: string; urls: readonly string[] },
+  configuration: Omit<SidebarNavigationGroup, "items"> & {
+    sectionLabel: string;
+    sourceSectionLabel?: string;
+    urls: readonly string[];
+  },
 ): SidebarNavigationSection[] {
   const { sectionLabel, sourceSectionLabel = sectionLabel, urls, ...group } = configuration;
+
   const groupedUrls = new Set(urls);
+
   const sourceSection = sections.find((section) => section.label === sourceSectionLabel);
+
   const children = sourceSection?.items.filter((item): item is NavigationItem => "url" in item && groupedUrls.has(item.url)) ?? [];
 
   if (children.length === 0) {
@@ -16,6 +23,7 @@ export function groupSidebarNavigationSection(
   }
 
   const navigationGroup = { ...group, items: children };
+
   const groupedSections = sections.map((section) => {
     if (section.label !== sectionLabel && section.label !== sourceSectionLabel) {
       return section;

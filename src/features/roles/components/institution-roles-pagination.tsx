@@ -1,7 +1,9 @@
 "use client";
 
-import { DataTablePagination } from "@common/components/ui/data-table-pagination";
+import type { ReactElement } from "react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import { PAGE_SIZE_OPTIONS } from "@common/utils/pagination-query.util";
 
 type InstitutionRolesPaginationProps = {
@@ -11,8 +13,9 @@ type InstitutionRolesPaginationProps = {
   totalPages: number;
 };
 
-export function InstitutionRolesPagination({ page, size, totalItems, totalPages }: InstitutionRolesPaginationProps): React.ReactElement {
+export function InstitutionRolesPagination({ page, size, totalItems, totalPages }: InstitutionRolesPaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
+
   return (
     <DataTablePagination
       page={page}

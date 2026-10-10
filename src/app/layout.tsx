@@ -1,12 +1,18 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Manrope } from "next/font/google";
-import NextTopLoader from "nextjs-toploader";
+import type { ReactNode } from "react";
+
 import "@app/globals.css";
 
-import { cn } from "@common/utils/cn.util";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono, Manrope } from "next/font/google";
+
+import NextTopLoader from "nextjs-toploader";
+
 import { TooltipProvider } from "@common/components/ui/tooltip";
 import { getRequestInstitution } from "@common/services/institutional-host/institutional-host.service";
+import { cn } from "@common/utils/cn.util";
+
 import type { PublicInstitution } from "@features/institutions/types/public-institution.types";
+
 import { Providers } from "@app/providers";
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-sans" });
@@ -60,7 +66,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html

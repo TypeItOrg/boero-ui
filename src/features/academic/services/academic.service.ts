@@ -1,36 +1,26 @@
 import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
-import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
+
+import { fetchDetail, fetchDetailWithParams, fetchPage } from "@features/academic/services/academic-resource-read.service";
+import { type PageParams } from "@features/academic/types/academic-page-params.types";
 import type { AcademicSpaceFormat } from "@features/academic/types/academic-space-format.types";
 import type { AcademicSpaceType } from "@features/academic/types/academic-space-type.types";
-import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
+import type { AcademicSpace } from "@features/academic/types/academic-space.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
 import type { AcademicYear } from "@features/academic/types/academic-year.types";
+import type { CourseStatus } from "@features/academic/types/course-status.types";
 import type { Course } from "@features/academic/types/course.types";
 import type { Instrument } from "@features/academic/types/instrument.types";
-import type { Shift } from "@features/academic/types/shift.types";
 import type { Prerequisite } from "@features/academic/types/prerequisite.types";
+import type { Shift } from "@features/academic/types/shift.types";
 import type { StudyPlanCurriculum } from "@features/academic/types/study-plan-curriculum.types";
 import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.types";
 import type { StudyPlanStatus } from "@features/academic/types/study-plan-status.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { TrainingPath } from "@features/academic/types/training-path.types";
-import type { CourseStatus } from "@features/academic/types/course-status.types";
-import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
-
-const FETCH_ERROR = "No se pudo obtener la información académica.";
-
-type PageParams = {
-  deleted?: boolean;
-  institutionId?: string;
-  page?: number;
-  size?: number;
-  search?: string;
-  sort?: string;
-};
+import { type AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 export async function fetchAcademicYears(
   scope: AcademicScope,
@@ -85,7 +75,11 @@ export async function fetchStudyPlanCurriculum(scope: AcademicScope, institution
 export async function fetchAcademicSpaces(
   scope: AcademicScope,
   institutionId: string | undefined,
-  params: PageParams & { active?: boolean; type?: AcademicSpaceType; format?: AcademicSpaceFormat } = {},
+  params: PageParams & {
+    active?: boolean;
+    type?: AcademicSpaceType;
+    format?: AcademicSpaceFormat;
+  } = {},
 ): Promise<PaginatedResponse<AcademicSpace>> {
   return fetchPage(scope, institutionId, "academic-spaces", params);
 }
@@ -153,42 +147,6 @@ export async function fetchPrerequisite(scope: AcademicScope, institutionId: str
   return fetchDetail(scope, institutionId, `prerequisites/${id}`);
 }
 
-async function fetchPage<T>(
-  scope: AcademicScope,
-  institutionId: string | undefined,
-  resource: string,
-  params: Record<string, string | number | boolean | undefined>,
-): Promise<PaginatedResponse<T>> {
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== "") searchParams.set(key, String(value));
-  });
-  const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
-  const base = institutionId ? getAcademicApiBase(scope, institutionId) : "/api/v1/admin";
-  const response = await academicApiFetch(scope, `${base}/${resource}${query}`);
-  return parseHttpResponse(response, FETCH_ERROR);
-}
-
-async function fetchDetail<T>(scope: AcademicScope, institutionId: string, resource: string): Promise<T | null> {
-  const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}`);
-  return parseNullableHttpResponse(response, FETCH_ERROR);
-}
-
-async function fetchDetailWithParams<T>(
-  scope: AcademicScope,
-  institutionId: string,
-  resource: string,
-  params: Record<string, string | number | undefined>,
-): Promise<T | null> {
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== "") searchParams.set(key, String(value));
-  });
-  const query = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
-  const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/${resource}${query}`);
-  return parseNullableHttpResponse(response, FETCH_ERROR);
-}
-
 export async function fetchTrainingPathForStudyPlanCreation(
   scope: AcademicScope,
   institutionId: string,
@@ -199,5 +157,6 @@ export async function fetchTrainingPathForStudyPlanCreation(
     operation: "STUDY_PLAN_CREATE",
     size: 1,
   });
+
   return page.items[0] ?? null;
 }

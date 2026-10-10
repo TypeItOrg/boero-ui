@@ -1,4 +1,7 @@
+/* eslint-disable no-restricted-syntax */
+
 import type { Metadata } from "next";
+
 import { UsersIcon } from "lucide-react";
 
 import { GuardianDependentsList } from "@features/guardian-dependents/components/guardian-dependents-list";
@@ -27,7 +30,9 @@ export default async function MyDependentsPage({ searchParams }: MyDependentsPag
   }
 
   const { search } = await searchParams;
+
   const initialSearch = typeof search === "string" ? search.trim().slice(0, MAX_SEARCH_LENGTH) : "";
+
   const dependents = await fetchGuardianDependents(user.institutionId);
 
   return (

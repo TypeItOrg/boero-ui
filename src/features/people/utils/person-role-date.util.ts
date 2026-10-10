@@ -9,10 +9,15 @@ const ROLE_ASSIGNED_AT_FORMATTER = new Intl.DateTimeFormat("es-AR", {
 });
 
 export function formatRoleAssignedAt(value: string | undefined): string {
-  if (!value) return "Asignación pendiente";
+  if (!value) {
+    return "Asignación pendiente";
+  }
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
 
   return ROLE_ASSIGNED_AT_FORMATTER.format(date);
 }

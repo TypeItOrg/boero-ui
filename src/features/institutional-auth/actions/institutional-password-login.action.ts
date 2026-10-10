@@ -2,12 +2,13 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
 import { z } from "zod";
 
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { passwordLoginInstitutionalAccount } from "@features/institutional-auth/services/password-login-institutional.service";
-import { setInstitutionalAuthCookies } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 import type { InstitutionalPasswordLoginActionState } from "@features/institutional-auth/types/institutional-password-login-state.types";
+import { setInstitutionalAuthCookies } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 const boundArgsSchema = z.object({
   loginAttemptId: z.string().min(1),
@@ -37,6 +38,7 @@ export async function institutionalPasswordLogin(
   }
 
   const rememberMe = rawRememberMe === "on";
+
   const output = await passwordLoginInstitutionalAccount({ loginAttemptId: bound.data.loginAttemptId, password, rememberMe }, await headers());
 
   if (!output.success) {

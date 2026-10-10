@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, type ReactElement } from "react";
+
 import { CircleAlertIcon, SendIcon } from "lucide-react";
 import type { z } from "zod";
 
@@ -14,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
+
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 
 type EnrollmentSubmitDialogProps = {
@@ -21,8 +23,9 @@ type EnrollmentSubmitDialogProps = {
   onSubmit: () => Promise<{ error?: string; issues?: z.ZodIssue[] }>;
 };
 
-export function EnrollmentSubmitDialog({ onClose, onSubmit }: EnrollmentSubmitDialogProps): React.ReactElement {
+export function EnrollmentSubmitDialog({ onClose, onSubmit }: EnrollmentSubmitDialogProps): ReactElement {
   const [state, action, pending] = useActionState(async () => onSubmit(), null);
+
   const error = state?.error ?? (state?.issues?.length ? ENROLLMENT_MESSAGES.INCOMPLETE_FIELDS_SUMMARY(state.issues.length) : undefined);
 
   return (

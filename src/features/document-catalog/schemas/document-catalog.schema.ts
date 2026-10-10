@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 export const documentAssignmentSchema = z.object({
   trainingPathId: z.uuid(),
   revision: z.number().int().min(0).optional(),
@@ -18,9 +19,14 @@ export const documentDefinitionSchema = z.object({
     .trim()
     .max(1000, "Las instrucciones no pueden superar los 1000 caracteres."),
   allowedFormats: z
-    .array(z.enum(["application/pdf", "image/jpeg", "image/png"], { error: "Seleccioná tipos de archivo válidos." }), {
-      error: "Seleccioná al menos un tipo de archivo.",
-    })
+    .array(
+      z.enum(["application/pdf", "image/jpeg", "image/png"], {
+        error: "Seleccioná tipos de archivo válidos.",
+      }),
+      {
+        error: "Seleccioná al menos un tipo de archivo.",
+      },
+    )
     .min(1, "Seleccioná al menos un tipo de archivo."),
   active: z.boolean({ error: "Seleccioná un estado válido." }),
   revision: z.number().int().min(0).optional(),

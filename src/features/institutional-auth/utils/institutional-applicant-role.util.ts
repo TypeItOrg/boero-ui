@@ -1,5 +1,5 @@
-import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import { hasInstitutionalPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 
 const INSTITUTIONAL_STAFF_ROLE_NAMES = new Set(["Administrador Institucional", "Administrativo", "Profesor"]);

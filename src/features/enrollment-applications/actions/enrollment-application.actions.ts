@@ -1,30 +1,23 @@
 "use server";
 
+import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
+
+import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
-import { isValidUuid, INVALID_ACTION_ARGUMENTS } from "@common/utils/action-argument.util";
-import { mutateEnrollmentApplication } from "@features/enrollment-applications/services/mutate-enrollment-application.service";
 import {
   startEnrollmentApplicationSchema,
   updateEnrollmentDraftSchema,
 } from "@features/enrollment-applications/schemas/enrollment-application.schema";
+import { mutateEnrollmentApplication } from "@features/enrollment-applications/services/mutate-enrollment-application.service";
+import type { ChangeEnrollmentCareerResult } from "@features/enrollment-applications/types/change-enrollment-career-result.types";
 import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import type { UpdateEnrollmentDraftInput } from "@features/enrollment-applications/types/update-enrollment-draft-input.types";
-import type { ChangeEnrollmentCareerResult } from "@features/enrollment-applications/types/change-enrollment-career-result.types";
-import { ENROLLMENT_APPLICATIONS_API_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
-import {
-  canMutateEnrollmentApplication,
-  canStartEnrollmentApplication,
-} from "@features/enrollment-applications/utils/can-mutate-enrollment-application.util";
 
 export async function startOrGetEnrollmentApplicationAction(input: StartEnrollmentApplicationInput): Promise<ChangeEnrollmentCareerResult> {
   const parsed = startEnrollmentApplicationSchema.safeParse(input);
 
   if (!parsed.success) {
     return { error: INVALID_ACTION_ARGUMENTS };
-  }
-
-  if (!(await canStartEnrollmentApplication(parsed.data.applicantPersonId))) {
-    return { error: ENROLLMENT_MESSAGES.APPLICATION_INVALID };
   }
 
   return mutateEnrollmentApplication(ENROLLMENT_APPLICATIONS_API_PATH, "POST", ENROLLMENT_MESSAGES.START_FAILED, parsed.data);
@@ -35,10 +28,6 @@ export async function updateEnrollmentDraftAction(applicationId: string, input: 
 
   if (!isValidUuid(applicationId) || !parsed.success) {
     return { error: INVALID_ACTION_ARGUMENTS };
-  }
-
-  if (!(await canMutateEnrollmentApplication(applicationId))) {
-    return { error: ENROLLMENT_MESSAGES.APPLICATION_INVALID };
   }
 
   return mutateEnrollmentApplication(
@@ -54,20 +43,12 @@ export async function submitEnrollmentApplicationAction(applicationId: string): 
     return { error: INVALID_ACTION_ARGUMENTS };
   }
 
-  if (!(await canMutateEnrollmentApplication(applicationId))) {
-    return { error: ENROLLMENT_MESSAGES.APPLICATION_INVALID };
-  }
-
   return mutateEnrollmentApplication(`${ENROLLMENT_APPLICATIONS_API_PATH}/${applicationId}/submit`, "POST", ENROLLMENT_MESSAGES.SUBMISSION_FAILED);
 }
 
 export async function cancelEnrollmentApplicationAction(applicationId: string): Promise<ChangeEnrollmentCareerResult> {
   if (!isValidUuid(applicationId)) {
     return { error: INVALID_ACTION_ARGUMENTS };
-  }
-
-  if (!(await canMutateEnrollmentApplication(applicationId))) {
-    return { error: ENROLLMENT_MESSAGES.APPLICATION_INVALID };
   }
 
   return mutateEnrollmentApplication(

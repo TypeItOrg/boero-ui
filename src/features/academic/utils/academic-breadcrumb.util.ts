@@ -16,8 +16,13 @@ const NEW_LABELS: Readonly<Record<string, string>> = {
 };
 
 export function getAcademicBreadcrumbLabels(segments: string[] | undefined): Readonly<Record<string, string>> {
-  if (!segments || segments.at(-1) !== ACADEMIC_ROUTE_SEGMENT.NEW) return {};
+  if (!segments || segments.at(-1) !== ACADEMIC_ROUTE_SEGMENT.NEW) {
+    return {};
+  }
+
   const parentSegment = segments.at(-2);
+
   const label = parentSegment ? NEW_LABELS[parentSegment] : undefined;
+
   return label ? { [ACADEMIC_ROUTE_SEGMENT.NEW]: label } : {};
 }

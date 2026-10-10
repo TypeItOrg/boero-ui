@@ -1,21 +1,22 @@
 "use client";
 
-import * as React from "react";
+import { useState, type CSSProperties, type ReactElement, type ReactNode } from "react";
 
 import { SidebarInset, SidebarProvider } from "@common/components/ui/sidebar";
+
+import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
 import { PlatformMobileBottomNavigation } from "@features/platform-auth/components/platform-mobile-bottom-navigation";
 import { PlatformSidebar } from "@features/platform-auth/components/platform-sidebar";
 import { PlatformTopbar } from "@features/platform-auth/components/platform-topbar";
-import type { ContextualSearchShortcutPlatform } from "@features/contextual-search/types/contextual-search-shortcut-platform.types";
 
 type PlatformShellProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   defaultSidebarOpen: boolean;
   shortcutPlatform: ContextualSearchShortcutPlatform;
 };
 
-export function PlatformShell({ children, defaultSidebarOpen, shortcutPlatform }: PlatformShellProps): React.ReactElement {
-  const [sidebarOpen, setSidebarOpen] = React.useState(defaultSidebarOpen);
+export function PlatformShell({ children, defaultSidebarOpen, shortcutPlatform }: PlatformShellProps): ReactElement {
+  const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
 
   function handleSidebarOpenChange(open: boolean): void {
     setSidebarOpen(open);
@@ -31,7 +32,7 @@ export function PlatformShell({ children, defaultSidebarOpen, shortcutPlatform }
           "--sidebar-width": "16rem",
           "--sidebar-width-mobile": "18rem",
           "--sidebar-width-icon": "4.5rem",
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <PlatformSidebar />

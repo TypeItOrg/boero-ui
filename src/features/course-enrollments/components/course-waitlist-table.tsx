@@ -1,16 +1,20 @@
 "use client";
 
-import { OptionalValue } from "@common/components/optional-value";
-import { WAITLIST_REASON_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
+import { ClockIcon } from "lucide-react";
+
+import { OptionalValue } from "@common/components/optional-value";
 import { Button } from "@common/components/ui/button";
-import { EnrollmentApplicationCourseDialog } from "@features/enrollment-applications/components/enrollment-application-courses-management";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { WAITLIST_REASON_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
-import { ClockIcon } from "lucide-react";
+import { EnrollmentApplicationCourseDialog } from "@features/enrollment-applications/components/enrollment-application-courses-management";
 
 type CourseWaitlistTableProps = {
   entries: readonly CourseWaitlistEntry[];
@@ -24,9 +28,11 @@ export function CourseWaitlistTable({
   canEnroll = false,
   institutionId,
   scope = AcademicScope.INSTITUTIONAL,
-}: CourseWaitlistTableProps): React.ReactElement {
+}: CourseWaitlistTableProps): ReactElement {
   const router = useRouter();
-  const [selected, setSelected] = React.useState<CourseWaitlistEntry>();
+
+  const [selected, setSelected] = useState<CourseWaitlistEntry>();
+
   if (entries.length === 0) {
     return (
       <Empty className="min-h-56 p-6">

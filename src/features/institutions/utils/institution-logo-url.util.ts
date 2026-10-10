@@ -6,10 +6,12 @@ export function getInstitutionLogoUrl(institutionId: string, backendLogoUrl: str
   }
 
   const path = `/api/v1/institutions/${institutionId}/logo`;
+
   if (backendLogoUrl !== path && !backendLogoUrl.startsWith(`${path}?`)) {
     return null;
   }
 
   const version = new URL(backendLogoUrl, "http://logo.invalid").searchParams.get("v");
+
   return `/api/public/institutions/${institutionId}/logo${version ? `?v=${encodeURIComponent(version)}` : ""}`;
 }

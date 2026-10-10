@@ -1,14 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
-  updateAcademicStatusAction: jest.fn(),
-}));
-
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import { ActiveAcademicStatusButton, ActiveAcademicStatusDialog } from "@features/academic/components/active-academic-status-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/actions/update-academic-status.action", () => ({
+  updateAcademicStatusAction: jest.fn(),
+}));
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 const RESOURCE_ID = "019f9c3a-f891-7bc5-a98d-e65332998126";
@@ -40,53 +40,37 @@ describe("ActiveAcademicStatusDialog", () => {
       />,
     );
 
+    if (resource === AcademicResource.ACADEMIC_SPACE) {
+      expect(screen.getByText(/No se podrá desactivar si está utilizado/)).toBeInTheDocument();
+    }
+
     await user.click(screen.getByRole("button", { name: actionLabel }));
 
-    await waitFor(() => expect(updateAcademicStatusAction).toHaveBeenCalled());
+    await waitFor(() => expect(updateAcademicStatusAction).toHaveBeenCalledTimes(1));
+    expect(updateAcademicStatusAction).toHaveBeenCalledWith(
+      "institutional",
+      INSTITUTION_ID,
+      resource,
+      RESOURCE_ID,
+      "/" + resource + "?active=true&page=1",
+      {},
+      expect.any(FormData),
+    );
     expect(screen.getByRole("alertdialog")).toBeInTheDocument();
     const submittedFormData = jest.mocked(updateAcademicStatusAction).mock.calls.at(-1)?.at(-1);
     expect(submittedFormData).toBeInstanceOf(FormData);
     expect((submittedFormData as FormData).get("active")).toBe("false");
   });
 
-  it("keeps the dialog open when the action returns an error", async () => {
+  it("locks a pending status change, keeps a rejected dialog and clears the error on reopening", async () => {
     const user = userEvent.setup();
-    jest.mocked(updateAcademicStatusAction).mockResolvedValueOnce({ error: "No se puede desactivar el instrumento." });
-
-    render(<StatusDialog resource={AcademicResource.INSTRUMENT} resourceLabel="Piano" />);
-
-    await user.click(screen.getByRole("button", { name: "Desactivar instrumento" }));
-
-    await waitFor(() => expect(screen.getByText("No se puede desactivar el instrumento.")).toBeInTheDocument());
-    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-  });
-
-  it("disables its controls while the update is pending", async () => {
-    const user = userEvent.setup();
-    let resolveUpdate: (state: object) => void = () => undefined;
-    jest.mocked(updateAcademicStatusAction).mockImplementationOnce(() => new Promise((resolve) => (resolveUpdate = resolve)));
-
-    render(<StatusDialog resource={AcademicResource.INSTRUMENT} resourceLabel="Piano" />);
-
-    await user.click(screen.getByRole("button", { name: "Desactivar instrumento" }));
-
-    await waitFor(() => expect(screen.getByRole("button", { name: "Desactivando…" })).toBeDisabled());
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
-
-    resolveUpdate({});
-    await waitFor(() => expect(screen.getByRole("button", { name: "Desactivar instrumento" })).not.toBeDisabled());
-  });
-
-  it("shows the academic-space constraint in the shared configuration", () => {
-    render(<StatusDialog resource={AcademicResource.ACADEMIC_SPACE} resourceLabel="Armonía" />);
-
-    expect(screen.getByText(/No se podrá desactivar si está utilizado/)).toBeInTheDocument();
-  });
-
-  it("resets a returned error after the button closes and reopens the dialog", async () => {
-    const user = userEvent.setup();
-    jest.mocked(updateAcademicStatusAction).mockResolvedValueOnce({ error: "No se puede desactivar el instrumento." }).mockResolvedValue({});
-
+    let finishUpdate: ((state: { error: string }) => void) | undefined;
+    jest.mocked(updateAcademicStatusAction).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishUpdate = resolve;
+        }),
+    );
     render(
       <ActiveAcademicStatusButton
         active
@@ -100,35 +84,29 @@ describe("ActiveAcademicStatusDialog", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Desactivar" }));
-    await user.click(screen.getByRole("button", { name: "Desactivar instrumento" }));
-    await waitFor(() => expect(screen.getByText("No se puede desactivar el instrumento.")).toBeInTheDocument());
+    const dialog = screen.getByRole("alertdialog");
+    await user.click(within(dialog).getByRole("button", { name: "Desactivar instrumento" }));
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Desactivando…" })).toBeDisabled());
+    const cancel = within(dialog).getByRole("button", { name: "Cancelar" });
+    expect(cancel).toBeDisabled();
+    await user.click(cancel);
+    expect(screen.getByRole("alertdialog")).toBe(dialog);
+    expect(updateAcademicStatusAction).toHaveBeenCalledTimes(1);
 
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    if (!finishUpdate) {
+      throw new Error("Status change was not submitted");
+    }
+
+    finishUpdate({ error: "No se puede desactivar el instrumento." });
+    expect(await screen.findByRole("alert")).toHaveTextContent("No se puede desactivar el instrumento.");
+    expect(screen.getByRole("alertdialog")).toBe(dialog);
+    expect(cancel).not.toBeDisabled();
+
+    await user.click(cancel);
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
-
     await user.click(screen.getByRole("button", { name: "Desactivar" }));
-    expect(screen.queryByText("No se puede desactivar el instrumento.")).not.toBeInTheDocument();
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(updateAcademicStatusAction).toHaveBeenCalledTimes(1);
   });
 });
-
-function StatusDialog({
-  resource,
-  resourceLabel,
-}: {
-  resource: AcademicResource.ACADEMIC_SPACE | AcademicResource.INSTRUMENT;
-  resourceLabel: string;
-}): React.ReactElement {
-  return (
-    <ActiveAcademicStatusDialog
-      id={RESOURCE_ID}
-      institutionId={INSTITUTION_ID}
-      onOpenChange={jest.fn()}
-      open
-      resource={resource}
-      resourceLabel={resourceLabel}
-      returnTo={`/${resource}`}
-      scope={AcademicScope.INSTITUTIONAL}
-      targetStatus="INACTIVE"
-    />
-  );
-}

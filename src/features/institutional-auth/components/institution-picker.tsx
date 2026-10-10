@@ -1,13 +1,17 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { BuildingIcon } from "lucide-react";
+
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
-import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 
 export type InstitutionalInstitution = {
@@ -27,9 +31,10 @@ type InstitutionPickerProps = {
 };
 
 const INSTITUTION_QUERY_KEY = ["institutional-auth", "institutions"] as const;
+
 const INSTITUTION_OPTION_HEIGHT = 52;
 
-export function InstitutionPicker({ disabled, ariaInvalid, id, onValueChange, selectedLabel, value }: InstitutionPickerProps): React.ReactElement {
+export function InstitutionPicker({ disabled, ariaInvalid, id, onValueChange, selectedLabel, value }: InstitutionPickerProps): ReactElement {
   return (
     <AsyncDropdown<InstitutionalInstitution>
       disabled={disabled}
@@ -63,10 +68,12 @@ async function fetchInstitutionPage({
   size,
 }: AsyncDropdownFetchPageInput): Promise<AsyncDropdownPage<InstitutionalInstitution>> {
   const searchParams = buildPaginationSearchParams({ page, search, size });
+
   searchParams.set("active", "true");
   searchParams.set("sort", serializeSpringSort({ field: "name", direction: "asc" }));
 
   const response = await fetch(`/api/institutions?${searchParams.toString()}`, { signal });
+
   const data = await parseHttpResponse<{
     items: InstitutionalInstitution[];
     page: number;
@@ -84,7 +91,7 @@ function getInstitutionValue(institution: InstitutionalInstitution): string {
   return institution.id;
 }
 
-function renderInstitutionItem(institution: InstitutionalInstitution): React.ReactElement {
+function renderInstitutionItem(institution: InstitutionalInstitution): ReactElement {
   return (
     <span className="flex min-w-0 flex-col gap-0.5">
       <span className="truncate leading-tight">{institution.name}</span>

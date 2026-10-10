@@ -1,6 +1,6 @@
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
-import type { PasskeyList } from "@features/institutional-auth/types/passkey-list.types";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import type { PasskeyList } from "@features/institutional-auth/types/passkey-list.types";
 
 export async function fetchPasskeys(): Promise<PasskeyList> {
   const response = await institutionalApiFetch("/api/v1/auth/passkeys", { cache: "no-store" });

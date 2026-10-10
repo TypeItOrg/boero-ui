@@ -31,6 +31,7 @@ describe("getPlatformAccount", () => {
 
   afterAll(() => {
     process.env.BOERO_API_URL = originalApiUrl;
+
     if (originalBaseDomain === undefined) {
       delete process.env.INSTITUTIONAL_BASE_DOMAIN;
     } else {

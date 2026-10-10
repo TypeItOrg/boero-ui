@@ -1,6 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { GuardianDependentsList } from "@features/guardian-dependents/components/guardian-dependents-list";
+import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
+
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
@@ -13,9 +16,6 @@ jest.mock("@features/guardian-dependents/actions/unlink-guardian-dependent.actio
 jest.mock("@features/guardian-workspace/actions/set-guardian-workspace.action", () => ({
   setGuardianWorkspaceAction: jest.fn().mockResolvedValue({ success: true }),
 }));
-
-import { GuardianDependentsList } from "@features/guardian-dependents/components/guardian-dependents-list";
-import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 

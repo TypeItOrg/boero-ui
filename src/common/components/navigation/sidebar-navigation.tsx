@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 
 import { SidebarNavigationGroupItem } from "@common/components/navigation/sidebar-navigation-group-item";
@@ -14,7 +16,7 @@ type SidebarNavigationProps = {
   navigation: MobileSidebarNavigation;
 };
 
-export function SidebarNavigation({ sections, navigation }: SidebarNavigationProps): React.ReactElement {
+export function SidebarNavigation({ sections, navigation }: SidebarNavigationProps): ReactElement {
   return (
     <div className="flex flex-col gap-3 group-data-[collapsible=icon]:gap-2">
       {sections.map((section, index) => (
@@ -33,6 +35,7 @@ export function SidebarNavigation({ sections, navigation }: SidebarNavigationPro
                 }
 
                 const isActive = navigation.isActive(item.url, item.exact);
+
                 const Icon = item.icon;
 
                 return (

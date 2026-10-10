@@ -1,5 +1,5 @@
-import { GUARDIAN_LINK_STATUS } from "@features/guardian-dependents/types/guardian-link-status.types";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
+import { GUARDIAN_LINK_STATUS } from "@features/guardian-dependents/types/guardian-link-status.types";
 
 /** The API hides the name until the link is approved, so the document is the only identifier left. */
 export function getGuardianDependentName(dependent: Pick<GuardianDependent, "firstName" | "lastName" | "documentNumber">): string {

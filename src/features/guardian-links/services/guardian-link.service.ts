@@ -1,9 +1,10 @@
 import "server-only";
 
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
+import type { GuardianLinkStatus } from "@features/guardian-dependents/types/guardian-link-status.types";
 import { GUARDIAN_LINK_MESSAGES, getGuardianLinksApiPath } from "@features/guardian-links/constants/guardian-link.constants";
 import type { GuardianLinkAttachment, GuardianLinkRequest } from "@features/guardian-links/types/guardian-link-request.types";
-import type { GuardianLinkStatus } from "@features/guardian-dependents/types/guardian-link-status.types";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 type GuardianLinkSummary = Omit<GuardianLinkRequest, "attachments">;

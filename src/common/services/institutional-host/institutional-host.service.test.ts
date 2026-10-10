@@ -1,5 +1,5 @@
-jest.mock("next/headers", () => ({ headers: jest.fn() }));
 import { headers } from "next/headers";
+
 import {
   getRequestInstitution,
   rebuildInstitutionalHostHeader,
@@ -7,9 +7,20 @@ import {
   validateRequestInstitutionId,
 } from "@common/services/institutional-host/institutional-host.service";
 
-const institution = { id: "22222222-2222-4222-8222-222222222222", name: "Conservatorio Boero", publicSubdomain: "cboero", logoUrl: null };
+jest.mock("next/headers", () => ({ headers: jest.fn() }));
+
+const institution = {
+  id: "22222222-2222-4222-8222-222222222222",
+  name: "Conservatorio Boero",
+  publicSubdomain: "cboero",
+  logoUrl: null,
+};
 const fetchMock = jest.fn();
-const original = { api: process.env.BOERO_API_URL, public: process.env.FRONTEND_PUBLIC_URL, domain: process.env.INSTITUTIONAL_BASE_DOMAIN };
+const original = {
+  api: process.env.BOERO_API_URL,
+  public: process.env.FRONTEND_PUBLIC_URL,
+  domain: process.env.INSTITUTIONAL_BASE_DOMAIN,
+};
 beforeEach(() => {
   process.env.BOERO_API_URL = "http://backend.test";
   process.env.FRONTEND_PUBLIC_URL = "https://testing.typeit.com.ar";
@@ -32,7 +43,13 @@ it("ignores forged internal/forwarded headers and rebuilds from actual Host", ()
   const outgoing = new Headers(incoming);
   rebuildInstitutionalHostHeader(outgoing, incoming);
   expect(outgoing.get("X-Institutional-Host")).toBe("cboero.testing.typeit.com.ar");
-  rebuildInstitutionalHostHeader(outgoing, new Headers({ host: "testing.typeit.com.ar", "X-Institutional-Host": "cboero.testing.typeit.com.ar" }));
+  rebuildInstitutionalHostHeader(
+    outgoing,
+    new Headers({
+      host: "testing.typeit.com.ar",
+      "X-Institutional-Host": "cboero.testing.typeit.com.ar",
+    }),
+  );
   expect(outgoing.get("X-Institutional-Host")).toBe("testing.typeit.com.ar");
 });
 it("returns minimal no-store institution context without a tenant-global cache", async () => {

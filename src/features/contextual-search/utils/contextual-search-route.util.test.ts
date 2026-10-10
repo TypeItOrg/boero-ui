@@ -78,9 +78,12 @@ describe("contextual search routes", () => {
   });
 
   it("rejects platform results that require a missing institution", () => {
-    expect(() => getContextualSearchResultHref("platform", "academic-space", { ...result, institutionId: null })).toThrow(
-      "no tiene una institución asociada",
-    );
+    expect(() =>
+      getContextualSearchResultHref("platform", "academic-space", {
+        ...result,
+        institutionId: null,
+      }),
+    ).toThrow("no tiene una institución asociada");
     expect(() => getContextualSearchResultHref("platform", "user", { ...result, institutionId: null })).toThrow("no tiene una institución asociada");
   });
 });

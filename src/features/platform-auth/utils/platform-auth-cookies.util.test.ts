@@ -1,112 +1,67 @@
-jest.mock("next/headers", () => ({
-  cookies: jest.fn(),
-}));
-
 import { cookies } from "next/headers";
-import {
-  clearPlatformAuthCookies,
-  getPlatformAuthCookieOptions,
-  PLATFORM_ACCESS_TOKEN_COOKIE,
-  PLATFORM_ACCESS_TOKEN_MAX_AGE,
-  PLATFORM_REFRESH_TOKEN_COOKIE,
-  PLATFORM_REFRESH_TOKEN_MAX_AGE,
-  setPlatformAuthCookies,
-} from "@features/platform-auth/utils/platform-auth-cookies.util";
 
-describe("platform-auth-cookies.util", () => {
+import { clearPlatformAuthCookies, setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
+
+jest.mock("next/headers", () => ({ cookies: jest.fn() }));
+
+describe("platform authentication cookie contract", () => {
   const originalNodeEnv = process.env.NODE_ENV;
-  const originalAuthCookieSecure = process.env.AUTH_COOKIE_SECURE;
-  const cookiesMock = jest.mocked(cookies);
-  const rawCookieStore = {
-    [Symbol.iterator]: function* iterator() {},
-    delete: jest.fn(),
-    get: jest.fn(),
-    getAll: jest.fn(),
-    has: jest.fn(),
-    set: jest.fn(),
-    size: 0,
-  };
-  const cookieStore = rawCookieStore as unknown as Awaited<ReturnType<typeof cookies>>;
+  const originalSecure = process.env.AUTH_COOKIE_SECURE;
+  const cookieStore = { delete: jest.fn(), set: jest.fn() };
 
   beforeEach(() => {
-    (process.env as Record<string, string | undefined>).NODE_ENV = "test";
-    delete process.env.AUTH_COOKIE_SECURE;
-    cookiesMock.mockResolvedValue(cookieStore);
+    jest.mocked(cookies).mockResolvedValue(cookieStore as never);
   });
-
   afterEach(() => {
-    rawCookieStore.set.mockReset();
-    rawCookieStore.delete.mockReset();
-    cookiesMock.mockReset();
-  });
-
-  afterAll(() => {
+    jest.mocked(cookies).mockReset();
+    cookieStore.set.mockReset();
+    cookieStore.delete.mockReset();
     (process.env as Record<string, string | undefined>).NODE_ENV = originalNodeEnv;
 
-    if (originalAuthCookieSecure === undefined) {
+    if (originalSecure === undefined) {
       delete process.env.AUTH_COOKIE_SECURE;
     } else {
-      process.env.AUTH_COOKIE_SECURE = originalAuthCookieSecure;
+      process.env.AUTH_COOKIE_SECURE = originalSecure;
     }
   });
 
-  it("returns insecure cookie options outside production", () => {
-    expect(getPlatformAuthCookieOptions(123)).toEqual({
+  it.each([
+    { environment: "test", override: undefined, secure: false },
+    { environment: "production", override: undefined, secure: true },
+    { environment: "production", override: "false", secure: false },
+    { environment: "test", override: "true", secure: true },
+  ])("writes protected cookies in $environment with override=$override", async ({ environment, override, secure }) => {
+    (process.env as Record<string, string | undefined>).NODE_ENV = environment;
+
+    if (override === undefined) {
+      delete process.env.AUTH_COOKIE_SECURE;
+    } else {
+      process.env.AUTH_COOKIE_SECURE = override;
+    }
+
+    await setPlatformAuthCookies({ accessToken: "access-token", refreshToken: "refresh-token" });
+
+    expect(cookieStore.set).toHaveBeenCalledTimes(2);
+    expect(cookieStore.set).toHaveBeenCalledWith("platform_access_token", "access-token", {
       httpOnly: true,
-      maxAge: 123,
       path: "/",
       sameSite: "lax",
-      secure: false,
+      secure,
+      maxAge: 900,
     });
-  });
-
-  it("returns secure cookie options in production", () => {
-    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
-
-    expect(getPlatformAuthCookieOptions(456)).toEqual({
+    expect(cookieStore.set).toHaveBeenCalledWith("platform_refresh_token", "refresh-token", {
       httpOnly: true,
-      maxAge: 456,
       path: "/",
       sameSite: "lax",
-      secure: true,
+      secure,
+      maxAge: 2592000,
     });
   });
 
-  it("allows insecure cookies for an HTTP production deployment", () => {
-    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
-    process.env.AUTH_COOKIE_SECURE = "false";
-
-    expect(getPlatformAuthCookieOptions(456)).toEqual({
-      httpOnly: true,
-      maxAge: 456,
-      path: "/",
-      sameSite: "lax",
-      secure: false,
-    });
-  });
-
-  it("sets both platform auth cookies", async () => {
-    await setPlatformAuthCookies({
-      accessToken: "access-token",
-      refreshToken: "refresh-token",
-    });
-
-    expect(cookieStore.set).toHaveBeenCalledWith(
-      PLATFORM_ACCESS_TOKEN_COOKIE,
-      "access-token",
-      getPlatformAuthCookieOptions(PLATFORM_ACCESS_TOKEN_MAX_AGE),
-    );
-    expect(cookieStore.set).toHaveBeenCalledWith(
-      PLATFORM_REFRESH_TOKEN_COOKIE,
-      "refresh-token",
-      getPlatformAuthCookieOptions(PLATFORM_REFRESH_TOKEN_MAX_AGE),
-    );
-  });
-
-  it("clears both platform auth cookies", async () => {
+  it("removes both platform credentials on logout", async () => {
     await clearPlatformAuthCookies();
-
-    expect(cookieStore.delete).toHaveBeenCalledWith(PLATFORM_ACCESS_TOKEN_COOKIE);
-    expect(cookieStore.delete).toHaveBeenCalledWith(PLATFORM_REFRESH_TOKEN_COOKIE);
+    expect(cookieStore.delete).toHaveBeenCalledTimes(2);
+    expect(cookieStore.delete).toHaveBeenCalledWith("platform_access_token");
+    expect(cookieStore.delete).toHaveBeenCalledWith("platform_refresh_token");
   });
 });

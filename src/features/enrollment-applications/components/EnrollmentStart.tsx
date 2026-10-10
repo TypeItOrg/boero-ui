@@ -1,11 +1,13 @@
 "use client";
 
-import * as React from "react";
-import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
+import { startTransition, useActionState, type ReactElement, type ReactNode } from "react";
+
 import { useRouter } from "next/navigation";
-import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+
 import { startOrGetEnrollmentApplicationAction } from "@features/enrollment-applications/actions/enrollment-application.actions";
+import { EnrollmentStartSelector } from "@features/enrollment-applications/components/EnrollmentStartSelector";
 import type { EnrollmentStartStudyPlanOption } from "@features/enrollment-applications/components/EnrollmentStartSelector";
+import type { StartEnrollmentApplicationInput } from "@features/enrollment-applications/types/start-enrollment-application-input.types";
 import type { EnrollmentPeriod } from "@features/enrollment-periods/types/enrollment-period.types";
 
 interface EnrollmentStartProps {
@@ -13,16 +15,17 @@ interface EnrollmentStartProps {
   applicantPersonId?: string;
   studyPlans: EnrollmentStartStudyPlanOption[];
   periods?: EnrollmentPeriod[];
-  studyPlanPagination?: React.ReactNode;
+  studyPlanPagination?: ReactNode;
 }
 
 type EnrollmentStartState = {
   error?: string;
 };
 
-export function EnrollmentStart({ applicantPersonId, studyPlans, studyPlanPagination }: EnrollmentStartProps): React.ReactElement {
+export function EnrollmentStart({ applicantPersonId, studyPlans, studyPlanPagination }: EnrollmentStartProps): ReactElement {
   const router = useRouter();
-  const [state, startApplication, isStarting] = React.useActionState(
+
+  const [state, startApplication, isStarting] = useActionState(
     async (_previous: EnrollmentStartState, input: StartEnrollmentApplicationInput): Promise<EnrollmentStartState> => {
       const result = await startOrGetEnrollmentApplicationAction(applicantPersonId ? { ...input, applicantPersonId } : input);
 
@@ -38,7 +41,7 @@ export function EnrollmentStart({ applicantPersonId, studyPlans, studyPlanPagina
   );
 
   function handleStart(input: StartEnrollmentApplicationInput): void {
-    React.startTransition(() => startApplication(input));
+    startTransition(() => startApplication(input));
   }
 
   return (

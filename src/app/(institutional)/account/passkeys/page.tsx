@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 
 import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
@@ -9,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Llaves de acceso");
 }
 
-export default async function PasskeysPage(): Promise<React.ReactElement> {
+export default async function PasskeysPage(): Promise<ReactElement> {
   const { passkeys, maxActivePasskeys } = await fetchPasskeys();
 
   return (

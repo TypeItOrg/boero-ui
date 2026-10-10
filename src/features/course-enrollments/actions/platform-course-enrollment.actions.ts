@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 type PlatformCourseEnrollmentActionResult = { error?: string };
 
@@ -28,6 +29,7 @@ function parseAssignments(value: FormDataEntryValue | null): { classScheduleId: 
         }
 
         const classScheduleId = (assignment as { classScheduleId?: unknown }).classScheduleId;
+
         const individualSlotId = (assignment as { individualSlotId?: unknown }).individualSlotId;
 
         return (
@@ -46,10 +48,12 @@ function parseAssignments(value: FormDataEntryValue | null): { classScheduleId: 
   }
 }
 
-function buildAssignmentBody(
-  formData: FormData,
-): { courseClassId: string; assignments: { classScheduleId: string; individualSlotId: string | null }[] } | null {
+function buildAssignmentBody(formData: FormData): {
+  courseClassId: string;
+  assignments: { classScheduleId: string; individualSlotId: string | null }[];
+} | null {
   const courseClassId = formData.get("courseClassId");
+
   const assignments = parseAssignments(formData.get("assignments"));
 
   if (typeof courseClassId !== "string" || !isValidUuid(courseClassId) || !assignments || assignments.length === 0) {
@@ -80,6 +84,7 @@ export async function enrollPlatformApplicationCourseAction(
   }
 
   await requirePlatformAccount();
+
   const response = platformApiFetch(
     `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/enroll`,
     {
@@ -88,6 +93,7 @@ export async function enrollPlatformApplicationCourseAction(
       body: JSON.stringify({ ...assignmentBody, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo inscribir la solicitud de cursada.");
 
   if (failure) {
@@ -95,6 +101,7 @@ export async function enrollPlatformApplicationCourseAction(
   }
 
   revalidatePath(`/admin/enrollment-applications/${institutionId}/${applicationId}`);
+
   return {};
 }
 
@@ -118,6 +125,7 @@ export async function rejectPlatformApplicationCourseAction(
   }
 
   await requirePlatformAccount();
+
   const response = platformApiFetch(
     `/api/v1/institutions/${institutionId}/enrollment-applications/${applicationId}/courses/${applicationCourseId}/reject`,
     {
@@ -126,6 +134,7 @@ export async function rejectPlatformApplicationCourseAction(
       body: JSON.stringify({ reason, expectedVersion }),
     },
   );
+
   const failure = await getResponseErrorActionState(response, [], "No se pudo rechazar la solicitud de cursada.");
 
   if (failure) {
@@ -133,5 +142,6 @@ export async function rejectPlatformApplicationCourseAction(
   }
 
   revalidatePath(`/admin/enrollment-applications/${institutionId}/${applicationId}`);
+
   return {};
 }

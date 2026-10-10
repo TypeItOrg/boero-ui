@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+
 import { ChevronRightIcon } from "lucide-react";
 
 import { useSidebarNavigationState } from "@common/components/navigation/sidebar-navigation-state-provider";
@@ -32,19 +34,27 @@ type SidebarNavigationGroupItemProps = {
   navigation: MobileSidebarNavigation;
 };
 
-export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigationGroupItemProps): React.ReactElement | null {
+export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigationGroupItemProps): ReactElement | null {
   const pathname = usePathname();
+
   const { isMobile, state: sidebarState } = useSidebar();
+
   const { groupStates, setGroupOpen } = useSidebarNavigationState();
+
   const suppressNextTooltipFocus = useRef(false);
+
   const activeItem = group.items.find((item) => navigation.isActive(item.url, item.exact));
+
   const activeUrl = activeItem?.url;
+
   const navigationKey = `${pathname}:${activeUrl ?? ""}`;
+
   const [expansion, setExpansion] = useState({
     navigationKey,
     open: groupStates[group.id] ?? Boolean(activeUrl),
     animate: false,
   });
+
   const Icon = group.icon;
 
   // Reopen on navigation into this group, not on unrelated renders or a manual close.
@@ -66,6 +76,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
 
   if (!isMobile && sidebarState === "collapsed") {
     const CollapsedIcon = activeItem?.icon ?? Icon;
+
     const collapsedLabel = activeItem ? `${group.title} › ${activeItem.ariaLabel ?? activeItem.title}` : group.title;
 
     return (
@@ -102,6 +113,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
             <DropdownMenuSeparator />
             {group.items.map((item) => {
               const isActive = navigation.isActive(item.url, item.exact);
+
               const ItemIcon = item.icon;
 
               return (
@@ -155,6 +167,7 @@ export function SidebarNavigationGroupItem({ group, navigation }: SidebarNavigat
           <SidebarMenuSub className="my-1 mr-0 ml-4 gap-0 pr-0 pl-2">
             {group.items.map((item) => {
               const isActive = navigation.isActive(item.url, item.exact);
+
               const ItemIcon = item.icon;
 
               return (

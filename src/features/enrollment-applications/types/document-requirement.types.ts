@@ -1,4 +1,5 @@
 import type { DocumentDelivery } from "@features/enrollment-applications/types/document-delivery.types";
+
 export interface DocumentRequirement {
   id: string;
   origin?: "ORIGINAL" | "ADDITIONAL";

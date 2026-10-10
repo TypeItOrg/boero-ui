@@ -1,8 +1,12 @@
+import type { ReactElement, ReactNode } from "react";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { BookPlusIcon, GitBranchPlusIcon, Layers3Icon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
 import { AcademicResourceForm } from "@features/academic/components/academic-resource-form";
 import { AcademicPageIcon, AcademicShell } from "@features/academic/components/academic-shell";
@@ -14,14 +18,14 @@ import type { StudyPlanSpace } from "@features/academic/types/study-plan-space.t
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type BaseFormProps = {
-  breadcrumb: React.ReactNode;
+  breadcrumb: ReactNode;
   id: string;
   institutionId: string;
   planPath: string;
   scope: AcademicScope;
 };
 
-export function NewLevel(props: BaseFormProps): React.ReactElement {
+export function NewLevel(props: BaseFormProps): ReactElement {
   return (
     <AcademicShell
       title="Nuevo nivel"
@@ -42,7 +46,7 @@ export function NewLevel(props: BaseFormProps): React.ReactElement {
   );
 }
 
-export function EditLevel(props: BaseFormProps & { level: AcademicLevel }): React.ReactElement {
+export function EditLevel(props: BaseFormProps & { level: AcademicLevel }): ReactElement {
   return (
     <AcademicShell
       title="Editar nivel"
@@ -64,7 +68,7 @@ export function EditLevel(props: BaseFormProps & { level: AcademicLevel }): Reac
   );
 }
 
-export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[] }): React.ReactElement {
+export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[] }): ReactElement {
   return (
     <AcademicShell
       title="Incorporar espacio"
@@ -86,7 +90,7 @@ export function NewPlanSpace(props: BaseFormProps & { levels: AcademicLevel[] })
   );
 }
 
-export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; space: StudyPlanSpace; spacePath: string }): React.ReactElement {
+export function EditPlanSpace(props: BaseFormProps & { levels: AcademicLevel[]; space: StudyPlanSpace; spacePath: string }): ReactElement {
   return (
     <AcademicShell
       title="Editar espacio"
@@ -124,7 +128,7 @@ export function NewPrerequisite(
     spaceId: string;
     spacePath: string;
   },
-): React.ReactElement {
+): ReactElement {
   return (
     <AcademicShell
       title="Nueva correlatividad"
@@ -154,7 +158,7 @@ export async function EditPrerequisite(
     spaceId: string;
     spacePath: string;
   },
-): Promise<React.ReactElement> {
+): Promise<ReactElement> {
   const prerequisite = await fetchPrerequisite(props.scope, props.institutionId, props.prerequisiteId);
 
   if (!prerequisite || prerequisite.targetStudyPlanSpaceId !== props.spaceId) {

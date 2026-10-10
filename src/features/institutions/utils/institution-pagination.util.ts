@@ -1,9 +1,10 @@
 import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import type { QueryParamValue } from "@common/types/query-param.types";
-import { parseOptionalBooleanQueryParam } from "@common/utils/query-param.util";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
+import { parseOptionalBooleanQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
+
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 
 export const DEFAULT_INSTITUTION_PAGE_SIZE = 10;
@@ -13,7 +14,10 @@ export const INSTITUTION_SORT_FIELDS = ["name", "active"] as const satisfies rea
 export type InstitutionSortField = (typeof INSTITUTION_SORT_FIELDS)[number];
 export type InstitutionSort = Sort<InstitutionSortField>;
 
-export const DEFAULT_INSTITUTION_SORT = { field: "name", direction: "asc" } as const satisfies InstitutionSort;
+export const DEFAULT_INSTITUTION_SORT = {
+  field: "name",
+  direction: "asc",
+} as const satisfies InstitutionSort;
 
 const institutionSortFields = new Set<InstitutionSortField>(INSTITUTION_SORT_FIELDS);
 

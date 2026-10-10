@@ -1,76 +1,73 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/academic/actions/academic-resource.action", () => ({
-  deleteAcademicResourceAction: jest.fn(),
-}));
-
-import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 import { AcademicDeleteButton } from "@features/academic/components/academic-delete-button";
-import { AcademicDeleteDialog } from "@features/academic/components/academic-delete-dialog";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+jest.mock("@features/academic/actions/academic-resource-lifecycle.actions", () => ({
+  deleteAcademicResourceAction: jest.fn(),
+}));
 
 const PROPS = {
   destination: "/study-plans?page=1",
   id: "019f9c3a-f891-7bc5-a98d-e65332998126",
   institutionId: "019f9c3a-f891-7bc5-a98d-e65332998127",
-  label: "el plan de estudio Plan 2027",
-  resource: AcademicResource.STUDY_PLAN,
+  label: "el nivel Nivel 1",
+  resource: AcademicResource.ACADEMIC_LEVEL,
   scope: AcademicScope.INSTITUTIONAL,
 } as const;
 
-const BUTTON_PROPS = {
-  ...PROPS,
-  resource: AcademicResource.ACADEMIC_LEVEL,
-} as const;
+it("locks deletion while pending, preserves a rejected dialog and resets the error on reopening", async () => {
+  const user = userEvent.setup();
+  let finishDelete: ((state: { error: string }) => void) | undefined;
+  jest
+    .mocked(deleteAcademicResourceAction)
+    .mockReset()
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishDelete = resolve;
+        }),
+    );
+  render(<AcademicDeleteButton {...PROPS} />);
 
-describe("AcademicDeleteDialog", () => {
-  beforeEach(() => {
-    jest.mocked(deleteAcademicResourceAction).mockReset().mockResolvedValue({});
-  });
+  await user.click(screen.getByRole("button", { name: "Eliminar" }));
+  const dialog = screen.getByRole("alertdialog");
+  expect(within(dialog).getByRole("heading")).toHaveTextContent("Eliminar el nivel Nivel 1");
+  await user.click(within(dialog).getByRole("button", { name: "Eliminar" }));
 
-  it("keeps the dialog open when deletion returns an error", async () => {
-    const user = userEvent.setup();
-    jest.mocked(deleteAcademicResourceAction).mockResolvedValueOnce({ error: "No se pudo eliminar el plan activo." });
+  await waitFor(() => expect(within(dialog).getByRole("button", { name: "Eliminando…" })).toBeDisabled());
+  const cancel = within(dialog).getByRole("button", { name: "Cancelar" });
+  expect(cancel).toBeDisabled();
+  await user.click(cancel);
+  expect(screen.getByRole("alertdialog")).toBe(dialog);
+  expect(deleteAcademicResourceAction).toHaveBeenCalledTimes(1);
+  expect(deleteAcademicResourceAction).toHaveBeenCalledWith(
+    "institutional",
+    PROPS.institutionId,
+    "academic-levels",
+    PROPS.id,
+    "/study-plans?page=1",
+    {},
+    expect.any(FormData),
+  );
 
-    render(<AcademicDeleteDialog {...PROPS} onOpenChange={jest.fn()} open />);
+  if (!finishDelete) {
+    throw new Error("Deletion was not submitted");
+  }
 
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
+  finishDelete({ error: "No se puede eliminar un nivel utilizado." });
+  expect(await screen.findByRole("alert")).toHaveTextContent("No se puede eliminar un nivel utilizado.");
+  expect(screen.getByRole("alertdialog")).toBe(dialog);
+  expect(cancel).not.toBeDisabled();
 
-    await waitFor(() => expect(screen.getByText("No se pudo eliminar el plan activo.")).toBeInTheDocument());
-    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
-  });
+  await user.click(cancel);
+  expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Eliminar" }));
 
-  it("disables its controls while deletion is pending", async () => {
-    const user = userEvent.setup();
-    let resolveDelete: (state: object) => void = () => undefined;
-    jest.mocked(deleteAcademicResourceAction).mockImplementationOnce(() => new Promise((resolve) => (resolveDelete = resolve)));
-
-    render(<AcademicDeleteDialog {...PROPS} onOpenChange={jest.fn()} open />);
-
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
-
-    await waitFor(() => expect(screen.getByRole("button", { name: "Eliminando…" })).toBeDisabled());
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
-
-    resolveDelete({});
-    await waitFor(() => expect(screen.getByRole("button", { name: "Eliminar" })).not.toBeDisabled());
-  });
-
-  it("resets a returned error when reopening from its trigger", async () => {
-    const user = userEvent.setup();
-    jest.mocked(deleteAcademicResourceAction).mockResolvedValueOnce({ error: "No se pudo eliminar el plan activo." });
-
-    render(<AcademicDeleteButton {...BUTTON_PROPS} />);
-
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
-    await waitFor(() => expect(screen.getByText("No se pudo eliminar el plan activo.")).toBeInTheDocument());
-
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
-    await user.click(screen.getByRole("button", { name: "Eliminar" }));
-
-    expect(screen.queryByText("No se pudo eliminar el plan activo.")).not.toBeInTheDocument();
-  });
+  expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(deleteAcademicResourceAction).toHaveBeenCalledTimes(1);
 });

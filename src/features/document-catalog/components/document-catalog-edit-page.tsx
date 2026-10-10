@@ -1,9 +1,13 @@
+import type { ReactElement } from "react";
+
 import { notFound } from "next/navigation";
+
 import { FileTextIcon } from "lucide-react";
 import { z } from "zod";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { appendReturnTo, getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { DocumentCatalogForm } from "@features/document-catalog/components/document-catalog-form";
@@ -28,17 +32,22 @@ export async function DocumentCatalogEditPage({
   scope: AcademicScope;
   params: Promise<{ documentId: string }>;
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const [{ documentId: rawId }, query] = await Promise.all([params, searchParams]);
+
   const parsedId = z.uuid().safeParse(rawId);
+
   if (!parsedId.success) {
     notFound();
   }
 
   let institutionId: string;
+
   if (scope === "admin") {
     await requirePlatformAccount();
+
     const parsedInstitutionId = z.uuid().safeParse(query.institutionId);
+
     if (!parsedInstitutionId.success) {
       notFound();
     }
@@ -46,6 +55,7 @@ export async function DocumentCatalogEditPage({
     institutionId = parsedInstitutionId.data;
   } else {
     const user = await requireInstitutionalUser();
+
     if (
       !hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ) ||
       !hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_MANAGE)
@@ -57,20 +67,31 @@ export async function DocumentCatalogEditPage({
   }
 
   const response = await academicApiFetch(scope, `${getAcademicApiBase(scope, institutionId)}/document-definitions/${parsedId.data}`);
+
   if (!response.ok) {
     notFound();
   }
 
   const document: DocumentDefinition = await response.json();
+
   const institution = scope === "admin" ? await fetchInstitution(institutionId) : undefined;
+
   const returnTo = getSafeReturnTo(query.returnTo, getDocumentCatalogPageUrl(scope, institutionId));
+
   const detailUrl = getDocumentCatalogDetailPageUrl(scope, institutionId, document.id);
+
   const origin = new URL(returnTo, "https://return-to.invalid");
+
   const catalogReturnTo =
     origin.pathname === detailUrl.split("?")[0]
       ? getSafeReturnTo(origin.searchParams.get("returnTo") ?? undefined, getDocumentCatalogPageUrl(scope, institutionId))
       : returnTo;
-  const segmentHrefs = { documentation: catalogReturnTo, [document.id]: appendReturnTo(detailUrl, catalogReturnTo) };
+
+  const segmentHrefs = {
+    documentation: catalogReturnTo,
+    [document.id]: appendReturnTo(detailUrl, catalogReturnTo),
+  };
+
   const segmentLabels = { [document.id]: document.name };
 
   return (

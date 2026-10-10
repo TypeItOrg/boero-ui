@@ -1,8 +1,8 @@
 "use server";
 
 import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
-
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { institutionalPasswordRecoverySchema } from "@features/institutional-auth/schemas/institutional-password-recovery.schema";
 import { requestInstitutionalPasswordRecovery } from "@features/institutional-auth/services/request-institutional-password-recovery.service";
@@ -21,12 +21,16 @@ export async function requestPasswordRecovery(_previousState: PasswordRecoveryAc
   }
 
   const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+
   if (contextError) {
     return { error: contextError };
   }
 
   const output = await requestInstitutionalPasswordRecovery(parsed.data);
-  if (output.success) return { success: true };
+
+  if (output.success) {
+    return { success: true };
+  }
 
   if (output.error.fieldErrors) {
     return { fieldErrors: pickFieldErrors(output.error.fieldErrors, PASSWORD_RECOVERY_FIELDS) };

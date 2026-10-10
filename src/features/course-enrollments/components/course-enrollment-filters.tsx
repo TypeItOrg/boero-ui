@@ -1,6 +1,9 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
+
 import {
   ACADEMIC_ENROLLMENT_STATUS_OPTIONS,
   COURSE_ENROLLMENT_STATUS_OPTIONS,
@@ -14,7 +17,7 @@ type CourseEnrollmentFiltersProps = {
   academicStatus?: AcademicEnrollmentStatus;
 };
 
-export function CourseEnrollmentFilters({ size, status, academicStatus }: CourseEnrollmentFiltersProps): React.ReactElement {
+export function CourseEnrollmentFilters({ size, status, academicStatus }: CourseEnrollmentFiltersProps): ReactElement {
   const selectFilters: DataTableSelectFilter[] = [
     {
       defaultValue: "all",

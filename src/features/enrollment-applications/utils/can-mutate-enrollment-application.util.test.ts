@@ -1,3 +1,11 @@
+import { fetchEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
+import {
+  canMutateEnrollmentApplication,
+  canStartEnrollmentApplication,
+} from "@features/enrollment-applications/utils/can-mutate-enrollment-application.util";
+import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+
 jest.mock("@features/enrollment-applications/services/enrollment-application.service", () => ({
   fetchEnrollmentApplicationById: jest.fn(),
 }));
@@ -9,14 +17,6 @@ jest.mock("@features/institutional-auth/services/get-institutional-user.service"
 jest.mock("@features/guardian-workspace/utils/guardian-workspace-cookie.util", () => ({
   getGuardianWorkspaceId: jest.fn(),
 }));
-
-import { fetchEnrollmentApplicationById } from "@features/enrollment-applications/services/enrollment-application.service";
-import {
-  canMutateEnrollmentApplication,
-  canStartEnrollmentApplication,
-} from "@features/enrollment-applications/utils/can-mutate-enrollment-application.util";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { getGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
 
 const APPLICATION_ID = "00000000-0000-4000-8000-000000000001";
 const ACTIVE_DEPENDENT_ID = "00000000-0000-4000-8000-000000000002";

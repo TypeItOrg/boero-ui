@@ -1,9 +1,9 @@
+import { parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
 import type { AcademicContextualSearchEntity } from "@features/contextual-search/types/academic-contextual-search-entity.types";
 import type { ContextualSearchEntity } from "@features/contextual-search/types/contextual-search-entity.types";
 import type { ContextualSearchResult } from "@features/contextual-search/types/contextual-search-result.types";
 import { CONTEXTUAL_SEARCH_SCOPE, type ContextualSearchScope } from "@features/contextual-search/types/contextual-search-scope.types";
 import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
-import { parseAcademicYearFilter } from "@features/academic/utils/academic-year.util";
 
 const ACADEMIC_RESOURCE_BY_ENTITY: Record<AcademicContextualSearchEntity, string> = {
   "academic-year": "academic-years",
@@ -27,6 +27,7 @@ export function getContextualSearchResultHref(
 
 export function getContextualSearchViewAllHref(scope: ContextualSearchScope, entityType: ContextualSearchEntity, search: string): string | null {
   const searchParams = new URLSearchParams({ search });
+
   return scope === CONTEXTUAL_SEARCH_SCOPE.INSTITUTIONAL
     ? getInstitutionalCollectionHref(entityType, searchParams)
     : getPlatformCollectionHref(entityType, searchParams);
@@ -99,6 +100,7 @@ function getPlatformCollectionHref(entityType: ContextualSearchEntity, searchPar
     case "course":
     case "shift":
       searchParams.set("type", entityType);
+
       return `/admin/search?${searchParams}`;
   }
 }
@@ -111,13 +113,20 @@ function getInstitutionalCollectionHref(entityType: ContextualSearchEntity, sear
       return `${GUARDIAN_DEPENDENTS_PAGE_PATH}?${searchParams}`;
     case "role":
       return `/roles?${searchParams}`;
+
     case "academic-year": {
       const year = parseAcademicYearFilter(searchParams.get("search")?.trim());
-      if (year === undefined) return null;
+
+      if (year === undefined) {
+        return null;
+      }
+
       searchParams.delete("search");
       searchParams.set("year", String(year));
+
       return `/${getAcademicResource(entityType)}?${searchParams}`;
     }
+
     case "training-path":
     case "study-plan":
     case "academic-space":
@@ -136,7 +145,9 @@ function getAcademicResource(entityType: AcademicContextualSearchEntity): string
 }
 
 function getRequiredInstitutionId(item: ContextualSearchResult): string {
-  if (item.institutionId) return item.institutionId;
+  if (item.institutionId) {
+    return item.institutionId;
+  }
 
   throw new Error(`El resultado ${item.id} no tiene una institución asociada.`);
 }

@@ -1,5 +1,8 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { NavigationCard } from "@common/components/navigation/navigation-card";
 import { cn } from "@common/utils/cn.util";
+
 import { ACADEMIC_COLLECTION_CONFIG } from "@features/academic/config/academic-collection.config";
 import { ACADEMIC_RESOURCE_ICONS } from "@features/academic/config/academic-resource-icons.config";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
@@ -9,7 +12,7 @@ import { AcademicResource } from "@features/academic/types/academic-resource.typ
 type AcademicResourceLinksProps = {
   basePath: string;
   className?: string;
-  leadingContent?: React.ReactNode;
+  leadingContent?: ReactNode;
   prominent?: boolean;
   resources: readonly AcademicCollectionResource[];
 };
@@ -34,7 +37,7 @@ export function AcademicResourceLinks({
   leadingContent,
   prominent = false,
   resources,
-}: AcademicResourceLinksProps): React.ReactElement {
+}: AcademicResourceLinksProps): ReactElement {
   const itemCount = resources.length + (leadingContent ? 1 : 0);
 
   return (
@@ -42,7 +45,9 @@ export function AcademicResourceLinks({
       {leadingContent}
       {resources.map((resource, index) => {
         const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
         const icon = ACADEMIC_RESOURCE_ICONS[resource];
+
         const isLastOddResource = itemCount % 2 === 1 && index === resources.length - 1;
 
         return (

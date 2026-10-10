@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { GlobeIcon, MapPinIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -10,11 +11,13 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
+
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import type { City } from "@features/locations/types/city.types";
 import type { Country } from "@features/locations/types/country.types";
 
 const LOCATION_PAGE_SIZE = 20;
+
 const CITY_OPTION_HEIGHT = 56;
 
 type LocationDropdownProps<TItem> = {
@@ -33,8 +36,8 @@ export function CountryDropdown({
   initialItem,
   onValueChange,
   optional = false,
-}: LocationDropdownProps<Country>): React.ReactElement {
-  const [country, setCountry] = React.useState<Country | undefined>(initialItem);
+}: LocationDropdownProps<Country>): ReactElement {
+  const [country, setCountry] = useState<Country | undefined>(initialItem);
 
   return (
     <AsyncDropdown<Country>
@@ -64,15 +67,8 @@ export function CountryDropdown({
   );
 }
 
-export function CityDropdown({
-  ariaInvalid,
-  id,
-  name,
-  initialItem,
-  onValueChange,
-  optional = false,
-}: LocationDropdownProps<City>): React.ReactElement {
-  const [city, setCity] = React.useState<City | undefined>(initialItem);
+export function CityDropdown({ ariaInvalid, id, name, initialItem, onValueChange, optional = false }: LocationDropdownProps<City>): ReactElement {
+  const [city, setCity] = useState<City | undefined>(initialItem);
 
   return (
     <AsyncDropdown<City>
@@ -114,9 +110,13 @@ async function fetchLocationPage<TItem>(
   { page, search, signal, size }: AsyncDropdownFetchPageInput,
 ): Promise<AsyncDropdownPage<TItem>> {
   const url = new URL(path, window.location.origin);
+
   url.search = buildPaginationSearchParams({ page, size, search }).toString();
+
   const response = await fetch(url, { signal });
+
   const data = await parseHttpResponse<PaginatedResponse<TItem>>(response, LOCATION_ERROR_MESSAGES.FETCH_LOCATION_PAGE);
+
   return toAsyncDropdownPage(data);
 }
 

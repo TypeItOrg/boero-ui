@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type ReactElement } from "react";
+
 import { InfoIcon, XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -18,24 +19,32 @@ export function TrainingPathDocumentInstructions({
   instructions: string;
   specificInstructions?: string | null;
   className?: string;
-}): React.ReactElement | null {
+}): ReactElement | null {
   const [open, setOpen] = useState(false);
+
   const [tooltipOpen, setTooltipOpen] = useState(false);
+
   const id = useId();
+
   const titleId = `${id}-title`;
+
   const descriptionId = `${id}-description`;
+
   const hasGeneral = Boolean(instructions?.trim());
+
   const hasSpecific = Boolean(specificInstructions?.trim());
+
   const hasBoth = hasGeneral && hasSpecific;
 
   if (!hasGeneral && !hasSpecific) {
     return null;
   }
 
-  const title = hasBoth ? "Instrucciones" : hasGeneral ? "Instrucciones generales" : "Instrucciones del trayecto";
+  const title = getInstructionsTitle(hasGeneral, hasSpecific);
 
   function changeOpen(value: boolean): void {
     setOpen(value);
+
     if (value) {
       setTooltipOpen(false);
     }
@@ -102,4 +111,12 @@ export function TrainingPathDocumentInstructions({
       </PopoverContent>
     </Popover>
   );
+}
+
+function getInstructionsTitle(hasGeneral: boolean, hasSpecific: boolean): string {
+  if (hasGeneral && hasSpecific) {
+    return "Instrucciones";
+  }
+
+  return hasGeneral ? "Instrucciones generales" : "Instrucciones del trayecto";
 }

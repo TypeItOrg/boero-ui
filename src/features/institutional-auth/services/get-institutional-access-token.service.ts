@@ -6,5 +6,6 @@ import { INSTITUTIONAL_ACCESS_TOKEN_COOKIE } from "@features/institutional-auth/
 
 export async function getInstitutionalAccessToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
+
   return cookieStore.get(INSTITUTIONAL_ACCESS_TOKEN_COOKIE)?.value;
 }

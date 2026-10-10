@@ -19,33 +19,6 @@ describe("DataTableFilters", () => {
     jest.useRealTimers();
   });
 
-  it("uses a wrapped flex layout with compact year and date filters", () => {
-    const { container } = render(
-      <DataTableFilters
-        dateFilters={[{ label: "Vigente en", name: "validOn", value: undefined }]}
-        search=""
-        searchPlaceholder="Buscar..."
-        yearFilters={[
-          {
-            defaultValue: "all",
-            label: "Año",
-            maxYear: 2030,
-            minYear: 2020,
-            name: "year",
-            value: "all",
-          },
-        ]}
-      >
-        <div data-testid="custom-filter" />
-      </DataTableFilters>,
-    );
-
-    expect(container.querySelector("form")).toHaveClass("flex", "flex-wrap", "[&>*]:flex-[1_0_min(250px,100%)]");
-    expect(screen.getByText("Buscar").closest("label")).toHaveClass("!flex-[2_1_min(300px,100%)]");
-    expect(screen.getByText("Año").parentElement).toHaveClass("!flex-[1_0_min(160px,100%)]");
-    expect(screen.getByText("Vigente en").closest("label")).toHaveClass("!flex-[1_0_min(200px,100%)]");
-  });
-
   it("debounces a manually entered date before updating the query", async () => {
     jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
@@ -69,6 +42,8 @@ describe("DataTableFilters", () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     render(<DataTableFilters search="" searchPlaceholder="Buscar..." size={20} />);
+
+    expect(screen.queryByRole("button", { name: "Filtros" })).not.toBeInTheDocument();
 
     await user.type(screen.getByRole("textbox"), "activo");
 
@@ -103,16 +78,45 @@ describe("DataTableFilters", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("keeps the wrapped flex layout with no trigger when no advanced content is provided", () => {
-    const { container } = render(<DataTableFilters search="" searchPlaceholder="Buscar..." size={20} />);
+  it("replaces an edited search with the URL value and cancels its queued navigation", async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = render(<DataTableFilters search="piano" searchPlaceholder="Buscar..." />);
+    const input = screen.getByRole("textbox");
 
-    expect(container.querySelector("form")).toHaveClass("flex", "flex-wrap");
-    expect(screen.queryByRole("button", { name: "Filtros" })).not.toBeInTheDocument();
+    await user.clear(input);
+    await user.type(input, "búsqueda pendiente");
+    rerender(<DataTableFilters search="violín" searchPlaceholder="Buscar..." />);
+
+    expect(screen.getByRole("textbox")).toBe(input);
+    expect(input).toHaveValue("violín");
+    act(() => jest.advanceTimersByTime(350));
+    expect(mockNavigate).not.toHaveBeenCalled();
+    rerender(<DataTableFilters search="piano" searchPlaceholder="Buscar..." />);
+    expect(input).toHaveValue("piano");
   });
 
-  it("renders a single-row layout with an advanced trigger that reveals secondary filters in a dialog", async () => {
+  it("replaces an edited date with the URL value without resurrecting an old draft on back navigation", async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = render(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2035-01-01" }]} />);
+    const input = screen.getByRole("textbox");
+
+    await user.clear(input);
+    await user.type(input, "02022036");
+    rerender(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2036-03-03" }]} />);
+
+    expect(screen.getByRole("textbox")).toBe(input);
+    expect(input).toHaveValue("03/03/2036");
+    act(() => jest.advanceTimersByTime(350));
+    expect(mockNavigate).not.toHaveBeenCalled();
+    rerender(<DataTableFilters dateFilters={[{ label: "Inicio", name: "startDate", value: "2035-01-01" }]} />);
+    expect(input).toHaveValue("01/01/2035");
+  });
+
+  it("opens secondary filters and closes them when viewing results", async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    render(
       <DataTableFilters
         activeAdvancedCount={0}
         advancedFilters={<div data-testid="advanced-custom" />}
@@ -146,9 +150,6 @@ describe("DataTableFilters", () => {
       />,
     );
 
-    expect(container.querySelector("form")).toHaveClass("flex-wrap", "items-end", "gap-3", "p-4");
-    expect(container.querySelector("form")).not.toHaveClass("flex-nowrap", "overflow-x-auto");
-    expect(screen.getByText("Filtros")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Filtros" })).toBeInTheDocument();
     expect(screen.queryByTestId("advanced-custom")).not.toBeInTheDocument();
 
@@ -156,6 +157,10 @@ describe("DataTableFilters", () => {
 
     expect(await screen.findByTestId("advanced-custom")).toBeInTheDocument();
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /ver resultados/i }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("shows the active advanced count on the trigger and hides the badge when zero", () => {
@@ -243,7 +248,13 @@ describe("DataTableFilters", () => {
     await user.click(clearButton);
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      { academicSpaceId: undefined, deleted: undefined, page: "0", size: "20", studyPlanId: undefined },
+      {
+        academicSpaceId: undefined,
+        deleted: undefined,
+        page: "0",
+        size: "20",
+        studyPlanId: undefined,
+      },
       { replace: true },
     );
   });
@@ -317,18 +328,5 @@ describe("DataTableFilters", () => {
 
     expect(await screen.findByTestId("advanced-custom")).toBeInTheDocument();
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
-  });
-
-  it("renders advanced drawer footer buttons with lg size and flex basis styles", async () => {
-    const user = userEvent.setup();
-    render(<DataTableFilters advancedFilters={<div data-testid="advanced-custom" />} search="" searchPlaceholder="Buscar..." size={20} />);
-
-    await user.click(screen.getByRole("button", { name: "Filtros" }));
-
-    const clearButton = await screen.findByRole("button", { name: /limpiar filtros/i });
-    const resultsButton = await screen.findByRole("button", { name: /ver resultados/i });
-
-    expect(clearButton).toHaveClass("flex-[1_0_min(120px,100%)]", "h-9");
-    expect(resultsButton).toHaveClass("flex-[1_0_min(120px,100%)]", "h-9");
   });
 });

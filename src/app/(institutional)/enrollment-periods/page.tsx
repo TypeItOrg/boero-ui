@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
+
+import type { Metadata } from "next";
+
 import { CalendarRangeIcon } from "lucide-react";
 
-import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
-import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
 import { fetchAcademicYear } from "@features/academic/services/academic.service";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodsTable } from "@features/enrollment-periods/components/EnrollmentPeriodsTable";
+import { listEnrollmentPeriods } from "@features/enrollment-periods/services/enrollment-period.service";
+import { parseEnrollmentPeriodPaginationParams } from "@features/enrollment-periods/utils/enrollment-period-pagination.util";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
@@ -38,14 +40,18 @@ export default async function EnrollmentPeriodsPage({ searchParams }: Props) {
   }
 
   const params = parseEnrollmentPeriodPaginationParams(await searchParams);
+
   const [periodsData, selectedAcademicYear] = await Promise.all([
     listEnrollmentPeriods(user.institutionId, params),
     params.academicYearId ? fetchAcademicYear(AcademicScope.INSTITUTIONAL, user.institutionId, params.academicYearId) : null,
   ]);
 
   const canCreate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_CREATE);
+
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_UPDATE);
+
   const canChangeStatus = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_STATUS_UPDATE);
+
   const canDelete = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_DELETE);
 
   return (

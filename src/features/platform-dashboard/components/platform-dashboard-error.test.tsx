@@ -1,4 +1,5 @@
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -9,8 +10,8 @@ describe("PlatformDashboardErrorBoundary", () => {
     const user = userEvent.setup();
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined);
 
-    function Harness(): React.ReactElement {
-      const [shouldThrow, setShouldThrow] = React.useState(true);
+    function Harness(): ReactElement {
+      const [shouldThrow, setShouldThrow] = useState(true);
 
       return (
         <>
@@ -22,13 +23,14 @@ describe("PlatformDashboardErrorBoundary", () => {
       );
     }
 
-    function ThrowingChild(): React.ReactElement {
+    function ThrowingChild(): ReactElement {
       throw new Error("fallo temporal");
     }
 
     try {
       render(<Harness />);
 
+      expect(screen.getByRole("link", { name: "Ir al inicio" })).toHaveAttribute("href", "/admin");
       await user.click(screen.getByRole("button", { name: "Preparar recuperación" }));
       await user.click(screen.getByRole("button", { name: "Reintentar" }));
 

@@ -20,8 +20,9 @@ import {
 } from "lucide-react";
 
 import type { NavigationItem } from "@common/utils/navigation.util";
-import { GUARDIAN_LINKS_PAGE_PATH } from "@features/guardian-links/constants/guardian-link.constants";
+
 import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+import { GUARDIAN_LINKS_PAGE_PATH } from "@features/guardian-links/constants/guardian-link.constants";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
@@ -47,14 +48,19 @@ export const INSTITUTIONAL_PRIMARY_NAVIGATION_ITEM = {
 
 export function getInstitutionalNavigationSections(user: InstitutionalUser): InstitutionalNavigationSection[] {
   const canManagePeople = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_READ_ANY);
+
   const canReadRoles = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_READ);
+
   const canReadInstitution = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.INSTITUTION_READ);
+
   const canReadEnrollmentPeriods = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_READ);
+
   const platformItems: NavigationItem[] = [
     ...(canReadInstitution ? [{ title: "Institución", url: "/institution", icon: Building2Icon }] : []),
     ...(canManagePeople ? [{ title: "Usuarios", url: "/people", icon: UsersIcon }] : []),
     ...(canReadRoles ? [{ title: "Roles y permisos", url: "/roles", icon: UserLockIcon }] : []),
   ];
+
   const academicItems: NavigationItem[] = canViewAcademicNavigation(user)
     ? [
         ...(hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.DOCUMENT_CATALOG_READ)

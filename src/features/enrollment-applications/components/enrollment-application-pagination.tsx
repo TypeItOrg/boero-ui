@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { ENROLLMENT_APPLICATION_PAGE_SIZE_OPTIONS } from "@features/enrollment-applications/utils/enrollment-application-pagination.util";
 
 type EnrollmentApplicationPaginationProps = PaginationParams & {
@@ -10,7 +13,7 @@ type EnrollmentApplicationPaginationProps = PaginationParams & {
   totalPages: number;
 };
 
-export function EnrollmentApplicationPagination({ page, size, totalItems, totalPages }: EnrollmentApplicationPaginationProps): React.ReactElement {
+export function EnrollmentApplicationPagination({ page, size, totalItems, totalPages }: EnrollmentApplicationPaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function navigateToPage(newPage: number): void {
@@ -22,6 +25,7 @@ export function EnrollmentApplicationPagination({ page, size, totalItems, totalP
   }
 
   const totalLabel = totalItems === 1 ? "solicitud de inscripción." : "solicitudes de inscripción.";
+
   const summaryLabel = `${totalItems} ${totalLabel}`;
 
   return (

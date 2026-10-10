@@ -1,3 +1,9 @@
+import { redirect } from "next/navigation";
+
+import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
+import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
+
 jest.mock("@common/services/institutional-host/institutional-host.service", () => ({ validateRequestInstitutionId: jest.fn(async () => undefined) }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(() => {
@@ -6,10 +12,6 @@ jest.mock("next/navigation", () => ({
 }));
 jest.mock("@features/institutional-auth/services/register-institutional.service", () => ({ registerInstitutionalAccount: jest.fn() }));
 jest.mock("@features/institutional-auth/utils/email-verification-context.util", () => ({ setEmailVerificationContext: jest.fn() }));
-import { redirect } from "next/navigation";
-import { registerInstitutional } from "@features/institutional-auth/actions/institutional-register.action";
-import { registerInstitutionalAccount } from "@features/institutional-auth/services/register-institutional.service";
-import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 const identity = { institutionId: "22222222-2222-4222-8222-222222222222", documentNumber: "12345678" };
 
 function createForm(overrides: Record<string, string> = {}): FormData {

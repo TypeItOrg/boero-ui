@@ -1,5 +1,5 @@
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 import { parseInstitutionalUser } from "@features/institutional-auth/schemas/institutional-user.schema";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 
 describe("parseInstitutionalUser", () => {
   it("keeps known permissions and ignores unknown permissions", () => {

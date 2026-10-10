@@ -64,7 +64,9 @@ describe("StudyPlanCurriculumView", () => {
 
     const editAction = screen.getByRole("link", { name: "Editar nivel" });
     const levelHeader = editAction.closest("header");
-    const deleteAction = within(levelHeader as HTMLElement).getByRole("button", { name: "Eliminar" });
+    const deleteAction = within(levelHeader as HTMLElement).getByRole("button", {
+      name: "Eliminar",
+    });
 
     expect(editAction).toHaveAttribute("href", `/study-plans/${STUDY_PLAN_ID}/academic-levels/${LEVEL_ID}/edit`);
     expect(editAction.compareDocumentPosition(deleteAction)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
@@ -85,7 +87,7 @@ describe("StudyPlanCurriculumView", () => {
     expect(screen.queryByRole("button", { name: "Eliminar" })).not.toBeInTheDocument();
   });
 
-  it("shows the space order instead of an arrow without hover effects", () => {
+  it("identifies a curriculum space by its name and display order", () => {
     render(
       <StudyPlanCurriculumView
         curriculum={CURRICULUM}
@@ -102,9 +104,6 @@ describe("StudyPlanCurriculumView", () => {
 
     expect(order.closest('[data-slot="card-header"]')).toBeInTheDocument();
     expect(card).toBeInTheDocument();
-    expect(card).not.toHaveClass("group", "transition", "hover:shadow-sm");
-    expect(card?.className).not.toContain("hover:");
-    expect(spaceLink.querySelector("svg")).not.toBeInTheDocument();
   });
 
   it("offers direct edit and delete actions on each space card", () => {

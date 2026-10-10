@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { COURSE_ENROLLMENT_PAGE_SIZE_OPTIONS } from "@features/course-enrollments/utils/course-enrollment-pagination.util";
 
 type CourseEnrollmentPaginationProps = PaginationParams & {
@@ -11,7 +14,7 @@ type CourseEnrollmentPaginationProps = PaginationParams & {
   totalPages: number;
 };
 
-export function CourseEnrollmentPagination({ page, size, totalItems, totalPages, itemLabel }: CourseEnrollmentPaginationProps): React.ReactElement {
+export function CourseEnrollmentPagination({ page, size, totalItems, totalPages, itemLabel }: CourseEnrollmentPaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   function navigateToPage(newPage: number): void {
@@ -23,6 +26,7 @@ export function CourseEnrollmentPagination({ page, size, totalItems, totalPages,
   }
 
   const totalLabel = totalItems === 1 ? "cursada." : "cursadas.";
+
   const summaryLabel = `${totalItems} ${itemLabel ?? totalLabel}`;
 
   return (

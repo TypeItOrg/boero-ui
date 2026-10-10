@@ -1,37 +1,26 @@
 "use client";
 
-import * as React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { ChevronsUpDownIcon, SearchIcon, XIcon } from "lucide-react";
+import type { ReactElement } from "react";
 
-import { Button } from "@common/components/ui/button";
+import { AsyncDropdownList } from "@common/components/ui/async-dropdown-list";
+import { AsyncDropdownTrigger } from "@common/components/ui/async-dropdown-trigger";
+import { Command, CommandInput, CommandList } from "@common/components/ui/command";
+import { Popover, PopoverContent } from "@common/components/ui/popover";
+import {
+  DEFAULT_DEBOUNCE_MS,
+  DEFAULT_ESTIMATED_ITEM_SIZE,
+  DEFAULT_LIST_HEIGHT,
+  DEFAULT_PAGE_SIZE,
+} from "@common/constants/async-dropdown-defaults.constants";
 import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@common/components/ui/command";
-import { DropdownEmptyState, ErrorState, LoadingState, VirtualizedDropdownItems } from "@common/components/ui/async-dropdown-virtual-list";
-import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
-import type { AsyncDropdownDefaultOption } from "@common/types/async-dropdown-default-option.types";
+import { useAsyncDropdown } from "@common/hooks/use-async-dropdown";
 import type { AsyncDropdownProps } from "@common/types/async-dropdown-props.types";
-import { useDebouncedValue } from "@/common/hooks/use-debounced-value";
 import { cn } from "@common/utils/cn.util";
 
 export type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 export type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 export type { AsyncDropdownProps } from "@common/types/async-dropdown-props.types";
 export type { AsyncDropdownRenderItemState } from "@common/types/async-dropdown-render-item-state.types";
-
-const DEFAULT_PAGE_SIZE = 50;
-const DEFAULT_DEBOUNCE_MS = 300;
-const DEFAULT_ESTIMATED_ITEM_SIZE = 36;
-const DEFAULT_LIST_HEIGHT = 288;
-
-type SelectedTextInput<TItem> = {
-  defaultOption?: AsyncDropdownDefaultOption;
-  getItemLabel: (item: TItem) => string;
-  placeholder: string;
-  selectedItem: TItem | undefined;
-  selectedLabel: string | undefined;
-  value: string | undefined;
-};
 
 export function AsyncDropdown<TItem>({
   ariaInvalid,
@@ -75,183 +64,94 @@ export function AsyncDropdown<TItem>({
   selectedLabel,
   selectedValues,
   value,
-}: AsyncDropdownProps<TItem>): React.ReactElement {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const [listRenderVersion, setListRenderVersion] = React.useState(0);
-  const [search, setSearch] = React.useState("");
-  const isOpen = open ?? internalOpen;
-  const debouncedSearch = useDebouncedValue(search, debounceMs);
-  const virtualListKey = `${listRenderVersion}-${debouncedSearch}`;
-
-  const asyncQueryKey = React.useMemo(() => [...queryKey, { search: debouncedSearch, size: pageSize }], [debouncedSearch, pageSize, queryKey]);
-
-  const query = useInfiniteQuery({
-    queryKey: asyncQueryKey,
-    queryFn: ({ pageParam, signal }) => fetchPage({ page: pageParam, search: debouncedSearch, signal, size: pageSize }),
-    enabled: isOpen && !disabled,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
-    refetchOnMount: "always",
-    staleTime: 0,
-  });
-
-  const { data, fetchNextPage, hasNextPage, isError, isFetching, isFetchingNextPage, isPending, refetch } = query;
-  const items = React.useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
-  const selectedItem = React.useMemo(() => items.find((item) => getItemValue(item) === value), [getItemValue, items, value]);
-  const selectedText = getSelectedText({
+}: AsyncDropdownProps<TItem>): ReactElement {
+  const {
+    isOpen,
+    virtualListKey,
+    search,
+    setSearch,
+    debouncedSearch,
+    query,
+    items,
+    selectedText,
+    isPlaceholder,
+    canClear,
+    setOpen,
+    selectItem,
+    clearValue,
+  } = useAsyncDropdown({
+    open,
+    disabled,
+    debounceMs,
+    queryKey,
+    pageSize,
+    fetchPage,
     defaultOption,
     getItemLabel,
-    placeholder,
-    selectedItem,
-    selectedLabel,
+    getItemValue,
     value,
+    selectedLabel,
+    placeholder,
+    resetSearchOnClose,
+    onOpenChange,
+    onValueChange,
+    closeOnSelect,
+    clearable,
   });
-  const isSelected = selectedItem !== undefined || selectedLabel !== undefined || (defaultOption !== undefined && value === defaultOption.value);
-  const isPlaceholder = !isSelected;
-  const canClear = clearable && value !== undefined;
-
-  function setOpen(nextOpen: boolean) {
-    if (nextOpen && !isOpen) setListRenderVersion((current) => current + 1);
-    if (!nextOpen && resetSearchOnClose) setSearch("");
-    if (open === undefined) setInternalOpen(nextOpen);
-    onOpenChange?.(nextOpen);
-  }
-
-  function selectItem(item: TItem | undefined) {
-    if (item === undefined) {
-      onValueChange(defaultOption?.value, undefined);
-    } else {
-      onValueChange(getItemValue(item), item);
-    }
-    if (closeOnSelect) setOpen(false);
-  }
-
-  function clearValue(event: React.MouseEvent<HTMLButtonElement>): void {
-    event.stopPropagation();
-    onValueChange(undefined, undefined);
-    setOpen(false);
-  }
-
-  let commandListContent: React.ReactNode;
-  const showDefaultOption = !!defaultOption && (!search || defaultOption.label.toLowerCase().includes(search.toLowerCase()));
-  const isLoading = isPending || (isFetching && !isFetchingNextPage);
-
-  if (isLoading) {
-    commandListContent = <LoadingState itemSize={estimateSize} />;
-  } else if (isError) {
-    commandListContent = <ErrorState message={errorMessage} retry={() => void refetch()} />;
-  } else if (items.length === 0 && !showDefaultOption) {
-    const isSearching = debouncedSearch.trim() !== "";
-    const activeIcon = isSearching ? SearchIcon : (emptyIcon ?? SearchIcon);
-    const activeTitle = isSearching ? "No se encontraron resultados" : (emptyTitle ?? emptyMessage);
-    const activeDescription = isSearching ? `No encontramos resultados para "${debouncedSearch.trim()}".` : emptyDescription;
-
-    commandListContent = (
-      <CommandEmpty className="p-0">
-        <DropdownEmptyState description={activeDescription} icon={activeIcon} title={activeTitle} />
-      </CommandEmpty>
-    );
-  } else {
-    commandListContent = (
-      <CommandGroup className={cn("px-1 pt-2 pb-1", getItemGroup && "px-0")}>
-        {items.length === 0 ? (
-          <CommandItem
-            className="h-9"
-            data-checked={value === defaultOption?.value}
-            onSelect={() => selectItem(undefined)}
-            value="__async-dropdown-default"
-          >
-            <span className="truncate">{defaultOption?.label}</span>
-          </CommandItem>
-        ) : (
-          <VirtualizedDropdownItems
-            key={virtualListKey}
-            estimateSize={estimateSize}
-            getItemLabel={getItemLabel}
-            getItemDisplayLabel={getItemDisplayLabel}
-            getItemDescription={getItemDescription}
-            getItemGroup={getItemGroup}
-            getItemValue={getItemValue}
-            groupOrder={groupOrder}
-            compareGroups={compareGroups}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-            items={items}
-            listClassName={listClassName}
-            listHeight={listHeight}
-            loadNextPage={() => void fetchNextPage({ cancelRefetch: false })}
-            onSelect={selectItem}
-            renderItem={renderItem}
-            selectedValues={selectedValues}
-            value={value}
-            defaultOption={defaultOption}
-            showDefaultOption={showDefaultOption}
-          />
-        )}
-      </CommandGroup>
-    );
-  }
 
   return (
     <>
       {name ? <input type="hidden" name={name} value={value ?? ""} /> : null}
       <Popover open={isOpen} onOpenChange={setOpen}>
-        <div className="relative w-full">
-          <PopoverTrigger asChild>
-            <Button
-              aria-expanded={isOpen}
-              aria-haspopup="listbox"
-              aria-invalid={ariaInvalid}
-              aria-describedby={ariaDescribedBy}
-              aria-required={ariaRequired}
-              className={cn(
-                "w-full justify-between text-base focus-visible:ring-1 aria-invalid:ring-0 aria-invalid:focus-visible:ring-1 md:text-sm",
-                className,
-              )}
-              disabled={disabled}
-              id={id}
-              role="combobox"
-              size="lg"
-              type="button"
-              variant="outline"
-            >
-              <span className={cn("min-w-0 flex-1 truncate text-left font-normal", canClear && "mr-8", isPlaceholder && "text-muted-foreground")}>
-                {selectedText}
-              </span>
-              <ChevronsUpDownIcon data-icon="inline-end" />
-            </Button>
-          </PopoverTrigger>
-          {canClear ? (
-            <Button
-              aria-label={clearLabel}
-              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-9 size-6 -translate-y-1/2 rounded-[calc(var(--radius)-3px)] p-0 [&>svg:not([class*='size-'])]:size-4"
-              disabled={disabled}
-              onClick={clearValue}
-              size="icon-xs"
-              type="button"
-              variant="ghost"
-            >
-              <XIcon />
-            </Button>
-          ) : null}
-        </div>
+        <AsyncDropdownTrigger
+          isOpen={isOpen}
+          ariaInvalid={ariaInvalid}
+          ariaDescribedBy={ariaDescribedBy}
+          ariaRequired={ariaRequired}
+          className={className}
+          disabled={disabled}
+          id={id}
+          canClear={canClear}
+          isPlaceholder={isPlaceholder}
+          selectedText={selectedText}
+          clearLabel={clearLabel}
+          clearValue={clearValue}
+        />
         <PopoverContent align="start" className={cn("w-(--radix-popover-trigger-width) gap-0 p-0", contentClassName)}>
           <Command className={getItemGroup ? "px-0 [&_[data-slot=command-input-wrapper]]:px-2" : undefined} shouldFilter={false} loop>
             <CommandInput disabled={disabled} onValueChange={setSearch} placeholder={searchPlaceholder} value={search} />
             <CommandList aria-multiselectable={selectedValues !== undefined || undefined} className="max-h-none overflow-visible p-0">
-              {commandListContent}
+              <AsyncDropdownList
+                emptyDescription={emptyDescription}
+                emptyIcon={emptyIcon}
+                emptyMessage={emptyMessage}
+                emptyTitle={emptyTitle}
+                errorMessage={errorMessage}
+                estimateSize={estimateSize}
+                defaultOption={defaultOption}
+                getItemGroup={getItemGroup}
+                getItemLabel={getItemLabel}
+                getItemDisplayLabel={getItemDisplayLabel}
+                getItemDescription={getItemDescription}
+                getItemValue={getItemValue}
+                groupOrder={groupOrder}
+                compareGroups={compareGroups}
+                value={value}
+                listClassName={listClassName}
+                listHeight={listHeight}
+                renderItem={renderItem}
+                selectedValues={selectedValues}
+                query={query}
+                search={search}
+                debouncedSearch={debouncedSearch}
+                items={items}
+                virtualListKey={virtualListKey}
+                selectItem={selectItem}
+              />
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
     </>
   );
-}
-
-function getSelectedText<TItem>({ defaultOption, getItemLabel, placeholder, selectedItem, selectedLabel, value }: SelectedTextInput<TItem>): string {
-  if (selectedItem) return getItemLabel(selectedItem);
-  if (selectedLabel) return selectedLabel;
-  if (defaultOption && value === defaultOption.value) return defaultOption.label;
-  if (value) return value;
-  return placeholder;
 }

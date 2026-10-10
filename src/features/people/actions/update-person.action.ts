@@ -1,25 +1,29 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
+
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
-import { personRoleAssignmentsSchema } from "@features/people/schemas/person-role.schema";
 import { updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
+import { personRoleAssignmentsSchema } from "@features/people/schemas/person-role.schema";
 import { peopleApiFetch } from "@features/people/services/people-api-fetch.service";
 import type { PersonActionState } from "@features/people/types/person-action-state.types";
 import { PERSON_FORM_FIELD_NAMES } from "@features/people/types/person-form-field-name.types";
+import { PeopleScope, getPeoplePath, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
-import { getPeoplePath, PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 export async function updateInstitutionalPersonAction(institutionId: string, personId: string, formData: FormData): Promise<PersonActionState> {
   await requireInstitutionalUser();
+
   return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.INSTITUTIONAL);
 }
 
 export async function updatePlatformPersonAction(institutionId: string, personId: string, formData: FormData): Promise<PersonActionState> {
   await requirePlatformAccount();
+
   return updatePersonActionInternal(institutionId, personId, formData, PeopleScope.ADMIN);
 }
 
@@ -34,6 +38,7 @@ async function updatePersonActionInternal(
   }
 
   const assignments = parseRoleAssignments(formData.get("assignments"));
+
   if (assignments === null || formData.has("roleIds")) {
     return { error: PEOPLE_ERROR_MESSAGES.INVALID_ROLE_CONFIGURATION };
   }
@@ -49,6 +54,7 @@ async function updatePersonActionInternal(
     };
 
     const parsed = updatePersonFormSchema.safeParse(payload);
+
     if (!parsed.success) {
       return getValidationActionState(parsed.error.issues, PERSON_FORM_FIELD_NAMES);
     }
@@ -73,7 +79,10 @@ async function updatePersonActionInternal(
       PERSON_FORM_FIELD_NAMES,
       PEOPLE_ERROR_MESSAGES.UPDATE_PERSON,
     );
-    if (errorState) return errorState;
+
+    if (errorState) {
+      return errorState;
+    }
   }
 
   if (assignments) {
@@ -86,12 +95,14 @@ async function updatePersonActionInternal(
       PERSON_FORM_FIELD_NAMES,
       PEOPLE_ERROR_MESSAGES.ASSIGN_SELECTED_ROLE,
     );
+
     if (roleError) {
       return roleError;
     }
   }
 
   revalidatePersonPaths(institutionId, personId, scope);
+
   return { success: true };
 }
 
@@ -101,12 +112,14 @@ function parseRoleAssignments(
   if (value === null) {
     return undefined;
   }
+
   if (typeof value !== "string") {
     return null;
   }
 
   try {
     const parsed = personRoleAssignmentsSchema.safeParse(JSON.parse(value));
+
     return parsed.success ? parsed.data : null;
   } catch {
     return null;

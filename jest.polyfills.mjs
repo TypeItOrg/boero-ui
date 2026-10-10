@@ -1,6 +1,7 @@
-import { TextDecoder, TextEncoder } from "node:util";
 import { createRequire } from "node:module";
 import { ReadableStream, TransformStream, WritableStream } from "node:stream/web";
+import { clearImmediate, setImmediate } from "node:timers";
+import { TextDecoder, TextEncoder } from "node:util";
 
 const require = createRequire(import.meta.url);
 
@@ -16,6 +17,11 @@ assignGlobalIfMissing("ReadableStream", ReadableStream);
 assignGlobalIfMissing("WritableStream", WritableStream);
 assignGlobalIfMissing("TransformStream", TransformStream);
 
+// Next's server scheduler patches node:timers using these globals. jsdom omits
+// them; provide the native functions before loading any Next server module.
+assignGlobalIfMissing("setImmediate", setImmediate);
+assignGlobalIfMissing("clearImmediate", clearImmediate);
+
 class MessagePortMock extends EventTarget {
   onmessage = null;
   onmessageerror = null;
@@ -27,7 +33,9 @@ class MessagePortMock extends EventTarget {
 
   postMessage(message) {
     queueMicrotask(() => {
-      if (!this.#otherPort) return;
+      if (!this.#otherPort) {
+        return;
+      }
 
       const event = new MessageEvent("message", { data: message });
 

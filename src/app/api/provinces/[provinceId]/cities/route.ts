@@ -9,6 +9,7 @@ type ProvinceCitiesContext = {
 
 export async function GET(request: Request, { params }: ProvinceCitiesContext): Promise<Response> {
   const parsedProvinceId = z.uuid().safeParse((await params).provinceId);
+
   if (!parsedProvinceId.success) {
     return Response.json({ message: LOCATION_ERROR_MESSAGES.INVALID_LOCATION_ID }, { status: 400 });
   }

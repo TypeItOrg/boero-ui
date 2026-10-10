@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
+import { useActionState, type ReactElement, type ReactNode } from "react";
+
+import { useQuery } from "@tanstack/react-query";
 import { CalendarCheckIcon, CalendarXIcon, CircleAlertIcon } from "lucide-react";
-import { useActionState } from "react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -15,8 +15,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Button } from "@common/components/ui/button";
 import { cn } from "@common/utils/cn.util";
-import { updateAcademicStatusAction } from "@features/academic/actions/academic-resource.action";
+import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
+import { updateAcademicStatusAction } from "@features/academic/actions/update-academic-status.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicYearStatus } from "@features/academic/types/academic-year-status.types";
@@ -37,7 +40,7 @@ type AcademicYearStatusDialogProps = {
 
 type StatusDialogConfig = {
   actionLabel: string;
-  description: (academicYearLabel: string) => React.ReactNode;
+  description: (academicYearLabel: string) => ReactNode;
   icon: typeof CalendarCheckIcon;
   iconClassName: string;
   pendingLabel: string;
@@ -86,39 +89,44 @@ export function AcademicYearStatusDialog({
   returnTo,
   scope,
   targetStatus,
-}: AcademicYearStatusDialogProps): React.ReactElement {
+}: AcademicYearStatusDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     updateAcademicStatusAction.bind(null, scope, institutionId, AcademicResource.ACADEMIC_YEAR, id, returnTo),
     INITIAL_STATE,
   );
-  const config = STATUS_DIALOG_CONFIG[targetStatus];
-  const Icon = config.icon;
-  const [courseCount, setCourseCount] = React.useState<number | null>(null);
 
-  React.useEffect(() => {
-    if (!open || targetStatus !== "CLOSED") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset transient count when dialog closes
-      setCourseCount(null);
-      return;
-    }
-    let cancelled = false;
-    fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?institutionId=${institutionId}`, {
-      cache: "no-store",
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (!cancelled && data && typeof data.count === "number") setCourseCount(data.count);
-      })
-      .catch(() => {
-        if (!cancelled) setCourseCount(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [open, targetStatus, scope, institutionId, id]);
+  const config = STATUS_DIALOG_CONFIG[targetStatus];
+
+  const Icon = config.icon;
+
+  const countQuery = useQuery({
+    queryKey: ["academic-year-course-count", scope, institutionId, id],
+    enabled: open && targetStatus === "CLOSED",
+    queryFn: async ({ signal }) => {
+      const params = new URLSearchParams({ institutionId });
+
+      const response = await fetch(`/api/${scope}/academic/academic-years/${id}/courses/count?${params}`, { cache: "no-store", signal });
+
+      const data = await parseHttpResponse<{ count: number }>(response, "No se pudieron consultar los cursos asociados.");
+
+      if (!Number.isSafeInteger(data?.count) || data.count < 0) {
+        throw new Error("No se pudieron consultar los cursos asociados.");
+      }
+
+      return data.count;
+    },
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  const courseCount = countQuery.data;
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
+    if (isPending && !nextOpen) {
+      return;
+    }
+
     onOpenChange(nextOpen);
   }
 
@@ -133,13 +141,7 @@ export function AcademicYearStatusDialog({
             <AlertDialogTitle>{config.title}</AlertDialogTitle>
             <AlertDialogDescription>{config.description(academicYearLabel)}</AlertDialogDescription>
             {targetStatus === "CLOSED" ? (
-              <p className="text-muted-foreground mt-2 text-sm">
-                {courseCount === null
-                  ? "Cargando cursos asociados..."
-                  : courseCount === 0
-                    ? "No hay cursos asociados para cerrar."
-                    : `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`}
-              </p>
+              <p className="text-muted-foreground mt-2 text-sm">{getCourseClosingDescription(courseCount, countQuery.isError)}</p>
             ) : null}
           </AlertDialogHeader>
 
@@ -164,4 +166,20 @@ export function AcademicYearStatusDialog({
       </AlertDialogContent>
     </AlertDialog>
   );
+}
+
+function getCourseClosingDescription(courseCount: number | undefined, hasError: boolean): string {
+  if (hasError) {
+    return "No se pudieron consultar los cursos asociados.";
+  }
+
+  if (courseCount === undefined) {
+    return "Cargando cursos asociados...";
+  }
+
+  if (courseCount === 0) {
+    return "No hay cursos asociados para cerrar.";
+  }
+
+  return `Al finalizar el ciclo lectivo también se cerrarán todos los cursos asociados (${courseCount} ${courseCount === 1 ? "curso" : "cursos"}).`;
 }

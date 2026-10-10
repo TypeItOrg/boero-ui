@@ -1,13 +1,15 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
+
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
-import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
+import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 
 type CourseEnrollmentDetailActionsProps = {
   enrollment: CourseEnrollment;
@@ -23,9 +25,11 @@ export function CourseEnrollmentDetailActions({
   canUpdateAcademicStatus,
   canReadWaitlist,
   returnTo,
-}: CourseEnrollmentDetailActionsProps): React.ReactElement {
+}: CourseEnrollmentDetailActionsProps): ReactElement {
   const router = useRouter();
-  const [mode, setMode] = React.useState<"withdraw" | "academic">();
+
+  const [mode, setMode] = useState<"withdraw" | "academic">();
+
   const canUpdateResult =
     canUpdateAcademicStatus &&
     enrollment.status !== COURSE_ENROLLMENT_STATUS.WITHDRAWN &&

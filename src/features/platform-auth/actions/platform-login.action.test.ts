@@ -1,3 +1,10 @@
+import { headers } from "next/headers";
+
+import { loginPlatform } from "@features/platform-auth/actions/platform-login.action";
+import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
+import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
+import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
+
 jest.mock("next/headers", () => ({
   headers: jest.fn(),
 }));
@@ -14,13 +21,6 @@ jest.mock("@features/platform-auth/utils/platform-auth-redirect.util", () => ({
   redirectToNext: jest.fn(),
 }));
 
-import { headers } from "next/headers";
-
-import { loginPlatformAccount } from "@features/platform-auth/services/login-platform-account.service";
-import { setPlatformAuthCookies } from "@features/platform-auth/utils/platform-auth-cookies.util";
-import { redirectToNext } from "@features/platform-auth/utils/platform-auth-redirect.util";
-import { loginPlatform } from "@features/platform-auth/actions/platform-login.action";
-
 type LoginFormInput = {
   email?: string;
   password?: string;
@@ -32,9 +32,17 @@ const requestHeaders = new Headers({ "user-agent": "Mozilla/5.0", "x-real-ip": "
 function createLoginFormData(input: LoginFormInput = {}): FormData {
   const formData = new FormData();
 
-  if (input.email) formData.set("email", input.email);
-  if (input.password) formData.set("password", input.password);
-  if (input.next) formData.set("next", input.next);
+  if (input.email) {
+    formData.set("email", input.email);
+  }
+
+  if (input.password) {
+    formData.set("password", input.password);
+  }
+
+  if (input.next) {
+    formData.set("next", input.next);
+  }
 
   return formData;
 }

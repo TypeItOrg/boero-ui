@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement, type ReactNode } from "react";
+
 import { GlobeIcon, MapPinIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
@@ -11,6 +12,7 @@ import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
 import { buildPaginationSearchParams } from "@common/utils/pagination-query.util";
 import { toAsyncDropdownPage } from "@common/utils/to-async-dropdown-page.util";
+
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import type { City } from "@features/locations/types/city.types";
 import type { Country } from "@features/locations/types/country.types";
@@ -30,12 +32,17 @@ type LocationPickerProps = {
   initialLocation?: InitialLocation;
 };
 
-export function LocationPicker({ onValueChange, error, initialLocation }: LocationPickerProps): React.ReactElement {
-  const [country, setCountry] = React.useState<Country | undefined>(() => initialLocation?.country);
-  const [province, setProvince] = React.useState<Province | undefined>(() => initialLocation?.province);
-  const [city, setCity] = React.useState<City | undefined>(() => initialLocation?.city);
+export function LocationPicker({ onValueChange, error, initialLocation }: LocationPickerProps): ReactElement {
+  const [country, setCountry] = useState<Country | undefined>(() => initialLocation?.country);
+
+  const [province, setProvince] = useState<Province | undefined>(() => initialLocation?.province);
+
+  const [city, setCity] = useState<City | undefined>(() => initialLocation?.city);
+
   const countryError = error && !country ? LOCATION_ERROR_MESSAGES.REQUIRED_COUNTRY : undefined;
+
   const provinceError = error && country && !province ? LOCATION_ERROR_MESSAGES.REQUIRED_PROVINCE : undefined;
+
   const cityError = error && province && !city ? error : undefined;
 
   function handleSelectCountry(_value: string | undefined, item: Country | undefined): void {
@@ -144,11 +151,13 @@ async function fetchLocationPage<TItem>(
   { page, search, signal, size }: AsyncDropdownFetchPageInput,
 ): Promise<AsyncDropdownPage<TItem>> {
   const url = new URL(path, window.location.origin);
+
   url.search = buildPaginationSearchParams({ page, size, search }).toString();
 
   const response = await fetch(url, { signal });
 
   const data = await parseHttpResponse<PaginatedResponse<TItem>>(response, LOCATION_ERROR_MESSAGES.FETCH_LOCATION_PAGE);
+
   return toAsyncDropdownPage(data);
 }
 
@@ -157,12 +166,18 @@ async function fetchCountries(input: AsyncDropdownFetchPageInput): Promise<Async
 }
 
 async function fetchProvinces(input: AsyncDropdownFetchPageInput, countryId: string | undefined): Promise<AsyncDropdownPage<Province>> {
-  if (!countryId) return { items: [], nextPage: null };
+  if (!countryId) {
+    return { items: [], nextPage: null };
+  }
+
   return fetchLocationPage<Province>(`/api/countries/${countryId}/provinces`, input);
 }
 
 async function fetchCities(input: AsyncDropdownFetchPageInput, provinceId: string | undefined): Promise<AsyncDropdownPage<City>> {
-  if (!provinceId) return { items: [], nextPage: null };
+  if (!provinceId) {
+    return { items: [], nextPage: null };
+  }
+
   return fetchLocationPage<City>(`/api/provinces/${provinceId}/cities`, input);
 }
 
@@ -178,6 +193,6 @@ function getCountryLabel(country: Country): string {
   return country.name;
 }
 
-function renderCountryItem(country: Country): React.ReactNode {
+function renderCountryItem(country: Country): ReactNode {
   return <span className="truncate">{country.name}</span>;
 }

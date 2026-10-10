@@ -1,15 +1,18 @@
-import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+import type { ReactElement } from "react";
+
 import { FileTextIcon, MapPinIcon, PhoneIcon, type LucideIcon } from "lucide-react";
 
-import { Card, CardContent, CardHeader } from "@common/components/ui/card";
-import type { Institution } from "@features/institutions/types/institution.types";
 import { SectionHeader } from "@common/components/section-header";
+import { Card, CardContent, CardHeader } from "@common/components/ui/card";
+import { DETAIL_LABEL_CLASS_NAME } from "@common/constants/detail-label.constants";
+
+import type { Institution } from "@features/institutions/types/institution.types";
 
 type InstitutionDetailProps = {
   institution: Institution;
 };
 
-export function InstitutionDetail({ institution }: InstitutionDetailProps): React.ReactElement {
+export function InstitutionDetail({ institution }: InstitutionDetailProps): ReactElement {
   const address = formatAddress(institution);
 
   return (
@@ -58,11 +61,11 @@ export function InstitutionDetail({ institution }: InstitutionDetailProps): Reac
   );
 }
 
-function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
+function InstitutionSectionHeader({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): ReactElement {
   return <SectionHeader icon={Icon} title={title} description={description} />;
 }
 
-function LocationDetail({ label, value }: { label: string; value: string }): React.ReactElement {
+function LocationDetail({ label, value }: { label: string; value: string }): ReactElement {
   return (
     <div>
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>
@@ -71,7 +74,7 @@ function LocationDetail({ label, value }: { label: string; value: string }): Rea
   );
 }
 
-function ContactDetail({ label, value }: { label: string; value: string | null }): React.ReactElement {
+function ContactDetail({ label, value }: { label: string; value: string | null }): ReactElement {
   return (
     <div className="min-w-0">
       <dt className={DETAIL_LABEL_CLASS_NAME}>{label}</dt>

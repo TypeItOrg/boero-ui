@@ -1,9 +1,13 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
+
 import { RouteIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import { parsePaginationQuery } from "@common/utils/pagination-query.util";
+
 import { AcademicOfferList } from "@features/academic-offers/components/academic-offer-list";
 import { fetchAcademicOffers } from "@features/academic-offers/services/academic-offer.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
@@ -19,7 +23,7 @@ export function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Oferta académica");
 }
 
-export default async function AcademicOffersPage({ searchParams }: { searchParams: Promise<PaginationSearchParams> }): Promise<React.ReactElement> {
+export default async function AcademicOffersPage({ searchParams }: { searchParams: Promise<PaginationSearchParams> }): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ACADEMIC_OFFER_READ)) {
@@ -27,6 +31,7 @@ export default async function AcademicOffersPage({ searchParams }: { searchParam
   }
 
   const { page, size } = parsePaginationQuery(await searchParams);
+
   const offers = await fetchAcademicOffers(user.institutionId, { page, size });
 
   return (

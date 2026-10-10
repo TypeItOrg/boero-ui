@@ -1,11 +1,14 @@
 "use client";
 
+import { useState, type ReactElement } from "react";
+
 import Image from "next/image";
-import { useState } from "react";
+
 import { ImageIcon } from "lucide-react";
 
 import { SectionHeader } from "@common/components/section-header";
 import { cn } from "@common/utils/cn.util";
+
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { getInstitutionLogoUrl } from "@features/institutions/utils/institution-logo-url.util";
 
@@ -17,7 +20,7 @@ type InstitutionLogoManagerProps = {
   canUpdate?: boolean;
 };
 
-export function InstitutionLogoManager({ institutionId, institutionName, logoUrl }: InstitutionLogoManagerProps): React.ReactElement {
+export function InstitutionLogoManager({ institutionId, institutionName, logoUrl }: InstitutionLogoManagerProps): ReactElement {
   const currentUrl = getInstitutionLogoUrl(institutionId, logoUrl);
 
   return (
@@ -46,7 +49,7 @@ export function InstitutionLogoImage({
   alt: string;
   className?: string;
   compact?: boolean;
-}): React.ReactElement {
+}): ReactElement {
   const [failedUrl, setFailedUrl] = useState<string>();
 
   if (failedUrl === src) {

@@ -5,12 +5,14 @@ export const HEALTH_PROBE_PATH = "/api/health";
 export const INSTITUTIONAL_UNAVAILABLE_PATH = "/institutional-unavailable";
 
 const ADMIN_SESSION_ROOT_PATHS = ["/admin", "/api/admin"] as const;
+
 const INSTITUTIONAL_PUBLIC_ROOT_PATHS = [
   "/auth/register",
   "/auth/password-recovery",
   "/auth/email-verification",
   INSTITUTIONAL_UNAVAILABLE_PATH,
 ] as const;
+
 const PUBLIC_API_PATHS = [
   /^\/api\/(?:institutions|countries|cities)\/?$/,
   /^\/api\/countries\/[^/]+\/provinces\/?$/,
@@ -37,12 +39,15 @@ export function getRouteAccess(pathname: string, searchParams?: URLSearchParams)
   if (pathname === HEALTH_PROBE_PATH || pathname === `${HEALTH_PROBE_PATH}/`) {
     return RouteAccess.HealthProbe;
   }
+
   if (pathname === PLATFORM_LOGIN_PATH) {
     return RouteAccess.AdminGuestOnly;
   }
+
   if (pathname === INSTITUTIONAL_LOGIN_PATH) {
     return RouteAccess.InstitutionalGuestOnly;
   }
+
   if (INSTITUTIONAL_PUBLIC_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
     return RouteAccess.Public;
   }
@@ -50,9 +55,11 @@ export function getRouteAccess(pathname: string, searchParams?: URLSearchParams)
   if (isPathWithinRoot(pathname, "/api/public") || PUBLIC_API_PATHS.some((pattern) => pattern.test(pathname))) {
     return RouteAccess.Public;
   }
+
   if (ADMIN_SESSION_ROOT_PATHS.some((rootPath) => isPathWithinRoot(pathname, rootPath))) {
     return RouteAccess.AdminSession;
   }
+
   if (searchParams?.get("scope") === "admin" && LEGACY_SCOPED_API_PATHS.some((pattern) => pattern.test(pathname))) {
     return RouteAccess.AdminSession;
   }

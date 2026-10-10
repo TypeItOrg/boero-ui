@@ -2,8 +2,8 @@ import type { LucideIcon } from "lucide-react";
 import {
   BookCopyIcon,
   BookOpenIcon,
-  CalendarRangeIcon,
   Building2Icon,
+  CalendarRangeIcon,
   ClipboardListIcon,
   FilePenLineIcon,
   GraduationCapIcon,
@@ -179,7 +179,12 @@ export function getInstitutionalFormationHomeLinks(user: InstitutionalUser): Ins
   }
 
   return [
-    { href: "/my-course-enrollments", title: "Mis materias", description: "Consultá tus materias y resultados académicos.", icon: BookOpenIcon },
+    {
+      href: "/my-course-enrollments",
+      title: "Mis materias",
+      description: "Consultá tus materias y resultados académicos.",
+      icon: BookOpenIcon,
+    },
     {
       href: "/my-schedules",
       title: "Mis horarios",

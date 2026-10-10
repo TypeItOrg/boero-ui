@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, useTransition, type MouseEvent, type ReactElement } from "react";
+
 import { Building2Icon, CircleAlertIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -16,6 +17,7 @@ import {
 } from "@common/components/ui/alert-dialog";
 import { cn } from "@common/utils/cn.util";
 import { safelyRunAction } from "@common/utils/safe-action.util";
+
 import { updateInstitutionStatusAction } from "@features/institutions/actions/update-institution-status.action";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 
@@ -35,19 +37,30 @@ export function InstitutionStatusDialog({
   open,
   onOpenChange,
   onUpdated,
-}: InstitutionStatusDialogProps): React.ReactElement {
-  const [isPending, startTransition] = React.useTransition();
-  const [error, setError] = React.useState<string>();
+}: InstitutionStatusDialogProps): ReactElement {
+  const [isPending, startTransition] = useTransition();
+
+  const [error, setError] = useState<string>();
+
   const nextActive = !active;
+
   const actionLabel = nextActive ? "Activar institución" : "Desactivar institución";
 
+  const pendingLabel = nextActive ? "Activando…" : "Desactivando…";
+
   function handleOpenChange(nextOpen: boolean): void {
-    if (isPending && !nextOpen) return;
-    if (!nextOpen) setError(undefined);
+    if (isPending && !nextOpen) {
+      return;
+    }
+
+    if (!nextOpen) {
+      setError(undefined);
+    }
+
     onOpenChange(nextOpen);
   }
 
-  function handleConfirm(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleConfirm(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
     setError(undefined);
 
@@ -59,6 +72,7 @@ export function InstitutionStatusDialog({
 
       if (result.error) {
         setError(result.error);
+
         return;
       }
 
@@ -105,7 +119,7 @@ export function InstitutionStatusDialog({
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction size="lg" variant={nextActive ? "default" : "destructive"} disabled={isPending} onClick={handleConfirm}>
-            {isPending ? (nextActive ? "Activando…" : "Desactivando…") : actionLabel}
+            {isPending ? pendingLabel : actionLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

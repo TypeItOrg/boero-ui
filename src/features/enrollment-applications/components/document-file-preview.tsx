@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useState, type ReactElement, type ReactNode } from "react";
+
 import Image from "next/image";
+
 import { ExpandIcon, EyeIcon, FileTextIcon, ImageIcon, XIcon } from "lucide-react";
 
-import { DocumentPdfPreview } from "@features/enrollment-applications/components/document-pdf-preview";
 import { Button } from "@common/components/ui/button";
-import { cn } from "@common/utils/cn.util";
 import {
   Dialog,
   DialogClose,
@@ -17,6 +17,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@common/components/ui/dialog";
+import { cn } from "@common/utils/cn.util";
+
+import { DocumentPdfPreview } from "@features/enrollment-applications/components/document-pdf-preview";
 
 export function DocumentFilePreview({
   src,
@@ -32,21 +35,28 @@ export function DocumentFilePreview({
   contentType: string;
   compact?: boolean;
   iconOnly?: boolean;
-  triggerLabel?: React.ReactNode;
+  triggerLabel?: ReactNode;
   className?: string;
-}): React.ReactElement {
-  const [failed, setFailed] = React.useState(false);
-  const onPreviewError = React.useCallback(() => setFailed(true), []);
+}): ReactElement {
+  const [failedSource, setFailedSource] = useState<string>();
+
+  const failed = failedSource === src;
+
+  const onPreviewError = useCallback(() => setFailedSource(src), [src]);
+
   const isImage = contentType === "image/png" || contentType === "image/jpeg";
+
   const isPdf = contentType === "application/pdf";
 
-  function content(expanded: boolean): React.ReactNode {
+  const formatLabel = getFormatLabel(contentType);
+
+  function content(expanded: boolean): ReactNode {
     if (failed || (!isImage && !isPdf)) {
       return (
         <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center text-sm">
           <p className="text-muted-foreground">No se pudo mostrar la vista previa.</p>
           {failed ? (
-            <Button type="button" variant="outline" onClick={() => setFailed(false)}>
+            <Button type="button" variant="outline" onClick={() => setFailedSource(undefined)}>
               Reintentar
             </Button>
           ) : null}
@@ -68,7 +78,7 @@ export function DocumentFilePreview({
       );
     }
 
-    return <DocumentPdfPreview key={src} src={src} name={name} expanded={expanded} onError={onPreviewError} />;
+    return <DocumentPdfPreview src={src} name={name} expanded={expanded} onError={onPreviewError} />;
   }
 
   return (
@@ -132,9 +142,7 @@ export function DocumentFilePreview({
             <div className="flex flex-wrap items-center gap-2">
               <DialogTitle className="leading-snug">Vista previa</DialogTitle>
               {isImage || isPdf ? (
-                <span className="text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-wide">
-                  {isPdf ? "PDF" : contentType === "image/png" ? "PNG" : "JPG"}
-                </span>
+                <span className="text-muted-foreground rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-wide">{formatLabel}</span>
               ) : null}
             </div>
             <DialogDescription className="line-clamp-2 break-all" title={name}>
@@ -158,4 +166,15 @@ export function DocumentFilePreview({
       </DialogContent>
     </Dialog>
   );
+}
+
+function getFormatLabel(contentType: string): string {
+  switch (contentType) {
+    case "application/pdf":
+      return "PDF";
+    case "image/png":
+      return "PNG";
+    default:
+      return "JPG";
+  }
 }

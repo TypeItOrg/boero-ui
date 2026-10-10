@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactElement } from "react";
+
 import { ImageIcon, Undo2Icon } from "lucide-react";
 
 import { SectionHeader } from "@common/components/section-header";
@@ -8,9 +9,10 @@ import { Button } from "@common/components/ui/button";
 import { FieldError } from "@common/components/ui/field";
 import { FileDropzone, rejectFileDragOutside } from "@common/components/ui/file-dropzone";
 import { FileUploadSelection } from "@common/components/ui/file-upload-selection";
+
 import { InstitutionLogoImage } from "@features/institutions/components/institution-logo-manager";
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
-import { INSTITUTION_LOGO_MIME_TYPES } from "@features/institutions/constants/institution-logo.constants";
+import { INSTITUTION_LOGO_INTENT, INSTITUTION_LOGO_MIME_TYPES } from "@features/institutions/constants/institution-logo.constants";
 import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
 import { getInstitutionLogoFileError } from "@features/institutions/utils/institution-logo-form.util";
 import { getInstitutionLogoUrl } from "@features/institutions/utils/institution-logo-url.util";
@@ -35,14 +37,32 @@ export function InstitutionLogoField({
   onError,
   error,
   disabled = false,
-}: InstitutionLogoFieldProps): React.ReactElement {
+}: InstitutionLogoFieldProps): ReactElement {
   const id = useId();
+
   const selectRef = useRef<HTMLButtonElement>(null);
+
   const [preview, setPreview] = useState<string>();
+
+  const [errorDismissed, setErrorDismissed] = useState(false);
+
+  const [undoRequested, setUndoRequested] = useState(false);
+
   const currentUrl = getInstitutionLogoUrl(institutionId, logoUrl);
-  const selectedFile = value.intent === "replace" ? value.file : undefined;
-  const displayUrl = selectedFile ? preview : value.intent === "keep" ? currentUrl : undefined;
-  const hasLogo = Boolean(selectedFile || (value.intent === "keep" && currentUrl));
+
+  const selectedFile = value.intent === INSTITUTION_LOGO_INTENT.REPLACE ? value.file : undefined;
+
+  const keptLogoUrl = value.intent === INSTITUTION_LOGO_INTENT.KEEP ? currentUrl : undefined;
+
+  let displayUrl = keptLogoUrl;
+
+  if (undoRequested) {
+    displayUrl = currentUrl ?? logoUrl ?? undefined;
+  } else if (selectedFile) {
+    displayUrl = preview;
+  }
+
+  const hasLogo = Boolean(displayUrl);
 
   useEffect(() => {
     return () => {
@@ -61,31 +81,42 @@ export function InstitutionLogoField({
       if (!silent) {
         onError(INSTITUTION_ERROR_MESSAGES.LOGO_SINGLE_FILE);
       }
+
       return;
     }
 
     const file = files[0];
+
     const fileError = getInstitutionLogoFileError(file);
+
     if (fileError) {
       if (!silent) {
         onError(fileError);
       }
+
       return;
     }
 
     setPreview(URL.createObjectURL(file));
-    onChange({ intent: "replace", file });
+    setErrorDismissed(false);
+    setUndoRequested(false);
+    onChange({ intent: INSTITUTION_LOGO_INTENT.REPLACE, file });
   }
 
   function removeSelection(): void {
     setPreview(undefined);
-    onChange({ intent: currentUrl ? "remove" : "keep" });
+    onChange({
+      intent: currentUrl ? INSTITUTION_LOGO_INTENT.REMOVE : INSTITUTION_LOGO_INTENT.KEEP,
+    });
     selectRef.current?.focus();
   }
 
   function undoChange(): void {
     setPreview(undefined);
-    onChange({ intent: "keep" });
+    setErrorDismissed(true);
+    setUndoRequested(true);
+    onError("");
+    onChange({ intent: INSTITUTION_LOGO_INTENT.KEEP });
     selectRef.current?.focus();
   }
 
@@ -107,6 +138,7 @@ export function InstitutionLogoField({
 
       <div className="mt-5 space-y-3">
         <FileDropzone
+          key={value.intent}
           accept={INSTITUTION_LOGO_MIME_TYPES}
           inputLabel="Imagen del logo"
           selectLabel="Seleccionar imagen del logo"
@@ -115,12 +147,12 @@ export function InstitutionLogoField({
           description="Arrastrá tu logo acá o hacé clic para seleccionar una imagen."
           buttonRef={selectRef}
           disabled={disabled}
-          error={error}
+          error={selectedFile && !errorDismissed && !undoRequested ? error : undefined}
           errorId={`${id}-error`}
           onSelectFiles={selectFiles}
         />
 
-        <FieldError id={`${id}-error`}>{error}</FieldError>
+        {selectedFile && !errorDismissed && !undoRequested ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
 
         {hasLogo ? (
           <FileUploadSelection
@@ -134,7 +166,7 @@ export function InstitutionLogoField({
               displayUrl ? (
                 <InstitutionLogoImage
                   src={displayUrl}
-                  alt={selectedFile ? "Vista previa del nuevo logo" : `Logo de ${institutionName}`}
+                  alt={selectedFile && !undoRequested ? "Vista previa del nuevo logo" : `Logo de ${institutionName}`}
                   className="h-full w-full object-contain"
                   compact
                 />
@@ -145,25 +177,28 @@ export function InstitutionLogoField({
           />
         ) : null}
 
-        {value.intent !== "keep" || error ? (
+        {value.intent !== INSTITUTION_LOGO_INTENT.KEEP || error ? (
           <div aria-live="polite" aria-atomic="true" className="grid min-h-8 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
             {selectedFile ? <span className="sr-only">Imagen seleccionada: {selectedFile.name}.</span> : null}
-            <p className="text-muted-foreground text-sm">
-              {value.intent === "remove"
-                ? "El logo se quitará al guardar los cambios."
-                : value.intent === "replace"
-                  ? "El nuevo logo se aplicará al guardar los cambios."
-                  : null}
-            </p>
-            {value.intent !== "keep" || error ? (
-              <Button type="button" variant="ghost" disabled={disabled} onClick={undoChange}>
-                <Undo2Icon aria-hidden="true" />
-                Deshacer
-              </Button>
-            ) : null}
+            <p className="text-muted-foreground text-sm">{getLogoChangeMessage(value.intent)}</p>
+            <Button type="button" variant="ghost" size="lg" disabled={disabled} onClick={undoChange}>
+              <Undo2Icon aria-hidden="true" />
+              Deshacer
+            </Button>
           </div>
         ) : null}
       </div>
     </section>
   );
+}
+
+function getLogoChangeMessage(intent: InstitutionLogoChange["intent"]): string | null {
+  switch (intent) {
+    case INSTITUTION_LOGO_INTENT.REMOVE:
+      return "El logo se quitará al guardar los cambios.";
+    case INSTITUTION_LOGO_INTENT.REPLACE:
+      return "El nuevo logo se aplicará al guardar los cambios.";
+    default:
+      return null;
+  }
 }

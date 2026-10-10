@@ -4,7 +4,9 @@ describe("http response errors", () => {
   it("parses successful JSON responses", async () => {
     const response = Response.json({ value: "ok" });
 
-    await expect(parseHttpResponse<{ value: string }>(response, "Fallback")).resolves.toEqual({ value: "ok" });
+    await expect(parseHttpResponse<{ value: string }>(response, "Fallback")).resolves.toEqual({
+      value: "ok",
+    });
   });
 
   it("throws an HttpResponseError for unsuccessful responses", async () => {

@@ -1,6 +1,7 @@
-import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
+
 import type { InstitutionalLoginResult } from "@features/institutional-auth/types/institutional-login-result.types";
 import type { InstitutionalPasswordLoginInput } from "@features/institutional-auth/types/institutional-password-login-input.types";
 import type { PasswordLoginInstitutionalOutput } from "@features/institutional-auth/types/password-login-institutional-output.types";
@@ -19,6 +20,7 @@ export async function passwordLoginInstitutionalAccount(
 
     if (!response.ok) {
       const error = (await response.json()) as BackendError;
+
       return { success: false, error };
     }
 

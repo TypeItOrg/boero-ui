@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/guardian-dependents/actions/unlink-guardian-dependent.action", () => ({
-  unlinkGuardianDependentAction: jest.fn(),
-}));
-
 import { unlinkGuardianDependentAction } from "@features/guardian-dependents/actions/unlink-guardian-dependent.action";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
 import { GUARDIAN_DEPENDENT_MESSAGES } from "@features/guardian-dependents/constants/guardian-dependent.constants";
+
+jest.mock("@features/guardian-dependents/actions/unlink-guardian-dependent.action", () => ({
+  unlinkGuardianDependentAction: jest.fn(),
+}));
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 const DEPENDENT_ID = "019f9c3a-f891-7bc5-a98d-e65332998002";

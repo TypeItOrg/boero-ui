@@ -1,10 +1,5 @@
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
-import {
-  DEFAULT_ACADEMIC_YEAR_SORT,
-  DEFAULT_TRAINING_PATH_SORT,
-  getAcademicRegistrationSummary,
-  parseAcademicPaginationParams,
-} from "@features/academic/utils/academic-pagination.util";
+import { getAcademicRegistrationSummary, parseAcademicPaginationParams } from "@features/academic/utils/academic-pagination.util";
 
 describe("parseAcademicPaginationParams", () => {
   it("parses the academic table filters independently", () => {
@@ -77,20 +72,21 @@ describe("parseAcademicPaginationParams", () => {
         sortDirection: "asc",
         sortField: "status",
       }).sort,
-    ).toEqual(DEFAULT_ACADEMIC_YEAR_SORT);
+    ).toEqual({ field: "year", direction: "asc" });
   });
 
   it("defaults training path sorting to name ascending", () => {
-    expect(parseAcademicPaginationParams({}, AcademicResource.TRAINING_PATH).sort).toEqual(DEFAULT_TRAINING_PATH_SORT);
+    expect(parseAcademicPaginationParams({}, AcademicResource.TRAINING_PATH).sort).toEqual({ field: "name", direction: "asc" });
 
     expect(parseAcademicPaginationParams({ sortDirection: "desc", sortField: "name" }, AcademicResource.TRAINING_PATH).sort).toEqual({
       field: "name",
       direction: "desc",
     });
 
-    expect(parseAcademicPaginationParams({ sortDirection: "asc", sortField: "year" }, AcademicResource.TRAINING_PATH).sort).toEqual(
-      DEFAULT_TRAINING_PATH_SORT,
-    );
+    expect(parseAcademicPaginationParams({ sortDirection: "asc", sortField: "year" }, AcademicResource.TRAINING_PATH).sort).toEqual({
+      field: "name",
+      direction: "asc",
+    });
   });
 
   it("uses singular and plural agreement in the registration summary", () => {

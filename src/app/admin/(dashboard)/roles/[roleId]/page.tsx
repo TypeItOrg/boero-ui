@@ -1,17 +1,21 @@
-import { notFound } from "next/navigation";
+import type { ReactElement, ReactNode } from "react";
+
 import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import { KeyRoundIcon, ShieldCheckIcon, UsersIcon, type LucideIcon } from "lucide-react";
 
+import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { cn } from "@common/utils/cn.util";
 import type { QueryParamValue } from "@common/types/query-param.types";
+import { cn } from "@common/utils/cn.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
-import { ReturnToLink } from "@common/components/navigation/return-to-link";
+
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { InstitutionRolePermissions } from "@features/roles/components/institution-role-permissions";
 import { PlatformRoleDeleteButton } from "@features/roles/components/platform-role-delete-button";
 import { fetchPlatformPermissionGroups, fetchPlatformRole } from "@features/roles/services/platform-role.service";
@@ -24,11 +28,16 @@ export default async function PlatformRoleDetailPage({
 }: {
   params: Promise<{ roleId: string }>;
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const [{ roleId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/roles");
+
   const [role, permissionGroups] = await Promise.all([fetchPlatformRole(roleId), fetchPlatformPermissionGroups()]);
-  if (!role) notFound();
+
+  if (!role) {
+    notFound();
+  }
 
   return (
     <PlatformPageShell
@@ -102,10 +111,10 @@ function RoleSummaryCard({
 }: {
   icon: LucideIcon;
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
   title?: string;
   className?: string;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <Card className={cn("bg-muted/25", className)}>
       <CardHeader className="flex-row items-center gap-3">

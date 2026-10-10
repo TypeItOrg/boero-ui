@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useState, useTransition, type MouseEvent, type ReactElement } from "react";
+
 import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -15,9 +16,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
-import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { safelyRunAction } from "@common/utils/safe-action.util";
+
 import { deletePersonAction } from "@features/people/actions/delete-person.action";
+import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PersonDeleteDialogProps = {
@@ -27,7 +29,7 @@ type PersonDeleteDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDeleted: () => void;
-  trigger?: React.ReactElement;
+  trigger?: ReactElement;
   scope?: PeopleScopeType;
 };
 
@@ -40,21 +42,30 @@ export function PersonDeleteDialog({
   onDeleted,
   trigger,
   scope = PeopleScope.ADMIN,
-}: PersonDeleteDialogProps): React.ReactElement {
-  const [isPending, startTransition] = React.useTransition();
-  const [isNavigating, startNavigation] = React.useTransition();
-  const [error, setError] = React.useState<string>();
+}: PersonDeleteDialogProps): ReactElement {
+  const [isPending, startTransition] = useTransition();
+
+  const [isNavigating, startNavigation] = useTransition();
+
+  const [error, setError] = useState<string>();
+
   const buttonSize = PeopleScope.isInstitutional(scope) ? "lg" : "default";
+
   const isBusy = isPending || isNavigating;
 
   function handleOpenChange(nextOpen: boolean): void {
-    if (isBusy && !nextOpen) return;
-    if (!nextOpen) setError(undefined);
+    if (isBusy && !nextOpen) {
+      return;
+    }
+
+    if (!nextOpen) {
+      setError(undefined);
+    }
 
     onOpenChange(nextOpen);
   }
 
-  function handleDelete(event: React.MouseEvent<HTMLButtonElement>): void {
+  function handleDelete(event: MouseEvent<HTMLButtonElement>): void {
     event.preventDefault();
     setError(undefined);
 
@@ -63,6 +74,7 @@ export function PersonDeleteDialog({
 
       if (!result.success) {
         setError(result.error ?? PEOPLE_ERROR_MESSAGES.DELETE_FALLBACK);
+
         return;
       }
 

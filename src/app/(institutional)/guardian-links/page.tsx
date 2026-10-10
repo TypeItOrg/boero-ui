@@ -1,4 +1,7 @@
+/* eslint-disable no-restricted-syntax */
+
 import type { Metadata } from "next";
+
 import { UsersIcon } from "lucide-react";
 
 import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";

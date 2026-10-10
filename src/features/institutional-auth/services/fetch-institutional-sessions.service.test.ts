@@ -1,4 +1,5 @@
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import type { ActiveSession } from "@features/institutional-auth/types/active-session.types";
 
 const SESSIONS_PAGE: PaginatedResponse<ActiveSession> = {

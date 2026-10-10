@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactElement, ReactNode } from "react";
+
 import { XIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -21,15 +23,15 @@ export function FileUploadSelection({
   label: string;
   name: string;
   file?: File;
-  preview?: React.ReactNode;
-  previewAction?: React.ReactNode;
-  secondaryActions?: React.ReactNode;
-  primaryAction?: React.ReactNode;
+  preview?: ReactNode;
+  previewAction?: ReactNode;
+  secondaryActions?: ReactNode;
+  primaryAction?: ReactNode;
   statusLabel?: string;
   removeLabel?: string;
   disabled?: boolean;
   onRemove?: () => void;
-}): React.ReactElement {
+}): ReactElement {
   const hasAdministrativeActions = secondaryActions !== undefined || primaryAction !== undefined;
 
   return (
@@ -98,6 +100,7 @@ function formatFileSize(bytes: number): string {
   }
 
   const inMebibytes = bytes >= 1024 * 1024;
+
   const amount = bytes / (inMebibytes ? 1024 * 1024 : 1024);
 
   return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(amount)} ${inMebibytes ? "MB" : "KB"}`;

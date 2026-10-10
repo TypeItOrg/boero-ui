@@ -1,9 +1,13 @@
+import type { ReactElement, ReactNode } from "react";
+
 import Link from "next/link";
-import { ENROLLMENT_APPLICATION_FILTER_MESSAGES } from "@features/enrollment-applications/constants/enrollment-application.constants";
+
 import { ClipboardListIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
+
+import { ENROLLMENT_APPLICATION_FILTER_MESSAGES } from "@features/enrollment-applications/constants/enrollment-application.constants";
 
 type EnrollmentApplicationEmptyStateProps = {
   hasFilter: boolean;
@@ -12,13 +16,8 @@ type EnrollmentApplicationEmptyStateProps = {
   totalItems: number;
 };
 
-export function EnrollmentApplicationEmptyState({
-  hasFilter,
-  isNavigating,
-  size,
-  totalItems,
-}: EnrollmentApplicationEmptyStateProps): React.ReactElement {
-  let content: React.ReactNode;
+export function EnrollmentApplicationEmptyState({ hasFilter, isNavigating, size, totalItems }: EnrollmentApplicationEmptyStateProps): ReactElement {
+  let content: ReactNode;
 
   if (totalItems > 0) {
     content = (

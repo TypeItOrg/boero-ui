@@ -18,25 +18,33 @@ export function getAcademicRowActions(
   canReadWaitlist = false,
 ): readonly AcademicRowAction[] {
   const detailHref = `${basePath}/${resource}/${row.id}`;
+
   const lifecycle = getAcademicLifecycleCapabilities(resource, row, {
     delete: canDelete,
     restore: canRestore,
   });
+
   if (lifecycle.isDeleted) {
     return lifecycle.canRestore ? [{ kind: ACADEMIC_ROW_ACTION_KIND.RESTORE, label: "Restaurar" }] : [];
   }
+
   if (resource === AcademicResource.ACADEMIC_YEAR) {
-    if ((!canUpdate && !canChangeStatus && !lifecycle.canDelete) || !row.statusValue) return [];
+    if ((!canUpdate && !canChangeStatus && !lifecycle.canDelete) || !row.statusValue) {
+      return [];
+    }
 
     const actions: AcademicRowAction[] = [];
+
     if (row.statusValue === "PLANNED") {
-      if (canUpdate)
+      if (canUpdate) {
         actions.push({
           href: `${detailHref}/edit`,
           kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE,
           label: "Editar",
           preserveReturnTo: true,
         });
+      }
+
       if (canChangeStatus) {
         actions.push({
           kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
@@ -54,12 +62,16 @@ export function getAcademicRowActions(
       });
     }
 
-    if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    if (lifecycle.canDelete) {
+      actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    }
+
     return actions;
   }
 
   if (resource === AcademicResource.STUDY_PLAN) {
     const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
+
     if (canUpdate && row.statusValue === "DRAFT") {
       actions.push({
         href: `${detailHref}/edit`,
@@ -68,6 +80,7 @@ export function getAcademicRowActions(
         preserveReturnTo: true,
       });
     }
+
     if (canChangeStatus && row.statusValue === "DRAFT") {
       actions.push({
         kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
@@ -76,6 +89,7 @@ export function getAcademicRowActions(
         targetStatus: "ACTIVE",
       });
     }
+
     if (canChangeStatus && row.statusValue === "ACTIVE") {
       actions.push({
         kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
@@ -84,6 +98,7 @@ export function getAcademicRowActions(
         targetStatus: "INACTIVE",
       });
     }
+
     if (canCreateVersion && (row.statusValue === "ACTIVE" || row.statusValue === "INACTIVE")) {
       actions.push({
         href: `${detailHref}/versions/new`,
@@ -92,12 +107,17 @@ export function getAcademicRowActions(
         preserveReturnTo: true,
       });
     }
-    if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+
+    if (lifecycle.canDelete) {
+      actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    }
+
     return actions;
   }
 
   if (resource === AcademicResource.COURSE) {
     const waitlistInstitutionId = row.institutionId ?? basePath.split("/")[3];
+
     const waitlistActions: AcademicRowAction[] =
       canReadWaitlist && (!basePath.startsWith("/admin") || waitlistInstitutionId)
         ? [
@@ -110,19 +130,26 @@ export function getAcademicRowActions(
             },
           ]
         : [];
+
     const status = (row.statusValue as string) ?? (row.active ? "ACTIVE" : "INACTIVE");
+
     if (status === "CLOSED") {
       return [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }, ...waitlistActions];
     }
+
     const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
+
     actions.push(...waitlistActions);
-    if (canUpdate)
+
+    if (canUpdate) {
       actions.push({
         href: `${detailHref}/edit`,
         kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE,
         label: "Editar",
         preserveReturnTo: true,
       });
+    }
+
     if (canChangeStatus) {
       actions.push({
         kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
@@ -137,19 +164,26 @@ export function getAcademicRowActions(
         targetStatus: "CLOSED",
       });
     }
-    if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+
+    if (lifecycle.canDelete) {
+      actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    }
+
     return actions;
   }
 
   if (isActiveStatusResource(resource)) {
     const actions: AcademicRowAction[] = [{ href: detailHref, kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE, label: "Ver detalle" }];
-    if (canUpdate)
+
+    if (canUpdate) {
       actions.push({
         href: `${detailHref}/edit`,
         kind: ACADEMIC_ROW_ACTION_KIND.NAVIGATE,
         label: "Editar",
         preserveReturnTo: true,
       });
+    }
+
     if (canChangeStatus) {
       actions.push({
         kind: ACADEMIC_ROW_ACTION_KIND.STATUS,
@@ -158,7 +192,11 @@ export function getAcademicRowActions(
         targetStatus: row.active ? "INACTIVE" : "ACTIVE",
       });
     }
-    if (lifecycle.canDelete) actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+
+    if (lifecycle.canDelete) {
+      actions.push({ kind: ACADEMIC_ROW_ACTION_KIND.DELETE, label: "Eliminar" });
+    }
+
     return actions;
   }
 

@@ -1,18 +1,18 @@
 "use server";
 
-import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
-
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 
+import { validateRequestInstitutionId } from "@common/services/institutional-host/institutional-host.service";
 import { getFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { emailVerificationContextSchema } from "@features/institutional-auth/schemas/email-verification.schema";
 import { institutionalIdentifySchema } from "@features/institutional-auth/schemas/institutional-identify.schema";
 import { identifyInstitutionalAccount } from "@features/institutional-auth/services/identify-institutional.service";
 import type { InstitutionalIdentifyActionState } from "@features/institutional-auth/types/institutional-identify-state.types";
 import { INSTITUTIONAL_IDENTIFY_FIELD_NAMES } from "@features/institutional-auth/types/institutional-identify-state.types";
+import { setEmailVerificationContext } from "@features/institutional-auth/utils/email-verification-context.util";
 
 export async function identifyInstitutionalUser(
   _previousState: InstitutionalIdentifyActionState,
@@ -28,6 +28,7 @@ export async function identifyInstitutionalUser(
   }
 
   const contextError = await validateRequestInstitutionId(parsed.data.institutionId);
+
   if (contextError) {
     return { error: contextError };
   }
@@ -47,8 +48,10 @@ export async function identifyInstitutionalUser(
       ...parsed.data,
       institutionName: formData.get("institutionName") || undefined,
     });
+
     await setEmailVerificationContext(context.success ? context.data : parsed.data);
     redirect("/auth/email-verification");
   }
+
   return { loginAttemptId: output.data.loginAttemptId, nextStep: output.data.nextStep };
 }

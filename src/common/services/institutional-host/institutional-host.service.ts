@@ -1,15 +1,18 @@
+import { cache } from "react";
+
 import "server-only";
 
-import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+import { classifyInstitutionalHost } from "@common/services/institutional-host/classify-institutional-host.util";
+import { InstitutionalHostError } from "@common/services/institutional-host/institutional-host-error";
+import { InstitutionalHostKind } from "@common/services/institutional-host/institutional-host-kind.types";
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
 import { isValidUuid } from "@common/utils/uuid.util";
-import { classifyInstitutionalHost } from "@common/services/institutional-host/classify-institutional-host.util";
-import { InstitutionalHostKind } from "@common/services/institutional-host/institutional-host-kind.types";
-import { InstitutionalHostError } from "@common/services/institutional-host/institutional-host-error";
-import type { PublicInstitution } from "@features/institutions/types/public-institution.types";
+
 import { INSTITUTIONAL_LOGIN_PATH } from "@features/institutional-auth/utils/institutional-auth-proxy-policy.util";
+import type { PublicInstitution } from "@features/institutions/types/public-institution.types";
 
 export const INSTITUTIONAL_HOST_HEADER = "X-Institutional-Host";
 
@@ -25,7 +28,9 @@ export function requireGenericPlatformHost(requestHeaders: Pick<Headers, "get">)
 
 export function rebuildInstitutionalHostHeader(outgoing: Headers, requestHeaders: Pick<Headers, "get">): void {
   outgoing.delete(INSTITUTIONAL_HOST_HEADER);
+
   const context = classifyInstitutionalHost(requestHeaders.get("host"));
+
   if (context.kind === InstitutionalHostKind.INVALID) {
     throw new InstitutionalHostError(404);
   }
@@ -41,6 +46,7 @@ export const getRequestInstitution = cache(async (): Promise<PublicInstitution |
 
 export async function resolveRequestInstitution(requestHeaders: Pick<Headers, "get">): Promise<PublicInstitution | undefined> {
   const context = classifyInstitutionalHost(requestHeaders.get("host"));
+
   if (context.kind === InstitutionalHostKind.INVALID) {
     throw new InstitutionalHostError(404);
   }
@@ -50,6 +56,7 @@ export async function resolveRequestInstitution(requestHeaders: Pick<Headers, "g
   }
 
   let response: Response;
+
   try {
     response = await fetch(new URL(`/api/v1/institutions/by-subdomain/${context.publicSubdomain}`, getApiUrlOrThrow()), {
       headers: { Accept: "application/json", [INSTITUTIONAL_HOST_HEADER]: context.hostname },
@@ -70,6 +77,7 @@ export async function resolveRequestInstitution(requestHeaders: Pick<Headers, "g
 
   try {
     const institution = (await response.json()) as PublicInstitution;
+
     if (
       !isValidUuid(institution.id) ||
       typeof institution.name !== "string" ||
@@ -79,7 +87,13 @@ export async function resolveRequestInstitution(requestHeaders: Pick<Headers, "g
     ) {
       throw new Error("Invalid institution payload");
     }
-    return { id: institution.id, name: institution.name, publicSubdomain: institution.publicSubdomain, logoUrl: institution.logoUrl };
+
+    return {
+      id: institution.id,
+      name: institution.name,
+      publicSubdomain: institution.publicSubdomain,
+      logoUrl: institution.logoUrl,
+    };
   } catch {
     throw new InstitutionalHostError(503);
   }
@@ -88,9 +102,11 @@ export async function resolveRequestInstitution(requestHeaders: Pick<Headers, "g
 export async function validateRequestInstitutionId(institutionId: string): Promise<string | undefined> {
   try {
     const institution = await getRequestInstitution();
+
     if (institution && institution.id !== institutionId) {
       return "La institución no corresponde a este acceso.";
     }
+
     return undefined;
   } catch (error) {
     return error instanceof InstitutionalHostError ? error.message : "No se pudo validar la institución. Intentá nuevamente.";

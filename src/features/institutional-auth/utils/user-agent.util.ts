@@ -23,9 +23,12 @@ const PLATFORM_PATTERNS: readonly [RegExp, string][] = [
 ];
 
 export function parseUserAgent(userAgent: string): ParsedUserAgent {
-  if (!userAgent.trim()) return { browser: UNKNOWN_LABEL, platform: UNKNOWN_LABEL };
+  if (!userAgent.trim()) {
+    return { browser: UNKNOWN_LABEL, platform: UNKNOWN_LABEL };
+  }
 
   const browser = BROWSER_PATTERNS.find(([pattern]) => pattern.test(userAgent))?.[1] ?? UNKNOWN_LABEL;
+
   const platform = PLATFORM_PATTERNS.find(([pattern]) => pattern.test(userAgent))?.[1] ?? UNKNOWN_LABEL;
 
   return { browser, platform };
@@ -33,7 +36,10 @@ export function parseUserAgent(userAgent: string): ParsedUserAgent {
 
 export function formatUserAgentLabel(userAgent: string): string {
   const { browser, platform } = parseUserAgent(userAgent);
-  if (browser === UNKNOWN_LABEL && platform === UNKNOWN_LABEL) return UNKNOWN_LABEL;
+
+  if (browser === UNKNOWN_LABEL && platform === UNKNOWN_LABEL) {
+    return UNKNOWN_LABEL;
+  }
 
   return `${browser} · ${platform}`;
 }

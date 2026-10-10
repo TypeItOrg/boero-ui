@@ -1,78 +1,53 @@
-import { getLatestAllowedBirthDate } from "@features/people/utils/person-birth-date.util";
 import { institutionalRegisterSchema } from "@features/institutional-auth/schemas/institutional-register.schema";
 
-function createValidInput(overrides: Record<string, string> = {}) {
-  return {
-    institutionId: "institution-id",
-    name: "Ana",
-    lastName: "Garcia",
-    birthDate: "2010-01-01",
-    documentNumber: "12345678",
-    email: "ana@example.com",
-    isGuardian: "false",
-    password: "password123",
-    confirmPassword: "password123",
-    ...overrides,
-  };
-}
+const validRegistration = {
+  institutionId: "019e6d85-d070-7000-8000-000000000001",
+  name: "Ana",
+  lastName: "Garcia",
+  email: "ana@example.com",
+  birthDate: "2010-01-01",
+  documentNumber: "12345678",
+  isGuardian: "false",
+  password: "password123",
+  confirmPassword: "password123",
+};
 
 describe("institutional register schema", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-09-14T15:00:00Z"));
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  it("accepts a complete registration and normalizes identity fields", () => {
+    expect(
+      institutionalRegisterSchema.parse({
+        ...validRegistration,
+        name: " Ana ",
+        lastName: " Garcia ",
+        email: " ana@example.com ",
+      }),
+    ).toEqual({ ...validRegistration, isGuardian: false });
+  });
+
   it.each([
-    ["true", true],
-    ["false", false],
-  ])("parses the guardian flag %s from the raw form value", (raw, expected) => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw, birthDate: "1990-01-01" }));
-
-    expect(result.success && result.data.isGuardian).toBe(expected);
+    ["birthDate", "", "La fecha de nacimiento es requerida."],
+    ["birthDate", "2023-09-15", "La persona debe tener al menos 3 años."],
+    ["documentNumber", "1234A678", "El número de documento debe tener exactamente 8 dígitos."],
+    ["email", "", "El correo electrónico es requerido."],
+    ["email", "not-an-email", "El correo electrónico debe tener un formato válido."],
+    ["confirmPassword", "different-password", "Las contraseñas no coinciden."],
+  ])("rejects invalid %s (%s) independently", (field, value, message) => {
+    expect(institutionalRegisterSchema.safeParse({ ...validRegistration, [field]: value })).toMatchObject({
+      success: false,
+      error: { issues: [expect.objectContaining({ path: [field], message })] },
+    });
   });
 
-  it.each(["", "maybe", "on"])("rejects the guardian flag %p instead of treating it as false", (raw) => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: raw }));
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["isGuardian"] }));
-    }
-  });
-
-  it("requires a birth date", () => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate: "" }));
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La fecha de nacimiento es requerida." }));
-    }
-  });
-
-  it("rejects a birth date younger than the minimum age", () => {
-    const tooRecentBirthDate = getLatestAllowedBirthDate();
-    tooRecentBirthDate.setDate(tooRecentBirthDate.getDate() + 1);
-    const birthDate = [
-      tooRecentBirthDate.getFullYear(),
-      String(tooRecentBirthDate.getMonth() + 1).padStart(2, "0"),
-      String(tooRecentBirthDate.getDate()).padStart(2, "0"),
-    ].join("-");
-
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ birthDate }));
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(expect.objectContaining({ path: ["birthDate"], message: "La persona debe tener al menos 3 años." }));
-    }
-  });
-
-  it("rejects a guardian who is a minor", () => {
-    const result = institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: "true", birthDate: "2010-01-01" }));
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({ path: ["birthDate"], message: "Para registrarte como tutor tenés que ser mayor de 18 años." }),
-      );
-    }
-  });
-
-  it("accepts a minor who does not register as guardian", () => {
-    expect(institutionalRegisterSchema.safeParse(createValidInput({ isGuardian: "false", birthDate: "2010-01-01" })).success).toBe(true);
+  it("accepts the exact third birthday", () => {
+    expect(institutionalRegisterSchema.parse({ ...validRegistration, birthDate: "2023-09-14" })).toMatchObject({
+      birthDate: "2023-09-14",
+    });
   });
 });

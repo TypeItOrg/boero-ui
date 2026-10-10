@@ -15,12 +15,16 @@ export async function authorizeAcademicAction(
   try {
     if (AcademicScope.isAdmin(scope)) {
       await requirePlatformAccount();
+
       return undefined;
     }
 
     const user = await requireInstitutionalUser();
+
     const belongsToInstitution = user.institutionId === institutionId;
+
     const hasPermission = hasInstitutionalPermission(user, permission);
+
     if (belongsToInstitution && hasPermission) {
       return undefined;
     }
@@ -29,6 +33,8 @@ export async function authorizeAcademicAction(
   } catch (error) {
     unstable_rethrow(error);
 
-    return { error: "No se pudo verificar tu sesión. Tus datos siguen en el formulario. Intentá nuevamente cuando se restablezca la conexión." };
+    return {
+      error: "No se pudo verificar tu sesión. Tus datos siguen en el formulario. Intentá nuevamente cuando se restablezca la conexión.",
+    };
   }
 }

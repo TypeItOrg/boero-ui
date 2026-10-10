@@ -1,18 +1,21 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef, useState, type SyntheticEvent } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState, type ReactElement, type SyntheticEvent } from "react";
+
 import { Loader2Icon } from "lucide-react";
+
 import { Button } from "@common/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@common/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+
 import { requestPasskeyRegistration, verifyPasskeyRegistrationAction } from "@features/institutional-auth/actions/passkey-registration.actions";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { RECENT_AUTH_REQUIRED } from "@features/institutional-auth/constants/passkey.constants";
 import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webauthn-support.hook";
 import type { VerifyPasskeyRegistrationState } from "@features/institutional-auth/types/verify-passkey-registration-state.types";
-import { createPasskeyCredential, toPublicKeyCreationOptions } from "@features/institutional-auth/utils/passkey-registration.util";
 import { isUserCancelled } from "@features/institutional-auth/utils/passkey-authentication.util";
+import { createPasskeyCredential, toPublicKeyCreationOptions } from "@features/institutional-auth/utils/passkey-registration.util";
 
 type PasskeyRegistrationDialogProps = {
   initialLabel: string;
@@ -21,10 +24,13 @@ type PasskeyRegistrationDialogProps = {
   onRequireReauth: (label: string) => void;
 };
 
-export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, onRequireReauth }: PasskeyRegistrationDialogProps): React.ReactElement {
+export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, onRequireReauth }: PasskeyRegistrationDialogProps): ReactElement {
   const ceremonyRef = useRef<AbortController | null>(null);
+
   const [verifying, setVerifying] = useState(false);
+
   const webauthnSupported = useWebAuthnSupport();
+
   const [state, action, isPending] = useActionState<VerifyPasskeyRegistrationState, FormData>(register, {});
 
   // WebAuthn is external to React: dismiss its prompt when this dialog unmounts.
@@ -37,37 +43,70 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
 
   async function register(_previous: VerifyPasskeyRegistrationState, formData: FormData): Promise<VerifyPasskeyRegistrationState> {
     const label = String(formData.get("label") ?? "").trim();
-    if (!webauthnSupported) return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_UNSUPPORTED };
+
+    if (!webauthnSupported) {
+      return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_UNSUPPORTED };
+    }
+
     const controller = new AbortController();
+
     ceremonyRef.current = controller;
 
     try {
       const options = await requestPasskeyRegistration({}, formData);
-      if (controller.signal.aborted) return {};
-      if (options.fieldErrors?.label) return { error: options.fieldErrors.label };
-      if (options.error === RECENT_AUTH_REQUIRED) {
-        onRequireReauth(label);
+
+      if (controller.signal.aborted) {
         return {};
       }
+
+      if (options.fieldErrors?.label) {
+        return { error: options.fieldErrors.label };
+      }
+
+      if (options.error === RECENT_AUTH_REQUIRED) {
+        onRequireReauth(label);
+
+        return {};
+      }
+
       if (options.error || !options.ceremonyId || !options.options) {
-        return { error: options.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_START_FAILED };
+        return {
+          error: options.error ?? INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_START_FAILED,
+        };
       }
 
       const credential = await createPasskeyCredential(toPublicKeyCreationOptions(options.options), controller.signal);
-      if (controller.signal.aborted) return {};
 
-      setVerifying(true);
-      const result = await verifyPasskeyRegistrationAction(options.ceremonyId, credential);
-      if (controller.signal.aborted) return {};
-      if (result.error === RECENT_AUTH_REQUIRED) {
-        onRequireReauth(label);
+      if (controller.signal.aborted) {
         return {};
       }
-      if (result.error) return result;
+
+      setVerifying(true);
+
+      const result = await verifyPasskeyRegistrationAction(options.ceremonyId, credential);
+
+      if (controller.signal.aborted) {
+        return {};
+      }
+
+      if (result.error === RECENT_AUTH_REQUIRED) {
+        onRequireReauth(label);
+
+        return {};
+      }
+
+      if (result.error) {
+        return result;
+      }
+
       onSuccess();
+
       return {};
     } catch (error) {
-      if (controller.signal.aborted || isUserCancelled(error)) return {};
+      if (controller.signal.aborted || isUserCancelled(error)) {
+        return {};
+      }
+
       return { error: INSTITUTIONAL_AUTH_ERROR_MESSAGES.PASSKEY_REGISTRATION_FAILED };
     } finally {
       if (ceremonyRef.current === controller) {
@@ -79,13 +118,21 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {
     event.preventDefault();
-    if (isPending) return;
+
+    if (isPending) {
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
+
     startTransition(() => action(formData));
   }
 
   function close(): void {
-    if (verifying) return;
+    if (verifying) {
+      return;
+    }
+
     ceremonyRef.current?.abort();
     onClose();
   }
@@ -94,7 +141,9 @@ export function PasskeyRegistrationDialog({ initialLabel, onClose, onSuccess, on
     <Dialog
       open
       onOpenChange={(open) => {
-        if (!open) close();
+        if (!open) {
+          close();
+        }
       }}
     >
       <DialogContent>

@@ -1,13 +1,13 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@features/guardian-links/actions/resolve-guardian-link.action", () => ({
-  resolveGuardianLinkAction: jest.fn(),
-}));
-
 import { resolveGuardianLinkAction } from "@features/guardian-links/actions/resolve-guardian-link.action";
 import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";
 import type { GuardianLinkRequest } from "@features/guardian-links/types/guardian-link-request.types";
+
+jest.mock("@features/guardian-links/actions/resolve-guardian-link.action", () => ({
+  resolveGuardianLinkAction: jest.fn(),
+}));
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 

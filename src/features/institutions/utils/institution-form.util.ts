@@ -1,12 +1,14 @@
+import type { ComponentProps } from "react";
+
 import type { UseFormSetError } from "react-hook-form";
 
-import type { LocationPicker } from "@features/locations/components/location-picker";
 import type { InstitutionFormInput } from "@features/institutions/schemas/institution-form.schema";
-import type { Institution } from "@features/institutions/types/institution.types";
 import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
 import type { InstitutionFormFieldName } from "@features/institutions/types/institution-form-field-name.types";
+import type { Institution } from "@features/institutions/types/institution.types";
+import type { LocationPicker } from "@features/locations/components/location-picker";
 
-export type InitialLocation = React.ComponentProps<typeof LocationPicker>["initialLocation"];
+export type InitialLocation = ComponentProps<typeof LocationPicker>["initialLocation"];
 
 export const EMPTY_FORM_VALUES: InstitutionFormInput = {
   name: "",
@@ -21,7 +23,9 @@ export const EMPTY_FORM_VALUES: InstitutionFormInput = {
 };
 
 export function getDefaultValues(institution: Institution | undefined): InstitutionFormInput {
-  if (!institution) return EMPTY_FORM_VALUES;
+  if (!institution) {
+    return EMPTY_FORM_VALUES;
+  }
 
   return {
     name: institution.name,
@@ -37,7 +41,9 @@ export function getDefaultValues(institution: Institution | undefined): Institut
 }
 
 export function getInitialLocation(institution: Institution | undefined): InitialLocation {
-  if (!institution) return undefined;
+  if (!institution) {
+    return undefined;
+  }
 
   return {
     country: {
@@ -59,14 +65,20 @@ export function getInitialLocation(institution: Institution | undefined): Initia
 }
 
 export function getSubmitLabel({ isEdit, isPending }: { isEdit: boolean; isPending: boolean }): string {
-  if (isPending) return isEdit ? "Guardando..." : "Creando...";
+  if (isPending) {
+    return isEdit ? "Guardando..." : "Creando...";
+  }
+
   return isEdit ? "Guardar cambios" : "Crear institución";
 }
 
 export function setActionFieldErrors(result: InstitutionActionState, setError: UseFormSetError<InstitutionFormInput>): boolean {
-  if (!result.fieldErrors) return false;
+  if (!result.fieldErrors) {
+    return false;
+  }
 
   let hasFieldErrors = false;
+
   for (const [field, message] of Object.entries(result.fieldErrors)) {
     if (message) {
       setError(field as InstitutionFormFieldName, { message });

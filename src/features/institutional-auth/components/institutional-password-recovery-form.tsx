@@ -1,27 +1,30 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, useState, type ReactElement } from "react";
 
-import { useActionState, useState } from "react";
-import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import Link from "next/link";
+
 import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { cn } from "@common/utils/cn.util";
+
 import { requestPasswordRecovery } from "@features/institutional-auth/actions/request-institutional-password-recovery.action";
 import { type InstitutionalInstitution } from "@features/institutional-auth/components/institution-picker";
+import { InstitutionalAuthInstitutionField } from "@features/institutional-auth/components/institutional-auth-institution-field";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import type { PasswordRecoveryActionState } from "@features/institutional-auth/types/password-recovery-action-state.types";
 
 const INITIAL_STATE: PasswordRecoveryActionState = {};
 
-export function InstitutionalPasswordRecoveryForm(): React.ReactElement {
+export function InstitutionalPasswordRecoveryForm(): ReactElement {
   const [state, formAction, isPending] = useActionState(requestPasswordRecovery, INITIAL_STATE);
+
   const [institution, setInstitution] = useState<InstitutionalInstitution>();
 
   return (

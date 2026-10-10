@@ -1,4 +1,8 @@
+import type { ReactElement, ReactNode } from "react";
+
 import { LayoutDashboardIcon, LibraryBigIcon, NetworkIcon, type LucideIcon } from "lucide-react";
+
+import { SectionHeader } from "@common/components/section-header";
 
 import { AcademicRecentItems } from "@features/academic/components/academic-recent-items";
 import { AcademicResourceLinks, getReadableAcademicResources } from "@features/academic/components/academic-resource-links";
@@ -8,12 +12,11 @@ import type { AcademicAccess } from "@features/academic/types/academic-access.ty
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type AcademicOverviewProps = {
   access: AcademicAccess;
   basePath: string;
-  breadcrumb: React.ReactNode;
+  breadcrumb: ReactNode;
   institutionId: string;
   scope: AcademicScope;
 };
@@ -31,10 +34,13 @@ const CATALOG_RESOURCES: readonly AcademicCollectionResource[] = [
   AcademicResource.SHIFT,
 ];
 
-export async function AcademicOverview({ access, basePath, breadcrumb, institutionId, scope }: AcademicOverviewProps): Promise<React.ReactElement> {
+export async function AcademicOverview({ access, basePath, breadcrumb, institutionId, scope }: AcademicOverviewProps): Promise<ReactElement> {
   const resources = getReadableAcademicResources(access);
+
   const structureResources = STRUCTURE_RESOURCES.filter((resource) => resources.includes(resource));
+
   const catalogResources = CATALOG_RESOURCES.filter((resource) => resources.includes(resource));
+
   const recentItems = await fetchAcademicRecentItems(scope, institutionId, access);
 
   return (
@@ -70,11 +76,11 @@ function AcademicGroup({
   icon: Icon,
   title,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   description: string;
   icon: LucideIcon;
   title: string;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <section className="bg-muted/25 rounded-xl border p-5 md:p-6">
       <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">

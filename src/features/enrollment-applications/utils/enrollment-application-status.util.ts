@@ -1,6 +1,6 @@
-import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
-import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { ENROLLMENT_APPLICATION_STATUS_LABELS } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
 const enrollmentApplicationStatusValues = new Set<string>(Object.values(ENROLLMENT_APPLICATION_STATUS));
 

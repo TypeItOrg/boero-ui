@@ -1,20 +1,17 @@
-import { Fragment } from "react";
-import Link from "next/link";
-import { Building2Icon, BuildingIcon, CalendarPlusIcon, MapPinIcon, type LucideIcon } from "lucide-react";
+import type { ReactElement } from "react";
 
-import { Badge } from "@common/components/ui/badge";
-import { Button } from "@common/components/ui/button";
+import { BuildingIcon, CalendarPlusIcon } from "lucide-react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@common/components/ui/card";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { Separator } from "@common/components/ui/separator";
 import { cn } from "@common/utils/cn.util";
+
+import { DashboardEmptyState } from "@features/platform-dashboard/components/dashboard-empty-state";
 import { InstitutionRegistrationChart } from "@features/platform-dashboard/components/institution-registration-chart";
 import { InstitutionStatusChart } from "@features/platform-dashboard/components/institution-status-chart";
 import { PlatformDashboardSummary } from "@features/platform-dashboard/components/platform-dashboard-summary";
+import { RecentInstitutionsCard } from "@features/platform-dashboard/components/recent-institutions-card";
 import type { PlatformDashboardSummary as PlatformDashboardSummaryData } from "@features/platform-dashboard/types/platform-dashboard-summary.types";
 import type { PlatformDashboard } from "@features/platform-dashboard/types/platform-dashboard.types";
-import type { RecentInstitution } from "@features/platform-dashboard/types/recent-institution.types";
-import { formatDashboardDate } from "@features/platform-dashboard/utils/dashboard-date.util";
 
 const numberFormatter = new Intl.NumberFormat("es-AR");
 
@@ -22,7 +19,7 @@ type PlatformDashboardViewProps = {
   dashboard: PlatformDashboard;
 };
 
-export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps): React.ReactElement {
+export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps): ReactElement {
   const hasRegistrations = dashboard.institutionRegistrations.some((registration) => registration.count > 0);
 
   return (
@@ -56,7 +53,7 @@ export function PlatformDashboardView({ dashboard }: PlatformDashboardViewProps)
   );
 }
 
-function InstitutionStatusCard({ summary }: { summary: PlatformDashboardSummaryData }): React.ReactElement {
+function InstitutionStatusCard({ summary }: { summary: PlatformDashboardSummaryData }): ReactElement {
   return (
     <Card className="bg-background p-5 sm:p-6">
       <CardHeader className="p-0">
@@ -90,7 +87,7 @@ type StatusValueProps = {
   variant: "active" | "inactive";
 };
 
-function StatusValue({ label, value, variant }: StatusValueProps): React.ReactElement {
+function StatusValue({ label, value, variant }: StatusValueProps): ReactElement {
   return (
     <div className="bg-muted/50 flex items-center gap-3 rounded-lg p-3">
       <span className={cn("size-2.5 rounded-full", variant === "active" ? "bg-primary" : "bg-muted-foreground")} />
@@ -99,89 +96,5 @@ function StatusValue({ label, value, variant }: StatusValueProps): React.ReactEl
         <span className="font-medium tabular-nums">{numberFormatter.format(value)}</span>
       </div>
     </div>
-  );
-}
-
-function RecentInstitutionsCard({ institutions }: { institutions: RecentInstitution[] }): React.ReactElement {
-  return (
-    <Card className="bg-background p-5 sm:p-6">
-      <CardHeader className="flex items-center justify-between gap-4 p-0">
-        <div className="flex min-w-0 flex-col gap-1">
-          <CardTitle>Instituciones recientes</CardTitle>
-          <CardDescription className="truncate">Las últimas instituciones incorporadas a la plataforma.</CardDescription>
-        </div>
-        <div className="shrink-0 self-end">
-          <Button asChild size="lg">
-            <Link href="/admin/institutions">Ver todas</Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {institutions.length === 0 ? (
-          <DashboardEmptyState
-            icon={Building2Icon}
-            title="Todavía no hay instituciones"
-            description="Las instituciones nuevas aparecerán en este espacio."
-          />
-        ) : (
-          <div className="flex flex-col">
-            {institutions.map((institution, index) => (
-              <Fragment key={institution.id}>
-                {index > 0 ? <Separator className="-mx-5 data-horizontal:w-auto sm:-mx-6" /> : null}
-                <RecentInstitutionRow institution={institution} />
-              </Fragment>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecentInstitutionRow({ institution }: { institution: RecentInstitution }): React.ReactElement {
-  return (
-    <Link
-      href={`/admin/institutions/${institution.id}`}
-      className="hover:bg-muted/50 -mx-2 flex min-w-0 items-center gap-3 rounded-lg px-2 py-3 transition-colors"
-    >
-      <div className="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-lg">
-        <BuildingIcon className="size-4" aria-hidden="true" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="truncate font-medium">{institution.name}</p>
-          <Badge variant={institution.active ? "success" : "destructive"}>{institution.active ? "Activa" : "Inactiva"}</Badge>
-        </div>
-        <p className="text-muted-foreground mt-1 flex min-w-0 items-center gap-1.5 text-xs">
-          <MapPinIcon className="size-3.5 shrink-0" aria-hidden="true" />
-          <span className="truncate">
-            {institution.city}, {institution.province}
-          </span>
-        </p>
-      </div>
-      <time className="text-muted-foreground hidden shrink-0 text-xs tabular-nums sm:block" dateTime={institution.createdAt}>
-        {formatDashboardDate(institution.createdAt)}
-      </time>
-    </Link>
-  );
-}
-
-type DashboardEmptyStateProps = {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-};
-
-function DashboardEmptyState({ icon: Icon, title, description }: DashboardEmptyStateProps): React.ReactElement {
-  return (
-    <Empty className="bg-muted/25 mt-4 min-h-56 rounded-xl border border-solid p-6">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon aria-hidden="true" className="size-5" />
-        </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyHeader>
-    </Empty>
   );
 }

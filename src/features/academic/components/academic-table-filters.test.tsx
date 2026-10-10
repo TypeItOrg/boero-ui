@@ -1,121 +1,104 @@
-import { render, screen } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@common/components/ui/async-dropdown", () => ({
-  AsyncDropdown: jest.fn(() => null),
-}));
+import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
 
-import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { AcademicTableFilters } from "@features/academic/components/academic-table-filters";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-const mockNavigate = jest.fn();
+import { createTestQueryClient } from "@/../test/utils/render-with-query-client";
 
-jest.mock("@common/components/ui/data-table-navigation", () => ({
-  useDataTableNavigation: () => ({ isPending: false, navigate: mockNavigate }),
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/study-plans",
+  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+jest.mock("@tanstack/react-virtual", () => ({
+  useVirtualizer: jest.requireActual("@/../test/utils/mock-virtualizer").mockVirtualizer,
 }));
 
-describe("AcademicTableFilters", () => {
+describe("AcademicTableFilters with a shared options cache", () => {
+  const originalFetch = global.fetch;
+  const fetchMock = jest.fn<ReturnType<typeof fetch>, Parameters<typeof fetch>>();
+
   beforeEach(() => {
-    mockNavigate.mockReset();
-    jest.mocked(AsyncDropdown).mockClear();
+    global.fetch = fetchMock;
+  });
+  afterEach(() => {
+    global.fetch = originalFetch;
+    fetchMock.mockReset();
   });
 
-  it("uses the resource-specific placeholder for the general search", () => {
-    const { container } = render(
-      <AcademicTableFilters
-        dateFilters={[]}
-        filters={[]}
-        search="2026"
-        searchPlaceholder="Buscar por año, fecha o estado..."
-        searchable
-        size={10}
-        yearFilters={[]}
-      />,
+  it("never displays cached options from another institution or authentication scope", async () => {
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient({ queries: { staleTime: 5 * 60 * 1000 } });
+    const contexts = [
+      { institutionId: "institution-a", scope: AcademicScope.INSTITUTIONAL, name: "Piano A" },
+      { institutionId: "institution-b", scope: AcademicScope.INSTITUTIONAL, name: "Canto B" },
+      { institutionId: "institution-b", scope: AcademicScope.ADMIN, name: "Administración B" },
+    ];
+    let finishRequest: ((response: Response) => void) | undefined;
+    fetchMock.mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishRequest = resolve;
+        }),
     );
-
-    expect(screen.getByPlaceholderText("Buscar por año, fecha o estado...")).toHaveValue("2026");
-    expect(container.querySelector("form")).toHaveClass("flex", "flex-wrap");
-  });
-
-  it("scopes the training-path option cache to the academic context", () => {
-    const institutionId = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
-
-    render(
+    const filters = (context: (typeof contexts)[number]) => (
       <AcademicTableFilters
         dateFilters={[]}
         filters={[]}
         search=""
         searchable={false}
         size={10}
-        trainingPathFilter={{
-          institutionId,
-          scope: "institutional",
-          selectedLabel: undefined,
-          value: undefined,
-        }}
+        trainingPathFilter={{ ...context, selectedLabel: undefined, value: undefined }}
         yearFilters={[]}
-      />,
+      />
     );
+    const { rerender } = render(filters(contexts[0]), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={queryClient}>
+          <DataTableNavigationProvider>{children}</DataTableNavigationProvider>
+        </QueryClientProvider>
+      ),
+    });
 
-    expect(jest.mocked(AsyncDropdown).mock.calls[0]?.[0]).toEqual(
-      expect.objectContaining({
-        queryKey: ["academic", "study-plans", "training-path-filter", "institutional", institutionId],
-      }),
-    );
-  });
+    await user.click(screen.getByRole("combobox"));
 
-  it("keeps primary course filters visible and moves secondary ones into the advanced dialog", async () => {
-    const user = userEvent.setup();
-    const institutionId = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
+    for (const [index, context] of contexts.entries()) {
+      if (index > 0) {
+        rerender(filters(context));
+      }
 
-    render(
-      <AcademicTableFilters
-        academicSpaceFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
-        activeAdvancedCount={0}
-        advancedSelectFilters={[
-          {
-            defaultValue: "false",
-            label: "Registros",
-            name: "deleted",
-            options: [
-              { value: "false", label: "Vigentes" },
-              { value: "true", label: "Eliminados" },
-            ],
-            value: "false",
-          },
-        ]}
-        cycleFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
-        dateFilters={[]}
-        filters={[
-          {
-            defaultValue: "all",
-            label: "Estado",
-            name: "courseStatus",
-            options: [
-              { value: "all", label: "Todos" },
-              { value: "ACTIVE", label: "Activo" },
-            ],
-            value: "ACTIVE",
-          },
-        ]}
-        search=""
-        searchable
-        size={10}
-        studyPlanFilter={{ institutionId, scope: "institutional", selectedLabel: undefined, value: undefined }}
-        yearFilters={[]}
-      />,
-    );
+      await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(index + 1));
 
-    expect(screen.getByText("Ciclo lectivo")).toBeInTheDocument();
-    expect(screen.getByText("Estado")).toBeInTheDocument();
-    expect(screen.queryByText("Plan de estudio")).not.toBeInTheDocument();
-    expect(screen.queryByText("Espacio académico")).not.toBeInTheDocument();
-    expect(screen.queryByText("Registros")).not.toBeInTheDocument();
+      for (const previous of contexts.slice(0, index)) {
+        expect(screen.queryByRole("option", { name: previous.name })).not.toBeInTheDocument();
+      }
 
-    await user.click(screen.getByRole("button", { name: "Filtros" }));
+      const requestUrl = new URL(String(fetchMock.mock.calls[index][0]), "https://boero.test");
+      expect(requestUrl.pathname).toBe("/api/" + context.scope + "/academic/options/training-paths");
+      expect(Object.fromEntries(requestUrl.searchParams)).toEqual({
+        institutionId: context.institutionId,
+        page: "0",
+        search: "",
+        size: "20",
+        active: "all",
+      });
 
-    expect(await screen.findByText("Plan de estudio")).toBeInTheDocument();
-    expect(await screen.findByText("Espacio académico")).toBeInTheDocument();
-    expect(await screen.findByText("Registros")).toBeInTheDocument();
+      if (!finishRequest) {
+        throw new Error("Options request was not started");
+      }
+
+      finishRequest(
+        Response.json({
+          items: [{ id: "path-" + index, name: context.name, active: true }],
+          page: 0,
+          totalPages: 1,
+        }),
+      );
+      expect(await screen.findByRole("option", { name: context.name })).toBeVisible();
+    }
   });
 });

@@ -1,13 +1,17 @@
+import type { ReactElement } from "react";
+
 import { notFound } from "next/navigation";
+
 import { UserRoundIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PersonForm } from "@features/people/components/person-form";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
   title: "Nuevo usuario",
@@ -18,12 +22,18 @@ type NewPersonPageProps = {
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
 
-export default async function NewPersonPage({ params, searchParams }: NewPersonPageProps): Promise<React.ReactElement> {
+export default async function NewPersonPage({ params, searchParams }: NewPersonPageProps): Promise<ReactElement> {
   const { id } = await params;
+
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, `/admin/institutions/${id}/people`);
+
   const institution = await fetchInstitution(id);
-  if (!institution) notFound();
+
+  if (!institution) {
+    notFound();
+  }
 
   return (
     <PlatformPageShell

@@ -1,5 +1,6 @@
-import { COURSE_DAY_LABELS, COURSE_ENROLLMENT_MESSAGES as MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { isValidUuid } from "@common/utils/action-argument.util";
+
+import { COURSE_DAY_LABELS, COURSE_ENROLLMENT_MESSAGES as MESSAGES } from "@features/course-enrollments/constants/course-enrollment.constants";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
 
 export type EnrollmentAssignmentValidation = {
@@ -38,6 +39,7 @@ function parseAssignments(value: FormDataEntryValue | null): SubmittedAssignment
 
 export function validateEnrollmentAssignment(formData: FormData, options: CourseEnrollmentAssignmentOptions): EnrollmentAssignmentValidation {
   const courseClassId = formData.get("courseClassId");
+
   const assignments = parseAssignments(formData.get("assignments"));
 
   if (typeof courseClassId !== "string" || !isValidUuid(courseClassId) || !assignments) {
@@ -49,17 +51,22 @@ export function validateEnrollmentAssignment(formData: FormData, options: Course
   }
 
   const selectedClass = options.classes.find((courseClass) => courseClass.id === courseClassId);
+
   if (!selectedClass) {
     return { ok: false, message: MESSAGES.INVALID_SCHEDULE };
   }
+
   const seenDays = new Set<string>();
+
   const messages: string[] = [];
+
   const invalidDayIds: string[] = [];
 
   for (const assignment of assignments) {
     const day = assignment.dayId
       ? selectedClass.days.find((candidate) => candidate.id === assignment.dayId)
       : selectedClass.days.find((candidate) => candidate.schedules.some((schedule) => schedule.id === assignment.classScheduleId));
+
     const label = day ? dayLabel(day.dayOfWeek) : "el día";
 
     if (typeof assignment.classScheduleId !== "string" || !isValidUuid(assignment.classScheduleId)) {
@@ -73,25 +80,32 @@ export function validateEnrollmentAssignment(formData: FormData, options: Course
     }
 
     const schedule = day?.schedules.find((value) => value.id === assignment.classScheduleId);
+
     if (!day || !schedule) {
       messages.push(MESSAGES.INVALID_SCHEDULE);
       continue;
     }
+
     if (seenDays.has(day.id)) {
       messages.push(MESSAGES.DUPLICATE_DAY);
       invalidDayIds.push(day.id);
     }
+
     seenDays.add(day.id);
+
     if (day.availableCapacity === 0) {
       messages.push(MESSAGES.NO_CAPACITY);
       invalidDayIds.push(day.id);
     }
+
     if (options.format === "GRUPAL" && assignment.individualSlotId !== null) {
       messages.push(MESSAGES.INVALID_SCHEDULE);
       invalidDayIds.push(day.id);
     }
+
     if (options.format === "INDIVIDUAL" && typeof assignment.individualSlotId === "string" && isValidUuid(assignment.individualSlotId)) {
       const slot = schedule.individualSlots.find((value) => value.id === assignment.individualSlotId);
+
       if (!slot || !slot.available) {
         messages.push(slot ? MESSAGES.NO_CAPACITY : MESSAGES.INVALID_SCHEDULE);
         invalidDayIds.push(day.id);

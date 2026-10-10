@@ -1,16 +1,17 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
-import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+import { useActionState, type ReactElement } from "react";
 
 import Link from "next/link";
-import { useActionState } from "react";
 
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+
+import { createStudyPlanVersionAction } from "@features/academic/actions/create-study-plan-version.action";
 import { DateRangeFields } from "@features/academic/components/academic-date-range-fields";
 import { NameField } from "@features/academic/components/academic-form-controls";
-import { createStudyPlanVersionAction } from "@features/academic/actions/academic-resource.action";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import type { StudyPlan } from "@features/academic/types/study-plan.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -24,15 +25,19 @@ type StudyPlanVersionFormProps = {
 
 const INITIAL_STATE: AcademicActionState = {};
 
-export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }: StudyPlanVersionFormProps): React.ReactElement {
+export function StudyPlanVersionForm({ institutionId, returnTo, scope, source }: StudyPlanVersionFormProps): ReactElement {
   const action = createStudyPlanVersionAction.bind(null, scope, institutionId, source.id, returnTo);
+
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE);
+
   const formRef = useActionFormErrorFocus(state, pending);
+
   const initialValues = {
     name: source.name,
     effectiveFrom: "",
     effectiveTo: "",
   };
+
   const hasFieldErrors = Object.keys(state.fieldErrors ?? {}).length > 0;
 
   return (

@@ -1,7 +1,10 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { InstitutionalBrandPanel } from "@features/institutional-auth/components/institutional-brand-identity";
 
 import { Card, CardContent } from "@common/components/ui/card";
+
+import { InstitutionalBrandPanel } from "@features/institutional-auth/components/institutional-brand-identity";
 import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
 import {
   hasInstitutionalEmailVerifiedCookie,
@@ -13,7 +16,7 @@ export const metadata: Metadata = {
   description: "Iniciá sesión en tu institución",
 };
 
-export default async function LoginPage(): Promise<React.ReactElement> {
+export default async function LoginPage(): Promise<ReactElement> {
   const [emailVerified, passwordChanged] = await Promise.all([hasInstitutionalEmailVerifiedCookie(), hasInstitutionalPasswordChangedCookie()]);
 
   return (

@@ -1,13 +1,16 @@
+import type { ReactElement } from "react";
+
 import { CheckIcon, KeyRoundIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
-import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
+
 import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
+import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
-import { SectionHeader } from "@common/components/section-header";
 
 const HIDDEN_PERMISSION_GROUP_CODES = new Set(["GRADES"]);
 
@@ -16,10 +19,13 @@ type InstitutionRolePermissionsProps = {
   groups: readonly InstitutionPermissionGroup[];
 };
 
-export function InstitutionRolePermissions({ permissionCodes, groups }: InstitutionRolePermissionsProps): React.ReactElement {
+export function InstitutionRolePermissions({ permissionCodes, groups }: InstitutionRolePermissionsProps): ReactElement {
   const assignedPermissionCodes = new Set(permissionCodes);
+
   const visibleGroups = groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code));
+
   const permissionMap = getPermissionMap(visibleGroups);
+
   const assignedGroups = visibleGroups
     .map((group) => ({
       ...group,
@@ -61,7 +67,7 @@ export function InstitutionRolePermissions({ permissionCodes, groups }: Institut
   );
 }
 
-function renderPermissionRow(permission: InstitutionPermission): React.ReactElement {
+function renderPermissionRow(permission: InstitutionPermission): ReactElement {
   return (
     <div key={permission.code} className="flex items-start gap-3 text-sm">
       <span className="bg-primary/10 text-primary mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full">

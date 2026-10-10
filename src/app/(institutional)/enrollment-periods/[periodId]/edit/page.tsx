@@ -1,13 +1,17 @@
-import { ENROLLMENT_PERIOD_MESSAGES } from "@features/enrollment-periods/constants/enrollment-period.messages";
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { CalendarRangeIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { parseUuidQueryParam } from "@common/utils/query-param.util";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodForm } from "@features/enrollment-periods/components/enrollment-period-form";
+import { ENROLLMENT_PERIOD_MESSAGES } from "@features/enrollment-periods/constants/enrollment-period.messages";
 import { fetchEnrollmentPeriod } from "@features/enrollment-periods/services/enrollment-period.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -27,8 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Editar período de inscripción");
 }
 
-export default async function EditEnrollmentPeriodPage({ params, searchParams }: EditEnrollmentPeriodPageProps): Promise<React.ReactElement> {
+export default async function EditEnrollmentPeriodPage({ params, searchParams }: EditEnrollmentPeriodPageProps): Promise<ReactElement> {
   const [{ periodId: rawPeriodId }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const periodId = parseUuidQueryParam(rawPeriodId);
 
   if (!periodId) {

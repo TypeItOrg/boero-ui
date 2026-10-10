@@ -1,5 +1,8 @@
+import type { ReactElement } from "react";
+
 import { Badge } from "@common/components/ui/badge";
 import { cn } from "@common/utils/cn.util";
+
 import {
   ENROLLMENT_APPLICATION_STATUS,
   type EnrollmentApplicationStatus,
@@ -21,7 +24,7 @@ const STATUS_CLASSNAMES: Record<EnrollmentApplicationStatus, string> = {
   [ENROLLMENT_APPLICATION_STATUS.CANCELLED]: "bg-muted text-muted-foreground border-border",
 };
 
-export function EnrollmentApplicationStatusBadge({ status }: EnrollmentApplicationStatusBadgeProps): React.ReactElement {
+export function EnrollmentApplicationStatusBadge({ status }: EnrollmentApplicationStatusBadgeProps): ReactElement {
   return (
     <Badge variant="outline" className={cn(STATUS_CLASSNAMES[status])}>
       {getEnrollmentApplicationStatusLabel(status)}

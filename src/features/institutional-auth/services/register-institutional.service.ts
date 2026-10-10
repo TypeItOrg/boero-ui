@@ -1,5 +1,6 @@
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import type { BackendError } from "@common/types/backend-error.types";
+
 import type { InstitutionalRegisterInput } from "@features/institutional-auth/types/institutional-register-input.types";
 import type { InstitutionalRegisterResult } from "@features/institutional-auth/types/institutional-register-result.types";
 import type { RegisterInstitutionalOutput } from "@features/institutional-auth/types/register-institutional-output.types";
@@ -15,6 +16,7 @@ export async function registerInstitutionalAccount(input: InstitutionalRegisterI
 
     if (!response.ok) {
       const error = (await response.json()) as BackendError;
+
       return { success: false, error };
     }
 

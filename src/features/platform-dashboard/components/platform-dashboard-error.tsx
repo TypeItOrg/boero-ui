@@ -1,13 +1,15 @@
 "use client";
 
+import { useEffect, type ReactElement } from "react";
+
 import { catchError, type ErrorInfo } from "next/error";
-import * as React from "react";
 
 import { BlockingError } from "@common/components/blocking-error";
+
 import { PLATFORM_DASHBOARD_ERROR_MESSAGES } from "@features/platform-dashboard/constants/error-messages.constants";
 
-function PlatformDashboardErrorFallback(_props: Record<string, unknown>, { error, retry }: ErrorInfo): React.ReactElement {
-  React.useEffect(() => {
+function PlatformDashboardErrorFallback(_props: Record<string, unknown>, { error, retry }: ErrorInfo): ReactElement {
+  useEffect(() => {
     console.error(error);
   }, [error]);
 

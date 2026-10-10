@@ -1,120 +1,20 @@
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { z } from "zod";
-import { parseDateInput } from "@common/utils/date-input.util";
 
-const BUSINESS_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Argentina/Buenos_Aires",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-export function calculateAge(birthDate: string | Date | undefined): number | null {
-  if (!birthDate) {
-    return null;
-  }
-
-  const date = typeof birthDate === "string" ? parseDateInput(birthDate) : birthDate;
-
-  if (!date || isNaN(date.getTime())) {
-    return null;
-  }
-
-  const parts = BUSINESS_DATE_FORMATTER.formatToParts(new Date());
-  const year = Number(parts.find((part) => part.type === "year")?.value);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const day = Number(parts.find((part) => part.type === "day")?.value);
-  let age = year - date.getFullYear();
-  const monthDiff = month - 1 - date.getMonth();
-
-  if (monthDiff < 0 || (monthDiff === 0 && day < date.getDate())) {
-    age--;
-  }
-
-  return age >= 0 ? age : null;
-}
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import {
+  healthInclusionSchema,
+  personalDataSchema,
+  preferenceSchema,
+  responsibleSchema,
+} from "@features/enrollment-applications/schemas/enrollment-applicant-data.schema";
+import { academicBackgroundSchema, educationLevelSchema } from "@features/enrollment-applications/schemas/enrollment-schooling.schema";
+import { calculateAge } from "@features/enrollment-applications/utils/enrollment-age.util";
 
 export const startEnrollmentApplicationSchema = z.object({
   enrollmentPeriodId: z.uuid().optional(),
   trainingPathId: z.string().uuid(ENROLLMENT_MESSAGES.TRAINING_PATH_ID_INVALID),
   academicYearId: z.string().uuid(ENROLLMENT_MESSAGES.ACADEMIC_YEAR_ID_INVALID).optional(),
   applicantPersonId: z.string().uuid(ENROLLMENT_MESSAGES.APPLICANT_PERSON_ID_INVALID).optional(),
-});
-
-// Paso 1: Datos Personales y Contacto
-export const personalDataSchema = z.object({
-  firstName: z.string().trim().min(1, ENROLLMENT_MESSAGES.NAME_REQUIRED),
-  lastName: z.string().trim().min(1, ENROLLMENT_MESSAGES.LAST_NAME_REQUIRED),
-  documentNumber: z.string().trim().min(1, ENROLLMENT_MESSAGES.DOCUMENT_REQUIRED),
-  birthDate: z.string({ error: ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED }).trim().min(1, ENROLLMENT_MESSAGES.BIRTH_DATE_REQUIRED),
-  phoneNumber: z.string().trim().nullish(),
-  email: z.string().trim().min(1, ENROLLMENT_MESSAGES.EMAIL_REQUIRED).email(ENROLLMENT_MESSAGES.EMAIL_INVALID),
-});
-
-const educationLevelSchema = z.enum(["NO_SCHOOLING", "INITIAL", "PRIMARY", "SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"]);
-
-// Paso 2: Escolaridad
-export const academicBackgroundSchema = z
-  .object({
-    secondarySchool: z.string().trim().max(255).nullish(),
-    currentlyStudying: z.boolean().nullable(),
-    educationLevel: educationLevelSchema.nullable(),
-    schoolOrigin: z.string().trim().max(150).nullable(),
-    currentGradeYear: z.string().trim().max(50).nullable(),
-    levelCompleted: z.boolean().nullable(),
-    secondaryCompleted: z.boolean().nullable(),
-    secondaryDegreeTitle: z.string().trim().max(150).nullable(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.currentlyStudying === null) {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.CURRENTLY_STUDYING_REQUIRED, path: ["currentlyStudying"] });
-      return;
-    }
-
-    if (data.educationLevel === null) {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_LEVEL_REQUIRED, path: ["educationLevel"] });
-      return;
-    }
-
-    if (data.currentlyStudying && data.educationLevel === "NO_SCHOOLING") {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.CURRENT_EDUCATION_LEVEL_INVALID, path: ["educationLevel"] });
-    }
-
-    if (data.currentlyStudying && (!data.schoolOrigin || data.schoolOrigin.length === 0)) {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_INSTITUTION_REQUIRED, path: ["schoolOrigin"] });
-    }
-
-    if (!data.currentlyStudying && !["NO_SCHOOLING", "SECONDARY"].includes(data.educationLevel) && data.levelCompleted === null) {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.EDUCATION_COMPLETION_REQUIRED, path: ["levelCompleted"] });
-    }
-
-    if (["SECONDARY", "NON_UNIVERSITY_HIGHER", "UNIVERSITY"].includes(data.educationLevel) && data.secondaryCompleted === null) {
-      ctx.addIssue({ code: "custom", message: ENROLLMENT_MESSAGES.SECONDARY_COMPLETION_REQUIRED, path: ["secondaryCompleted"] });
-    }
-  });
-
-// Paso 3: Salud e Inclusión
-export const healthInclusionSchema = z.object({
-  receivesReasonableAdjustments: z.boolean().default(false),
-  adjustmentDetails: z.string().trim().optional(),
-});
-
-// Paso 4: Responsable / Tutor Legal
-export const responsibleSchema = z.object({
-  fullName: z.string().trim().optional(),
-  documentNumber: z.string().trim().optional(),
-  phoneNumber: z.string().trim().optional(),
-  email: z.string().trim().optional(),
-  occupation: z.string().trim().optional(),
-  educationLevel: z.string().trim().optional(),
-});
-
-// Paso 5: Preferencias
-export const preferenceSchema = z.object({
-  preferredShift: z.string().trim().min(1, ENROLLMENT_MESSAGES.SHIFT_REQUIRED),
-  allowsImageUse: z.boolean().default(false),
-  isReenrolling: z.boolean().default(false),
-  previousTeacher: z.string().trim().optional(),
 });
 
 // Paso: Trayecto Formativo
@@ -152,7 +52,12 @@ export const updateEnrollmentDraftSchema = z.object({
         secondaryDegreeTitle: z.string().max(150).nullable().optional(),
       })
       .optional(),
-    healthInclusion: z.object({ receivesReasonableAdjustments: z.boolean().optional(), adjustmentDetails: z.string().optional() }).optional(),
+    healthInclusion: z
+      .object({
+        receivesReasonableAdjustments: z.boolean().optional(),
+        adjustmentDetails: z.string().optional(),
+      })
+      .optional(),
     responsible: responsibleSchema.partial().optional(),
     preference: z
       .object({
@@ -183,6 +88,7 @@ export const enrollmentApplicationSubmissionSchema = z
   .superRefine((data, ctx) => {
     // 1. Condicional: Si edad < 18, tutor legal obligatorio
     const age = calculateAge(data.personalData.birthDate);
+
     const isMinor = age !== null && age < 18;
 
     if (!isMinor) {
@@ -277,3 +183,15 @@ export const enrollmentApplicationSubmissionSchema = z
   });
 
 export type EnrollmentApplicationSubmissionInput = z.infer<typeof enrollmentApplicationSubmissionSchema>;
+
+export { calculateAge } from "@features/enrollment-applications/utils/enrollment-age.util";
+
+export { academicBackgroundSchema } from "@features/enrollment-applications/schemas/enrollment-schooling.schema";
+
+export { personalDataSchema } from "@features/enrollment-applications/schemas/enrollment-applicant-data.schema";
+
+export { healthInclusionSchema } from "@features/enrollment-applications/schemas/enrollment-applicant-data.schema";
+
+export { responsibleSchema } from "@features/enrollment-applications/schemas/enrollment-applicant-data.schema";
+
+export { preferenceSchema } from "@features/enrollment-applications/schemas/enrollment-applicant-data.schema";

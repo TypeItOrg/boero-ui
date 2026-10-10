@@ -2,13 +2,14 @@ import "server-only";
 
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { parseHttpResponse, parseNullableHttpResponse } from "@common/utils/http-response-error.util";
+
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
+import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 import type { CourseWaitlistEntry } from "@features/course-enrollments/types/course-waitlist-entry.types";
-import type { CourseEnrollmentHistory } from "@features/course-enrollments/types/course-enrollment-history.types";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 export type CourseEnrollmentListParams = {
   page?: number;
@@ -40,6 +41,7 @@ export async function fetchMyCourseEnrollments(
   params: CourseEnrollmentListParams = {},
 ): Promise<PaginatedResponse<CourseEnrollment>> {
   const searchParams = courseEnrollmentSearchParams(params);
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments/mine?${searchParams}`);
 
   return parseHttpResponse(response, "No se pudieron obtener tus cursadas.");
@@ -50,6 +52,7 @@ export async function fetchInstitutionalCourseEnrollments(
   params: CourseEnrollmentListParams = {},
 ): Promise<PaginatedResponse<CourseEnrollment>> {
   const searchParams = courseEnrollmentSearchParams(params);
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${institutionId}/course-enrollments?${searchParams}`);
 
   return parseHttpResponse(response, "No se pudieron obtener las cursadas.");

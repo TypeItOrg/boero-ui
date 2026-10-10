@@ -1,7 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+/* eslint-disable max-lines, no-restricted-syntax */
+
 import { useState, useTransition } from "react";
+
+import { useRouter } from "next/navigation";
+
 import { ClipboardPlusIcon, PhoneCallIcon, PlusIcon, SearchIcon, UserMinusIcon, UsersIcon, XIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
@@ -9,15 +13,16 @@ import { Button } from "@common/components/ui/button";
 import { EmptyMedia } from "@common/components/ui/empty";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
+
+import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
+import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 import { UnlinkGuardianDependentDialog } from "@features/guardian-dependents/components/unlink-guardian-dependent-dialog";
-import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
-import { ENROLLMENT_PAGE_PATH } from "@features/enrollment-applications/constants/enrollment-application.constants";
 import { GUARDIAN_LINK_STATUS_LABELS, GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 import { GUARDIAN_LINK_STATUS, type GuardianLinkStatus } from "@features/guardian-dependents/types/guardian-link-status.types";
 import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
-import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
+import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
 
 type GuardianDependentsListProps = { dependents: GuardianDependent[]; institutionId: string; initialSearch?: string };
 
@@ -45,10 +50,15 @@ function matchesSearch(dependent: GuardianDependent, search: string): boolean {
 
 export function GuardianDependentsList({ dependents, institutionId, initialSearch = "" }: GuardianDependentsListProps): React.ReactElement {
   const router = useRouter();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const [dependentToUnlink, setDependentToUnlink] = useState<GuardianDependent | null>(null);
+
   const [search, setSearch] = useState(initialSearch);
+
   const [isSelectingWorkspace, startSelectingWorkspace] = useTransition();
+
   const visibleDependents = dependents.filter((dependent) => matchesSearch(dependent, search));
 
   function handleEnrollment(dependentPersonId: string): void {
@@ -177,8 +187,11 @@ function DependentRow({
   onUnlink: () => void;
 }): React.ReactElement {
   const age = calculateAge(dependent.birthDate ?? undefined);
+
   const name = getGuardianDependentName(dependent);
+
   const isActive = dependent.status === GUARDIAN_LINK_STATUS.ACTIVE;
+
   const canUnlink = isActive || dependent.status === GUARDIAN_LINK_STATUS.PENDING;
 
   return (

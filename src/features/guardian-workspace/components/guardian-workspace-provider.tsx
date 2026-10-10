@@ -1,7 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+/* eslint-disable no-nested-ternary, no-restricted-syntax */
+
 import * as React from "react";
+
+import { useRouter } from "next/navigation";
 
 import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
 import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
@@ -16,6 +19,7 @@ type GuardianWorkspaceProviderProps = React.PropsWithChildren<{
 
 export function GuardianWorkspaceProvider({ children, dependents, initialActiveDependentId }: GuardianWorkspaceProviderProps): React.ReactElement {
   const router = useRouter();
+
   const [activeDependentId, setActiveDependentId] = React.useState<string | null>(() =>
     dependents.some((dependent) => dependent.dependentPersonId === initialActiveDependentId)
       ? (initialActiveDependentId ?? null)
@@ -23,8 +27,11 @@ export function GuardianWorkspaceProvider({ children, dependents, initialActiveD
         ? dependents[0].dependentPersonId
         : null,
   );
+
   const [error, setError] = React.useState<string | null>(null);
+
   const [isPending, startTransition] = React.useTransition();
+
   const effectiveActiveDependentId = dependents.some((dependent) => dependent.dependentPersonId === activeDependentId)
     ? activeDependentId
     : dependents.some((dependent) => dependent.dependentPersonId === initialActiveDependentId)
@@ -32,6 +39,7 @@ export function GuardianWorkspaceProvider({ children, dependents, initialActiveD
       : dependents.length === 1
         ? dependents[0].dependentPersonId
         : null;
+
   const activeDependent = dependents.find((dependent) => dependent.dependentPersonId === effectiveActiveDependentId) ?? null;
 
   function selectDependent(dependentPersonId: string): void {
@@ -45,6 +53,7 @@ export function GuardianWorkspaceProvider({ children, dependents, initialActiveD
 
       if ("error" in result) {
         setError(result.error);
+
         return;
       }
 

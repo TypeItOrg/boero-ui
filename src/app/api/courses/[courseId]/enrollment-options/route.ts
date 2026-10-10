@@ -1,7 +1,8 @@
-import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { NextRequest } from "next/server";
 
+import { COMMON_ERROR_MESSAGES } from "@common/constants/error-messages.constants";
 import { createPassthroughResponse } from "@common/utils/create-passthrough-response.util";
+
 import { getInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
@@ -13,6 +14,8 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ co
   }
 
   const { courseId } = await context.params;
+
   const response = await institutionalApiFetch(`/api/v1/institutions/${user.institutionId}/courses/${courseId}/enrollment-options`);
+
   return createPassthroughResponse(response);
 }

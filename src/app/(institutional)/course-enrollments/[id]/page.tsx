@@ -1,16 +1,20 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
 import { ScrollTextIcon } from "lucide-react";
 
 import { getSafeReturnTo } from "@common/utils/return-to.util";
-import { CourseEnrollmentDetailActions } from "@features/course-enrollments/components/course-enrollment-detail-actions";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import { hasInstitutionalPermission, hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
-import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
+
 import { CourseEnrollmentDetail } from "@features/course-enrollments/components/course-enrollment-detail";
+import { CourseEnrollmentDetailActions } from "@features/course-enrollments/components/course-enrollment-detail-actions";
+import { fetchCourseEnrollment, fetchCourseEnrollmentHistory } from "@features/course-enrollments/services/course-enrollment.service";
+import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { fetchCourseEnrollment, fetchCourseEnrollmentHistory } from "@features/course-enrollments/services/course-enrollment.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { hasInstitutionalPermission, hasTrainingPathPermission } from "@features/institutional-auth/utils/institutional-permission.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
@@ -22,14 +26,17 @@ export default async function CourseEnrollmentDetailPage({
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ returnTo?: string | string[] }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const user = await requireInstitutionalUser();
+
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_READ)) {
     return <InstitutionalAccessDenied description="No tenés permisos para consultar las cursadas." />;
   }
 
   const { id } = await params;
+
   const returnTo = getSafeReturnTo((await searchParams).returnTo, "/course-enrollments");
+
   const [enrollment, history] = await Promise.all([
     fetchCourseEnrollment(user.institutionId, id),
     fetchCourseEnrollmentHistory(user.institutionId, id),

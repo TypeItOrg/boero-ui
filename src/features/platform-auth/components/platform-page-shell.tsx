@@ -1,13 +1,13 @@
-import * as React from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import { cn } from "@common/utils/cn.util";
 
 type PlatformPageShellProps = {
-  title: React.ReactNode;
-  actions?: React.ReactNode;
-  children?: React.ReactNode;
+  title: ReactNode;
+  actions?: ReactNode;
+  children?: ReactNode;
   minViewportHeight?: boolean;
-  breadcrumb?: React.ReactNode;
+  breadcrumb?: ReactNode;
   contentVariant?: "surface" | "plain";
   headerClassName?: string;
   actionsClassName?: string;
@@ -22,7 +22,7 @@ export function PlatformPageShell({
   contentVariant = "surface",
   headerClassName,
   actionsClassName,
-}: PlatformPageShellProps): React.ReactElement {
+}: PlatformPageShellProps): ReactElement {
   return (
     <section
       className={cn("@container/page-shell flex h-full max-w-full min-w-0 flex-col gap-4 p-3 md:p-4", minViewportHeight && "min-h-full flex-1")}

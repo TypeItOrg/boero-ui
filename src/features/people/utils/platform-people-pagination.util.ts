@@ -4,6 +4,7 @@ import type { QueryParamValue } from "@common/types/query-param.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
 import { getQueryParamValue, parseUuidQueryParam } from "@common/utils/query-param.util";
 import { parseSortQuery, type Sort, type SortSearchParams } from "@common/utils/sort-query.util";
+
 import type { PlatformPersonSummary } from "@features/people/types/platform-person-summary.types";
 import { SYSTEM_ROLE_CODES, type SystemRoleCode } from "@features/people/types/system-role-code.types";
 
@@ -24,6 +25,7 @@ export const DEFAULT_PLATFORM_PEOPLE_SORT = {
 } as const satisfies PlatformPeopleSort;
 
 const platformPeopleSortFields = new Set<PlatformPeopleSortField>(PLATFORM_PEOPLE_SORT_FIELDS);
+
 const systemRoleCodes = new Set<string>(SYSTEM_ROLE_CODES);
 
 export type PlatformPeopleSearchParams = PaginationSearchParams &
@@ -57,5 +59,6 @@ export function parsePlatformPeoplePaginationParams(searchParams: PlatformPeople
 
 function parseRoleCode(value: QueryParamValue): SystemRoleCode | undefined {
   const roleCode = getQueryParamValue(value);
+
   return roleCode && systemRoleCodes.has(roleCode) ? (roleCode as SystemRoleCode) : undefined;
 }

@@ -1,20 +1,25 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { BuildingIcon, XIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import { Button } from "@common/components/ui/button";
 import { DataTableFilters, type DataTableSelectFilter } from "@common/components/ui/data-table-filters";
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+
 import { fetchPlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
-import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
-import type { SystemRole } from "@features/people/types/system-role.types";
 import { LOCATION_ERROR_MESSAGES } from "@features/locations/constants/error-messages.constants";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import type { SystemRoleCode } from "@features/people/types/system-role-code.types";
+import type { SystemRole } from "@features/people/types/system-role.types";
 
 const INSTITUTION_FILTER_QUERY_KEY = ["platform", "institutions", "people-filter"] as const;
+
 const INSTITUTION_FILTER_PAGE_SIZE = 20;
+
 const ALL_ROLES = "all";
 
 type RoleFilterValue = SystemRoleCode | typeof ALL_ROLES;
@@ -35,8 +40,9 @@ export function PlatformPeopleTableFilters({
   roles,
   search,
   size,
-}: PlatformPeopleTableFiltersProps): React.ReactElement {
+}: PlatformPeopleTableFiltersProps): ReactElement {
   const { navigate } = useDataTableNavigation();
+
   const roleFilter: DataTableSelectFilter<RoleFilterValue> = {
     defaultValue: ALL_ROLES,
     label: "Rol",

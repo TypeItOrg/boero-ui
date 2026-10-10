@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, type ReactElement } from "react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
@@ -30,26 +30,38 @@ export function DocumentDefinitionPicker({
   selectedValues?: readonly string[];
   onSelect: (item: DocumentDefinition) => void;
   disabled?: boolean;
-}): React.ReactElement {
-  const fetchPage = React.useCallback(
+}): ReactElement {
+  const fetchPage = useCallback(
     async ({ page, search, size, signal }: { page: number; search: string; size: number; signal?: AbortSignal }) => {
-      const query = new URLSearchParams({ page: String(page), size: String(size), search, active: "true" });
+      const query = new URLSearchParams({
+        page: String(page),
+        size: String(size),
+        search,
+        active: "true",
+      });
+
       if (forTrainingPathCreation) {
         query.set("forTrainingPathCreation", "true");
       }
+
       if (applicationId) {
         query.set("applicationId", applicationId);
       }
+
       if (trainingPathId) {
         query.set("trainingPathId", trainingPathId);
       }
 
       const data = await fetchDocumentCatalog<PaginatedResponse<DocumentDefinition>>(scope, institutionId, `?${query}`, signal);
 
-      return { items: data.items, nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null };
+      return {
+        items: data.items,
+        nextPage: data.page + 1 < data.totalPages ? data.page + 1 : null,
+      };
     },
     [scope, institutionId, trainingPathId, applicationId, forTrainingPathCreation],
   );
+
   return (
     <FormField name="document-definition" label="Documento del catálogo" required>
       <AsyncDropdown<DocumentDefinition>

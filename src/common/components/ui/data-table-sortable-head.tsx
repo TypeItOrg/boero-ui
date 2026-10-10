@@ -1,6 +1,7 @@
 "use client";
 
-import type * as React from "react";
+import type { AriaAttributes, ComponentProps, ReactElement } from "react";
+
 import { ChevronsDownIcon, ChevronsUpDownIcon, ChevronsUpIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -8,7 +9,7 @@ import { TableHead } from "@common/components/ui/table";
 import { cn } from "@common/utils/cn.util";
 import { getNextSort, getSortDirection, type Sort, type SortDirection } from "@common/utils/sort-query.util";
 
-type DataTableSortableHeadProps<TField extends string> = React.ComponentProps<typeof TableHead> & {
+type DataTableSortableHeadProps<TField extends string> = ComponentProps<typeof TableHead> & {
   defaultDirection?: SortDirection;
   field: TField;
   label: string;
@@ -24,7 +25,7 @@ export function DataTableSortableHead<TField extends string>({
   onSortChange,
   sort,
   ...props
-}: DataTableSortableHeadProps<TField>): React.ReactElement {
+}: DataTableSortableHeadProps<TField>): ReactElement {
   const direction = getSortDirection(sort, field);
 
   function updateSort(): void {
@@ -41,7 +42,7 @@ export function DataTableSortableHead<TField extends string>({
   );
 }
 
-function SortIcon({ direction }: { direction: SortDirection | undefined }): React.ReactElement {
+function SortIcon({ direction }: { direction: SortDirection | undefined }): ReactElement {
   if (direction === "asc") {
     return <ChevronsUpIcon data-icon="inline-end" />;
   }
@@ -53,9 +54,14 @@ function SortIcon({ direction }: { direction: SortDirection | undefined }): Reac
   return <ChevronsUpDownIcon data-icon="inline-end" className="text-muted-foreground" />;
 }
 
-function getSortAriaValue(direction: SortDirection | undefined): React.AriaAttributes["aria-sort"] {
-  if (direction === "asc") return "ascending";
-  if (direction === "desc") return "descending";
+function getSortAriaValue(direction: SortDirection | undefined): AriaAttributes["aria-sort"] {
+  if (direction === "asc") {
+    return "ascending";
+  }
+
+  if (direction === "desc") {
+    return "descending";
+  }
 
   return "none";
 }

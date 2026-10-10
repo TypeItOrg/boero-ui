@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createPassthroughResponse } from "@common/utils/create-passthrough-response.util";
+
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { getAcademicApiBase, type AcademicScope } from "@features/academic/utils/academic-scope.util";
 
@@ -36,6 +37,7 @@ const DEFAULT_SORT_BY_RESOURCE: Record<"training-paths" | "academic-spaces" | "s
 
 export async function proxyAcademicOptionsGet(request: Request, resourceSegment: string, scope: AcademicScope): Promise<Response> {
   const { searchParams } = new URL(request.url);
+
   const parsed = academicOptionsRequestSchema.safeParse({
     resource: resourceSegment,
     ...Object.fromEntries(searchParams),
@@ -67,6 +69,7 @@ export async function proxyAcademicOptionsGet(request: Request, resourceSegment:
   if (parsed.data.published) {
     backendParams.set("published", parsed.data.published);
   }
+
   if (parsed.data.trainingPathId) {
     backendParams.set("trainingPathId", parsed.data.trainingPathId);
   }

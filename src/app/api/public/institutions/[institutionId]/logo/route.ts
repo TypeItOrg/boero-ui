@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
 import { isValidUuid } from "@common/utils/uuid.util";
+
 import { INSTITUTION_LOGO_MIME_TYPES, MAX_INSTITUTION_LOGO_BYTES } from "@features/institutions/constants/institution-logo.constants";
 
 function unavailable(status = 503): Response {
@@ -9,65 +11,89 @@ function unavailable(status = 503): Response {
 
 export async function GET(request: Request, { params }: { params: Promise<{ institutionId: string }> }): Promise<Response> {
   const { institutionId } = await params;
+
   if (!isValidUuid(institutionId)) {
     return unavailable(404);
   }
 
   try {
     const version = new URL(request.url).searchParams.get("v");
+
     const response = await publicApiFetch(`/api/v1/institutions/${institutionId}/logo${version ? `?v=${encodeURIComponent(version)}` : ""}`);
+
     if (!response.ok) {
       return unavailable(response.status === 404 ? 404 : 503);
     }
 
     const type = response.headers.get("content-type")?.split(";")[0];
+
     const declaredSize = Number(response.headers.get("content-length"));
+
     if (!response.body || !type || !INSTITUTION_LOGO_MIME_TYPES.some((allowed) => allowed === type) || declaredSize > MAX_INSTITUTION_LOGO_BYTES) {
       await response.body?.cancel();
+
       return unavailable();
     }
 
     const reader = response.body.getReader();
+
     const initialChunks: Uint8Array[] = [];
+
     let initialSize = 0;
+
     let complete = false;
+
     while (initialSize < 8 && !complete) {
       const chunk = await reader.read();
+
       complete = chunk.done;
+
       if (chunk.value) {
         initialChunks.push(chunk.value);
         initialSize += chunk.value.byteLength;
       }
     }
+
     if (initialSize > MAX_INSTITUTION_LOGO_BYTES) {
       await reader.cancel();
+
       return unavailable();
     }
+
     const signature = new Uint8Array(Math.min(initialSize, 8));
+
     let offset = 0;
+
     for (const chunk of initialChunks) {
       const prefix = chunk.subarray(0, signature.byteLength - offset);
+
       signature.set(prefix, offset);
       offset += prefix.byteLength;
+
       if (offset === signature.byteLength) {
         break;
       }
     }
+
     const validSignature =
       type === "image/png"
         ? [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => signature[index] === byte)
         : signature[0] === 255 && signature[1] === 216 && signature[2] === 255;
+
     if (!validSignature) {
       await reader.cancel();
+
       return unavailable();
     }
 
     let total = initialSize;
+
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
         for (const chunk of initialChunks) {
           controller.enqueue(chunk);
         }
+
         if (complete) {
           controller.close();
         }
@@ -76,19 +102,26 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
         if (complete) {
           return;
         }
+
         try {
           const chunk = await reader.read();
+
           if (chunk.done) {
             complete = true;
             controller.close();
+
             return;
           }
+
           total += chunk.value.byteLength;
+
           if (total > MAX_INSTITUTION_LOGO_BYTES) {
             await reader.cancel();
             controller.error(new Error("Logo size limit exceeded"));
+
             return;
           }
+
           controller.enqueue(chunk.value);
         } catch (error) {
           controller.error(error);
@@ -98,6 +131,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ inst
         return reader.cancel();
       },
     });
+
     return new Response(stream, {
       headers: {
         "Content-Type": type,

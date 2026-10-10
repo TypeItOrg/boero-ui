@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 
 export const institutionalIdentifySchema = z.object({

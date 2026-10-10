@@ -1,3 +1,4 @@
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import {
   calculateAge,
   personalDataSchema,
@@ -82,7 +83,10 @@ describe("enrollment-application.schema", () => {
       expect(personalDataSchema.safeParse(valid).success).toBe(true);
 
       const invalidEmail = { ...valid, email: "not-an-email" };
-      expect(personalDataSchema.safeParse(invalidEmail).success).toBe(false);
+      expect(personalDataSchema.safeParse(invalidEmail)).toMatchObject({
+        success: false,
+        error: { issues: [{ path: ["email"], message: ENROLLMENT_MESSAGES.EMAIL_INVALID }] },
+      });
     });
 
     it("validates academicBackgroundSchema", () => {
@@ -98,11 +102,40 @@ describe("enrollment-application.schema", () => {
         }).success,
       ).toBe(true);
 
-      expect(
-        academicBackgroundSchema.safeParse({
-          secondarySchool: "",
-        }).success,
-      ).toBe(false);
+      const incomplete = academicBackgroundSchema.safeParse({ secondarySchool: "" });
+      expect(incomplete.success).toBe(false);
+
+      if (!incomplete.success) {
+        expect(incomplete.error.issues).toHaveLength(7);
+        expect(incomplete.error.issues.map((issue) => issue.path.join("."))).toEqual(
+          expect.arrayContaining([
+            "currentlyStudying",
+            "educationLevel",
+            "schoolOrigin",
+            "currentGradeYear",
+            "levelCompleted",
+            "secondaryCompleted",
+            "secondaryDegreeTitle",
+          ]),
+        );
+      }
+    });
+
+    it("requires the current school when the applicant is studying", () => {
+      const result = academicBackgroundSchema.safeParse({
+        currentlyStudying: true,
+        educationLevel: "SECONDARY",
+        schoolOrigin: "   ",
+        currentGradeYear: null,
+        levelCompleted: null,
+        secondaryCompleted: false,
+        secondaryDegreeTitle: null,
+      });
+
+      expect(result).toMatchObject({
+        success: false,
+        error: { issues: [{ path: ["schoolOrigin"], message: ENROLLMENT_MESSAGES.EDUCATION_INSTITUTION_REQUIRED }] },
+      });
     });
 
     it("validates healthInclusionSchema", () => {
@@ -122,11 +155,10 @@ describe("enrollment-application.schema", () => {
         }).success,
       ).toBe(true);
 
-      expect(
-        preferenceSchema.safeParse({
-          preferredShift: "",
-        }).success,
-      ).toBe(false);
+      expect(preferenceSchema.safeParse({ preferredShift: "" })).toMatchObject({
+        success: false,
+        error: { issues: [{ path: ["preferredShift"], message: ENROLLMENT_MESSAGES.SHIFT_REQUIRED }] },
+      });
     });
   });
 
@@ -167,9 +199,21 @@ describe("enrollment-application.schema", () => {
         isReenrolling: false,
       },
       attachments: [
-        { id: "1", requirementId: "00000000-0000-4000-8000-000000000001", originalFileName: "dni-frente.jpg" },
-        { id: "2", requirementId: "00000000-0000-4000-8000-000000000002", originalFileName: "dni-dorso.jpg" },
-        { id: "3", requirementId: "00000000-0000-4000-8000-000000000003", originalFileName: "foto.jpg" },
+        {
+          id: "1",
+          requirementId: "00000000-0000-4000-8000-000000000001",
+          originalFileName: "dni-frente.jpg",
+        },
+        {
+          id: "2",
+          requirementId: "00000000-0000-4000-8000-000000000002",
+          originalFileName: "dni-dorso.jpg",
+        },
+        {
+          id: "3",
+          requirementId: "00000000-0000-4000-8000-000000000003",
+          originalFileName: "foto.jpg",
+        },
       ],
     };
 
@@ -190,10 +234,19 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(minorData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
-        const issues = result.error.issues;
-        const responsibleErrors = issues.filter((i) => i.path[0] === "responsible");
-        expect(responsibleErrors.length).toBeGreaterThan(0);
+        expect(result.error.issues).toHaveLength(6);
+        expect(result.error.issues).toEqual(
+          expect.arrayContaining([
+            { code: "custom", path: ["responsible", "fullName"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_NAME_REQUIRED },
+            { code: "custom", path: ["responsible", "documentNumber"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_DOCUMENT_REQUIRED },
+            { code: "custom", path: ["responsible", "phoneNumber"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_PHONE_REQUIRED },
+            { code: "custom", path: ["responsible", "email"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_EMAIL_REQUIRED },
+            { code: "custom", path: ["responsible", "occupation"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_OCCUPATION_REQUIRED },
+            { code: "custom", path: ["responsible", "educationLevel"], message: ENROLLMENT_MESSAGES.RESPONSIBLE_EDUCATION_REQUIRED },
+          ]),
+        );
       }
     });
 
@@ -251,9 +304,27 @@ describe("enrollment-application.schema", () => {
 
       for (const result of [missing, invalid]) {
         expect(result.success).toBe(false);
+
         if (!result.success) {
           expect(result.error.issues.map((issue) => issue.path.join("."))).toContain("personalData.email");
         }
+      }
+    });
+
+    it.each([
+      ["2008-09-26", true],
+      ["2008-09-27", false],
+    ])("applies the eighteenth birthday boundary for %s", (birthDate, success) => {
+      const result = enrollmentApplicationSubmissionSchema.safeParse({
+        ...baseValidAdult,
+        personalData: { ...baseValidAdult.personalData, birthDate },
+      });
+
+      expect(result.success).toBe(success);
+
+      if (!result.success) {
+        expect(result.error.issues).toHaveLength(6);
+        expect(result.error.issues.every((issue) => issue.path[0] === "responsible")).toBe(true);
       }
     });
 
@@ -268,9 +339,11 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(healthSupportData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
-        const paths = result.error.issues.map((i) => i.path.join("."));
-        expect(paths).toContain("healthInclusion.adjustmentDetails");
+        expect(result.error.issues).toEqual([
+          { code: "custom", path: ["healthInclusion", "adjustmentDetails"], message: ENROLLMENT_MESSAGES.ADJUSTMENT_DETAILS_REQUIRED },
+        ]);
       }
     });
 
@@ -299,10 +372,30 @@ describe("enrollment-application.schema", () => {
 
       const result = enrollmentApplicationSubmissionSchema.safeParse(reenrollingData);
       expect(result.success).toBe(false);
+
       if (!result.success) {
-        const paths = result.error.issues.map((i) => i.path.join("."));
-        expect(paths).toContain("preference.previousTeacher");
+        expect(result.error.issues).toEqual([
+          { code: "custom", path: ["preference", "previousTeacher"], message: ENROLLMENT_MESSAGES.PREVIOUS_TEACHER_REQUIRED },
+        ]);
       }
+    });
+
+    it("accepts a returning applicant with a previous teacher", () => {
+      expect(
+        enrollmentApplicationSubmissionSchema.safeParse({
+          ...baseValidAdult,
+          preference: { ...baseValidAdult.preference, isReenrolling: true, previousTeacher: "María Pérez" },
+        }).success,
+      ).toBe(true);
+    });
+
+    it("requires at least one selected course", () => {
+      const result = enrollmentApplicationSubmissionSchema.safeParse({ ...baseValidAdult, courses: [] });
+
+      expect(result).toMatchObject({
+        success: false,
+        error: { issues: [{ path: ["courses"], message: ENROLLMENT_MESSAGES.SPACE_REQUIRED }] },
+      });
     });
 
     it("allows submission when attachments are empty (documentation relegated)", () => {

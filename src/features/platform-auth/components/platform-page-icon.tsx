@@ -1,6 +1,8 @@
+import type { ReactElement } from "react";
+
 import type { LucideIcon } from "lucide-react";
 
-export function PlatformPageIcon({ icon: Icon }: { icon: LucideIcon }): React.ReactElement {
+export function PlatformPageIcon({ icon: Icon }: { icon: LucideIcon }): ReactElement {
   return (
     <div
       data-slot="platform-page-icon"

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { getFieldErrors, pickFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
 import { resetInstitutionalPasswordSchema } from "@features/institutional-auth/schemas/reset-institutional-password.schema";
 import { resetInstitutionalPassword } from "@features/institutional-auth/services/reset-institutional-password.service";
@@ -27,6 +28,7 @@ export async function resetPassword(_previousState: ResetPasswordActionState, fo
     password: parsed.data.password,
     confirmPassword: parsed.data.confirmPassword,
   });
+
   if (output.success) {
     await setInstitutionalPasswordChangedCookie();
     redirect("/auth/login");

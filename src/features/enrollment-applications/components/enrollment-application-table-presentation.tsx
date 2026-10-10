@@ -1,14 +1,17 @@
 "use client";
 
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { Loader2Icon } from "lucide-react";
 
 import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { EnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/enrollment-application-approve-dialog";
 import { EnrollmentApplicationEmptyState } from "@features/enrollment-applications/components/enrollment-application-empty-state";
 import { EnrollmentApplicationPagination } from "@features/enrollment-applications/components/enrollment-application-pagination";
@@ -16,8 +19,9 @@ import { EnrollmentApplicationRejectDialog } from "@features/enrollment-applicat
 import { EnrollmentApplicationTableRow } from "@features/enrollment-applications/components/enrollment-application-table-row";
 import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
 import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
-import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
+import type { EnrollmentApplicationReviewSummary } from "@features/enrollment-applications/types/enrollment-application-review-summary.types";
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 
 type EnrollmentApplicationTablePresentationProps = {
   data: PaginatedResponse<EnrollmentApplication>;
@@ -39,11 +43,18 @@ export function EnrollmentApplicationTablePresentation({
   canApprove,
   canReject,
   scope,
-}: EnrollmentApplicationTablePresentationProps): React.ReactElement {
+}: EnrollmentApplicationTablePresentationProps): ReactElement {
   const router = useRouter();
+
   const { isPending: isNavigating } = useDataTableNavigation();
-  const [applicationToApprove, setApplicationToApprove] = React.useState<EnrollmentApplication>();
-  const [applicationToReject, setApplicationToReject] = React.useState<EnrollmentApplication>();
+
+  const [applicationToApprove, setApplicationToApprove] = useState<EnrollmentApplication>();
+
+  const [applicationToReject, setApplicationToReject] = useState<EnrollmentApplication>();
+
+  const ApproveDialog = scope === AcademicScope.ADMIN ? PlatformEnrollmentApplicationApproveDialog : EnrollmentApplicationApproveDialog;
+
+  const RejectDialog = scope === AcademicScope.ADMIN ? PlatformEnrollmentApplicationRejectDialog : EnrollmentApplicationRejectDialog;
 
   function handleApproveDialogOpenChange(open: boolean): void {
     if (!open) {
@@ -94,13 +105,7 @@ export function EnrollmentApplicationTablePresentation({
                 canReject={canReject && application.canReject === true}
                 onApprove={setApplicationToApprove}
                 onReject={setApplicationToReject}
-                detailHref={
-                  scope === AcademicScope.ADMIN
-                    ? `/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`
-                    : scope === AcademicScope.INSTITUTIONAL
-                      ? `/enrollment-applications/${application.applicationId}`
-                      : undefined
-                }
+                detailHref={getApplicationDetailHref(scope, application)}
               />
             ))}
           </TableBody>
@@ -115,64 +120,18 @@ export function EnrollmentApplicationTablePresentation({
 
       <EnrollmentApplicationPagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} />
 
-      {applicationToApprove && scope === AcademicScope.ADMIN ? (
-        <PlatformEnrollmentApplicationApproveDialog
-          application={{
-            institutionId: applicationToApprove.institutionId,
-            applicationId: applicationToApprove.applicationId,
-            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
-            canConfirm: applicationToApprove.canConfirm,
-            applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName
-              ? formatStudyPlanLabel(applicationToApprove)
-              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
-          }}
-          open
-          onOpenChange={handleApproveDialogOpenChange}
-          onApproved={handleResolved}
-        />
-      ) : applicationToApprove ? (
-        <EnrollmentApplicationApproveDialog
-          application={{
-            institutionId: applicationToApprove.institutionId,
-            applicationId: applicationToApprove.applicationId,
-            canApproveProvisionally: applicationToApprove.canApproveProvisionally,
-            canConfirm: applicationToApprove.canConfirm,
-            applicantName: `${applicationToApprove.applicantFirstName} ${applicationToApprove.applicantLastName}`,
-            studyPlanName: applicationToApprove.studyPlanName
-              ? formatStudyPlanLabel(applicationToApprove)
-              : applicationToApprove.trainingPathName || "Sin trayecto formativo",
-          }}
+      {applicationToApprove ? (
+        <ApproveDialog
+          application={getReviewSummary(applicationToApprove)}
           open
           onOpenChange={handleApproveDialogOpenChange}
           onApproved={handleResolved}
         />
       ) : null}
 
-      {applicationToReject && scope === AcademicScope.ADMIN ? (
-        <PlatformEnrollmentApplicationRejectDialog
-          application={{
-            institutionId: applicationToReject.institutionId,
-            applicationId: applicationToReject.applicationId,
-            applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName
-              ? formatStudyPlanLabel(applicationToReject)
-              : applicationToReject.trainingPathName || "Sin trayecto formativo",
-          }}
-          open
-          onOpenChange={handleRejectDialogOpenChange}
-          onRejected={handleResolved}
-        />
-      ) : applicationToReject ? (
-        <EnrollmentApplicationRejectDialog
-          application={{
-            institutionId: applicationToReject.institutionId,
-            applicationId: applicationToReject.applicationId,
-            applicantName: `${applicationToReject.applicantFirstName} ${applicationToReject.applicantLastName}`,
-            studyPlanName: applicationToReject.studyPlanName
-              ? formatStudyPlanLabel(applicationToReject)
-              : applicationToReject.trainingPathName || "Sin trayecto formativo",
-          }}
+      {applicationToReject ? (
+        <RejectDialog
+          application={getReviewSummary(applicationToReject)}
           open
           onOpenChange={handleRejectDialogOpenChange}
           onRejected={handleResolved}
@@ -180,4 +139,26 @@ export function EnrollmentApplicationTablePresentation({
       ) : null}
     </div>
   );
+}
+
+function getApplicationDetailHref(scope: AcademicScope | undefined, application: EnrollmentApplication): string | undefined {
+  switch (scope) {
+    case AcademicScope.ADMIN:
+      return `/admin/enrollment-applications/${application.institutionId}/${application.applicationId}`;
+    case AcademicScope.INSTITUTIONAL:
+      return `/enrollment-applications/${application.applicationId}`;
+    default:
+      return undefined;
+  }
+}
+
+function getReviewSummary(application: EnrollmentApplication): EnrollmentApplicationReviewSummary {
+  return {
+    institutionId: application.institutionId,
+    applicationId: application.applicationId,
+    canApproveProvisionally: application.canApproveProvisionally,
+    canConfirm: application.canConfirm,
+    applicantName: `${application.applicantFirstName} ${application.applicantLastName}`,
+    studyPlanName: application.studyPlanName ? formatStudyPlanLabel(application) : application.trainingPathName || "Sin trayecto formativo",
+  };
 }

@@ -1,6 +1,7 @@
+import { NextRequest, type NextResponse } from "next/server";
+
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { NextRequest, type NextResponse } from "next/server";
 
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 
@@ -75,7 +76,10 @@ class PlatformCookieJar {
     for (const name of AUTH_COOKIE_NAMES) {
       const cookie = response.cookies.get(name);
 
-      if (!cookie) continue;
+      if (!cookie) {
+        continue;
+      }
+
       if (cookie.value === "") {
         this.cookies.delete(name);
         continue;
@@ -88,6 +92,7 @@ class PlatformCookieJar {
 
 function getCookieValue(cookies: Map<string, string>, name: string): { value: string } | undefined {
   const value = cookies.get(name);
+
   return value ? { value } : undefined;
 }
 
@@ -158,6 +163,7 @@ afterEach(() => {
 
 afterAll(() => {
   server.close();
+
   for (const [key, value] of Object.entries(originalEnvironment)) {
     if (value === undefined) {
       delete process.env[key];

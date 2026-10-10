@@ -1,34 +1,45 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 
 import { YearSelect } from "@common/components/ui/year-select";
 import { toOptionalFormString } from "@common/utils/form-value.util";
+
 import { DateRangeFields, parseInitialDate } from "@features/academic/components/academic-date-range-fields";
 import { FormField, FormSelect } from "@features/academic/components/academic-form-controls";
 import type { AcademicFieldsProps } from "@features/academic/types/academic-fields-props.types";
 import { ACADEMIC_YEAR_STATUS } from "@features/academic/types/academic-year-status.types";
 import { academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
-import { getMaxAcademicYear, MIN_ACADEMIC_YEAR } from "@features/academic/utils/academic-year.util";
+import { MIN_ACADEMIC_YEAR, getMaxAcademicYear } from "@features/academic/utils/academic-year.util";
 
 const ACADEMIC_YEAR_STATUS_OPTIONS = ACADEMIC_YEAR_STATUS.filter((status) => status !== "CLOSED").map((status) => ({
   value: status,
   label: academicYearStatusLabels[status],
 }));
 
-export function AcademicYearFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): React.ReactElement {
-  const initialYear = Number(toOptionalFormString(initialValues.year));
+export function AcademicYearFields({ initialValues = {}, fieldErrors }: AcademicFieldsProps): ReactElement {
   const initialStatus = toOptionalFormString(initialValues.status);
-  const [selectedYear, setSelectedYear] = useState<number | undefined>(Number.isInteger(initialYear) ? initialYear : undefined);
-  const [startDate, setStartDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, "startDate"));
-  const [endDate, setEndDate] = useState<Date | undefined>(() => parseInitialDate(initialValues, "endDate"));
+
+  const [selection, setSelection] = useState(() => {
+    const year = Number(toOptionalFormString(initialValues.year));
+
+    return {
+      year: Number.isInteger(year) ? year : undefined,
+      startDate: parseInitialDate(initialValues, "startDate"),
+      endDate: parseInitialDate(initialValues, "endDate"),
+    };
+  });
+
+  const { year: selectedYear, startDate, endDate } = selection;
+
   const hasSelectedYear = selectedYear !== undefined;
+
   const yearStart = hasSelectedYear ? new Date(selectedYear, 0, 1) : undefined;
+
   const yearEnd = hasSelectedYear ? new Date(selectedYear, 11, 31) : undefined;
+
   const followingYearEnd = hasSelectedYear ? new Date(selectedYear + 1, 11, 31) : undefined;
 
   function handleYearChange(value: string): void {
-    setSelectedYear(Number(value));
-    setStartDate(undefined);
-    setEndDate(undefined);
+    setSelection({ year: Number(value), startDate: undefined, endDate: undefined });
   }
 
   return (
@@ -56,7 +67,12 @@ export function AcademicYearFields({ initialValues = {}, fieldErrors }: Academic
         endLabel="Fecha de finalización"
         endName="endDate"
         initialValues={initialValues}
-        controlledRange={{ startDate, endDate, onStartDateChange: setStartDate, onEndDateChange: setEndDate }}
+        controlledRange={{
+          startDate,
+          endDate,
+          onStartDateChange: (date) => setSelection((previous) => ({ ...previous, startDate: date })),
+          onEndDateChange: (date) => setSelection((previous) => ({ ...previous, endDate: date })),
+        }}
         fieldErrors={fieldErrors}
         disabled={!hasSelectedYear}
         dateFieldsKey={selectedYear}

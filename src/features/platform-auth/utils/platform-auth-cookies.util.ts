@@ -26,8 +26,13 @@ export function getPlatformAuthCookieOptions(maxAge: number): PlatformAuthCookie
 }
 
 function shouldUseSecureCookies(): boolean {
-  if (process.env.AUTH_COOKIE_SECURE === "true") return true;
-  if (process.env.AUTH_COOKIE_SECURE === "false") return false;
+  if (process.env.AUTH_COOKIE_SECURE === "true") {
+    return true;
+  }
+
+  if (process.env.AUTH_COOKIE_SECURE === "false") {
+    return false;
+  }
 
   return process.env.NODE_ENV === "production";
 }
@@ -46,6 +51,7 @@ export async function setPlatformAuthCookies(tokens: PlatformLoginResult["tokens
 
 export async function clearPlatformAuthCookies(): Promise<void> {
   const cookieStore = await cookies();
+
   cookieStore.delete(PLATFORM_ACCESS_TOKEN_COOKIE);
   cookieStore.delete(PLATFORM_REFRESH_TOKEN_COOKIE);
 }

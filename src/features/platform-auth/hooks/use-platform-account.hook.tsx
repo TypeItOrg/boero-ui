@@ -1,9 +1,11 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
 import { platformAccountKeys } from "@features/platform-auth/utils/platform-account-keys.util";
 
@@ -40,5 +42,6 @@ export function usePlatformAccount(options: UsePlatformAccountOptions = {}) {
 
 async function fetchPlatformAccount(): Promise<PlatformAccount | null> {
   const response = await fetch("/api/admin/account", { cache: "no-store" });
+
   return parseHttpResponse(response, "No se pudo actualizar la sesión de plataforma.");
 }

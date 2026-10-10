@@ -1,7 +1,3 @@
-jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
-jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({ institutionalApiFetch: jest.fn() }));
-jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({ requireInstitutionalUser: jest.fn() }));
-
 import { revalidatePath } from "next/cache";
 
 import { resolveGuardianLinkAction } from "@features/guardian-links/actions/resolve-guardian-link.action";
@@ -9,6 +5,10 @@ import { GUARDIAN_LINKS_PAGE_PATH } from "@features/guardian-links/constants/gua
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
 import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+
+jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
+jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({ institutionalApiFetch: jest.fn() }));
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({ requireInstitutionalUser: jest.fn() }));
 
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const LINK_ID = "00000000-0000-4000-8000-0000000000aa";

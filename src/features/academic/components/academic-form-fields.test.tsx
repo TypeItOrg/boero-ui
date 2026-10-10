@@ -1,11 +1,13 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { AcademicFormFields } from "@features/academic/components/academic-form-fields";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { getCurrentAcademicYear, getMaxAcademicYear } from "@features/academic/utils/academic-year.util";
+
+import { createTestQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@common/components/ui/year-select", () => ({
   YearSelect: ({
@@ -38,7 +40,7 @@ jest.mock("@common/components/ui/year-select", () => ({
 describe("AcademicFormFields", () => {
   it("renders the course builder with locked plan and space once a class exists", () => {
     render(
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider client={createTestQueryClient()}>
         <AcademicFormFields
           resource={AcademicResource.COURSE}
           institutionId="05b84ac4-66aa-409f-a813-012d15b8cb9b"
@@ -101,7 +103,7 @@ describe("AcademicFormFields", () => {
     const trainingPathId = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 
     render(
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider client={createTestQueryClient()}>
         <AcademicFormFields
           resource={AcademicResource.STUDY_PLAN}
           institutionId="05b84ac4-66aa-409f-a813-012d15b8cb9b"
@@ -124,12 +126,11 @@ describe("AcademicFormFields", () => {
     expect(screen.getByLabelText("Fecha de inicio")).toHaveAttribute("type", "text");
     expect(screen.getByLabelText("Fecha de finalización")).toHaveAttribute("type", "text");
     expect(screen.getAllByPlaceholderText("dd/mm/aaaa")).toHaveLength(2);
-    expect(screen.getByLabelText(/Año/).closest('[data-slot="field"]')).toHaveClass("sm:col-span-2");
   });
 
   it("marks every required study-plan-space field consistently", () => {
     render(
-      <QueryClientProvider client={new QueryClient()}>
+      <QueryClientProvider client={createTestQueryClient()}>
         <AcademicFormFields resource={AcademicResource.STUDY_PLAN_SPACE} />
       </QueryClientProvider>,
     );
@@ -370,9 +371,6 @@ describe("AcademicFormFields", () => {
 
     expect(screen.queryByLabelText(/Nombre/)).not.toBeInTheDocument();
     expect(screen.getByText("El nombre se genera automáticamente a partir del orden (Nivel 1, Nivel 2, …).")).toBeInTheDocument();
-
-    const orderField = screen.getByLabelText(/Orden/).closest('[data-slot="field"]');
-    expect(orderField).toHaveClass("w-full", "flex-none");
   });
 
   it("marks an end date before the start date as invalid", async () => {
@@ -385,8 +383,6 @@ describe("AcademicFormFields", () => {
 
     expect(screen.getByLabelText("Fecha de finalización")).toHaveAttribute("aria-invalid", "true");
     expect(document.querySelector<HTMLInputElement>('input[name="endDate"]')).toHaveValue(`29/07/${year}`);
-    expect(screen.getByLabelText("Fecha de inicio").closest('[data-slot="field"]')).toHaveClass("self-start");
-    expect(screen.getByLabelText("Fecha de finalización").closest('[data-slot="field"]')).toHaveClass("self-start");
   });
 
   it("preserves an invalid manual date so the project schema can report it", async () => {

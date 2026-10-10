@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import { getResponseErrorActionState, getValidationActionState } from "@common/utils/action-state.util";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
 import { institutionalProfileSchema } from "@features/institutional-auth/schemas/institutional-profile.schema";
 import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 export async function updateInstitutionalProfileAction(formData: FormData) {
   const payload = {
@@ -20,7 +21,10 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
   };
 
   const parsed = institutionalProfileSchema.safeParse(payload);
-  if (!parsed.success) return getValidationActionState(parsed.error.issues, PROFILE_FIELDS);
+
+  if (!parsed.success) {
+    return getValidationActionState(parsed.error.issues, PROFILE_FIELDS);
+  }
 
   await requireInstitutionalUser();
 
@@ -29,11 +33,16 @@ export async function updateInstitutionalProfileAction(formData: FormData) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed.data),
   });
+
   const errorState = await getResponseErrorActionState(response, PROFILE_FIELDS, "No se pudieron actualizar tus datos.");
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   revalidatePath("/");
   revalidatePath("/account");
+
   return { success: true } as const;
 }
 
@@ -56,8 +65,12 @@ const PROFILE_FIELDS = [
 
 function parseAddress(formData: FormData) {
   const cityId = String(formData.get("address.cityId") ?? "");
+
   const street = String(formData.get("address.street") ?? "");
-  if (!cityId && !street) return undefined;
+
+  if (!cityId && !street) {
+    return undefined;
+  }
 
   return {
     cityId,

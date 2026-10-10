@@ -19,6 +19,7 @@ export function getAcademicLifecycleCapabilities(
   permissions: { delete: boolean; restore: boolean },
 ): AcademicLifecycleCapabilities {
   const isDeleted = item.deletedAt != null;
+
   return {
     canDelete: !isDeleted && permissions.delete && isDeletableState(resource, item),
     canRestore: isDeleted && permissions.restore,
@@ -27,7 +28,13 @@ export function getAcademicLifecycleCapabilities(
 }
 
 function isDeletableState(resource: AcademicCollectionResource, item: LifecycleInput): boolean {
-  if (resource === AcademicResource.ACADEMIC_YEAR) return item.statusValue === "PLANNED";
-  if (resource === AcademicResource.STUDY_PLAN) return item.statusValue === "DRAFT" || item.statusValue === "INACTIVE";
+  if (resource === AcademicResource.ACADEMIC_YEAR) {
+    return item.statusValue === "PLANNED";
+  }
+
+  if (resource === AcademicResource.STUDY_PLAN) {
+    return item.statusValue === "DRAFT" || item.statusValue === "INACTIVE";
+  }
+
   return !item.active;
 }

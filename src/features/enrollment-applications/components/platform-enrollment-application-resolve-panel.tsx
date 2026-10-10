@@ -1,10 +1,13 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { BadgeCheckIcon, BanIcon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
+
 import { PlatformEnrollmentApplicationApproveDialog } from "@features/enrollment-applications/components/platform-enrollment-application-approve-dialog";
 import { PlatformEnrollmentApplicationRejectDialog } from "@features/enrollment-applications/components/platform-enrollment-application-reject-dialog";
 import {
@@ -21,10 +24,12 @@ type PlatformEnrollmentApplicationResolvePanelProps = {
 export function PlatformEnrollmentApplicationResolvePanel({
   application,
   status,
-}: PlatformEnrollmentApplicationResolvePanelProps): React.ReactElement | null {
+}: PlatformEnrollmentApplicationResolvePanelProps): ReactElement | null {
   const router = useRouter();
-  const [showApproveDialog, setShowApproveDialog] = React.useState(false);
-  const [showRejectDialog, setShowRejectDialog] = React.useState(false);
+
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
 
   function handleResolved(): void {
     setShowApproveDialog(false);

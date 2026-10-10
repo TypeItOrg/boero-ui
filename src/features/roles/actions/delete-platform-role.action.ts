@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
+
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 export async function deletePlatformRoleAction(institutionId: string, roleId: string): Promise<{ error?: string }> {
@@ -18,7 +19,12 @@ export async function deletePlatformRoleAction(institutionId: string, roleId: st
     [],
     "No se pudo eliminar el rol.",
   );
-  if (error) return error;
+
+  if (error) {
+    return error;
+  }
+
   revalidatePath("/admin/roles");
+
   return {};
 }

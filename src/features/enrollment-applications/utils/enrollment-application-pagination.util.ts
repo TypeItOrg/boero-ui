@@ -1,6 +1,7 @@
 import type { PaginationParams } from "@common/types/pagination-params.types";
 import type { PaginationSearchParams } from "@common/types/pagination-search-params.types";
 import { PAGE_SIZE_OPTIONS, parsePaginationQuery } from "@common/utils/pagination-query.util";
+
 import type { EnrollmentApplicationStatus } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import { isEnrollmentApplicationStatus } from "@features/enrollment-applications/utils/enrollment-application-status.util";
 

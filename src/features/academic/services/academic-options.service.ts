@@ -1,7 +1,8 @@
-import type { AcademicOptionOperation } from "@features/academic/types/academic-option-operation.types";
 import type { AsyncDropdownFetchPageInput } from "@common/types/async-dropdown-fetch-page-input.types";
 import type { AsyncDropdownPage } from "@common/types/async-dropdown-page.types";
 import { parseHttpResponse } from "@common/utils/http-response-error.util";
+
+import type { AcademicOptionOperation } from "@features/academic/types/academic-option-operation.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
 type AcademicOptionResource = "training-paths" | "academic-spaces" | "study-plans" | "academic-years" | "instruments";
@@ -41,6 +42,7 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
   if (options.published) {
     searchParams.set("published", "true");
   }
+
   if (options.trainingPathId) {
     searchParams.set("trainingPathId", options.trainingPathId);
   }
@@ -53,6 +55,7 @@ export async function fetchAcademicOptionPage<TItem extends AcademicOption>(
     cache: "no-store",
     signal,
   });
+
   const data = await parseHttpResponse<{ items: TItem[]; page: number; totalPages: number }>(
     response,
     "No se pudieron cargar las opciones académicas.",

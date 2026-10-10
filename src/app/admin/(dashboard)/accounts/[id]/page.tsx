@@ -1,17 +1,21 @@
+import type { ReactElement } from "react";
+
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { FingerprintIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { PlatformAccountDetail } from "@features/platform-accounts/components/platform-account-detail";
 import { fetchPlatformAccountAdmin } from "@features/platform-accounts/services/fetch-platform-account.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
-import { Metadata } from "next";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 type PlatformAccountDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -22,11 +26,17 @@ export const metadata: Metadata = {
   title: "Detalle de cuenta",
 };
 
-export default async function PlatformAccountDetailPage({ params, searchParams }: PlatformAccountDetailPageProps): Promise<React.ReactElement> {
+export default async function PlatformAccountDetailPage({ params, searchParams }: PlatformAccountDetailPageProps): Promise<ReactElement> {
   const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
+
   const destination = getSafeReturnTo(returnTo, "/admin/accounts");
+
   const account = await fetchPlatformAccountAdmin(id);
-  if (!account) notFound();
+
+  if (!account) {
+    notFound();
+  }
+
   const fullName = `${account.name} ${account.lastName}`;
 
   return (

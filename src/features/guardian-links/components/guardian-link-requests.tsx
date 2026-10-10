@@ -1,6 +1,9 @@
 "use client";
 
+/* eslint-disable max-lines, no-nested-ternary, no-restricted-syntax */
+
 import { useMemo, useState, useTransition } from "react";
+
 import { CheckIcon, FileTextIcon, SearchIcon, UsersIcon, XIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -11,6 +14,7 @@ import { Input } from "@common/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import { formatDisplayDate } from "@common/utils/date-input.util";
+
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 import { formatApplicationDateTime } from "@features/enrollment-applications/utils/enrollment-application.util";
 import { GUARDIAN_RELATIONSHIP_LABELS } from "@features/guardian-dependents/constants/guardian-dependent.constants";
@@ -48,14 +52,20 @@ export function GuardianLinkRequests({
   showInstitution = false,
 }: GuardianLinkRequestsProps): React.ReactElement {
   const [rows, setRows] = useState(requests);
+
   const [search, setSearch] = useState("");
+
   const [documentNumber, setDocumentNumber] = useState("");
+
   const [status, setStatus] = useState<StatusFilter>("ALL");
+
   const normalizedSearch = search.trim().toLocaleLowerCase();
+
   const filteredRows = useMemo(
     () =>
       rows.filter((request) => {
         const people = `${getGuardianDependentName(request.tutor)} ${getGuardianDependentName(request.dependent)}`.toLocaleLowerCase();
+
         const documents = `${request.tutor.documentNumber} ${request.dependent.documentNumber}`;
 
         return (
@@ -182,7 +192,9 @@ function RequestRow({
   showInstitution: boolean;
 }): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
+
   const [isPending, startTransition] = useTransition();
+
   const getAttachmentPath =
     attachmentPathMode === "platform"
       ? getPlatformGuardianLinkAttachmentContentPath
@@ -193,6 +205,7 @@ function RequestRow({
 
     if (!requestInstitutionId) {
       setError("La solicitud no tiene una institución asociada.");
+
       return;
     }
 
@@ -203,6 +216,7 @@ function RequestRow({
 
         if (result.error) {
           setError(result.error);
+
           return;
         }
 

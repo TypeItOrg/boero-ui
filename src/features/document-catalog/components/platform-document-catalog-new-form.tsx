@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
 
-import type { DocumentDefinitionDefaults } from "@features/document-catalog/types/document-definition-defaults.types";
 import { DocumentCatalogForm } from "@features/document-catalog/components/document-catalog-form";
 import { DocumentCatalogInstitutionField } from "@features/document-catalog/components/document-catalog-institution-field";
+import type { DocumentDefinitionDefaults } from "@features/document-catalog/types/document-definition-defaults.types";
 
 export function PlatformDocumentCatalogNewForm({
   institutionId,
@@ -18,11 +18,13 @@ export function PlatformDocumentCatalogNewForm({
   returnTo: string;
   defaults?: DocumentDefinitionDefaults;
   copySourceInstitutionId?: string;
-}): React.ReactElement {
-  const [institution, setInstitution] = React.useState<{ id: string; name?: string } | undefined>(
+}): ReactElement {
+  const [institution, setInstitution] = useState<{ id: string; name?: string } | undefined>(
     institutionId ? { id: institutionId, name: institutionName } : undefined,
   );
-  const [pending, setPending] = React.useState(false);
+
+  const [pending, setPending] = useState(false);
+
   const institutionField = (
     <DocumentCatalogInstitutionField
       id="new-document-institution"

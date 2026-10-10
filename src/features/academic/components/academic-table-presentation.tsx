@@ -1,53 +1,26 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ReactElement } from "react";
+
 import { usePathname, useSearchParams } from "next/navigation";
+
 import { PlusIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
 import { Button } from "@common/components/ui/button";
-import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTableLoadingOverlay } from "@common/components/ui/data-table-loading-overlay";
-import { DataTableSortableHead } from "@common/components/ui/data-table-sortable-head";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
-import type { PaginatedResponse } from "@common/types/paginated-response.types";
-import type { PaginationParams } from "@common/types/pagination-params.types";
+import { useDataTableNavigation } from "@common/components/ui/data-table-navigation";
+
 import { AcademicDeleteDialog } from "@features/academic/components/academic-delete-dialog";
 import { AcademicRestoreDialog } from "@features/academic/components/academic-restore-dialog";
+import { AcademicResultsTable } from "@features/academic/components/academic-results-table";
 import { AcademicStatusDialogRouter } from "@features/academic/components/academic-status-dialog-router";
 import { AcademicTableEmptyState, getEmptyStateSupportingDescription } from "@features/academic/components/academic-table-empty-state";
 import { AcademicTablePagination } from "@features/academic/components/academic-table-pagination";
-import { AcademicTableRow } from "@features/academic/components/academic-table-row";
 import { ACADEMIC_LIFECYCLE_ACTION_KIND, type AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
-import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import type { AcademicStatusSelection } from "@features/academic/types/academic-status-selection.types";
-import type { AcademicTableColumns } from "@features/academic/types/academic-table-columns.types";
-import type { AcademicTableRow as AcademicTableRowData } from "@features/academic/types/academic-table-row.types";
-import type { AcademicSort, AcademicSortField } from "@features/academic/utils/academic-pagination.util";
-import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
-
-type AcademicTablePresentationProps = PaginationParams & {
-  basePath: string;
-  canCreate: boolean;
-  canCreateVersion?: boolean;
-  canReadWaitlist?: boolean;
-  canDelete: boolean;
-  canRestore: boolean;
-  canChangeStatus: boolean;
-  columns: AcademicTableColumns;
-  createAction?: React.ReactNode;
-  data: PaginatedResponse<AcademicTableRowData>;
-  deleted: boolean;
-  hasFilters: boolean;
-  global?: boolean;
-  institutionId?: string;
-  canUpdate: boolean;
-  plural: string;
-  resource: AcademicCollectionResource;
-  scope: AcademicScope;
-  singular: string;
-  sort: AcademicSort;
-};
+import { type AcademicTablePresentationProps } from "@features/academic/types/academic-table-presentation-props.types";
+import type { AcademicSort } from "@features/academic/utils/academic-pagination.util";
 
 export function AcademicTablePresentation({
   basePath,
@@ -72,20 +45,31 @@ export function AcademicTablePresentation({
   singular,
   sort,
   size,
-}: AcademicTablePresentationProps): React.ReactElement {
+}: AcademicTablePresentationProps): ReactElement {
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
+
   const { isPending, navigate } = useDataTableNavigation();
-  const [statusAction, setStatusAction] = React.useState<{ institutionId: string; selection: AcademicStatusSelection }>();
-  const [lifecycleAction, setLifecycleAction] = React.useState<{
+
+  const [statusAction, setStatusAction] = useState<{
+    institutionId: string;
+    selection: AcademicStatusSelection;
+  }>();
+
+  const [lifecycleAction, setLifecycleAction] = useState<{
     id: string;
     kind: AcademicLifecycleActionKind;
     label: string;
     institutionId: string;
   }>();
+
   const returnTo = getCurrentPath(pathname, searchParams.toString());
+
   const lifecycleRow = lifecycleAction ? data.items.find((row) => row.id === lifecycleAction.id) : undefined;
+
   const showDeleteDialog = lifecycleAction?.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.DELETE && lifecycleRow?.deletedAt == null;
+
   const showRestoreDialog = lifecycleAction?.kind === ACADEMIC_LIFECYCLE_ACTION_KIND.RESTORE && lifecycleRow?.deletedAt != null;
 
   function updateSort(nextSort: AcademicSort): void {
@@ -98,7 +82,19 @@ export function AcademicTablePresentation({
 
   if (data.items.length === 0) {
     const allowCreate = !deleted && (canCreate || createAction !== undefined);
+
     const isInitialEmptyState = !hasFilters && !deleted && data.totalItems === 0 && allowCreate;
+
+    const defaultCreateAction = (
+      <Button asChild size="lg">
+        <ReturnToLink href={`${basePath}/${resource}/new`}>
+          <PlusIcon data-icon="inline-start" />
+          {`Nuevo ${singular}`}
+        </ReturnToLink>
+      </Button>
+    );
+
+    const emptyStateCreateAction = createAction ? <div>{createAction}</div> : defaultCreateAction;
 
     return (
       <div className="relative h-full" aria-busy={isPending}>
@@ -109,18 +105,7 @@ export function AcademicTablePresentation({
           showingDeleted={deleted}
           onFirstPage={() => navigate({ page: "0", size: String(size) })}
           supportingDescription={isInitialEmptyState ? getEmptyStateSupportingDescription(resource, singular) : undefined}
-          createAction={
-            allowCreate && createAction ? (
-              <div>{createAction}</div>
-            ) : allowCreate ? (
-              <Button asChild size="lg">
-                <ReturnToLink href={`${basePath}/${resource}/new`}>
-                  <PlusIcon data-icon="inline-start" />
-                  {`Nuevo ${singular}`}
-                </ReturnToLink>
-              </Button>
-            ) : null
-          }
+          createAction={allowCreate ? emptyStateCreateAction : null}
         />
         {isPending ? <DataTableLoadingOverlay label="Cargando información académica" /> : null}
       </div>
@@ -130,57 +115,24 @@ export function AcademicTablePresentation({
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative h-full overflow-hidden rounded-lg border" aria-busy={isPending}>
-        <Table containerClassName="table-scrollbar" className={columns.detailLabels.length > 1 ? "min-w-220" : "min-w-180"}>
-          <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-            <TableRow>
-              <TableHead className="w-16 pl-4">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
-              {global ? <TableHead>Institución</TableHead> : null}
-              {[columns.primaryLabel, ...columns.detailLabels].map((label, index) => {
-                const field = columns.sortableFields?.[index];
-                if (field) {
-                  return (
-                    <DataTableSortableHead<AcademicSortField>
-                      key={`${label}-${index}`}
-                      field={field}
-                      label={label}
-                      sort={sort}
-                      onSortChange={updateSort}
-                    />
-                  );
-                }
-
-                return <TableHead key={`${label}-${index}`}>{label}</TableHead>;
-              })}
-              <TableHead>Estado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.items.map((row) => (
-              <AcademicTableRow
-                key={row.id}
-                basePath={global ? `/admin/institutions/${row.institutionId}/academic` : basePath}
-                canChangeStatus={canChangeStatus && (row.scopedActions?.status ?? true)}
-                canDelete={canDelete && (row.scopedActions?.delete ?? true)}
-                canCreateVersion={canCreateVersion && (row.scopedActions?.createVersion ?? true)}
-                canReadWaitlist={canReadWaitlist && (row.scopedActions?.waitlist ?? true)}
-                canRestore={canRestore && (row.scopedActions?.restore ?? true)}
-                canUpdate={canUpdate && (row.scopedActions?.update ?? true)}
-                columns={columns}
-                global={global}
-                onLifecycleAction={(id, label, kind) => {
-                  setLifecycleAction({ id, institutionId: getInstitutionId(id), kind, label });
-                }}
-                onStatusAction={(selection) => {
-                  setStatusAction({ institutionId: getInstitutionId(selection.id), selection });
-                }}
-                resource={resource}
-                row={row}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <AcademicResultsTable
+          columns={columns}
+          global={global}
+          sort={sort}
+          updateSort={updateSort}
+          data={data}
+          basePath={basePath}
+          canChangeStatus={canChangeStatus}
+          canDelete={canDelete}
+          canCreateVersion={canCreateVersion}
+          canReadWaitlist={canReadWaitlist}
+          canRestore={canRestore}
+          canUpdate={canUpdate}
+          setLifecycleAction={setLifecycleAction}
+          getInstitutionId={getInstitutionId}
+          setStatusAction={setStatusAction}
+          resource={resource}
+        />
         {isPending ? <DataTableLoadingOverlay label="Cargando información académica" /> : null}
       </div>
       <AcademicTablePagination
@@ -198,7 +150,9 @@ export function AcademicTablePresentation({
         <AcademicStatusDialogRouter
           institutionId={statusAction.institutionId}
           onOpenChange={(open) => {
-            if (!open) setStatusAction(undefined);
+            if (!open) {
+              setStatusAction(undefined);
+            }
           }}
           returnTo={returnTo}
           scope={scope}
@@ -212,7 +166,9 @@ export function AcademicTablePresentation({
           institutionId={lifecycleAction.institutionId}
           label={`${singular} ${lifecycleAction.label}`}
           onOpenChange={(open) => {
-            if (!open) setLifecycleAction(undefined);
+            if (!open) {
+              setLifecycleAction(undefined);
+            }
           }}
           open
           resource={resource}
@@ -226,7 +182,9 @@ export function AcademicTablePresentation({
           institutionId={lifecycleAction.institutionId}
           label={`${singular} ${lifecycleAction.label}`}
           onOpenChange={(open) => {
-            if (!open) setLifecycleAction(undefined);
+            if (!open) {
+              setLifecycleAction(undefined);
+            }
           }}
           open
           resource={resource}

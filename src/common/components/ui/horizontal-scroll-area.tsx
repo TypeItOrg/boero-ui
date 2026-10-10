@@ -1,22 +1,27 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+
 import { ScrollArea as ScrollAreaPrimitive } from "radix-ui";
 
 import { cn } from "@common/utils/cn.util";
 
 type HorizontalScrollAreaProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): React.ReactElement {
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const viewportRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollBackward, setCanScrollBackward] = React.useState(false);
-  const [canScrollForward, setCanScrollForward] = React.useState(false);
+export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): ReactElement {
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  const [canScrollBackward, setCanScrollBackward] = useState(false);
+
+  const [canScrollForward, setCanScrollForward] = useState(false);
+
+  useEffect(() => {
     const root = rootRef.current;
+
     const viewport = viewportRef.current;
 
     if (!root || !viewport) {
@@ -40,6 +45,7 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
       }
 
       const verticalDelta = normalizeWheelDelta(event.deltaY, event.deltaMode, scrollViewport.clientWidth);
+
       const scrollDelta = Math.abs(event.deltaX) >= Math.abs(verticalDelta) ? event.deltaX : verticalDelta;
 
       event.preventDefault();
@@ -53,6 +59,7 @@ export function HorizontalScrollArea({ children }: HorizontalScrollAreaProps): R
     }
 
     const resizeObserver = new ResizeObserver(updateScrollState);
+
     const animationFrame = window.requestAnimationFrame(updateScrollState);
 
     root.addEventListener("wheel", handleWheel, { capture: true, passive: false });

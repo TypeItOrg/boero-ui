@@ -1,23 +1,25 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
-import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+import { useActionState, type ReactElement } from "react";
 
-import { useActionState } from "react";
 import Link from "next/link";
+
 import { CircleAlertIcon, InfoIcon, KeyRoundIcon, UserRoundCogIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
+import { SectionHeader } from "@common/components/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
+import { useActionFormErrorFocus } from "@common/hooks/use-action-form-error-focus";
+
 import { saveInstitutionRoleAction } from "@features/roles/actions/save-institution-role.action";
 import { PermissionGroupsFields } from "@features/roles/components/permission-groups-fields";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionRole } from "@features/roles/types/institution-role.types";
 import type { RoleFormState } from "@features/roles/types/role-form-state.types";
-import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionRoleFormProps = {
   institutionId: string;
@@ -28,10 +30,13 @@ type InstitutionRoleFormProps = {
 
 const initialState: RoleFormState = {};
 
-export function InstitutionRoleForm({ institutionId, role, permissionGroups, returnTo }: InstitutionRoleFormProps): React.ReactElement {
+export function InstitutionRoleForm({ institutionId, role, permissionGroups, returnTo }: InstitutionRoleFormProps): ReactElement {
   const destination = returnTo ?? (role ? `/roles/${role.id}` : "/roles");
+
   const action = saveInstitutionRoleAction.bind(null, institutionId, role?.id, destination);
+
   const [state, formAction, pending] = useActionState(action, initialState);
+
   const formRef = useActionFormErrorFocus(state, pending);
 
   return (

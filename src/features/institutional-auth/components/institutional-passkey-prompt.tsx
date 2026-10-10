@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { FingerprintIcon, Loader2Icon } from "lucide-react";
 
 import { Button } from "@common/components/ui/button";
@@ -18,7 +20,7 @@ export function InstitutionalPasskeyPrompt({
   onContinue,
   onCancel,
   onUsePassword,
-}: InstitutionalPasskeyPromptProps): React.ReactElement {
+}: InstitutionalPasskeyPromptProps): ReactElement {
   return (
     <section aria-labelledby="passkey-prompt-title" className="border-primary/10 bg-primary/3 @container rounded-xl border p-4 sm:p-5">
       <div className="flex items-stretch gap-3">

@@ -1,6 +1,8 @@
-import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
-import type { fetchPeople } from "@features/people/services/fetch-people.service";
+import type { ReactElement } from "react";
+
 import { PeopleTablePresentation } from "@features/people/components/people-table-presentation";
+import type { fetchPeople } from "@features/people/services/fetch-people.service";
+import type { PeoplePaginationParams } from "@features/people/utils/people-pagination.util";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
 type PeopleTableContainerProps = PeoplePaginationParams & {
@@ -15,7 +17,7 @@ type PeopleTableContainerProps = PeoplePaginationParams & {
   canUpdateStatus?: boolean;
 };
 
-export async function PeopleTableContainer(props: PeopleTableContainerProps): Promise<React.ReactElement> {
+export async function PeopleTableContainer(props: PeopleTableContainerProps): Promise<ReactElement> {
   const {
     dataPromise,
     institutionId,
@@ -31,6 +33,7 @@ export async function PeopleTableContainer(props: PeopleTableContainerProps): Pr
     canDelete = true,
     canUpdateStatus = false,
   } = props;
+
   const data = await dataPromise;
 
   return (

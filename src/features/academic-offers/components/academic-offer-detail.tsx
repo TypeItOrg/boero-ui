@@ -1,21 +1,24 @@
-import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
+import type { ReactElement } from "react";
+
 import { BookMarkedIcon, BookOpenCheckIcon, Layers3Icon, type LucideIcon } from "lucide-react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Badge } from "@common/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@common/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { formatDisplayDate } from "@common/utils/date-input.util";
-import type { AcademicOfferDetail as AcademicOfferDetailType } from "@features/academic-offers/types/academic-offer-detail.types";
-import type { AcademicOfferSpace } from "@features/academic-offers/types/academic-offer-space.types";
+
 import {
   academicSpaceFormatLabels,
   academicSpaceTypeLabels,
   approvalModeLabels,
   requirementTypeLabels,
 } from "@features/academic/utils/academic-labels.util";
-import { SectionHeader } from "@common/components/section-header";
+import { formatStudyPlanName } from "@features/academic/utils/study-plan-label.util";
+import type { AcademicOfferDetail as AcademicOfferDetailType } from "@features/academic-offers/types/academic-offer-detail.types";
+import type { AcademicOfferSpace } from "@features/academic-offers/types/academic-offer-space.types";
 
-export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailType }): React.ReactElement {
+export function AcademicOfferDetail({ detail }: { detail: AcademicOfferDetailType }): ReactElement {
   const hasSpaces = detail.levels.some((level) => level.spaces.length > 0) || detail.unassignedSpaces.length > 0;
 
   return (
@@ -110,7 +113,7 @@ type AcademicOfferSectionHeaderProps = {
   titleId: string;
 };
 
-function AcademicOfferSectionHeader({ description, icon: Icon, title, titleId }: AcademicOfferSectionHeaderProps): React.ReactElement {
+function AcademicOfferSectionHeader({ description, icon: Icon, title, titleId }: AcademicOfferSectionHeaderProps): ReactElement {
   return (
     <header className="-mx-5 border-b px-5 pb-5 md:-mx-6 md:px-6">
       <SectionHeader icon={Icon} title={title} description={<span className="text-muted-foreground text-sm">{description}</span>} titleId={titleId} />
@@ -118,7 +121,7 @@ function AcademicOfferSectionHeader({ description, icon: Icon, title, titleId }:
   );
 }
 
-function AcademicOfferSpaceCard({ space }: { space: AcademicOfferSpace }): React.ReactElement {
+function AcademicOfferSpaceCard({ space }: { space: AcademicOfferSpace }): ReactElement {
   return (
     <Card size="sm" className="bg-background h-full">
       <CardHeader>
@@ -136,6 +139,9 @@ function AcademicOfferSpaceCard({ space }: { space: AcademicOfferSpace }): React
 }
 
 function formatValidity(effectiveFrom: string, effectiveTo: string | null): string {
-  if (!effectiveTo) return `Vigente desde ${formatDisplayDate(effectiveFrom)}`;
+  if (!effectiveTo) {
+    return `Vigente desde ${formatDisplayDate(effectiveFrom)}`;
+  }
+
   return `Del ${formatDisplayDate(effectiveFrom)} al ${formatDisplayDate(effectiveTo)}`;
 }

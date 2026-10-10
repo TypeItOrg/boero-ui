@@ -1,7 +1,9 @@
+import type { ReactElement } from "react";
+
 import { NavigationCardSkeleton } from "@common/components/navigation/navigation-card-skeleton";
 import { Skeleton } from "@common/components/ui/skeleton";
 
-export function InstitutionalHomeSkeleton(): React.ReactElement {
+export function InstitutionalHomeSkeleton(): ReactElement {
   return (
     <main className="flex min-h-full flex-1 flex-col gap-4" aria-label="Cargando portal institucional" role="status">
       <header className="bg-muted/60 @container/home-hero relative flex h-56 min-w-0 items-center overflow-hidden shadow-sm @2xl/home-hero:h-64">

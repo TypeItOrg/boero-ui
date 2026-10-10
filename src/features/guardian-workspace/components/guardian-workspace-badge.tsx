@@ -1,8 +1,11 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax */
+
 import { UserRoundIcon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
+
 import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { useGuardianWorkspace } from "@features/guardian-workspace/components/guardian-workspace-provider";
 
@@ -23,6 +26,7 @@ export function GuardianWorkspaceBadge(): React.ReactElement | null {
   }
 
   const fullName = getGuardianDependentName(activeDependent);
+
   const roleLabel = activeDependent.roles.join(", ");
 
   return (

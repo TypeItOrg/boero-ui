@@ -1,3 +1,8 @@
+import { revalidatePath } from "next/cache";
+
+import { approveEnrollmentApplicationAction } from "@features/enrollment-applications/actions/approve-enrollment-application.action";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -9,11 +14,6 @@ jest.mock("@features/institutional-auth/services/institutional-api-fetch.service
 jest.mock("@features/academic/utils/academic-action-auth.util", () => ({
   authorizeAcademicAction: jest.fn().mockResolvedValue(undefined),
 }));
-
-import { revalidatePath } from "next/cache";
-
-import { approveEnrollmentApplicationAction } from "@features/enrollment-applications/actions/approve-enrollment-application.action";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
 
 const INSTITUTION_ID = "00000000-0000-4000-8000-000000000001";
 const APPLICATION_ID = "00000000-0000-4000-8000-000000000002";

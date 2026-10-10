@@ -1,4 +1,7 @@
+import type { ReactElement } from "react";
+
 import { parseUuidQueryParam } from "@common/utils/query-param.util";
+
 import { AcademicCollectionView } from "@features/academic/components/academic-collection";
 import { AcademicPageIcon } from "@features/academic/components/academic-shell";
 import { PlatformAcademicCreateButton } from "@features/academic/components/platform-academic-create-button";
@@ -17,9 +20,11 @@ export async function PlatformAcademicCollectionPage({
 }: {
   resource: AcademicCollectionResource;
   searchParams: AcademicSearchParams;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const config = ACADEMIC_COLLECTION_CONFIG[resource];
+
   const institutionId = parseUuidQueryParam(searchParams.institutionId);
+
   const institution = institutionId ? await fetchInstitution(institutionId) : null;
 
   return (

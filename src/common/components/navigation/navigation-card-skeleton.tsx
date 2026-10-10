@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { Skeleton } from "@common/components/ui/skeleton";
 import { cn } from "@common/utils/cn.util";
 
@@ -6,7 +8,7 @@ type NavigationCardSkeletonProps = {
   prominent?: boolean;
 };
 
-export function NavigationCardSkeleton({ className, prominent = false }: NavigationCardSkeletonProps): React.ReactElement {
+export function NavigationCardSkeleton({ className, prominent = false }: NavigationCardSkeletonProps): ReactElement {
   return (
     <div
       aria-hidden="true"

@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTableNavigationProvider, useDataTableNavigation } from "@common/components/ui/data-table-navigation";
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
-import { getAcademicRegistrationSummary, ACADEMIC_PAGE_SIZE_OPTIONS } from "@features/academic/utils/academic-pagination.util";
+
+import { ACADEMIC_PAGE_SIZE_OPTIONS, getAcademicRegistrationSummary } from "@features/academic/utils/academic-pagination.util";
 
 type AcademicSpaceUsagePaginationProps = {
   page: number;
@@ -11,7 +14,7 @@ type AcademicSpaceUsagePaginationProps = {
   totalPages: number;
 };
 
-export function AcademicSpaceUsagePagination(props: AcademicSpaceUsagePaginationProps): React.ReactElement {
+export function AcademicSpaceUsagePagination(props: AcademicSpaceUsagePaginationProps): ReactElement {
   return (
     <DataTableNavigationProvider>
       <AcademicSpaceUsagePaginationControls {...props} />
@@ -19,7 +22,7 @@ export function AcademicSpaceUsagePagination(props: AcademicSpaceUsagePagination
   );
 }
 
-function AcademicSpaceUsagePaginationControls({ page, size, totalItems, totalPages }: AcademicSpaceUsagePaginationProps): React.ReactElement {
+function AcademicSpaceUsagePaginationControls({ page, size, totalItems, totalPages }: AcademicSpaceUsagePaginationProps): ReactElement {
   const { isPending, navigate } = useDataTableNavigation();
 
   return (

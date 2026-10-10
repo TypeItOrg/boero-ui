@@ -5,7 +5,9 @@ export type PersonRoleChanges = {
 
 export function getRoleChanges(currentRoleCodes: readonly string[], desiredRoleCodes: readonly string[]): PersonRoleChanges {
   const currentRoleCodeSet = new Set(currentRoleCodes);
+
   const desiredRoleCodeSet = new Set(desiredRoleCodes);
+
   const assignments = desiredRoleCodes.filter((roleCode) => !currentRoleCodeSet.has(roleCode));
 
   return {

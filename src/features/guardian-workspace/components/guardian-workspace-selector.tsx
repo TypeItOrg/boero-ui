@@ -1,6 +1,9 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax */
+
 import Link from "next/link";
+
 import { UserRoundIcon, UsersRoundIcon } from "lucide-react";
 
 import {
@@ -10,6 +13,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@common/components/ui/dropdown-menu";
+
 import { GUARDIAN_DEPENDENTS_PAGE_PATH } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import { getGuardianDependentName } from "@features/guardian-dependents/utils/guardian-dependent-display.util";
 import { useGuardianWorkspace } from "@features/guardian-workspace/components/guardian-workspace-provider";

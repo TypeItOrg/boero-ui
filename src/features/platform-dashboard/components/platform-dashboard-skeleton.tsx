@@ -1,7 +1,9 @@
+import type { ReactElement } from "react";
+
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Skeleton } from "@common/components/ui/skeleton";
 
-export function PlatformDashboardSkeleton(): React.ReactElement {
+export function PlatformDashboardSkeleton(): ReactElement {
   return (
     <div className="flex flex-col gap-4" aria-label="Cargando resumen de la plataforma" role="status">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -52,7 +54,7 @@ export function PlatformDashboardSkeleton(): React.ReactElement {
   );
 }
 
-function InstitutionStatusSkeleton(): React.ReactElement {
+function InstitutionStatusSkeleton(): ReactElement {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="relative size-52">

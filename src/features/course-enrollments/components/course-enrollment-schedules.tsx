@@ -1,7 +1,10 @@
-import { OptionalValue } from "@common/components/optional-value";
+import type { ReactElement } from "react";
+
 import { ClockIcon } from "lucide-react";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { Badge } from "@common/components/ui/badge";
+
 import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
 
@@ -9,14 +12,18 @@ type CourseEnrollmentSchedulesProps = {
   schedules: CourseEnrollment["schedules"];
 };
 
-export function CourseEnrollmentSchedules({ schedules }: CourseEnrollmentSchedulesProps): React.ReactElement {
+export function CourseEnrollmentSchedules({ schedules }: CourseEnrollmentSchedulesProps): ReactElement {
   const groups = new Map<string, { days: Set<string>; startTime: string; endTime: string; released: boolean }>();
 
   for (const schedule of schedules) {
     const startTime = schedule.startTime.slice(0, 5);
+
     const endTime = schedule.endTime.slice(0, 5);
+
     const released = Boolean(schedule.releasedAt);
+
     const key = `${startTime}-${endTime}-${released}`;
+
     const group = groups.get(key);
 
     if (group) {

@@ -1,6 +1,9 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax */
+
 import { startTransition, useActionState, useState, type SyntheticEvent } from "react";
+
 import { AlertCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -13,6 +16,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@co
 import { Input } from "@common/components/ui/input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@common/components/ui/select";
+
 import { calculateAge } from "@features/enrollment-applications/schemas/enrollment-application.schema";
 import { createGuardianDependentAction } from "@features/guardian-dependents/actions/create-guardian-dependent.action";
 import {
@@ -43,9 +47,13 @@ export function AddGuardianDependentDialog({ institutionId, onClose, onSuccess }
       return { error: GUARDIAN_DEPENDENT_MESSAGES.CREATE };
     }
   }, {});
+
   const [birthDate, setBirthDate] = useState<Date>();
+
   const age = calculateAge(birthDate);
+
   const [relationship, setRelationship] = useState("");
+
   const [isPrimaryContact, setIsPrimaryContact] = useState(false);
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>): void {

@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, type PropsWithChildren, type ReactElement } from "react";
 
+import { DropdownOptionContent } from "@common/components/ui/dropdown-option-content";
 import { Field, FieldContent, FieldError, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@common/components/ui/select";
-import { DropdownOptionContent } from "@common/components/ui/dropdown-option-content";
-import { DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES, DROPDOWN_GROUP_HEADING_CLASS_NAME } from "@common/constants/dropdown-group.constants";
-import { groupDropdownItems } from "@common/utils/dropdown-groups.util";
 import { Textarea } from "@common/components/ui/textarea";
+import { DROPDOWN_GROUP_EDGE_SPACING_CLASS_NAMES, DROPDOWN_GROUP_HEADING_CLASS_NAME } from "@common/constants/dropdown-group.constants";
 import type { FormValue } from "@common/types/form-value.types";
 import { cn } from "@common/utils/cn.util";
+import { groupDropdownItems } from "@common/utils/dropdown-groups.util";
 import { toFormControlValue } from "@common/utils/form-value.util";
 
 type SharedFieldProps = {
@@ -20,7 +20,7 @@ type NameFieldProps = SharedFieldProps & {
   fullWidth?: boolean;
 };
 
-type FormFieldProps = React.PropsWithChildren<{
+type FormFieldProps = PropsWithChildren<{
   className?: string;
   error?: string;
   label: string;
@@ -34,13 +34,20 @@ type FormSelectProps = {
   disabled?: boolean;
   name: string;
   onValueChange?: (value: string) => void;
-  options: { value: string; label: string; disabled?: boolean; group?: string; displayLabel?: string; description?: string }[];
+  options: {
+    value: string;
+    label: string;
+    disabled?: boolean;
+    group?: string;
+    displayLabel?: string;
+    description?: string;
+  }[];
   groupOrder?: readonly string[];
   placeholder?: string;
   value?: string;
 };
 
-export function NameField({ initialValues, error, fullWidth = true }: NameFieldProps): React.ReactElement {
+export function NameField({ initialValues, error, fullWidth = true }: NameFieldProps): ReactElement {
   return (
     <FormField label="Nombre" name="name" error={error} className={fullWidth ? "w-full flex-[1_0_100%]" : undefined} required>
       <Input aria-invalid={Boolean(error)} defaultValue={toFormControlValue(initialValues.name)} id="name" maxLength={150} name="name" required />
@@ -48,7 +55,7 @@ export function NameField({ initialValues, error, fullWidth = true }: NameFieldP
   );
 }
 
-export function DescriptionField({ initialValues, error }: SharedFieldProps): React.ReactElement {
+export function DescriptionField({ initialValues, error }: SharedFieldProps): ReactElement {
   return (
     <FormField label="Descripción" name="description" error={error} className="w-full flex-[1_0_100%]">
       <Textarea
@@ -63,7 +70,7 @@ export function DescriptionField({ initialValues, error }: SharedFieldProps): Re
   );
 }
 
-export function FormField({ label, name, error, className, children, required = false }: FormFieldProps): React.ReactElement {
+export function FormField({ label, name, error, className, children, required = false }: FormFieldProps): ReactElement {
   return (
     <Field data-invalid={Boolean(error)} className={cn("flex-[1_0_min(350px,100%)] self-start", className)}>
       <FieldContent>
@@ -87,12 +94,17 @@ export function FormSelect({
   placeholder,
   value: controlledValue,
   onValueChange,
-}: FormSelectProps): React.ReactElement {
+}: FormSelectProps): ReactElement {
   const [internalValue, setInternalValue] = useState<string>(() => String(defaultValue ?? ""));
+
   const value = controlledValue ?? internalValue;
+
   const handleValueChange = onValueChange ?? setInternalValue;
+
   const selectedOption = options.find((option) => option.value === value);
+
   const groups = groupDropdownItems(options, (option) => option.group, groupOrder);
+
   const hasRichOptions = options.some((option) => option.displayLabel !== undefined);
 
   return (

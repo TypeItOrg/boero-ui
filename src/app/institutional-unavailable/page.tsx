@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
 
 import { InstitutionalUnavailableView } from "@features/institutional-auth/components/institutional-unavailable-view";
@@ -14,8 +16,9 @@ type InstitutionalUnavailablePageProps = {
   }>;
 };
 
-export default async function InstitutionalUnavailablePage({ searchParams }: InstitutionalUnavailablePageProps): Promise<React.ReactElement> {
+export default async function InstitutionalUnavailablePage({ searchParams }: InstitutionalUnavailablePageProps): Promise<ReactElement> {
   const { message } = await searchParams;
+
   const homeHref = process.env.FRONTEND_PUBLIC_URL || "/";
 
   return <InstitutionalUnavailableView message={message} homeHref={homeHref} />;

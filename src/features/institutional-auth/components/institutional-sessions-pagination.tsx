@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { SESSIONS_PAGE_SIZE_OPTIONS } from "@features/institutional-auth/utils/session-pagination.util";
 
 type InstitutionalSessionsPaginationProps = PaginationParams & {
@@ -20,7 +23,7 @@ export function InstitutionalSessionsPagination({
   isPending,
   onPageChange,
   onPageSizeChange,
-}: InstitutionalSessionsPaginationProps): React.ReactElement {
+}: InstitutionalSessionsPaginationProps): ReactElement {
   return (
     <DataTablePagination
       page={page}

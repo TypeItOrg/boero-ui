@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+
+import { usePathname } from "next/navigation";
 
 import { useSidebar } from "@common/components/ui/sidebar";
 import { MOBILE_SIDEBAR_CLOSE_DELAY_MS } from "@common/constants/sidebar.constants";
@@ -14,8 +15,11 @@ export type MobileSidebarNavigation = {
 
 export function useMobileSidebarNavigation(): MobileSidebarNavigation {
   const pathname = usePathname();
+
   const { isMobile, setOpenMobile } = useSidebar();
+
   const [pendingUrl, setPendingUrl] = useState<string>();
+
   const [navigatedFromPathname, setNavigatedFromPathname] = useState<string>();
 
   function clearPendingState(): void {
@@ -25,6 +29,7 @@ export function useMobileSidebarNavigation(): MobileSidebarNavigation {
 
   if (pendingUrl) {
     const hasPathnameChanged = navigatedFromPathname !== undefined && pathname !== navigatedFromPathname;
+
     const shouldResetOnRender = (!isMobile && pathname === pendingUrl) || (hasPathnameChanged && pathname !== pendingUrl);
 
     if (shouldResetOnRender) {
@@ -38,13 +43,17 @@ export function useMobileSidebarNavigation(): MobileSidebarNavigation {
   }
 
   function isActive(url: string, exact = false): boolean {
-    if (pendingUrl) return pendingUrl === url;
+    if (pendingUrl) {
+      return pendingUrl === url;
+    }
 
     return isNavigationItemActive(pathname, url, exact);
   }
 
   useEffect(() => {
-    if (!isMobile || !pendingUrl || pathname !== pendingUrl) return;
+    if (!isMobile || !pendingUrl || pathname !== pendingUrl) {
+      return;
+    }
 
     const timeoutId = window.setTimeout(() => {
       setOpenMobile(false);

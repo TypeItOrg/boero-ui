@@ -1,23 +1,25 @@
 "use client";
 
-import { ActionForm } from "@common/components/action-form";
+import { useActionState, type ReactElement } from "react";
 
-import { useActionState } from "react";
-import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import Link from "next/link";
+
 import { AlertCircleIcon, Loader2Icon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { PasswordInput } from "@common/components/ui/password-input";
 import { cn } from "@common/utils/cn.util";
+
 import { resetPassword } from "@features/institutional-auth/actions/reset-institutional-password.action";
+import { InstitutionalAuthStepHeader } from "@features/institutional-auth/components/institutional-auth-step-header";
 import type { ResetPasswordActionState } from "@features/institutional-auth/types/reset-password-action-state.types";
 
 const INITIAL_STATE: ResetPasswordActionState = {};
 
-export function ResetInstitutionalPasswordForm({ token }: { token: string }): React.ReactElement {
+export function ResetInstitutionalPasswordForm({ token }: { token: string }): ReactElement {
   const [state, formAction, isPending] = useActionState(resetPassword, INITIAL_STATE);
 
   return (

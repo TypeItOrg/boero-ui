@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { DataTablePagination } from "@common/components/ui/data-table-pagination";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
 import { PLATFORM_PEOPLE_PAGE_SIZE_OPTIONS } from "@features/people/utils/platform-people-pagination.util";
 
 type PlatformPeoplePaginationProps = PaginationParams & {
@@ -20,7 +23,7 @@ export function PlatformPeoplePagination({
   onPageSizeChange,
   totalItems,
   totalPages,
-}: PlatformPeoplePaginationProps): React.ReactElement {
+}: PlatformPeoplePaginationProps): ReactElement {
   const userLabel = totalItems === 1 ? "usuario registrado." : "usuarios registrados.";
 
   return (

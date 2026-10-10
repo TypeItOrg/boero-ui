@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 import type { DataTableDateFilter, DataTableSelectFilter, DataTableYearFilter } from "@common/components/ui/data-table-filters";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
+
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";

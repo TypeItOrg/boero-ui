@@ -1,8 +1,12 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
+
 import { CalendarRangeIcon } from "lucide-react";
 
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { EnrollmentPeriodForm } from "@features/enrollment-periods/components/enrollment-period-form";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
@@ -22,9 +26,11 @@ export default async function NewEnrollmentPeriodPage({
   searchParams,
 }: {
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+}): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/enrollment-periods");
+
   const user = await requireInstitutionalUser();
 
   if (!hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ENROLLMENT_PERIOD_CREATE)) {

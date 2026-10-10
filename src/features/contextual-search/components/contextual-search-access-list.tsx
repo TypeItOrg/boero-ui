@@ -1,8 +1,9 @@
 "use client";
 
-import * as React from "react";
+import { Fragment, type ReactElement } from "react";
 
 import { CommandGroup, CommandItem, CommandSeparator } from "@common/components/ui/command";
+
 import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
 
 type ContextualSearchAccessListProps = {
@@ -10,13 +11,15 @@ type ContextualSearchAccessListProps = {
   sections: readonly ContextualSearchAccessSection[];
 };
 
-export function ContextualSearchAccessList({ onNavigate, sections }: ContextualSearchAccessListProps): React.ReactElement | null {
-  if (sections.length === 0) return null;
+export function ContextualSearchAccessList({ onNavigate, sections }: ContextualSearchAccessListProps): ReactElement | null {
+  if (sections.length === 0) {
+    return null;
+  }
 
   return (
     <>
       {sections.map((section, sectionIndex) => (
-        <React.Fragment key={`${section.label ?? "Accesos"}-${sectionIndex}`}>
+        <Fragment key={`${section.label ?? "Accesos"}-${sectionIndex}`}>
           {sectionIndex > 0 ? <CommandSeparator /> : null}
           <CommandGroup heading={section.label ?? "Accesos"} className="px-3 pb-2.5 sm:px-4 **:[[cmdk-group-heading]]:px-0">
             {section.items.map((item) => {
@@ -32,7 +35,7 @@ export function ContextualSearchAccessList({ onNavigate, sections }: ContextualS
               );
             })}
           </CommandGroup>
-        </React.Fragment>
+        </Fragment>
       ))}
     </>
   );

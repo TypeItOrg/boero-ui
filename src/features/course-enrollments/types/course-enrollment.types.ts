@@ -1,4 +1,5 @@
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
+import { type CourseEnrollmentSchedule } from "@features/course-enrollments/types/course-enrollment-schedule.types";
 import type { CourseEnrollmentSource } from "@features/course-enrollments/types/course-enrollment-source.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
 
@@ -30,12 +31,4 @@ export interface CourseEnrollment {
   schedules: CourseEnrollmentSchedule[];
 }
 
-export interface CourseEnrollmentSchedule {
-  id: string;
-  classScheduleId: string;
-  individualSlotId?: string | null;
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-  releasedAt?: string | null;
-}
+export type { CourseEnrollmentSchedule } from "@features/course-enrollments/types/course-enrollment-schedule.types";

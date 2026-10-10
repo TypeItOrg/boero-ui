@@ -1,7 +1,9 @@
-import { Suspense } from "react";
+import { Suspense, type ReactElement } from "react";
+
 import { UsersIcon } from "lucide-react";
 
 import { DataTableNavigationProvider } from "@common/components/ui/data-table-navigation";
+
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformPeopleTableContainer } from "@features/people/components/platform-people-table-container";
 import { PlatformPeopleTableFilters } from "@features/people/components/platform-people-table-filters";
@@ -10,8 +12,8 @@ import { fetchPlatformPeople } from "@features/people/services/fetch-platform-pe
 import { fetchSystemRolesCatalog } from "@features/people/services/fetch-system-roles.service";
 import { parsePlatformPeoplePaginationParams, type PlatformPeopleSearchParams } from "@features/people/utils/platform-people-pagination.util";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
-import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
+import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export const metadata = {
   title: "Usuarios",
@@ -22,9 +24,11 @@ type PlatformPeoplePageProps = {
   searchParams: Promise<PlatformPeopleSearchParams>;
 };
 
-export default async function PlatformPeoplePage({ searchParams }: PlatformPeoplePageProps): Promise<React.ReactElement> {
+export default async function PlatformPeoplePage({ searchParams }: PlatformPeoplePageProps): Promise<ReactElement> {
   const params = parsePlatformPeoplePaginationParams(await searchParams);
+
   const peoplePromise = fetchPlatformPeople(params);
+
   const [roleList, selectedInstitutionName] = await Promise.all([fetchSystemRolesCatalog(), getSelectedInstitutionName(params.institutionId)]);
 
   return (
@@ -48,8 +52,11 @@ export default async function PlatformPeoplePage({ searchParams }: PlatformPeopl
 }
 
 async function getSelectedInstitutionName(institutionId: string | undefined): Promise<string | undefined> {
-  if (!institutionId) return undefined;
+  if (!institutionId) {
+    return undefined;
+  }
 
   const institution = await fetchInstitution(institutionId);
+
   return institution?.name;
 }

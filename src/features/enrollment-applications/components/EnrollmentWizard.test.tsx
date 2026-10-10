@@ -1,9 +1,18 @@
-import * as React from "react";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import type { ComponentProps } from "react";
+
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import {
+  updateEnrollmentDraftAction,
+  submitEnrollmentApplicationAction,
+  cancelEnrollmentApplicationAction,
+} from "@features/enrollment-applications/actions/enrollment-application.actions";
 import { EnrollmentWizard } from "@features/enrollment-applications/components/EnrollmentWizard";
 import type { EnrollmentApplicationResponse } from "@features/enrollment-applications/types/enrollment-application-response.types";
 import type { EnrollmentCourseOption } from "@features/enrollment-applications/types/enrollment-course-option.types";
+
+import { renderWithQueryClient as render } from "@/../test/utils/render-with-query-client";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -26,12 +35,6 @@ jest.mock("@features/enrollment-applications/actions/enrollment-application.acti
   submitEnrollmentApplicationAction: jest.fn(),
   cancelEnrollmentApplicationAction: jest.fn(),
 }));
-
-import {
-  updateEnrollmentDraftAction,
-  submitEnrollmentApplicationAction,
-  cancelEnrollmentApplicationAction,
-} from "@features/enrollment-applications/actions/enrollment-application.actions";
 
 jest.mock("@features/enrollment-applications/actions/documentation.actions", () => ({
   mutateDocument: jest.fn(),
@@ -96,14 +99,26 @@ const COMPLETE_DRAFT: EnrollmentApplicationResponse = {
     responsible: {},
     preference: { preferredShift: "MORNING", allowsImageUse: true, isReenrolling: false },
     attachments: [
-      { id: "a1", requirementId: "00000000-0000-4000-8000-000000000004", originalFileName: "dni-f.png" },
-      { id: "a2", requirementId: "00000000-0000-4000-8000-000000000005", originalFileName: "dni-d.png" },
-      { id: "a3", requirementId: "00000000-0000-4000-8000-000000000006", originalFileName: "foto.png" },
+      {
+        id: "a1",
+        requirementId: "00000000-0000-4000-8000-000000000004",
+        originalFileName: "dni-f.png",
+      },
+      {
+        id: "a2",
+        requirementId: "00000000-0000-4000-8000-000000000005",
+        originalFileName: "dni-d.png",
+      },
+      {
+        id: "a3",
+        requirementId: "00000000-0000-4000-8000-000000000006",
+        originalFileName: "foto.png",
+      },
     ],
   },
 };
 
-function renderWizard(props: Partial<React.ComponentProps<typeof EnrollmentWizard>> = {}): ReturnType<typeof render> {
+function renderWizard(props: Partial<ComponentProps<typeof EnrollmentWizard>> = {}): ReturnType<typeof render> {
   return render(<EnrollmentWizard initialApplication={BASE} initialCourseOptions={[COURSE_OPTION]} {...props} />);
 }
 
@@ -116,9 +131,6 @@ async function confirmSubmission(): Promise<void> {
 describe("EnrollmentWizard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // El wizard dispara un autoguardado apenas termina de cargar el borrador
-    // (aunque el usuario no haya tocado nada todavía), así que sin esto la
-    // promesa sin resolver revienta el efecto en cada test.
     updateAction.mockResolvedValue({ application: BASE });
   });
 
@@ -134,33 +146,31 @@ describe("EnrollmentWizard", () => {
   });
 
   it("autosaves the draft after the applicant edits a field", async () => {
-    updateAction.mockResolvedValue({ application: BASE });
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     renderWizard();
 
     await screen.findByLabelText(/^nombre/i);
-    await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    await userEvent.click(screen.getByRole("combobox", { name: /actualmente asistís/i }));
-    await userEvent.click(screen.getByRole("option", { name: "Sí" }));
-    await userEvent.click(screen.getByRole("combobox", { name: /nivel educativo actual/i }));
-    await userEvent.click(screen.getByRole("option", { name: /secundari/i }));
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    await user.click(screen.getByRole("combobox", { name: /actualmente asistís/i }));
+    await user.click(screen.getByRole("option", { name: "Sí" }));
+    await user.click(screen.getByRole("combobox", { name: /nivel educativo actual/i }));
+    await user.click(screen.getByRole("option", { name: /secundari/i }));
     const schoolInput = await screen.findByLabelText(/institución educativa actual/i);
     updateAction.mockClear();
 
-    jest.useFakeTimers();
-    try {
-      fireEvent.change(schoolInput, { target: { value: "Colegio Nacional" } });
+    fireEvent.change(schoolInput, { target: { value: "Colegio Nacional" } });
 
-      act(() => {
-        jest.advanceTimersByTime(900);
-      });
-    } finally {
-      jest.useRealTimers();
-    }
+    act(() => jest.advanceTimersByTime(799));
+    expect(updateAction).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(updateAction).toHaveBeenCalled());
-    const [, payload] = updateAction.mock.calls[updateAction.mock.calls.length - 1];
+    act(() => jest.advanceTimersByTime(1));
+    await waitFor(() => expect(updateAction).toHaveBeenCalledTimes(1));
+    const [applicationId, payload] = updateAction.mock.calls[0];
+    expect(applicationId).toBe("app-1");
     expect(payload.data.academicBackground?.schoolOrigin).toBe("Colegio Nacional");
+    expect(await screen.findByText("Borrador guardado")).toBeInTheDocument();
   });
 
   it("blocks submission, jumps back to the personal data tab and focuses the first invalid field when required fields are missing", async () => {
@@ -246,12 +256,92 @@ describe("EnrollmentWizard", () => {
     expect(screen.getByRole("tab", { name: /cursos/i })).toBeInTheDocument();
   });
   it("preserves saved courses and teacher preferences outside the loaded catalog page", async () => {
-    const courses = [{ courseId: "00000000-0000-4000-8000-000000000099", preferredTeacherId: "00000000-0000-4000-8000-000000000098" }];
-    renderWizard({ initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } } });
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const courses = [
+      {
+        courseId: "00000000-0000-4000-8000-000000000099",
+        preferredTeacherId: "00000000-0000-4000-8000-000000000098",
+      },
+    ];
+    renderWizard({
+      initialApplication: { ...COMPLETE_DRAFT, data: { ...COMPLETE_DRAFT.data, courses } },
+    });
     await screen.findByLabelText(/^nombre/i);
-    await userEvent.click(screen.getByRole("tab", { name: /escolaridad/i }));
-    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Otro colegio" } });
-    await waitFor(() => expect(updateAction).toHaveBeenCalled(), { timeout: 3000 });
-    expect(updateAction.mock.calls.at(-1)?.[1].data.courses).toEqual(courses);
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    updateAction.mockClear();
+
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), {
+      target: { value: "Otro colegio" },
+    });
+
+    act(() => jest.advanceTimersByTime(800));
+    await waitFor(() => expect(updateAction).toHaveBeenCalledTimes(1));
+    expect(updateAction.mock.calls[0][0]).toBe("app-1");
+    expect(updateAction.mock.calls[0][1].data.courses).toEqual(courses);
+    expect(updateAction.mock.calls[0][1].data.academicBackground?.schoolOrigin).toBe("Otro colegio");
+    expect(await screen.findByText("Borrador guardado")).toBeInTheDocument();
+  });
+
+  it("keeps the autosave deadline across unrelated renders and does not resave an unchanged draft", async () => {
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    renderWizard({ initialApplication: COMPLETE_DRAFT });
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Colegio corregido" } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(updateAction).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("tab", { name: /salud/i }));
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(updateAction).toHaveBeenCalledTimes(1);
+    expect(updateAction.mock.calls[0][1].data.academicBackground?.schoolOrigin).toBe("Colegio corregido");
+    expect(updateAction.mock.calls[0][1].data.personalData?.birthDate).toBe("1990-04-10");
+
+    await act(async () => {
+      jest.advanceTimersByTime(2400);
+    });
+
+    expect(updateAction).toHaveBeenCalledTimes(1);
+  });
+
+  it("discards the previous applicant's draft and queued autosave when changing applications", async () => {
+    jest.useFakeTimers({ doNotFake: ["queueMicrotask", "nextTick"] });
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { rerender } = renderWizard({ initialApplication: COMPLETE_DRAFT });
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    fireEvent.change(screen.getByLabelText(/última institución educativa/i), { target: { value: "Edición sin guardar" } });
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    rerender(
+      <EnrollmentWizard
+        initialApplication={{
+          ...COMPLETE_DRAFT,
+          applicationId: "app-2",
+          data: {
+            ...COMPLETE_DRAFT.data,
+            personalData: { ...COMPLETE_DRAFT.data.personalData, firstName: "Ana" },
+            academicBackground: { ...COMPLETE_DRAFT.data.academicBackground, schoolOrigin: "Escuela de Ana" },
+          },
+        }}
+        initialCourseOptions={[COURSE_OPTION]}
+      />,
+    );
+
+    expect(screen.getByLabelText(/^nombre/i)).toHaveValue("Ana");
+    await user.click(screen.getByRole("tab", { name: /escolaridad/i }));
+    expect(screen.getByLabelText(/última institución educativa/i)).toHaveValue("Escuela de Ana");
+    await act(async () => {
+      jest.advanceTimersByTime(1600);
+    });
+
+    expect(updateAction).not.toHaveBeenCalled();
   });
 });

@@ -1,3 +1,9 @@
+import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
+import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
+import { setGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+
 jest.mock("@features/guardian-dependents/services/guardian-dependent.service", () => ({
   fetchGuardianDependents: jest.fn(),
 }));
@@ -7,12 +13,6 @@ jest.mock("@features/institutional-auth/services/get-institutional-user.service"
 jest.mock("@features/guardian-workspace/utils/guardian-workspace-cookie.util", () => ({
   setGuardianWorkspaceId: jest.fn(),
 }));
-
-import { fetchGuardianDependents } from "@features/guardian-dependents/services/guardian-dependent.service";
-import { setGuardianWorkspaceAction } from "@features/guardian-workspace/actions/set-guardian-workspace.action";
-import { setGuardianWorkspaceId } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 
 const DEPENDENT_ID = "019f9c3a-f891-7bc5-a98d-e65332998002";
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998003";

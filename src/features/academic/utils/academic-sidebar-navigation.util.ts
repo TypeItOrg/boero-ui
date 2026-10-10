@@ -9,6 +9,7 @@ export function getAcademicSidebarNavigationSections(
   scope: "institutional" | "platform",
 ): SidebarNavigationSection[] {
   const prefix = scope === "platform" ? "/admin" : "";
+
   const enrollmentSections = groupSidebarNavigationSection(sections, {
     sectionLabel: "Académico",
     sourceSectionLabel: "Inscripciones",

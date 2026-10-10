@@ -1,8 +1,11 @@
+/* eslint-disable no-restricted-syntax */
+
 import type { Metadata } from "next";
+
 import { UsersIcon } from "lucide-react";
 
-import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";
 import { resolvePlatformGuardianLinkAction } from "@features/guardian-links/actions/resolve-platform-guardian-link.action";
+import { GuardianLinkRequests } from "@features/guardian-links/components/guardian-link-requests";
 import { fetchAllPlatformGuardianLinkRequests } from "@features/guardian-links/services/platform-guardian-link.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";

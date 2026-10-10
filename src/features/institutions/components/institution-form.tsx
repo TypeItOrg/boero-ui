@@ -1,62 +1,64 @@
 "use client";
 
-import * as React from "react";
+import { startTransition, useActionState, useMemo, useState, type ChangeEvent, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlertIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
+import { FORM_MODE } from "@common/types/form-mode.types";
+import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { safelyRunAction } from "@common/utils/safe-action.util";
+
+import { createInstitutionAction } from "@features/institutions/actions/create-institution.action";
+import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
 import {
   InstitutionContactFields,
   InstitutionGeneralFields,
   InstitutionLocationFields,
   InstitutionStatusField,
 } from "@features/institutions/components/institution-form-fields";
-import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+import { InstitutionFormFooter } from "@features/institutions/components/institution-form-footer";
 import { InstitutionLogoField } from "@features/institutions/components/institution-logo-field";
-import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
-import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
-import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
-import { safelyRunAction } from "@common/utils/safe-action.util";
-import { getSafeReturnTo } from "@common/utils/return-to.util";
+import { InstitutionPublicAccessField } from "@features/institutions/components/institution-public-access-field";
+import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
+import { INSTITUTION_LOGO_INTENT } from "@features/institutions/constants/institution-logo.constants";
 import { institutionFormSchema, type InstitutionFormInput, type InstitutionFormValues } from "@features/institutions/schemas/institution-form.schema";
-import { createInstitutionAction } from "@features/institutions/actions/create-institution.action";
-import { updateInstitutionAction } from "@features/institutions/actions/update-institution.action";
-import type { Institution } from "@features/institutions/types/institution.types";
+import type { InstitutionActionState } from "@features/institutions/types/institution-action-state.types";
+import { type InstitutionFormProps } from "@features/institutions/types/institution-form-props.types";
+import type { InstitutionLogoChange } from "@features/institutions/types/institution-logo-change.types";
 import { createInstitutionFormData } from "@features/institutions/utils/institution-form-data.util";
+import { getDefaultValues, getInitialLocation, setActionFieldErrors } from "@features/institutions/utils/institution-form.util";
+import { appendInstitutionLogoChange } from "@features/institutions/utils/institution-logo-form.util";
 import { createInstitutionSlug } from "@features/institutions/utils/institution-slug.util";
-import { FORM_MODE } from "@common/types/form-mode.types";
-import { getDefaultValues, getInitialLocation, getSubmitLabel, setActionFieldErrors } from "@features/institutions/utils/institution-form.util";
 
 const INSTITUTIONS_PATH = "/admin/institutions";
 
-type CreateMode = {
-  mode: typeof FORM_MODE.CREATE;
-  institution?: never;
-};
-
-type EditMode = {
-  mode: typeof FORM_MODE.EDIT;
-  institution: Institution;
-};
-
-type InstitutionFormProps = (CreateMode | EditMode) & {
-  returnTo?: string;
-};
-
-export function InstitutionForm({ mode, institution, returnTo }: InstitutionFormProps): React.ReactElement {
+export function InstitutionForm({ mode, institution, returnTo, baseDomain = "" }: InstitutionFormProps): ReactElement {
   const router = useRouter();
-  const isEdit = mode === FORM_MODE.EDIT;
-  const defaultDestination = isEdit ? `${INSTITUTIONS_PATH}/${institution.id}` : INSTITUTIONS_PATH;
-  const destination = getSafeReturnTo(returnTo, defaultDestination);
-  const [logoChange, setLogoChange] = React.useState<InstitutionLogoChange>({ intent: "keep" });
-  const [isSlugTouched, setIsSlugTouched] = React.useState(false);
-  const [active, setActive] = React.useState(() => institution?.active ?? true);
 
-  const initialLocation = React.useMemo(() => getInitialLocation(institution), [institution]);
-  const defaultValues = React.useMemo(() => getDefaultValues(institution), [institution]);
+  const isEdit = mode === FORM_MODE.EDIT;
+
+  const defaultDestination = isEdit ? `${INSTITUTIONS_PATH}/${institution.id}` : INSTITUTIONS_PATH;
+
+  const destination = getSafeReturnTo(returnTo, defaultDestination);
+
+  const [logoChange, setLogoChange] = useState<InstitutionLogoChange>({
+    intent: INSTITUTION_LOGO_INTENT.KEEP,
+  });
+
+  const [publicSubdomain, setPublicSubdomain] = useState(institution?.publicSubdomain ?? "");
+
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
+
+  const [active, setActive] = useState(() => institution?.active ?? true);
+
+  const initialLocation = useMemo(() => getInitialLocation(institution), [institution]);
+
+  const defaultValues = useMemo(() => getDefaultValues(institution), [institution]);
 
   const {
     register,
@@ -72,18 +74,25 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
   });
 
   const nameField = register("name");
+
   const slugField = register("slug");
 
-  const [state, formAction, isPending] = React.useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
+  const [state, formAction, isPending] = useActionState<InstitutionActionState, FormData>(async (_previous, formData) => {
     const request = isEdit ? updateInstitutionAction(institution.id, formData) : createInstitutionAction(formData);
+
     const result = await safelyRunAction(
       request,
       isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_INSTITUTION : INSTITUTION_ERROR_MESSAGES.CREATE_INSTITUTION,
     );
 
     setActionFieldErrors(result, setError);
+
     if (result.logoError) {
       setError("root.logo", { type: "server", message: result.logoError });
+    }
+
+    if (result.publicSubdomainError) {
+      setError("root.publicSubdomain", { type: "server", message: result.publicSubdomainError });
     }
 
     if (result.success) {
@@ -93,8 +102,9 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     return result;
   }, {});
 
-  function handleNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  function handleNameChange(event: ChangeEvent<HTMLInputElement>): void {
     nameField.onChange(event);
+
     if (!isSlugTouched) {
       setValue("slug", createInstitutionSlug(event.target.value), {
         shouldDirty: true,
@@ -103,7 +113,7 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     }
   }
 
-  function handleSlugChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  function handleSlugChange(event: ChangeEvent<HTMLInputElement>): void {
     setIsSlugTouched(true);
     slugField.onChange(event);
   }
@@ -114,13 +124,15 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     }
 
     clearErrors();
+
     const formData = createInstitutionFormData(values, active);
 
     if (isEdit) {
       appendInstitutionLogoChange(formData, logoChange);
+      formData.set("publicSubdomain", publicSubdomain);
     }
 
-    React.startTransition(() => {
+    startTransition(() => {
       formAction(formData);
     });
   }
@@ -129,13 +141,14 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
     router.push(destination);
   }
 
-  const errorAlert = state.error ? (
-    <Alert variant="destructive">
-      <CircleAlertIcon />
-      <AlertTitle>{isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE}</AlertTitle>
-      <AlertDescription>{state.error}</AlertDescription>
-    </Alert>
-  ) : null;
+  const errorAlert =
+    state.error && logoChange.intent !== INSTITUTION_LOGO_INTENT.KEEP ? (
+      <Alert variant="destructive">
+        <CircleAlertIcon />
+        <AlertTitle>{isEdit ? INSTITUTION_ERROR_MESSAGES.UPDATE_TITLE : INSTITUTION_ERROR_MESSAGES.CREATE_TITLE}</AlertTitle>
+        <AlertDescription>{state.error}</AlertDescription>
+      </Alert>
+    ) : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex h-full min-h-0 w-full flex-1 flex-col">
@@ -152,19 +165,30 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
         />
 
         {isEdit ? (
-          <InstitutionLogoField
-            institutionId={institution.id}
-            institutionName={institution.name}
-            logoUrl={institution.logoUrl}
-            value={logoChange}
-            disabled={isPending}
-            error={errors.root?.logo?.message}
-            onChange={(change) => {
-              clearErrors("root.logo");
-              setLogoChange(change);
-            }}
-            onError={(message) => setError("root.logo", { type: "client", message })}
-          />
+          <>
+            <InstitutionPublicAccessField
+              value={publicSubdomain}
+              baseDomain={baseDomain}
+              error={errors.root?.publicSubdomain?.message}
+              onChange={(value) => {
+                clearErrors("root.publicSubdomain");
+                setPublicSubdomain(value);
+              }}
+            />
+            <InstitutionLogoField
+              institutionId={institution.id}
+              institutionName={institution.name}
+              logoUrl={institution.logoUrl}
+              value={logoChange}
+              disabled={isPending}
+              error={errors.root?.logo?.message}
+              onChange={(change) => {
+                clearErrors("root.logo");
+                setLogoChange(change);
+              }}
+              onError={(message) => (message ? setError("root.logo", { type: "client", message }) : clearErrors("root.logo"))}
+            />
+          </>
         ) : null}
 
         <InstitutionLocationFields
@@ -180,20 +204,7 @@ export function InstitutionForm({ mode, institution, returnTo }: InstitutionForm
         <InstitutionStatusField active={active} onActiveChange={setActive} />
       </fieldset>
 
-      <div className="border-border/40 flex flex-row flex-wrap items-center justify-end gap-3 border-t pt-5 pb-6">
-        <Button type="button" variant="outline" size="lg" className="flex-1 sm:flex-none" onClick={handleCancel} disabled={isPending}>
-          Cancelar
-        </Button>
-        <Button
-          type="submit"
-          size="lg"
-          className="flex-1 sm:flex-none"
-          disabled={isPending || errors.root?.logo?.type === "client"}
-          aria-busy={isPending}
-        >
-          {getSubmitLabel({ isEdit, isPending })}
-        </Button>
-      </div>
+      <InstitutionFormFooter handleCancel={handleCancel} isPending={isPending} errors={errors} isEdit={isEdit} />
     </form>
   );
 }

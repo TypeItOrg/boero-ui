@@ -1,32 +1,22 @@
-import * as React from "react";
-import { Controller, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
-import { KeyRoundIcon, ShieldCheckIcon, UserRoundIcon, type LucideIcon } from "lucide-react";
+import type { ReactElement } from "react";
 
-import { DatePicker } from "@common/components/ui/date-picker";
+import { KeyRoundIcon, UserRoundIcon } from "lucide-react";
+
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { PasswordInput } from "@common/components/ui/password-input";
-import { NumericInput, PhoneInput } from "@common/components/ui/restricted-input";
-import type { Person } from "@features/people/types/person.types";
-import type { PersonFormInput } from "@features/people/types/person-form-input.types";
-import { formatBirthDateInput, getLatestAllowedBirthDate, parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
-import { SectionHeader } from "@common/components/section-header";
+import { PhoneInput } from "@common/components/ui/restricted-input";
 
-type PersonFormFieldsProps = {
-  errors: FieldErrors<PersonFormInput>;
-  register: UseFormRegister<PersonFormInput>;
-};
+import { PersonFormCard, PersonFormSectionHeading } from "@features/people/components/person-form-card";
+import { type PersonFormFieldsProps } from "@features/people/types/person-form-fields-props.types";
+import type { Person } from "@features/people/types/person.types";
 
 type PersonDetailsFieldsProps = PersonFormFieldsProps & {
   isEdit: boolean;
   person?: Person;
 };
 
-type PersonCreateFieldsProps = PersonFormFieldsProps & {
-  control: Control<PersonFormInput>;
-};
-
-export function PersonDetailsFields({ errors, isEdit, person, register }: PersonDetailsFieldsProps): React.ReactElement {
+export function PersonDetailsFields({ errors, isEdit, person, register }: PersonDetailsFieldsProps): ReactElement {
   return (
     <PersonFormCard>
       <PersonFormSectionHeading icon={UserRoundIcon} title="Datos personales" description="Información principal del usuario institucional." />
@@ -84,7 +74,7 @@ export function PersonDetailsFields({ errors, isEdit, person, register }: Person
   );
 }
 
-export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps): React.ReactElement {
+export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps): ReactElement {
   return (
     <PersonFormCard>
       <PersonFormSectionHeading
@@ -113,75 +103,4 @@ export function PersonPasswordFields({ errors, register }: PersonFormFieldsProps
   );
 }
 
-export function PersonCreateFields({ control, errors, register }: PersonCreateFieldsProps): React.ReactElement {
-  return (
-    <PersonFormCard>
-      <PersonFormSectionHeading icon={ShieldCheckIcon} title="Cuenta de acceso" description="Credenciales iniciales para iniciar sesión." />
-      <FieldGroup className="mt-4 flex flex-row flex-wrap items-start gap-4 sm:mt-5">
-        <Field data-invalid={!!errors.documentNumber} className="flex-[1_0_min(200px,100%)]">
-          <FieldContent>
-            <FieldLabel htmlFor="person-document" required>
-              Documento
-            </FieldLabel>
-          </FieldContent>
-          <NumericInput id="person-document" aria-invalid={!!errors.documentNumber} {...register("documentNumber")} />
-          <FieldError errors={[errors.documentNumber]} />
-        </Field>
-
-        <Field data-invalid={!!errors.birthDate} className="flex-[1_0_min(200px,100%)]">
-          <FieldContent>
-            <FieldLabel htmlFor="person-birth-date" required>
-              Fecha de nacimiento
-            </FieldLabel>
-          </FieldContent>
-          <Controller
-            control={control}
-            name="birthDate"
-            render={({ field, fieldState }) => (
-              <DatePicker
-                id="person-birth-date"
-                value={parseBirthDateInput(field.value)}
-                maxDate={getLatestAllowedBirthDate()}
-                onChange={(date) => field.onChange(formatBirthDateInput(date))}
-                aria-invalid={fieldState.invalid}
-              />
-            )}
-          />
-          <FieldError errors={[errors.birthDate]} />
-        </Field>
-
-        <Field data-invalid={!!errors.password} className="flex-[1_0_min(200px,100%)]">
-          <FieldContent>
-            <FieldLabel htmlFor="person-password" required>
-              Contraseña inicial
-            </FieldLabel>
-          </FieldContent>
-          <PasswordInput id="person-password" aria-invalid={!!errors.password} {...register("password")} />
-          <FieldError errors={[errors.password]} />
-        </Field>
-
-        <Field data-invalid={!!errors.confirmPassword} className="flex-[1_0_min(200px,100%)]">
-          <FieldContent>
-            <FieldLabel htmlFor="person-confirm-password" required>
-              Confirmar contraseña
-            </FieldLabel>
-          </FieldContent>
-          <PasswordInput id="person-confirm-password" aria-invalid={!!errors.confirmPassword} {...register("confirmPassword")} />
-          <FieldError errors={[errors.confirmPassword]} />
-        </Field>
-      </FieldGroup>
-    </PersonFormCard>
-  );
-}
-
-function PersonFormSectionHeading({ description, icon: Icon, title }: { description: string; icon: LucideIcon; title: string }): React.ReactElement {
-  return (
-    <header className="-mx-4 border-b px-4 pb-4 sm:-mx-5 sm:px-5 sm:pb-5">
-      <SectionHeader icon={Icon} title={title} description={description} />
-    </header>
-  );
-}
-
-function PersonFormCard({ children }: React.PropsWithChildren): React.ReactElement {
-  return <div className="bg-muted/25 rounded-xl border p-4 sm:p-5">{children}</div>;
-}
+export { PersonCreateFields } from "@features/people/components/person-create-fields";

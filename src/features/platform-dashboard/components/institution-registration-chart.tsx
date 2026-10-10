@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@common/components/ui/chart";
+
 import type { MonthlyInstitutionRegistration } from "@features/platform-dashboard/types/monthly-institution-registration.types";
 import { formatDashboardMonth } from "@features/platform-dashboard/utils/dashboard-month.util";
 
@@ -17,7 +20,7 @@ type InstitutionRegistrationChartProps = {
   registrations: MonthlyInstitutionRegistration[];
 };
 
-export function InstitutionRegistrationChart({ registrations }: InstitutionRegistrationChartProps): React.ReactElement {
+export function InstitutionRegistrationChart({ registrations }: InstitutionRegistrationChartProps): ReactElement {
   const chartData = registrations.map((registration) => ({
     ...registration,
     label: formatDashboardMonth(registration, "short"),

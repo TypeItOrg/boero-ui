@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { createGuardianDependentAction } from "@features/guardian-dependents/actions/create-guardian-dependent.action";
+import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
+
 jest.mock("@features/guardian-dependents/actions/create-guardian-dependent.action", () => ({
   createGuardianDependentAction: jest.fn(),
 }));
-
-import { createGuardianDependentAction } from "@features/guardian-dependents/actions/create-guardian-dependent.action";
-import { AddGuardianDependentDialog } from "@features/guardian-dependents/components/add-guardian-dependent-dialog";
 
 const INSTITUTION_ID = "019f9c3a-f891-7bc5-a98d-e65332998127";
 const BIRTH_YEAR = new Date().getFullYear() - 8;

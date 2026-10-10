@@ -1,5 +1,10 @@
 "use client";
 
+import type { ReactElement } from "react";
+
+import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+
 import { Avatar, AvatarFallback } from "@common/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,8 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@common/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@common/components/ui/sidebar";
-import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import { useLogoutPlatform } from "@features/platform-auth/hooks/use-logout-platform.hook";
 import type { PlatformAccount } from "@features/platform-auth/types/platform-account.types";
@@ -21,9 +24,11 @@ type PlatformSidebarUserProps = {
   user: PlatformAccount;
 };
 
-export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): React.ReactElement {
+export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): ReactElement {
   const { isMobile } = useSidebar();
+
   const { resolvedTheme, setTheme } = useTheme();
+
   const logout = useLogoutPlatform();
 
   return (
@@ -53,6 +58,7 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): React.R
             onCloseAutoFocus={(event) => event.preventDefault()}
             onPointerDownOutside={(event) => {
               const target = event.target as HTMLElement;
+
               if (target.closest('[data-sidebar="sidebar"]')) {
                 event.preventDefault();
               }
@@ -89,7 +95,7 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): React.R
   );
 }
 
-function PlatformUserAvatar({ user }: { user: PlatformAccount }): React.ReactElement {
+function PlatformUserAvatar({ user }: { user: PlatformAccount }): ReactElement {
   return (
     <Avatar className="size-[34px] rounded-md group-data-[collapsible=icon]:size-8!">
       <AvatarFallback className="bg-primary text-primary-foreground rounded-md font-semibold">{getInitials(user.name, user.lastName)}</AvatarFallback>

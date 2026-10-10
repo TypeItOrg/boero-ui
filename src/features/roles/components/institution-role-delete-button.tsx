@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { CircleAlertIcon, Trash2Icon } from "lucide-react";
 
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@common/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
+
 import { deleteInstitutionRoleAction } from "@features/roles/actions/delete-institution-role.action";
 
 export function InstitutionRoleDeleteButton({
@@ -27,9 +30,11 @@ export function InstitutionRoleDeleteButton({
   institutionId: string;
   roleId: string;
   roleName: string;
-}): React.ReactElement {
+}): ReactElement {
   const [error, setError] = useState<string>();
+
   const [pending, startTransition] = useTransition();
+
   const router = useRouter();
 
   return (
@@ -66,10 +71,13 @@ export function InstitutionRoleDeleteButton({
               event.preventDefault();
               startTransition(async () => {
                 const result = await deleteInstitutionRoleAction(institutionId, roleId);
+
                 if (result.error) {
                   setError(result.error);
+
                   return;
                 }
+
                 router.replace("/roles");
               });
             }}

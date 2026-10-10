@@ -1,6 +1,5 @@
-import type { RoleAssignment } from "@features/people/types/role-assignment.types";
-import type { Resolver, UseFormSetError } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { Resolver, UseFormSetError } from "react-hook-form";
 
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
 import { createPersonFormSchema, updatePersonFormSchema } from "@features/people/schemas/person-form.schema";
@@ -8,6 +7,7 @@ import type { PersonActionState } from "@features/people/types/person-action-sta
 import type { PersonFormFieldName } from "@features/people/types/person-form-field-name.types";
 import type { PersonFormInput } from "@features/people/types/person-form-input.types";
 import type { Person } from "@features/people/types/person.types";
+import type { RoleAssignment } from "@features/people/types/role-assignment.types";
 
 export const EMPTY_FORM_VALUES: PersonFormInput = {
   firstName: "",
@@ -27,7 +27,9 @@ export function getPersonFormResolver(isEdit: boolean): Resolver<PersonFormInput
 }
 
 export function getDefaultValues(person: Person | undefined): PersonFormInput {
-  if (!person) return { ...EMPTY_FORM_VALUES };
+  if (!person) {
+    return { ...EMPTY_FORM_VALUES };
+  }
 
   return {
     firstName: person.firstName,
@@ -62,7 +64,9 @@ export function getFormData(values: PersonFormInput, isEdit: boolean, canEdit: b
 }
 
 export function setActionFieldErrors(result: PersonActionState, setError: UseFormSetError<PersonFormInput>): boolean {
-  if (!result.fieldErrors) return false;
+  if (!result.fieldErrors) {
+    return false;
+  }
 
   let hasFieldErrors = false;
 
@@ -81,8 +85,13 @@ export function getErrorTitle(isEdit: boolean): string {
 }
 
 export function getSubmitLabel({ isEdit, isPending, canEdit = true }: { isEdit: boolean; isPending: boolean; canEdit?: boolean }): string {
-  if (isPending) return "Guardando...";
-  if (isEdit) return canEdit ? "Guardar cambios" : "Guardar roles";
+  if (isPending) {
+    return "Guardando...";
+  }
+
+  if (isEdit) {
+    return canEdit ? "Guardar cambios" : "Guardar roles";
+  }
 
   return "Crear usuario";
 }

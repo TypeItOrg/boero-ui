@@ -1,20 +1,24 @@
 "use client";
 
-import { CircleAlertIcon, Trash2Icon } from "lucide-react";
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { useActionState } from "react";
+
 import { useRouter } from "next/navigation";
+
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
+
 import { Alert, AlertDescription } from "@common/components/ui/alert";
-import { Button } from "@common/components/ui/button";
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
+import { Button } from "@common/components/ui/button";
+
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { deleteEnrollmentPeriodAction } from "@features/enrollment-periods/actions/enrollment-period.actions";
 import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
 
@@ -30,6 +34,7 @@ export function EnrollmentPeriodDeleteDialog({
   onClose: () => void;
 }) {
   const router = useRouter();
+
   const [state, action, pending] = useActionState(async (): Promise<EnrollmentPeriodActionState> => {
     const result = await deleteEnrollmentPeriodAction(institutionId, periodId, scope);
 

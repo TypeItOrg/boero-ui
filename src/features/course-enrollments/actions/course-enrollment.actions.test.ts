@@ -1,21 +1,8 @@
-jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
-jest.mock("next/navigation", () => ({
-  redirect: jest.fn(() => {
-    throw new Error("NEXT_REDIRECT");
-  }),
-}));
-jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({ institutionalApiFetch: jest.fn() }));
-jest.mock("@features/platform-auth/services/platform-api-fetch.service", () => ({ platformApiFetch: jest.fn() }));
-jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
-  requireInstitutionalUser: jest.fn().mockResolvedValue({ institutionId: "00000000-0000-4000-8000-000000000001" }),
-}));
-jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({ requirePlatformAccount: jest.fn() }));
-
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
 import { INVALID_ACTION_ARGUMENTS } from "@common/utils/action-argument.util";
-import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
 import {
   createManualCourseEnrollmentAction,
   rejectApplicationCourseAction,
@@ -23,6 +10,27 @@ import {
   updateCourseAcademicStatusAction,
 } from "@features/course-enrollments/actions/course-enrollment.actions";
 import { rejectPlatformApplicationCourseAction } from "@features/course-enrollments/actions/platform-course-enrollment.actions";
+import { institutionalApiFetch } from "@features/institutional-auth/services/institutional-api-fetch.service";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
+jest.mock("next/cache", () => ({ revalidatePath: jest.fn() }));
+jest.mock("next/navigation", () => ({
+  redirect: jest.fn(() => {
+    throw new Error("NEXT_REDIRECT");
+  }),
+}));
+jest.mock("@features/institutional-auth/services/institutional-api-fetch.service", () => ({
+  institutionalApiFetch: jest.fn(),
+}));
+jest.mock("@features/platform-auth/services/platform-api-fetch.service", () => ({
+  platformApiFetch: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
+  requireInstitutionalUser: jest.fn().mockResolvedValue({ institutionId: "00000000-0000-4000-8000-000000000001" }),
+}));
+jest.mock("@features/platform-auth/services/get-platform-account.service", () => ({
+  requirePlatformAccount: jest.fn(),
+}));
 
 const ID = "00000000-0000-4000-8000-000000000001";
 
@@ -33,10 +41,18 @@ beforeEach(() => {
 
 it.each([null, undefined, 123, {}, [], "", "   "])("rejects invalid remote reasons without throwing: %p", async (value) => {
   const reason = value as unknown as string;
-  await expect(rejectApplicationCourseAction(ID, ID, 0, reason)).resolves.toEqual({ error: INVALID_ACTION_ARGUMENTS });
-  await expect(withdrawCourseEnrollmentAction(ID, "VOLUNTARY", reason, 0)).resolves.toEqual({ error: INVALID_ACTION_ARGUMENTS });
-  await expect(updateCourseAcademicStatusAction(ID, "PASSED", reason, 0)).resolves.toEqual({ error: INVALID_ACTION_ARGUMENTS });
-  await expect(rejectPlatformApplicationCourseAction(ID, ID, ID, 0, reason)).resolves.toEqual({ error: INVALID_ACTION_ARGUMENTS });
+  await expect(rejectApplicationCourseAction(ID, ID, 0, reason)).resolves.toEqual({
+    error: INVALID_ACTION_ARGUMENTS,
+  });
+  await expect(withdrawCourseEnrollmentAction(ID, "VOLUNTARY", reason, 0)).resolves.toEqual({
+    error: INVALID_ACTION_ARGUMENTS,
+  });
+  await expect(updateCourseAcademicStatusAction(ID, "PASSED", reason, 0)).resolves.toEqual({
+    error: INVALID_ACTION_ARGUMENTS,
+  });
+  await expect(rejectPlatformApplicationCourseAction(ID, ID, ID, 0, reason)).resolves.toEqual({
+    error: INVALID_ACTION_ARGUMENTS,
+  });
   expect(institutionalApiFetch).not.toHaveBeenCalled();
   expect(platformApiFetch).not.toHaveBeenCalled();
 });
@@ -58,6 +74,7 @@ function manualForm(returnTo: string): FormData {
   data.set("courseClassId", ID);
   data.set("assignments", JSON.stringify([{ classScheduleId: ID, individualSlotId: null }]));
   data.set("returnTo", returnTo);
+
   return data;
 }
 

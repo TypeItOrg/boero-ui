@@ -1,7 +1,9 @@
+import type { ReactElement } from "react";
+
 import { Skeleton } from "@common/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 
-export function PlatformAccountsTableSkeleton(): React.ReactElement {
+export function PlatformAccountsTableSkeleton(): ReactElement {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="h-full overflow-hidden rounded-lg border">

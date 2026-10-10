@@ -5,13 +5,25 @@ describe("webauthn-capability", () => {
   const originalCredentials = navigator.credentials;
 
   afterEach(() => {
-    Object.defineProperty(window, "PublicKeyCredential", { value: originalPublicKeyCredential, configurable: true });
-    Object.defineProperty(navigator, "credentials", { value: originalCredentials, configurable: true });
+    Object.defineProperty(window, "PublicKeyCredential", {
+      value: originalPublicKeyCredential,
+      configurable: true,
+    });
+    Object.defineProperty(navigator, "credentials", {
+      value: originalCredentials,
+      configurable: true,
+    });
   });
 
   it("reports supported when the platform exposes credentials", () => {
-    Object.defineProperty(window, "PublicKeyCredential", { value: function () {}, configurable: true });
-    Object.defineProperty(navigator, "credentials", { value: { create: jest.fn(), get: jest.fn() }, configurable: true });
+    Object.defineProperty(window, "PublicKeyCredential", {
+      value: function () {},
+      configurable: true,
+    });
+    Object.defineProperty(navigator, "credentials", {
+      value: { create: jest.fn(), get: jest.fn() },
+      configurable: true,
+    });
 
     expect(isWebAuthnSupported()).toBe(true);
   });
@@ -23,7 +35,10 @@ describe("webauthn-capability", () => {
   });
 
   it("reports unsupported when credentials api is missing", () => {
-    Object.defineProperty(window, "PublicKeyCredential", { value: function () {}, configurable: true });
+    Object.defineProperty(window, "PublicKeyCredential", {
+      value: function () {},
+      configurable: true,
+    });
     Object.defineProperty(navigator, "credentials", { value: undefined, configurable: true });
 
     expect(isWebAuthnSupported()).toBe(false);

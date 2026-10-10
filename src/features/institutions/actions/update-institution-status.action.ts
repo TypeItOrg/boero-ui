@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
+
 import { INSTITUTION_ERROR_MESSAGES } from "@features/institutions/constants/error-messages.constants";
 import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
@@ -15,7 +16,9 @@ type UpdateInstitutionStatusActionState = {
 const INSTITUTIONS_PATH = "/admin/institutions";
 
 export async function updateInstitutionStatusAction(id: string, nextActive: boolean): Promise<UpdateInstitutionStatusActionState> {
-  if (!isValidUuid(id)) return { error: INVALID_ACTION_ARGUMENTS };
+  if (!isValidUuid(id)) {
+    return { error: INVALID_ACTION_ARGUMENTS };
+  }
 
   const errorState = await getResponseErrorActionState(
     platformApiFetch(`/api/v1/admin/institutions/${id}/status`, {
@@ -28,10 +31,14 @@ export async function updateInstitutionStatusAction(id: string, nextActive: bool
     [],
     INSTITUTION_ERROR_MESSAGES.UPDATE_STATUS(nextActive),
   );
-  if (errorState) return errorState;
+
+  if (errorState) {
+    return errorState;
+  }
 
   revalidatePath(INSTITUTIONS_PATH);
   revalidatePath(`${INSTITUTIONS_PATH}/${id}`);
   revalidatePath(`${INSTITUTIONS_PATH}/${id}/edit`);
+
   return { success: true };
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
+import type { ComponentProps, MouseEvent } from "react";
 
 import { cn } from "@common/utils/cn.util";
 
-function Label({ className, onClick, ...props }: React.ComponentProps<"label">) {
-  const handleClick = (event: React.MouseEvent<HTMLLabelElement>) => {
+function Label({ className, onClick, ...props }: ComponentProps<"label">) {
+  const handleClick = (event: MouseEvent<HTMLLabelElement>) => {
     onClick?.(event);
 
     if (event.defaultPrevented) {

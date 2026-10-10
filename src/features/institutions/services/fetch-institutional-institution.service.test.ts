@@ -27,7 +27,10 @@ describe("fetchInstitutionalInstitution", () => {
   it("returns institution detail when response is ok", async () => {
     const mockInstitution = { id: "inst-1", name: "Conservatorio Boero" };
     institutionalApiFetchMock.mockResolvedValue(
-      new Response(JSON.stringify(mockInstitution), { status: 200, headers: { "Content-Type": "application/json" } }),
+      new Response(JSON.stringify(mockInstitution), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
     );
 
     const { fetchInstitutionalInstitution } = await importService();

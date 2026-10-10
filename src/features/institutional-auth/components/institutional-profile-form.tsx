@@ -1,54 +1,63 @@
 "use client";
 
-import * as React from "react";
+import { useActionState, useState, type ReactElement } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { CircleAlertIcon, UserRoundIcon } from "lucide-react";
 
+import { ActionForm } from "@common/components/action-form";
+import { SectionHeader } from "@common/components/section-header";
 import { Alert, AlertDescription, AlertTitle } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
 import { FieldGroup } from "@common/components/ui/field";
+
 import { updateInstitutionalProfileAction } from "@features/institutional-auth/actions/update-institutional-profile.action";
 import { DateField, TextField } from "@features/institutional-auth/components/institutional-profile-fields";
 import { InstitutionalProfileLocationSection } from "@features/institutional-auth/components/institutional-profile-location-section";
 import type { InstitutionalPerson } from "@features/institutional-auth/types/institutional-person.types";
 import { parseBirthDateInput } from "@features/people/utils/person-birth-date.util";
-import { SectionHeader } from "@common/components/section-header";
 
 type InstitutionalProfileFormProps = {
   person: InstitutionalPerson;
   returnTo?: string;
 };
 
-export function InstitutionalProfileForm({ person, returnTo = "/account" }: InstitutionalProfileFormProps): React.ReactElement {
-  const router = useRouter();
-  const [isPending, startTransition] = React.useTransition();
-  const [error, setError] = React.useState<string>();
-  const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
-  const [birthDate, setBirthDate] = React.useState<Date | undefined>(() => parseBirthDateInput(person.birthDate));
-  const [addressCityId, setAddressCityId] = React.useState(person.address?.city?.id ?? "");
-  const [addressStreet, setAddressStreet] = React.useState(person.address?.street ?? "");
-  const hasAddress = Boolean(addressCityId || addressStreet.trim());
+export function InstitutionalProfileForm(props: InstitutionalProfileFormProps): ReactElement {
+  return <InstitutionalProfileFormView key={`${props.person.institutionId}:${props.person.personId}`} {...props} />;
+}
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-    setError(undefined);
-    setFieldErrors({});
-    const formData = new FormData(event.currentTarget);
-    startTransition(async () => {
+function InstitutionalProfileFormView({ person, returnTo = "/account" }: InstitutionalProfileFormProps): ReactElement {
+  const router = useRouter();
+
+  const [state, formAction, isPending] = useActionState(
+    async (_previous: Awaited<ReturnType<typeof updateInstitutionalProfileAction>>, formData: FormData) => {
       const result = await updateInstitutionalProfileAction(formData);
+
       if (result.success) {
         router.replace(returnTo);
-        return;
       }
-      const nextFieldErrors = "fieldErrors" in result ? result.fieldErrors : undefined;
-      setFieldErrors(nextFieldErrors ?? {});
-      setError(getFormError(result.error, nextFieldErrors));
-    });
-  }
+
+      return result;
+    },
+    {},
+  );
+
+  const fieldErrors = "fieldErrors" in state ? (state.fieldErrors ?? {}) : {};
+
+  const error = getFormError("error" in state ? state.error : undefined, "fieldErrors" in state ? state.fieldErrors : undefined);
+
+  const [birthDate, setBirthDate] = useState<Date | undefined>(() => parseBirthDateInput(person.birthDate));
+
+  const [addressCityId, setAddressCityId] = useState(person.address?.city?.id ?? "");
+
+  const [addressStreet, setAddressStreet] = useState(person.address?.street ?? "");
+
+  const hasAddress = Boolean(addressCityId || addressStreet.trim());
 
   return (
-    <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col gap-4">
+    <ActionForm action={formAction} className="flex h-full flex-1 flex-col gap-4">
       {error ? (
         <Alert variant="destructive">
           <CircleAlertIcon className="size-4" />
@@ -115,12 +124,18 @@ export function InstitutionalProfileForm({ person, returnTo = "/account" }: Inst
           {isPending ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>
-    </form>
+    </ActionForm>
   );
 }
 
 function getFormError(error: string | undefined, fieldErrors: Record<string, string> | undefined): string | undefined {
-  if (fieldErrors && Object.keys(fieldErrors).length > 0) return undefined;
-  if (error) return error;
-  return "Revisá los datos ingresados.";
+  if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+    return undefined;
+  }
+
+  if (error) {
+    return error;
+  }
+
+  return undefined;
 }

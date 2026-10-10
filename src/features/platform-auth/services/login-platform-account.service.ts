@@ -1,6 +1,7 @@
+import type { BackendError } from "@common/types/backend-error.types";
 import { createAuthRequestHeaders } from "@common/utils/auth-request-headers.util";
 import { getApiUrlOrThrow } from "@common/utils/get-api-url-or-throw.util";
-import type { BackendError } from "@common/types/backend-error.types";
+
 import type { LoginPlatformAccountOutput } from "@features/platform-auth/types/login-platform-account-output.types";
 import type { PlatformLoginInput } from "@features/platform-auth/types/platform-login-input.types";
 import type { PlatformLoginResult } from "@features/platform-auth/types/platform-login-result.types";
@@ -15,9 +16,11 @@ export async function loginPlatformAccount(input: PlatformLoginInput, requestHea
 
   if (!response.ok) {
     const error = (await response.json()) as BackendError;
+
     return { success: false, error };
   }
 
   const data = (await response.json()) as PlatformLoginResult;
+
   return { success: true, data };
 }

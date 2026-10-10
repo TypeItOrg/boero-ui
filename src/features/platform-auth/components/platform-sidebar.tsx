@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 
 import { Sidebar, SidebarContent, SidebarFooter } from "@common/components/ui/sidebar";
 import { cn } from "@common/utils/cn.util";
+
 import { PlatformSidebarNav } from "@features/platform-auth/components/platform-sidebar-nav";
 import { PlatformSidebarUser } from "@features/platform-auth/components/platform-sidebar-user";
 import { PLATFORM_NAVIGATION_SECTIONS } from "@features/platform-auth/constants/platform-navigation.constants";

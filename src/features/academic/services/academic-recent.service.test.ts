@@ -1,22 +1,9 @@
-import {
-  fetchAcademicSpaces,
-  fetchAcademicYears,
-  fetchInstruments,
-  fetchStudyPlans,
-  fetchTrainingPaths,
-} from "@features/academic/services/academic.service";
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import { fetchAcademicRecentItems } from "@features/academic/services/academic-recent.service";
 import type { AcademicAccess } from "@features/academic/types/academic-access.types";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 
-jest.mock("@features/academic/services/academic.service", () => ({
-  fetchAcademicSpaces: jest.fn(),
-  fetchAcademicYears: jest.fn(),
-  fetchInstruments: jest.fn(),
-  fetchStudyPlans: jest.fn(),
-  fetchTrainingPaths: jest.fn(),
-}));
+jest.mock("@features/academic/services/academic-api-fetch.service", () => ({ academicApiFetch: jest.fn() }));
 
 const INSTITUTION_ID = "05b84ac4-66aa-409f-a813-012d15b8cb9b";
 const ACCESS: AcademicAccess = {
@@ -65,41 +52,37 @@ const ACCESS: AcademicAccess = {
   shiftRestore: false,
 };
 
-describe("fetchAcademicRecentItems", () => {
-  it("loads only readable sections ordered by creation date", async () => {
-    jest.mocked(fetchAcademicYears).mockResolvedValue(
-      page([
-        {
-          id: "year-id",
-          institutionId: INSTITUTION_ID,
-          year: 2028,
-          startDate: null,
-          endDate: null,
-          status: "PLANNED",
-        },
-      ]),
-    );
-    jest.mocked(fetchAcademicSpaces).mockResolvedValue(page([]));
-    jest
-      .mocked(fetchInstruments)
-      .mockResolvedValue(page([{ id: "instrument-id", institutionId: INSTITUTION_ID, name: "Piano", description: null, active: true }]));
+it("requests only readable sections through the real academic services and returns complete recent entries", async () => {
+  const year = { id: "year-id", institutionId: INSTITUTION_ID, year: 2028, startDate: null, endDate: null, status: "PLANNED" };
+  const instrument = { id: "instrument-id", institutionId: INSTITUTION_ID, name: "Piano", description: null, active: false };
+  jest
+    .mocked(academicApiFetch)
+    .mockReset()
+    .mockImplementation(async (_scope, path) => {
+      const resource = new URL(path, "https://boero.test").pathname.split("/").at(-1);
+      const items = resource === "academic-years" ? [year] : resource === "instruments" ? [instrument] : [];
 
-    const items = await fetchAcademicRecentItems(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, ACCESS);
-
-    expect(fetchAcademicYears).toHaveBeenCalledWith(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, {
-      page: 0,
-      size: 1,
-      sort: "createdAt,desc",
+      return Response.json({ items, page: 0, size: 1, totalItems: items.length, totalPages: items.length });
     });
-    expect(fetchTrainingPaths).not.toHaveBeenCalled();
-    expect(fetchStudyPlans).not.toHaveBeenCalled();
-    expect(items).toEqual([
-      expect.objectContaining({ resource: AcademicResource.ACADEMIC_YEAR, label: "2028" }),
-      expect.objectContaining({ resource: AcademicResource.INSTRUMENT, label: "Piano" }),
-    ]);
-  });
-});
 
-function page<T>(items: T[]) {
-  return { items, page: 0, size: 1, totalItems: items.length, totalPages: items.length > 0 ? 1 : 0 };
-}
+  const items = await fetchAcademicRecentItems(AcademicScope.INSTITUTIONAL, INSTITUTION_ID, ACCESS);
+
+  expect(academicApiFetch).toHaveBeenCalledTimes(3);
+  expect(
+    jest.mocked(academicApiFetch).mock.calls.map(([scope, path]) => {
+      expect(scope).toBe("institutional");
+      const url = new URL(path, "https://boero.test");
+      expect(Object.fromEntries(url.searchParams)).toEqual({ page: "0", size: "1", sort: "createdAt,desc" });
+
+      return url.pathname;
+    }),
+  ).toEqual([
+    "/api/v1/institutions/" + INSTITUTION_ID + "/academic-years",
+    "/api/v1/institutions/" + INSTITUTION_ID + "/academic-spaces",
+    "/api/v1/institutions/" + INSTITUTION_ID + "/instruments",
+  ]);
+  expect(items).toEqual([
+    { id: "year-id", label: "2028", active: false, detail: "Planificado", resource: "academic-years", section: "Ciclos lectivos" },
+    { id: "instrument-id", label: "Piano", active: false, detail: "Inactivo", resource: "instruments", section: "Instrumentos" },
+  ]);
+});

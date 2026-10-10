@@ -44,14 +44,19 @@ describe("passkey-registration", () => {
       { type: "public-key", alg: -257 },
     ]);
     expect(options.excludeCredentials).toHaveLength(1);
-    expect(options.authenticatorSelection).toEqual({ residentKey: "required", userVerification: "required" });
+    expect(options.authenticatorSelection).toEqual({
+      residentKey: "required",
+      userVerification: "required",
+    });
     expect(options.attestation).toBe("none");
   });
 
   it("uses the native JSON parser when available", () => {
     const sentinel = { native: true };
     const parse = jest.fn().mockReturnValue(sentinel);
-    (globalThis as Record<string, unknown>).PublicKeyCredential = { parseCreationOptionsFromJSON: parse };
+    (globalThis as Record<string, unknown>).PublicKeyCredential = {
+      parseCreationOptionsFromJSON: parse,
+    };
     const raw = validOptions();
 
     expect(toPublicKeyCreationOptions(raw)).toBe(sentinel);

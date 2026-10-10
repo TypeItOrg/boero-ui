@@ -1,22 +1,25 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("next/navigation", () => ({
-  usePathname: () => "/study-plans",
-  useSearchParams: () => new URLSearchParams(),
-}));
-
 import { AcademicTableRow } from "@features/academic/components/academic-table-row";
 import type { AcademicTableRow as AcademicTableRowData } from "@features/academic/config/academic-collection.config";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
+
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/study-plans",
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 const ROW_ID = "2d9ec931-453c-4778-86a9-dc40a06d0247";
 
 describe("AcademicTableRow", () => {
   it("links training paths to their detail and exposes the detail action", async () => {
     const user = userEvent.setup();
-    renderRow({ resource: AcademicResource.TRAINING_PATH, row: createRow({ primaryValue: "CAVI" }) });
+    renderRow({
+      resource: AcademicResource.TRAINING_PATH,
+      row: createRow({ primaryValue: "CAVI" }),
+    });
 
     expect(screen.getByRole("link", { name: "CAVI" })).toHaveAttribute("href", `/training-paths/${ROW_ID}`);
 

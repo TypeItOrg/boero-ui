@@ -1,16 +1,17 @@
 "use client";
 
-import * as React from "react";
+import { Fragment, useMemo, useState, type ReactElement } from "react";
 
+import { SectionHeader } from "@common/components/section-header";
 import { Card, CardContent, CardHeader } from "@common/components/ui/card";
 import { Checkbox } from "@common/components/ui/checkbox";
 import { Field, FieldLabel } from "@common/components/ui/field";
+
+import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
 import { getPermissionGroupIcon } from "@features/roles/config/permission-group-icons.config";
 import type { InstitutionPermissionGroup } from "@features/roles/types/institution-permission-group.types";
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
-import { PermissionHierarchy } from "@features/roles/components/permission-hierarchy";
 import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
-import { SectionHeader } from "@common/components/section-header";
 
 const HIDDEN_PERMISSION_GROUP_CODES = new Set(["GRADES"]);
 
@@ -26,22 +27,29 @@ export function PermissionGroupsFields({
   selectedPermissions = [],
   protectedPermissions = [],
   inputIdPrefix = "permission",
-}: PermissionGroupsFieldsProps): React.ReactElement {
-  const visibleGroups = React.useMemo(() => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)), [groups]);
-  const permissions = React.useMemo(() => getPermissionMap(visibleGroups), [visibleGroups]);
-  const [explicitCodes, setExplicitCodes] = React.useState<Set<string>>(() => new Set(selectedPermissions));
-  const selectedCodes = React.useMemo(() => expandSelectedPermissions(explicitCodes, permissions), [explicitCodes, permissions]);
-  const protectedCodeSet = React.useMemo(() => new Set(protectedPermissions), [protectedPermissions]);
-  const requiredCodeSet = React.useMemo(() => getRequiredPermissionCodes(selectedCodes, permissions), [permissions, selectedCodes]);
+}: PermissionGroupsFieldsProps): ReactElement {
+  const visibleGroups = useMemo(() => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)), [groups]);
+
+  const permissions = useMemo(() => getPermissionMap(visibleGroups), [visibleGroups]);
+
+  const [explicitCodes, setExplicitCodes] = useState<Set<string>>(() => new Set(selectedPermissions));
+
+  const selectedCodes = useMemo(() => expandSelectedPermissions(explicitCodes, permissions), [explicitCodes, permissions]);
+
+  const protectedCodeSet = useMemo(() => new Set(protectedPermissions), [protectedPermissions]);
+
+  const requiredCodeSet = useMemo(() => getRequiredPermissionCodes(selectedCodes, permissions), [permissions, selectedCodes]);
 
   function handlePermissionChange(code: string, checked: boolean): void {
     setExplicitCodes((currentCodes) => {
       const nextCodes = new Set(currentCodes);
+
       if (checked) {
         nextCodes.add(code);
       } else {
         nextCodes.delete(code);
       }
+
       return nextCodes;
     });
   }
@@ -50,6 +58,7 @@ export function PermissionGroupsFields({
     <div className="flex flex-wrap items-stretch gap-4">
       {visibleGroups.map((group) => {
         const Icon = getPermissionGroupIcon(group.code);
+
         const permissionTree = getPermissionTree(group.permissions, permissions);
 
         return (
@@ -66,14 +75,17 @@ export function PermissionGroupsFields({
     </div>
   );
 
-  function renderPermissionField(permission: InstitutionPermission): React.ReactElement {
+  function renderPermissionField(permission: InstitutionPermission): ReactElement {
     const selected = selectedCodes.has(permission.code);
+
     const protectedPermission = protectedCodeSet.has(permission.code);
+
     const disabled = !permission.grantable || protectedPermission || requiredCodeSet.has(permission.code);
+
     const inputId = `${inputIdPrefix}-${permission.code}`;
 
     return (
-      <React.Fragment key={permission.code}>
+      <Fragment key={permission.code}>
         {disabled && selected ? <input type="hidden" name="permissions" value={permission.code} /> : null}
         <Field orientation="horizontal" data-disabled={disabled}>
           <Checkbox
@@ -88,25 +100,33 @@ export function PermissionGroupsFields({
             {permission.description}
           </FieldLabel>
         </Field>
-      </React.Fragment>
+      </Fragment>
     );
   }
 }
 
 function expandSelectedPermissions(selectedPermissions: Iterable<string>, permissions: ReadonlyMap<string, InstitutionPermission>): Set<string> {
   const selectedCodes = new Set(selectedPermissions);
+
   for (const code of selectedPermissions) {
     addRequiredPermissions(code, selectedCodes, permissions);
   }
+
   return selectedCodes;
 }
 
 function addRequiredPermissions(code: string, selectedCodes: Set<string>, permissions: ReadonlyMap<string, InstitutionPermission>): void {
   const permission = permissions.get(code);
-  if (!permission) return;
+
+  if (!permission) {
+    return;
+  }
 
   for (const requiredCode of permission.requiredPermissions) {
-    if (selectedCodes.has(requiredCode)) continue;
+    if (selectedCodes.has(requiredCode)) {
+      continue;
+    }
+
     selectedCodes.add(requiredCode);
     addRequiredPermissions(requiredCode, selectedCodes, permissions);
   }
@@ -114,12 +134,18 @@ function addRequiredPermissions(code: string, selectedCodes: Set<string>, permis
 
 function getRequiredPermissionCodes(selectedCodes: ReadonlySet<string>, permissions: ReadonlyMap<string, InstitutionPermission>): Set<string> {
   const requiredCodes = new Set<string>();
+
   for (const code of selectedCodes) {
     const permission = permissions.get(code);
-    if (!permission) continue;
+
+    if (!permission) {
+      continue;
+    }
+
     for (const requiredCode of permission.requiredPermissions) {
       requiredCodes.add(requiredCode);
     }
   }
+
   return requiredCodes;
 }

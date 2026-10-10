@@ -1,14 +1,16 @@
-import * as React from "react";
+import type { ReactElement, ReactNode } from "react";
+
 import { GraduationCapIcon, SearchIcon } from "lucide-react";
 
 import { DataTableEmptyStateActions } from "@common/components/ui/data-table-empty-state-actions";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@common/components/ui/empty";
 import { DATA_TABLE_EMPTY_MESSAGES } from "@common/constants/data-table-empty.constants";
+
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 
 type AcademicTableEmptyStateProps = {
-  createAction: React.ReactNode;
+  createAction: ReactNode;
   hasFilters: boolean;
   hasItemsOnOtherPages: boolean;
   onFirstPage: () => void;
@@ -25,9 +27,11 @@ export function AcademicTableEmptyState({
   showingDeleted,
   plural = "registros académicos",
   supportingDescription,
-}: AcademicTableEmptyStateProps): React.ReactElement {
+}: AcademicTableEmptyStateProps): ReactElement {
   const Icon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : GraduationCapIcon;
+
   const copy = getEmptyStateCopy(hasFilters, hasItemsOnOtherPages, showingDeleted, plural);
+
   const description = supportingDescription ?? copy.description;
 
   return (
@@ -61,6 +65,7 @@ function getEmptyStateCopy(
       description: DATA_TABLE_EMPTY_MESSAGES.PAGE_DESCRIPTION,
     };
   }
+
   if (hasFilters) {
     return {
       title: `No se encontraron ${plural}`,

@@ -1,3 +1,8 @@
+import { revalidatePath } from "next/cache";
+
+import { updatePlatformAccountAction } from "@features/platform-accounts/actions/update-platform-account.action";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -5,11 +10,6 @@ jest.mock("next/cache", () => ({
 jest.mock("@features/platform-auth/services/platform-api-fetch.service", () => ({
   platformApiFetch: jest.fn(),
 }));
-
-import { revalidatePath } from "next/cache";
-
-import { updatePlatformAccountAction } from "@features/platform-accounts/actions/update-platform-account.action";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const ACCOUNT_ID = "00000000-0000-4000-8000-000000000003";
 
@@ -25,7 +25,9 @@ describe("updatePlatformAccountAction", () => {
   it("omits the password when the fields are empty", async () => {
     platformApiFetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
-    await expect(updatePlatformAccountAction(ACCOUNT_ID, createFormData())).resolves.toEqual({ success: true });
+    await expect(updatePlatformAccountAction(ACCOUNT_ID, createFormData())).resolves.toEqual({
+      success: true,
+    });
 
     const [, request] = platformApiFetchMock.mock.calls[0];
     expect(JSON.parse(request?.body as string)).toEqual({
@@ -67,5 +69,6 @@ function createFormData(overrides: Partial<Record<"name" | "lastName" | "email" 
   };
   const formData = new FormData();
   Object.entries(values).forEach(([field, value]) => formData.set(field, value));
+
   return formData;
 }

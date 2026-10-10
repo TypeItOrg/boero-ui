@@ -1,6 +1,9 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax */
+
 import { startTransition, useActionState, type SyntheticEvent } from "react";
+
 import { CircleAlertIcon, UserMinusIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@common/components/ui/alert";
@@ -14,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
 import { Button } from "@common/components/ui/button";
+
 import { unlinkGuardianDependentAction } from "@features/guardian-dependents/actions/unlink-guardian-dependent.action";
 import { GUARDIAN_DEPENDENT_MESSAGES } from "@features/guardian-dependents/constants/guardian-dependent.constants";
 import type { GuardianDependentActionState } from "@features/guardian-dependents/types/guardian-dependent-action-state.types";

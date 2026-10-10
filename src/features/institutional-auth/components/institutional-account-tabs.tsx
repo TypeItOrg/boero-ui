@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,8 +14,9 @@ const ACCOUNT_TABS = [
   { title: "Sesiones", url: "/account/sessions" },
 ] as const;
 
-export function InstitutionalAccountTabs(): React.ReactElement {
+export function InstitutionalAccountTabs(): ReactElement {
   const pathname = usePathname();
+
   const activeUrl = getActiveTabUrl(pathname);
 
   return (
@@ -43,9 +45,17 @@ export function InstitutionalAccountTabs(): React.ReactElement {
 }
 
 function getActiveTabUrl(pathname: string): string {
-  if (pathname.startsWith("/account/password")) return "/account/password";
-  if (pathname.startsWith("/account/sessions")) return "/account/sessions";
-  if (pathname.startsWith("/account/passkeys")) return "/account/passkeys";
+  if (pathname.startsWith("/account/password")) {
+    return "/account/password";
+  }
+
+  if (pathname.startsWith("/account/sessions")) {
+    return "/account/sessions";
+  }
+
+  if (pathname.startsWith("/account/passkeys")) {
+    return "/account/passkeys";
+  }
 
   return "/account";
 }

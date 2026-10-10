@@ -1,18 +1,20 @@
-import * as React from "react";
+import type { ComponentProps, ReactElement } from "react";
+
 import { Controller, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@common/components/ui/field";
 import { Input } from "@common/components/ui/input";
 import { NumericInput } from "@common/components/ui/restricted-input";
 import { Textarea } from "@common/components/ui/textarea";
-import { LocationPicker } from "@features/locations/components/location-picker";
+
 import type { InstitutionFormInput, InstitutionFormValues } from "@features/institutions/schemas/institution-form.schema";
+import { LocationPicker } from "@features/locations/components/location-picker";
 
 type InstitutionLocationFieldsProps = {
   control: Control<InstitutionFormInput, unknown, InstitutionFormValues>;
   defaultValues: InstitutionFormInput;
   errors: FieldErrors<InstitutionFormInput>;
-  initialLocation: React.ComponentProps<typeof LocationPicker>["initialLocation"];
+  initialLocation: ComponentProps<typeof LocationPicker>["initialLocation"];
   register: UseFormRegister<InstitutionFormInput>;
 };
 
@@ -22,7 +24,7 @@ export function InstitutionLocationFields({
   errors,
   initialLocation,
   register,
-}: InstitutionLocationFieldsProps): React.ReactElement {
+}: InstitutionLocationFieldsProps): ReactElement {
   return (
     <div className="bg-muted/25 flex grow flex-col rounded-xl border p-5 md:p-6">
       <div className="flex grow flex-col gap-4">

@@ -14,6 +14,7 @@ export const DOCUMENT_FILE_CATEGORIES = [
   { value: "documents", label: "Documentos", formats: ["application/pdf"] },
 ] as const;
 export const DOCUMENT_MESSAGES = {
+  reloadFailed: "No se pudo recargar el detalle. Intentá nuevamente.",
   invalid: "Revisá los datos de la documentación.",
   failed: "No se pudo guardar la documentación.",
   readFailed: "No se pudo consultar la documentación.",

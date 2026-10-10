@@ -1,22 +1,33 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+
+import { EmailVerificationForm } from "@features/institutional-auth/components/email-verification-form";
 import { InstitutionalBrandProvider } from "@features/institutional-auth/components/institutional-brand-context";
 import { InstitutionalBrandIdentity, InstitutionalBrandPanel } from "@features/institutional-auth/components/institutional-brand-identity";
 import { InstitutionalLoginForm } from "@features/institutional-auth/components/institutional-login-form";
-import { InstitutionalRegisterForm } from "@features/institutional-auth/components/institutional-register-form";
 import { InstitutionalPasswordRecoveryForm } from "@features/institutional-auth/components/institutional-password-recovery-form";
-import { EmailVerificationForm } from "@features/institutional-auth/components/email-verification-form";
+import { InstitutionalRegisterForm } from "@features/institutional-auth/components/institutional-register-form";
 
 jest.mock("@features/institutional-auth/components/institution-picker", () => ({
   InstitutionPicker: ({ id, value }: { id: string; value?: string }) => (
     <input id={id} aria-label="Institución" name="institutionId" defaultValue={value ?? ""} />
   ),
 }));
-jest.mock("@features/institutional-auth/actions/identify-institutional-user.action", () => ({ identifyInstitutionalUser: jest.fn() }));
-jest.mock("@features/institutional-auth/actions/institutional-password-login.action", () => ({ institutionalPasswordLogin: jest.fn() }));
-jest.mock("@features/institutional-auth/actions/begin-passkey-login.action", () => ({ beginPasskeyLogin: jest.fn() }));
-jest.mock("@features/institutional-auth/actions/finish-passkey-login.action", () => ({ finishPasskeyLogin: jest.fn() }));
+jest.mock("@features/institutional-auth/actions/identify-institutional-user.action", () => ({
+  identifyInstitutionalUser: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/actions/institutional-password-login.action", () => ({
+  institutionalPasswordLogin: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/actions/begin-passkey-login.action", () => ({
+  beginPasskeyLogin: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/actions/finish-passkey-login.action", () => ({
+  finishPasskeyLogin: jest.fn(),
+}));
 jest.mock("@features/institutional-auth/actions/consume-institutional-login-flashes.action", () => ({ consumeInstitutionalLoginFlashes: jest.fn() }));
-jest.mock("@features/institutional-auth/actions/institutional-register.action", () => ({ registerInstitutional: jest.fn() }));
+jest.mock("@features/institutional-auth/actions/institutional-register.action", () => ({
+  registerInstitutional: jest.fn(),
+}));
 jest.mock("@features/institutional-auth/actions/request-institutional-password-recovery.action", () => ({ requestPasswordRecovery: jest.fn() }));
 jest.mock("@features/institutional-auth/actions/email-verification.actions", () => ({
   resendEmailVerification: jest.fn(),
@@ -28,12 +39,17 @@ const institution = {
   publicSubdomain: "cboero",
   logoUrl: `/api/v1/institutions/22222222-2222-4222-8222-222222222222/logo?v=opaque`,
 };
-const forms = [InstitutionalLoginForm, InstitutionalRegisterForm, InstitutionalPasswordRecoveryForm, EmailVerificationForm];
-it.each(forms)("[A01.generic-flows] existing $name keeps the institution selector", (Form) => {
+const forms = [
+  { formName: "login", Form: InstitutionalLoginForm },
+  { formName: "registration", Form: InstitutionalRegisterForm },
+  { formName: "password recovery", Form: InstitutionalPasswordRecoveryForm },
+  { formName: "email verification", Form: EmailVerificationForm },
+];
+it.each(forms)("[A01.generic-flows] existing $formName keeps the institution selector", ({ Form }) => {
   render(<Form />);
   expect(screen.getByLabelText("Institución")).toBeInTheDocument();
 });
-it.each(forms)("[A02.branded-mobile] $name fixes institution and exposes mobile identity without a selector", (Form) => {
+it.each(forms)("[A02.branded-mobile] $formName fixes institution and exposes mobile identity without a selector", ({ Form }) => {
   const { container } = render(
     <InstitutionalBrandProvider institution={institution}>
       <Form />

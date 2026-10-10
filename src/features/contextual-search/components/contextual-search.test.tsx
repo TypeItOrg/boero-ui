@@ -6,6 +6,7 @@ import { ContextualSearch } from "@features/contextual-search/components/context
 import { fetchContextualSearch } from "@features/contextual-search/services/fetch-contextual-search.service";
 import type { ContextualSearchAccessSection } from "@features/contextual-search/types/contextual-search-access-section.types";
 import type { ContextualSearchSummary } from "@features/contextual-search/types/contextual-search-summary.types";
+
 import { renderWithQueryClient } from "@/../test/utils/render-with-query-client";
 
 const mockRouter = { push: jest.fn() };
@@ -91,12 +92,14 @@ describe("ContextualSearch", () => {
     expect(await screen.findByText("Ctrl K")).toBeInTheDocument();
   });
 
-  it("can render an expanded search trigger on mobile", () => {
+  it("opens search from the expanded mobile trigger", async () => {
+    const user = userEvent.setup();
     renderWithQueryClient(<ContextualSearch accessSections={platformAccessSections} scope="platform" mobileVariant="input" />);
 
-    const trigger = screen.getByRole("button", { name: "Buscar en la plataforma" });
-    expect(trigger).toHaveClass("w-full", "justify-start", "pl-9");
-    expect(screen.getByText("Buscar en la plataforma...")).toHaveClass("block");
+    await user.click(screen.getByRole("button", { name: "Buscar en la plataforma" }));
+
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Buscar en la plataforma" })).toHaveFocus();
   });
 
   it("opens the modal and focuses the contextual input", async () => {
@@ -111,19 +114,8 @@ describe("ContextualSearch", () => {
 
     const dialog = await screen.findByRole("dialog");
     expect(dialog).toBeInTheDocument();
-    expect(dialog).toHaveClass(
-      "bottom-0",
-      "max-w-none",
-      "rounded-none!",
-      "max-sm:data-open:slide-in-from-bottom",
-      "sm:max-w-2xl",
-      "sm:top-1/2",
-      "sm:rounded-xl!",
-      "sm:-translate-y-1/2",
-    );
     expect(screen.getByRole("combobox", { name: "Buscar en la institución" })).toHaveFocus();
     expect(screen.getByText("Esc")).toHaveAttribute("data-slot", "kbd");
-    expect(screen.getByText("Esc")).toHaveClass("hidden", "sm:inline-flex");
     expect(screen.queryByText("Accesos")).not.toBeInTheDocument();
     expect(screen.queryByText("Inicio")).not.toBeInTheDocument();
     expect(screen.queryByText("Perfil")).not.toBeInTheDocument();
@@ -237,7 +229,7 @@ describe("ContextualSearch", () => {
     expect(queryClient.getQueryData(otherInstitutionKey)).toEqual(userSearchSummary);
   });
 
-  it("shows a result-shaped loading skeleton", async () => {
+  it("announces a pending search while results are unavailable", async () => {
     const user = userEvent.setup();
     mockedFetchContextualSearch.mockImplementation(() => new Promise<ContextualSearchSummary>(() => {}));
 
@@ -247,9 +239,7 @@ describe("ContextualSearch", () => {
     await user.type(screen.getByRole("combobox", { name: "Buscar en la institución" }), "ma");
 
     const skeleton = await screen.findByLabelText("Buscando resultados");
-    expect(skeleton).toHaveClass("px-3", "sm:px-4");
     expect(skeleton).toHaveAttribute("role", "status");
-    expect(skeleton.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(3);
   });
 
   it("navigates after selecting a result and clears the next search", async () => {

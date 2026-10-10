@@ -15,7 +15,11 @@ describe("institutional host classification", () => {
   it.each(["test", "staging"])("resolves one institution label in the %s namespace", (environment) => {
     expect(
       classifyInstitutionalHost(`cboero.${environment}.typeit.com.ar:443`, `https://${environment}.typeit.com.ar`, `${environment}.typeit.com.ar`),
-    ).toEqual({ kind: InstitutionalHostKind.INSTITUTIONAL, hostname: `cboero.${environment}.typeit.com.ar`, publicSubdomain: "cboero" });
+    ).toEqual({
+      kind: InstitutionalHostKind.INSTITUTIONAL,
+      hostname: `cboero.${environment}.typeit.com.ar`,
+      publicSubdomain: "cboero",
+    });
   });
   it.each([
     null,
@@ -46,6 +50,7 @@ it("[A01.generic-flows] absent new environment keeps existing staging/local gene
   const oldDomain = process.env.INSTITUTIONAL_BASE_DOMAIN;
   delete process.env.FRONTEND_PUBLIC_URL;
   delete process.env.INSTITUTIONAL_BASE_DOMAIN;
+
   try {
     expect(classifyInstitutionalHost("staging.typeit.com.ar").kind).toBe(InstitutionalHostKind.GENERIC);
     expect(classifyInstitutionalHost("127.0.0.1:3000").kind).toBe(InstitutionalHostKind.GENERIC);
@@ -55,6 +60,7 @@ it("[A01.generic-flows] absent new environment keeps existing staging/local gene
     } else {
       process.env.FRONTEND_PUBLIC_URL = oldUrl;
     }
+
     if (oldDomain === undefined) {
       delete process.env.INSTITUTIONAL_BASE_DOMAIN;
     } else {

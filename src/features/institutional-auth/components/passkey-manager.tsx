@@ -1,27 +1,33 @@
 "use client";
 
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+
 import { FingerprintIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+
+import { SectionHeader } from "@common/components/section-header";
 import { Button } from "@common/components/ui/button";
+
+import { revokePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
+import { PasskeyReauthDialog } from "@features/institutional-auth/components/passkey-reauth-dialog";
 import { PasskeyRegistrationDialog } from "@features/institutional-auth/components/passkey-registration-dialog";
 import { PasskeyRenameDialog } from "@features/institutional-auth/components/passkey-rename-dialog";
 import { PasskeyRevokeDialog } from "@features/institutional-auth/components/passkey-revoke-dialog";
-import { PasskeyReauthDialog } from "@features/institutional-auth/components/passkey-reauth-dialog";
-import { revokePasskeyAction } from "@features/institutional-auth/actions/passkey-management.actions";
 import { useWebAuthnSupport } from "@features/institutional-auth/hooks/use-webauthn-support.hook";
 import type { Passkey } from "@features/institutional-auth/types/passkey.types";
 import type { ReAuthenticateState } from "@features/institutional-auth/types/re-authenticate-state.types";
-import { SectionHeader } from "@common/components/section-header";
 
 type PasskeyOperation = { kind: "register"; label: string } | { kind: "revoke"; passkey: Passkey };
 type PasskeyDialog = PasskeyOperation | { kind: "rename"; passkey: Passkey } | { kind: "reauth"; next: PasskeyOperation };
 
 type PasskeyManagerProps = { initialPasskeys: Passkey[]; maxActivePasskeys: number };
 
-export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyManagerProps): React.ReactElement {
+export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyManagerProps): ReactElement {
   const router = useRouter();
+
   const [dialog, setDialog] = useState<PasskeyDialog | null>(null);
+
   const webauthnSupported = useWebAuthnSupport();
 
   function close(): void {
@@ -36,11 +42,18 @@ export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyMa
   async function resumeOperation(next: PasskeyOperation): Promise<ReAuthenticateState> {
     if (next.kind === "register") {
       setDialog(next);
+
       return {};
     }
+
     const result = await revokePasskeyAction(next.passkey.id);
-    if (result.error) return result;
+
+    if (result.error) {
+      return result;
+    }
+
     complete();
+
     return {};
   }
 
@@ -141,12 +154,17 @@ export function PasskeyManager({ initialPasskeys, maxActivePasskeys }: PasskeyMa
     </div>
   );
 }
+
 function formatDate(value: string | null): string {
-  if (!value) return "fecha desconocida";
+  if (!value) {
+    return "fecha desconocida";
+  }
 
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) return "fecha desconocida";
+  if (Number.isNaN(date.getTime())) {
+    return "fecha desconocida";
+  }
 
   return date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }

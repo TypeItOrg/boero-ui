@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
 import { PEOPLE_ERROR_MESSAGES } from "@features/people/constants/error-messages.constants";
+import { hasMinimumPersonAge } from "@features/people/utils/person-birth-date.util";
 
 const requiredEmail = z
   .string()
@@ -41,6 +41,7 @@ export const updatePersonFormSchema = basePersonSchema
   })
   .superRefine((values, context) => {
     const password = values.password ?? "";
+
     const confirmPassword = values.confirmPassword ?? "";
 
     if (password !== "" && password.length < 8) {

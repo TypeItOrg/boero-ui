@@ -1,8 +1,11 @@
-import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
+import type { ReactElement } from "react";
+
 import { ClockIcon, Music2Icon } from "lucide-react";
 
 import { Badge } from "@common/components/ui/badge";
 import { Button } from "@common/components/ui/button";
+
+import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { COURSE_DAY_LABELS } from "@features/course-enrollments/constants/course-enrollment.constants";
 import { MY_SUBJECTS_MESSAGES } from "@features/course-enrollments/constants/my-subjects.constants";
 import { COURSE_ENROLLMENT_STATUS } from "@features/course-enrollments/types/course-enrollment-status.types";
@@ -16,16 +19,22 @@ type MySubjectCardProps = {
   onMutation: (enrollment: CourseEnrollment, mode: "withdraw" | "academic") => void;
 };
 
-export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus, onMutation }: MySubjectCardProps): React.ReactElement {
+export function MySubjectCard({ enrollment, canWithdraw, canUpdateAcademicStatus, onMutation }: MySubjectCardProps): ReactElement {
   const isEnrolled = enrollment.status === COURSE_ENROLLMENT_STATUS.ENROLLED;
+
   const isWithdrawn =
     enrollment.status === COURSE_ENROLLMENT_STATUS.WITHDRAWN || enrollment.status === COURSE_ENROLLMENT_STATUS.ADMINISTRATIVELY_WITHDRAWN;
+
   const showWithdraw = canWithdraw && isEnrolled;
+
   const showAcademicAction = canUpdateAcademicStatus && !isWithdrawn;
+
   const days = Object.keys(COURSE_DAY_LABELS);
+
   const schedules = enrollment.schedules
     .filter((schedule) => !isEnrolled || !schedule.releasedAt)
     .toSorted((a, b) => days.indexOf(a.dayOfWeek) - days.indexOf(b.dayOfWeek) || a.startTime.localeCompare(b.startTime));
+
   const context = [formatStudyPlanLabel(enrollment), enrollment.academicLevelName].filter(Boolean).join(" · ");
 
   return (

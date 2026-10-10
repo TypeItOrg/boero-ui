@@ -1,15 +1,16 @@
 "use server";
 
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { revalidatePath } from "next/cache";
-import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
 
 import { INVALID_ACTION_ARGUMENTS, isValidUuid } from "@common/utils/action-argument.util";
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
-import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
+
+import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import type { EnrollmentApplicationActionState } from "@features/enrollment-applications/types/enrollment-application-action-state.types";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import { platformApiFetch } from "@features/platform-auth/services/platform-api-fetch.service";
 
 const UPDATE_PATH = "/admin/enrollment-applications";
 

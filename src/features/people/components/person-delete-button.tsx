@@ -1,9 +1,11 @@
 "use client";
 
-import * as React from "react";
+import { useState, type ComponentProps, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
+
 import { PersonDeleteDialog } from "@features/people/components/person-delete-dialog";
 import { PeopleScope, type PeopleScope as PeopleScopeType } from "@features/people/utils/people-scope.util";
 
@@ -13,7 +15,7 @@ type PersonDeleteButtonProps = {
   personName: string;
   scope?: PeopleScopeType;
   label?: string;
-  size?: React.ComponentProps<typeof Button>["size"];
+  size?: ComponentProps<typeof Button>["size"];
 };
 
 export function PersonDeleteButton({
@@ -23,9 +25,10 @@ export function PersonDeleteButton({
   scope = PeopleScope.ADMIN,
   label = "Eliminar",
   size,
-}: PersonDeleteButtonProps): React.ReactElement {
+}: PersonDeleteButtonProps): ReactElement {
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
+
+  const [open, setOpen] = useState(false);
 
   function handleDeleted(): void {
     router.push(PeopleScope.isInstitutional(scope) ? "/people" : `/admin/institutions/${institutionId}/people`);

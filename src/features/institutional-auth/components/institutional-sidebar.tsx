@@ -1,7 +1,11 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax */
+
 import type { ComponentProps } from "react";
+
 import Link from "next/link";
+
 import { ChevronsUpDownIcon, LogOutIcon, MoonIcon, SunIcon, UserRoundIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -17,12 +21,13 @@ import {
 } from "@common/components/ui/dropdown-menu";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@common/components/ui/sidebar";
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
+import { cn } from "@common/utils/cn.util";
+
 import { GuardianWorkspaceMenuItems } from "@features/guardian-workspace/components/guardian-workspace-selector";
 import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import type { InstitutionalNavigationSection } from "@features/institutional-auth/utils/institutional-navigation.util";
-import { cn } from "@common/utils/cn.util";
 
 type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
   user: InstitutionalUser;
@@ -31,7 +36,9 @@ type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
 
 export function InstitutionalSidebar({ user, navigationSections, className, ...props }: InstitutionalSidebarProps): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
+
   const navigation = useMobileSidebarNavigation();
+
   const { isMobile } = useSidebar();
 
   return (
@@ -67,6 +74,7 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                 onCloseAutoFocus={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => {
                   const target = event.target as HTMLElement;
+
                   if (target.closest('[data-sidebar="sidebar"]')) {
                     event.preventDefault();
                   }

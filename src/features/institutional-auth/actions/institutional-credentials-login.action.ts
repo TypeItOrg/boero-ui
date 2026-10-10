@@ -1,7 +1,9 @@
 "use server";
 
 import { z } from "zod";
+
 import { getFieldErrors } from "@common/utils/form-field-errors.util";
+
 import { identifyInstitutionalUser } from "@features/institutional-auth/actions/identify-institutional-user.action";
 import { institutionalPasswordLogin } from "@features/institutional-auth/actions/institutional-password-login.action";
 import { INSTITUTIONAL_AUTH_ERROR_MESSAGES } from "@features/institutional-auth/constants/error-messages.constants";
@@ -33,6 +35,7 @@ export async function institutionalCredentialsLogin(
 
   // Identification stays internal; a PASSKEY preference must not override the chosen method.
   const identified = await identifyInstitutionalUser({}, formData);
+
   if (!identified.loginAttemptId) {
     return identified;
   }

@@ -15,18 +15,23 @@ export function getPermissionTree(
   allPermissions: ReadonlyMap<string, InstitutionPermission>,
 ): PermissionTreeNode[] {
   const groupPermissionCodes = new Set(groupPermissions.map((permission) => permission.code));
+
   const originalOrder = new Map(groupPermissions.map((permission, index) => [permission.code, index]));
+
   const childrenByParentCode = new Map<string, InstitutionPermission[]>();
+
   const rootPermissions: InstitutionPermission[] = [];
 
   for (const permission of groupPermissions) {
     const parentCode = getVisibleParentCode(permission, groupPermissionCodes, allPermissions);
+
     if (!parentCode) {
       rootPermissions.push(permission);
       continue;
     }
 
     const children = childrenByParentCode.get(parentCode) ?? [];
+
     children.push(permission);
     childrenByParentCode.set(parentCode, children);
   }
@@ -36,6 +41,7 @@ export function getPermissionTree(
 
   function buildTree(permission: InstitutionPermission, ancestorCodes: ReadonlySet<string> = new Set()): PermissionTreeNode {
     const nextAncestorCodes = new Set(ancestorCodes).add(permission.code);
+
     const children = (childrenByParentCode.get(permission.code) ?? [])
       .filter((child) => !nextAncestorCodes.has(child.code))
       .sort(sortByOriginalOrder)

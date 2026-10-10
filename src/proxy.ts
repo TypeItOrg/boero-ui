@@ -1,15 +1,16 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { handleGuestOnlyRoute, handleProtectedRoute } from "@common/services/auth-proxy/auth-proxy.service";
 import { INSTITUTIONAL_UNAVAILABLE_PATH, RouteAccess, getRouteAccess } from "@common/services/auth-proxy/auth-proxy-route.util";
-import { institutionalAuthProxyPolicy } from "@features/institutional-auth/utils/institutional-auth-proxy-policy.util";
+import { handleGuestOnlyRoute, handleProtectedRoute } from "@common/services/auth-proxy/auth-proxy.service";
+import { InstitutionalHostError } from "@common/services/institutional-host/institutional-host-error";
 import {
   INSTITUTIONAL_HOST_HEADER,
   rebuildInstitutionalHostHeader,
   resolveRequestInstitution,
 } from "@common/services/institutional-host/institutional-host.service";
-import { InstitutionalHostError } from "@common/services/institutional-host/institutional-host-error";
+
+import { institutionalAuthProxyPolicy } from "@features/institutional-auth/utils/institutional-auth-proxy-policy.util";
 import { platformAuthProxyPolicy } from "@features/platform-auth/utils/platform-auth-proxy-policy.util";
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
@@ -17,6 +18,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   request.headers.delete(INSTITUTIONAL_HOST_HEADER);
 
   const routeAccess = getRouteAccess(request.nextUrl.pathname, request.nextUrl.searchParams);
+
   if (routeAccess === RouteAccess.HealthProbe) {
     return NextResponse.next({ request: { headers: new Headers(request.headers) } });
   }
@@ -27,7 +29,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   try {
     rebuildInstitutionalHostHeader(request.headers, request.headers);
+
     const institution = await resolveRequestInstitution(request.headers);
+
     if (institution && (routeAccess === RouteAccess.AdminGuestOnly || routeAccess === RouteAccess.AdminSession)) {
       return NextResponse.redirect(institutionalAuthProxyPolicy.getLoginRedirect(request), {
         status: 303,
@@ -36,6 +40,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     }
   } catch (error) {
     const status = error instanceof InstitutionalHostError ? error.status : 503;
+
     const message = error instanceof InstitutionalHostError ? error.message : "No se pudo consultar la institución. Intentá nuevamente.";
 
     if (request.nextUrl.pathname.startsWith("/api/")) {
@@ -43,6 +48,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     }
 
     const destination = new URL(INSTITUTIONAL_UNAVAILABLE_PATH, request.url);
+
     destination.searchParams.set("status", String(status));
     destination.searchParams.set("message", message);
 

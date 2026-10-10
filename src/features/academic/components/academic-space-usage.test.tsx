@@ -1,12 +1,12 @@
-jest.mock("next/navigation", () => ({
-  usePathname: () => "/academic-spaces/space-1",
-  useSearchParams: () => new URLSearchParams(),
-}));
-
 import { render, screen, within } from "@testing-library/react";
 
 import { AcademicSpaceUsage } from "@features/academic/components/academic-space-usage";
 import type { AcademicSpaceUsage as AcademicSpaceUsageData } from "@features/academic/types/academic-space-usage.types";
+
+jest.mock("next/navigation", () => ({
+  usePathname: () => "/academic-spaces/space-1",
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 const USAGE: AcademicSpaceUsageData = {
   summary: {

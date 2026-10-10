@@ -1,10 +1,10 @@
 import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 import {
   hasAllInstitutionalPermissions,
   hasAnyInstitutionalPermission,
   hasInstitutionalPermission,
 } from "@features/institutional-auth/utils/institutional-permission.util";
-import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 
 const user: InstitutionalUser = {
   userId: "user-id",

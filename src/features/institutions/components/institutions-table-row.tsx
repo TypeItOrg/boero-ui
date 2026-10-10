@@ -1,5 +1,7 @@
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import Link from "next/link";
+
 import { EllipsisVerticalIcon, UserIcon } from "lucide-react";
 
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
@@ -16,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
+
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 
 type InstitutionsTableRowProps = {
@@ -29,7 +32,7 @@ type InstitutionAction = {
   preserveReturnTo?: boolean;
 };
 
-export function InstitutionsTableRow({ institution, onStatusChange }: InstitutionsTableRowProps): React.ReactElement {
+export function InstitutionsTableRow({ institution, onStatusChange }: InstitutionsTableRowProps): ReactElement {
   const actions = getInstitutionActions(institution);
 
   return (
@@ -84,7 +87,10 @@ export function InstitutionsTableRow({ institution, onStatusChange }: Institutio
 
 function getInstitutionActions(institution: InstitutionSummary): InstitutionAction[] {
   const detailHref = `/admin/institutions/${institution.id}`;
-  if (!institution.active) return [{ label: "Ver", href: detailHref }];
+
+  if (!institution.active) {
+    return [{ label: "Ver", href: detailHref }];
+  }
 
   return [
     { label: "Ver", href: detailHref },
@@ -93,11 +99,15 @@ function getInstitutionActions(institution: InstitutionSummary): InstitutionActi
   ];
 }
 
-function InstitutionUsersCell({ institution }: { institution: InstitutionSummary }): React.ReactElement {
+function InstitutionUsersCell({ institution }: { institution: InstitutionSummary }): ReactElement {
   const count = Number.isFinite(institution.userCount) ? institution.userCount : 0;
-  if (count === 0) return <span className="text-muted-foreground/60">Sin usuarios</span>;
+
+  if (count === 0) {
+    return <span className="text-muted-foreground/60">Sin usuarios</span>;
+  }
 
   const visibleAvatars = Math.min(count, 3);
+
   const overflow = count - visibleAvatars;
 
   return (
@@ -116,13 +126,7 @@ function InstitutionUsersCell({ institution }: { institution: InstitutionSummary
   );
 }
 
-function InstitutionActionsMenu({
-  institution,
-  onStatusChange,
-}: {
-  institution: InstitutionSummary;
-  onStatusChange: () => void;
-}): React.ReactElement {
+function InstitutionActionsMenu({ institution, onStatusChange }: { institution: InstitutionSummary; onStatusChange: () => void }): ReactElement {
   return (
     <div className="flex justify-start">
       <DropdownMenu>

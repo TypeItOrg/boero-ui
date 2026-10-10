@@ -1,17 +1,20 @@
 "use client";
 
-import { OptionalValue } from "@common/components/optional-value";
-import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
+import type { ReactElement } from "react";
+
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { Button } from "@common/components/ui/button";
 import { ReturnToLink } from "@common/components/navigation/return-to-link";
+import { OptionalValue } from "@common/components/optional-value";
+import { Button } from "@common/components/ui/button";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@common/components/ui/context-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@common/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
+
+import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
+import { ENROLLMENT_APPLICATION_STATUS } from "@features/enrollment-applications/types/enrollment-application-status.types";
 import type { EnrollmentApplication } from "@features/enrollment-applications/types/enrollment-application.types";
 import { formatEnrollmentApplicationDate } from "@features/enrollment-applications/utils/enrollment-application-date.util";
-import { EnrollmentApplicationStatusBadge } from "@features/enrollment-applications/components/enrollment-application-status-badge";
 
 type EnrollmentApplicationTableRowProps = {
   application: EnrollmentApplication;
@@ -29,12 +32,16 @@ export function EnrollmentApplicationTableRow({
   onApprove,
   onReject,
   detailHref,
-}: EnrollmentApplicationTableRowProps): React.ReactElement {
+}: EnrollmentApplicationTableRowProps): ReactElement {
   const isPendingEvaluation = application.status === ENROLLMENT_APPLICATION_STATUS.SUBMITTED;
+
   const canResolve =
     (isPendingEvaluation || application.status === ENROLLMENT_APPLICATION_STATUS.PROVISIONALLY_APPROVED) && (canApprove || canReject);
+
   const showApprove = canResolve && canApprove && Boolean(application.canConfirm || application.canApproveProvisionally);
+
   const hasActions = Boolean(detailHref) || canResolve;
+
   const row = (
     <TableRow className="h-12">
       <TableCell className="w-16 pl-4">

@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactElement } from "react";
+
 import { BuildingIcon } from "lucide-react";
 
 import { AsyncDropdown } from "@common/components/ui/async-dropdown";
+
 import { FormField } from "@features/academic/components/academic-form-controls";
 import { fetchActivePlatformInstitutionOptions } from "@features/institutions/services/fetch-platform-institution-options.service";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
@@ -17,7 +20,7 @@ export function PlatformInstitutionFormField({
   error?: string;
   institution?: InstitutionSummary;
   onChange: (institution: InstitutionSummary | undefined) => void;
-}): React.ReactElement {
+}): ReactElement {
   return (
     <FormField label="Institución" name="institutionId" error={error} className="w-full flex-[1_0_100%]" required>
       <AsyncDropdown<InstitutionSummary>

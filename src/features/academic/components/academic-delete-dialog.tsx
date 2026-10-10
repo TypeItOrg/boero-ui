@@ -1,8 +1,10 @@
 "use client";
 
-import { CircleAlertIcon, Trash2Icon } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, type ReactElement } from "react";
 
+import { CircleAlertIcon, Trash2Icon } from "lucide-react";
+
+import { Alert, AlertDescription } from "@common/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,9 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@common/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@common/components/ui/alert";
 import { Button } from "@common/components/ui/button";
-import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource.action";
+
+import { deleteAcademicResourceAction } from "@features/academic/actions/academic-resource-lifecycle.actions";
 import type { AcademicActionState } from "@features/academic/types/academic-action-state.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicScope } from "@features/academic/utils/academic-scope.util";
@@ -42,23 +44,28 @@ export type AcademicDeleteDialogProps = {
 
 const INITIAL_STATE: AcademicActionState = {};
 
-export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): React.ReactElement {
+export function AcademicDeleteDialog(props: AcademicDeleteDialogProps): ReactElement {
   const [state, formAction, isPending] = useActionState(
     deleteAcademicResourceAction.bind(null, props.scope, props.institutionId, props.resource, props.id, props.destination),
     INITIAL_STATE,
   );
+
   const isRootResource =
     props.resource === AcademicResource.ACADEMIC_YEAR ||
     props.resource === AcademicResource.TRAINING_PATH ||
     props.resource === AcademicResource.STUDY_PLAN ||
     props.resource === AcademicResource.ACADEMIC_SPACE ||
     props.resource === AcademicResource.INSTRUMENT;
+
   const description = isRootResource
     ? "El registro dejará de estar disponible en la operación habitual, pero conservará su historial y podrá restaurarse."
     : "Esta acción no se puede deshacer. Las relaciones protegidas impedirán la eliminación.";
 
   function handleOpenChange(open: boolean): void {
-    if (isPending && !open) return;
+    if (isPending && !open) {
+      return;
+    }
+
     props.onOpenChange(open);
   }
 

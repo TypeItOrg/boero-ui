@@ -1,19 +1,10 @@
-import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
-import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
-import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
-import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
-
-import { render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 
-jest.mock("next/navigation", () => ({
-  ...jest.requireActual("next/navigation"),
-  usePathname: () => "/academic-spaces/4c9ec931-453c-4778-86a9-dc40a06d0247",
-  useSearchParams: () => new URLSearchParams(),
-}));
+import { render, screen } from "@testing-library/react";
 
 import { AcademicRouteView } from "@features/academic/components/academic-route-view";
 import { ACADEMIC_ROUTE_SEGMENT } from "@features/academic/constants/academic-route.constants";
+import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
 import {
   fetchAcademicSpace,
   fetchAcademicSpaceUsage,
@@ -26,12 +17,25 @@ import {
   fetchTrainingPaths,
 } from "@features/academic/services/academic.service";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
-import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
+import type { AcademicSpaceUsage } from "@features/academic/types/academic-space-usage.types";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { requireInstitutionalUser } from "@features/institutional-auth/services/get-institutional-user.service";
+import { INSTITUTIONAL_PERMISSION } from "@features/institutional-auth/types/institutional-permission.types";
+import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
 
-jest.mock("@features/academic/services/academic-api-fetch.service", () => ({ academicApiFetch: jest.fn() }));
-jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({ requireInstitutionalUser: jest.fn() }));
+jest.mock("next/navigation", () => ({
+  ...jest.requireActual("next/navigation"),
+  usePathname: () => "/academic-spaces/4c9ec931-453c-4778-86a9-dc40a06d0247",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+jest.mock("@features/academic/services/academic-api-fetch.service", () => ({
+  academicApiFetch: jest.fn(),
+}));
+jest.mock("@features/institutional-auth/services/get-institutional-user.service", () => ({
+  requireInstitutionalUser: jest.fn(),
+}));
 
 jest.mock("@features/academic/services/academic.service", () => ({
   fetchAcademicSpace: jest.fn(),
@@ -318,11 +322,18 @@ describe("AcademicRouteView", () => {
       ...USER,
       permissionScopes: {
         ...USER.permissionScopes,
-        [INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE]: { accessScope: "TRAINING_PATHS", trainingPathIds: [] },
+        [INSTITUTIONAL_PERMISSION.TRAINING_PATH_UPDATE]: {
+          accessScope: "TRAINING_PATHS",
+          trainingPathIds: [],
+        },
       },
     });
     const result = await AcademicRouteView({
-      access: { ...FULL_ACADEMIC_ACCESS, trainingPathUpdate: false, trainingPathStatusUpdate: true },
+      access: {
+        ...FULL_ACADEMIC_ACCESS,
+        trainingPathUpdate: false,
+        trainingPathStatusUpdate: true,
+      },
       institutionId: INSTITUTION_ID,
       renderBreadcrumb: () => null,
       scope: AcademicScope.INSTITUTIONAL,

@@ -6,7 +6,15 @@ describe("countActiveAdvancedFilters", () => {
       countActiveAdvancedFilters({
         activeAdvancedCount: 0,
         advancedDateFilters: [],
-        advancedSelectFilters: [{ defaultValue: "false", label: "Registros", name: "deleted", options: [], value: "false" }],
+        advancedSelectFilters: [
+          {
+            defaultValue: "false",
+            label: "Registros",
+            name: "deleted",
+            options: [],
+            value: "false",
+          },
+        ],
         advancedYearFilters: [],
       }),
     ).toBe(0);
@@ -18,10 +26,25 @@ describe("countActiveAdvancedFilters", () => {
         activeAdvancedCount: 2,
         advancedDateFilters: [{ label: "Inicio", name: "startDate", value: "2035-01-01" }],
         advancedSelectFilters: [
-          { defaultValue: "false", label: "Registros", name: "deleted", options: [], value: "true" },
+          {
+            defaultValue: "false",
+            label: "Registros",
+            name: "deleted",
+            options: [],
+            value: "true",
+          },
           { defaultValue: "all", label: "Estado", name: "courseStatus", options: [], value: "all" },
         ],
-        advancedYearFilters: [{ defaultValue: "all", label: "Año", maxYear: 2030, minYear: 2020, name: "year", value: "2027" }],
+        advancedYearFilters: [
+          {
+            defaultValue: "all",
+            label: "Año",
+            maxYear: 2030,
+            minYear: 2020,
+            name: "year",
+            value: "2027",
+          },
+        ],
       }),
     ).toBe(5);
   });

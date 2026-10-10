@@ -1,20 +1,22 @@
-import { OptionalValue } from "@common/components/optional-value";
-import * as React from "react";
+import type { ReactElement } from "react";
+
 import Link from "next/link";
 
+import { OptionalValue } from "@common/components/optional-value";
 import { Badge } from "@common/components/ui/badge";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@common/components/ui/context-menu";
 import { TableCell, TableRow } from "@common/components/ui/table";
+
 import { AcademicContextMenuActions, AcademicRowActions } from "@features/academic/components/academic-row-actions";
 import type { AcademicCollectionResource } from "@features/academic/types/academic-collection-resource.types";
-import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { AcademicLifecycleActionKind } from "@features/academic/types/academic-lifecycle-action-kind.types";
+import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import { ACADEMIC_ROW_ACTION_KIND } from "@features/academic/types/academic-row-action-kind.types";
 import type { AcademicRowAction } from "@features/academic/types/academic-row-action.types";
-import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import type { AcademicStatusSelection } from "@features/academic/types/academic-status-selection.types";
 import type { AcademicTableColumns } from "@features/academic/types/academic-table-columns.types";
 import type { AcademicTableRow as AcademicTableRowData } from "@features/academic/types/academic-table-row.types";
+import type { ActiveAcademicStatusResource } from "@features/academic/types/active-academic-status-resource.types";
 import { getAcademicRowActions } from "@features/academic/utils/academic-row-actions.util";
 
 type AcademicStatusAction = Extract<AcademicRowAction, { kind: typeof ACADEMIC_ROW_ACTION_KIND.STATUS }>;
@@ -49,9 +51,15 @@ export function AcademicTableRow({
   onStatusAction,
   resource,
   row,
-}: AcademicTableRowProps): React.ReactElement {
+}: AcademicTableRowProps): ReactElement {
+  const activeVariant = row.active ? "success" : "secondary";
+
+  const statusVariant = row.deletedAt ? "destructive" : activeVariant;
+
   const institutionId = row.institutionId ?? "";
+
   const detailHref = `${basePath}/${resource}/${row.id}`;
+
   const actions = getAcademicRowActions(
     basePath,
     resource,
@@ -72,6 +80,7 @@ export function AcademicTableRow({
         resource: action.resource,
         targetStatus: action.targetStatus,
       });
+
       return;
     }
 
@@ -83,6 +92,7 @@ export function AcademicTableRow({
         studyPlanLabel: row.primaryValue,
         targetStatus: action.targetStatus,
       });
+
       return;
     }
 
@@ -93,6 +103,7 @@ export function AcademicTableRow({
         resourceLabel: row.primaryValue,
         targetStatus: action.targetStatus,
       });
+
       return;
     }
 
@@ -142,7 +153,7 @@ export function AcademicTableRow({
             </TableCell>
           ))}
           <TableCell>
-            <Badge variant={row.deletedAt ? "destructive" : row.active ? "success" : "secondary"}>{row.deletedAt ? "Eliminado" : row.status}</Badge>
+            <Badge variant={statusVariant}>{row.deletedAt ? "Eliminado" : row.status}</Badge>
           </TableCell>
         </TableRow>
       </ContextMenuTrigger>

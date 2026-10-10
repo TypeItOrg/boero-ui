@@ -25,7 +25,13 @@ describe("revokePasskey", () => {
   });
 
   it("requests re-authentication only for the backend code", async () => {
-    apiFetchMock.mockResolvedValue(jsonResponse(403, { status: 403, message: "Requerido.", code: "RECENT_AUTHENTICATION_REQUIRED" }));
+    apiFetchMock.mockResolvedValue(
+      jsonResponse(403, {
+        status: 403,
+        message: "Requerido.",
+        code: "RECENT_AUTHENTICATION_REQUIRED",
+      }),
+    );
 
     const { revokePasskey } = await importService();
 

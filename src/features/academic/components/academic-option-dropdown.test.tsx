@@ -1,10 +1,12 @@
+import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { AcademicSpaceDropdown, TrainingPathDropdown } from "@features/academic/components/academic-option-dropdown";
 import { fetchAcademicOptionPage } from "@features/academic/services/academic-options.service";
+import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+
+import { createTestQueryClient } from "@/../test/utils/render-with-query-client";
 
 jest.mock("@features/academic/services/academic-options.service", () => ({
   fetchAcademicOptionPage: jest.fn(),
@@ -19,13 +21,7 @@ describe("Academic Option Dropdowns", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
+    queryClient = createTestQueryClient();
   });
 
   describe("TrainingPathDropdown", () => {

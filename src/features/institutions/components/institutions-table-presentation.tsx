@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,10 +12,11 @@ import { DataTableSortableHead } from "@common/components/ui/data-table-sortable
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@common/components/ui/table";
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import type { PaginationParams } from "@common/types/pagination-params.types";
+
+import { InstitutionStatusDialog } from "@features/institutions/components/institution-status-dialog";
+import { InstitutionsPagination } from "@features/institutions/components/institutions-pagination";
 import { InstitutionsTableEmptyState } from "@features/institutions/components/institutions-table-empty-state";
 import { InstitutionsTableRow } from "@features/institutions/components/institutions-table-row";
-import { InstitutionsPagination } from "@features/institutions/components/institutions-pagination";
-import { InstitutionStatusDialog } from "@features/institutions/components/institution-status-dialog";
 import type { InstitutionSummary } from "@features/institutions/types/institution-summary.types";
 import type { InstitutionSort, InstitutionSortField } from "@features/institutions/utils/institution-pagination.util";
 
@@ -24,9 +27,11 @@ type InstitutionsTablePresentationProps = PaginationParams & {
   active: boolean | undefined;
 };
 
-export function InstitutionsTablePresentation({ data, page, size, sort, search, active }: InstitutionsTablePresentationProps): React.ReactElement {
+export function InstitutionsTablePresentation({ data, page, size, sort, search, active }: InstitutionsTablePresentationProps): ReactElement {
   const router = useRouter();
+
   const { isPending: isNavigating, navigate } = useDataTableNavigation();
+
   const [statusTargetInstitution, setStatusTargetInstitution] = useState<InstitutionSummary>();
 
   function navigateToPage(newPage: number): void {
@@ -98,10 +103,13 @@ export function InstitutionsTablePresentation({ data, page, size, sort, search, 
           active={statusTargetInstitution.active}
           open={Boolean(statusTargetInstitution)}
           onOpenChange={(open) => {
-            if (!open) setStatusTargetInstitution(undefined);
+            if (!open) {
+              setStatusTargetInstitution(undefined);
+            }
           }}
           onUpdated={() => {
             const nextActive = !statusTargetInstitution.active;
+
             toast.success(`${statusTargetInstitution.name} fue ${nextActive ? "activada" : "desactivada"}.`);
             setStatusTargetInstitution(undefined);
             router.refresh();

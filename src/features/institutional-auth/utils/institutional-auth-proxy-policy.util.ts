@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import type { AuthProxyPolicy } from "@common/services/auth-proxy/auth-proxy-policy.types";
 import type { RefreshedTokens } from "@common/services/auth-proxy/refreshed-tokens.types";
+
 import {
-  getInstitutionalAuthCookieOptions,
   INSTITUTIONAL_ACCESS_TOKEN_COOKIE,
   INSTITUTIONAL_ACCESS_TOKEN_MAX_AGE,
   INSTITUTIONAL_REFRESH_TOKEN_COOKIE,
   INSTITUTIONAL_REFRESH_TOKEN_MAX_AGE,
+  getInstitutionalAuthCookieOptions,
 } from "@features/institutional-auth/utils/institutional-auth-cookies.util";
 
 export const INSTITUTIONAL_LOGIN_PATH = "/auth/login";

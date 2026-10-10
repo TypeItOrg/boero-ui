@@ -1,18 +1,21 @@
 "use server";
 
-import { ENROLLMENT_PERIOD_STATUS } from "@features/enrollment-periods/types/enrollment-period-status.types";
-import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
 import { revalidatePath } from "next/cache";
-import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
-import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
+
 import { z } from "zod";
+
 import { getResponseErrorActionState } from "@common/utils/action-state.util";
+
 import { academicApiFetch } from "@features/academic/services/academic-api-fetch.service";
-import type { CreateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/create-enrollment-period-request.types";
-import type { UpdateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/update-enrollment-period-request.types";
-import type { EnrollmentPeriodStatusRequest } from "@features/enrollment-periods/types/enrollment-period-status-request.types";
-import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
+import { authorizeAcademicAction } from "@features/academic/utils/academic-action-auth.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
+import { ENROLLMENT_MESSAGES } from "@features/enrollment-applications/constants/enrollment-messages.constants";
+import type { CreateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/create-enrollment-period-request.types";
+import type { EnrollmentPeriodActionState } from "@features/enrollment-periods/types/enrollment-period-action-state.types";
+import type { EnrollmentPeriodStatusRequest } from "@features/enrollment-periods/types/enrollment-period-status-request.types";
+import { ENROLLMENT_PERIOD_STATUS } from "@features/enrollment-periods/types/enrollment-period-status.types";
+import type { UpdateEnrollmentPeriodRequest } from "@features/enrollment-periods/types/update-enrollment-period-request.types";
+import { INSTITUTIONAL_PERMISSION, type InstitutionalPermission } from "@features/institutional-auth/types/institutional-permission.types";
 
 const contextSchema = z.object({
   institutionId: z.uuid(),
@@ -59,6 +62,7 @@ async function mutate(
   }
 
   const path = `/api/v1/institutions/${institutionId}/enrollment-periods${periodId ? "/" + periodId : ""}${suffix}`;
+
   const error = await getResponseErrorActionState(
     academicApiFetch(scope, path, {
       method,

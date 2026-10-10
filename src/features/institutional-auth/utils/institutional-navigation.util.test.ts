@@ -162,14 +162,19 @@ describe("getInstitutionalNavigationSections", () => {
     });
 
     expect(sections.find((section) => section.label === "Inscripciones")?.items).toEqual([
-      expect.objectContaining({ title: "Solicitudes de inscripción", url: "/enrollment-applications" }),
+      expect.objectContaining({
+        title: "Solicitudes de inscripción",
+        url: "/enrollment-applications",
+      }),
     ]);
   });
 
   it("keeps Inicio outside labeled navigation sections", () => {
     const sections = getInstitutionalNavigationSections(USER);
 
-    expect(sections[0]).toEqual({ items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })] });
+    expect(sections[0]).toEqual({
+      items: [expect.objectContaining({ title: "Inicio", url: "/", exact: true })],
+    });
     expect(sections.map((section) => section.label)).toEqual([undefined, "Personal"]);
   });
 
@@ -177,10 +182,16 @@ describe("getInstitutionalNavigationSections", () => {
     const sections = getInstitutionalNavigationSections(USER);
     const personalSection = sections.find((section) => section.label === "Personal");
 
-    expect(personalSection).toEqual({ label: "Personal", items: [expect.objectContaining({ title: "Cuenta", url: "/account" })] });
+    expect(personalSection).toEqual({
+      label: "Personal",
+      items: [expect.objectContaining({ title: "Cuenta", url: "/account" })],
+    });
   });
   it("shows teaching without granting administration and preserves student access for teachers", () => {
-    const items = getInstitutionalNavigationSections({ ...USER, roles: ["Profesor", "Estudiante"] }).flatMap((section) => section.items);
+    const items = getInstitutionalNavigationSections({
+      ...USER,
+      roles: ["Profesor", "Estudiante"],
+    }).flatMap((section) => section.items);
     expect(items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ url: "/my-teaching" }),

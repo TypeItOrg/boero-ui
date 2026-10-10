@@ -27,9 +27,15 @@ describe("platformAccountFormSchema", () => {
     });
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
-        expect.arrayContaining([expect.objectContaining({ path: ["confirmPassword"], message: "Las contraseñas no coinciden." })]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            path: ["confirmPassword"],
+            message: "Las contraseñas no coinciden.",
+          }),
+        ]),
       );
     }
   });
@@ -65,6 +71,7 @@ describe("platformAccountUpdateFormSchema", () => {
     });
 
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toEqual(
         expect.arrayContaining([expect.objectContaining({ path: ["password"] }), expect.objectContaining({ path: ["confirmPassword"] })]),

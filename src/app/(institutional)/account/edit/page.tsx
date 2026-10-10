@@ -1,11 +1,13 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import type { ReactElement } from "react";
 
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { Button } from "@common/components/ui/button";
 import type { QueryParamValue } from "@common/types/query-param.types";
 import { getSafeReturnTo } from "@common/utils/return-to.util";
+
 import { InstitutionalAccountHeader } from "@features/institutional-auth/components/institutional-account-header";
 import { InstitutionalProfileForm } from "@features/institutional-auth/components/institutional-profile";
 import { fetchInstitutionalPerson } from "@features/institutional-auth/services/fetch-institutional-person.service";
@@ -15,16 +17,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return getInstitutionalMetadata("Editar perfil");
 }
 
-export default async function EditProfilePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ returnTo?: QueryParamValue }>;
-}): Promise<React.ReactElement> {
+export default async function EditProfilePage({ searchParams }: { searchParams: Promise<{ returnTo?: QueryParamValue }> }): Promise<ReactElement> {
   const { returnTo } = await searchParams;
+
   const destination = getSafeReturnTo(returnTo, "/account");
 
   const person = await fetchInstitutionalPerson();
-  if (!person) notFound();
+
+  if (!person) {
+    notFound();
+  }
 
   return (
     <>

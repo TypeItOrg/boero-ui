@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 
+import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
+import { GuardianWorkspaceBadge } from "@features/guardian-workspace/components/guardian-workspace-badge";
+
 const useGuardianWorkspaceMock = jest.fn();
 
 jest.mock("@features/guardian-workspace/components/guardian-workspace-provider", () => ({
   useGuardianWorkspace: () => useGuardianWorkspaceMock(),
 }));
-
-import type { GuardianDependent } from "@features/guardian-dependents/types/guardian-dependent.types";
-import { GuardianWorkspaceBadge } from "@features/guardian-workspace/components/guardian-workspace-badge";
 
 function buildDependent(overrides: Partial<GuardianDependent> = {}): GuardianDependent {
   return {

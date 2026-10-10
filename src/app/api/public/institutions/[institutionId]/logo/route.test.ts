@@ -1,13 +1,23 @@
-jest.mock("@common/services/public-api-fetch.service", () => ({ publicApiFetch: jest.fn() }));
-import { GET } from "@app/api/public/institutions/[institutionId]/logo/route";
 import { publicApiFetch } from "@common/services/public-api-fetch.service";
+
+import { GET } from "@app/api/public/institutions/[institutionId]/logo/route";
+
+jest.mock("@common/services/public-api-fetch.service", () => ({ publicApiFetch: jest.fn() }));
 const id = "22222222-2222-4222-8222-222222222222";
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aP1sAAAAASUVORK5CYII=", "base64");
+
 function get(institutionId = id): Promise<Response> {
-  return GET(new Request("https://testing.typeit.com.ar/api/public/logo?v=opaque%2Bversion"), { params: Promise.resolve({ institutionId }) });
+  return GET(new Request("https://testing.typeit.com.ar/api/public/logo?v=opaque%2Bversion"), {
+    params: Promise.resolve({ institutionId }),
+  });
 }
+
 it("[L03.logo-cache-fallback] streams real PNG bytes no-store without exposing provider paths", async () => {
-  jest.mocked(publicApiFetch).mockResolvedValue(new Response(png, { headers: { "Content-Type": "image/png", "X-Storage-Key": "private/secret" } }));
+  jest.mocked(publicApiFetch).mockResolvedValue(
+    new Response(png, {
+      headers: { "Content-Type": "image/png", "X-Storage-Key": "private/secret" },
+    }),
+  );
   const response = await get();
   expect(response.status).toBe(200);
   expect(response.headers.get("Cache-Control")).toBe("no-store");

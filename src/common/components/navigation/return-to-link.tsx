@@ -1,9 +1,9 @@
 "use client";
 
-import * as React from "react";
+import { forwardRef, type ComponentProps, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { ComponentProps, ReactElement } from "react";
 
 import { appendReturnTo } from "@common/utils/return-to.util";
 
@@ -12,12 +12,11 @@ export type ReturnToLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   returnTo?: string;
 };
 
-export const ReturnToLink = React.forwardRef<HTMLAnchorElement, ReturnToLinkProps>(function ReturnToLink(
-  { href, returnTo, ...props },
-  ref,
-): ReactElement {
+export const ReturnToLink = forwardRef<HTMLAnchorElement, ReturnToLinkProps>(function ReturnToLink({ href, returnTo, ...props }, ref): ReactElement {
   const pathname = usePathname();
+
   const searchParams = useSearchParams();
+
   const currentPath = returnTo ?? getCurrentPath(pathname, searchParams.toString());
 
   return <Link ref={ref} href={appendReturnTo(href, currentPath)} {...props} />;

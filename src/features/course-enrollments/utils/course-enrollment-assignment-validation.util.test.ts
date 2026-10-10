@@ -1,5 +1,5 @@
-import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 import type { CourseEnrollmentAssignmentOptions } from "@features/course-enrollments/types/course-enrollment-assignment-options.types";
+import { validateEnrollmentAssignment } from "@features/course-enrollments/utils/course-enrollment-assignment-validation.util";
 
 const CLASS_ID = "00000000-0000-4000-8000-000000000001";
 const DAY_ID = "00000000-0000-4000-8000-000000000002";
@@ -40,6 +40,7 @@ function formData(assignments: unknown, courseClassId = CLASS_ID): FormData {
   const data = new FormData();
   data.set("courseClassId", courseClassId);
   data.set("assignments", typeof assignments === "string" ? assignments : JSON.stringify(assignments));
+
   return data;
 }
 

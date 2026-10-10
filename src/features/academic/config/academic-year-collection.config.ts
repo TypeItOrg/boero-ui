@@ -2,6 +2,7 @@ import { CalendarPlusIcon } from "lucide-react";
 
 import { formatDisplayDate } from "@common/utils/date-input.util";
 import { serializeSpringSort } from "@common/utils/sort-query.util";
+
 import { fetchAcademicYear, fetchAcademicYears } from "@features/academic/services/academic.service";
 import type { AcademicCollectionConfig } from "@features/academic/types/academic-collection-config.types";
 import type { AcademicCollection } from "@features/academic/types/academic-collection.types";
@@ -10,7 +11,7 @@ import { ACADEMIC_YEAR_STATUS } from "@features/academic/types/academic-year-sta
 import { deletionFilter, toOptions } from "@features/academic/utils/academic-collection-filters.util";
 import { academicYearStatusLabels } from "@features/academic/utils/academic-labels.util";
 import { ACADEMIC_YEAR_SORT_FIELDS } from "@features/academic/utils/academic-pagination.util";
-import { getMaxAcademicYear, MIN_ACADEMIC_YEAR } from "@features/academic/utils/academic-year.util";
+import { MIN_ACADEMIC_YEAR, getMaxAcademicYear } from "@features/academic/utils/academic-year.util";
 
 export const academicYearCollectionConfig: AcademicCollectionConfig = {
   resource: AcademicResource.ACADEMIC_YEAR,
@@ -70,6 +71,7 @@ export const academicYearCollectionConfig: AcademicCollectionConfig = {
   dateFilters: ({ validOn }) => [{ label: "Vigente en", name: "validOn", value: validOn }],
   toRow: (item) => {
     const year = item as Extract<AcademicCollection, { startDate: string | null }>;
+
     return {
       id: year.id,
       institutionId: year.institutionId,

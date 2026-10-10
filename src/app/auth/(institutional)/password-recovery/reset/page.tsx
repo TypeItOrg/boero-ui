@@ -1,8 +1,11 @@
+import type { ReactElement } from "react";
+
 import type { Metadata } from "next";
-import { InstitutionalBrandPanel, InstitutionalBrandIdentity } from "@features/institutional-auth/components/institutional-brand-identity";
 import Link from "next/link";
 
 import { Card, CardContent } from "@common/components/ui/card";
+
+import { InstitutionalBrandIdentity, InstitutionalBrandPanel } from "@features/institutional-auth/components/institutional-brand-identity";
 import { ResetInstitutionalPasswordForm } from "@features/institutional-auth/components/reset-institutional-password-form";
 
 export const metadata: Metadata = {
@@ -10,8 +13,9 @@ export const metadata: Metadata = {
   description: "Elegí una nueva contraseña para tu cuenta institucional",
 };
 
-export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string }> }): Promise<React.ReactElement> {
+export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string }> }): Promise<ReactElement> {
   const { token } = await searchParams;
+
   if (token) {
     return (
       <Card className="animate-fade-in-up mx-auto w-full max-w-240 p-0">

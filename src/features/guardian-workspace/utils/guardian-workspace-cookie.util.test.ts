@@ -1,7 +1,3 @@
-jest.mock("next/headers", () => ({
-  cookies: jest.fn(),
-}));
-
 import { cookies } from "next/headers";
 
 import { GUARDIAN_WORKSPACE_COOKIE, GUARDIAN_WORKSPACE_MAX_AGE } from "@features/guardian-workspace/constants/guardian-workspace.constants";
@@ -10,6 +6,10 @@ import {
   getGuardianWorkspaceId,
   setGuardianWorkspaceId,
 } from "@features/guardian-workspace/utils/guardian-workspace-cookie.util";
+
+jest.mock("next/headers", () => ({
+  cookies: jest.fn(),
+}));
 
 describe("guardian workspace cookie", () => {
   const cookieStore = {

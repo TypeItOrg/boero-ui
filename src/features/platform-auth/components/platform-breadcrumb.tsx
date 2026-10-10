@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { Fragment, type ReactElement } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -54,6 +55,7 @@ function getSegments(
   trailingLabel?: string,
 ): BreadcrumbSegment[] {
   const withoutPlatform = pathname.replace(/^\/admin\/?/, "");
+
   const parts = withoutPlatform.split("/").filter(Boolean);
 
   if (parts.length === 0) {
@@ -61,10 +63,13 @@ function getSegments(
   }
 
   const segments: BreadcrumbSegment[] = [{ label: "Inicio", href: "/admin" }];
+
   const hiddenSegmentSet = new Set(["academic", ...hiddenSegments]);
+
   const visiblePartCount = parts.filter((part) => !hiddenSegmentSet.has(part)).length;
 
   let accumulatedPath = "/admin";
+
   let visiblePartIndex = 0;
 
   for (const part of parts) {
@@ -75,6 +80,7 @@ function getSegments(
     }
 
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
+
     const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
 
     segments.push({ label, href: isLast ? undefined : (segmentHrefs[part] ?? accumulatedPath) });
@@ -93,8 +99,9 @@ export function PlatformBreadcrumb({
   segmentHrefs,
   segmentLabels,
   trailingLabel,
-}: PlatformBreadcrumbProps): React.ReactElement {
+}: PlatformBreadcrumbProps): ReactElement {
   const pathname = usePathname();
+
   const segments = getSegments(pathname, segmentLabels ?? EMPTY_SEGMENT_LABELS, segmentHrefs ?? EMPTY_SEGMENT_LABELS, hiddenSegments, trailingLabel);
 
   return (
@@ -104,7 +111,7 @@ export function PlatformBreadcrumb({
           const isLast = index === segments.length - 1;
 
           return (
-            <React.Fragment key={index}>
+            <Fragment key={index}>
               <BreadcrumbItem className="shrink-0">
                 {isLast ? (
                   <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
@@ -115,7 +122,7 @@ export function PlatformBreadcrumb({
                 )}
               </BreadcrumbItem>
               {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>

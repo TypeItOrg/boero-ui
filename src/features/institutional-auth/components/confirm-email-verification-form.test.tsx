@@ -1,8 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-jest.mock("@features/institutional-auth/actions/email-verification.actions", () => ({ confirmEmailVerification: jest.fn() }));
+
 import { confirmEmailVerification } from "@features/institutional-auth/actions/email-verification.actions";
 import { ConfirmEmailVerificationForm } from "@features/institutional-auth/components/confirm-email-verification-form";
+
+jest.mock("@features/institutional-auth/actions/email-verification.actions", () => ({
+  confirmEmailVerification: jest.fn(),
+}));
 it("does not consume the token on load and submits only on click", async () => {
   jest.mocked(confirmEmailVerification).mockResolvedValue({});
   render(<ConfirmEmailVerificationForm token={"a".repeat(43)} />);
