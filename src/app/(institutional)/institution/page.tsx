@@ -20,7 +20,7 @@ import { PlatformPageIcon } from "@features/platform-auth/components/platform-pa
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Mi institución");
+  return getInstitutionalMetadata("Institución");
 }
 
 export default async function InstitutionalInstitutionPage({

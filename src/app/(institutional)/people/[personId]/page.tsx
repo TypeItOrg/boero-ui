@@ -28,8 +28,18 @@ import { PeopleScope } from "@features/people/utils/people-scope.util";
 import { PlatformPageIcon } from "@features/platform-auth/components/platform-page-icon";
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Detalle de usuario");
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ view?: QueryParamValue }> }): Promise<Metadata> {
+  const { view } = await searchParams;
+
+  if (view === "detail") {
+    return getInstitutionalMetadata("Detalle de usuario");
+  }
+
+  const user = await requireInstitutionalUser();
+
+  const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.PERSON_UPDATE_ANY);
+
+  return getInstitutionalMetadata(canUpdate ? "Editar usuario" : "Administrar roles");
 }
 
 export default async function PersonPage({

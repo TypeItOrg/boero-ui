@@ -23,7 +23,7 @@ type PlatformAccountDetailPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Detalle de cuenta",
+  title: "Detalle de administrador",
 };
 
 export default async function PlatformAccountDetailPage({ params, searchParams }: PlatformAccountDetailPageProps): Promise<ReactElement> {

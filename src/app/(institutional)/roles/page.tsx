@@ -23,7 +23,7 @@ import { InstitutionRolesTablePresentation } from "@features/roles/components/in
 import { fetchInstitutionRoles } from "@features/roles/services/institution-role.service";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Roles");
+  return getInstitutionalMetadata("Roles y permisos");
 }
 
 export default async function RolesPage({
@@ -46,7 +46,7 @@ export default async function RolesPage({
   const canUpdate = hasInstitutionalPermission(user, INSTITUTIONAL_PERMISSION.ROLE_UPDATE);
 
   return (
-    <PlatformPageShell title="Roles" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UserLockIcon} />}>
+    <PlatformPageShell title="Roles y permisos" breadcrumb={<InstitutionalBreadcrumb />} actions={<PlatformPageIcon icon={UserLockIcon} />}>
       <PlatformCollectionActions className="sm:justify-start">
         {canCreate ? (
           <Button asChild size="lg" className="w-full">

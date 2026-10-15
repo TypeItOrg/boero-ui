@@ -42,7 +42,7 @@ export function InstitutionalLoginForm(props: InstitutionalLoginFormProps): Reac
   return (
     <div className="flex flex-col justify-center p-5 sm:p-8">
       <InstitutionalAuthStepHeader
-        title="Bienvenido de nuevo"
+        title="Iniciar sesión"
         showInstitutionName={false}
         description="Ingresá con tu contraseña o una llave de acceso."
       />

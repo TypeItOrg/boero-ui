@@ -45,6 +45,13 @@ describe("contextual search routes", () => {
     expect(getContextualSearchResultHref("institutional", "role", result)).toBe("/roles/result-1");
   });
 
+  it("opens the dependents page filtered by the dependent's document", () => {
+    const dependent = { ...result, title: "Mateo Gonzalez", subtitle: "12345678" };
+
+    expect(getContextualSearchResultHref("institutional", "guardian-dependent", dependent)).toBe("/my-dependents?search=12345678");
+    expect(getContextualSearchViewAllHref("institutional", "guardian-dependent", "Mateo Gonzalez")).toBe("/my-dependents?search=Mateo+Gonzalez");
+  });
+
   it("keeps platform academic collections in the global result page", () => {
     expect(getContextualSearchViewAllHref("platform", "academic-space", "Música aplicada")).toBe(
       "/admin/search?search=M%C3%BAsica+aplicada&type=academic-space",
@@ -63,6 +70,11 @@ describe("contextual search routes", () => {
   it("rejects platform-only entities in an institutional scope", () => {
     expect(() => getContextualSearchResultHref("institutional", "institution", result)).toThrow("no pertenece a la búsqueda institucional");
     expect(() => getContextualSearchViewAllHref("institutional", "platform-account", "admin")).toThrow("no pertenece a la búsqueda institucional");
+  });
+
+  it("rejects guardian dependents in the platform scope", () => {
+    expect(() => getContextualSearchResultHref("platform", "guardian-dependent", result)).toThrow("no pertenece a la búsqueda de plataforma");
+    expect(() => getContextualSearchViewAllHref("platform", "guardian-dependent", "Mateo")).toThrow("no pertenece a la búsqueda de plataforma");
   });
 
   it("rejects platform results that require a missing institution", () => {

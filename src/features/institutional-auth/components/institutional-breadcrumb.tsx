@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
+import { getAcademicBreadcrumbGroupLabel } from "@features/academic/utils/academic-breadcrumb.util";
+
 const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   documentation: "Documentación",
   people: "Usuarios",
@@ -14,8 +16,9 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   account: "Cuenta",
   edit: "Editar",
   password: "Contraseña",
+  passkeys: "Llaves de acceso",
   sessions: "Sesiones",
-  roles: "Roles",
+  roles: "Roles y permisos",
   institution: "Institución",
   "academic-years": "Ciclos lectivos",
   "academic-offers": "Oferta académica",
@@ -26,11 +29,13 @@ const SEGMENT_LABELS: Readonly<Record<string, string>> = {
   prerequisites: "Correlatividades",
   "academic-spaces": "Espacios académicos",
   instruments: "Instrumentos",
-  "enrollment-periods": "Períodos de inscripción",
-  enrollment: "Inscripción",
+  "enrollment-periods": "Períodos",
+  enrollment: "Nueva inscripción",
   courses: "Cursos",
   shifts: "Turnos",
-  "enrollment-applications": "Solicitudes de inscripción",
+  "enrollment-applications": "Solicitudes",
+  "guardian-links": "Vinculaciones",
+  "my-dependents": "Personas a cargo",
   "my-enrollment-applications": "Mis inscripciones",
   "course-enrollments": "Cursadas",
   "my-course-enrollments": "Mis materias",
@@ -75,13 +80,13 @@ export function InstitutionalBreadcrumb({
           return (
             <Fragment key={index}>
               <BreadcrumbItem className="shrink-0">
-                {isLast ? (
-                  <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
-                ) : (
+                {isLast && <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>}
+                {!isLast && segment.href && (
                   <BreadcrumbLink asChild>
-                    <Link href={segment.href!}>{segment.label}</Link>
+                    <Link href={segment.href}>{segment.label}</Link>
                   </BreadcrumbLink>
                 )}
+                {!isLast && !segment.href && <span>{segment.label}</span>}
               </BreadcrumbItem>
               {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
             </Fragment>
@@ -121,6 +126,12 @@ function getSegments(
     const isLast = visiblePartIndex === visiblePartCount - 1 && !trailingLabel;
 
     const label = customSegmentLabels[part] ?? SEGMENT_LABELS[part] ?? "Editar";
+
+    const groupLabel = getAcademicBreadcrumbGroupLabel(part);
+
+    if (groupLabel) {
+      segments.push({ label: groupLabel });
+    }
 
     segments.push({
       label,

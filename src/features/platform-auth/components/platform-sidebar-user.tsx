@@ -76,14 +76,25 @@ export function PlatformSidebarUser({ user }: PlatformSidebarUserProps): ReactEl
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault();
+                  setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                }}
+              >
                 {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
                 Cambiar tema
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled={logout.isPending} onClick={() => logout.mutate()}>
+              <DropdownMenuItem
+                disabled={logout.isPending}
+                onSelect={(event) => {
+                  event.preventDefault();
+                  logout.mutate();
+                }}
+              >
                 <LogOutIcon />
                 {logout.isPending ? "Cerrando sesión" : "Cerrar sesión"}
               </DropdownMenuItem>

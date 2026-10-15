@@ -38,7 +38,7 @@ export default async function EditPlatformRolePage({
 
   return (
     <PlatformPageShell
-      title="Editar Rol"
+      title="Editar rol"
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ roles: "Roles", [roleId]: role.name, edit: "Editar" }} />}
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"

@@ -39,7 +39,7 @@ export function FieldError({
   }
 
   return (
-    <div role="alert" data-slot="field-error" className={cn("text-destructive text-sm font-normal", className)} {...props}>
+    <div role="alert" data-slot="field-error" className={cn("text-destructive text-sm font-normal outline-none", className)} {...props}>
       {content}
     </div>
   );

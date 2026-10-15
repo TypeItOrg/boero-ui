@@ -137,7 +137,7 @@ export function InstitutionalInstitutionForm({ institution, returnTo = "/institu
             clearErrors("root.logo");
             setLogoChange(change);
           }}
-          onError={(message) => setError("root.logo", { type: "client", message })}
+          onError={(message) => (message ? setError("root.logo", { type: "client", message }) : clearErrors("root.logo"))}
         />
 
         <InstitutionalInstitutionLocationFields

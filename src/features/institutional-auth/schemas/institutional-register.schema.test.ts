@@ -7,6 +7,7 @@ const validRegistration = {
   email: "ana@example.com",
   birthDate: "2010-01-01",
   documentNumber: "12345678",
+  isGuardian: "false",
   password: "password123",
   confirmPassword: "password123",
 };
@@ -27,7 +28,7 @@ describe("institutional register schema", () => {
         lastName: " Garcia ",
         email: " ana@example.com ",
       }),
-    ).toEqual(validRegistration);
+    ).toEqual({ ...validRegistration, isGuardian: false });
   });
 
   it.each([

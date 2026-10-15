@@ -92,6 +92,11 @@ const ENROLLMENT_NAVIGATION_ITEMS = [
     url: "/admin/enrollment-applications",
     icon: ClipboardListIcon,
   },
+  {
+    title: "Solicitudes de vinculación",
+    url: "/admin/guardian-links",
+    icon: UsersIcon,
+  },
 ] as const satisfies readonly NavigationItem[];
 
 const PLATFORM_NAVIGATION_ITEM = {

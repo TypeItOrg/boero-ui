@@ -6,12 +6,17 @@ import { notFound } from "next/navigation";
 import { AcademicRouteView, type AcademicBreadcrumbOptions } from "@features/academic/components/academic-route-view";
 import { FULL_ACADEMIC_ACCESS } from "@features/academic/types/academic-access.types";
 import { getAcademicBreadcrumbLabels } from "@features/academic/utils/academic-breadcrumb.util";
+import { getAcademicPageTitle } from "@features/academic/utils/academic-page-title.util";
 import { AcademicScope } from "@features/academic/utils/academic-scope.util";
 import { fetchInstitution } from "@features/institutions/services/fetch-institution.service";
 import { PlatformBreadcrumb } from "@features/platform-auth/components/platform-breadcrumb";
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 
-export const metadata: Metadata = { title: "Gestión académica" };
+export async function generateMetadata({ params }: { params: Promise<{ id: string; segments?: string[] }> }): Promise<Metadata> {
+  const { segments = [] } = await params;
+
+  return { title: getAcademicPageTitle(segments) };
+}
 
 export default async function AdminAcademicPage({
   params,

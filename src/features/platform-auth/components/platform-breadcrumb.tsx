@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@common/components/ui/breadcrumb";
 
+import { getAcademicBreadcrumbGroupLabel } from "@features/academic/utils/academic-breadcrumb.util";
+
 const ROUTE_LABELS: Readonly<Record<string, string>> = {
   documentation: "Documentación",
   institutions: "Instituciones",
@@ -25,8 +27,9 @@ const ROUTE_LABELS: Readonly<Record<string, string>> = {
   instruments: "Instrumentos",
   courses: "Cursos",
   shifts: "Turnos",
-  "enrollment-periods": "Períodos de inscripción",
-  "enrollment-applications": "Solicitudes de inscripción",
+  "enrollment-periods": "Períodos",
+  "enrollment-applications": "Solicitudes",
+  "guardian-links": "Vinculaciones",
   "course-enrollments": "Cursadas",
   waitlist: "Lista de espera",
 };
@@ -83,6 +86,12 @@ function getSegments(
 
     const label = segmentLabels[part] ?? ROUTE_LABELS[part] ?? "Editar";
 
+    const groupLabel = getAcademicBreadcrumbGroupLabel(part);
+
+    if (groupLabel) {
+      segments.push({ label: groupLabel });
+    }
+
     segments.push({ label, href: isLast ? undefined : (segmentHrefs[part] ?? accumulatedPath) });
     visiblePartIndex += 1;
   }
@@ -113,13 +122,13 @@ export function PlatformBreadcrumb({
           return (
             <Fragment key={index}>
               <BreadcrumbItem className="shrink-0">
-                {isLast ? (
-                  <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>
-                ) : (
+                {isLast && <BreadcrumbPage className="text-muted-foreground font-medium">{segment.label}</BreadcrumbPage>}
+                {!isLast && segment.href && (
                   <BreadcrumbLink asChild>
-                    <Link href={segment.href!}>{segment.label}</Link>
+                    <Link href={segment.href}>{segment.label}</Link>
                   </BreadcrumbLink>
                 )}
+                {!isLast && !segment.href && <span>{segment.label}</span>}
               </BreadcrumbItem>
               {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
             </Fragment>

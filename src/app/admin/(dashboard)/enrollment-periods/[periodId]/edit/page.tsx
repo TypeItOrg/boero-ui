@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CalendarRangeIcon } from "lucide-react";
@@ -20,6 +21,8 @@ type EditEnrollmentPeriodPageProps = {
   params: Promise<{ periodId: string }>;
   searchParams: Promise<{ institutionId?: QueryParamValue; returnTo?: QueryParamValue }>;
 };
+
+export const metadata: Metadata = { title: "Editar período de inscripción" };
 
 export default async function EditEnrollmentPeriodPage({ params, searchParams }: EditEnrollmentPeriodPageProps): Promise<ReactElement> {
   const [{ periodId: rawPeriodId }, query] = await Promise.all([params, searchParams]);

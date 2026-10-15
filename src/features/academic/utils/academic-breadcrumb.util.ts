@@ -15,6 +15,18 @@ const NEW_LABELS: Readonly<Record<string, string>> = {
   [ACADEMIC_ROUTE_SEGMENT.VERSIONS]: "Nueva versión",
 };
 
+export function getAcademicBreadcrumbGroupLabel(segment: string): string | undefined {
+  if (["enrollment-periods", "enrollment-applications"].includes(segment)) {
+    return "Inscripciones";
+  }
+
+  if (["academic-years", "academic-spaces", "instruments", "shifts", "documentation"].includes(segment)) {
+    return "Configuración";
+  }
+
+  return undefined;
+}
+
 export function getAcademicBreadcrumbLabels(segments: string[] | undefined): Readonly<Record<string, string>> {
   if (!segments || segments.at(-1) !== ACADEMIC_ROUTE_SEGMENT.NEW) {
     return {};

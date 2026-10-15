@@ -6,8 +6,8 @@ import { getInstitutionalAcademicMetadata, renderInstitutionalAcademicRoute } fr
 import { AcademicResource } from "@features/academic/types/academic-resource.types";
 import type { InstitutionalAcademicPageProps } from "@features/academic/types/institutional-academic-page-props.types";
 
-export function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalAcademicMetadata(AcademicResource.ACADEMIC_YEAR);
+export function generateMetadata({ params }: InstitutionalAcademicPageProps): Promise<Metadata> {
+  return getInstitutionalAcademicMetadata(AcademicResource.ACADEMIC_YEAR, params);
 }
 
 export default function AcademicYearsPage(props: InstitutionalAcademicPageProps): Promise<ReactElement> {

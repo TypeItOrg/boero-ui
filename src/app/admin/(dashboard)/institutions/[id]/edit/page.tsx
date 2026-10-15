@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -19,6 +20,8 @@ type EditInstitutionPageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ returnTo?: QueryParamValue }>;
 };
+
+export const metadata: Metadata = { title: "Editar institución" };
 
 export default async function EditInstitutionPage({ params, searchParams }: EditInstitutionPageProps): Promise<ReactElement> {
   const { id } = await params;

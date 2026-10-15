@@ -23,8 +23,8 @@ export function PlatformAcademicFormPage({
 
   return (
     <PlatformPageShell
-      title={`Nuevo ${config.singular}`}
-      breadcrumb={<PlatformBreadcrumb />}
+      title={config.createLabel}
+      breadcrumb={<PlatformBreadcrumb segmentLabels={{ new: config.createLabel }} />}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"
       actionsClassName="self-stretch"

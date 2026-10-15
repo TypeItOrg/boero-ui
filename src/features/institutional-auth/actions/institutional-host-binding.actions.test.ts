@@ -36,6 +36,7 @@ function form(): FormData {
     name: "Ana",
     lastName: "Garcia",
     birthDate: "2000-01-01",
+    isGuardian: "false",
     email: "ana@example.com",
     password: "password123",
     confirmPassword: "password123",

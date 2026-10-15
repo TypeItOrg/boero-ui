@@ -26,7 +26,7 @@ export function ResetInstitutionalPasswordForm({ token }: { token: string }): Re
     <ActionForm action={formAction} className="flex flex-col justify-center p-5 sm:p-8">
       <input name="token" type="hidden" value={token} />
       <InstitutionalAuthStepHeader
-        title="Elegí una nueva contraseña"
+        title="Restablecer contraseña"
         showInstitutionName={false}
         description="Ingresá una clave de al menos 8 caracteres."
       />

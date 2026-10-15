@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, ReactElement } from "react";
+import { useState, type ComponentProps, type ReactElement } from "react";
 
 import Link from "next/link";
 
@@ -21,9 +21,11 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton,
 import { useMobileSidebarNavigation } from "@common/hooks/use-mobile-sidebar-navigation";
 import { cn } from "@common/utils/cn.util";
 
-import { logoutInstitutional } from "@features/institutional-auth/actions/institutional-logout.action";
+import { GuardianWorkspaceMenuItems } from "@features/guardian-workspace/components/guardian-workspace-selector";
+import { InstitutionalLogoutDialog } from "@features/institutional-auth/components/institutional-logout-dialog";
 import { InstitutionalSidebarNav } from "@features/institutional-auth/components/institutional-sidebar-nav";
 import type { InstitutionalUser } from "@features/institutional-auth/types/institutional-user.types";
+import { canManageDependents } from "@features/institutional-auth/utils/institutional-applicant-role.util";
 import type { InstitutionalNavigationSection } from "@features/institutional-auth/utils/institutional-navigation.util";
 
 type InstitutionalSidebarProps = ComponentProps<typeof Sidebar> & {
@@ -37,6 +39,8 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
   const navigation = useMobileSidebarNavigation();
 
   const { isMobile } = useSidebar();
+
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   return (
     <Sidebar collapsible="icon" variant="sidebar" className={cn("bg-muted [&_[data-slot=sidebar-inner]]:bg-muted", className)} {...props}>
@@ -72,7 +76,7 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                 onPointerDownOutside={(event) => {
                   const target = event.target as HTMLElement;
 
-                  if (target.closest('[data-sidebar="sidebar"]')) {
+                  if (target.closest('[aria-haspopup="menu"]')) {
                     event.preventDefault();
                   }
                 }}
@@ -88,29 +92,38 @@ export function InstitutionalSidebar({ user, navigationSections, className, ...p
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {canManageDependents(user) && (
+                  <>
+                    <GuardianWorkspaceMenuItems onNavigate={navigation.handleNavigation} />
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuGroup>
+                  {canManageDependents(user) && <DropdownMenuLabel>Cuenta</DropdownMenuLabel>}
                   <DropdownMenuItem asChild>
                     <Link href="/account" onClick={() => navigation.handleNavigation("/account")}>
                       <UserRoundIcon />
                       Perfil
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+                  <DropdownMenuItem
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                    }}
+                  >
                     {resolvedTheme === "dark" ? <SunIcon /> : <MoonIcon />}
                     Cambiar tema
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <form action={logoutInstitutional}>
-                  <DropdownMenuItem asChild>
-                    <button type="submit" className="w-full">
-                      <LogOutIcon />
-                      Cerrar sesión
-                    </button>
-                  </DropdownMenuItem>
-                </form>
+                <DropdownMenuItem variant="destructive" onSelect={() => setIsLogoutDialogOpen(true)}>
+                  <LogOutIcon />
+                  Cerrar sesión
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {isLogoutDialogOpen ? <InstitutionalLogoutDialog onClose={() => setIsLogoutDialogOpen(false)} /> : null}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

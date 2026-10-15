@@ -28,7 +28,7 @@ type PeoplePageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Lista de usuarios",
+  title: "Usuarios",
 };
 
 export default async function InstitutionPeoplePage({ params, searchParams }: PeoplePageProps): Promise<ReactElement> {
@@ -48,7 +48,7 @@ export default async function InstitutionPeoplePage({ params, searchParams }: Pe
 
   return (
     <PlatformPageShell
-      title="Lista de usuarios"
+      title="Usuarios"
       breadcrumb={<PlatformBreadcrumb segmentLabels={{ [id]: institution.name }} />}
       actions={<PlatformPageIcon icon={UsersIcon} />}
     >

@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -25,9 +25,11 @@ type EditPersonPageProps = {
   searchParams: Promise<{ returnTo?: QueryParamValue; view?: QueryParamValue }>;
 };
 
-export const metadata: Metadata = {
-  title: "Editar usuario",
-};
+export async function generateMetadata({ searchParams }: Pick<EditPersonPageProps, "searchParams">): Promise<Metadata> {
+  const { view } = await searchParams;
+
+  return { title: view === "detail" ? "Detalle de usuario" : "Editar usuario" };
+}
 
 export default async function EditPersonPage({ params, searchParams }: EditPersonPageProps): Promise<ReactElement> {
   const { id, personId } = await params;

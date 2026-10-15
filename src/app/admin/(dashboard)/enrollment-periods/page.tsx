@@ -20,7 +20,7 @@ import { PlatformPageShell } from "@features/platform-auth/components/platform-p
 import { requirePlatformAccount } from "@features/platform-auth/services/get-platform-account.service";
 
 export const metadata: Metadata = {
-  title: "Períodos de Inscripción - Admin",
+  title: "Períodos de Inscripción",
   description: "Gestión global de períodos de inscripción por institución",
 };
 

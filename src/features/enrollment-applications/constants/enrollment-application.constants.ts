@@ -5,6 +5,8 @@ import {
   type EnrollmentApplicationStatus,
 } from "@features/enrollment-applications/types/enrollment-application-status.types";
 
+export const ENROLLMENT_PAGE_PATH = "/enrollment";
+
 export const ENROLLMENT_APPLICATIONS_API_PATH = "/api/v1/enrollment-applications";
 
 export const ENROLLMENT_SUBMISSION_ERROR_FIELDS = [

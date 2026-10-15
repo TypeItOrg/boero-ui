@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type DragEvent, type ReactElement, type Ref } from "react";
+import { useId, useRef, useState, type DragEvent, type ReactElement, type ReactNode, type Ref } from "react";
 
 import { UploadIcon } from "lucide-react";
 
@@ -24,6 +24,7 @@ export function FileDropzone({
   error,
   errorId,
   disabled = false,
+  multiple = false,
   buttonRef,
   onSelectFiles,
 }: {
@@ -32,10 +33,11 @@ export function FileDropzone({
   selectLabel: string;
   title: string;
   dragTitle: string;
-  description: string;
+  description: ReactNode;
   error?: string;
   errorId?: string;
   disabled?: boolean;
+  multiple?: boolean;
   buttonRef?: Ref<HTMLButtonElement>;
   onSelectFiles: (files: File[], silent?: boolean) => void;
 }): ReactElement {
@@ -55,7 +57,8 @@ export function FileDropzone({
     const items = Array.from(event.dataTransfer.items).filter((item) => item.kind === "file");
 
     // Some browsers expose the MIME type only after the file has been dropped.
-    const canDrop = !disabled && (items.length === 0 || (items.length === 1 && (!items[0].type || accept.includes(items[0].type))));
+    const canDrop =
+      !disabled && (items.length === 0 || ((multiple || items.length === 1) && items.every((item) => !item.type || accept.includes(item.type))));
 
     event.dataTransfer.dropEffect = canDrop ? "copy" : "none";
     setDragActive(canDrop);
@@ -69,6 +72,7 @@ export function FileDropzone({
         type="file"
         accept={accept.join(",")}
         disabled={disabled}
+        multiple={multiple}
         className="hidden"
         aria-label={inputLabel}
         aria-invalid={Boolean(error)}

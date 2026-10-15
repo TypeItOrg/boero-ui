@@ -33,7 +33,7 @@ export function PlatformLoginForm({ next }: { next?: string }): ReactElement {
     <form onSubmit={handleSubmit} className="p-6 md:p-8">
       {next ? <input type="hidden" name="next" value={next} /> : null}
       <header className="space-y-1 text-center">
-        <h1 className="text-2xl font-bold">Bienvenido de nuevo</h1>
+        <h1 className="text-2xl font-bold">Iniciar sesión</h1>
         <p className="text-muted-foreground text-sm">
           <span className="hidden md:block">Ingresá tus credenciales para acceder a tu cuenta.</span>
           <span className="md:hidden">Ingresá tus credenciales para continuar.</span>

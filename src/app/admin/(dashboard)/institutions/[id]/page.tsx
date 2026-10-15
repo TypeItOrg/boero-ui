@@ -67,9 +67,6 @@ export default async function InstitutionDetailPage({ params, searchParams }: In
               <Button asChild variant="outline" size="lg" className="flex-1 md:flex-none">
                 <Link href={`/admin/institutions/${id}/people`}>Administrar usuarios</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="flex-1 md:flex-none">
-                <Link href={`/admin/institutions/${id}/academic`}>Gestión académica</Link>
-              </Button>
               <Button asChild size="lg" className="w-full sm:w-auto sm:flex-1 md:flex-none">
                 <ReturnToLink href={`/admin/institutions/${id}/edit`} returnTo={destination}>
                   Editar institución

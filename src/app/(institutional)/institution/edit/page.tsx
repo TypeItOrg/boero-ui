@@ -20,7 +20,7 @@ import { PlatformPageIcon } from "@features/platform-auth/components/platform-pa
 import { PlatformPageShell } from "@features/platform-auth/components/platform-page-shell";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Editar mi institución");
+  return getInstitutionalMetadata("Editar institución");
 }
 
 type EditInstitutionalInstitutionPageProps = {
@@ -46,7 +46,7 @@ export default async function EditInstitutionalInstitutionPage({ searchParams }:
 
   return (
     <PlatformPageShell
-      title="Editar información"
+      title="Editar institución"
       breadcrumb={<InstitutionalBreadcrumb />}
       minViewportHeight
       headerClassName="flex-row items-center justify-between"

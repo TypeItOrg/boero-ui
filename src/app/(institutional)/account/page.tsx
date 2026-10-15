@@ -12,7 +12,7 @@ import { fetchInstitutionalPerson } from "@features/institutional-auth/services/
 import { getInstitutionalMetadata } from "@features/institutional-auth/utils/institutional-metadata.util";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return getInstitutionalMetadata("Perfil");
+  return getInstitutionalMetadata("Cuenta");
 }
 
 export default async function ProfilePage(): Promise<ReactElement> {

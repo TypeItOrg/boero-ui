@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type AriaAttributes, type ChangeEvent, type ReactElement } from "react";
+import { useId, useRef, useState, type AriaAttributes, type ChangeEvent, type ReactElement } from "react";
 
 import { format, isValid, parse } from "date-fns";
 import { es } from "date-fns/locale";
@@ -8,14 +8,13 @@ import { CalendarIcon, XIcon } from "lucide-react";
 
 import { Calendar } from "@common/components/ui/calendar";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@common/components/ui/input-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@common/components/ui/popover";
 import { cn } from "@common/utils/cn.util";
+import { getCalendarDefaultMonth, getCalendarEndMonth, getDisabledDates } from "@common/utils/date-picker-calendar.util";
 
 const DISPLAY_DATE_FORMAT = "dd/MM/yyyy";
 
 const EARLIEST_DATE = new Date(1900, 0);
-
-const DEFAULT_FUTURE_YEARS = 20;
 
 type DatePickerProps = {
   value?: Date;
@@ -53,6 +52,10 @@ export function DatePicker({
   "aria-required": ariaRequired,
 }: DatePickerProps): ReactElement {
   const [open, setOpen] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const calendarId = useId();
 
   const canonicalValue = value ? format(value, DISPLAY_DATE_FORMAT) : "";
 
@@ -129,38 +132,64 @@ export function DatePicker({
     commitValue(undefined, "clear");
   }
 
+  function preserveInputFocus(event: Event): void {
+    if (document.activeElement === inputRef.current) {
+      event.preventDefault();
+    }
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <InputGroup className={cn("h-9", className)}>
-        <InputGroupInput
-          id={id}
-          type="text"
-          inputMode="numeric"
-          autoComplete={autoComplete}
-          placeholder="dd/mm/aaaa"
-          maxLength={10}
-          disabled={disabled}
-          required={required}
-          aria-invalid={ariaInvalid || hasInvalidDraft || hasOutOfRangeValue}
-          aria-required={ariaRequired ?? required}
-          value={displayValue}
-          onBlur={handleBlur}
-          onChange={handleInputChange}
-        />
-        <InputGroupAddon align="inline-end">
-          {hasValue ? (
-            <InputGroupButton aria-label="Limpiar fecha" disabled={disabled} onClick={handleClear} size="icon-xs">
-              <XIcon />
-            </InputGroupButton>
-          ) : null}
-          <PopoverTrigger asChild>
-            <InputGroupButton aria-label="Abrir calendario" disabled={disabled} size="icon-xs">
-              <CalendarIcon />
-            </InputGroupButton>
-          </PopoverTrigger>
-        </InputGroupAddon>
-      </InputGroup>
-      <PopoverContent align="start" className="w-auto p-0">
+      <PopoverAnchor asChild>
+        <InputGroup className={cn("h-9", className)}>
+          <InputGroupInput
+            ref={inputRef}
+            id={id}
+            type="text"
+            inputMode="numeric"
+            autoComplete={autoComplete}
+            placeholder="dd/mm/aaaa"
+            maxLength={10}
+            disabled={disabled}
+            required={required}
+            aria-invalid={ariaInvalid || hasInvalidDraft || hasOutOfRangeValue}
+            aria-required={ariaRequired ?? required}
+            aria-controls={open ? calendarId : undefined}
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            value={displayValue}
+            onBlur={handleBlur}
+            onChange={handleInputChange}
+            onClick={() => setOpen(true)}
+            onFocus={() => setOpen(true)}
+          />
+          <InputGroupAddon align="inline-end">
+            {hasValue ? (
+              <InputGroupButton aria-label="Limpiar fecha" disabled={disabled} onClick={handleClear} size="icon-xs">
+                <XIcon />
+              </InputGroupButton>
+            ) : null}
+            <PopoverTrigger asChild>
+              <InputGroupButton aria-label="Abrir calendario" disabled={disabled} size="icon-xs">
+                <CalendarIcon />
+              </InputGroupButton>
+            </PopoverTrigger>
+          </InputGroupAddon>
+        </InputGroup>
+      </PopoverAnchor>
+      <PopoverContent
+        id={calendarId}
+        aria-label="Seleccionar fecha"
+        align="start"
+        className="w-auto p-0"
+        onOpenAutoFocus={preserveInputFocus}
+        onCloseAutoFocus={preserveInputFocus}
+        onInteractOutside={(event) => {
+          if (event.target === inputRef.current) {
+            event.preventDefault();
+          }
+        }}
+      >
         <Calendar
           mode="single"
           selected={value}
@@ -175,44 +204,6 @@ export function DatePicker({
       </PopoverContent>
     </Popover>
   );
-}
-
-function getDefaultEndMonth(): Date {
-  const today = new Date();
-
-  return new Date(today.getFullYear() + DEFAULT_FUTURE_YEARS, 11);
-}
-
-function getCalendarEndMonth(calendarMinDate: Date, calendarMaxDate: Date | undefined): Date {
-  if (calendarMaxDate) {
-    return calendarMaxDate;
-  }
-
-  const defaultEndMonth = getDefaultEndMonth();
-
-  if (calendarMinDate <= defaultEndMonth) {
-    return defaultEndMonth;
-  }
-
-  return new Date(calendarMinDate.getFullYear() + DEFAULT_FUTURE_YEARS, 11);
-}
-
-function getCalendarDefaultMonth(value: Date | undefined, minDate: Date, maxDate: Date | undefined): Date {
-  const candidate = value ?? new Date();
-
-  if (candidate < minDate) {
-    return minDate;
-  }
-
-  if (maxDate && candidate > maxDate) {
-    return maxDate;
-  }
-
-  return candidate;
-}
-
-function getDisabledDates(minDate: Date, maxDate: Date | undefined): { before: Date; after?: Date } {
-  return maxDate ? { before: minDate, after: maxDate } : { before: minDate };
 }
 
 function formatDateDraft(value: string): string {
