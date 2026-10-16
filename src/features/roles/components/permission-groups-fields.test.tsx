@@ -178,7 +178,7 @@ describe("PermissionGroupsFields", () => {
     expect(trainingPathBranch).not.toContainElement(createYearField);
   });
 
-  it("hides GRADES permission group", () => {
+  it("displays the GRADES permission group", () => {
     const gradesGroup: InstitutionPermissionGroup = {
       code: "GRADES",
       displayName: "Calificaciones",
@@ -195,6 +195,6 @@ describe("PermissionGroupsFields", () => {
 
     render(<PermissionGroupsFields groups={[...mockPermissionGroups, gradesGroup]} />);
 
-    expect(screen.queryByText("Calificaciones")).not.toBeInTheDocument();
+    expect(screen.getByText("Calificaciones")).toBeInTheDocument();
   });
 });

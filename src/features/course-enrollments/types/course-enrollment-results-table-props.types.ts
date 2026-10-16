@@ -13,4 +13,7 @@ export type CourseEnrollmentResultsTableProps = {
   canUpdateAcademicStatus: boolean;
   detailBasePath: string | undefined;
   setMutation: Dispatch<SetStateAction<{ enrollment: CourseEnrollment; mode: "withdraw" | "academic" } | undefined>>;
+  gradeMode?: "institutional" | "teacher";
+  canReadGrades: boolean;
+  setGradeEnrollment: Dispatch<SetStateAction<CourseEnrollment | null>>;
 };

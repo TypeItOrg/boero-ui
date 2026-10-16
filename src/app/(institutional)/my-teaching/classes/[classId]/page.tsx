@@ -6,6 +6,7 @@ import { DataTableNavigationProvider } from "@common/components/ui/data-table-na
 import { isValidUuid } from "@common/utils/action-argument.util";
 
 import { CourseEnrollmentTable } from "@features/course-enrollments/components/course-enrollment-table";
+import { PublishGradesButton } from "@features/course-enrollments/components/publish-grades-button";
 import { fetchTeacherClassEnrollments } from "@features/course-enrollments/services/teacher-course.service";
 import {
   parseCourseEnrollmentPaginationParams,
@@ -45,9 +46,20 @@ export default async function TeacherClassPage({
     <PlatformPageShell
       title="Cursadas de mi clase"
       breadcrumb={<InstitutionalBreadcrumb hiddenSegments={[classId]} segmentLabels={{ classes: "Cursadas de mi clase" }} />}
+      actions={<PublishGradesButton classId={classId} mode="teacher" />}
     >
       <DataTableNavigationProvider>
-        <CourseEnrollmentTable data={data} page={page} size={size} emptyMessage="Esta clase todavía no tiene cursadas." />
+        <CourseEnrollmentTable
+          data={data}
+          page={page}
+          size={size}
+          emptyMessage="Esta clase todavía no tiene cursadas."
+          gradeMode="teacher"
+          canReadGrades
+          canCreateGrade
+          canUpdateGrade
+          canDeleteGrade
+        />
       </DataTableNavigationProvider>
     </PlatformPageShell>
   );

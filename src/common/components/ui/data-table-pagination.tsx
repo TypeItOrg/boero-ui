@@ -9,6 +9,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import type { PaginationParams } from "@common/types/pagination-params.types";
 
 type DataTablePaginationProps = PaginationParams & {
+  /**
+   * Renders the summary and controls inline (single row) as soon as the container allows it (@2xl) instead of waiting for a wide container (@4xl).
+   * Below @2xl it stacks exactly like the default arrangement, and at/above @4xl both arrangements are equivalent.
+   */
+  isInline?: boolean;
   isPending?: boolean;
   pageSizeCompactLabel?: string;
   pageSizeLabel?: string;
@@ -43,6 +48,7 @@ export function DataTablePagination({
   summaryLabel,
   totalPages,
   pageSizeOptions,
+  isInline = false,
   isPending = false,
   pageSizeCompactLabel = "Filas",
   pageSizeLabel = "Filas por página",
@@ -55,12 +61,20 @@ export function DataTablePagination({
 
   const canGoToNextPage = page < totalPages - 1;
 
+  const summaryRowClassName = isInline
+    ? "grid gap-4 @2xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @2xl/table-pagination:items-center"
+    : "grid gap-4 @4xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @4xl/table-pagination:items-center";
+
+  const controlsRowClassName = isInline
+    ? "grid gap-4 @2xl/table-pagination:flex @2xl/table-pagination:items-center @2xl/table-pagination:gap-6"
+    : "grid gap-4 @2xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @2xl/table-pagination:items-center @4xl/table-pagination:flex @4xl/table-pagination:gap-6";
+
   return (
     <nav aria-label="Paginación de tabla" className="@container/table-pagination px-1">
-      <div className="grid gap-4 @4xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @4xl/table-pagination:items-center">
+      <div className={summaryRowClassName}>
         <p className="text-muted-foreground min-w-0 truncate text-sm">{summaryLabel}</p>
 
-        <div className="grid gap-4 @2xl/table-pagination:grid-cols-[minmax(0,1fr)_auto] @2xl/table-pagination:items-center @4xl/table-pagination:flex @4xl/table-pagination:gap-6">
+        <div className={controlsRowClassName}>
           <PageSizeSelect
             compactLabel={pageSizeCompactLabel}
             disabled={isPending}

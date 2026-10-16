@@ -13,12 +13,15 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@c
 import type { PaginatedResponse } from "@common/types/paginated-response.types";
 import { getDataTableEmptyContent } from "@common/utils/data-table-empty-content.util";
 
+import { CourseEnrollmentGradeDialog } from "@features/course-enrollments/components/course-enrollment-grade-dialog";
 import { CourseEnrollmentMutationDialog } from "@features/course-enrollments/components/course-enrollment-mutation-dialog";
 import { CourseEnrollmentPagination } from "@features/course-enrollments/components/course-enrollment-pagination";
 import { CourseEnrollmentResultsTable } from "@features/course-enrollments/components/course-enrollment-results-table";
 import type { AcademicEnrollmentStatus } from "@features/course-enrollments/types/academic-enrollment-status.types";
 import type { CourseEnrollmentStatus } from "@features/course-enrollments/types/course-enrollment-status.types";
 import type { CourseEnrollment } from "@features/course-enrollments/types/course-enrollment.types";
+import { INSTITUTIONAL_PERMISSION as P } from "@features/institutional-auth/types/institutional-permission.types";
+import { scopeIncludesTrainingPath } from "@features/institutional-auth/utils/institutional-permission.util";
 
 type CourseEnrollmentTableProps = {
   permissionScopes?: import("@features/institutional-auth/types/institutional-user.types").InstitutionalUser["permissionScopes"];
@@ -31,6 +34,11 @@ type CourseEnrollmentTableProps = {
   canWithdraw?: boolean;
   canUpdateAcademicStatus?: boolean;
   detailBasePath?: string;
+  gradeMode?: "institutional" | "teacher";
+  canReadGrades?: boolean;
+  canCreateGrade?: boolean;
+  canUpdateGrade?: boolean;
+  canDeleteGrade?: boolean;
 };
 
 export function CourseEnrollmentTable({
@@ -44,6 +52,11 @@ export function CourseEnrollmentTable({
   canWithdraw = false,
   canUpdateAcademicStatus = false,
   detailBasePath,
+  gradeMode,
+  canReadGrades = false,
+  canCreateGrade = false,
+  canUpdateGrade = false,
+  canDeleteGrade = false,
 }: CourseEnrollmentTableProps): ReactElement {
   const router = useRouter();
 
@@ -54,13 +67,15 @@ export function CourseEnrollmentTable({
     mode: "withdraw" | "academic";
   }>();
 
+  const [gradeEnrollment, setGradeEnrollment] = useState<CourseEnrollment | null>(null);
+
   const hasFilters = status !== undefined || academicStatus !== undefined;
 
   const hasItemsOnOtherPages = data.totalItems > 0;
 
   const EmptyIcon = hasFilters && !hasItemsOnOtherPages ? SearchIcon : ScrollTextIcon;
 
-  const showActionsColumn = Boolean(detailBasePath) || canWithdraw || canUpdateAcademicStatus;
+  const showActionsColumn = Boolean(detailBasePath) || canWithdraw || canUpdateAcademicStatus || canReadGrades;
 
   if (data.items.length === 0) {
     const emptyContent = getDataTableEmptyContent({
@@ -114,6 +129,9 @@ export function CourseEnrollmentTable({
           canUpdateAcademicStatus={canUpdateAcademicStatus}
           detailBasePath={detailBasePath}
           setMutation={setMutation}
+          gradeMode={gradeMode}
+          canReadGrades={canReadGrades}
+          setGradeEnrollment={setGradeEnrollment}
         />
 
         {isNavigating && (
@@ -127,6 +145,34 @@ export function CourseEnrollmentTable({
 
       <CourseEnrollmentPagination page={page} size={size} totalItems={data.totalItems} totalPages={data.totalPages} />
 
+      {gradeEnrollment && gradeMode ? (
+        <CourseEnrollmentGradeDialog
+          enrollment={gradeEnrollment}
+          mode={gradeMode}
+          canCreate={
+            gradeMode === "teacher"
+              ? canCreateGrade
+              : canCreateGrade && scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_CREATE, gradeEnrollment.trainingPathId)
+          }
+          canUpdate={
+            gradeMode === "teacher"
+              ? canUpdateGrade
+              : canUpdateGrade && scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_UPDATE, gradeEnrollment.trainingPathId)
+          }
+          canDelete={
+            gradeMode === "teacher"
+              ? canDeleteGrade
+              : canDeleteGrade && scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_DELETE, gradeEnrollment.trainingPathId)
+          }
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setGradeEnrollment(null);
+            }
+          }}
+          onChanged={() => router.refresh()}
+        />
+      ) : null}
       {mutation ? (
         <CourseEnrollmentMutationDialog
           enrollment={mutation.enrollment}

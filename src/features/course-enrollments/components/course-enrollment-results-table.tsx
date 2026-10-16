@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableRow } from "@common/components/ui/tab
 import { formatStudyPlanLabel } from "@features/academic/utils/study-plan-label.util";
 import { CourseEnrollmentSchedules } from "@features/course-enrollments/components/course-enrollment-schedules";
 import { CourseEnrollmentTableHeader } from "@features/course-enrollments/components/course-enrollment-table-header";
+import { COURSE_ENROLLMENT_GRADE_MESSAGES } from "@features/course-enrollments/constants/course-enrollment-grade.constants";
 import type { CourseEnrollmentResultsTableProps } from "@features/course-enrollments/types/course-enrollment-results-table-props.types";
 import { getCourseEnrollmentSituationLabel } from "@features/course-enrollments/utils/course-enrollment-situation.util";
 import { INSTITUTIONAL_PERMISSION as P } from "@features/institutional-auth/types/institutional-permission.types";
@@ -28,6 +29,9 @@ export function CourseEnrollmentResultsTable({
   canUpdateAcademicStatus,
   detailBasePath,
   setMutation,
+  gradeMode,
+  canReadGrades,
+  setGradeEnrollment,
 }: CourseEnrollmentResultsTableProps): ReactElement {
   return (
     <Table className="min-w-192">
@@ -45,13 +49,17 @@ export function CourseEnrollmentResultsTable({
             enrollment.status !== "WITHDRAWN" &&
             enrollment.status !== "ADMINISTRATIVELY_WITHDRAWN";
 
-          const hasActions = Boolean(detailBasePath) || canWithdrawEnrollment || canUpdateResult;
+          const canViewGrades =
+            canReadGrades &&
+            (gradeMode === "teacher" || scopeIncludesTrainingPath(permissionScopes, P.COURSE_ENROLLMENT_GRADE_READ, enrollment.trainingPathId));
+
+          const hasActions = Boolean(detailBasePath) || canWithdrawEnrollment || canUpdateResult || canViewGrades;
 
           function renderActions(
             Item: typeof DropdownMenuItem | typeof ContextMenuItem,
             Separator: typeof DropdownMenuSeparator | typeof ContextMenuSeparator,
           ): ReactElement {
-            const hasActionBeforeWithdrawal = Boolean(detailBasePath) || canUpdateResult;
+            const hasActionBeforeWithdrawal = Boolean(detailBasePath) || canUpdateResult || canViewGrades;
 
             return (
               <>
@@ -60,6 +68,11 @@ export function CourseEnrollmentResultsTable({
                     <ReturnToLink href={`${detailBasePath}/${enrollment.id}`} className="px-2.5 py-1.5">
                       Ver detalle
                     </ReturnToLink>
+                  </Item>
+                ) : null}
+                {canViewGrades && gradeMode ? (
+                  <Item className="px-2.5 py-1.5" onSelect={() => setGradeEnrollment(enrollment)}>
+                    {COURSE_ENROLLMENT_GRADE_MESSAGES.VIEW_GRADES}
                   </Item>
                 ) : null}
                 {canUpdateResult ? (

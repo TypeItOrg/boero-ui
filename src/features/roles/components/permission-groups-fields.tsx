@@ -13,8 +13,6 @@ import type { InstitutionPermissionGroup } from "@features/roles/types/instituti
 import type { InstitutionPermission } from "@features/roles/types/institution-permission.types";
 import { getPermissionMap, getPermissionTree } from "@features/roles/utils/permission-hierarchy.util";
 
-const HIDDEN_PERMISSION_GROUP_CODES = new Set(["GRADES"]);
-
 type PermissionGroupsFieldsProps = {
   groups: readonly InstitutionPermissionGroup[];
   selectedPermissions?: readonly string[];
@@ -28,7 +26,7 @@ export function PermissionGroupsFields({
   protectedPermissions = [],
   inputIdPrefix = "permission",
 }: PermissionGroupsFieldsProps): ReactElement {
-  const visibleGroups = useMemo(() => groups.filter((group) => !HIDDEN_PERMISSION_GROUP_CODES.has(group.code)), [groups]);
+  const visibleGroups = groups;
 
   const permissions = useMemo(() => getPermissionMap(visibleGroups), [visibleGroups]);
 

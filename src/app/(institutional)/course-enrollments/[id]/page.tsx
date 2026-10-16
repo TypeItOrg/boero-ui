@@ -9,6 +9,7 @@ import { getSafeReturnTo } from "@common/utils/return-to.util";
 
 import { CourseEnrollmentDetail } from "@features/course-enrollments/components/course-enrollment-detail";
 import { CourseEnrollmentDetailActions } from "@features/course-enrollments/components/course-enrollment-detail-actions";
+import { CourseEnrollmentDetailGradeSection } from "@features/course-enrollments/components/course-enrollment-detail-grade-section";
 import { fetchCourseEnrollment, fetchCourseEnrollmentHistory } from "@features/course-enrollments/services/course-enrollment.service";
 import { InstitutionalAccessDenied } from "@features/institutional-auth/components/institutional-access-denied";
 import { InstitutionalBreadcrumb } from "@features/institutional-auth/components/institutional-breadcrumb";
@@ -64,6 +65,13 @@ export default async function CourseEnrollmentDetailPage({
         canReadWaitlist={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_WAITLIST_READ, enrollment.trainingPathId)}
       />
       <CourseEnrollmentDetail enrollment={enrollment} history={history} />
+      <CourseEnrollmentDetailGradeSection
+        enrollment={enrollment}
+        canRead={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_READ, enrollment.trainingPathId)}
+        canCreate={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_CREATE, enrollment.trainingPathId)}
+        canUpdate={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_UPDATE, enrollment.trainingPathId)}
+        canDelete={hasTrainingPathPermission(user, INSTITUTIONAL_PERMISSION.COURSE_ENROLLMENT_GRADE_DELETE, enrollment.trainingPathId)}
+      />
     </PlatformPageShell>
   );
 }
